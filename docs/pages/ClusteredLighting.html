@@ -15,7 +15,7 @@
 			<header>
 				<div class="class-description"><p>A custom lighting implementation based on Forward+ Clustered Shading that
 overwrites the default lighting system in <a href="WebGPURenderer.html">WebGPURenderer</a>. Suitable
-for 3D scenes with many point lights and real depth complexity — the view
+for 3D scenes with many point and spot lights and real depth complexity — the view
 frustum is partitioned into a 3D cluster grid so only the lights actually
 reaching each fragment are evaluated.</p></div>
 				<h2>Code Example</h2>
@@ -41,7 +41,7 @@ renderer.lighting = lighting; // set lighting system
 										<strong translate="no">maxLights</strong>
 									</td>
 									<td class="description last">
-										<p>Maximum number of point lights.</p>
+										<p>Maximum number of point and spot lights.</p>
 										<p>Default is <code>1024</code>.</p>
 									</td>
 								</tr>
@@ -82,6 +82,30 @@ renderer.lighting = lighting; // set lighting system
 					<dd></dd>
 				</dl>
 				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="beginRender" translate="no">.<a href="#beginRender">beginRender</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Saves the lights of the scene's lights node and fits its cluster grid to the framebuffer
+of the render. This happens before any render object of the render is prepared, and the
+node of this depth is not used by any pending command buffer, so resources replaced by a
+rebuild are freed immediately.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Lighting.html#beginRender">Lighting#beginRender</a></dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="createNode" translate="no">.<a href="#createNode">createNode</a><span class="signature">( lights : <span class="param-type">Array.&lt;<a href="Light.html">Light</a>></span> )</span><span class="type-signature"> : <a href="ClusteredLightsNode.html">ClusteredLightsNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -106,6 +130,53 @@ all custom lighting implementations.</p>
 						</dl>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The clustered lights node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="finishRender" translate="no">.<a href="#finishRender">finishRender</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Restores the lights of the scene's lights node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Lighting.html#finishRender">Lighting#finishRender</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getNode" translate="no">.<a href="#getNode">getNode</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span> )</span><span class="type-signature"> : <a href="LightsNode.html">LightsNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the lights node of the given scene for the current render depth of that scene.
+A scene rendered inside one of its own renders uses another node, so it never modifies
+the cluster data of the outer render, which has not been submitted yet.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Lighting.html#getNode">Lighting#getNode</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The lights node.</dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

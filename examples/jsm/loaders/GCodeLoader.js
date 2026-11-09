@@ -57,6 +57,8 @@ class GCodeLoader extends Loader {
 		const scope = this;
 
 		const loader = new FileLoader( scope.manager );
+		loader.setPriority( scope.priority );
+		loader.setCache( scope.cache );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
@@ -153,7 +155,7 @@ class GCodeLoader extends Loader {
 
 		for ( let i = 0; i < lines.length; i ++ ) {
 
-			const tokens = lines[ i ].split( ' ' );
+			const tokens = lines[ i ].trim().split( /\s+/ );
 			const cmd = tokens[ 0 ].toUpperCase();
 
 			//Arguments

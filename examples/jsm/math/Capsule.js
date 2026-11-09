@@ -120,6 +120,7 @@ class Capsule {
 
 	/**
 	 * Returns `true` if the given bounding box intersects with this capsule.
+	 * The test is conservative so it may report false positives.
 	 *
 	 * @param {Box3} box - The bounding box to test.
 	 * @return {boolean} Whether the given bounding box intersects with this capsule.

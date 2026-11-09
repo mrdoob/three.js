@@ -1,8 +1,8 @@
 # PMREMGenerator
 
-This class generates a Prefiltered, Mipmapped Radiance Environment Map (PMREM) from a cubeMap environment texture. This allows different levels of blur to be quickly accessed based on material roughness. It is packed into a special CubeUV format that allows us to perform custom interpolation so that we can support nonlinear formats such as RGBE. Unlike a traditional mipmap chain, it only goes down to the LOD\_MIN level (above), and then creates extra even more filtered 'mips' at the same LOD\_MIN resolution, associated with higher roughness levels. In this way we maintain resolution to smoothly interpolate diffuse lighting while limiting sampling computation.
+Generates a Prefiltered, Mipmapped Radiance Environment Map (PMREM) for image-based lighting. The result is a cube render target whose mip levels store GGX-filtered radiance at increasing roughness, from a mirror at level 0 to roughness 1. See [PMREMGenerator.lodToRoughness](PMREMGenerator.html#.lodToRoughness) for the mapping.
 
-The prefiltering uses GGX VNDF (Visible Normal Distribution Function) importance sampling based on "Sampling the GGX Distribution of Visible Normals" (Heitz, 2018) to generate environment maps that accurately match the GGX BRDF used in material rendering for physically-based image-based lighting.
+Filtering assumes the view direction equals the surface normal. Sharp levels use GGX visible normal sampling (Heitz, 2018), while rough levels integrate a lower-resolution source cubemap.
 
 ## Constructor
 
@@ -13,6 +13,10 @@ Constructs a new PMREM generator.
 **renderer**
 
 The renderer.
+
+See:
+
+*   [Sampling the GGX Distribution of Visible Normals](https://jcgt.org/published/0007/04/01/)
 
 ## Methods
 
@@ -26,11 +30,11 @@ Pre-compiles the equirectangular shader. You can get faster start-up by invoking
 
 ### .dispose()
 
-Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static class, so you should not need more than one PMREMGenerator object. If you do, calling dispose() on one of them will cause any others to also become unusable.
+Disposes of the PMREMGenerator's internal memory. The PMREMs it returned belong to the caller and are not disposed.
 
-### .fromCubemap( cubemap : Texture, renderTarget : WebGLRenderTarget ) : WebGLRenderTarget
+### .fromCubemap( cubemap : Texture, renderTarget : WebGLCubeRenderTarget ) : WebGLCubeRenderTarget
 
-Generates a PMREM from an cubemap texture, which can be either LDR or HDR. The ideal input cube size is 256 x 256, as this matches best with the 256 x 256 cubemap output. The minimum supported input cube size is 16 x 16 per face.
+Generates a PMREM from an LDR or HDR cubemap. The cube face size matches the input, rounded down to a power of two and at least 256.
 
 **cubemap**
 
@@ -44,9 +48,9 @@ Default is `null`.
 
 **Returns:** The resulting PMREM.
 
-### .fromEquirectangular( equirectangular : Texture, renderTarget : WebGLRenderTarget ) : WebGLRenderTarget
+### .fromEquirectangular( equirectangular : Texture, renderTarget : WebGLCubeRenderTarget ) : WebGLCubeRenderTarget
 
-Generates a PMREM from an equirectangular texture, which can be either LDR or HDR. The ideal input image size is 1k (1024 x 512), as this matches best with the 256 x 256 cubemap output. The minimum supported input image size is 64 x 32.
+Generates a PMREM from an LDR or HDR equirectangular texture. The cube face size is one quarter of the image width, rounded down to a power of two and at least 256.
 
 **equirectangular**
 
@@ -60,9 +64,9 @@ Default is `null`.
 
 **Returns:** The resulting PMREM.
 
-### .fromScene( scene : Scene, sigma : number, near : number, far : number, options : Object ) : WebGLRenderTarget
+### .fromScene( scene : Scene, sigma : number, near : number, far : number, options : Object ) : WebGLCubeRenderTarget
 
-Generates a PMREM from a supplied Scene, which can be faster than using an image if networking bandwidth is low. Optional sigma specifies a blur radius in radians to be applied to the scene before PMREM generation. Optional near and far planes ensure the scene is rendered in its entirety.
+Generates a PMREM from a scene, optionally applying a Gaussian blur before GGX filtering.
 
 **scene**
 
@@ -94,7 +98,7 @@ Default is `{}`.
 
 **size**
 
-The texture size of the PMREM.
+The texture size of the PMREM, rounded down to a power of two and at least 256.
 
 Default is `256`.
 
@@ -105,6 +109,22 @@ The position of the internal cube camera that renders the scene.
 Default is `origin`.
 
 **Returns:** The resulting PMREM.
+
+## Static Methods
+
+### .lodToRoughness( lod : number, maxLod : number ) : number
+
+Returns the roughness a mip level of a PMREM has been prefiltered for. The inverse mapping is used by the renderers when sampling a PMREM.
+
+**lod**
+
+The mip level.
+
+**maxLod**
+
+The last mip level of the PMREM.
+
+**Returns:** The roughness.
 
 ## Source
 

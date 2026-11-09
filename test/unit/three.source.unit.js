@@ -170,8 +170,8 @@ import './src/materials/MeshPhongMaterial.tests.js';
 import './src/materials/MeshPhysicalMaterial.tests.js';
 import './src/materials/MeshStandardMaterial.tests.js';
 import './src/materials/MeshToonMaterial.tests.js';
+import './src/materials/NodeMaterialInstance.tests.js';
 import './src/materials/PointsMaterial.tests.js';
-import './src/materials/ProxyNodeMaterial.tests.js';
 import './src/materials/RawShaderMaterial.tests.js';
 import './src/materials/ShaderMaterial.tests.js';
 import './src/materials/ShadowMaterial.tests.js';
@@ -231,6 +231,9 @@ import './src/renderers/WebGL3DRenderTarget.tests.js';
 import './src/renderers/WebGLArrayRenderTarget.tests.js';
 import './src/renderers/WebGLCubeRenderTarget.tests.js';
 import './src/renderers/WebGLRenderTarget.tests.js';
+
+//src/renderers/common
+import './src/renderers/common/ClippingContext.tests.js';
 
 //src/renderers/shaders
 import './src/renderers/shaders/ShaderChunk.tests.js';

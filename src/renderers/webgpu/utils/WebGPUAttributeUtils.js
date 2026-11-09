@@ -355,17 +355,19 @@ class WebGPUAttributeUtils {
 
 				let arrayStride, stepMode;
 
-				if ( geometryAttribute.isInterleavedBufferAttribute === true ) {
+				// the layout is defined by the buffer, interleaved attributes can also view a buffer attribute
 
-					arrayStride = geometryAttribute.data.stride * bytesPerElement;
-					stepMode = geometryAttribute.data.isInstancedInterleavedBuffer ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
+				if ( bufferAttribute.isInterleavedBuffer === true ) {
+
+					arrayStride = bufferAttribute.stride * bytesPerElement;
+					stepMode = bufferAttribute.isInstancedInterleavedBuffer ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
 
 				} else {
 
-					arrayStride = geometryAttribute.itemSize * bytesPerElement;
-					stepMode = geometryAttribute.isInstancedBufferAttribute ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
+					arrayStride = bufferAttribute.itemSize * bytesPerElement;
+					stepMode = bufferAttribute.isInstancedBufferAttribute ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
 
-					if ( geometryAttribute.itemSize > 1 && arrayStride % 4 !== 0 ) {
+					if ( bufferAttribute.itemSize > 1 && arrayStride % 4 !== 0 ) {
 
 						// packed attribute data are padded per vertex on upload
 

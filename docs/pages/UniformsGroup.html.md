@@ -112,6 +112,14 @@ Returns a new uniforms group with copied values from this instance.
 
 **Returns:** A clone of this instance.
 
+### .clone() : UniformsGroup
+
+Returns a clone of this uniforms group. The clone has its own buffer and update state.
+
+**Overrides:** [UniformBuffer#clone](UniformBuffer.html#clone)
+
+**Returns:** The cloned uniforms group.
+
 ### .copy( source : UniformsGroup ) : UniformsGroup
 
 Copies the values of the given uniforms group to this instance.

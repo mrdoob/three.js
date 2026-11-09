@@ -53,6 +53,8 @@ class AMFLoader extends Loader {
 		const scope = this;
 
 		const loader = new FileLoader( scope.manager );
+		loader.setPriority( scope.priority );
+		loader.setCache( scope.cache );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
@@ -232,19 +234,19 @@ class AMFLoader extends Loader {
 
 				if ( matColor.nodeName === 'r' ) {
 
-					color.r = matColor.textContent;
+					color.r = parseFloat( matColor.textContent );
 
 				} else if ( matColor.nodeName === 'g' ) {
 
-					color.g = matColor.textContent;
+					color.g = parseFloat( matColor.textContent );
 
 				} else if ( matColor.nodeName === 'b' ) {
 
-					color.b = matColor.textContent;
+					color.b = parseFloat( matColor.textContent );
 
 				} else if ( matColor.nodeName === 'a' ) {
 
-					color.a = matColor.textContent;
+					color.a = parseFloat( matColor.textContent );
 
 				}
 

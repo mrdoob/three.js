@@ -18,6 +18,8 @@ The node type.
 
 Default is `null`.
 
+**Deprecated:** Extend Node instead.
+
 ## Properties
 
 ### .isTempNode : boolean (readonly)

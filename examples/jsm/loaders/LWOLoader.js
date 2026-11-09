@@ -87,6 +87,8 @@ class LWOLoader extends Loader {
 		const modelName = url.split( path ).pop().split( '.' )[ 0 ];
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setWithCredentials( this.withCredentials );
 		loader.setPath( scope.path );
@@ -137,6 +139,8 @@ class LWOLoader extends Loader {
 		// console.log( 'lwoTree', lwoTree );
 
 		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		textureLoader.setPriority( this.priority );
+		textureLoader.setCache( this.cache );
 
 		return new LWOTreeParser( textureLoader ).parse( modelName );
 

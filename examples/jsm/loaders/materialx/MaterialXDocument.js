@@ -23,7 +23,6 @@ import {
 	mat3,
 	mat4,
 	element,
-	mx_transform_uv,
 	mx_srgb_texture_to_lin_rec709,
 	positionLocal,
 	positionWorld,
@@ -171,7 +170,6 @@ function getBottomLeftUvSpaceHelpers( uvSpace ) {
 	const helper = uvSpace === 'top-left' ? mxFlipUvY : mxIdentityUv;
 	return {
 		mxToBottomLeftUvSpace: helper,
-		mxFromBottomLeftUvSpace: helper,
 	};
 
 }
@@ -1018,6 +1016,8 @@ class MaterialXDocument {
 			compileRegistry: COMPILE_REGISTRY,
 			nodeLibrary: MtlXLibrary,
 			...bottomLeftUvSpaceHelpers,
+			// Graph coordinates start at the bottom-left; images are stored top-first.
+			mxToImageUv: ( uvNode ) => uvNode.flipY(),
 			getTexcoordNode: ( index = 0 ) => bottomLeftUvSpaceHelpers.mxToBottomLeftUvSpace( uv( index ) ),
 			getGeomPropNode: ( name ) => {
 
@@ -1026,7 +1026,6 @@ class MaterialXDocument {
 				return GEOMPROP_NODES[ name ];
 
 			},
-			mxTransformUv: mx_transform_uv,
 			mxHextileCoord,
 			mxHextileComputeBlendWeights,
 			invertConstantMatrixValues,

@@ -95,6 +95,26 @@ Node.prototype.get = function ( value ) {
 
 const proto = {};
 
+// Cache of the swizzle and element nodes, a proxy of a node has its own cache
+
+const _swizzleCache = new WeakMap();
+
+function getSwizzleCache( node ) {
+
+	let cache = _swizzleCache.get( node );
+
+	if ( cache === undefined ) {
+
+		cache = {};
+
+		_swizzleCache.set( node, cache );
+
+	}
+
+	return cache;
+
+}
+
 // Set swizzle properties for xyzw, rgba, and stpq.
 
 function setProtoSwizzle( property, altA, altB ) {
@@ -105,17 +125,17 @@ function setProtoSwizzle( property, altA, altB ) {
 
 		get() {
 
-			this._cache = this._cache || {};
+			const cache = getSwizzleCache( this );
 
 			//
 
-			let split = this._cache[ property ];
+			let split = cache[ property ];
 
 			if ( split === undefined ) {
 
 				split = new SplitNode( this, property );
 
-				this._cache[ property ] = split;
+				cache[ property ] = split;
 
 			}
 
@@ -211,17 +231,17 @@ for ( let i = 0; i < 32; i ++ ) {
 
 		get() {
 
-			this._cache = this._cache || {};
+			const cache = getSwizzleCache( this );
 
 			//
 
-			let element = this._cache[ i ];
+			let element = cache[ i ];
 
 			if ( element === undefined ) {
 
 				element = new ArrayElementNode( this, new ConstNode( i, 'uint' ) );
 
-				this._cache[ i ] = element;
+				cache[ i ] = element;
 
 			}
 
@@ -248,17 +268,17 @@ function setProtoProperty( property, target ) {
 
 		get() {
 
-			this._cache = this._cache || {};
+			const cache = getSwizzleCache( this );
 
 			//
 
-			let split = this._cache[ target ];
+			let split = cache[ target ];
 
 			if ( split === undefined ) {
 
 				split = new SplitNode( this, target );
 
-				this._cache[ target ] = split;
+				cache[ target ] = split;
 
 			}
 
@@ -646,7 +666,9 @@ class ShaderCallNodeInternal extends Node {
 
 	build( builder, output = null ) {
 
-		// The call does not use Node.build(), so it handles shared and overridden nodes and assignable state here.
+		// The call does not use Node.build(), so it handles the inspector node, shared and overridden nodes and assignable state here.
+		this._setupInspector( builder );
+
 		const refNode = this.getShared( builder );
 
 		if ( this !== refNode ) {

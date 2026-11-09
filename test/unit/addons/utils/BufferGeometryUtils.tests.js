@@ -1,4 +1,4 @@
-import { BufferAttribute, BufferGeometry, DynamicDrawUsage, Float16BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute } from 'three';
+import { Bone, BufferAttribute, BufferGeometry, DynamicDrawUsage, Float16BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Skeleton, SkinnedMesh, Vector3 } from 'three';
 import * as BufferGeometryUtils from '../../../../examples/jsm/utils/BufferGeometryUtils.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
@@ -329,6 +329,37 @@ export default QUnit.module( 'Addons', () => {
 					assert.deepEqual( Array.from( normal.array ), [ 0, 0, 1, 0, 0, 1 ], 'keeps normals' );
 					assert.deepEqual( Array.from( morphPosition0.array ), [ 0, 1, 0, 1, 1, 0 ], 'keeps first morph target' );
 					assert.deepEqual( Array.from( morphPosition1.array ), [ 0, 2, 0, 1, 2, 0 ], 'keeps second morph target' );
+
+				} );
+
+			} );
+
+			QUnit.module( 'computeMorphedAttributes', () => {
+
+				QUnit.test( 'transforms skinned normals as directions', ( assert ) => {
+
+					const geometry = new BufferGeometry();
+					geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 0, 0, 0, 1, 0, 0, 0, 0, 1 ] ), 3 ) );
+					geometry.setAttribute( 'normal', new BufferAttribute( new Float32Array( [ 0, 1, 0, 0, 1, 0, 0, 1, 0 ] ), 3 ) );
+					geometry.setAttribute( 'skinIndex', new BufferAttribute( new Uint16Array( 12 ), 4 ) );
+					geometry.setAttribute( 'skinWeight', new BufferAttribute( new Float32Array( [ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 ] ), 4 ) );
+
+					const bone = new Bone();
+					const mesh = new SkinnedMesh( geometry );
+					mesh.add( bone );
+					mesh.bind( new Skeleton( [ bone ] ) );
+
+					bone.position.set( 5, 0, 0 );
+					bone.rotation.z = Math.PI / 2;
+					mesh.updateMatrixWorld( true );
+
+					const { morphedPositionAttribute, morphedNormalAttribute } = BufferGeometryUtils.computeMorphedAttributes( mesh );
+
+					const position = new Vector3().fromBufferAttribute( morphedPositionAttribute, 1 );
+					const normal = new Vector3().fromBufferAttribute( morphedNormalAttribute, 1 );
+
+					assert.ok( position.distanceTo( new Vector3( 5, 1, 0 ) ) < 1e-6, 'positions are rotated and translated' );
+					assert.ok( normal.distanceTo( new Vector3( - 1, 0, 0 ) ) < 1e-6, 'normals are only rotated' );
 
 				} );
 

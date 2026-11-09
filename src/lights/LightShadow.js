@@ -63,6 +63,28 @@ class LightShadow {
 		this.biasNode = null;
 
 		/**
+		 * A custom shadow filter function. Only supported with `WebGPURenderer`.
+		 *
+		 * If a filter node is defined, it replaces the filter selected by the
+		 * renderer's shadow map type.
+		 *
+		 * @type {?Function}
+		 * @default null
+		 */
+		this.filterNode = null;
+
+		/**
+		 * A custom shadow node that replaces the default shadow node of the light.
+		 * Only supported with `WebGPURenderer`.
+		 *
+		 * The node is bound to its light, so `copy()` and `clone()` do not transfer it.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.shadowNode = null;
+
+		/**
 		 * Defines how much the position used to query the shadow map is offset along
 		 * the object normal. The default is `0`. Increasing this value can be used to
 		 * reduce shadow acne especially in large scenes where light shines onto
@@ -331,8 +353,10 @@ class LightShadow {
 		this.blurSamples = source.blurSamples;
 
 		this.mapSize.copy( source.mapSize );
+		this.mapType = source.mapType;
 
 		this.biasNode = source.biasNode;
+		this.filterNode = source.filterNode;
 
 		return this;
 
@@ -365,6 +389,7 @@ class LightShadow {
 		object.radius = this.radius;
 		object.blurSamples = this.blurSamples;
 		object.mapSize = this.mapSize.toArray();
+		object.mapType = this.mapType;
 
 		object.camera = this.camera.toJSON( false ).object;
 		delete object.camera.matrix;

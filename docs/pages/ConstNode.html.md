@@ -28,6 +28,12 @@ This flag can be used for type testing.
 
 Default is `true`.
 
+### .isWeak : boolean
+
+Whether this constant is an implicit number whose type can adapt to other operands.
+
+Default is `false`.
+
 ## Methods
 
 ### .generateConst( builder : NodeBuilder ) : string

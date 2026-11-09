@@ -101,6 +101,7 @@ export class RendererInspector extends InspectorBase {
 
 		this.overdraw = false;
 		this._overdrawMaterial = null;
+		this._renderingOverdraw = false;
 
 		this.isRendererInspector = true;
 
@@ -163,12 +164,6 @@ export class RendererInspector extends InspectorBase {
 
 		this._lastFinishTime = now;
 
-		if ( this.overdraw === true ) {
-
-			this._renderOverdraw();
-
-		}
-
 	}
 
 	_renderOverdraw() {
@@ -203,7 +198,11 @@ export class RendererInspector extends InspectorBase {
 
 		scene.overrideMaterial = this._overdrawMaterial;
 
+		this._renderingOverdraw = true;
+
 		renderer.render( scene, camera );
+
+		this._renderingOverdraw = false;
 
 		RendererUtils.restoreRendererAndSceneState( renderer, scene, state );
 
@@ -589,6 +588,14 @@ export class RendererInspector extends InspectorBase {
 
 		this.currentContext = currentRender.parent;
 		this.currentRender = currentRender.parent && currentRender.parent.isRenderStats ? currentRender.parent : null;
+
+		// draw over each top-level render to the canvas, the frame finishes only at the start of the next one
+
+		if ( this.overdraw === true && this._renderingOverdraw === false && currentRender.parent === frame && this.getRenderer().getRenderTarget() === null ) {
+
+			this._renderOverdraw();
+
+		}
 
 	}
 

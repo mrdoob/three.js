@@ -6,6 +6,7 @@ import BasicLightingModel from '../../nodes/functions/BasicLightingModel.js';
 import { normalViewGeometry } from '../../nodes/accessors/Normal.js';
 import { diffuseColor } from '../../nodes/core/PropertyNode.js';
 import { negateOnBackSide } from '../../nodes/display/FrontFacingNode.js';
+import { vec3 } from '../../nodes/tsl/TSLBase.js';
 
 import { MeshBasicMaterial } from '../MeshBasicMaterial.js';
 
@@ -96,7 +97,11 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 
 		let node = null;
 
-		if ( builder.material.lightMap ) {
+		if ( this.lightMapNode !== null ) {
+
+			node = new BasicLightMapNode( vec3( this.lightMapNode ) );
+
+		} else if ( builder.material.lightMap ) {
 
 			node = new BasicLightMapNode( materialLightMap );
 

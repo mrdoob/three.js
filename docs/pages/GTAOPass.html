@@ -240,12 +240,15 @@ previous pass from this buffer.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Pass.html#render">Pass#render</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setGBuffer" translate="no">.<a href="#setGBuffer">setGBuffer</a><span class="signature">( depthTexture : <span class="param-type"><a href="DepthTexture.html">DepthTexture</a></span>, normalTexture : <span class="param-type"><a href="DepthTexture.html">DepthTexture</a></span> )</span> </h3>
+					<h3 class="name name-method" id="setGBuffer" translate="no">.<a href="#setGBuffer">setGBuffer</a><span class="signature">( depthTexture : <span class="param-type"><a href="DepthTexture.html">DepthTexture</a></span>, normalTexture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Configures the GBuffer of this pass. If no arguments are passed,
 the pass creates an internal render target for holding depth
-and normal data.</p>
+and normal data. External depth and normal data must use separate
+textures and remain owned by the caller.
+If no normal texture is supplied, normals are reconstructed from depth
+for AO and denoising, and the normal output displays black.</p>
 						</div>
 						<table class="params">
 							<tbody>

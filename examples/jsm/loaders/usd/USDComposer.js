@@ -898,6 +898,8 @@ class USDComposer {
 
 			const composer = new USDComposer( this.manager );
 			composer.imageLoader.setCrossOrigin( this.imageLoader.crossOrigin );
+			composer.imageLoader.setPriority( this.imageLoader.priority );
+			composer.imageLoader.setCache( this.imageLoader.cache );
 			const newBasePath = this._getBasePath( resolvedPath );
 			const composedGroup = composer.compose( referencedData, this.assets, mergedVariants, newBasePath );
 

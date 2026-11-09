@@ -64,6 +64,8 @@ class PLYLoader extends Loader {
 		const scope = this;
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
@@ -702,6 +704,7 @@ class PLYLoader extends Loader {
 					// convert to float for color space conversion
 
 					const scale = getColorScale( color.type );
+					const isFloat = isFloatType( color.type );
 
 					_color.setRGB(
 						element[ color.names[ 0 ] ] * scale,
@@ -714,9 +717,9 @@ class PLYLoader extends Loader {
 
 					const invScale = 1 / scale;
 
-					const r = _color.r * invScale;
-					const g = _color.g * invScale;
-					const b = _color.b * invScale;
+					const r = isFloat ? _color.r : Math.round( _color.r * invScale );
+					const g = isFloat ? _color.g : Math.round( _color.g * invScale );
+					const b = isFloat ? _color.b : Math.round( _color.b * invScale );
 
 					buffer.faceVertexColors.push( r, g, b );
 					buffer.faceVertexColors.push( r, g, b );

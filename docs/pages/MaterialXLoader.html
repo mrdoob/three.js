@@ -214,6 +214,14 @@ together with the translation log.</p>
 								</tr>
 								<tr>
 									<td class="name">
+										<strong translate="no">nodeResolver</strong>
+									</td>
+									<td class="description last">
+										<p>Builds the TSL node of a MaterialX node before the built-in node library. Called with the node and the requested output (<code>null</code> for the default output); returns the node, or <code>null</code> to leave it to the loader. For channel outputs such as <code>outx</code>, the loader takes the channel of the returned node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
 										<strong translate="no">throwOnErrors</strong>
 									</td>
 									<td class="description last">

@@ -73,6 +73,7 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
 
 				if ( pmrem !== undefined ) {
 
+					pmrem.texture.pmremVersion = - 1;
 					pmrem.dispose();
 					cache.delete( texture );
 

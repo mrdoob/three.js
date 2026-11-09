@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # VelocityNode
 
@@ -13,6 +13,10 @@ The node keeps track of the model, view and projection matrices of the previous 
 Constructs a new vertex color node.
 
 ## Properties
+
+### .currentProjectionMatrix : UniformNode.<mat4>
+
+The projection matrix of the current frame.
 
 ### .previousCameraViewMatrix : UniformNode.<mat4>
 
@@ -34,7 +38,7 @@ Default is `null`.
 
 ### .projectionMatrix : Matrix4
 
-The current projection matrix.
+An optional projection matrix that overrides the camera's projection matrix.
 
 Default is `null`.
 
@@ -44,7 +48,7 @@ Overwritten since velocity nodes save data after the update.
 
 Default is `'object'`.
 
-**Overrides:** [TempNode#updateAfterType](TempNode.html#updateAfterType)
+**Overrides:** [Node#updateAfterType](Node.html#updateAfterType)
 
 ### .updateType : string
 
@@ -52,7 +56,7 @@ Overwritten since velocity nodes are updated per object.
 
 Default is `'object'`.
 
-**Overrides:** [TempNode#updateType](TempNode.html#updateType)
+**Overrides:** [Node#updateType](Node.html#updateType)
 
 ## Methods
 
@@ -72,7 +76,7 @@ Implements the velocity computation based on the previous and current vertex dat
 
 A reference to the current node builder.
 
-**Overrides:** [TempNode#setup](TempNode.html#setup)
+**Overrides:** [Node#setup](Node.html#setup)
 
 **Returns:** The motion vector.
 
@@ -84,7 +88,7 @@ Updates velocity specific uniforms.
 
 A reference to the current node frame.
 
-**Overrides:** [TempNode#update](TempNode.html#update)
+**Overrides:** [Node#update](Node.html#update)
 
 ### .updateAfter( frame : NodeFrame )
 
@@ -94,7 +98,7 @@ Overwritten to updated velocity specific uniforms.
 
 A reference to the current node frame.
 
-**Overrides:** [TempNode#updateAfter](TempNode.html#updateAfter)
+**Overrides:** [Node#updateAfter](Node.html#updateAfter)
 
 ## Source
 

@@ -1,4 +1,4 @@
-/* global chrome, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_REGISTER, EVENT_RENDERER, EVENT_OBJECT_DETAILS, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_COMMITTED */
+/* global chrome, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_SELECT_OBJECTS, EVENT_REGISTER, EVENT_RENDERER, EVENT_OBJECT_DETAILS, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_COMMITTED */
 
 const STATE_POLLING_INTERVAL = 1000;
 
@@ -17,6 +17,9 @@ const openState = new Map();
 // Objects expanded in the tree (uuid -> its details block, kept across rebuilds so the selection and the image survive)
 const expanded = new Map();
 
+// The row of each object in the tree (uuid -> element), so expanding one leaves the others alone
+const treeRows = new Map();
+
 // Static DOM from panel.html
 const renderersSection = document.getElementById( 'renderers' );
 const scenesSection = document.getElementById( 'scenes' );
@@ -26,14 +29,35 @@ document.querySelector( '.version' ).textContent = chrome.runtime.getManifest().
 
 // --- Connection ---
 
-const port = chrome.runtime.connect();
+let port = null;
 const intervalId = setInterval( poll, STATE_POLLING_INTERVAL );
+
+// The background script is a service worker, which Chrome stops and restarts, closing the port.
+// The next message connects again, and tells the new one which tab this panel inspects.
+function getPort() {
+
+	if ( port === null ) {
+
+		port = chrome.runtime.connect();
+		port.onMessage.addListener( receive );
+		port.onDisconnect.addListener( () => {
+
+			port = null;
+
+		} );
+		port.postMessage( { name: MESSAGE_INIT, tabId: chrome.devtools.inspectedWindow.tabId } );
+
+	}
+
+	return port;
+
+}
 
 function send( name, data ) {
 
 	try {
 
-		port.postMessage( { name: name, ...data } );
+		getPort().postMessage( { name: name, ...data } );
 
 	} catch ( error ) {
 
@@ -48,23 +72,15 @@ function poll() {
 
 	send( MESSAGE_REQUEST_STATE );
 
-	// A preview costs the page a frame, so it is only asked for on expand and when the geometry or material changes
+	// Drawing a preview takes the page time, so it is only asked for on expand and when the geometry or material changes
 	for ( const uuid of expanded.keys() ) send( MESSAGE_REQUEST_OBJECT_DETAILS, { uuid: uuid, preview: false } );
 
 }
 
-send( MESSAGE_INIT, { tabId: chrome.devtools.inspectedWindow.tabId } );
 send( MESSAGE_REQUEST_STATE );
 updateNotice();
 
-port.onDisconnect.addListener( () => {
-
-	clearInterval( intervalId );
-	clearState();
-
-} );
-
-port.onMessage.addListener( ( message ) => {
+function receive( message ) {
 
 	const detail = message.detail;
 
@@ -104,7 +120,7 @@ port.onMessage.addListener( ( message ) => {
 
 	}
 
-} );
+}
 
 // Drop a scene's objects, except the ones a new batch still lists
 function forgetObjects( sceneUuid, keep = new Set() ) {
@@ -170,7 +186,7 @@ function removeFrame( frameId ) {
 
 }
 
-// Clear state when the page navigates or the connection drops
+// Clear state when the page navigates
 function clearState() {
 
 	state.scenes.clear();
@@ -230,11 +246,15 @@ function createLabel( name, details ) {
 
 }
 
-function formatValue( value ) {
+function formatValue( value, inList = false ) {
 
 	if ( value === undefined || value === null ) return '–';
-	if ( Array.isArray( value ) ) return value.map( formatValue ).join( ', ' );
-	if ( typeof value === 'number' ) return value.toLocaleString();
+	if ( Array.isArray( value ) ) return value.map( item => formatValue( item, true ) ).join( ', ' );
+
+	// Small values like a shadow bias keep the digits that tell them apart from zero. In a list, numbers are
+	// written like code, so no thousands separator or decimal comma can be taken for the commas between them.
+	if ( typeof value === 'number' ) return value.toLocaleString( inList ? 'en-US' : undefined, { maximumFractionDigits: Math.abs( value ) < 0.01 ? 5 : 3, signDisplay: 'negative', useGrouping: ! inList } );
+
 	return value;
 
 }
@@ -251,9 +271,40 @@ function createPropertyRow( label, value ) {
 	valueSpan.className = 'property-value';
 	valueSpan.textContent = formatValue( value );
 
+	// Colors come as hex strings, shown after a swatch
+	if ( /^#[0-9a-f]{6}$/.test( value ) ) {
+
+		const swatch = document.createElement( 'span' );
+		swatch.className = 'swatch';
+		swatch.style.background = value;
+		valueSpan.prepend( swatch );
+
+	}
+
 	row.append( labelSpan, valueSpan );
 
 	return row;
+
+}
+
+// A light's properties and its shadow's, listed in full since there are only a few
+function createLightRows( light ) {
+
+	const rows = [];
+
+	for ( const [ title, properties ] of [[ light.type, light.properties ], [ 'Shadow', light.shadow ]] ) {
+
+		if ( properties === undefined ) continue;
+
+		const heading = document.createElement( 'h4' );
+		heading.textContent = title;
+		rows.push( heading );
+
+		for ( const [ label, value ] of Object.entries( properties ) ) rows.push( createPropertyRow( label, value ) );
+
+	}
+
+	return rows;
 
 }
 
@@ -433,6 +484,7 @@ function renderObject( object, container, level = 0, parentInvisible = false ) {
 	if ( invisible ) item.classList.add( 'invisible' );
 	if ( expanded.has( object.uuid ) ) item.classList.add( 'expanded' );
 	item.append( toggle, icon, createLabel( name, details ), type );
+	treeRows.set( object.uuid, item );
 
 	// The arrow toggles the children, the rest of the row toggles the details
 	item.addEventListener( 'click', ( event ) => {
@@ -480,12 +532,17 @@ function renderObject( object, container, level = 0, parentInvisible = false ) {
 
 }
 
-// Expand or collapse an object's details under its row
+// Expand or collapse an object's details under its row. A scene can have thousands of rows,
+// so only this one changes, the tree is not rebuilt.
 function toggleDetails( uuid ) {
+
+	const item = treeRows.get( uuid );
 
 	if ( expanded.has( uuid ) ) {
 
+		expanded.get( uuid ).remove();
 		expanded.delete( uuid );
+		item.classList.remove( 'expanded' );
 
 	} else {
 
@@ -499,13 +556,24 @@ function toggleDetails( uuid ) {
 		expanded.set( uuid, block );
 		send( MESSAGE_REQUEST_OBJECT_DETAILS, { uuid: uuid, preview: true } );
 
+		block.style.marginLeft = item.style.paddingLeft;
+		item.classList.add( 'expanded' );
+		item.after( block );
+
 	}
 
-	updateSceneTree();
+	sendSelection();
 
 }
 
-// The object rendered with its own material in one column, its transform, geometry and materials in the other.
+// The expanded objects stay drawn over the page
+function sendSelection() {
+
+	send( MESSAGE_SELECT_OBJECTS, { uuids: [ ...expanded.keys() ] } );
+
+}
+
+// The object rendered with its own material in one column, its transform, geometry and materials, or light, in the other.
 // Built once, then only refreshed, so the selections stay and the image does not flicker.
 function renderObjectDetails( block, details ) {
 
@@ -530,9 +598,12 @@ function renderObjectDetails( block, details ) {
 		const transform = document.createElement( 'div' );
 		transform.className = 'transform';
 
+		const light = document.createElement( 'div' );
+		light.className = 'light';
+
 		const column = document.createElement( 'div' );
 		column.className = 'property-group object-properties';
-		column.appendChild( transform );
+		column.append( transform, light );
 
 		for ( const [ item, rows ] of groups ) {
 
@@ -553,12 +624,12 @@ function renderObjectDetails( block, details ) {
 	groups.forEach( ( [ , rows ], i ) => updatePropertyPicker( pickers[ i ], rows ) );
 
 	// A preview comes with the details when one was asked for: the image, or the reason there is
-	// none, shown in its place. An object with nothing to draw keeps no tile at all.
+	// none, shown in its place. An object with nothing to draw keeps an empty tile, so every
+	// expanded row has the same layout.
 	if ( 'preview' in details ) {
 
 		const rendered = details.preview !== null && details.preview.startsWith( 'data:' );
 
-		tile.hidden = details.preview === null;
 		tile.style.backgroundImage = rendered ? `url(${details.preview})` : '';
 		tile.textContent = rendered ? '' : details.preview;
 
@@ -569,6 +640,8 @@ function renderObjectDetails( block, details ) {
 		createPropertyRow( 'Rotation', details.rotation ),
 		createPropertyRow( 'Scale', details.scale )
 	);
+
+	block.querySelector( '.light' ).replaceChildren( ...( details.light === null ? [] : createLightRows( details.light ) ) );
 
 }
 
@@ -618,7 +691,9 @@ function updateSceneTree() {
 
 	}
 
+	treeRows.clear();
 	renderSection( scenesSection, 'Scenes', state.scenes, renderObject );
 	updateNotice();
+	sendSelection();
 
 }

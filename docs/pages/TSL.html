@@ -328,6 +328,12 @@ Algorithm originally from REBLUR (NRD).</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="diffuseRoughness" translate="no">.<a href="#diffuseRoughness">diffuseRoughness</a><span class="type-signature"> : <a href="PropertyNode.html">PropertyNode</a>.&lt;float></span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>TSL object that represents the shader variable <code>DiffuseRoughness</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="dispersion" translate="no">.<a href="#dispersion">dispersion</a><span class="type-signature"> : <a href="PropertyNode.html">PropertyNode</a>.&lt;float></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>TSL object that represents the shader variable <code>Dispersion</code>.</p>
@@ -386,6 +392,14 @@ Algorithm originally from REBLUR (NRD).</p>
 					<h3 class="name" id="getTemporalVarianceFactor" translate="no">.<a href="#getTemporalVarianceFactor">getTemporalVarianceFactor</a> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>Temporal accumulation variance factor in <code>[0, 1]</code>. Higher values mean more history confidence.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="ggxReflectionSample" translate="no">.<a href="#ggxReflectionSample">ggxReflectionSample</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Importance-samples the GGX/VNDF specular lobe for one pixel and returns the reflected
+ray direction plus the Monte-Carlo weight to apply to the gathered radiance, along with
+the GGX terms the SSR env-miss MIS fallback needs.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -582,6 +596,13 @@ The value is composed via <code>clearcoatRoughness</code> * <code>clearcoatRough
 					<div class="description">
 						<p>TSL object that represents the diffuse color of the current material.
 The value is composed via <code>color</code> * <code>map</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="materialDiffuseRoughness" translate="no">.<a href="#materialDiffuseRoughness">materialDiffuseRoughness</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>TSL object that represents the diffuse roughness of the current material.
+The value is composed via <code>diffuseRoughness</code> * <code>diffuseRoughnessMap.r</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1258,33 +1279,6 @@ Useful for normal mapping without precomputed tangents.</p>
 					</div>
 				</div>
 				<div class="member">
-					<h3 class="name" id="transformedClearcoatNormalView" translate="no">.<a href="#transformedClearcoatNormalView">transformedClearcoatNormalView</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> <span class="type-signature">(constant) </span></h3>
-					<div class="description">
-						<p>TSL object that represents the transformed clearcoat vertex normal of the current rendered object in view space.</p>
-					</div>
-						<dl class="details">
-							<dt class="important tag-deprecated"><strong>Deprecated:</strong> since r178. Use `clearcoatNormalView` instead.</dt>
-						</dl>
-				</div>
-				<div class="member">
-					<h3 class="name" id="transformedNormalView" translate="no">.<a href="#transformedNormalView">transformedNormalView</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> <span class="type-signature">(constant) </span></h3>
-					<div class="description">
-						<p>TSL object that represents the transformed vertex normal of the current rendered object in view space.</p>
-					</div>
-						<dl class="details">
-							<dt class="important tag-deprecated"><strong>Deprecated:</strong> since r178. Use `normalView` instead.</dt>
-						</dl>
-				</div>
-				<div class="member">
-					<h3 class="name" id="transformedNormalWorld" translate="no">.<a href="#transformedNormalWorld">transformedNormalWorld</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> <span class="type-signature">(constant) </span></h3>
-					<div class="description">
-						<p>TSL object that represents the transformed vertex normal of the current rendered object in world space.</p>
-					</div>
-						<dl class="details">
-							<dt class="important tag-deprecated"><strong>Deprecated:</strong> since r178. Use `normalWorld` instead.</dt>
-						</dl>
-				</div>
-				<div class="member">
 					<h3 class="name" id="transmission" translate="no">.<a href="#transmission">transmission</a><span class="type-signature"> : <a href="PropertyNode.html">PropertyNode</a>.&lt;float></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>TSL object that represents the shader variable <code>Transmission</code>.</p>
@@ -1359,6 +1353,14 @@ const computeFn = Fn( () => {
 // workgroupId.x =  [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3];
 // Buffer Output =  [0, 1, 2, 0, 0, 0, 6, 7, 8, 0, 0, 0];
 </code></pre>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="workingLuminanceCoefficients" translate="no">.<a href="#workingLuminanceCoefficients">workingLuminanceCoefficients</a><span class="type-signature"> : <a href="VarNode.html">VarNode</a>.&lt;vec3></span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>TSL object that represents the luminance coefficients of the current working color space.
+It is evaluated once per build, so it can also be used as the default value of a parameter
+of a function with layout.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -1520,24 +1522,6 @@ const computeFn = Fn( () => {
 									</td>
 									<td class="description last">
 										<p>The name of the variable in the shader.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-					<h3 class="name name-method" id="VarIntent" translate="no">.<a href="#VarIntent">VarIntent</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="VarNode.html">VarNode</a></span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>TSL function for creating a var intent node.</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong translate="no">node</strong>
-									</td>
-									<td class="description last">
-										<p>The node for which a variable should be created.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -3150,7 +3134,7 @@ without being modulated by the AO since it already accounts for occlusion.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="bumpMap" translate="no">.<a href="#bumpMap">bumpMap</a><span class="signature">( textureNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, scaleNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="BumpMapNode.html">BumpMapNode</a></span> </h3>
+					<h3 class="name name-method" id="bumpMap" translate="no">.<a href="#bumpMap">bumpMap</a><span class="signature">( textureNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, scaleNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, normalNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="BumpMapNode.html">BumpMapNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TSL function for creating a bump map node.</p>
@@ -3172,6 +3156,15 @@ without being modulated by the AO since it already accounts for occlusion.</p>
 									<td class="description last">
 										<p>Controls the intensity of the bump effect.</p>
 										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">normalNode</strong>
+									</td>
+									<td class="description last">
+										<p>The view-space normal to perturb.</p>
+										<p>Default is <code>normalView</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -3536,7 +3529,7 @@ Useful for masking effects based on distance from center.</p>
 										<strong translate="no">maxLights</strong>
 									</td>
 									<td class="description last">
-										<p>Maximum number of point lights.</p>
+										<p>Maximum number of point and spot lights.</p>
 										<p>Default is <code>1024</code>.</p>
 									</td>
 								</tr>
@@ -5628,7 +5621,7 @@ depth value and the camera's inverse projection matrix.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="grayscale" translate="no">.<a href="#grayscale">grayscale</a><span class="signature">( color : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<h3 class="name name-method" id="grayscale" translate="no">.<a href="#grayscale">grayscale</a><span class="signature">( color : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, luminanceCoefficients : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes a grayscale value for the given RGB color value.</p>
@@ -5643,10 +5636,18 @@ depth value and the camera's inverse projection matrix.</p>
 										<p>The color value to compute the grayscale for.</p>
 									</td>
 								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">luminanceCoefficients</strong>
+									</td>
+									<td class="description last">
+										<p>The luminance coefficients. By default predefined values of the current working color space are used.</p>
+									</td>
+								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The grayscale color.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> The grayscale value.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="greaterThan" translate="no">.<a href="#greaterThan">greaterThan</a><span class="signature">( a : <span class="param-type"><a href="Node.html">Node</a></span>, b : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="OperatorNode.html">OperatorNode</a></span> </h3>
@@ -5891,14 +5892,14 @@ Compared to Gaussian blur, hash blur requires just a single pass.</p>
 										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
-										<p>Optional callback to modify the node during setup.</p>
+										<p>Optional callback to modify the node presented by the inspector.</p>
 										<p>Default is <code>null</code>.</p>
 									</td>
 								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The inspector node.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> The inspected node.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="instance" translate="no">.<a href="#instance">instance</a><span class="signature">( matrices : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a> | <a href="StorageInstancedBufferAttribute.html">StorageInstancedBufferAttribute</a></span>, colors : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a> | <a href="StorageInstancedBufferAttribute.html">StorageInstancedBufferAttribute</a></span> )</span> </h3>
@@ -6050,6 +6051,8 @@ Transforms positionLocal and normalLocal, and assigns varying color in-place.</p
 					<div class="method">
 						<div class="description">
 							<p>TSL wrapper for applying instanced mesh rendering setup.</p>
+<p>The instance data of the rendered mesh are bound per object via <a href="ReferenceAttributeNode.html">ReferenceAttributeNode</a>,
+so instanced meshes share builds.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -6145,6 +6148,28 @@ default white noise, blue noise or Bayer.</p>
 								</tr>
 							</tbody>
 						</table>
+					</div>
+					<h3 class="name name-method" id="isBackgroundDepth" translate="no">.<a href="#isBackgroundDepth">isBackgroundDepth</a><span class="signature">( depth : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;bool></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given depth value belongs to the background, i.e. the cleared
+far plane. Takes the renderer's reversed depth buffer into account.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">depth</strong>
+									</td>
+									<td class="description last">
+										<p>The depth value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the depth value belongs to the background.</dt>
+						</dl>
 					</div>
 					<h3 class="name name-method" id="isolate" translate="no">.<a href="#isolate">isolate</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="IsolateNode.html">IsolateNode</a></span> </h3>
 					<div class="method">
@@ -6254,6 +6279,47 @@ default white noise, blue noise or Bayer.</p>
 								</tr>
 							</tbody>
 						</table>
+					</div>
+					<h3 class="name name-method" id="lensDirt" translate="no">.<a href="#lensDirt">lensDirt</a><span class="signature">( textureNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span>, dirtTextureNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, intensity : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies a lens dirt effect. The lens dirt texture is revealed wherever the
+scene's luminance is bright. The input is typically a blurred luminance of
+the scene, e.g. the result of a bloom pass. A wider blur reveals the dirt
+over a larger area around bright spots.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">textureNode</strong>
+									</td>
+									<td class="description last">
+										<p>The node that represents the scene's blurred luminance.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">dirtTextureNode</strong>
+									</td>
+									<td class="description last">
+										<p>The lens dirt texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">intensity</strong>
+									</td>
+									<td class="description last">
+										<p>Defines the intensity of the lens dirt.</p>
+										<p>Default is <code>float(1)</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The lens dirt.</dt>
+						</dl>
 					</div>
 					<h3 class="name name-method" id="lensflare" translate="no">.<a href="#lensflare">lensflare</a><span class="signature">( node : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, params : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="LensflareNode.html">LensflareNode</a></span> </h3>
 					<div class="method">
@@ -6506,7 +6572,7 @@ Relevant when using maps with spot lights.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The light target position in world space.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="lightViewPosition" translate="no">.<a href="#lightViewPosition">lightViewPosition</a><span class="signature">( light : <span class="param-type"><a href="Light.html">Light</a></span> )</span><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;vec3></span> </h3>
+					<h3 class="name name-method" id="lightViewPosition" translate="no">.<a href="#lightViewPosition">lightViewPosition</a><span class="signature">( light : <span class="param-type"><a href="Light.html">Light</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TSL function for getting the position in view space for the given light.</p>
@@ -6932,6 +6998,28 @@ When no material is set, the node refers to the material of the current rendered
 								</tr>
 							</tbody>
 						</table>
+					</div>
+					<h3 class="name name-method" id="morphColor" translate="no">.<a href="#morphColor">morphColor</a><span class="signature">( color : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function that applies the color morph targets to the given color.
+The result is computed in the vertex stage.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to morph. Must be available in the vertex stage.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The morphed color.</dt>
+						</dl>
 					</div>
 					<h3 class="name name-method" id="morphReference" translate="no">.<a href="#morphReference">morphReference</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span> )</span> </h3>
 					<div class="method">
@@ -7654,7 +7742,7 @@ based on the material's side configuration.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The created override context node.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="overrideNodes" translate="no">.<a href="#overrideNodes">overrideNodes</a><span class="signature">( overrides : <span class="param-type">Map.&lt;<a href="Node.html">Node</a>, (function()|<a href="Node.html">Node</a>)> | Array.&lt;Array.&lt;(<a href="Node.html">Node</a>|function()|<a href="Node.html">Node</a>)>></span>, flowNode : <span class="param-type"><a href="Node.html">Node</a> | null</span> )</span><span class="type-signature"> : <a href="OverrideContextNode.html">OverrideContextNode</a></span> </h3>
+					<h3 class="name name-method" id="overrideNodes" translate="no">.<a href="#overrideNodes">overrideNodes</a><span class="signature">( overrides : <span class="param-type">Map.&lt;<a href="Node.html">Node</a>, (function()|<a href="Node.html">Node</a>)> | Array.&lt;Array.&lt;(<a href="Node.html">Node</a>|function()|<a href="Node.html">Node</a>)>></span>, flowNode : <span class="param-type"><a href="Node.html">Node</a> | null</span>, shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="OverrideContextNode.html">OverrideContextNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TSL function for creating an <code>OverrideContextNode</code> to override multiple target nodes.</p>
@@ -7680,6 +7768,16 @@ based on the material's side configuration.</p>
 									</td>
 									<td class="description last">
 										<p>The node whose context should be modified.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage the overrides apply to, all stages by default. With fragment overrides,
+all varyings of the context are evaluated in the fragment stage, e.g. if the surface is reconstructed per fragment.</p>
 										<p>Default is <code>null</code>.</p>
 									</td>
 								</tr>
@@ -8154,7 +8252,7 @@ Reference: <a href="https://iquilezles.org/articles/functions/" target="_blank" 
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="pixelationPass" translate="no">.<a href="#pixelationPass">pixelationPass</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, pixelSize : <span class="param-type"><a href="Node.html">Node</a>.&lt;float> | number</span>, normalEdgeStrength : <span class="param-type"><a href="Node.html">Node</a>.&lt;float> | number</span>, depthEdgeStrength : <span class="param-type"><a href="Node.html">Node</a>.&lt;float> | number</span> )</span><span class="type-signature"> : <a href="PixelationPassNode.html">PixelationPassNode</a></span> </h3>
+					<h3 class="name name-method" id="pixelationPass" translate="no">.<a href="#pixelationPass">pixelationPass</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, pixelSize : <span class="param-type">number</span>, normalEdgeStrength : <span class="param-type"><a href="Node.html">Node</a>.&lt;float> | number</span>, depthEdgeStrength : <span class="param-type"><a href="Node.html">Node</a>.&lt;float> | number</span> )</span><span class="type-signature"> : <a href="PixelationPassNode.html">PixelationPassNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TSL function for creating a pixelation render pass node for post processing.</p>
@@ -8207,7 +8305,7 @@ Reference: <a href="https://iquilezles.org/articles/functions/" target="_blank" 
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="pmremTexture" translate="no">.<a href="#pmremTexture">pmremTexture</a><span class="signature">( value : <span class="param-type"><a href="Texture.html">Texture</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span>, levelNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="PMREMNode.html">PMREMNode</a></span> </h3>
+					<h3 class="name name-method" id="pmremTexture" translate="no">.<a href="#pmremTexture">pmremTexture</a><span class="signature">( value : <span class="param-type"><a href="Texture.html">Texture</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, levelNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="PMREMNode.html">PMREMNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TSL function for creating a PMREM node.</p>
@@ -8445,6 +8543,40 @@ rendering for certain operations, such as compositing and image processing.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The color with premultiplied alpha.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="projectionDepth" translate="no">.<a href="#projectionDepth">projectionDepth</a><span class="signature">( depth : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, near : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, far : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function for retrieving the depth value as produced by the camera's projection matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">depth</strong>
+									</td>
+									<td class="description last">
+										<p>The depth value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">near</strong>
+									</td>
+									<td class="description last">
+										<p>The camera's near value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">far</strong>
+									</td>
+									<td class="description last">
+										<p>The camera's far value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="property" translate="no">.<a href="#property">property</a><span class="signature">( type : <span class="param-type">string</span>, name : <span class="param-type">string</span>, placeholderNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="PropertyNode.html">PropertyNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -8481,7 +8613,7 @@ rendering for certain operations, such as compositing and image processing.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="quadBroadcast" translate="no">.<a href="#quadBroadcast">quadBroadcast</a><span class="signature">( e : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<h3 class="name name-method" id="quadBroadcast" translate="no">.<a href="#quadBroadcast">quadBroadcast</a><span class="signature">( e : <span class="param-type">number</span>, id : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Broadcasts e from the quad invocation with id equal to id.</p>
@@ -8494,6 +8626,14 @@ rendering for certain operations, such as compositing and image processing.</p>
 									</td>
 									<td class="description last">
 										<p>The value to broadcast.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">id</strong>
+									</td>
+									<td class="description last">
+										<p>The quad invocation id to broadcast from.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -8819,6 +8959,42 @@ If you increase the sample count, you have to increase this option as well to av
 									</td>
 									<td class="description last">
 										<p>The object the property belongs to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="referenceAttribute" translate="no">.<a href="#referenceAttribute">referenceAttribute</a><span class="signature">( name : <span class="param-type">string</span>, type : <span class="param-type">string</span>, object : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="ReferenceAttributeNode.html">ReferenceAttributeNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function for creating a reference attribute node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the property the node refers to.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">type</strong>
+									</td>
+									<td class="description last">
+										<p>The node type. Inferred from the attribute if not set.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">object</strong>
+									</td>
+									<td class="description last">
+										<p>The object the property belongs to. The rendered object if not set.</p>
+										<p>Default is <code>null</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -9477,6 +9653,44 @@ on whether the position data are 2D or 3D, the rotation is expressed a single fl
 							<dt class="tag-returns"><strong>Returns:</strong> The rotated uv coordinates.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="roughnessToMip" translate="no">.<a href="#roughnessToMip">roughnessToMip</a><span class="signature">( roughness : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, maxLod : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the mip level of a PMREM that has been prefiltered for the given roughness.
+Uses the inverse of <code>PMREMGenerator.lodToRoughness()</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">roughness</strong>
+									</td>
+									<td class="description last">
+										<p>The roughness.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxLod</strong>
+									</td>
+									<td class="description last">
+										<p>The last mip level of the PMREM.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<li><a href="https://github.com/google/filament/blob/main/shaders/src/surface_light_indirect.fs" target="_blank" rel="noopener">Filament: perceptualRoughnessToLod()</a></li>
+								</ul>
+							</dd>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The mip level.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="round" translate="no">.<a href="#round">round</a><span class="signature">( x : <span class="param-type"><a href="Node.html">Node</a> | number</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -9667,7 +9881,7 @@ on whether the position data are 2D or 3D, the rotation is expressed a single fl
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="saturation" translate="no">.<a href="#saturation">saturation</a><span class="signature">( color : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, adjustment : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<h3 class="name name-method" id="saturation" translate="no">.<a href="#saturation">saturation</a><span class="signature">( color : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, adjustment : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, luminanceCoefficients : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Super-saturates or desaturates the given RGB color.</p>
@@ -9689,6 +9903,14 @@ on whether the position data are 2D or 3D, the rotation is expressed a single fl
 									<td class="description last">
 										<p>Specifies the amount of the conversion. A value under <code>1</code> desaturates the color, a value over <code>1</code> super-saturates it.</p>
 										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">luminanceCoefficients</strong>
+									</td>
+									<td class="description last">
+										<p>The luminance coefficients. By default predefined values of the current working color space are used.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -12437,7 +12659,7 @@ normal can be transformed directly without involving the normal matrix.</p>
 					<h3 class="name name-method" id="uniformCubeTexture" translate="no">.<a href="#uniformCubeTexture">uniformCubeTexture</a><span class="signature">( value : <span class="param-type"><a href="CubeTexture.html">CubeTexture</a></span> )</span><span class="type-signature"> : <a href="CubeTextureNode.html">CubeTextureNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>TSL function for creating a uniform cube texture node.</p>
+							<p>TSL function for creating a non-mergeable uniform cube texture node.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -12492,7 +12714,7 @@ normal can be transformed directly without involving the normal matrix.</p>
 					<h3 class="name name-method" id="uniformTexture" translate="no">.<a href="#uniformTexture">uniformTexture</a><span class="signature">( value : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>TSL function for creating a uniform texture node.</p>
+							<p>TSL function for creating a non-mergeable uniform texture node.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -13992,6 +14214,28 @@ complete before the barrier can be surpassed.</p>
 				</td>
 			<td class="description last">
 				<p>Per-pixel metalness. Drives GGX reflection sampling and, with <code>reflectNonMetals=false</code>, the non-metal early-out.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>specularNode</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>
+				</td>
+			<td class="description last">
+				<p>Stochastic mode only: material normal-incidence reflectance (F0), typically an MRT <code>specularColorBlended</code> attachment (it already includes IOR, specular intensity and metalness; raw <code>material.specularColor</code> reflects too brightly). Defaults to the metalness/base-color approximation.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>specularF90Node</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>
+				</td>
+			<td class="description last">
+				<p>Stochastic mode only: material grazing reflectance, typically an MRT <code>specularF90</code> attachment. Defaults to one.</p>
 						<p>Default is <code>null</code>.</p>
 			</td>
 		</tr>

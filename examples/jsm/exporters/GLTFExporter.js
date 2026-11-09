@@ -2265,8 +2265,8 @@ class GLTFWriter {
 		if ( isOrtho ) {
 
 			cameraDef.orthographic = {
-				xmag: camera.right * 2,
-				ymag: camera.top * 2,
+				xmag: camera.right,
+				ymag: camera.top,
 				zfar: camera.far <= 0 ? 0.001 : camera.far,
 				znear: camera.near < 0 ? 0 : camera.near
 			};
@@ -3396,7 +3396,7 @@ class GLTFMaterialsSheenExtension {
 		}
 
 		extensionDef.sheenRoughnessFactor = material.sheenRoughness;
-		extensionDef.sheenColorFactor = material.sheenColor.toArray();
+		extensionDef.sheenColorFactor = material.sheenColor.clone().multiplyScalar( material.sheen ).toArray();
 
 		materialDef.extensions = materialDef.extensions || {};
 		materialDef.extensions[ this.name ] = extensionDef;
@@ -3434,7 +3434,10 @@ class GLTFMaterialsAnisotropyExtension {
 
 		if ( material.anisotropyMap ) {
 
-			const anisotropyMapDef = { index: await writer.processTextureAsync( material.anisotropyMap ) };
+			const anisotropyMapDef = {
+				index: await writer.processTextureAsync( material.anisotropyMap ),
+				texCoord: material.anisotropyMap.channel
+			};
 			writer.applyTextureTransform( anisotropyMapDef, material.anisotropyMap );
 			extensionDef.anisotropyTexture = anisotropyMapDef;
 
@@ -3565,11 +3568,13 @@ class GLTFMeshGpuInstancing {
 		const translationAttr = new Float32Array( mesh.count * 3 );
 		const rotationAttr = new Float32Array( mesh.count * 4 );
 		const scaleAttr = new Float32Array( mesh.count * 3 );
+		const colorAttr = mesh.instanceColor ? new Float32Array( mesh.count * 3 ) : null;
 
 		const matrix = new Matrix4();
 		const position = new Vector3();
 		const quaternion = new Quaternion();
 		const scale = new Vector3();
+		const color = new Color();
 
 		for ( let i = 0; i < mesh.count; i ++ ) {
 
@@ -3580,6 +3585,13 @@ class GLTFMeshGpuInstancing {
 			quaternion.toArray( rotationAttr, i * 4 );
 			scale.toArray( scaleAttr, i * 3 );
 
+			if ( colorAttr !== null ) {
+
+				mesh.getColorAt( i, color );
+				color.toArray( colorAttr, i * 3 );
+
+			}
+
 		}
 
 		const attributes = {
@@ -3588,8 +3600,8 @@ class GLTFMeshGpuInstancing {
 			SCALE: writer.processAccessor( new BufferAttribute( scaleAttr, 3 ) ),
 		};
 
-		if ( mesh.instanceColor )
-			attributes._COLOR_0 = writer.processAccessor( mesh.instanceColor );
+		if ( colorAttr !== null )
+			attributes._COLOR_0 = writer.processAccessor( new BufferAttribute( colorAttr, 3 ) );
 
 		nodeDef.extensions = nodeDef.extensions || {};
 		nodeDef.extensions[ this.name ] = { attributes };

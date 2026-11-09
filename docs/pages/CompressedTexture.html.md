@@ -16,6 +16,8 @@ Constructs a new compressed texture.
 
 This array holds for all mipmaps (including the bases mip) the data and dimensions.
 
+Default is `[]`.
+
 **width**
 
 The width of the texture.

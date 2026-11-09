@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # RotateNode
 
@@ -40,7 +40,7 @@ Represents the rotation that is applied to the position node. Depending on wheth
 
 Overwrites the default `customCacheKey()` implementation by including the Euler order into the cache key.
 
-**Overrides:** [TempNode#customCacheKey](TempNode.html#customCacheKey)
+**Overrides:** [Node#customCacheKey](Node.html#customCacheKey)
 
 **Returns:** The hash.
 
@@ -52,7 +52,7 @@ The type of the [RotateNode#positionNode](RotateNode.html#positionNode) defines 
 
 The current node builder.
 
-**Overrides:** [TempNode#generateNodeType](TempNode.html#generateNodeType)
+**Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
 
 **Returns:** The node's type.
 

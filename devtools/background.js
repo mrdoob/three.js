@@ -1,4 +1,4 @@
-/* global chrome, importScripts, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_REGISTER, EVENT_COMMITTED */
+/* global chrome, importScripts, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_SELECT_OBJECTS, EVENT_REGISTER, EVENT_COMMITTED */
 
 importScripts( 'constants.js' );
 
@@ -11,7 +11,8 @@ const FORWARDABLE_MESSAGES = new Set( [
 	MESSAGE_REQUEST_OBJECT_DETAILS,
 	MESSAGE_SCROLL_TO_CANVAS,
 	MESSAGE_HIGHLIGHT_OBJECT,
-	MESSAGE_UNHIGHLIGHT_OBJECT
+	MESSAGE_UNHIGHLIGHT_OBJECT,
+	MESSAGE_SELECT_OBJECTS
 ] );
 
 // Badge helpers. The tab may already be gone, so errors are ignored.
@@ -75,10 +76,12 @@ chrome.runtime.onConnect.addListener( ( port ) => {
 
 	} );
 
-	// Clean up when devtools is closed
+	// Clean up when devtools is closed, the expanded objects are no longer drawn over the page
 	port.onDisconnect.addListener( () => {
 
 		connections.delete( tabId );
+
+		if ( tabId !== undefined ) chrome.tabs.sendMessage( tabId, { name: MESSAGE_SELECT_OBJECTS, uuids: [] } ).catch( () => {} );
 
 	} );
 

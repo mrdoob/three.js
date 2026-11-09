@@ -221,6 +221,14 @@ defines how the texture data is going to be stored on the GPU.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="isPMREMTexture" translate="no">.<a href="#isPMREMTexture">isPMREMTexture</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Indicates whether this texture is a prefiltered cube environment map generated
+by <a href="PMREMGenerator.html">PMREMGenerator</a>.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="isRenderTargetTexture" translate="no">.<a href="#isRenderTargetTexture">isRenderTargetTexture</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>Indicates whether a texture belongs to a render target or not.</p>
@@ -242,7 +250,7 @@ defines how the texture data is going to be stored on the GPU.</p>
 					</div>
 				</div>
 				<div class="member">
-					<h3 class="name" id="mapping" translate="no">.<a href="#mapping">mapping</a><span class="type-signature"> : <a href="global.html#UVMapping">UVMapping</a> | <a href="global.html#CubeReflectionMapping">CubeReflectionMapping</a> | <a href="global.html#CubeRefractionMapping">CubeRefractionMapping</a> | <a href="global.html#EquirectangularReflectionMapping">EquirectangularReflectionMapping</a> | <a href="global.html#EquirectangularRefractionMapping">EquirectangularRefractionMapping</a> | <a href="global.html#CubeUVReflectionMapping">CubeUVReflectionMapping</a></span> </h3>
+					<h3 class="name" id="mapping" translate="no">.<a href="#mapping">mapping</a><span class="type-signature"> : <a href="global.html#UVMapping">UVMapping</a> | <a href="global.html#CubeReflectionMapping">CubeReflectionMapping</a> | <a href="global.html#CubeRefractionMapping">CubeRefractionMapping</a> | <a href="global.html#EquirectangularReflectionMapping">EquirectangularReflectionMapping</a> | <a href="global.html#EquirectangularRefractionMapping">EquirectangularRefractionMapping</a></span> </h3>
 					<div class="description">
 						<p>How the texture is applied to the object. The value <code>UVMapping</code>
 is the default, where texture or uv coordinates are used to apply the map.</p>
@@ -276,6 +284,16 @@ from the properties <a href="Texture.html#offset">Texture#offset</a>, <a href="T
 					<h3 class="name" id="mipmaps" translate="no">.<a href="#mipmaps">mipmaps</a><span class="type-signature"> : Array.&lt;Object></span> </h3>
 					<div class="description">
 						<p>An array holding user-defined mipmaps.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mipmapsAutoUpdate" translate="no">.<a href="#mipmapsAutoUpdate">mipmapsAutoUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the renderer regenerates the mipmaps automatically whenever the
+texture is uploaded, rendered to or copied into. Set this to <code>false</code> to
+pause the regeneration and write the mip levels yourself. Requires
+<a href="Texture.html#generateMipmaps">Texture#generateMipmaps</a>.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -442,6 +460,7 @@ should not hold references to functions as these will not be cloned.</p>
 						<p>Default is <code>ClampToEdgeWrapping</code>.</p>
 					</div>
 				</div>
+				<h2 class="subsection-title">Static Properties</h2>
 				<div class="member">
 					<h3 class="name" id=".DEFAULT_ANISOTROPY" translate="no">.<a href="#.DEFAULT_ANISOTROPY">DEFAULT_ANISOTROPY</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
@@ -531,6 +550,9 @@ should not hold references to functions as these will not be cloned.</p>
 						<div class="description">
 							<p>Frees the GPU-related resources allocated by this instance. Call this
 method whenever this instance is no longer used in your app.</p>
+<p>Textures that belong to a render target are managed by the render target.
+Calling this method on such a texture only dispatches the dispose event but
+does not free any GPU resources. Use <a href="RenderTarget.html#dispose">RenderTarget#dispose</a> instead.</p>
 						</div>
 						<h5>Fires:</h5>
 						<ul>

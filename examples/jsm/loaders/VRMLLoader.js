@@ -80,6 +80,8 @@ class VRMLLoader extends Loader {
 		const path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		const loader = new FileLoader( scope.manager );
+		loader.setPriority( scope.priority );
+		loader.setCache( scope.cache );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
@@ -976,9 +978,18 @@ class VRMLLoader extends Loader {
 				if ( groundColor.length > 0 ) {
 
 					const groundGeometry = new SphereGeometry( radius, 32, 16, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
-					const groundMaterial = new MeshBasicMaterial( { fog: false, side: BackSide, vertexColors: true, depthWrite: false, depthTest: false } );
+					const groundMaterial = new MeshBasicMaterial( { fog: false, side: BackSide, depthWrite: false, depthTest: false } );
 
-					paintFaces( groundGeometry, radius, groundAngle, toColorArray( groundColor ), false );
+					if ( groundColor.length > 3 ) {
+
+						paintFaces( groundGeometry, radius, groundAngle, toColorArray( groundColor ), false );
+						groundMaterial.vertexColors = true;
+
+					} else {
+
+						groundMaterial.color.setRGB( groundColor[ 0 ], groundColor[ 1 ], groundColor[ 2 ], SRGBColorSpace );
+
+					}
 
 					const ground = new Mesh( groundGeometry, groundMaterial );
 					group.add( ground );
@@ -1616,7 +1627,7 @@ class VRMLLoader extends Loader {
 				switch ( fieldName ) {
 
 					case 'position':
-						camera.position.set( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 0 ] );
+						camera.position.set( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
 						break;
 
 					case 'orientation':
@@ -3338,6 +3349,8 @@ class VRMLLoader extends Loader {
 		//
 
 		const textureLoader = new TextureLoader( this.manager );
+		textureLoader.setPriority( this.priority );
+		textureLoader.setCache( this.cache );
 		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		// check version (only 2.0 is supported)

@@ -46,6 +46,12 @@ Default is `2`.
 
 The resolution of the shadow map.
 
+**depthType**
+
+The type of the tile depth texture. `UnsignedShortType` halves the memory when the depth range allows it.
+
+Default is `UnsignedIntType`.
+
 **debug**
 
 Whether to enable debug mode.

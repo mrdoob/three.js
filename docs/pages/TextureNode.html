@@ -117,6 +117,13 @@ This must be in range [0, 3] and a compile-time constant.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="mergeable" translate="no">.<a href="#mergeable">mergeable</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the uniform may be merged with other uniforms at compile-time.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="offsetNode" translate="no">.<a href="#offsetNode">offsetNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;(ivec2|ivec3)></span> </h3>
 					<div class="description">
 						<p>Represents the optional texel offset applied to the unnormalized texture
@@ -146,18 +153,6 @@ automatically updated or not. Use <code>setUpdateMatrix()</code>
 if you want to change the value of the property.</p>
 						<p>Default is <code>false</code>.</p>
 					</div>
-				</div>
-				<div class="member">
-					<h3 class="name" id="updateType" translate="no">.<a href="#updateType">updateType</a><span class="type-signature"> : string</span> </h3>
-					<div class="description">
-						<p>By default the <code>update()</code> method is not executed. Depending on
-whether a uv transformation matrix and/or flipY is applied, <code>update()</code>
-is executed per object.</p>
-						<p>Default is <code>'none'</code>.</p>
-					</div>
-						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="UniformNode.html#updateType">UniformNode#updateType</a></dt>
-						</dl>
 				</div>
 				<div class="member">
 					<h3 class="name" id="uvNode" translate="no">.<a href="#uvNode">uvNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;(vec2|vec3)></span> </h3>
@@ -246,6 +241,18 @@ is executed per object.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> A texture node representing the texture sample.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="customCacheKey" translate="no">.<a href="#customCacheKey">customCacheKey</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwritten since the texture's type and filters influence the generated shader code.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="UniformNode.html#customCacheKey">UniformNode#customCacheKey</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The custom cache key.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="depth" translate="no">.<a href="#depth">depth</a><span class="signature">( depthNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;int></span> )</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
@@ -581,7 +588,7 @@ is executed per object.</p>
 					<h3 class="name name-method" id="getUniformHash" translate="no">.<a href="#getUniformHash">getUniformHash</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Overwritten since the uniform hash is defined by the texture's UUID.</p>
+							<p>Overwritten since the uniform hash is defined by the texture's UUID - if mergeable - and the hash of its reference node otherwise.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -837,15 +844,6 @@ to modify the uv node for correct sampling.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The texture size.</dt>
-						</dl>
-					</div>
-					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">()</span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>The update is used to implement the update of the uv transformation matrix.</p>
-						</div>
-						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="UniformNode.html#update">UniformNode#update</a></dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="updateReference" translate="no">.<a href="#updateReference">updateReference</a><span class="signature">( state : <span class="param-type"><a href="global.html#any">any</a></span> )</span><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>

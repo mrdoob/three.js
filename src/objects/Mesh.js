@@ -134,6 +134,8 @@ class Mesh extends Object3D {
 		this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 		this.geometry = source.geometry;
 
+		this.count = source.count;
+
 		return this;
 
 	}

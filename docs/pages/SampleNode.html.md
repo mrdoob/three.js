@@ -34,6 +34,8 @@ Represents the texture coordinates.
 
 Default is `null`.
 
+## Static Properties
+
 ### .type : string (readonly)
 
 Returns the type of the node.

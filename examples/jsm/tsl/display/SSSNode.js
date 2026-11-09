@@ -1,5 +1,5 @@
 import { RedFormat, RenderTarget, Vector2, RendererUtils, QuadMesh, Node, NodeMaterial, NodeUpdateType, UnsignedByteType } from 'three/webgpu';
-import { reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, float, Break, Loop, int, max, abs, If, interleavedGradientNoise, screenCoordinate, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, lightPosition, lightTargetPosition, fract, rand, mix, context, isBackgroundDepth } from 'three/tsl';
+import { reference, getScreenPosition, getViewPosition, float, Break, Loop, int, max, abs, If, interleavedGradientNoise, screenCoordinate, Fn, passTexture, uv, uniform, depthToViewZ, vec2, lightPosition, lightTargetPosition, fract, rand, mix, context, isBackgroundDepth, projectionDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -37,7 +37,7 @@ let _rendererState;
  * are currently visible within the camera's view.
  *
  * References:
- * - {@link https://panoskarabelas.com/posts/screen_space_shadows/}.
+ * - {@link https://panoskarabelas.com/blog/posts/screen_space_shadows/}.
  * - {@link https://www.bendstudio.com/blog/inside-bend-screen-space-shadows/}.
  *
  * @augments Node
@@ -339,39 +339,7 @@ class SSSNode extends Node {
 
 		const uvNode = uv();
 
-		const getViewZ = Fn( ( [ depth ] ) => {
-
-			let viewZNode;
-
-			if ( this._camera.isPerspectiveCamera ) {
-
-				viewZNode = perspectiveDepthToViewZ( depth, this._cameraNear, this._cameraFar );
-
-			} else {
-
-				viewZNode = orthographicDepthToViewZ( depth, this._cameraNear, this._cameraFar );
-
-			}
-
-			return viewZNode;
-
-		} );
-
-		const sampleDepth = ( uv ) => {
-
-			const depth = this.depthNode.sample( uv ).r;
-
-			if ( builder.renderer.logarithmicDepthBuffer === true ) {
-
-				const viewZ = logarithmicDepthToViewZ( depth, this._cameraNear, this._cameraFar );
-
-				return viewZToPerspectiveDepth( viewZ, this._cameraNear, this._cameraFar );
-
-			}
-
-			return depth;
-
-		};
+		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
 
 		const sss = Fn( () => {
 
@@ -424,11 +392,10 @@ class SSSNode extends Node {
 
 				} );
 
-				// compute new uv, depth and viewZ for the next fragment
+				// compute new uv and viewZ for the next fragment
 
 				const uvNode = xy.div( this._resolution );
-				const fragmentDepth = sampleDepth( uvNode ).toConst();
-				const fragmentViewZ = getViewZ( fragmentDepth ).toConst( 'fragmentViewZ' );
+				const fragmentViewZ = depthToViewZ( this.depthNode.sample( uvNode ).r, this._cameraNear, this._cameraFar, this._camera ).toConst( 'fragmentViewZ' );
 
 				const s = xy.sub( d0 ).length().div( totalLen ).toVar();
 				const rayPosition = mix( rayStartPosition, rayEndPosition, s );

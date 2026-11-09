@@ -131,7 +131,7 @@ class BitcountNode extends MathNode {
 
 			If( value.equal( uint( 0 ) ), () => {
 
-				return uint( 32 );
+				return outputConvertNode( 32 );
 
 			} );
 
@@ -167,7 +167,7 @@ class BitcountNode extends MathNode {
 
 			If( value.equal( uint( 0 ) ), () => {
 
-				return uint( 32 );
+				return outputConvertNode( 32 );
 
 			} );
 

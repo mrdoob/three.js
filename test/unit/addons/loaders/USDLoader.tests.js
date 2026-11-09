@@ -60,6 +60,7 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( parser._stripBlockComments( '/* x */a/* y */b/**/c' ), 'abc', 'Multiple and empty comments are removed.' );
 				assert.strictEqual( parser._stripBlockComments( 'a */ b /*/ c */ d' ), 'a */ b  d', 'A stray closer is kept and the closer search starts after the opener.' );
 				assert.strictEqual( parser._stripBlockComments( 'a /* unclosed' ), 'a ', 'An unclosed comment extends to the end.' );
+				assert.strictEqual( parser._stripBlockComments( 'a = "x /* y" /* c */b' ), 'a = "x /* y" b', 'A /* inside a string is text.' );
 
 			} );
 
@@ -333,6 +334,47 @@ def Xform "Root"
 					Array.from( track.times ),
 					[ 0, 1 ],
 					'Time samples are converted to seconds.'
+				);
+
+			} );
+
+			QUnit.test( 'keeps USDA time samples at negative time codes', ( assert ) => {
+
+				const usda = `#usda 1.0
+(
+	defaultPrim = "Root"
+	timeCodesPerSecond = 10
+	startTimeCode = -10
+	endTimeCode = 10
+)
+
+def Xform "Root"
+{
+	def Xform "Animated"
+	{
+		float3 xformOp:translate.timeSamples = {
+			-10: (0, 0, 0),
+			-2.5: (1, 0, 0),
+			10: (2, 0, 0),
+		}
+		uniform token[] xformOpOrder = ["xformOp:translate"]
+	}
+}`;
+
+				const { specsByPath } = new USDAParser().parseData( usda );
+
+				assert.deepEqual(
+					specsByPath[ '/Root/Animated.xformOp:translate' ].fields.timeSamples.times,
+					[ - 10, - 2.5, 10 ],
+					'Negative time codes are kept.'
+				);
+
+				const track = new USDLoader().parse( usda ).animations[ 0 ].tracks[ 0 ];
+
+				assert.deepEqual(
+					Array.from( track.times ),
+					[ - 1, - 0.25, 1 ],
+					'Every time sample becomes a keyframe.'
 				);
 
 			} );

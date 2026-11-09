@@ -117,6 +117,10 @@ Default is `'bottom-left'`.
 
 Validates node interfaces, see `createStrictInterfaceValidator()` in `MaterialXInterfaceValidation.js`.
 
+**nodeResolver**
+
+Builds the TSL node of a MaterialX node before the built-in node library. Called with the node and the requested output (`null` for the default output); returns the node, or `null` to leave it to the loader. For channel outputs such as `outx`, the loader takes the channel of the returned node.
+
 **throwOnErrors**
 
 Whether translation errors throw or are only reported in the log.

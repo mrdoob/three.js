@@ -55,12 +55,12 @@
 			let probes, probesHelper;
 			let bakeIndex = 0, bakePass = 0;
 
-			// the irradiance grid spans the whole footprint plus the streets, rising to
-			// the mid-rise rooftops. diffuse GI is low frequency, so a coarse grid still
+			// the irradiance grid spans the whole footprint plus the streets, rising past
+			// the tallest tower crowns. diffuse GI is low frequency, so a coarse grid still
 			// reads the urban canyon: streets sit in shade, walls glow with terracotta bounce
 
-			const GRID_SIZE = new THREE.Vector3( 240, 120, 170 );
-			const GRID_PROBES = new THREE.Vector3( 10, 7, 8 );
+			const GRID_SIZE = new THREE.Vector3( 270, 180, 200 );
+			const GRID_PROBES = new THREE.Vector3( 10, 9, 8 );
 
 			const parameters = {
 				seed: 94,
@@ -156,7 +156,7 @@
 				// irradiance probes across the city, with the bottom layer just above the road
 
 				probes = new LightProbeGrid( GRID_SIZE.x, GRID_SIZE.y, GRID_SIZE.z, GRID_PROBES.x, GRID_PROBES.y, GRID_PROBES.z );
-				probes.position.set( 0, GRID_SIZE.y / 2 + 1, 0 );
+				probes.position.set( 0, ( GRID_SIZE.y - GRID_SIZE.y / GRID_PROBES.y ) / 2 + 1, 0 );
 				scene.add( probes );
 
 				renderPipeline = new THREE.RenderPipeline( renderer );

@@ -1,5 +1,5 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context, isBackgroundDepth } from 'three/tsl';
+import { reference, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -405,33 +405,7 @@ class GTAONode extends Node {
 
 		const uvNode = uv();
 
-		const linearizeDepth = ( depth ) => {
-
-			if ( builder.renderer.logarithmicDepthBuffer === true ) {
-
-				const viewZ = logarithmicDepthToViewZ( depth, this._cameraNear, this._cameraFar );
-
-				return viewZToPerspectiveDepth( viewZ, this._cameraNear, this._cameraFar );
-
-			}
-
-			return depth;
-
-		};
-
-		const sampleDepth = ( uv ) => linearizeDepth( this.depthNode.sample( uv ).r );
-
-		const sampleCenterDepth = ( uv ) => {
-
-			// Sidestep the nearest-rounding during depth access for the unjittered center pixel to avoid banding
-
-			const g = this.depthNode.gather().sample( uv );
-			const depth = builder.renderer.reversedDepthBuffer === true ? max( max( g.x, g.y ), max( g.z, g.w ) ) : min( min( g.x, g.y ), min( g.z, g.w ) );
-
-			return linearizeDepth( depth );
-
-		};
-
+		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
 		const sampleNoise = ( uv ) => this._noiseNode.sample( uv );
 		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 
@@ -448,7 +422,38 @@ class GTAONode extends Node {
 
 		this._ao = Fn( () => {
 
-			const depth = this._resolutionScale.lessThan( 1 ).select( sampleCenterDepth( uvNode ), sampleDepth( uvNode ) ).toConst();
+			const depth = float( 0 ).toVar();
+			const normalUV = uvNode.toVar();
+
+			If( this._resolutionScale.lessThan( 1 ), () => {
+
+				// Use the nearest depth texel to avoid banding. At silhouettes (view-space depth difference above 1%), take the
+				// normal from that texel to avoid dark rims. At creases, keep the blended normal to avoid jumpy noise.
+
+				const g = this.depthNode.gather().sample( uvNode ).toConst();
+				const minD = min( min( g.x, g.y ), min( g.z, g.w ) ).toConst();
+				const maxD = max( max( g.x, g.y ), max( g.z, g.w ) ).toConst();
+				const d = builder.renderer.reversedDepthBuffer === true ? maxD : minD;
+
+				depth.assign( projectionDepth( d, this._cameraNear, this._cameraFar ) );
+
+				const minViewZ = depthToViewZ( minD, this._cameraNear, this._cameraFar, this._camera ).toConst();
+				const maxViewZ = depthToViewZ( maxD, this._cameraNear, this._cameraFar, this._camera ).toConst();
+
+				If( minViewZ.div( maxViewZ ).sub( 1 ).abs().greaterThan( 0.01 ), () => {
+
+					const size = vec2( textureSize( this.depthNode, 0 ) ).toConst();
+					const offset = g.w.equal( d ).select( vec2( 0.5, 0.5 ), g.z.equal( d ).select( vec2( 1.5, 0.5 ), g.y.equal( d ).select( vec2( 1.5, 1.5 ), vec2( 0.5, 1.5 ) ) ) ).toConst();
+
+					normalUV.assign( uvNode.mul( size ).sub( 0.5 ).floor().add( offset ).div( size ) );
+
+				} );
+
+			} ).Else( () => {
+
+				depth.assign( sampleDepth( uvNode ) );
+
+			} );
 
 			isBackgroundDepth( depth ).discard();
 
@@ -456,7 +461,7 @@ class GTAONode extends Node {
 			const centerTexel = uvNode.mul( depthSize ).floor().toConst();
 
 			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toConst();
-			const viewNormal = sampleNormal( uvNode ).toConst();
+			const viewNormal = sampleNormal( normalUV ).toConst();
 
 			const radius = this.radius;
 			const invRadius = radius.reciprocal().toConst();

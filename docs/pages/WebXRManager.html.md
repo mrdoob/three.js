@@ -48,6 +48,8 @@ Returns an instance of [ArrayCamera](ArrayCamera.html) which represents the XR c
 
 The camera's `fov` is currently not used and does not reflect the fov of the XR camera. If you need the fov on app level, you have to compute in manually from the XR camera's projection matrices.
 
+The camera's transformation and projection matrix are derived from the first sub camera (e.g. the left eye in a stereo setup).
+
 **Returns:** The XR camera.
 
 ### .getCameraTexture( xrCamera : XRCamera ) : Texture

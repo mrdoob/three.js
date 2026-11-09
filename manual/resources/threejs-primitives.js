@@ -191,7 +191,7 @@ const extrudeSettings = {
   bevelSegments: 2,  // ui: bevelSegments
 };
 
-const geometry = THREE.ExtrudeGeometry(shape, extrudeSettings);
+const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
 `,
 			create2( steps = 100 ) {
 

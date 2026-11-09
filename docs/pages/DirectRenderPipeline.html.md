@@ -2,7 +2,7 @@
 
 # DirectRenderPipeline
 
-An alternative render pipeline that applies output processing directly in material shaders. This avoids the intermediate framebuffer and output pass used by [Renderer](Renderer.html), but changes blending and is not compatible with materials that sample the framebuffer, such as transmissive materials.
+An alternative render pipeline that applies output processing directly in material shaders. This avoids the intermediate framebuffer and output pass used by [Renderer](Renderer.html), but changes blending and is not compatible with materials that sample the framebuffer, such as transmissive materials. With the WebGL backend, `antialias` has no effect.
 
 Note: This module can only be used with `WebGPURenderer`.
 

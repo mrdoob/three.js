@@ -94,7 +94,7 @@
 
 					const arrayBuffer = new THREE.StorageInstancedBufferAttribute( new Float32Array( array ), typeSize );
 
-					arrayBufferNodes.push( storage( arrayBuffer, type[ i ], size ).setPBO( true ) );
+					arrayBufferNodes.push( storage( arrayBuffer, type[ i ] ).setPBO( true ) );
 
 				}
 

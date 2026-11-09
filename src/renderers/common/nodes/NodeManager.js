@@ -9,7 +9,7 @@ import { builtin } from '../../../nodes/accessors/BuiltinNode.js';
 
 import { EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
 import { hashArray } from '../../../nodes/core/NodeUtils.js';
-import { error, yieldToMain } from '../../../utils.js';
+import { error } from '../../../utils.js';
 
 const _chainKeys = [];
 const _cacheKeyValues = [];
@@ -78,22 +78,6 @@ class NodeManager extends DataMap {
 		 * @type {ChainMap}
 		 */
 		this.groupsData = new ChainMap();
-
-		/**
-		 * Queue for pending async builds to limit concurrent compilation.
-		 *
-		 * @private
-		 * @type {Array<Function>}
-		 */
-		this._buildQueue = [];
-
-		/**
-		 * Whether an async build is currently in progress.
-		 *
-		 * @private
-		 * @type {boolean}
-		 */
-		this._buildInProgress = false;
 
 		/**
 		 * A cache for managing node objects of
@@ -189,35 +173,12 @@ class NodeManager extends DataMap {
 	}
 
 	/**
-	 * Logs an error thrown while building a node material.
-	 *
-	 * @private
-	 * @param {Error} e - The build error.
-	 */
-	_reportBuildError( e ) {
-
-		let stackTrace = e.stackTrace;
-
-		if ( ! stackTrace && e.stack ) {
-
-			// Capture stack trace for JavaScript errors
-
-			stackTrace = new StackTrace( e.stack );
-
-		}
-
-		error( 'TSL: ' + e, stackTrace );
-
-	}
-
-	/**
 	 * Returns a node builder state for the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
-	 * @param {?Function} [yieldFn=null] - If set, the build is async and yields to the main thread via this function.
-	 * @return {NodeBuilderState|Promise<NodeBuilderState>} The node builder state (or Promise if async).
+	 * @return {NodeBuilderState} The node builder state.
 	 */
-	getForRender( renderObject, yieldFn = null ) {
+	getForRender( renderObject ) {
 
 		const renderObjectData = this.get( renderObject );
 
@@ -233,80 +194,34 @@ class NodeManager extends DataMap {
 
 			if ( nodeBuilderState === undefined ) {
 
-				const buildNodeBuilder = async () => {
+				let nodeBuilder = this._createNodeBuilder( renderObject, renderObject.material );
 
-					let nodeBuilder = this._createNodeBuilder( renderObject, renderObject.material );
+				try {
 
-					try {
+					nodeBuilder.build();
 
-						if ( yieldFn !== null ) {
+				} catch ( e ) {
 
-							await nodeBuilder.buildAsync( yieldFn );
+					nodeBuilder = this._createNodeBuilder( renderObject, new NodeMaterial() );
+					nodeBuilder.build();
 
-						} else {
+					let stackTrace = e.stackTrace;
 
-							nodeBuilder.build();
+					if ( ! stackTrace && e.stack ) {
 
-						}
+						// Capture stack trace for JavaScript errors
 
-					} catch ( e ) {
-
-						nodeBuilder = this._createNodeBuilder( renderObject, new NodeMaterial() );
-
-						if ( yieldFn !== null ) {
-
-							await nodeBuilder.buildAsync( yieldFn );
-
-						} else {
-
-							nodeBuilder.build();
-
-						}
-
-						this._reportBuildError( e );
+						stackTrace = new StackTrace( e.stack );
 
 					}
 
-					return nodeBuilder;
-
-				};
-
-				if ( yieldFn !== null ) {
-
-					return buildNodeBuilder().then( ( nodeBuilder ) => {
-
-						nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
-						nodeBuilderCache.set( cacheKey, nodeBuilderState );
-						nodeBuilderState.usedTimes ++;
-						renderObjectData.nodeBuilderState = nodeBuilderState;
-
-						return nodeBuilderState;
-
-					} );
-
-				} else {
-
-					// Synchronous path - call buildNodeBuilder but don't await
-					let nodeBuilder = this._createNodeBuilder( renderObject, renderObject.material );
-
-					try {
-
-						nodeBuilder.build();
-
-					} catch ( e ) {
-
-						nodeBuilder = this._createNodeBuilder( renderObject, new NodeMaterial() );
-						nodeBuilder.build();
-
-						this._reportBuildError( e );
-
-					}
-
-					nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
-
-					nodeBuilderCache.set( cacheKey, nodeBuilderState );
+					error( 'TSL: ' + e, stackTrace );
 
 				}
+
+				nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
+
+				if ( nodeBuilder.objectSpecific === false ) nodeBuilderCache.set( cacheKey, nodeBuilderState );
 
 			}
 
@@ -317,115 +232,6 @@ class NodeManager extends DataMap {
 		}
 
 		return nodeBuilderState;
-
-	}
-
-	/**
-	 * Async version of getForRender() that yields to main thread during build.
-	 * Use this in compileAsync() to prevent blocking the main thread.
-	 *
-	 * @param {RenderObject} renderObject - The render object.
-	 * @param {Function} [yieldFn=yieldToMain] - The function used to yield to the main thread.
-	 * @return {Promise<NodeBuilderState>} A promise that resolves to the node builder state.
-	 */
-	getForRenderAsync( renderObject, yieldFn = yieldToMain ) {
-
-		const result = this.getForRender( renderObject, yieldFn );
-
-		// Ensure we always return a Promise (cache hit returns nodeBuilderState directly)
-		if ( result.then ) {
-
-			return result;
-
-		}
-
-		return Promise.resolve( result );
-
-	}
-
-	/**
-	 * Returns nodeBuilderState if ready, null if pending async build.
-	 * Queues async build on first call for cache miss.
-	 * Use this in render() path to enable non-blocking compilation.
-	 *
-	 * @param {RenderObject} renderObject - The render object.
-	 * @return {?NodeBuilderState} The node builder state, or null if still building.
-	 */
-	getForRenderDeferred( renderObject ) {
-
-		const renderObjectData = this.get( renderObject );
-
-		// Already built for this renderObject
-		if ( renderObjectData.nodeBuilderState !== undefined ) {
-
-			return renderObjectData.nodeBuilderState;
-
-		}
-
-		// Check cache with stable key
-		const cacheKey = this.getForRenderCacheKey( renderObject );
-		const nodeBuilderState = this.nodeBuilderCache.get( cacheKey );
-
-		if ( nodeBuilderState !== undefined ) {
-
-			// Cache hit - use it
-			nodeBuilderState.usedTimes ++;
-			renderObjectData.nodeBuilderState = nodeBuilderState;
-			return nodeBuilderState;
-
-		}
-
-		// Cache miss - check if async build already queued
-		if ( renderObjectData.pendingBuild !== true ) {
-
-			// Mark as pending and add to build queue
-			renderObjectData.pendingBuild = true;
-
-			this._buildQueue.push( () => {
-
-				return this.getForRenderAsync( renderObject ).then( () => {
-
-					renderObjectData.pendingBuild = false;
-
-				} );
-
-			} );
-
-			// Start processing queue if not already running
-			this._processBuildQueue();
-
-		}
-
-		return null; // Not ready
-
-	}
-
-	/**
-	 * Processes the build queue one item at a time.
-	 * This ensures builds don't all run simultaneously and freeze the main thread.
-	 *
-	 * @private
-	 */
-	_processBuildQueue() {
-
-		if ( this._buildInProgress || this._buildQueue.length === 0 ) {
-
-			return;
-
-		}
-
-		this._buildInProgress = true;
-
-		const buildFn = this._buildQueue.shift();
-
-		buildFn().then( () => {
-
-			this._buildInProgress = false;
-
-			// Process next item in queue
-			this._processBuildQueue();
-
-		} );
 
 	}
 
@@ -463,11 +269,9 @@ class NodeManager extends DataMap {
 	 * Returns a node builder state for the given compute node.
 	 *
 	 * @param {Node} computeNode - The compute node.
-	 * @param {boolean} [useAsync=false] - Whether to use async build with yielding.
-	 * @param {Function} [yieldFn=yieldToMain] - The function used to yield to the main thread in an async build.
-	 * @return {NodeBuilderState|Promise<NodeBuilderState>} The node builder state (or Promise if async).
+	 * @return {NodeBuilderState} The node builder state.
 	 */
-	getForCompute( computeNode, useAsync = false, yieldFn = yieldToMain ) {
+	getForCompute( computeNode ) {
 
 		const computeData = this.get( computeNode );
 
@@ -482,21 +286,6 @@ class NodeManager extends DataMap {
 
 			if ( onNodeBuilderCreated !== null ) onNodeBuilderCreated( nodeBuilder, computeNode );
 
-			if ( useAsync ) {
-
-				return nodeBuilder.buildAsync( yieldFn ).then( () => {
-
-					nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
-
-					computeData.nodeBuilderState = nodeBuilderState;
-					computeData.version = computeNode.version;
-
-					return nodeBuilderState;
-
-				} );
-
-			}
-
 			nodeBuilder.build();
 
 			nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
@@ -507,28 +296,6 @@ class NodeManager extends DataMap {
 		}
 
 		return nodeBuilderState;
-
-	}
-
-	/**
-	 * Async version of getForCompute() that yields to main thread during build.
-	 * Use this in compileComputeAsync() to prevent blocking the main thread.
-	 *
-	 * @param {Node} computeNode - The compute node.
-	 * @param {Function} [yieldFn=yieldToMain] - The function used to yield to the main thread.
-	 * @return {Promise<NodeBuilderState>} A promise that resolves to the node builder state.
-	 */
-	getForComputeAsync( computeNode, yieldFn = yieldToMain ) {
-
-		const result = this.getForCompute( computeNode, true, yieldFn );
-
-		if ( result.then ) {
-
-			return result;
-
-		}
-
-		return Promise.resolve( result );
 
 	}
 
@@ -688,11 +455,11 @@ class NodeManager extends DataMap {
 		_chainKeys[ 0 ] = scene;
 		_chainKeys[ 1 ] = lightsNode;
 
-		const callId = this.renderer.info.calls;
+		const renderId = this.nodeFrame.renderId;
 
 		const cacheKeyData = this.callHashCache.get( _chainKeys ) || {};
 
-		if ( cacheKeyData.callId !== callId ) {
+		if ( cacheKeyData.renderId !== renderId ) {
 
 			_cacheKeyValues.push( this.renderer.getOutputRenderTarget() && this.renderer.getOutputRenderTarget().multiview ? 1 : 0 );
 			_cacheKeyValues.push( this.renderer.lighting.enabled ? 1 : 0 );
@@ -703,6 +470,7 @@ class NodeManager extends DataMap {
 
 				_cacheKeyValues.push( this.renderer.shadowMap.enabled ? 1 : 0 );
 				_cacheKeyValues.push( this.renderer.shadowMap.type );
+				_cacheKeyValues.push( this.renderer.shadowMap.transmitted ? 1 : 0 );
 
 				const environmentNode = this.getEnvironmentNode( scene );
 				if ( environmentNode ) _cacheKeyValues.push( environmentNode.getCacheKey() );
@@ -712,7 +480,7 @@ class NodeManager extends DataMap {
 			const fogNode = this.getFogNode( scene );
 			if ( fogNode ) _cacheKeyValues.push( fogNode.getCacheKey() );
 
-			cacheKeyData.callId = callId;
+			cacheKeyData.renderId = renderId;
 			cacheKeyData.cacheKey = hashArray( _cacheKeyValues );
 
 			this.callHashCache.set( _chainKeys, cacheKeyData );

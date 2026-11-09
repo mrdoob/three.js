@@ -10,6 +10,7 @@ import {
 	TriangleStripDrawMode,
 	TrianglesDrawMode,
 	Vector3,
+	Vector4,
 } from 'three';
 
 /**
@@ -166,6 +167,7 @@ function mergeGeometries( geometries, useGroups = false ) {
 	const morphTargetsRelative = geometries[ 0 ].morphTargetsRelative;
 
 	const mergedGeometry = new BufferGeometry();
+	mergedGeometry.morphTargetsRelative = morphTargetsRelative;
 
 	let offset = 0;
 
@@ -912,6 +914,8 @@ function computeMorphedAttributes( object ) {
 	const _morphB = new Vector3();
 	const _morphC = new Vector3();
 
+	const _direction = new Vector4();
+
 	function _calculateMorphedAttributeData(
 		object,
 		attribute,
@@ -970,9 +974,21 @@ function computeMorphedAttributes( object ) {
 
 		if ( object.isSkinnedMesh ) {
 
-			object.applyBoneTransform( a, _vA );
-			object.applyBoneTransform( b, _vB );
-			object.applyBoneTransform( c, _vC );
+			if ( attribute === object.geometry.getAttribute( 'normal' ) ) {
+
+				// normals are directions so they must be transformed with w = 0
+
+				_vA.copy( object.applyBoneTransform( a, _direction.set( _vA.x, _vA.y, _vA.z, 0 ) ) );
+				_vB.copy( object.applyBoneTransform( b, _direction.set( _vB.x, _vB.y, _vB.z, 0 ) ) );
+				_vC.copy( object.applyBoneTransform( c, _direction.set( _vC.x, _vC.y, _vC.z, 0 ) ) );
+
+			} else {
+
+				object.applyBoneTransform( a, _vA );
+				object.applyBoneTransform( b, _vB );
+				object.applyBoneTransform( c, _vC );
+
+			}
 
 		}
 
@@ -1225,6 +1241,8 @@ function mergeGroups( geometry ) {
 	for ( let i = 0; i < groups.length; i ++ ) {
 
 		const group = groups[ i ];
+
+		if ( group.count === Infinity ) group.count = index.count - group.start;
 
 		const groupStart = group.start;
 		const groupLength = groupStart + group.count;

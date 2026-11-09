@@ -2,6 +2,8 @@ import DataMap from './DataMap.js';
 import { AttributeType } from './Constants.js';
 import { hashString } from '../../nodes/core/NodeUtils.js';
 
+const _cacheKeyIds = [];
+
 /**
  * This renderer module manages the bindings of the renderer.
  *
@@ -164,13 +166,13 @@ class Bindings extends DataMap {
 
 				for ( const uniform of binding.uniforms ) {
 
-					cacheKeyString += uniform.nodeUniform.node.id;
+					cacheKeyString += uniform.nodeUniform.node.id + ',';
 
 				}
 
 			} else {
 
-				cacheKeyString += binding.nodeUniform.id;
+				cacheKeyString += binding.nodeUniform.id + ',';
 
 			}
 
@@ -451,7 +453,7 @@ class Bindings extends DataMap {
 
 		let needsBindingsUpdate = false;
 		let cacheBindings = true;
-		let cacheKey = '';
+		let cacheKeyLength = 0;
 		let version = 0;
 
 		// iterate over all bindings and check if buffer updates or a new binding group is required
@@ -491,7 +493,7 @@ class Bindings extends DataMap {
 
 				// the generation is part of the version so a re-created buffer replaces the cached bind group
 
-				cacheKey += attribute.id + ',';
+				_cacheKeyIds[ cacheKeyLength ++ ] = attribute.id;
 				version += generation;
 
 			}
@@ -545,7 +547,7 @@ class Bindings extends DataMap {
 
 				} else {
 
-					cacheKey += texture.id + ',';
+					_cacheKeyIds[ cacheKeyLength ++ ] = texture.id;
 					version += texture.version;
 
 				}
@@ -598,7 +600,11 @@ class Bindings extends DataMap {
 
 		if ( needsBindingsUpdate === true ) {
 
-			this.backend.updateBindings( bindGroup, bindings, cacheBindings ? cacheKey : '', version );
+			_cacheKeyIds.length = cacheKeyLength;
+
+			const cacheKey = cacheBindings ? _cacheKeyIds.join( ',' ) : '';
+
+			this.backend.updateBindings( bindGroup, bindings, cacheKey, version );
 
 		}
 

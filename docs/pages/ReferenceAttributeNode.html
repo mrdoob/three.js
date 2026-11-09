@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ReferenceAttributeNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">ReferenceAttributeNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This node binds a buffer attribute that is a property of the rendered object, like the
+matrices of an instanced mesh. Unlike <a href="BufferAttributeNode.html">BufferAttributeNode</a>, the attribute isn't part
+of the program: each object binds its own attribute, so objects can share a program.</p>
+<p>Matrices are bound as columns. Storage buffer attributes are bound as storage buffers.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const matrix = referenceAttribute( 'instanceMatrix', 'mat4' );
+const color = referenceAttribute( 'instanceColor' );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ReferenceAttributeNode" translate="no">new <a href="#ReferenceAttributeNode">ReferenceAttributeNode</a><span class="signature">( property : <span class="param-type">string</span>, nodeType : <span class="param-type">string</span>, object : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new reference attribute node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">property</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the property the node refers to.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">nodeType</strong>
+									</td>
+									<td class="description last">
+										<p>The node type. Inferred from the attribute if not set.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">object</strong>
+									</td>
+									<td class="description last">
+										<p>The object the property belongs to. The rendered object if not set.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="object" translate="no">.<a href="#object">object</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The object the property belongs to. If <code>null</code>, the rendered object is used.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="properties" translate="no">.<a href="#properties">properties</a><span class="type-signature"> : Array.&lt;string></span> </h3>
+					<div class="description">
+						<p>The property name might have dots so nested properties can be referred.
+The hierarchy of the names is stored inside this array.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="property" translate="no">.<a href="#property">property</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The name of the property the node refers to.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="generateNodeType" translate="no">.<a href="#generateNodeType">generateNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the node type, inferred from the attribute if not set.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#generateNodeType">Node#generateNodeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getAttribute" translate="no">.<a href="#getAttribute">getAttribute</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the attribute the node binds when rendering the given object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">object</strong>
+									</td>
+									<td class="description last">
+										<p>The rendered object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The buffer attribute.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getValueFromReference" translate="no">.<a href="#getValueFromReference">getValueFromReference</a><span class="signature">( object : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the value of the referred property of the given object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">object</strong>
+									</td>
+									<td class="description last">
+										<p>The object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The value of the referred property.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets up the attribute nodes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#setup">Node#setup</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The attribute node.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/ReferenceAttributeNode.js" translate="no" target="_blank" rel="noopener">src/nodes/accessors/ReferenceAttributeNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

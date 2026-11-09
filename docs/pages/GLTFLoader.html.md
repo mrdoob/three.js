@@ -12,6 +12,7 @@ A loader for the glTF 2.0 format.
 *   KHR\_lights\_punctual
 *   KHR\_materials\_anisotropy
 *   KHR\_materials\_clearcoat
+*   KHR\_materials\_diffuse\_roughness
 *   KHR\_materials\_dispersion
 *   KHR\_materials\_emissive\_strength
 *   KHR\_materials\_ior

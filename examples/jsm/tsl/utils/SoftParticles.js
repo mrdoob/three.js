@@ -1,4 +1,4 @@
-import { Fn, float, positionView, viewportDepthTexture, perspectiveDepthToViewZ, cameraNear, cameraFar } from 'three/tsl';
+import { Fn, float, positionView, viewportDepthTexture, depthToViewZ, cameraNear, cameraFar } from 'three/tsl';
 
 /**
  * @module SoftParticles
@@ -12,19 +12,19 @@ import { Fn, float, positionView, viewportDepthTexture, perspectiveDepthToViewZ,
  * @tsl
  * @function
  * @private
- * @param {Node<float>} input - The value to remap, expected in the `[0, 1]` range.
+ * @param {Node<float>} value - The value to remap, expected in the `[0, 1]` range.
  * @param {Node<float>} power - The contrast power. `1` is linear, higher values sharpen the transition.
  * @return {Node<float>} The remapped value.
  */
-const contrastCurve = /*@__PURE__*/ Fn( ( [ input, power ] ) => {
+const contrastCurve = /*@__PURE__*/ Fn( ( [ value, power ] ) => {
 
-	const aboveHalf = input.greaterThan( 0.5 ).toConst();
-	const folded = aboveHalf.select( input.oneMinus(), input ).toConst();
+	const aboveHalf = value.greaterThan( 0.5 ).toConst();
+	const folded = aboveHalf.select( value.oneMinus(), value ).toConst();
 	const output = folded.mul( 2 ).saturate().pow( power ).mul( 0.5 ).toConst();
 
 	return aboveHalf.select( output.oneMinus(), output );
 
-}, { input: 'float', power: 'float', return: 'float' } );
+}, { value: 'float', power: 'float', return: 'float' } );
 
 /**
  * Computes an opacity node for soft particles, based on the "Soft Particles" white
@@ -44,7 +44,7 @@ export function softParticles( { opacity = float( 1 ), distance = 1, contrast = 
 	// Read the opaque scene depth captured before the particle pass and convert both
 	// the scene depth and the particle's depth to view space, so the gap between them
 	// can be measured in world units.
-	const sceneViewZ = perspectiveDepthToViewZ( viewportDepth, cameraNear, cameraFar ).toConst();
+	const sceneViewZ = Fn( ( { camera } ) => depthToViewZ( viewportDepth, cameraNear, cameraFar, camera ) )().toConst();
 	const depthDelta = positionView.z.sub( sceneViewZ ).div( distance ).saturate();
 
 	// Fade out as the particle approaches the scene; stay opaque when well in front of it.

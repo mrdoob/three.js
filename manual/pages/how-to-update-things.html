@@ -71,6 +71,16 @@ object.updateMatrix();
               no way to create a BufferGeometry that can efficiently be extended indefinitely.
             </p>
             <p>
+              If an update exceeds the pre-allocated buffer capacity, create a new geometry instead of
+              replacing attributes with larger buffers on a geometry that has already been rendered.
+              Dispose of the old geometry when it is no longer used to release its GPU resources.
+            </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+const newGeometry = new THREE.BufferGeometry().setFromPoints( newPoints );
+line.geometry.dispose();
+line.geometry = newGeometry;
+</pre>
+            <p>
               We'll use the example of a line that gets extended at render time. We'll allocate space
               in the buffer for 500 vertices but draw only two at first, using `BufferGeometry.drawRange`.
             </p>

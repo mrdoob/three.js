@@ -6,7 +6,7 @@ Represents the lighting model for a PBR material.
 
 ## Constructor
 
-### new PhysicalLightingModel( clearcoat : boolean, sheen : boolean, iridescence : boolean, anisotropy : boolean, transmission : boolean, dispersion : boolean, retroreflection : boolean )
+### new PhysicalLightingModel( clearcoat : boolean, sheen : boolean, iridescence : boolean, anisotropy : boolean, transmission : boolean, dispersion : boolean, retroreflection : boolean, diffuseRoughness : boolean )
 
 Constructs a new physical lighting model.
 
@@ -52,6 +52,12 @@ Whether retroreflection is supported or not.
 
 Default is `false`.
 
+**diffuseRoughness**
+
+Whether EON rough diffuse reflection is supported or not.
+
+Default is `false`.
+
 ## Properties
 
 ### .anisotropy : boolean
@@ -90,11 +96,23 @@ The sampled DFG LUT value, shared by the direct and indirect lighting paths.
 
 Default is `null`.
 
+### .diffuseRoughness : boolean
+
+Whether EON rough diffuse reflection is supported or not.
+
+Default is `false`.
+
 ### .dispersion : boolean
 
 Whether dispersion is supported or not.
 
 Default is `false`.
+
+### .eonDirectionalAlbedo : Node
+
+The EON directional albedo, shared by the indirect lighting paths.
+
+Default is `null`.
 
 ### .iridescence : boolean
 
@@ -126,6 +144,12 @@ The multi-scattering energy compensation for direct lighting.
 
 Default is `null`.
 
+### .multiScatteringDielectric : Node
+
+The dielectric multi-scattering term, shared by the indirect lighting paths.
+
+Default is `null`.
+
 ### .retroreflection : boolean
 
 Whether retroreflection is supported or not.
@@ -147,6 +171,12 @@ Default is `null`.
 ### .sheenSpecularIndirect : Node
 
 The sheen specular indirect.
+
+Default is `null`.
+
+### .singleScatteringDielectric : Node
+
+The dielectric single-scattering term, shared by the indirect lighting paths.
 
 Default is `null`.
 

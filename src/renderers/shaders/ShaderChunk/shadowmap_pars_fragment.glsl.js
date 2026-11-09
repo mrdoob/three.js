@@ -371,17 +371,22 @@ export default /* glsl */`
 
 		if ( viewSpaceZ - shadowCameraFar <= 0.0 && viewSpaceZ - shadowCameraNear >= 0.0 ) {
 
-			// viewZ to perspective depth
+			// Each sample is compared against the depth of the point next to the fragment in its direction,
+			// on whichever face of the cube it falls, so the comparison is the same on every face. A face
+			// stores the depth along its own axis, which for the point at direction * lightDistance is
+			// lightDistance * max( |x|, |y|, |z| ) of the direction, and perspective depth is a + b / z.
+			float lightDistance = length( lightToPosition );
+			float depthRange = shadowCameraFar - shadowCameraNear;
 
 			#ifdef USE_REVERSED_DEPTH_BUFFER
 
-				float dp = ( shadowCameraNear * ( shadowCameraFar - viewSpaceZ ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );
-				dp -= shadowBias;
+				float depthA = - shadowCameraNear / depthRange - shadowBias;
+				float depthB = shadowCameraNear * shadowCameraFar / ( depthRange * lightDistance );
 
 			#else
 
-				float dp = ( shadowCameraFar * ( viewSpaceZ - shadowCameraNear ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );
-				dp += shadowBias;
+				float depthA = shadowCameraFar / depthRange + shadowBias;
+				float depthB = - shadowCameraNear * shadowCameraFar / ( depthRange * lightDistance );
 
 			#endif
 
@@ -398,19 +403,21 @@ export default /* glsl */`
 			// Use IGN to rotate sampling pattern per pixel
 			float phi = interleavedGradientNoise( gl_FragCoord.xy ) * PI2;
 
-			vec2 sample0 = vogelDiskSample( 0, 5, phi );
-			vec2 sample1 = vogelDiskSample( 1, 5, phi );
-			vec2 sample2 = vogelDiskSample( 2, 5, phi );
-			vec2 sample3 = vogelDiskSample( 3, 5, phi );
-			vec2 sample4 = vogelDiskSample( 4, 5, phi );
+			shadow = 0.0;
 
-			shadow = (
-				texture( shadowMap, vec4( bd3D + ( tangent * sample0.x + bitangent * sample0.y ) * texelSize, dp ) ) +
-				texture( shadowMap, vec4( bd3D + ( tangent * sample1.x + bitangent * sample1.y ) * texelSize, dp ) ) +
-				texture( shadowMap, vec4( bd3D + ( tangent * sample2.x + bitangent * sample2.y ) * texelSize, dp ) ) +
-				texture( shadowMap, vec4( bd3D + ( tangent * sample3.x + bitangent * sample3.y ) * texelSize, dp ) ) +
-				texture( shadowMap, vec4( bd3D + ( tangent * sample4.x + bitangent * sample4.y ) * texelSize, dp ) )
-			) * 0.2;
+			for ( int i = 0; i < 5; i ++ ) {
+
+				vec2 offset = vogelDiskSample( i, 5, phi );
+				vec3 direction = bd3D + ( tangent * offset.x + bitangent * offset.y ) * texelSize;
+				vec3 absDirection = abs( direction );
+
+				float dp = depthA + depthB / max( max( absDirection.x, absDirection.y ), absDirection.z );
+
+				shadow += texture( shadowMap, vec4( direction, dp ) );
+
+			}
+
+			shadow *= 0.2;
 
 		}
 

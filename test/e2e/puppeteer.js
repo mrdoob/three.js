@@ -14,7 +14,7 @@ const exceptionList = [
  	'webgl_materials_cubemap_dynamic', 	// 1 min
 	'webgl_materials_displacementmap', 	// 1 min
 	'webgl_materials_envmaps_hdr', 		// 1 min
-	'webgpu_water', 					// 1 min
+	'webgpu_loader_vdb',				// streams 31 MB of frames
 
 	// Requires HTML-in-Canvas API
 	'webgl_materials_texture_html',
@@ -40,8 +40,8 @@ const exceptionList = [
 	'webgpu_compute_audio',
 	'webgpu_compute_cloth',
 	'webgpu_compute_particles_fluid',
-	'webgpu_compute_rasterizer_ibl', // Rasterizer discrepancies
 	'webgpu_compute_sort_bitonic',
+	'webgpu_meshlets_ibl', // Rasterizer discrepancies
 	'webgpu_storage_buffer',
 	'webgpu_tsl_editor',
 	'webgpu_tsl_graph',
@@ -57,8 +57,11 @@ const exceptionList = [
 	'webgl_morphtargets_face',
 	'webgl_shadowmap_progressive',
 	'webgpu_materials_matcap',
+	'webgpu_meshlets_city',
+	'webgpu_meshlets_materials',
 	'webgpu_morphtargets_face',
 	'webgpu_shadowmap_progressive',
+	'webgpu_lightmap_baking',
 	'webgpu_postprocessing_ssr_denoise',
 	'webgpu_renderer_pathtracer',
 	'webgpu_vxgi',
@@ -95,6 +98,7 @@ const parseTime = 1; // 1 second per megabyte
 
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
+const maxRetries = 2; // Retry timed-out or completely black examples in a fresh browser
 const numCIJobs = 5; // GitHub Actions run the script in 5 threads
 
 const width = 400;
@@ -443,7 +447,7 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file ) {
+async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file, retries = 0 ) {
 
 	const page = ctx.page;
 	const pageStart = performance.now();
@@ -591,6 +595,18 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 			} else {
 
+				const isBlack = actual.data.every( ( value, index ) => index % 4 === 3 || value === 0 );
+
+				if ( isBlack && retries < maxRetries ) {
+
+					console.yellow( 'Restarting browser...' );
+					await ctx.restart();
+
+					console.yellow( `Retrying ${ file } after black screenshot (${ retries + 1 }/${ maxRetries })...` );
+					return await checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file, retries + 1 );
+
+				}
+
 				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg`, jpgQuality );
 				await expected.write( `test/e2e/output-screenshots/${ file }-expected.jpg`, jpgQuality );
 				await diff.write( `test/e2e/output-screenshots/${ file }-diff.jpg`, jpgQuality );
@@ -609,6 +625,23 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 			await ctx.restart();
 
 		} else {
+
+			// A timed-out page can stay wedged and time out every following file
+
+			if ( String( e ).includes( 'TimeoutError' ) ) {
+
+				console.yellow( 'Restarting browser...' );
+				await ctx.restart();
+
+				if ( retries < maxRetries ) {
+
+					console.yellow( `${ e }` );
+					console.yellow( `Retrying ${ file } after timeout (${ retries + 1 }/${ maxRetries })...` );
+					return await checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file, retries + 1 );
+
+				}
+
+			}
 
 			console.red( e );
 			failedScreenshots.push( file );

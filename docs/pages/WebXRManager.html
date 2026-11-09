@@ -77,6 +77,8 @@ of the active XR session. For each view it holds a separate camera object.</p>
 <p>The camera's <code>fov</code> is currently not used and does not reflect the fov of
 the XR camera. If you need the fov on app level, you have to compute in
 manually from the XR camera's projection matrices.</p>
+<p>The camera's transformation and projection matrix are derived from the first
+sub camera (e.g. the left eye in a stereo setup).</p>
 						</div>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The XR camera.</dt>

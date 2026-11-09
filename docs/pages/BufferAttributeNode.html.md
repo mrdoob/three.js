@@ -22,7 +22,7 @@ material.positionNode = positionBuffer.toAttribute();
 
 ## Constructor
 
-### new BufferAttributeNode( value : BufferAttribute | InterleavedBuffer | TypedArray, bufferType : string, bufferStride : number, bufferOffset : number )
+### new BufferAttributeNode( value : BufferAttribute | InterleavedBufferAttribute | InterleavedBuffer | TypedArray, bufferType : string, bufferStride : number, bufferOffset : number )
 
 Constructs a new buffer attribute node.
 
@@ -149,6 +149,16 @@ The current node builder.
 **Overrides:** [InputNode#getInputType](InputNode.html#getInputType)
 
 **Returns:** The input type.
+
+### .getObjectAttribute( object : Object3D ) : BufferAttribute | InterleavedBufferAttribute
+
+Returns the buffer attribute to bind when rendering the given object. Nodes that bind attributes of the rendered object, like [ReferenceAttributeNode](ReferenceAttributeNode.html), overwrite it.
+
+**object**
+
+The rendered object.
+
+**Returns:** The buffer attribute.
 
 ### .setInstanced( value : boolean ) : BufferAttributeNode
 

@@ -36,6 +36,14 @@ Whether this camera is used with multiview rendering or not.
 
 Default is `false`.
 
+### .perCameraFrustumCulled : boolean
+
+Whether 3D objects are frustum culled per sub camera or not.
+
+Since this requires an additional frustum test per sub camera, it should only be enabled when the frustums of the sub cameras barely overlap. The property has no effect with multiview rendering.
+
+Default is `false`.
+
 ## Source
 
 [src/cameras/ArrayCamera.js](https://github.com/mrdoob/three.js/blob/master/src/cameras/ArrayCamera.js)

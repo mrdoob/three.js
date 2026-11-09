@@ -362,7 +362,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 
 			numLightProbes: lights.numLightProbes,
 
-			numLightProbeGrids: lightProbeGrids.length,
+			numLightProbeGrids: lightProbeGrids.filter( grid => grid.texture !== null ).length,
 
 			numClippingPlanes: clipping.numPlanes,
 			numClipIntersection: clipping.numIntersection,
@@ -497,6 +497,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 		array.push( parameters.numSpotLightShadows );
 		array.push( parameters.numSpotLightShadowsWithMaps );
 		array.push( parameters.numLightProbes );
+		array.push( parameters.numLightProbeGrids );
 		array.push( parameters.shadowMapType );
 		array.push( parameters.toneMapping );
 		array.push( parameters.numClippingPlanes );

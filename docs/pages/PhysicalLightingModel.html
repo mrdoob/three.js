@@ -18,7 +18,7 @@
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="PhysicalLightingModel" translate="no">new <a href="#PhysicalLightingModel">PhysicalLightingModel</a><span class="signature">( clearcoat : <span class="param-type">boolean</span>, sheen : <span class="param-type">boolean</span>, iridescence : <span class="param-type">boolean</span>, anisotropy : <span class="param-type">boolean</span>, transmission : <span class="param-type">boolean</span>, dispersion : <span class="param-type">boolean</span>, retroreflection : <span class="param-type">boolean</span> )</span> </h3>
+					<h3 class="name name-method" id="PhysicalLightingModel" translate="no">new <a href="#PhysicalLightingModel">PhysicalLightingModel</a><span class="signature">( clearcoat : <span class="param-type">boolean</span>, sheen : <span class="param-type">boolean</span>, iridescence : <span class="param-type">boolean</span>, anisotropy : <span class="param-type">boolean</span>, transmission : <span class="param-type">boolean</span>, dispersion : <span class="param-type">boolean</span>, retroreflection : <span class="param-type">boolean</span>, diffuseRoughness : <span class="param-type">boolean</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new physical lighting model.</p>
@@ -88,6 +88,15 @@
 										<p>Default is <code>false</code>.</p>
 									</td>
 								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">diffuseRoughness</strong>
+									</td>
+									<td class="description last">
+										<p>Whether EON rough diffuse reflection is supported or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
 							</tbody>
 						</table>
 					</div>
@@ -136,10 +145,24 @@
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="diffuseRoughness" translate="no">.<a href="#diffuseRoughness">diffuseRoughness</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether EON rough diffuse reflection is supported or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="dispersion" translate="no">.<a href="#dispersion">dispersion</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Whether dispersion is supported or not.</p>
 						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="eonDirectionalAlbedo" translate="no">.<a href="#eonDirectionalAlbedo">eonDirectionalAlbedo</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The EON directional albedo, shared by the indirect lighting paths.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -178,6 +201,13 @@
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="multiScatteringDielectric" translate="no">.<a href="#multiScatteringDielectric">multiScatteringDielectric</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The dielectric multi-scattering term, shared by the indirect lighting paths.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="retroreflection" translate="no">.<a href="#retroreflection">retroreflection</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Whether retroreflection is supported or not.</p>
@@ -202,6 +232,13 @@
 					<h3 class="name" id="sheenSpecularIndirect" translate="no">.<a href="#sheenSpecularIndirect">sheenSpecularIndirect</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="description">
 						<p>The sheen specular indirect.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="singleScatteringDielectric" translate="no">.<a href="#singleScatteringDielectric">singleScatteringDielectric</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The dielectric single-scattering term, shared by the indirect lighting paths.</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>

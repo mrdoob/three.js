@@ -294,9 +294,9 @@
 				randomizeDataArray( array );
 
 				const currentElementsBuffer = new THREE.StorageInstancedBufferAttribute( array, 1 );
-				const currentElementsStorage = storage( currentElementsBuffer, 'uint', size ).setPBO( true ).setName( 'Elements' );
+				const currentElementsStorage = storage( currentElementsBuffer, 'uint' ).setPBO( true ).setName( 'Elements' );
 				const randomizedElementsBuffer = new THREE.StorageInstancedBufferAttribute( size, 1 );
-				const randomizedElementsStorage = storage( randomizedElementsBuffer, 'uint', size ).setPBO( true ).setName( 'RandomizedElements' );
+				const randomizedElementsStorage = storage( randomizedElementsBuffer, 'uint' ).setPBO( true ).setName( 'RandomizedElements' );
 
 				const computeInitFn = Fn( () => {
 
@@ -404,11 +404,11 @@
 
 				const infoArray = new Uint32Array( [ 3, 2, 2 ] );
 				const infoBuffer = new THREE.StorageInstancedBufferAttribute( infoArray, 1 );
-				const infoStorage = storage( infoBuffer, 'uint', infoBuffer.count ).setPBO( true ).setName( 'TheInfo' );
+				const infoStorage = storage( infoBuffer, 'uint' ).setPBO( true ).setName( 'TheInfo' );
 
 				const nextBlockHeightBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( 2 ), 1 );
-				const nextBlockHeightStorage = storage( nextBlockHeightBuffer, 'uint', nextBlockHeightBuffer.count ).setPBO( true ).setName( 'NextBlockHeight' );
-				const nextBlockHeightRead = storage( nextBlockHeightBuffer, 'uint', nextBlockHeightBuffer.count ).setPBO( true ).setName( 'NextBlockHeight' ).toReadOnly();
+				const nextBlockHeightStorage = storage( nextBlockHeightBuffer, 'uint' ).setPBO( true ).setName( 'NextBlockHeight' );
+				const nextBlockHeightRead = storage( nextBlockHeightBuffer, 'uint' ).setPBO( true ).setName( 'NextBlockHeight' ).toReadOnly();
 
 				const array = new Uint32Array( Array.from( { length: size }, ( _, i ) => {
 
@@ -419,11 +419,11 @@
 				randomizeDataArray( array );
 
 				const currentElementsBuffer = new THREE.StorageInstancedBufferAttribute( array, 1 );
-				const currentElementsStorage = storage( currentElementsBuffer, 'uint', size ).setPBO( true ).setName( 'Elements' );
+				const currentElementsStorage = storage( currentElementsBuffer, 'uint' ).setPBO( true ).setName( 'Elements' );
 				const tempBuffer = new THREE.StorageInstancedBufferAttribute( array, 1 );
-				const tempStorage = storage( tempBuffer, 'uint', size ).setPBO( true ).setName( 'Temp' );
+				const tempStorage = storage( tempBuffer, 'uint' ).setPBO( true ).setName( 'Temp' );
 				const randomizedElementsBuffer = new THREE.StorageInstancedBufferAttribute( size, 1 );
-				const randomizedElementsStorage = storage( randomizedElementsBuffer, 'uint', size ).setPBO( true ).setName( 'RandomizedElements' );
+				const randomizedElementsStorage = storage( randomizedElementsBuffer, 'uint' ).setPBO( true ).setName( 'RandomizedElements' );
 
 				// Swap the elements in local storage
 				const globalCompareAndSwap = ( idxBefore, idxAfter ) => {

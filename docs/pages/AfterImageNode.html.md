@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # AfterImageNode
 
@@ -44,7 +44,7 @@ The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders i
 
 Default is `'frame'`.
 
-**Overrides:** [TempNode#updateBeforeType](TempNode.html#updateBeforeType)
+**Overrides:** [Node#updateBeforeType](Node.html#updateBeforeType)
 
 ## Methods
 
@@ -52,7 +52,7 @@ Default is `'frame'`.
 
 Frees internal resources. This method should be called when the effect is no longer required.
 
-**Overrides:** [TempNode#dispose](TempNode.html#dispose)
+**Overrides:** [Node#dispose](Node.html#dispose)
 
 ### .getTextureNode() : PassTextureNode
 
@@ -80,7 +80,7 @@ This method is used to setup the effect's TSL code.
 
 The current node builder.
 
-**Overrides:** [TempNode#setup](TempNode.html#setup)
+**Overrides:** [Node#setup](Node.html#setup)
 
 ### .updateBefore( frame : NodeFrame )
 
@@ -90,7 +90,7 @@ This method is used to render the effect once per frame.
 
 The current node frame.
 
-**Overrides:** [TempNode#updateBefore](TempNode.html#updateBefore)
+**Overrides:** [Node#updateBefore](Node.html#updateBefore)
 
 ## Source
 

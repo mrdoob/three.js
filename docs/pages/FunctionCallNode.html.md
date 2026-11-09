@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # FunctionCallNode
 
@@ -46,7 +46,7 @@ Returns the type of this function call node.
 
 The current node builder.
 
-**Overrides:** [TempNode#generateNodeType](TempNode.html#generateNodeType)
+**Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
 
 **Returns:** The type of this node.
 
@@ -62,7 +62,7 @@ The current node builder.
 
 The name of the member.
 
-**Overrides:** [TempNode#getMemberType](TempNode.html#getMemberType)
+**Overrides:** [Node#getMemberType](Node.html#getMemberType)
 
 **Returns:** The type of the member.
 

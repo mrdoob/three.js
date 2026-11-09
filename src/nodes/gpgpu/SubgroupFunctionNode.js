@@ -586,6 +586,7 @@ export const subgroupShuffleDown = /*@__PURE__*/ nodeProxyAssignable( SubgroupFu
  * @tsl
  * @method
  * @param {number} e - The value to broadcast.
+ * @param {number} id - The quad invocation id to broadcast from.
  * @return {number} The broadcast value.
  */
-export const quadBroadcast = /*@__PURE__*/ nodeProxyAssignable( SubgroupFunctionNode, SubgroupFunctionNode.QUAD_BROADCAST ).setParameterLength( 1 );
+export const quadBroadcast = /*@__PURE__*/ nodeProxyAssignable( SubgroupFunctionNode, SubgroupFunctionNode.QUAD_BROADCAST ).setParameterLength( 2 );

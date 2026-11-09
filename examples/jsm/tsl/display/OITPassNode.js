@@ -252,11 +252,6 @@ class OITPassNode extends PassNode {
 
 		_rendererState = RendererUtils.saveRendererState( renderer, _rendererState );
 
-		const currentAutoClearColor = renderer.autoClearColor;
-		const currentAutoClearDepth = renderer.autoClearDepth;
-		const currentAutoClearStencil = renderer.autoClearStencil;
-		const currentTransparent = renderer.transparent;
-		const currentOpaque = renderer.opaque;
 		const currentMask = camera.layers.mask;
 
 		this._cameraNear.value = camera.near;
@@ -298,12 +293,6 @@ class OITPassNode extends PassNode {
 
 		RendererUtils.restoreSceneState( scene, _sceneState );
 		RendererUtils.restoreRendererState( renderer, _rendererState );
-
-		renderer.autoClearColor = currentAutoClearColor;
-		renderer.autoClearDepth = currentAutoClearDepth;
-		renderer.autoClearStencil = currentAutoClearStencil;
-		renderer.transparent = currentTransparent;
-		renderer.opaque = currentOpaque;
 
 		camera.layers.mask = currentMask;
 

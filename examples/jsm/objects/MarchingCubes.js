@@ -43,6 +43,8 @@ class MarchingCubes extends Mesh {
 
 		const scope = this;
 
+		let vertexCount = 0;
+
 		// temp buffers used in polygonize
 
 		const vlist = new Float32Array( 12 * 3 );
@@ -96,7 +98,7 @@ class MarchingCubes extends Mesh {
 
 			//
 
-			this.count = 0;
+			vertexCount = 0;
 
 			const maxVertexCount = maxPolyCount * 3;
 
@@ -432,7 +434,7 @@ class MarchingCubes extends Mesh {
 
 		function posnormtriv( pos, norm, colors, o1, o2, o3 ) {
 
-			const c = scope.count * 3;
+			const c = vertexCount * 3;
 
 			// positions
 
@@ -488,7 +490,7 @@ class MarchingCubes extends Mesh {
 
 			if ( scope.enableUvs ) {
 
-				const d = scope.count * 2;
+				const d = vertexCount * 2;
 
 				scope.uvArray[ d + 0 ] = pos[ o1 + 0 ];
 				scope.uvArray[ d + 1 ] = pos[ o1 + 2 ];
@@ -519,7 +521,7 @@ class MarchingCubes extends Mesh {
 
 			}
 
-			scope.count += 3;
+			vertexCount += 3;
 
 		}
 
@@ -905,7 +907,7 @@ class MarchingCubes extends Mesh {
 		 */
 		this.update = function () {
 
-			this.count = 0;
+			vertexCount = 0;
 
 			// Triangulate. Yeah, this is slow.
 
@@ -936,7 +938,7 @@ class MarchingCubes extends Mesh {
 
 			// set the draw range to only the processed triangles
 
-			this.geometry.setDrawRange( 0, this.count );
+			this.geometry.setDrawRange( 0, vertexCount );
 
 			// update geometry data
 
@@ -948,7 +950,7 @@ class MarchingCubes extends Mesh {
 
 			// safety check
 
-			if ( this.count / 3 > maxPolyCount ) console.warn( 'THREE.MarchingCubes: Geometry buffers too small for rendering. Please create an instance with a higher poly count.' );
+			if ( vertexCount / 3 > maxPolyCount ) console.warn( 'THREE.MarchingCubes: Geometry buffers too small for rendering. Please create an instance with a higher poly count.' );
 
 		};
 

@@ -105,6 +105,17 @@ value instead, use <a href="TSL.html#materialClearcoatRoughness">materialClearco
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="diffuseRoughnessNode" translate="no">.<a href="#diffuseRoughnessNode">diffuseRoughnessNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The diffuse roughness of physical materials is by default inferred from the
+<code>diffuseRoughness</code> and <code>diffuseRoughnessMap</code> properties. This node property allows to overwrite the
+default and define the diffuse roughness with a node instead.</p>
+<p>If you don't want to overwrite the diffuse roughness but modify the existing
+value instead, use <a href="TSL.html#materialDiffuseRoughness">materialDiffuseRoughness</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="dispersionNode" translate="no">.<a href="#dispersionNode">dispersionNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
 					<div class="description">
 						<p>The dispersion of physical materials is by default inferred from the
@@ -151,8 +162,8 @@ value instead, use <a href="TSL.html#materialIridescence">materialIridescence</a
 				<div class="member">
 					<h3 class="name" id="iridescenceThicknessNode" translate="no">.<a href="#iridescenceThicknessNode">iridescenceThicknessNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
 					<div class="description">
-						<p>The iridescence thickness of physical materials is by default inferred from the <code>iridescenceThicknessRange</code>
-and <code>iridescenceThicknessMap</code> properties. This node property allows to overwrite the default
+						<p>The iridescence thickness of physical materials is by default inferred from the <code>iridescenceThicknessMinimum</code>,
+<code>iridescenceThicknessMaximum</code> and <code>iridescenceThicknessMap</code> properties. This node property allows to overwrite the default
 and define the iridescence thickness with a node instead.</p>
 <p>If you don't want to overwrite the iridescence thickness but modify the existing
 value instead, use <a href="TSL.html#materialIridescenceThickness">materialIridescenceThickness</a>.</p>
@@ -255,6 +266,13 @@ value instead, use <a href="TSL.html#materialTransmission">materialTransmission<
 					<div class="description">
 						<p>Whether the lighting model should use clearcoat or not.</p>
 						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="useDiffuseRoughness" translate="no">.<a href="#useDiffuseRoughness">useDiffuseRoughness</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the lighting model should use EON rough diffuse reflection or not.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">

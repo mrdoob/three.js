@@ -1165,17 +1165,18 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 		const emissiveIntensity = material.emissiveIntensity ?? 1;
 
+		const emissiveColor = new Color(
+			material.emissive.r * emissiveIntensity,
+			material.emissive.g * emissiveIntensity,
+			material.emissive.b * emissiveIntensity
+		);
+
 		if ( material.emissiveMap ) {
 
 			previewSurfaceNode.addProperty(
 				`color3f inputs:emissiveColor.connect = </Materials/Material_${material.id}/Texture_${material.emissiveMap.id}_emissive.outputs:rgb>`
 			);
 
-			const emissiveColor = new Color(
-				material.emissive.r * emissiveIntensity,
-				material.emissive.g * emissiveIntensity,
-				material.emissive.b * emissiveIntensity
-			);
 			const textureNodes = buildTextureNodes(
 				material.emissiveMap,
 				'emissive',
@@ -1186,7 +1187,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 		} else if ( material.emissive.getHex() > 0 ) {
 
 			previewSurfaceNode.addProperty(
-				`color3f inputs:emissiveColor = ${buildColor( material.emissive )}`
+				`color3f inputs:emissiveColor = ${buildColor( emissiveColor )}`
 			);
 
 		}
@@ -1410,45 +1411,48 @@ function buildCamera( camera, usedNames, options ) {
 	)}, ${camera.far.toPrecision( PRECISION )})`;
 	node.addProperty( `float2 clippingRange = ${clippingRange}` );
 
-	let horizontalAperture;
 	if ( camera.isOrthographicCamera ) {
 
-		horizontalAperture = (
-			( Math.abs( camera.left ) + Math.abs( camera.right ) ) *
-			10
-		).toPrecision( PRECISION );
+		const horizontalAperture = ( ( camera.right - camera.left ) / camera.zoom * 10 ).toPrecision( PRECISION );
+		node.addProperty( `float horizontalAperture = ${horizontalAperture}` );
 
-	} else {
+		const verticalAperture = ( ( camera.top - camera.bottom ) / camera.zoom * 10 ).toPrecision( PRECISION );
+		node.addProperty( `float verticalAperture = ${verticalAperture}` );
 
-		horizontalAperture = camera.getFilmWidth().toPrecision( PRECISION );
+		if ( camera.left + camera.right !== 0 ) {
 
-	}
+			const horizontalApertureOffset = ( ( camera.right + camera.left ) / 2 * 10 ).toPrecision( PRECISION );
+			node.addProperty( `float horizontalApertureOffset = ${horizontalApertureOffset}` );
 
-	node.addProperty( `float horizontalAperture = ${horizontalAperture}` );
+		}
 
-	let verticalAperture;
-	if ( camera.isOrthographicCamera ) {
+		if ( camera.top + camera.bottom !== 0 ) {
 
-		verticalAperture = (
-			( Math.abs( camera.top ) + Math.abs( camera.bottom ) ) *
-			10
-		).toPrecision( PRECISION );
+			const verticalApertureOffset = ( ( camera.top + camera.bottom ) / 2 * 10 ).toPrecision( PRECISION );
+			node.addProperty( `float verticalApertureOffset = ${verticalApertureOffset}` );
 
-	} else {
+		}
 
-		verticalAperture = camera.getFilmHeight().toPrecision( PRECISION );
+	} else if ( camera.isPerspectiveCamera ) {
 
-	}
+		const horizontalAperture = camera.getFilmWidth().toPrecision( PRECISION );
+		node.addProperty( `float horizontalAperture = ${horizontalAperture}` );
 
-	node.addProperty( `float verticalAperture = ${verticalAperture}` );
-
-	if ( camera.isPerspectiveCamera ) {
+		const verticalAperture = camera.getFilmHeight().toPrecision( PRECISION );
+		node.addProperty( `float verticalAperture = ${verticalAperture}` );
 
 		const focalLength = camera.getFocalLength().toPrecision( PRECISION );
 		node.addProperty( `float focalLength = ${focalLength}` );
 
 		const focusDistance = camera.focus.toPrecision( PRECISION );
 		node.addProperty( `float focusDistance = ${focusDistance}` );
+
+	} else {
+
+		console.warn(
+			'THREE.USDZExporter: USDZ does not support the given camera type',
+			camera
+		);
 
 	}
 

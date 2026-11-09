@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # CubeMapNode
 
@@ -26,7 +26,7 @@ The `updateBeforeType` is set to `NodeUpdateType.RENDER` since the node updates 
 
 Default is `'render'`.
 
-**Overrides:** [TempNode#updateBeforeType](TempNode.html#updateBeforeType)
+**Overrides:** [Node#updateBeforeType](Node.html#updateBeforeType)
 
 ## Source
 
