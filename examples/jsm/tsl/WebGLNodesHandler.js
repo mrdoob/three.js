@@ -315,7 +315,9 @@ export class WebGLNodesHandler {
 		this.onBeforeRenderCallback = function ( renderer, scene, camera, geometry, object ) {
 
 			// update node frame references for update nodes
-			const { nodeFrame } = self;
+			const { nodeFrame, renderStack } = self;
+			renderStack[ renderStack.length - 1 ].camera = camera;
+			nodeFrame.camera = camera;
 			nodeFrame.material = this;
 			nodeFrame.object = object;
 
@@ -402,6 +404,9 @@ export class WebGLNodesHandler {
 
 
 	renderStart( scene, camera, targetScene = scene ) {
+
+		// WebGLRenderer draws each view of an ArrayCamera separately.
+		if ( camera.isArrayCamera && camera.cameras.length > 0 ) camera = camera.cameras[ 0 ];
 
 		const { nodeFrame, renderStack, renderer, sceneContexts } = this;
 		nodeFrame.update();

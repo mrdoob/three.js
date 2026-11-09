@@ -1,6 +1,7 @@
 import { uniform } from '../core/UniformNode.js';
 import { renderGroup, sharedUniformGroup } from '../core/UniformGroupNode.js';
 import { Vector3 } from '../../math/Vector3.js';
+import { Vector4 } from '../../math/Vector4.js';
 import { Fn, vec4 } from '../tsl/TSLBase.js';
 import { uniformArray } from './UniformArrayNode.js';
 import { builtin } from './BuiltinNode.js';
@@ -51,6 +52,7 @@ let _cameraNormalMatrixBase = null;
 let _cameraPositionBase = null;
 
 let _cameraViewportBase = null;
+let _cameraViewportWebGL = null;
 
 /**
  * TSL object that represents the current `index` value of the camera if used ArrayCamera.
@@ -372,7 +374,18 @@ export const cameraViewport = /*@__PURE__*/ ( Fn( ( { camera, renderer } ) => {
 
 	let cameraViewport;
 
-	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
+	if ( renderer.isWebGLRenderer === true ) {
+
+		// Each view uses a separate draw and viewport in WebGLRenderer.
+		if ( _cameraViewportWebGL === null ) {
+
+			_cameraViewportWebGL = uniform( new Vector4() ).setName( 'cameraViewport' ).setGroup( renderGroup ).onRenderUpdate( ( { renderer }, self ) => renderer.getCurrentViewport( self.value ) );
+
+		}
+
+		cameraViewport = _cameraViewportWebGL;
+
+	} else if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
 		const cameraArray = getCameraArray( renderer, camera, 'cameraViewports', ( camera ) => {
 
