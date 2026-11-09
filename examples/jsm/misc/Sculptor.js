@@ -384,15 +384,6 @@ class Sculptor extends EventDispatcher {
 		 */
 		this.enabled = true;
 
-		/**
-		 * Whether every stamp is repeated across the mesh's local `YZ` plane (`x = 0`).
-		 * Drag and Scale follow the pointer and are not mirrored.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.mirror = false;
-
 		this._sculptMesh = new SculptorMesh();
 		this._sculptMesh.initFromGeometry( mesh.geometry );
 
@@ -940,7 +931,6 @@ class Sculptor extends EventDispatcher {
 		if ( this._sculpting === false ) return false;
 		if ( this._tool !== tool ) validateRayTool( this._tool );
 		this._applyStroke();
-		this._applyMirroredStroke();
 		this._syncGeometry();
 
 		return true;
@@ -1081,38 +1071,12 @@ class Sculptor extends EventDispatcher {
 
 	}
 
-	_applyMirroredStroke() {
-
-		if ( this.mirror === false || this._tool === 'drag' || this._tool === 'scale' ) return;
-
-		const rayOrigin = this._rayOrigin;
-		const rayDirection = this._rayDirection;
-
-		rayOrigin[ 0 ] = - rayOrigin[ 0 ];
-		rayDirection[ 0 ] = - rayDirection[ 0 ];
-
-		if ( this._pickClosestFace( rayOrigin, rayDirection ) ) {
-
-			this._computePickedNormal();
-			this._applyStroke();
-
-		}
-
-		// Restore the pointer's own hit, which the cursor and the next stamp read.
-		rayOrigin[ 0 ] = - rayOrigin[ 0 ];
-		rayDirection[ 0 ] = - rayDirection[ 0 ];
-
-		if ( this._pickClosestFace( rayOrigin, rayDirection ) ) this._computePickedNormal();
-
-	}
-
 	_makeStroke( clientX, clientY, scale2 ) {
 
 		if ( this._intersectionRayMesh( clientX, clientY, scale2 ) === false ) return false;
 
 		this._computePickedNormal();
 		this._applyStroke();
-		this._applyMirroredStroke();
 
 		return true;
 
