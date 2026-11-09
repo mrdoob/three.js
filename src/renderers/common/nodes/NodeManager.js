@@ -4,7 +4,7 @@ import NodeBuilderState from './NodeBuilderState.js';
 import NodeMaterial from '../../../materials/nodes/NodeMaterial.js';
 import { cubeMapNode } from '../../../nodes/utils/CubeMapNode.js';
 import { NodeFrame, NodeUpdateType, StackTrace } from '../../../nodes/Nodes.js';
-import { renderGroup, cubeTexture, texture, fog, rangeFogFactor, densityFogFactor, reference, pmremTexture, screenUV, uniform } from '../../../nodes/TSL.js';
+import { renderGroup, cubeTexture, texture, fog, rangeFogFactor, densityFogFactor, reference, pmremTexture, screenUV, uniform, outputStruct, vec4 } from '../../../nodes/TSL.js';
 import { builtin } from '../../../nodes/accessors/BuiltinNode.js';
 
 import { EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
@@ -202,7 +202,19 @@ class NodeManager extends DataMap {
 
 				} catch ( e ) {
 
-					nodeBuilder = this._createNodeBuilder( renderObject, new NodeMaterial() );
+					const fallbackMaterial = new NodeMaterial();
+					nodeBuilder = this._createNodeBuilder( renderObject, fallbackMaterial );
+
+					const renderTarget = this.renderer.getRenderTarget();
+					if ( renderTarget !== null && renderTarget.textures.length > 1 && this.renderer.getMRT()?.isCompatible( renderTarget ) !== true ) {
+
+						// Match the attachments without building the material's failed node graph again.
+						const outputs = renderTarget.textures.map( ( _, index ) => vec4( 0, 0, 0, 1 ).convert( nodeBuilder.getOutputType( index ) ) );
+						fallbackMaterial.fragmentNode = outputStruct( ...outputs );
+						fallbackMaterial.fog = false;
+
+					}
+
 					nodeBuilder.build();
 
 					let stackTrace = e.stackTrace;
