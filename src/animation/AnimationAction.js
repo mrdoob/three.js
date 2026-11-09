@@ -824,6 +824,12 @@ class AnimationAction {
 
 					time = deltaTime > 0 ? duration : 0;
 
+					// keep the parity of the round that just finished, so a ping pong
+					// action clamps to the same pose it holds on later paused frames
+
+					loopCount = this.repetitions - 1;
+					this._loopCount = loopCount;
+
 					this.time = time;
 
 					this._mixer.dispatchEvent( {

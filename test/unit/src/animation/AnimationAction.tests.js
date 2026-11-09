@@ -225,6 +225,36 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
+		QUnit.test( 'LoopPingPong with clampWhenFinished holds the final pose', ( assert ) => {
+
+			for ( const [ repetitions, end ] of [[ 1, 360 ], [ 2, 0 ], [ 3, 360 ]] ) {
+
+				const { root, mixer, animationAction } = createAnimation();
+				animationAction.setLoop( LoopPingPong, repetitions );
+				animationAction.clampWhenFinished = true;
+				animationAction.play();
+				mixer.update( repetitions * 1000 - 250 );
+				mixer.update( 500 );
+				assert.notOk( animationAction.isRunning(), `${ repetitions } repetitions: the action has finished.` );
+				assert.equal( root.rotation.x, end, `${ repetitions } repetitions: the finishing update clamps to the final pose.` );
+				mixer.update( 500 );
+				assert.equal( root.rotation.x, end, `${ repetitions } repetitions: later updates keep that pose.` );
+
+			}
+
+			const { root, mixer, animationAction } = createAnimation();
+			animationAction.setLoop( LoopPingPong, 2 );
+			animationAction.clampWhenFinished = true;
+			animationAction.timeScale = - 1;
+			animationAction.play();
+			mixer.update( 1750 );
+			mixer.update( 500 );
+			assert.equal( root.rotation.x, 360, 'Reversed: the finishing update clamps to the final pose.' );
+			mixer.update( 500 );
+			assert.equal( root.rotation.x, 360, 'Reversed: later updates keep that pose.' );
+
+		} );
+
 		QUnit.test( 'setLoop LoopPingPong', ( assert ) => {
 
 			const { root, mixer, animationAction } = createAnimation();
