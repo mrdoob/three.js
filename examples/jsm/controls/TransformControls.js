@@ -484,7 +484,7 @@ class TransformControls extends Controls {
 
 			if ( pointer !== null ) _raycaster.setFromCamera( pointer, this.camera );
 
-			// the axis might have changed since the last render (e.g. on touch devices) so update the plane's orientation
+			// the plane is only updated during rendering but pointerHover() might have just changed the axis (see #31280)
 
 			this._plane.updateMatrixWorld();
 
