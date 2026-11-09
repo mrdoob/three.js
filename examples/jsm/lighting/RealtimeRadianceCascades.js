@@ -153,8 +153,9 @@ class RealtimeRadianceCascades {
 	 * @param {number} [options.quality=1] - The share of the rays and the fineness of the probes, from 0 to 1, see `quality`.
 	 * @param {boolean} [options.halfResolution=false] - Whether the pixels interpolate the light of a grid of 2x2 pixels, see `halfResolution`.
 	 * @param {?RadianceCascadesAdaptiveQuality} [options.adaptiveQuality=null] - What adapts `quality` and `halfResolution` to the frame time, see `adaptiveQuality`.
+	 * @param {?Vector2} [options.renderSize=null] - The size of the G-buffer in pixels, or null for the drawing buffer's, see `renderSize`.
 	 */
-	constructor( { spacing = 0.0625, levelDistance = 4, levels = 16, blendingRadius = 1.1, cascades = 4, directions = 4, maxProbes = 32768, rayStride = 1, secondary = true, qualityDecay = 0.97, minDirectionWeight = 2, useQualityWeight = true, maxLifetime = 1, secondaryLifetime = 10, orientations = false, maxRadiance = 500, adaptiveLOD = true, velocity = false, useShadowMap = true, quality = 1, halfResolution = false, adaptiveQuality = null } = {} ) {
+	constructor( { spacing = 0.0625, levelDistance = 4, levels = 16, blendingRadius = 1.1, cascades = 4, directions = 4, maxProbes = 32768, rayStride = 1, secondary = true, qualityDecay = 0.97, minDirectionWeight = 2, useQualityWeight = true, maxLifetime = 1, secondaryLifetime = 10, orientations = false, maxRadiance = 500, adaptiveLOD = true, velocity = false, useShadowMap = true, quality = 1, halfResolution = false, adaptiveQuality = null, renderSize = null } = {} ) {
 
 		this._blendingOctaves = uniform( 0 );
 		this._maxLifetime = uniform( 1, 'uint' );
@@ -222,6 +223,17 @@ class RealtimeRadianceCascades {
 		 * @default null
 		 */
 		this.adaptiveQuality = adaptiveQuality;
+
+		/**
+		 * The size of the G-buffer in pixels, or null for the size of the drawing buffer. The rays, the probes that are
+		 * inserted and the light of the pixels are per pixel of the G-buffer, so their cost falls with it. For an
+		 * upscaler that renders at a lower resolution: the composite and the textures of `getTextureNode()` then have
+		 * this size.
+		 *
+		 * @type {?Vector2}
+		 * @default null
+		 */
+		this.renderSize = renderSize;
 
 		/**
 		 * The factor of the interval lengths between cascades.
@@ -757,7 +769,7 @@ class RealtimeRadianceCascades {
 
 		if ( this.adaptiveQuality !== null ) this.adaptiveQuality.update( this, this._frame );
 
-		const size = renderer.getDrawingBufferSize( _size );
+		const size = this.renderSize !== null ? _size.copy( this.renderSize ) : renderer.getDrawingBufferSize( _size );
 		const width = Math.max( Math.floor( size.x ), 1 ), height = Math.max( Math.floor( size.y ), 1 );
 		const gbuffer = this._getGBuffer( width, height );
 		const pixels = width * height;
