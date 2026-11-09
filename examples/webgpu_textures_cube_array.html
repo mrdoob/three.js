@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - cube texture array</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+			<div class="title-wrapper"><a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Cube Texture Array</span></div>
+			<small>Two uploaded cubemaps in one texture. Select a cube and mip level.<br>Cube maps by <a href="https://www.humus.name/" target="_blank" rel="noopener">Humus</a>.</small>
+		</div>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+		<script type="module">
+			import * as THREE from 'three/webgpu';
+			import { cubeTexture, positionWorldDirection, uniform } from 'three/tsl';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			const renderer = new THREE.WebGPURenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+			await renderer.init();
+
+			const loader = new THREE.ImageLoader();
+			const [ bridge, park ] = await Promise.all( [
+				Promise.all( [ 'posx', 'negx', 'posy', 'negy', 'posz', 'negz' ].map( face => loader.loadAsync( `textures/cube/Bridge2/${ face }.jpg` ) ) ),
+				Promise.all( [ 'px', 'nx', 'py', 'ny', 'pz', 'nz' ].map( face => loader.loadAsync( `textures/cube/Park3Med/${ face }.jpg` ) ) )
+			] );
+			const array = new THREE.CubeArrayTexture( [ bridge, park ] );
+			array.colorSpace = THREE.SRGBColorSpace;
+			array.needsUpdate = true;
+
+			const cubeIndex = uniform( 0, 'int' );
+			const mipLevel = uniform( 0 );
+			const scene = new THREE.Scene();
+			scene.backgroundNode = cubeTexture( array, positionWorldDirection ).depth( cubeIndex ).level( mipLevel );
+			const material = new THREE.MeshBasicNodeMaterial();
+			material.colorNode = cubeTexture( array ).depth( cubeIndex ).level( mipLevel );
+			scene.add( new THREE.Mesh( new THREE.TorusKnotGeometry( 1, 0.3, 128, 32 ), material ) );
+
+			const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
+			camera.position.set( 0, 0, 5 );
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.enableDamping = true;
+			const params = { cube: 0, mipLevel: 0 };
+			const gui = new GUI();
+			gui.add( params, 'cube', { Bridge: 0, Park: 1 } ).name( 'Cube' ).onChange( value => cubeIndex.value = Number( value ) );
+			gui.add( params, 'mipLevel', 0, Math.log2( bridge[ 0 ].width ), 1 ).name( 'Mip level' ).onChange( value => mipLevel.value = value );
+
+			renderer.setAnimationLoop( () => {
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			} );
+			window.addEventListener( 'resize', () => {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			} );
+		</script>
+	</body>
+</html>

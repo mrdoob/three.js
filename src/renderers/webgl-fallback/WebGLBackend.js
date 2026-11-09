@@ -1430,6 +1430,8 @@ class WebGLBackend extends Backend {
 	 */
 	createTexture( texture, options ) {
 
+		if ( texture.isCubeArrayTexture ) throw new Error( 'WebGLBackend: CubeArrayTexture requires WebGPU.' );
+
 		this.textureUtils.createTexture( texture, options );
 
 	}

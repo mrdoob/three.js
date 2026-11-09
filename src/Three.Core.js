@@ -31,7 +31,6 @@ export { CompressedTexture } from './textures/CompressedTexture.js';
 export { CompressedArrayTexture } from './textures/CompressedArrayTexture.js';
 export { CompressedCubeTexture } from './textures/CompressedCubeTexture.js';
 export { CubeTexture } from './textures/CubeTexture.js';
-export { CubeArrayTexture } from './textures/CubeArrayTexture.js';
 export { CanvasTexture } from './textures/CanvasTexture.js';
 export { HTMLTexture } from './textures/HTMLTexture.js';
 export { DepthTexture } from './textures/DepthTexture.js';

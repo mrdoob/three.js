@@ -195,6 +195,8 @@ class TextureSource {
 
 function serializeImage( image ) {
 
+	if ( Array.isArray( image ) ) return image.map( face => serializeImage( face.isDataTexture ? face.image : face ) );
+
 	if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
 		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
 		( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {

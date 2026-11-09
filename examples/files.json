@@ -504,6 +504,7 @@
 		"webgpu_texturegather",
 		"webgpu_texturegrad",
 		"webgpu_textures_2d-array",
+		"webgpu_textures_cube_array",
 		"webgpu_textures_2d-array_compressed",
 		"webgpu_textures_anisotropy",
 		"webgpu_textures_partialupdate",
