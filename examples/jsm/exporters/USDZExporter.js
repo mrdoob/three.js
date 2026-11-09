@@ -1411,69 +1411,48 @@ function buildCamera( camera, usedNames, options ) {
 	)}, ${camera.far.toPrecision( PRECISION )})`;
 	node.addProperty( `float2 clippingRange = ${clippingRange}` );
 
-	let horizontalAperture;
 	if ( camera.isOrthographicCamera ) {
 
-		horizontalAperture = (
-			( ( camera.right - camera.left ) / camera.zoom ) *
-			10
-		).toPrecision( PRECISION );
+		const horizontalAperture = ( ( camera.right - camera.left ) / camera.zoom * 10 ).toPrecision( PRECISION );
+		node.addProperty( `float horizontalAperture = ${horizontalAperture}` );
 
-	} else {
-
-		horizontalAperture = camera.getFilmWidth().toPrecision( PRECISION );
-
-	}
-
-	node.addProperty( `float horizontalAperture = ${horizontalAperture}` );
-
-	let verticalAperture;
-	if ( camera.isOrthographicCamera ) {
-
-		verticalAperture = (
-			( ( camera.top - camera.bottom ) / camera.zoom ) *
-			10
-		).toPrecision( PRECISION );
-
-	} else {
-
-		verticalAperture = camera.getFilmHeight().toPrecision( PRECISION );
-
-	}
-
-	node.addProperty( `float verticalAperture = ${verticalAperture}` );
-
-	if ( camera.isOrthographicCamera ) {
+		const verticalAperture = ( ( camera.top - camera.bottom ) / camera.zoom * 10 ).toPrecision( PRECISION );
+		node.addProperty( `float verticalAperture = ${verticalAperture}` );
 
 		if ( camera.left + camera.right !== 0 ) {
 
-			const horizontalApertureOffset = (
-				( ( camera.right + camera.left ) / ( 2 * camera.zoom ) ) *
-				10
-			).toPrecision( PRECISION );
+			const horizontalApertureOffset = ( ( camera.right + camera.left ) / 2 * 10 ).toPrecision( PRECISION );
 			node.addProperty( `float horizontalApertureOffset = ${horizontalApertureOffset}` );
 
 		}
 
 		if ( camera.top + camera.bottom !== 0 ) {
 
-			const verticalApertureOffset = (
-				( ( camera.top + camera.bottom ) / ( 2 * camera.zoom ) ) *
-				10
-			).toPrecision( PRECISION );
+			const verticalApertureOffset = ( ( camera.top + camera.bottom ) / 2 * 10 ).toPrecision( PRECISION );
 			node.addProperty( `float verticalApertureOffset = ${verticalApertureOffset}` );
 
 		}
 
-	}
+	} else if ( camera.isPerspectiveCamera ) {
 
-	if ( camera.isPerspectiveCamera ) {
+		const horizontalAperture = camera.getFilmWidth().toPrecision( PRECISION );
+		node.addProperty( `float horizontalAperture = ${horizontalAperture}` );
+
+		const verticalAperture = camera.getFilmHeight().toPrecision( PRECISION );
+		node.addProperty( `float verticalAperture = ${verticalAperture}` );
 
 		const focalLength = camera.getFocalLength().toPrecision( PRECISION );
 		node.addProperty( `float focalLength = ${focalLength}` );
 
 		const focusDistance = camera.focus.toPrecision( PRECISION );
 		node.addProperty( `float focusDistance = ${focusDistance}` );
+
+	} else {
+
+		console.warn(
+			'THREE.USDZExporter: USDZ does not support the given camera type',
+			camera
+		);
 
 	}
 
