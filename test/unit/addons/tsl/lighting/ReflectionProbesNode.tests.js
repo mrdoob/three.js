@@ -1,4 +1,4 @@
-import { BackSide, DataTexture, EquirectangularReflectionMapping, FloatType, MeshBasicMaterial, NodeMaterial, OrthographicCamera, PlaneGeometry, RenderTarget, Scene, BoxGeometry, CubeArrayTexture, Mesh, MeshStandardNodeMaterial, Vector3, WebGPUCoordinateSystem } from 'three/webgpu';
+import { BackSide, Color, DataTexture, EquirectangularReflectionMapping, FloatType, MeshBasicMaterial, NodeMaterial, OrthographicCamera, PMREMGenerator, PlaneGeometry, RenderTarget, Scene, BoxGeometry, CubeArrayTexture, Mesh, MeshStandardNodeMaterial, Vector3, WebGPUCoordinateSystem } from 'three/webgpu';
 import { getParallaxCorrectNormal, indirectSpecular, nodeObject, pmremTexture, vec3, vec4 } from 'three/tsl';
 import { ReflectionProbe, ReflectionProbes } from '../../../../../examples/jsm/lighting/ReflectionProbes.js';
 import { ReflectionProbesNode, reflectionProbesSpecular, reflectionProbesDiffuse } from '../../../../../examples/jsm/tsl/lighting/ReflectionProbesNode.js';
@@ -69,9 +69,11 @@ export default QUnit.module( 'Addons', () => {
 
 					const environmentNode = vec3( 0.25 );
 					source.environmentNode = environmentNode;
-					probes.bake( renderer, source );
+					probes.bake( renderer, source, { resolution: 128 } );
 					assert.strictEqual( source.environmentNode, environmentNode, 'Capture restores the application lighting node' );
 					assert.strictEqual( probes.texture.image.depth, 6, 'One probe allocates exactly six layers' );
+					assert.strictEqual( probes.texture.image.width, 128, 'Local probes support 128-pixel cube faces' );
+					assert.deepEqual( probes.texture.mipmaps.map( mip => mip.width ), [ 128, 64, 32, 16, 8 ], '128-pixel probes retain their full roughness range' );
 					const provider = reflectionProbesSpecular( probes );
 					close( await draw( provider( query ) ), [ 1, 1, 1, 1 ], 'Interior supplies conditional white radiance' );
 					close( await draw( reflectionProbesDiffuse( probes )( { position: query.position, normal: query.direction } ) ), [ Math.PI, Math.PI, Math.PI, 1 ], 'Diffuse provider returns irradiance with the same coverage' );
@@ -135,6 +137,35 @@ export default QUnit.module( 'Addons', () => {
 					probes.capturing = false;
 					renderer.setRenderTarget( previousTarget );
 					for ( const resource of [ boxGeometry, boxMaterial, geometry, material, target, environment, alternateEnvironment, probes ] ) resource.dispose();
+
+				}
+
+			} );
+
+			QUnit.test( '128-pixel scene PMREM retains mirror and rough mip levels', async assert => {
+
+				const renderer = await getSharedRenderer( 'webgpu' );
+				if ( renderer === null ) {
+
+					assert.ok( true, 'SKIPPED: WebGPU is unavailable.' );
+					return;
+
+				}
+
+				const scene = new Scene();
+				scene.background = new Color( 0xff0000 );
+				const generator = new PMREMGenerator( renderer );
+				const target = generator.fromScene( scene, 0, 0.1, 100, { size: 128 } );
+
+				try {
+
+					assert.strictEqual( target.width, 128, 'Scene captures render at the requested 128 pixels.' );
+					assert.deepEqual( target.texture.mipmaps.map( mip => mip.width ), [ 128, 64, 32, 16, 8 ], 'Roughness spans mirror through the 8-pixel final mip.' );
+
+				} finally {
+
+					target.dispose();
+					generator.dispose();
 
 				}
 

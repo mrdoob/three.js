@@ -28,7 +28,7 @@
 		</script>
 		<script type="module">
 			import * as THREE from 'three/webgpu';
-			import { Fn, context, diffuseColor, environmentSpecular, getViewPosition, indirectSpecular, metalness, mrt, normalView, output, roughness as materialRoughness, packNormalToRGB, pass, pmremTexture, sample, screenUV, texture, uniform, unpackRGBToNormal, vec3, vec4, velocity } from 'three/tsl';
+			import { Fn, context, diffuseColor, environmentSpecular, getViewPosition, indirectSpecular, metalness, mrt, normalView, output, roughness as materialRoughness, packNormalToRGB, pass, pmremTexture, sample, screenUV, uniform, unpackRGBToNormal, vec3, vec4, velocity } from 'three/tsl';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
@@ -36,7 +36,6 @@
 			import { LightMapper } from 'three/addons/lighting/LightMapper.js';
 			import { RayTracedRadiosity, rayTracedRadiosityIrradiance } from 'three/addons/lighting/RayTracedRadiosity.js';
 			import { ReflectionProbe, ReflectionProbes } from 'three/addons/lighting/ReflectionProbes.js';
-			import { ReflectionProbesHelper } from 'three/addons/helpers/ReflectionProbesHelper.js';
 			import { reflectionProbesSpecular } from 'three/addons/tsl/lighting/ReflectionProbesNode.js';
 			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
 			import { denoise, temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
@@ -47,28 +46,20 @@
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			const status = document.getElementById( 'status' );
-			const search = new URLSearchParams( location.search );
+			const LIGHT_MAP_SIZE = 1024;
+			const BAKE_SAMPLES = 32;
+			const PROBE_SIZE = 128;
 			const params = {
-				output: 'Beauty', ssr: true, probes: true, diffuseGI: true, environmentMap: true, helpers: false,
-				exposure: 1.5, environment: 0.25, effectScale: 0.5,
-				resolution: Number( search.get( 'resolution' ) ) === 2048 ? 2048 : 1024,
-				samples: [ 32, 64, 128 ].includes( Number( search.get( 'samples' ) ) ) ? Number( search.get( 'samples' ) ) : 64,
-				probeResolution: Number( search.get( 'probes' ) ) === 512 ? 512 : 256,
-				rebake: () => {
-
-					location.search = new URLSearchParams( { resolution: params.resolution, samples: params.samples, probes: params.probeResolution } );
-
-				}
+				output: 'Beauty', ssr: true, probes: true,
+				exposure: 1.5, environment: 0.25, effectScale: 0.5
 			};
 			const ssrEnabled = uniform( 1 );
 			const probesEnabled = uniform( 1 );
-			const giEnabled = uniform( 1 );
-			const environmentEnabled = uniform( 1 );
 			const environmentIntensity = uniform( params.environment );
 			const bakeMeshes = [];
 			const materials = new Set();
 			let renderer, scene, camera, controls, pipeline, lightMapper, radiosity, lightMapDenoise;
-			let probes, helper, ssrPass, ssrDenoise, guides, traaPass, views;
+			let probes, ssrPass, ssrDenoise, guides, traaPass, views;
 			let bakeComplete = false;
 
 			init().catch( error => {
@@ -104,14 +95,7 @@
 				scene.backgroundIntensity = params.environment;
 				// The light map already includes the sky's diffuse irradiance. Supply the
 				// environment through the specular chain only, avoiding a second diffuse sky.
-				const sampleEnvironment = environmentSpecular( pmremTexture( environment ), environmentIntensity );
-				const environmentProvider = query => {
-
-					const value = sampleEnvironment( query );
-					return vec4( value.rgb, value.a.mul( environmentEnabled ) );
-
-				};
-
+				const environmentProvider = environmentSpecular( pmremTexture( environment ), environmentIntensity );
 				renderer.contextNode = context( { indirectSpecularNode: indirectSpecular( [ environmentProvider ] ) } );
 
 				const model = gltf.scene;
@@ -158,8 +142,8 @@
 		if ( object.isMesh ) oldGeometries.add( object.geometry );
 
 	} );
-				const atlas = unwrapUVs( model, { resolution: params.resolution, padding: 3 } );
-				if ( atlas === null ) throw new Error( 'The UV atlas did not fit. Increase the light-map resolution.' );
+				const atlas = unwrapUVs( model, { resolution: LIGHT_MAP_SIZE, padding: 3 } );
+				if ( atlas === null ) throw new Error( 'Unable to generate the corridor light-map atlas.' );
 				for ( const geometry of oldGeometries ) geometry.dispose();
 
 				status.textContent = 'Building the ray radiosity bounce cache…';
@@ -179,7 +163,7 @@
 
 				lightMapper = new LightMapper( renderer, atlas.resolution, rayTracedRadiosityIrradiance( radiosity ), { variance: true, guides: true } );
 				lightMapper.addObjects( bakeMeshes );
-				for ( const material of materials ) material.lightMapNode = lightMapper.getTextureNode().rgb.mul( giEnabled );
+				for ( const material of materials ) material.lightMapNode = lightMapper.getTextureNode().rgb;
 
 				probes = new ReflectionProbes();
 				for ( const offset of [ - 1 / 3, 0, 1 / 3 ] ) {
@@ -209,37 +193,18 @@
 					lightMapDenoise.autoUpdate = false;
 					for ( const material of materials ) {
 
-						material.lightMapNode = lightMapDenoise.rgb.mul( giEnabled );
+						material.lightMapNode = lightMapDenoise.rgb;
 						material.needsUpdate = true;
 
 					}
 
 					status.textContent = 'Capturing 3 Refl. probes from the baked GI…';
 					// SSR is not installed yet. Capture the denoised GI, emission and environment.
-					const previousGI = giEnabled.value;
-					const previousEnvironment = environmentEnabled.value;
-					const previousBackground = scene.backgroundIntensity;
-					giEnabled.value = 1;
-					environmentEnabled.value = 1;
-					scene.backgroundIntensity = params.environment;
-					try {
+					probes.bake( renderer, scene, { resolution: PROBE_SIZE, near: 0.05, far: 100 } );
 
-						probes.bake( renderer, scene, { resolution: params.probeResolution, near: 0.05, far: 100 } );
-
-					} finally {
-
-						giEnabled.value = previousGI;
-						environmentEnabled.value = previousEnvironment;
-						scene.backgroundIntensity = previousBackground;
-
-					}
-
-					helper = new ReflectionProbesHelper( probes, 0.18 );
-					helper.visible = params.helpers;
-					scene.add( helper );
 					buildPipeline( environmentProvider );
 					bakeComplete = true;
-					status.textContent = `Ready · ${ atlas.resolution }² atlas · ${ params.samples * radiosity.rays } rays/texel · 3 probes.`;
+					status.textContent = `Ready · ${ atlas.resolution }² atlas · ${ BAKE_SAMPLES * radiosity.rays } rays/texel · 3 probes.`;
 
 				}
 
@@ -248,10 +213,10 @@
 					controls.update();
 					if ( ! bakeComplete ) {
 
-						if ( lightMapper.samples < params.samples ) {
+						if ( lightMapper.samples < BAKE_SAMPLES ) {
 
 							lightMapper.update();
-							status.textContent = `Baking diffuse GI: ${ lightMapper.samples } / ${ params.samples } samples`;
+							status.textContent = `Baking diffuse GI: ${ lightMapper.samples } / ${ BAKE_SAMPLES } samples`;
 							renderer.render( scene, camera );
 							return;
 
@@ -326,8 +291,6 @@
 				const beauty = pass( scene, camera );
 				beauty.contextNode = context( { indirectSpecularNode: resolved } );
 				traaPass = traa( beauty, depth, motion, camera );
-				const giOnly = pass( scene, camera );
-				giOnly.contextNode = context( { indirectSpecularNode: indirectSpecular( [] ) } );
 
 				const screenQuery = coordinate => {
 
@@ -348,9 +311,7 @@
 					'SSR Coverage': vec4( vec3( filtered.sample( screenUV ).a.mul( ssrEnabled ) ), 1 ),
 					'Refl. probes Radiance': vec4( probeSample.sample( screenUV ).rgb.mul( probeSample.sample( screenUV ).a ), 1 ),
 					'Refl. probes Coverage': vec4( vec3( probeSample.sample( screenUV ).a ), 1 ),
-					'Resolved Radiance': sample( coordinate => resolved.sample( screenQuery( coordinate ) ) ),
-					'Baked GI + emission': giOnly,
-					'Light-map atlas': texture( lightMapDenoise.getTexture(), screenUV )
+					'Resolved Radiance': sample( coordinate => resolved.sample( screenQuery( coordinate ) ) )
 				};
 				pipeline = new THREE.RenderPipeline( renderer );
 				updateOutput();
@@ -360,7 +321,7 @@
 			function createGUI() {
 
 				const gui = renderer.inspector.createParameters( 'Coverage lighting' );
-				gui.add( params, 'output', [ 'Beauty', 'SSR Radiance', 'SSR Coverage', 'Refl. probes Radiance', 'Refl. probes Coverage', 'Resolved Radiance', 'Baked GI + emission', 'Light-map atlas' ] ).name( 'Output' ).onChange( updateOutput );
+				gui.add( params, 'output', [ 'Beauty', 'SSR Radiance', 'SSR Coverage', 'Refl. probes Radiance', 'Refl. probes Coverage', 'Resolved Radiance' ] ).name( 'Output' ).onChange( updateOutput );
 				gui.add( params, 'ssr' ).name( 'SSR' ).onChange( value => {
 
 					ssrEnabled.value = Number( value );
@@ -373,36 +334,7 @@
 					resetHistory();
 
 				} );
-				gui.add( params, 'diffuseGI' ).name( 'Baked Diffuse GI' ).onChange( value => {
-
-					giEnabled.value = Number( value );
-					resetHistory();
-
-				} );
-				gui.add( params, 'environmentMap' ).name( 'Environment map' ).onChange( value => {
-
-					environmentEnabled.value = Number( value );
-					scene.backgroundIntensity = value ? params.environment : 0;
-					resetHistory();
-
-				} );
-				gui.add( params, 'helpers' ).name( 'Probe volumes' ).onChange( value => {
-
-					if ( helper ) helper.visible = value;
-					resetHistory();
-
-				} );
-				gui.add( { reset: () => {
-
-		controls.reset(); resetHistory();
-
-	} }, 'reset' ).name( 'Reset camera' );
 				gui.add( params, 'exposure', 0.25, 4 ).name( 'Exposure' ).onChange( value => renderer.toneMappingExposure = value );
-				const bake = gui.addFolder( 'Bake settings' ).close();
-				bake.add( params, 'resolution', [ 1024, 2048 ] ).name( 'Atlas size' );
-				bake.add( params, 'samples', [ 32, 64, 128 ] ).name( 'Samples' );
-				bake.add( params, 'probeResolution', [ 256, 512 ] ).name( 'Probe resolution' );
-				bake.add( params, 'rebake' ).name( 'Rebake (reload)' );
 
 			}
 
