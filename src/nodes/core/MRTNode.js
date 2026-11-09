@@ -1,5 +1,5 @@
 import OutputStructNode from './OutputStructNode.js';
-import { nodeProxy } from '../tsl/TSLBase.js';
+import { nodeProxy, vec4 } from '../tsl/TSLBase.js';
 import { MaterialBlending, NoBlending } from '../../constants.js';
 import BlendMode from '../../renderers/common/BlendMode.js';
 import Color4 from '../../renderers/common/Color4.js';
@@ -7,29 +7,6 @@ import Color4 from '../../renderers/common/Color4.js';
 // Predefined blend modes for MRT nodes.
 const _noBlending = /**@__PURE__*/ new BlendMode( NoBlending );
 const _materialBlending = /**@__PURE__*/ new BlendMode( MaterialBlending );
-
-/**
- * Returns the MRT texture index for the given name.
- *
- * @param {Array<Texture>} textures - The textures of a MRT-configured render target.
- * @param {string} name - The name of the MRT texture which index is requested.
- * @return {number} The texture index.
- */
-export function getTextureIndex( textures, name ) {
-
-	for ( let i = 0; i < textures.length; i ++ ) {
-
-		if ( textures[ i ].name === name ) {
-
-			return i;
-
-		}
-
-	}
-
-	return - 1;
-
-}
 
 /**
  * This node can be used setup a MRT context for rendering. A typical MRT setup for
@@ -181,18 +158,6 @@ class MRTNode extends OutputStructNode {
 	}
 
 	/**
-	 * Returns `true` if the given render target defines a target for each MRT output.
-	 *
-	 * @param {RenderTarget} renderTarget - The render target.
-	 * @return {boolean} Whether the MRT node is compatible with the render target or not.
-	 */
-	isCompatible( renderTarget ) {
-
-		return renderTarget.textures.every( ( texture ) => this.has( texture.name ) );
-
-	}
-
-	/**
 	 * Merges the outputs of the given MRT node with the outputs of this node.
 	 *
 	 * @param {MRTNode} mrtNode - The MRT to merge.
@@ -215,22 +180,15 @@ class MRTNode extends OutputStructNode {
 	setup( builder ) {
 
 		const outputNodes = this.outputNodes;
-		const mrt = builder.renderer.getRenderTarget();
+		const textures = builder.renderer.getRenderTarget().textures;
 
 		const members = [];
 
-		const textures = mrt.textures;
+		for ( let i = 0; i < textures.length; i ++ ) {
 
-		for ( const name in outputNodes ) {
+			const outputNode = outputNodes[ textures[ i ].name ] || vec4( 0 );
 
-			const index = getTextureIndex( textures, name );
-
-			// Ignore if the output exists in the MRT but has never been used.
-			if ( index === - 1 ) continue;
-
-			const type = builder.getOutputType( index );
-
-			members[ index ] = outputNodes[ name ].convert( type );
+			members[ i ] = outputNode.convert( builder.getOutputType( i ) );
 
 		}
 
