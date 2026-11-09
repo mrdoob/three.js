@@ -974,7 +974,7 @@ function computeMorphedAttributes( object ) {
 
 		if ( object.isSkinnedMesh ) {
 
-			if ( attribute === object.geometry.attributes.normal ) {
+			if ( attribute === object.geometry.getAttribute( 'normal' ) ) {
 
 				// normals are directions so they must be transformed with w = 0
 
