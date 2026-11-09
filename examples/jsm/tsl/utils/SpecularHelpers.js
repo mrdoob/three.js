@@ -23,6 +23,24 @@ export const ENV_RAY_LENGTH = 1e4;
  */
 export const ENV_RAY_LENGTH_THRESHOLD = 1e3;
 
+/**
+ * Returns the SSR hit distance when the sample has coverage, otherwise the
+ * environment sentinel.
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} rayLength - Raw SSR hit distance.
+ * @param {Node<float>} coverage - Effective screen-space coverage, after fades.
+ * @return {Node<float>} Distance suitable for specular history/reconstruction.
+ */
+export const resolveSSRHitDistance = ( rayLength, coverage ) => {
+
+	rayLength = float( rayLength );
+	return float( coverage ).greaterThan( 0 ).and( rayLength.greaterThan( 0 ) )
+		.and( rayLength.lessThan( ENV_RAY_LENGTH_THRESHOLD ) ).select( rayLength, float( ENV_RAY_LENGTH ) );
+
+};
+
 // Bounded-VNDF sampler (Eto & Tokuyoshi 2023; spherical-cap form, Dupuy & Benyoub 2023)
 const SampleGGXVNDF = Fn( ( [ V, ax, ay, r1, r2 ] ) => {
 
@@ -161,8 +179,17 @@ const ggxReflectionStruct = struct( {
 	f0: 'vec3' // Fresnel reflectance at normal incidence
 } );
 
-// Core of `ggxReflectionSample()` with explicit F0/F90.
-const ggxReflectionSampleWithReflectance = Fn( ( [ N, V, roughness, f0, f90, Xi ] ) => {
+/**
+ * Samples a GGX/VNDF reflection direction without evaluating material reflectance.
+ *
+ * @tsl
+ * @param {Node<vec3>} N - Normalized view-space shading normal.
+ * @param {Node<vec3>} V - Normalized view-space surface-to-camera direction.
+ * @param {Node<float>} roughness - Perceptual roughness.
+ * @param {Node<vec4>} Xi - Random numbers; only xy are used.
+ * @return {Node<vec3>} Reflection direction.
+ */
+export const ggxReflectionDirection = Fn( ( [ N, V, roughness, Xi ] ) => {
 
 	// GGX alpha (use r^2, clamp to avoid degenerate)
 	const a = roughness.mul( roughness ).max( 0.001 ).toVar();
@@ -189,7 +216,25 @@ const ggxReflectionSampleWithReflectance = Fn( ( [ N, V, roughness, f0, f90, Xi 
 	const h = normalize( T.mul( Hlocal.x ).add( B.mul( Hlocal.y ) ).add( N.mul( Hlocal.z ) ) ).toVar();
 
 	// reflect with V (surface->camera) and H
-	const viewReflectDir = reflect( V.negate(), h ).normalize().toVar();
+	return reflect( V.negate(), h ).normalize();
+
+}, { N: 'vec3', V: 'vec3', roughness: 'float', Xi: 'vec4', return: 'vec3' } );
+
+/**
+ * Samples a GGX reflection direction and evaluates its Monte Carlo weight.
+ *
+ * @param {Node<vec3>} N - Normalized view-space shading normal.
+ * @param {Node<vec3>} V - Normalized view-space surface-to-camera direction.
+ * @param {Node<float>} roughness - Perceptual roughness.
+ * @param {Node<vec3>} f0 - Normal-incidence reflectance.
+ * @param {Node<float>} f90 - Grazing reflectance.
+ * @param {Node<vec4>} Xi - Random numbers; only xy are used.
+ * @return {ggxReflectionStruct}
+ */
+const ggxReflectionSampleWithReflectance = Fn( ( [ N, V, roughness, f0, f90, Xi ] ) => {
+
+	const ax = roughness.mul( roughness ).max( 0.001 ).toVar();
+	const viewReflectDir = ggxReflectionDirection( N, V, roughness, Xi ).toVar();
 
 	// BRDF/PDF evaluation for the sampled direction
 	// V: surface -> camera, L: reflected direction, N: normal, H: half-vector
