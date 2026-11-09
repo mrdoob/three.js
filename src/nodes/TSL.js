@@ -154,6 +154,7 @@ export * from './lighting/PointLightNode.js';
 
 // pmrem
 export * from './pmrem/PMREMNode.js';
+export { roughnessToMip } from './pmrem/PMREMUtils.js';
 
 // procedural
 export * from './procedural/Checker.js';
