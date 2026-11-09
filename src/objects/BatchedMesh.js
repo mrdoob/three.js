@@ -428,14 +428,26 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	// Make sure the geometry is compatible with the existing combined geometry attributes
-	_validateGeometry( geometry ) {
+	_getGeometryCompatibilityError( geometry, reservedVertexCount ) {
 
-		// check to ensure the geometries are using consistent attributes and indices
-		const batchGeometry = this.geometry;
-		if ( Boolean( geometry.getIndex() ) !== Boolean( batchGeometry.getIndex() ) ) {
+		if ( geometry?.isBufferGeometry !== true || ! geometry.hasAttribute( 'position' ) ) {
 
-			throw new Error( 'THREE.BatchedMesh: All geometries must consistently have "index".' );
+			return 'THREE.BatchedMesh: Added geometry must be a BufferGeometry with a "position" attribute.';
+
+		}
+
+		const vertexLimit = reservedVertexCount === - 1 ? geometry.getAttribute( 'position' ).count : reservedVertexCount;
+		const batchGeometry = this._geometryInitialized ? this.geometry : geometry;
+		const index = geometry.getIndex();
+		if ( Boolean( index ) !== Boolean( batchGeometry.getIndex() ) ) {
+
+			return 'THREE.BatchedMesh: All geometries must consistently have "index".';
+
+		}
+
+		if ( index !== null && index.array === undefined ) {
+
+			return 'THREE.BatchedMesh: Added geometry index data must be available on the CPU.';
 
 		}
 
@@ -443,19 +455,60 @@ class BatchedMesh extends Mesh {
 
 			if ( ! geometry.hasAttribute( attributeName ) ) {
 
-				throw new Error( `THREE.BatchedMesh: Added geometry missing "${ attributeName }". All geometries must have consistent attributes.` );
+				return `THREE.BatchedMesh: Added geometry missing "${ attributeName }". All geometries must have consistent attributes.`;
 
 			}
 
 			const srcAttribute = geometry.getAttribute( attributeName );
 			const dstAttribute = batchGeometry.getAttribute( attributeName );
+			if ( srcAttribute.array === undefined ) {
+
+				return `THREE.BatchedMesh: Added geometry attribute "${ attributeName }" must be available on the CPU.`;
+
+			}
+
+			if ( srcAttribute.count > vertexLimit ) {
+
+				return 'THREE.BatchedMesh: Reserved space not large enough for provided geometry.';
+
+			}
+
 			if ( srcAttribute.itemSize !== dstAttribute.itemSize || srcAttribute.normalized !== dstAttribute.normalized ) {
 
-				throw new Error( `THREE.BatchedMesh: Added geometry attribute "${ attributeName }" has an inconsistent itemSize or normalized value.` );
+				return `THREE.BatchedMesh: Added geometry attribute "${ attributeName }" has an inconsistent itemSize or normalized value.`;
 
 			}
 
 		}
+
+		return null;
+
+	}
+
+	_getGeometryAddError( geometry, reservedVertexCount, reservedIndexCount ) {
+
+		const error = this._getGeometryCompatibilityError( geometry, reservedVertexCount );
+		if ( error !== null ) return error;
+
+		const vertexCount = geometry.getAttribute( 'position' ).count;
+		const index = geometry.getIndex();
+
+		const vertices = reservedVertexCount === - 1 ? vertexCount : reservedVertexCount;
+		const indices = index === null ? 0 : ( reservedIndexCount === - 1 ? index.count : reservedIndexCount );
+
+		if ( ! Number.isInteger( vertices ) || ! Number.isInteger( indices ) || vertices < vertexCount || ( index !== null && indices < index.count ) ) {
+
+			return 'THREE.BatchedMesh: Reserved space not large enough for provided geometry.';
+
+		}
+
+		if ( vertices > this.unusedVertexCount || ( index !== null && indices > this.unusedIndexCount ) ) {
+
+			return 'THREE.BatchedMesh: Reserved space request exceeds the maximum buffer size.';
+
+		}
+
+		return null;
 
 	}
 
@@ -624,6 +677,20 @@ class BatchedMesh extends Mesh {
 	}
 
 	/**
+	 * Tests whether a geometry is compatible and fits in the batch's remaining buffer space.
+	 *
+	 * @param {BufferGeometry} geometry - The geometry to test.
+	 * @param {number} [reservedVertexCount=-1] - The vertex space to reserve. Defaults to the geometry's vertex count.
+	 * @param {number} [reservedIndexCount=-1] - The index space to reserve. Defaults to the geometry's index count.
+	 * @return {boolean} Whether the geometry can be added.
+	 */
+	canAddGeometry( geometry, reservedVertexCount = - 1, reservedIndexCount = - 1 ) {
+
+		return this._getGeometryAddError( geometry, reservedVertexCount, reservedIndexCount ) === null;
+
+	}
+
+	/**
 	 * Adds the given geometry to the batch and returns the associated
 	 * geometry id referring to it to be used in other functions.
 	 *
@@ -640,9 +707,10 @@ class BatchedMesh extends Mesh {
 	 */
 	addGeometry( geometry, reservedVertexCount = - 1, reservedIndexCount = - 1 ) {
 
-		this._initializeGeometry( geometry );
+		const error = this._getGeometryAddError( geometry, reservedVertexCount, reservedIndexCount );
+		if ( error !== null ) throw new Error( error );
 
-		this._validateGeometry( geometry );
+		this._initializeGeometry( geometry );
 
 		const geometryInfo = {
 			// geometry information
@@ -674,16 +742,6 @@ class BatchedMesh extends Mesh {
 
 			geometryInfo.indexStart = this._nextIndexStart;
 			geometryInfo.reservedIndexCount = reservedIndexCount === - 1 ? index.count : reservedIndexCount;
-
-		}
-
-		if (
-			geometryInfo.indexStart !== - 1 &&
-			geometryInfo.indexStart + geometryInfo.reservedIndexCount > this._maxIndexCount ||
-			geometryInfo.vertexStart + geometryInfo.reservedVertexCount > this._maxVertexCount
-		) {
-
-			throw new Error( 'THREE.BatchedMesh: Reserved space request exceeds the maximum buffer size.' );
 
 		}
 
@@ -733,13 +791,14 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		this._validateGeometry( geometry );
+		const geometryInfo = this._geometryInfo[ geometryId ];
+		const error = this._getGeometryCompatibilityError( geometry, geometryInfo.reservedVertexCount );
+		if ( error !== null ) throw new Error( error );
 
 		const batchGeometry = this.geometry;
 		const hasIndex = batchGeometry.getIndex() !== null;
 		const dstIndex = batchGeometry.getIndex();
 		const srcIndex = geometry.getIndex();
-		const geometryInfo = this._geometryInfo[ geometryId ];
 		if (
 			hasIndex &&
 			srcIndex.count > geometryInfo.reservedIndexCount ||
