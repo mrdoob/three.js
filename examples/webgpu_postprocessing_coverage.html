@@ -140,7 +140,6 @@
 				controls.update();
 				controls.saveState();
 				window.addEventListener( 'resize', onWindowResize );
-				controls.addEventListener( 'start', resetHistory );
 
 				status.textContent = 'Unwrapping the corridor into a light-map atlas…';
 				await new Promise( requestAnimationFrame );
