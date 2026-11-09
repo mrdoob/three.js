@@ -311,8 +311,6 @@ class Inspector extends RendererInspector {
 
 					if ( renderer.hasInitialized() === false ) await renderer.init();
 
-					renderer.backend.trackTimestamp = true;
-
 					if ( renderer.hasFeature( 'timestamp-query' ) !== true ) {
 
 						this.console.addMessage( 'error', 'THREE.Inspector: GPU Timestamp Queries not available.' );
@@ -469,16 +467,11 @@ class Inspector extends RendererInspector {
 		data.cpu = this.getAverageDeltaTime( data, 'cpu' );
 		data.gpu = this.getAverageDeltaTime( data, 'gpu' );
 
-		// children: the CPU time of a render or compute call includes the calls nested in it, the GPU time of each
-		// pass is measured separately
+		// children: the CPU and GPU time of a render or compute call include the calls nested in it
 
 		for ( const child of stats.children ) {
 
 			this.resolveStats( child );
-
-			const childData = this.getStatsData( child.cid );
-
-			data.gpu += childData.gpu;
 
 		}
 

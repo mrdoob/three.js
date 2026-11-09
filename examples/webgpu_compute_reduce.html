@@ -1005,7 +1005,7 @@
 				const computeResetBuffer = computeResetBufferFn().compute( size );
 				const computeResetWorkgroupSums = computeResetWorkgroupSumsFn().compute( 256 );
 
-				const renderer = new THREE.WebGPURenderer( { antialias: false, trackTimestamp: true } );
+				const renderer = new THREE.WebGPURenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth / 2, window.innerHeight );
 
@@ -1267,6 +1267,8 @@
 
 				renderer.info.autoReset = false;
 
+				const computeTimer = new THREE.GPUTimer( renderer );
+
 				const stepAnimation = async function () {
 
 					const currentAlgorithm = effectController.algo;
@@ -1284,6 +1286,8 @@
 
 						const cpuTime = 0;
 
+						computeTimer.begin();
+
 						switch ( currentAlgorithm ) {
 
 							case 'Reduce 0 (N/2)': {
@@ -1297,7 +1301,6 @@
 									const reduce0 = reduce0Calls[ i ];
 									// Do a reduction step
 									renderer.compute( reduce0 );
-									renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
 
 									m /= 2;
 
@@ -1315,7 +1318,6 @@
 								for ( let i = 0; i < currentAlgoCalls.length; i ++ ) {
 
 									renderer.compute( currentAlgoCalls[ i ] );
-									renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
 
 								}
 
@@ -1324,6 +1326,8 @@
 							}
 
 						}
+
+						const computeTime = await computeTimer.end();
 
 						// DEBUG: const reductionResult = new Uint32Array( await renderer.getArrayBufferAsync( currentBuffer ) )[0];
 
@@ -1335,7 +1339,7 @@
 
 						} else {
 
-							passInfoString = `${renderer.info.compute.frameCalls} pass in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>`;
+							passInfoString = `${renderer.info.compute.frameCalls} pass in ${computeTime.toFixed( 6 )}ms<br>`;
 
 						}
 
@@ -1349,7 +1353,6 @@
 					}
 
 					renderer.render( scene, camera );
-					renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
 
 					// Validate next state
 

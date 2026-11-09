@@ -1,5 +1,5 @@
 
-import { InspectorBase, TimestampQuery, warnOnce, RendererUtils, MeshBasicNodeMaterial, AdditiveBlending, NoToneMapping, LinearSRGBColorSpace } from 'three/webgpu';
+import { InspectorBase, GPUTimer, warnOnce, RendererUtils, MeshBasicNodeMaterial, AdditiveBlending, NoToneMapping, LinearSRGBColorSpace } from 'three/webgpu';
 import { vec3 } from 'three/tsl';
 
 class ObjectStats {
@@ -10,8 +10,10 @@ class ObjectStats {
 		this.cid = uid.match( /^(.*):f(\d+)$/ )[ 1 ]; // call id
 		this.name = name;
 		this.timestamp = 0;
+		this.timer = null;
 		this.cpu = 0;
 		this.gpu = 0;
+		this.gpuNotAvailable = false;
 		this.fps = 0;
 
 		this.children = [];
@@ -96,8 +98,6 @@ export class RendererInspector extends InspectorBase {
 
 		this._lastFinishTime = 0;
 		this._lastRenderedFinishTime = 0;
-		this._resolveTimestampPromise = null;
-		this._rAFId = null;
 
 		this.overdraw = false;
 		this._overdrawMaterial = null;
@@ -236,8 +236,8 @@ export class RendererInspector extends InspectorBase {
 
 		return {
 			frameId: this.nodeFrame.frameId,
-			resolvedCompute: false,
-			resolvedRender: false,
+			finished: false,
+			pendingTimers: 0,
 			deltaTime: 0,
 			startTime: performance.now(),
 			finishTime: 0,
@@ -288,193 +288,47 @@ export class RendererInspector extends InspectorBase {
 
 	resolveFrame( /*frame*/ ) { }
 
-	async resolveTimestamp() {
+	// each render and compute call is timed by its own GPU timer. The frame is resolved once it has
+	// finished and all its timers have been read
 
-		if ( this._resolveTimestampPromise !== null ) {
+	_beginTimer( stats ) {
 
-			return this._resolveTimestampPromise;
+		stats.timer = new GPUTimer( this.getRenderer() );
+		stats.timer.begin();
 
-		}
+	}
 
-		this._resolveTimestampPromise = new Promise( ( resolve ) => {
+	_endTimer( frame, stats ) {
 
-			this._rAFId = requestAnimationFrame( async () => {
+		frame.pendingTimers ++;
 
-				this._rAFId = null;
+		stats.timer.end().then( ( gpu ) => {
 
-				const renderer = this.getRenderer();
+			if ( gpu === null ) {
 
-				if ( renderer === null ) {
+				stats.gpuNotAvailable = true;
 
-					this._resolveTimestampPromise = null;
-					resolve();
-					return;
+			} else {
 
-				}
+				stats.gpu = gpu;
 
-				if ( renderer.backend.hasTimestamp ) {
+			}
 
-					await renderer.resolveTimestampsAsync( TimestampQuery.COMPUTE );
-					await renderer.resolveTimestampsAsync( TimestampQuery.RENDER );
+			frame.pendingTimers --;
 
-					if ( renderer !== this.getRenderer() ) {
-
-						this._resolveTimestampPromise = null;
-						resolve();
-						return;
-
-					}
-
-					const computeFrames = renderer.backend.getTimestampFrames( TimestampQuery.COMPUTE );
-					const renderFrames = renderer.backend.getTimestampFrames( TimestampQuery.RENDER );
-
-					const frameIds = [ ...new Set( [ ...computeFrames, ...renderFrames ] ) ];
-
-					for ( const frameId of frameIds ) {
-
-						const frame = this.getFrameById( frameId );
-
-						if ( frame !== null ) {
-
-							// resolve compute timestamps
-
-							if ( frame.resolvedCompute === false ) {
-
-								if ( frame.computes.length > 0 ) {
-
-									if ( computeFrames.includes( frameId ) ) {
-
-										for ( const stats of frame.computes ) {
-
-											if ( renderer.backend.hasTimestampQuery( stats.uid ) ) {
-
-												stats.gpu = renderer.backend.getTimestamp( stats.uid );
-
-											} else {
-
-												stats.gpu = 0;
-												stats.gpuNotAvailable = true;
-
-											}
-
-										}
-
-										frame.resolvedCompute = true;
-
-									}
-
-								} else {
-
-									frame.resolvedCompute = true;
-
-								}
-
-							}
-
-							// resolve render timestamps
-
-							if ( frame.resolvedRender === false ) {
-
-								if ( frame.renders.length > 0 ) {
-
-									if ( renderFrames.includes( frameId ) ) {
-
-										for ( const stats of frame.renders ) {
-
-											if ( renderer.backend.hasTimestampQuery( stats.uid ) ) {
-
-												stats.gpu = renderer.backend.getTimestamp( stats.uid );
-
-											} else {
-
-												stats.gpu = 0;
-												stats.gpuNotAvailable = true;
-
-											}
-
-										}
-
-										frame.resolvedRender = true;
-
-									}
-
-								} else {
-
-									frame.resolvedRender = true;
-
-								}
-
-							}
-
-							if ( frame.resolvedCompute === true && frame.resolvedRender === true ) {
-
-								this.resolveFrame( frame );
-
-							}
-
-						}
-
-					}
-
-				} else {
-
-					for ( const frame of this.frames ) {
-
-						if ( frame.resolvedCompute === true && frame.resolvedRender === true ) {
-
-							continue;
-
-						}
-
-						const previousFrame = this.getFrameById( frame.frameId - 1 );
-
-						if ( previousFrame === null ) continue;
-
-						if ( frame.resolvedCompute === false ) {
-
-							for ( const stats of frame.computes ) {
-
-								stats.gpu = 0;
-								stats.gpuNotAvailable = true;
-
-							}
-
-							frame.resolvedCompute = true;
-
-						}
-
-						if ( frame.resolvedRender === false ) {
-
-							for ( const stats of frame.renders ) {
-
-								stats.gpu = 0;
-								stats.gpuNotAvailable = true;
-
-							}
-
-							frame.resolvedRender = true;
-
-						}
-
-						if ( frame.resolvedCompute === true && frame.resolvedRender === true ) {
-
-							this.resolveFrame( frame );
-
-						}
-
-					}
-
-				}
-
-				this._resolveTimestampPromise = null;
-
-				resolve();
-
-			} );
+			this._resolveFrameIfComplete( frame );
 
 		} );
 
-		return this._resolveTimestampPromise;
+	}
+
+	_resolveFrameIfComplete( frame ) {
+
+		if ( frame.finished === true && frame.pendingTimers === 0 && this.framesLib[ frame.frameId ] === frame ) {
+
+			this.resolveFrame( frame );
+
+		}
 
 	}
 
@@ -500,10 +354,12 @@ export class RendererInspector extends InspectorBase {
 		this.frames.push( frame );
 		this.framesLib[ frame.frameId ] = frame;
 
+		frame.finished = true;
+
 		if ( this.isAvailable ) {
 
 			this.updateTabs();
-			this.resolveTimestamp();
+			this._resolveFrameIfComplete( frame );
 
 		}
 
@@ -543,6 +399,8 @@ export class RendererInspector extends InspectorBase {
 		this.currentCompute = currentCompute;
 		this.currentContext = currentCompute;
 
+		this._beginTimer( currentCompute );
+
 	}
 
 	finishCompute() {
@@ -553,6 +411,8 @@ export class RendererInspector extends InspectorBase {
 
 		const currentCompute = this.currentCompute;
 		currentCompute.cpu = performance.now() - currentCompute.timestamp;
+
+		this._endTimer( frame, currentCompute );
 
 		this.currentContext = currentCompute.parent;
 		this.currentCompute = currentCompute.parent && currentCompute.parent.isComputeStats ? currentCompute.parent : null;
@@ -575,6 +435,8 @@ export class RendererInspector extends InspectorBase {
 		this.currentRender = currentRender;
 		this.currentContext = currentRender;
 
+		this._beginTimer( currentRender );
+
 	}
 
 	finishRender() {
@@ -585,6 +447,8 @@ export class RendererInspector extends InspectorBase {
 
 		const currentRender = this.currentRender;
 		currentRender.cpu = performance.now() - currentRender.timestamp;
+
+		this._endTimer( frame, currentRender );
 
 		this.currentContext = currentRender.parent;
 		this.currentRender = currentRender.parent && currentRender.parent.isRenderStats ? currentRender.parent : null;
@@ -600,15 +464,6 @@ export class RendererInspector extends InspectorBase {
 	}
 
 	dispose() {
-
-		if ( this._rAFId !== null ) {
-
-			cancelAnimationFrame( this._rAFId );
-			this._rAFId = null;
-
-		}
-
-		this._resolveTimestampPromise = null;
 
 		if ( this._overdrawMaterial !== null ) {
 

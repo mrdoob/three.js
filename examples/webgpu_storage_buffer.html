@@ -185,7 +185,7 @@
 				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
 				scene.add( plane );
 
-				const renderer = new THREE.WebGPURenderer( { antialias: false, forceWebGL: forceWebGL, trackTimestamp: true } );
+				const renderer = new THREE.WebGPURenderer( { antialias: false, forceWebGL: forceWebGL } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth / 2, window.innerHeight );
 
@@ -217,20 +217,25 @@
 
 				renderer.info.autoReset = false;
 
+				const computeTimer = new THREE.GPUTimer( renderer );
+				const renderTimer = new THREE.GPUTimer( renderer );
+
 				 const stepAnimation = async function () {
 
 					renderer.info.reset();
 
+					computeTimer.begin();
 					renderer.compute( compute );
-					renderer.render( scene, camera );
+					const computeTime = computeTimer.end();
 
-					renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
-					renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
+					renderTimer.begin();
+					renderer.render( scene, camera );
+					const renderTime = renderTimer.end();
 
 					timestamps[ forceWebGL ? 'webgl' : 'webgpu' ].innerHTML = `
 
-							Compute ${renderer.info.compute.frameCalls} pass in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>
-							Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.render.timestamp.toFixed( 6 )}ms`;
+							Compute ${renderer.info.compute.frameCalls} pass in ${( await computeTime ).toFixed( 6 )}ms<br>
+							Draw ${renderer.info.render.drawCalls} pass in ${( await renderTime ).toFixed( 6 )}ms`;
 
 					setTimeout( stepAnimation, 1000 );
 			

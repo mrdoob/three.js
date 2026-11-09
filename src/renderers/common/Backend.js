@@ -72,8 +72,15 @@ class Backend {
 		 *
 		 * @type {boolean}
 		 * @default false
+		 * @deprecated since r188. Use {@link GPUTimer} instead.
 		 */
 		this.trackTimestamp = ( parameters.trackTimestamp === true );
+
+		if ( this.trackTimestamp === true ) {
+
+			warnOnce( 'WebGPURenderer: "trackTimestamp" has been deprecated. Use "GPUTimer" instead.' ); // @deprecated r188
+
+		}
 
 	}
 
