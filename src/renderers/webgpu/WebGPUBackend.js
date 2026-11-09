@@ -39,7 +39,6 @@ const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
 const _computePassDescriptor = new GPUComputePassDescriptor();
 const _querySetDescriptor = new GPUQuerySetDescriptor();
 const _shaderModuleDescriptor = new GPUShaderModuleDescriptor();
-const _renderPassTimestampWrites = new GPURenderPassTimestampWrites();
 const _texelCopyTextureInfoSrc = new GPUTexelCopyTextureInfo();
 const _texelCopyTextureInfoDst = new GPUTexelCopyTextureInfo();
 const _textureDescriptor = new GPUTextureDescriptor();
@@ -941,7 +940,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		this.initTimestampQuery( TimestampQuery.RENDER, this.getTimestampUID( renderContext ), descriptor );
+		this.initTimestampQuery( TimestampQuery.RENDER, renderContext, descriptor );
 
 		descriptor.occlusionQuerySet = occlusionQuerySet;
 
@@ -1482,6 +1481,8 @@ class WebGPUBackend extends Backend {
 
 					const renderPass = encoder.beginRenderPass( layerDescriptor );
 
+					this._continueTimestampQuery( layerDescriptor );
+
 					if ( renderContext.viewport ) {
 
 						const { x, y, width, height, minDepth, maxDepth } = renderContext.viewportValue;
@@ -1886,7 +1887,7 @@ class WebGPUBackend extends Backend {
 		_computePassDescriptor.label = label;
 		_commandEncoderDescriptor.label = label;
 
-		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ), _computePassDescriptor );
+		this.initTimestampQuery( TimestampQuery.COMPUTE, computeGroup, _computePassDescriptor );
 
 		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( _commandEncoderDescriptor );
 		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( _computePassDescriptor );
@@ -2616,12 +2617,12 @@ class WebGPUBackend extends Backend {
 	 * Inits a time stamp query for the given render context.
 	 *
 	 * @param {string} type - The type of the timestamp query (e.g. 'render', 'compute').
-	 * @param {number} uid - Unique id for the context (e.g. render context id).
+	 * @param {RenderContext|ComputeNode|Array<ComputeNode>} renderContext - The render context or compute group.
 	 * @param {Object} descriptor - The query descriptor.
 	 */
-	initTimestampQuery( type, uid, descriptor ) {
+	initTimestampQuery( type, renderContext, descriptor ) {
 
-		if ( ! this.trackTimestamp ) {
+		if ( this.trackTimestamp === false ) {
 
 			descriptor.timestampWrites = undefined;
 			return;
@@ -2637,13 +2638,39 @@ class WebGPUBackend extends Backend {
 
 		const timestampQueryPool = this.timestampQueryPool[ type ];
 
-		const baseOffset = timestampQueryPool.allocateQueriesForContext( uid );
+		const contextData = this.get( renderContext );
 
-		_renderPassTimestampWrites.querySet = timestampQueryPool.querySet;
-		_renderPassTimestampWrites.beginningOfPassWriteIndex = baseOffset;
-		_renderPassTimestampWrites.endOfPassWriteIndex = baseOffset + 1;
+		const baseOffset = timestampQueryPool.allocateQueriesForContext( contextData.timestampUID );
 
-		descriptor.timestampWrites = _renderPassTimestampWrites;
+		if ( contextData.timestampWrites === undefined ) {
+
+			contextData.timestampWrites = new GPURenderPassTimestampWrites();
+
+		}
+
+		const timestampWrites = contextData.timestampWrites;
+		timestampWrites.querySet = timestampQueryPool.querySet;
+		timestampWrites.beginningOfPassWriteIndex = baseOffset;
+		timestampWrites.endOfPassWriteIndex = baseOffset + 1;
+
+		descriptor.timestampWrites = timestampWrites;
+
+	}
+
+	/**
+	 * Makes following passes of a split render pass only write the end timestamp so the
+	 * query measures from the first pass to the last one.
+	 *
+	 * @private
+	 * @param {Object} descriptor - The render pass descriptor.
+	 */
+	_continueTimestampQuery( descriptor ) {
+
+		if ( this.trackTimestamp === true ) {
+
+			descriptor.timestampWrites.beginningOfPassWriteIndex = undefined;
+
+		}
 
 	}
 
@@ -3224,6 +3251,8 @@ class WebGPUBackend extends Backend {
 
 			if ( renderContext.depth ) descriptor.depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
 			if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+
+			this._continueTimestampQuery( descriptor );
 
 			renderContextData.currentPass = encoder.beginRenderPass( descriptor );
 
