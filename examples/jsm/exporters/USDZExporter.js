@@ -1415,7 +1415,7 @@ function buildCamera( camera, usedNames, options ) {
 	if ( camera.isOrthographicCamera ) {
 
 		horizontalAperture = (
-			( Math.abs( camera.left ) + Math.abs( camera.right ) ) *
+			( ( camera.right - camera.left ) / camera.zoom ) *
 			10
 		).toPrecision( PRECISION );
 
@@ -1431,7 +1431,7 @@ function buildCamera( camera, usedNames, options ) {
 	if ( camera.isOrthographicCamera ) {
 
 		verticalAperture = (
-			( Math.abs( camera.top ) + Math.abs( camera.bottom ) ) *
+			( ( camera.top - camera.bottom ) / camera.zoom ) *
 			10
 		).toPrecision( PRECISION );
 
@@ -1442,6 +1442,30 @@ function buildCamera( camera, usedNames, options ) {
 	}
 
 	node.addProperty( `float verticalAperture = ${verticalAperture}` );
+
+	if ( camera.isOrthographicCamera ) {
+
+		if ( camera.left + camera.right !== 0 ) {
+
+			const horizontalApertureOffset = (
+				( ( camera.right + camera.left ) / ( 2 * camera.zoom ) ) *
+				10
+			).toPrecision( PRECISION );
+			node.addProperty( `float horizontalApertureOffset = ${horizontalApertureOffset}` );
+
+		}
+
+		if ( camera.top + camera.bottom !== 0 ) {
+
+			const verticalApertureOffset = (
+				( ( camera.top + camera.bottom ) / ( 2 * camera.zoom ) ) *
+				10
+			).toPrecision( PRECISION );
+			node.addProperty( `float verticalApertureOffset = ${verticalApertureOffset}` );
+
+		}
+
+	}
 
 	if ( camera.isPerspectiveCamera ) {
 

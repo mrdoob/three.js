@@ -1,4 +1,4 @@
-import { BoxGeometry, Mesh, MeshStandardMaterial, Scene, SphereGeometry } from 'three';
+import { BoxGeometry, Mesh, MeshStandardMaterial, OrthographicCamera, PerspectiveCamera, Scene, SphereGeometry } from 'three';
 import { USDZExporter } from '../../../../examples/jsm/exporters/USDZExporter.js';
 import { USDLoader } from '../../../../examples/jsm/loaders/USDLoader.js';
 import { unzipSync, strFromU8 } from '../../../../examples/jsm/libs/fflate.module.js';
@@ -240,6 +240,44 @@ export default QUnit.module( 'Addons', () => {
 					assert.closeTo( importedMesh.material.metalness, mesh.material.metalness, tolerance, 'Material metalness matches' );
 
 				}
+
+			} );
+
+			QUnit.test( 'export camera', async ( assert ) => {
+
+				const exporter = new USDZExporter();
+
+				const scene = new Scene();
+
+				const perspectiveCamera = new PerspectiveCamera( 60, 2, 0.1, 1000 );
+				perspectiveCamera.name = 'perspCam';
+				scene.add( perspectiveCamera );
+
+				const orthographicCamera = new OrthographicCamera( 2, 8, 10, 2, 0.5, 500 );
+				orthographicCamera.name = 'orthoCam';
+				scene.add( orthographicCamera );
+
+				const zoomedOrthoCamera = new OrthographicCamera( - 5, 5, 5, - 5, 0.1, 100 );
+				zoomedOrthoCamera.zoom = 2;
+				zoomedOrthoCamera.name = 'zoomedOrthoCam';
+				scene.add( zoomedOrthoCamera );
+
+				const exportResult = await exporter.parseAsync( scene );
+				const unzipped = unzipSync( exportResult );
+				const usdaContent = strFromU8( unzipped[ 'model.usda' ] );
+
+				assert.ok( isValidUSDA( usdaContent ), 'model.usda is valid USDA' );
+				assert.ok( usdaContent.includes( 'def Camera "perspCam"' ), 'Contains perspective camera' );
+				assert.ok( usdaContent.includes( 'token projection = "perspective"' ), 'Perspective projection' );
+				assert.ok( usdaContent.includes( 'def Camera "orthoCam"' ), 'Contains orthographic camera' );
+				assert.ok( usdaContent.includes( 'token projection = "orthographic"' ), 'Orthographic projection' );
+				assert.ok( usdaContent.includes( 'float horizontalAperture = 60.00000' ), 'Correct orthographic horizontalAperture' );
+				assert.ok( usdaContent.includes( 'float verticalAperture = 80.00000' ), 'Correct orthographic verticalAperture' );
+				assert.ok( usdaContent.includes( 'float horizontalApertureOffset = 50.00000' ), 'Correct orthographic horizontalApertureOffset' );
+				assert.ok( usdaContent.includes( 'float verticalApertureOffset = 60.00000' ), 'Correct orthographic verticalApertureOffset' );
+				assert.ok( usdaContent.includes( 'def Camera "zoomedOrthoCam"' ), 'Contains zoomed orthographic camera' );
+				assert.ok( usdaContent.includes( 'float horizontalAperture = 50.00000' ), 'Correct zoomed horizontalAperture' );
+				assert.ok( usdaContent.includes( 'float verticalAperture = 50.00000' ), 'Correct zoomed verticalAperture' );
 
 			} );
 
