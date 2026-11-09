@@ -801,7 +801,6 @@ class XRManager extends EventDispatcher {
 			const depthFormat = this._renderer.stencil ? DepthStencilFormat : DepthFormat;
 			const depthType = this._renderer.stencil ? UnsignedInt248Type : UnsignedIntType;
 			depthTexture = new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat, 2 );
-			depthTexture.isArrayTexture = true;
 
 		}
 
@@ -1941,13 +1940,6 @@ function onAnimationFrame( time, frame ) {
 			const xrRenderTarget = this._xrRenderTarget;
 
 			if ( layerWidth > 0 && layerHeight > 0 && ( xrRenderTarget.width !== layerWidth || xrRenderTarget.height !== layerHeight ) ) {
-
-				if ( xrRenderTarget.depthTexture !== null ) {
-
-					xrRenderTarget.depthTexture.image.width = layerWidth;
-					xrRenderTarget.depthTexture.image.height = layerHeight;
-
-				}
 
 				xrRenderTarget.setSize( layerWidth, layerHeight, 2 );
 
