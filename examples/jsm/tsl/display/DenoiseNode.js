@@ -81,8 +81,6 @@ class DenoiseNode extends Node {
 	 * @param {?Node<float>} [options.surfaceId=null] - Screen space: positive integer surface identities, sampled on the geometry guide grid.
 	 * @param {?Node<float>} [options.reactive=null] - Temporal: positive values reject history for the current input texel.
 	 * @param {boolean} [options.coverage=false] - Screen space: whether the input is radiance with its coverage in alpha.
-	 * @param {boolean} [options.geometryOnlyCoverage=false] - With coverage: filter output coverage using geometry and kernel weights only. Radiance retains its original SVGF weights and normalization; temporal accumulation is unchanged.
-	 * @param {boolean} [options.compactCoverage=false] - With geometry-only coverage: use only the first spatial pass and Gaussian tap weights.
 	 * @param {boolean} [options.temporal=false] - Screen space: whether to accumulate the input in time, see `temporalDenoise()`.
 	 * @param {('fast'|'quality')} [options.quality='fast'] - The preset of the filter.
 	 */
@@ -92,7 +90,7 @@ class DenoiseNode extends Node {
 
 		const {
 			depth = null, normal = null, camera = null, position = null, variance = null, velocity = null,
-			roughness = null, hitDistance = null, surfaceId = null, reactive = null, alpha = false, coverage = false, geometryOnlyCoverage = false, compactCoverage = false, temporal = false, quality = 'fast'
+			roughness = null, hitDistance = null, surfaceId = null, reactive = null, alpha = false, coverage = false, temporal = false, quality = 'fast'
 		} = options;
 
 		const screenSpace = position === null;
@@ -197,18 +195,6 @@ class DenoiseNode extends Node {
 		this.coverage = coverage;
 
 		/**
-		 * Filters output coverage independently of luminance and reflected hit distance.
-		 * Only affects spatial coverage reconstruction; radiance and temporal accumulation retain their weights.
-		 * Coverage mode reserves a third channel in the alpha intermediates for this estimate.
-		 *
-		 * @type {UniformNode<bool>}
-		 */
-		this.geometryOnlyCoverage = uniform( geometryOnlyCoverage );
-
-		/** Restricts geometry-only coverage to the first spatial pass with Gaussian tap weights. @type {UniformNode<bool>} */
-		this.compactCoverage = uniform( compactCoverage );
-
-		/**
 		 * Whether the node accumulates the input in time.
 		 *
 		 * @type {boolean}
@@ -311,7 +297,7 @@ class DenoiseNode extends Node {
 		// background ) with the surface id * 256 + the history length, and the octahedral view normal, with the
 		// roughness and the hit distance factor h / ( h + d ) for reflections
 
-		const values = this.alpha ? [ 'value', coverage ? 'coverage' : 'alpha' ] : [ 'value' ];
+		const values = this.alpha ? [ 'value', 'alpha' ] : [ 'value' ];
 		const guides = [ 'depth', this.roughnessNode !== null ? 'normalSpecular' : 'normal' ];
 
 		this._targets = [ createTarget( values ), createTarget( values ) ];
@@ -1151,7 +1137,7 @@ class DenoiseNode extends Node {
 				const deviation = sqrt( variance ).toVar();
 				const noData = surface.w.equal( 0 );
 
-				return [ vec4( value.rgb, noData.select( - 1, deviation.x ) ), vec4( value.a, noData.select( - 1, deviation.y ), value.a, 0 ) ];
+				return [ vec4( value.rgb, noData.select( - 1, deviation.x ) ), vec4( value.a, noData.select( - 1, deviation.y ), 0, 0 ) ];
 
 			};
 
@@ -1179,7 +1165,7 @@ class DenoiseNode extends Node {
 				const noData = surface.w.equal( 0 );
 
 				const outputs = [ vec4( value.rgb, noData.select( - 1, deviation.x ) ) ];
-				if ( alpha ) outputs.push( vec4( value.a, noData.select( - 1, deviation.y ), value.a, 0 ) );
+				if ( alpha ) outputs.push( vec4( value.a, noData.select( - 1, deviation.y ), 0, 0 ) );
 				outputs.push( ...this._packGuides( guides ) );
 
 				return outputs;
@@ -1266,7 +1252,6 @@ class DenoiseNode extends Node {
 		const step = this._step;
 		const alpha = this.alpha;
 		const roughness = this.roughnessNode !== null;
-		const separateCoverage = this.coverage;
 
 		// 'fast': a flat kernel, at strides 1 and 3 two passes tile one 9x9 box, where a peaked kernel would leave a
 		// grid; 'quality': the weights 1/4, 1/2 and 1/4 along each axis, and a linear fit
@@ -1282,7 +1267,7 @@ class DenoiseNode extends Node {
 			const centerTexel = this._texelAt( coord, rays );
 			const surface = centerTexel.surface.toVar();
 			const center = direct ? vec4( loaded.rgb, surface.w.greaterThan( 0 ).select( sqrt( this._currentFast.load( coord ).w.max( 0 ) ), - 1 ) ).toVar() : loaded;
-			const centerAlpha = alpha ? ( direct ? vec4( loaded.a, 0, loaded.a, 0 ) : inputAlpha.load( coord ) ).toVar() : null;
+			const centerAlpha = alpha ? ( direct ? vec4( loaded.a, 0, 0, 0 ) : inputAlpha.load( coord ) ).toVar() : null;
 			const result = center.toVar();
 			const resultAlpha = alpha ? centerAlpha.toVar() : null;
 
@@ -1354,7 +1339,6 @@ class DenoiseNode extends Node {
 				const noiseSpread = vec3( 0 ).toVar(); // times x x, x y, y y
 				const sumA = alpha ? float( 0 ).toVar() : null;
 				const noiseA = alpha ? float( 0 ).toVar() : null;
-				const geometryCoverage = separateCoverage ? vec2( 0 ).toVar() : null;
 
 				// the taps are loops, unrolled ones would make shaders that take seconds to compile on some platforms
 
@@ -1382,21 +1366,11 @@ class DenoiseNode extends Node {
 							const similarity = pow( max( dot( normal, otherNormal.xyz ), 0 ), normalPhi );
 							const difference = abs( luminance( value.rgb ).sub( centerLuminance ) ).mul( luminanceScale ).toVar();
 
-							const valueAlpha = alpha ? ( direct ? vec4( tapLoaded.a, 0, tapLoaded.a, 0 ) : inputAlpha.load( q ) ).toVar() : null;
+							const valueAlpha = alpha ? ( direct ? vec4( tapLoaded.a, 0, 0, 0 ) : inputAlpha.load( q ) ).toVar() : null;
 							if ( alpha && ! direct ) difference.addAssign( abs( valueAlpha.x.sub( centerAlpha.x ) ).mul( alphaScale ) );
 
-							let geometryExponent = plane.div( this.planePhi );
-							if ( roughness ) geometryExponent = geometryExponent.add( abs( otherNormal.w.sub( normalRoughness.w ) ).mul( ROUGHNESS_PHI ) );
-							let exponent = geometryExponent.add( difference );
-
-							if ( separateCoverage ) {
-
-								// Visibility support must not depend on the brightness of a reflection or its hit distance.
-								const gaussian = fx.mul( fx ).add( fy.mul( fy ) ).mul( - 0.5 ).exp();
-								const geometryWeight = similarity.mul( exp( geometryExponent.negate() ) ).mul( kernelWeight ).mul( this.compactCoverage.select( gaussian, 1 ) );
-								geometryCoverage.addAssign( vec2( valueAlpha.z, 1 ).mul( geometryWeight ) );
-
-							}
+							let exponent = plane.div( this.planePhi ).add( difference );
+							if ( roughness ) exponent = exponent.add( abs( otherNormal.w.sub( normalRoughness.w ) ).mul( ROUGHNESS_PHI ) );
 
 							if ( footprint !== null ) {
 
@@ -1465,7 +1439,7 @@ class DenoiseNode extends Node {
 
 				// alpha: the weighted mean; after a direct pass, without an edge stop
 
-				if ( alpha ) resultAlpha.assign( vec4( sumA.div( moments.x ), direct ? float( 1e3 ) : sqrt( noiseA ).div( moments.x ), separateCoverage ? this.compactCoverage.and( step.greaterThan( 1 ) ).select( centerAlpha.z, geometryCoverage.x.div( geometryCoverage.y.max( 1e-6 ) ) ) : float( 0 ), 0 ) );
+				if ( alpha ) resultAlpha.assign( vec4( sumA.div( moments.x ), direct ? float( 1e3 ) : sqrt( noiseA ).div( moments.x ), 0, 0 ) );
 
 			} );
 
@@ -1473,14 +1447,7 @@ class DenoiseNode extends Node {
 
 				// coverage: the radiance again, the weighted mean of the radiance of the texels with coverage
 
-				if ( this.coverage ) {
-
-					const supported = resultAlpha.x.greaterThan( 1e-4 );
-					// Independent coverage cannot replace the fallback where SVGF reconstructed no radiance.
-					const coverage = this.geometryOnlyCoverage.select( supported.select( resultAlpha.z, 0 ), resultAlpha.x ).clamp();
-					return vec4( supported.select( result.rgb.div( resultAlpha.x.max( 1e-4 ) ), vec3( 0 ) ), coverage );
-
-				}
+				if ( this.coverage ) return vec4( resultAlpha.x.greaterThan( 1e-4 ).select( result.rgb.div( resultAlpha.x.max( 1e-4 ) ), vec3( 0 ) ), resultAlpha.x.clamp() );
 
 				return vec4( result.rgb, alpha ? resultAlpha.x : 1 );
 
