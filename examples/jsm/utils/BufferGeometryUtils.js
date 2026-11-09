@@ -896,6 +896,7 @@ function toTrianglesDrawMode( geometry, drawMode ) {
  * Helpful for Raytracing or Decals (i.e. a `DecalGeometry` applied to a morphed Object with a `BufferGeometry`
  * will use the original `BufferGeometry`, not the morphed/skinned one, generating an incorrect result.
  * Using this function to create a shadow `Object3`D the `DecalGeometry` can be correctly generated).
+ * If the geometry has no normal attribute, both returned normal attributes are `undefined`.
  *
  * @param {Mesh|Line|Points} object - The 3D object to compute morph attributes for.
  * @return {Object} An object with original position/normal attributes and morphed ones.
@@ -926,6 +927,8 @@ function computeMorphedAttributes( object ) {
 		c,
 		modifiedAttributeArray
 	) {
+
+		if ( attribute === undefined ) return;
 
 		_vA.fromBufferAttribute( attribute, a );
 		_vB.fromBufferAttribute( attribute, b );
@@ -1022,7 +1025,7 @@ function computeMorphedAttributes( object ) {
 	let start, end;
 
 	const modifiedPosition = new Float32Array( positionAttribute.count * positionAttribute.itemSize );
-	const modifiedNormal = new Float32Array( normalAttribute.count * normalAttribute.itemSize );
+	const modifiedNormal = normalAttribute ? new Float32Array( normalAttribute.count * normalAttribute.itemSize ) : undefined;
 
 	if ( index !== null ) {
 
@@ -1175,7 +1178,7 @@ function computeMorphedAttributes( object ) {
 	}
 
 	const morphedPositionAttribute = new Float32BufferAttribute( modifiedPosition, 3 );
-	const morphedNormalAttribute = new Float32BufferAttribute( modifiedNormal, 3 );
+	const morphedNormalAttribute = normalAttribute ? new Float32BufferAttribute( modifiedNormal, 3 ) : undefined;
 
 	return {
 
