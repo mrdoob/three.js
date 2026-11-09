@@ -28,7 +28,7 @@
 		</script>
 		<script type="module">
 			import * as THREE from 'three/webgpu';
-			import { Fn, context, diffuseColor, environmentSpecular, getViewPosition, indirectSpecular, metalness, mrt, normalView, output, roughness as materialRoughness, packNormalToRGB, pass, pmremTexture, sample, screenUV, uniform, unpackRGBToNormal, vec3, vec4, velocity } from 'three/tsl';
+			import { Fn, context, environmentSpecular, getViewPosition, indirectSpecular, mrt, normalView, output, roughness as materialRoughness, packNormalToRGB, pass, pmremTexture, sample, screenUV, uniform, unpackRGBToNormal, vec3, vec4, velocity } from 'three/tsl';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
@@ -40,8 +40,6 @@
 			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
 			import { denoise, temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
 			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
-			import { screenSpaceGBuffer } from 'three/addons/tsl/display/ScreenSpaceGBufferNode.js';
-			import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 			import { resolveSSRHitDistance } from 'three/addons/tsl/utils/SpecularHelpers.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -51,7 +49,7 @@
 			const PROBE_SIZE = 256;
 			const params = {
 				output: 'Beauty', ssr: true, probes: true,
-				exposure: 1.5, environment: 0.25, effectScale: 0.5
+				exposure: 1.5, environment: 0.25
 			};
 			const ssrEnabled = uniform( 1 );
 			const probesEnabled = uniform( 1 );
@@ -59,7 +57,7 @@
 			const bakeMeshes = [];
 			const materials = new Set();
 			let renderer, scene, camera, controls, pipeline, lightMapper, radiosity, lightMapDenoise;
-			let probes, ssrPass, ssrDenoise, guides, traaPass, views;
+			let probes, ssrPass, ssrDenoise, traaPass, views;
 			let bakeComplete = false;
 
 			init().catch( error => {
@@ -243,35 +241,29 @@
 				geometryPass.contextNode = context( { indirectSpecularNode: indirectSpecular( [] ) } );
 				geometryPass.setMRT( mrt( {
 					output: vec4( packNormalToRGB( normalView ), materialRoughness ),
-					albedo: vec4( diffuseColor.rgb, metalness ), velocity
+					velocity
 				} ) );
-				geometryPass.getTexture( 'albedo' ).type = THREE.UnsignedByteType;
 				const depth = geometryPass.getTextureNode( 'depth' );
 				const normalRoughness = geometryPass.getTextureNode();
 				const motion = geometryPass.getTextureNode( 'velocity' );
 				const normals = sample( coordinate => unpackRGBToNormal( normalRoughness.sample( coordinate ).rgb ).normalize() );
-				guides = screenSpaceGBuffer( depth, normalRoughness, geometryPass.getTextureNode( 'albedo' ) );
-				guides.resolutionScale = params.effectScale;
-				const effectDepth = guides.getTextureNode();
-				const effectNormal = guides.getViewNormalNode();
-				const effectRoughness = sample( coordinate => guides.getTextureNode( 'normal' ).sample( coordinate ).a );
+				const roughness = sample( coordinate => normalRoughness.sample( coordinate ).a );
 				const source = pass( scene, camera );
 				source.contextNode = context( { indirectSpecularNode: fallback } );
 				source.setMRT( mrt( { output: vec4( output.rgb, 1 ) } ) );
-				ssrPass = ssr( guides.resample( source.getTextureNode() ), effectDepth, effectNormal, {
-					camera, stochastic: true, outputCoverage: true, binaryRefine: true, roughnessNode: effectRoughness
+				ssrPass = ssr( source.getTextureNode(), depth, normals, {
+					camera, stochastic: true, outputCoverage: true, binaryRefine: true, roughnessNode: roughness
 				} );
-				ssrPass.resolutionScale = params.effectScale;
-				ssrPass.maxSteps.value = 32;
+				ssrPass.quality.value = 0.5;
 				ssrPass.maxDistance.value = 20;
 				ssrPass.thickness.value = 0.15;
 				ssrDenoise = temporalDenoise( ssrPass.getTextureNode(), {
-					camera, depth: effectDepth, normal: effectNormal, roughness: effectRoughness,
-					velocity: guides.resample( motion ), coverage: true,
+					camera, depth, normal: normals, roughness,
+					velocity: motion, coverage: true,
 					hitDistance: sample( coordinate => resolveSSRHitDistance( ssrPass.getHitNode().sample( coordinate ).r, ssrPass.getTextureNode().sample( coordinate ).a ) )
 				} );
 				ssrDenoise.maxFrames.value = 16;
-				const filtered = jointBilateralUpsample( ssrDenoise.getTextureNode(), effectDepth, effectNormal, depth, normals, camera );
+				const filtered = ssrDenoise.getTextureNode();
 				const screenReflection = ( { normal, direction, viewDirection, roughness } ) => Fn( () => {
 
 					// One traced lobe belongs to the base material. Other lobes keep the local/env fallback.

@@ -78,8 +78,6 @@ class DenoiseNode extends Node {
 	 * @param {?Node<float>} [options.roughness=null] - Screen space, reflections: the roughness of the scene, a node with `sample( uv )`.
 	 * @param {?Node<float>} [options.hitDistance=null] - Screen space, reflections: the hit distance of each pixel of the input, a node with `sample( uv )`, with `roughness`.
 	 * @param {boolean} [options.alpha=false] - Screen space: whether alpha is a second signal to filter, e.g. AO next to GI.
-	 * @param {?Node<float>} [options.surfaceId=null] - Screen space: positive integer surface identities, sampled on the geometry guide grid.
-	 * @param {?Node<float>} [options.reactive=null] - Temporal: positive values reject history for the current input texel.
 	 * @param {boolean} [options.coverage=false] - Screen space: whether the input is radiance with its coverage in alpha.
 	 * @param {boolean} [options.temporal=false] - Screen space: whether to accumulate the input in time, see `temporalDenoise()`.
 	 * @param {('fast'|'quality')} [options.quality='fast'] - The preset of the filter.
@@ -90,7 +88,7 @@ class DenoiseNode extends Node {
 
 		const {
 			depth = null, normal = null, camera = null, position = null, variance = null, velocity = null,
-			roughness = null, hitDistance = null, surfaceId = null, reactive = null, alpha = false, coverage = false, temporal = false, quality = 'fast'
+			roughness = null, hitDistance = null, alpha = false, coverage = false, temporal = false, quality = 'fast'
 		} = options;
 
 		const screenSpace = position === null;
@@ -163,11 +161,6 @@ class DenoiseNode extends Node {
 		 * @type {?Node<float>}
 		 */
 		this.roughnessNode = roughness;
-
-		/** Optional positive integer surface identities for geometry and history validation. @type {?Node<float>} */
-		this.surfaceIdNode = surfaceId;
-		/** Optional positive mask rejecting history at moving reflected objects. @type {?Node<float>} */
-		this.reactiveNode = reactive;
 
 		/**
 		 * Screen space, reflections: the hit distance of each pixel of the input.
@@ -720,9 +713,7 @@ class DenoiseNode extends Node {
 		const normal = this.normalNode !== null ? this.normalNode.sample( guideUV ).xyz : getNormalFromDepth( guideUV, this.depthNode.value, this._cameraProjectionMatrixInverse );
 		const roughness = this.roughnessNode !== null ? float( this.roughnessNode.sample( guideUV ) ) : float( 1 );
 
-		const surfaceId = this.surfaceIdNode !== null ? float( this.surfaceIdNode.sample( guideUV ) ).max( 1 ).floor() : float( 1 );
-
-		return { position: vec4( position, isBackgroundDepth( depth ).select( 0, surfaceId ) ), normal: vec4( normal, roughness ), uv: guideUV };
+		return { position: vec4( position, isBackgroundDepth( depth ).select( 0, 1 ) ), normal: vec4( normal, roughness ), uv: guideUV };
 
 	}
 
@@ -891,9 +882,7 @@ class DenoiseNode extends Node {
 			m1.divAssign( 9 );
 			m2.divAssign( 9 );
 
-			const acceptsHistory = this.reactiveNode !== null ? float( this.reactiveNode.sample( uv ) ).lessThanEqual( 0 ) : this._historyValid;
-
-			If( surface.w.greaterThan( 0 ).and( this._historyValid ).and( acceptsHistory ), () => {
+			If( surface.w.greaterThan( 0 ).and( this._historyValid ), () => {
 
 				// the current surface in the previous view
 
