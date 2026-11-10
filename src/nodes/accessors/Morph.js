@@ -48,18 +48,6 @@ const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, dept
  * The morph target base influence of the object. It is `1` when `morphTargetsRelative`
  * is `true`, otherwise `1 - sum( influences )`.
  *
- * @type {UniformNode<float>}
- */
-const morphBaseInfluence = /*@__PURE__*/ uniform( 1 ).onObjectUpdate( ( { object } ) => {
-
-	return object.geometry.morphTargetsRelative ? 1 : 1 - object.morphTargetInfluences.reduce( ( a, b ) => a + b, 0 );
-
-} );
-
-/**
- * The morph target base influence used by the vertex. Instanced meshes with
- * a morph texture read it per instance, see {@link InstancedMesh#setMorphAt}.
- *
  * @type {PropertyNode<float>}
  */
 const morphBase = /*@__PURE__*/ property( 'float', 'morphBase' );
@@ -246,7 +234,7 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 
 	if ( morphTargetsCount === 0 ) return;
 
-	if ( mesh.morphTexture ) builder.objectSpecific = true;
+	if ( mesh.isInstancedMesh === true ) builder.objectSpecific = true;
 
 	// Init
 
@@ -269,15 +257,17 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 
 	const { texture: bufferMap, stride, size } = getEntry( geometry );
 
-	const isInstanced = mesh.count > 1 && ( mesh.morphTexture !== null && mesh.morphTexture !== undefined );
-
-	if ( isInstanced === true ) {
+	if ( mesh.isInstancedMesh === true ) {
 
 		morphBase.assign( textureLoad( mesh.morphTexture, ivec2( 0, int( instanceIndex ) ) ).r );
 
 	} else {
 
-		morphBase.assign( morphBaseInfluence );
+		morphBase.assign( uniform( 1 ).onObjectUpdate( ( { object } ) => {
+
+			return object.geometry.morphTargetsRelative ? 1 : 1 - object.morphTargetInfluences.reduce( ( a, b ) => a + b, 0 );
+
+		} ) );
 
 	}
 
@@ -291,7 +281,7 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 
 		const influence = float( 0 ).toVar();
 
-		if ( isInstanced === true ) {
+		if ( mesh.isInstancedMesh === true ) {
 
 			influence.assign( textureLoad( mesh.morphTexture, ivec2( int( i ).add( 1 ), int( instanceIndex ) ) ).r );
 
