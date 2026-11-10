@@ -208,13 +208,7 @@ class VXGINode extends Node {
 		this._frame = uniform( 0 );
 		this._noiseIndex = uniform( 0, 'uint' );
 
-		/**
-		 * Noise algorithm: 0 = analytic R², 1 = original IGN schedule, 2 = animated IGN, 3 = HHW.
-		 *
-		 * @type {UniformNode<uint>}
-		 * @default 1
-		 */
-		this.noiseAlgorithm = uniform( 1, 'uint' );
+		this._noiseAlgorithm = 1;
 		this._cameraProjectionMatrix = uniform( camera.projectionMatrix );
 		this._cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
 		this._cameraWorldMatrix = uniform( camera.matrixWorld );
@@ -251,6 +245,30 @@ class VXGINode extends Node {
 
 		this._aoNode = passTexture( this, aoTexture );
 		this._giNode = passTexture( this, giTexture );
+
+	}
+
+	/**
+	 * Noise algorithm: 0 = analytic R², 1 = IGN, 2 = animated IGN, 3 = HHW.
+	 * Changing this value rebuilds the effect's shader with only the selected algorithm.
+	 *
+	 * @type {number}
+	 * @default 1
+	 */
+	get noiseAlgorithm() {
+
+		return this._noiseAlgorithm;
+
+	}
+
+	set noiseAlgorithm( value ) {
+
+		if ( value !== this._noiseAlgorithm ) {
+
+			this._noiseAlgorithm = value;
+			if ( this._sharedContext !== null ) this._setupMaterial();
+
+		}
 
 	}
 
@@ -483,13 +501,21 @@ class VXGINode extends Node {
 			const viewNormal = sampleNormal( uvNode ).toConst();
 			const worldNormal = normalize( this._cameraWorldMatrix.mul( vec4( viewNormal, 0 ) ).xyz ).toConst();
 
-			// interleaved gradient noise for both values: its spatial structure converges well under temporal filtering
+			let rotationNoise, elevationNoise;
 
-			const temporalShift = this._frame.mul( TEMPORAL_SHIFT ).toConst();
-			const noise = bindNoise( this._resolution, this.noiseAlgorithm, 29 )( uvNode, this._noiseIndex ).toVar();
-			const originalNoise = this.noiseAlgorithm.equal( 1 );
-			const rotationNoise = originalNoise.select( interleavedGradientNoise( screenCoordinate.add( temporalShift ) ), noise.x ).toConst();
-			const elevationNoise = originalNoise.select( interleavedGradientNoise( screenCoordinate.add( temporalShift ).add( vec2( 5.588238, 3.14159 ) ) ), noise.y ).toConst();
+			if ( this.noiseAlgorithm === 1 ) {
+
+				const temporalShift = this._frame.mul( TEMPORAL_SHIFT ).toConst();
+				rotationNoise = interleavedGradientNoise( screenCoordinate.add( temporalShift ) ).toConst();
+				elevationNoise = interleavedGradientNoise( screenCoordinate.add( temporalShift ).add( vec2( 5.588238, 3.14159 ) ) ).toConst();
+
+			} else {
+
+				const noise = bindNoise( this._resolution, this.noiseAlgorithm, 29 )( uvNode, this._noiseIndex ).toVar();
+				rotationNoise = noise.x.toConst();
+				elevationNoise = noise.y.toConst();
+
+			}
 
 			const CONE_COUNT = this.coneCount.toConst();
 			const tanHalfAngle = this.coneAngle.mul( 0.5 ).radians().tan().toConst();

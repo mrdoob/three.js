@@ -71,7 +71,6 @@
 			const framesElement = document.getElementById( 'frames' );
 
 			const mode = uniform( modes[ params.mode ] );
-			const noiseType = uniform( noises[ params.noise ] );
 			const index = uniform( 0, 'uint' );
 			const blend = uniform( 1 );
 
@@ -104,7 +103,7 @@
 				// Match SSR's primary sample dimension and seed.
 				const analytic = bindAnalyticNoise( screenSize, 47 )( screenUV, index ).x;
 
-				const noise = left.select( white, noiseType.equal( 5 ).select( analytic, noiseType.equal( 4 ).select( hhw, noiseType.equal( 0 ).select( animated, noiseType.equal( 1 ).select( golden, noiseType.equal( 2 ).select( offset4, ign ) ) ) ) ) );
+				const noiseNodes = [ animated, golden, offset4, ign, hhw, analytic ];
 
 				// the same shaded sphere over a gradient in each half
 
@@ -121,11 +120,17 @@
 
 				// 1 sample per frame, accumulated with a running average
 
-				const sample = mode.equal( 0 ).select( noise.lessThan( image ).select( 1, 0 ), noise );
-				const accumulated = mix( history.sample( screenUV ).r, sample, blend );
+				const createComputeNode = () => {
+
+					const noise = left.select( white, noiseNodes[ noises[ params.noise ] ] );
+					const sample = mode.equal( 0 ).select( noise.lessThan( image ).select( 1, 0 ), noise );
+					const accumulated = mix( history.sample( screenUV ).r, sample, blend );
+					return vec4( accumulated, 0, 0, 1 );
+
+				};
 
 				computeQuad = new THREE.QuadMesh( new THREE.NodeMaterial() );
-				computeQuad.material.fragmentNode = vec4( accumulated, 0, 0, 1 );
+				computeQuad.material.fragmentNode = createComputeNode();
 
 				// sigma = 0 selects a sigma = 1 Gaussian with kernel radius 3
 
@@ -147,7 +152,8 @@
 				} );
 				gui.add( params, 'noise', Object.keys( noises ) ).onChange( ( value ) => {
 
-					noiseType.value = noises[ value ];
+					computeQuad.material.fragmentNode = createComputeNode();
+					computeQuad.material.needsUpdate = true;
 					document.getElementById( 'noiseLabel' ).textContent = value;
 					samples = 0;
 

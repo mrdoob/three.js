@@ -182,7 +182,7 @@
 				const traaPass = traa( compositePass, scenePassDepth, scenePassVelocity, camera );
 				renderPipeline.outputNode = traaPass;
 				const gui = renderer.inspector.createParameters( 'SSGI settings' );
-				gui.add( giPass.noiseAlgorithm, 'value', noiseAlgorithms ).name( 'noise algorithm' ).onChange( () => denoiseNode.reset() );
+				gui.add( giPass, 'noiseAlgorithm', noiseAlgorithms ).name( 'noise algorithm' ).onChange( () => denoiseNode.reset() );
 
 				// light
 

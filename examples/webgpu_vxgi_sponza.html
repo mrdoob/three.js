@@ -227,7 +227,7 @@
 
 				//
 
-				giPass.noiseAlgorithm.value = noiseAlgorithms[ 'Hierarchical Hashed Weyl' ];
+				giPass.noiseAlgorithm = noiseAlgorithms[ 'Hierarchical Hashed Weyl' ];
 
 				const params = {
 					output: 0,
@@ -257,7 +257,7 @@
 				const debugTypes = { Off: 0, Radiance: 1, Opacity: 2 };
 
 				const gui = renderer.inspector.createParameters( 'VXGI Settings' );
-				gui.add( giPass.noiseAlgorithm, 'value', noiseAlgorithms ).name( 'noise algorithm' );
+				gui.add( giPass, 'noiseAlgorithm', noiseAlgorithms ).name( 'noise algorithm' );
 
 				const effectFolder = gui.addFolder( 'Effect Settings' );
 				effectFolder.add( params, 'output', types ).onChange( updatePostprocessing );

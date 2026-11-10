@@ -269,7 +269,7 @@
 				envImportanceSampling: params.ssr.envImportanceSampling,
 				binaryRefine: params.ssr.binaryRefine
 			} ).toInspector( 'SSR' );
-			ssrNode.noiseAlgorithm.value = noiseAlgorithms[ 'Hierarchical Hashed Weyl' ];
+			ssrNode.noiseAlgorithm = noiseAlgorithms[ 'Hierarchical Hashed Weyl' ];
 
 			coverage = ssrNode.a.greaterThan( 0 ).and( ssrNode.a.lessThan( ENV_RAY_LENGTH_THRESHOLD ) ).toFloat();
 			coverageDenoise = temporalDenoise( vec4( coverage, coverage, coverage, 1 ), {
@@ -338,7 +338,7 @@
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR settings' );
 			ssrGui.add( params, 'output', outputTypes ).onChange( updateOutputNode );
-			ssrGui.add( ssrNode.noiseAlgorithm, 'value', noiseAlgorithms ).name( 'noise algorithm' ).onChange( () => {
+			ssrGui.add( ssrNode, 'noiseAlgorithm', noiseAlgorithms ).name( 'noise algorithm' ).onChange( () => {
 
 				denoiseNode.reset();
 				coverageDenoise.reset();

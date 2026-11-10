@@ -69,13 +69,7 @@ class SSGINode extends Node {
 		 */
 		this.beautyNode = beautyNode;
 
-		/**
-		 * Noise algorithm: 0 = analytic R², 1 = original IGN schedule, 2 = animated IGN, 3 = HHW.
-		 *
-		 * @type {UniformNode<uint>}
-		 * @default 1
-		 */
-		this.noiseAlgorithm = uniform( 1, 'uint' );
+		this._noiseAlgorithm = 1;
 		this._noiseIndex = uniform( 0, 'uint' );
 
 		/**
@@ -322,6 +316,8 @@ class SSGINode extends Node {
 		 */
 		this._material = new NodeMaterial();
 		this._material.name = 'SSGI';
+		this._sharedContext = null;
+		this._reversedDepthBuffer = false;
 
 		/**
 		 * The AO result of the effect is represented as a separate texture node.
@@ -338,6 +334,30 @@ class SSGINode extends Node {
 		 * @type {PassTextureNode}
 		 */
 		this._giNode = passTexture( this, this._ssgiRenderTarget.textures[ 1 ] );
+
+	}
+
+	/**
+	 * Noise algorithm: 0 = analytic R², 1 = IGN, 2 = animated IGN, 3 = HHW.
+	 * Changing this value rebuilds the effect's shader with only the selected algorithm.
+	 *
+	 * @type {number}
+	 * @default 1
+	 */
+	get noiseAlgorithm() {
+
+		return this._noiseAlgorithm;
+
+	}
+
+	set noiseAlgorithm( value ) {
+
+		if ( value !== this._noiseAlgorithm ) {
+
+			this._noiseAlgorithm = value;
+			if ( this._sharedContext !== null ) this._setupMaterial();
+
+		}
 
 	}
 
@@ -451,6 +471,21 @@ class SSGINode extends Node {
 			console.error( 'THREE.SSGINode: The device does not support the "rg11b10ufloat-renderable" feature which is required for SSGI.' );
 
 		}
+
+		this._sharedContext = builder.getSharedContext();
+		this._reversedDepthBuffer = renderer.reversedDepthBuffer;
+		this._setupMaterial();
+
+		return this._aoNode;
+
+	}
+
+	/**
+	 * Builds the TSL code of the effect into the internal pass material.
+	 *
+	 * @private
+	 */
+	_setupMaterial() {
 
 		const uvNode = uv();
 		const MAX_RAY = uint( 32 );
@@ -582,7 +617,7 @@ class SSGINode extends Node {
 				const g = this.depthNode.gather().sample( uvNode ).toConst();
 				const minD = min( min( g.x, g.y ), min( g.z, g.w ) ).toConst();
 				const maxD = max( max( g.x, g.y ), max( g.z, g.w ) ).toConst();
-				const d = builder.renderer.reversedDepthBuffer === true ? maxD : minD;
+				const d = this._reversedDepthBuffer === true ? maxD : minD;
 
 				depth.assign( projectionDepth( d, this._cameraNear, this._cameraFar ) );
 
@@ -612,12 +647,22 @@ class SSGINode extends Node {
 
 			//
 
-			const noiseOffset = spatialOffsets( screenCoordinate );
-			const noise = bindNoise( this._resolution, this.noiseAlgorithm, 13 )( uvNode, this._noiseIndex ).toVar();
-			const originalNoise = this.noiseAlgorithm.equal( 1 );
-			const noiseDirection = originalNoise.select( interleavedGradientNoise( screenCoordinate ).add( this._temporalDirection ), noise.x );
-			const noiseJitterIdx = this._temporalDirection.mul( 0.02 ); // Port: Add noiseJitterIdx here for slightly better noise convergence with TRAA (see #31890 for more details)
-			const initialRayStep = originalNoise.select( fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) ), noise.y.add( noise.z ) );
+			let noiseDirection, initialRayStep;
+
+			if ( this.noiseAlgorithm === 1 ) {
+
+				const noiseOffset = spatialOffsets( screenCoordinate );
+				const noiseJitterIdx = this._temporalDirection.mul( 0.02 ); // Improves convergence with TRAA, see #31890.
+				noiseDirection = interleavedGradientNoise( screenCoordinate ).add( this._temporalDirection );
+				initialRayStep = fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) );
+
+			} else {
+
+				const noise = bindNoise( this._resolution, this.noiseAlgorithm, 13 )( uvNode, this._noiseIndex ).toVar();
+				noiseDirection = noise.x;
+				initialRayStep = noise.y.add( noise.z );
+
+			}
 
 			const ao = float( 0 );
 			const color = vec3( 0 );
@@ -689,14 +734,10 @@ class SSGINode extends Node {
 
 		} );
 
-		this._material.contextNode = context( builder.getSharedContext() );
+		this._material.contextNode = context( this._sharedContext );
 		this._material.colorNode = gi();
 		this._material.outputNode = outputNode;
 		this._material.needsUpdate = true;
-
-		//
-
-		return this._aoNode;
 
 	}
 
