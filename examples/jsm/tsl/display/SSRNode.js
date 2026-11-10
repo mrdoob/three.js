@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
+import { Break, Continue, Fn, If, Loop, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
@@ -8,9 +8,6 @@ import ImportanceSampledEnvironment from './ImportanceSampledEnvironment.js';
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 let _rendererState;
-
-// Maximum ray-march step count; `quality` (0..1) scales it to a fixed per-ray count.
-const MAX_STEPS = 64;
 
 /**
  * @typedef {Object} SSRNodeOptions
@@ -24,7 +21,6 @@ const MAX_STEPS = 64;
  * @property {boolean} [envImportanceSampling=false] - When `true`, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.
  * @property {Node} [diffuseNode=null] - Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
  * @property {boolean} [binaryRefine=false] - Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
- * @property {Node<float>} [maxSteps=null] - Optional explicit ray-march step count. When omitted, quality controls the step count as before.
  * @property {Camera} [camera=null] - Camera the scene is rendered with. Inferred from the color pass when omitted.
  */
 
@@ -66,18 +62,10 @@ class SSRNode extends Node {
 			environmentNode = null,
 			envImportanceSampling = false,
 			diffuseNode = null,
-			binaryRefine = false,
-			maxSteps = null
+			binaryRefine = false
 		} = options;
 
 		let camera = options.camera ?? null;
-
-		/**
-		 * Optional explicit ray-march step count, overriding the quality-based count.
-		 *
-		 * @type {?Node<float>}
-		 */
-		this.maxSteps = maxSteps !== null ? nodeObject( maxSteps ) : null;
 
 		/**
 		 * When `true`, the reflection direction is varied per pixel with stochastic GGX rays
@@ -249,17 +237,14 @@ class SSRNode extends Node {
 		this.maxLuminance = uniform( 10 );
 
 		/**
-		 * This parameter controls how detailed the raymarching process works.
-		 * The value ranges is `[0,1]` where `1` means best quality (the maximum number
-		 * of raymarching iterations/samples) and `0` means no samples at all.
+		 * Maximum ray-march steps per reflection ray, for both mirror and stochastic tracing.
+		 * Must be a positive integer. Rays can terminate early; binary refinement adds
+		 * up to eight extra steps. This does not control the number of rays per pixel.
 		 *
-		 * A quality of `0.5` is usually sufficient for most use cases. Try to keep
-		 * this parameter as low as possible. Larger values result in noticeable more
-		 * overhead.
-		 *
-		 * @type {UniformNode<float>}
+		 * @type {UniformNode<int>}
+		 * @default 32
 		 */
-		this.quality = uniform( 0.5 );
+		this.maxSteps = uniform( 32, 'int' );
 
 		/**
 		 * Mirror bias for the stochastic GGX sampling. Concentrates the reflected rays toward
@@ -1072,12 +1057,8 @@ class SSRNode extends Node {
 			// dominant-axis ray length in texels (used for the per-step floor below)
 			const rayLen = max( xLen.abs(), yLen.abs() ).max( 1 ).toVar();
 
-			// Blur traces a single mirror ray, so spend steps in proportion to the ray's screen-space
-			// length (cheap for the short rays that dominate). Scatter needs a fixed, bounded count for
-			// coherent stochastic sampling; each step then spans the whole ray as rayVec / totalStep.
-			const totalStep = int( this.maxSteps !== null ? this.maxSteps.max( 1 ) : this.stochastic === false
-				? trunc( max( abs( xLen ), abs( yLen ) ).mul( this.quality.clamp() ) ).max( int( 1 ) ).toConst()
-				: this.quality.clamp().mul( MAX_STEPS ).max( float( 1 ) ) ).toConst();
+			// Both tracing modes use the explicit per-ray step budget.
+			const totalStep = this.maxSteps.max( 1 ).toConst();
 
 			const xSpan = xLen.div( totalStep ).toVar();
 			const ySpan = yLen.div( totalStep ).toVar();
@@ -1131,8 +1112,8 @@ class SSRNode extends Node {
 			const canRefine = bool( false ).toVar();
 
 			// March from d0 toward d1, looking for an intersection with the depth buffer.
-			// Include the last stochastic step so a one-step budget can trace a ray.
-			Loop( { start: int( 1 ), end: totalStep, condition: this.stochastic || this.maxSteps !== null ? '<=' : '<' }, ( { i } ) => {
+			// Include the last step so a one-step budget can trace a ray.
+			Loop( { start: int( 1 ), end: totalStep, condition: '<=' }, ( { i } ) => {
 
 				// Exponentially-distributed ray parameter, shared by the sample position and ray depth.
 				const s = sampleFraction( float( i ) ).toVar();

@@ -214,6 +214,15 @@ computational overhead but also increases the reflection distance.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="maxSteps" translate="no">.<a href="#maxSteps">maxSteps</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;int></span> </h3>
+					<div class="description">
+						<p>Maximum ray-march steps per reflection ray, for both mirror and stochastic tracing.
+Must be a positive integer. Rays can terminate early; binary refinement adds
+up to eight extra steps. This does not control the number of rays per pixel.</p>
+						<p>Default is <code>32</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="metalnessNode" translate="no">.<a href="#metalnessNode">metalnessNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
 					<div class="description">
 						<p>Per-pixel metalness, used to drive the GGX reflection sampling and the non-metal
@@ -233,17 +242,6 @@ the lobe's narrow (near-mirror) core, trading sampling bias for less noise.
 					<h3 class="name" id="normalNode" translate="no">.<a href="#normalNode">normalNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="description">
 						<p>A node that represents the beauty pass's normals.</p>
-					</div>
-				</div>
-				<div class="member">
-					<h3 class="name" id="quality" translate="no">.<a href="#quality">quality</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
-					<div class="description">
-						<p>This parameter controls how detailed the raymarching process works.
-The value ranges is <code>[0,1]</code> where <code>1</code> means best quality (the maximum number
-of raymarching iterations/samples) and <code>0</code> means no samples at all.</p>
-<p>A quality of <code>0.5</code> is usually sufficient for most use cases. Try to keep
-this parameter as low as possible. Larger values result in noticeable more
-overhead.</p>
 					</div>
 				</div>
 				<div class="member">

@@ -320,7 +320,7 @@
 			if ( ! ssrNode ) return;
 
 			ssrNode.resolutionScale = params.ssr.resolutionScale;
-			ssrNode.quality.value = params.ssr.steps / 64;
+			ssrNode.maxSteps.value = params.ssr.steps;
 			ssrNode.mirrorBias.value = params.ssr.mirrorBias;
 			// stepExponent / screenEdgeFadeBlack / binaryRefine are build-time constants: assigning
 			// them recompiles the SSR material (the setters no-op when the value is unchanged).

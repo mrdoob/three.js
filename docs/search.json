@@ -22755,6 +22755,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "SSRNode#maxSteps",
+			"kind": "member"
+		},
+		{
 			"title": "SSRNode#metalnessNode",
 			"kind": "member"
 		},
@@ -22764,10 +22768,6 @@
 		},
 		{
 			"title": "SSRNode#normalNode",
-			"kind": "member"
-		},
-		{
-			"title": "SSRNode#quality",
 			"kind": "member"
 		},
 		{

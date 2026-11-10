@@ -154,7 +154,7 @@
 			const normal = sample( uv => unpackRGBToNormal( packedNormal.sample( uv ).rgb ) );
 			const surfaceRoughness = sample( uv => packedNormal.sample( uv ).a );
 			const reflection = ssr( beauty, depth, normal, {
-				maxSteps: uniform( params.steps ), binaryRefine: params.binaryRefine,
+				binaryRefine: params.binaryRefine,
 				diffuseNode: albedo, metalnessNode: albedo.a, roughnessNode: surfaceRoughness
 			} ).toInspector( 'SSR' );
 			const raw = passTexture( reflection, reflection.getRenderTarget().texture );
