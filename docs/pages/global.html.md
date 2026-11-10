@@ -1315,18 +1315,6 @@ Shared [sampleBilinearTap](TSL.html#sampleBilinearTap) inputs plus `reprojICoord
 
 **bilinearWeight**
 
-### .bindAnalyticNoise( resolution : UniformNode.<Vector2>, seed : number )
-
-Returns a TSL function that samples texture-free analytic R² noise. Index 0 uses continuous screen pixels; other indices tile-shift with an R² sequence into a 64×64 period. Values are four independent R² dimensions hashed from the sample coordinates.
-
-**resolution**
-
-**seed**
-
-Added to the coordinate hash so each pass gets an independent R² phase.
-
-Default is `0`.
-
 ### .bindTemporalCameraUniforms( camera : Camera )
 
 Current and previous-frame camera matrices for temporal reprojection passes.

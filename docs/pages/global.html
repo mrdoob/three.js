@@ -2226,35 +2226,6 @@ a single draw call and the compute rasterizer.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="bindAnalyticNoise" translate="no">.<a href="#bindAnalyticNoise">bindAnalyticNoise</a><span class="signature">( resolution : <span class="param-type"><a href="UniformNode.html">UniformNode</a>.&lt;<a href="Vector2.html">Vector2</a>></span>, seed : <span class="param-type">number</span> )</span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>Returns a TSL function that samples texture-free analytic R² noise.
-Index 0 uses continuous screen pixels; other indices tile-shift with an R²
-sequence into a 64×64 period. Values are four independent R² dimensions
-hashed from the sample coordinates.</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong translate="no">resolution</strong>
-									</td>
-									<td class="description last">
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">seed</strong>
-									</td>
-									<td class="description last">
-										<p>Added to the coordinate hash so each pass gets an independent R² phase.</p>
-										<p>Default is <code>0</code>.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
 					<h3 class="name name-method" id="bindTemporalCameraUniforms" translate="no">.<a href="#bindTemporalCameraUniforms">bindTemporalCameraUniforms</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">

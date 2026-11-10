@@ -27849,10 +27849,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "bindAnalyticNoise",
-			"kind": "function"
-		},
-		{
 			"title": "bindTemporalCameraUniforms",
 			"kind": "function"
 		},
