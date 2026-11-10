@@ -1,6 +1,6 @@
 import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
-import { bindAnalyticNoise } from '../utils/RNoise.js';
+import { bindNoise } from '../utils/Noise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
 import { boxBlur } from './boxBlur.js';
 import ImportanceSampledEnvironment from './ImportanceSampledEnvironment.js';
@@ -78,6 +78,15 @@ class SSRNode extends Node {
 		 * @type {boolean}
 		 */
 		this.stochastic = stochastic;
+
+		/**
+		 * Noise algorithm: 0 = analytic R², 1 = IGN, 2 = animated IGN, 3 = HSN.
+		 * Used by stochastic reflections. Can be changed at runtime.
+		 *
+		 * @type {UniformNode<uint>}
+		 * @default 0
+		 */
+		this.noiseAlgorithm = uniform( 0, 'uint' );
 
 		/**
 		 * When `true`, env-luminance CDF tables are built and MIS is used for environment misses.
@@ -853,7 +862,7 @@ class SSRNode extends Node {
 
 		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
 
-		const sampleMarchNoise = this.stochastic === true ? bindAnalyticNoise( this._resolution, 47 ) : null;
+		const sampleMarchNoise = this.stochastic === true ? bindNoise( this._resolution, this.noiseAlgorithm, 47 ) : null;
 
 		const computeScreenBorderFactor = Fn( ( [ uvCoord, borderWidth ] ) => {
 
@@ -947,7 +956,7 @@ class SSRNode extends Node {
 
 					if ( this.envImportanceSampling ) {
 
-						const Xi2 = bindAnalyticNoise( this._resolution, 59 )( uvPos, this._noiseIndex );
+						const Xi2 = bindNoise( this._resolution, this.noiseAlgorithm, 59 )( uvPos, this._noiseIndex );
 
 						envColor.assign( this._importanceEnvironment.sampleEnvironmentMIS( {
 							cameraWorldMatrix: this._cameraWorldMatrix,

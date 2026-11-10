@@ -41,6 +41,8 @@
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { noiseAlgorithms } from 'three/addons/tsl/utils/Noise.js';
+
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -216,6 +218,8 @@
 
 				//
 
+				giPass.noiseAlgorithm.value = noiseAlgorithms[ 'Houston Stratified Noise' ];
+
 				const params = {
 					output: 0,
 					debug: 0,
@@ -227,6 +231,7 @@
 				const debugTypes = { Off: 0, Radiance: 1, Opacity: 2 };
 
 				const gui = renderer.inspector.createParameters( 'VXGI Settings' );
+				gui.add( giPass.noiseAlgorithm, 'value', noiseAlgorithms ).name( 'noise algorithm' );
 				gui.add( params, 'output', types ).onChange( updatePostprocessing );
 				gui.add( params, 'debug', debugTypes ).name( 'voxel view' ).onChange( updatePostprocessing );
 				gui.add( giPass.debugLevel, 'value', 0, 4, 1 ).name( 'voxel view level' );

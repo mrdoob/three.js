@@ -523,6 +523,7 @@
 		"webgpu_tsl_graph",
 		"webgpu_tsl_halftone",
 		"webgpu_tsl_interoperability",
+		"webgpu_tsl_stratified_noise",
 		"webgpu_tsl_occlusion_dither",
 		"webgpu_tsl_procedural_terrain",
 		"webgpu_tsl_raging_sea",

@@ -1,6 +1,8 @@
 import { RenderTarget, Vector2, Node, QuadMesh, NodeMaterial, RendererUtils, MathUtils, RGBFormat, RedFormat, UnsignedInt101111Type, UnsignedByteType } from 'three/webgpu';
 import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, property, outputStruct, context, isBackgroundDepth, min, projectionDepth, textureSize, depthToViewZ } from 'three/tsl';
 
+import { bindNoise } from '../utils/Noise.js';
+
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -66,6 +68,15 @@ class SSGINode extends Node {
 		 * @type {TextureNode}
 		 */
 		this.beautyNode = beautyNode;
+
+		/**
+		 * Noise algorithm: 0 = analytic R², 1 = original IGN schedule, 2 = animated IGN, 3 = HSN.
+		 *
+		 * @type {UniformNode<uint>}
+		 * @default 1
+		 */
+		this.noiseAlgorithm = uniform( 1, 'uint' );
+		this._noiseIndex = uniform( 0, 'uint' );
 
 		/**
 		 * A node that represents the scene's depth.
@@ -389,6 +400,8 @@ class SSGINode extends Node {
 
 		// update temporal uniforms
 
+		this._noiseIndex.value = this.useTemporalFiltering ? frame.frameId : 0;
+
 		if ( this.useTemporalFiltering === true ) {
 
 			const frameId = frame.frameId;
@@ -600,9 +613,11 @@ class SSGINode extends Node {
 			//
 
 			const noiseOffset = spatialOffsets( screenCoordinate );
-			const noiseDirection = interleavedGradientNoise( screenCoordinate );
+			const noise = bindNoise( this._resolution, this.noiseAlgorithm, 13 )( uvNode, this._noiseIndex ).toVar();
+			const originalNoise = this.noiseAlgorithm.equal( 1 );
+			const noiseDirection = originalNoise.select( interleavedGradientNoise( screenCoordinate ).add( this._temporalDirection ), noise.x );
 			const noiseJitterIdx = this._temporalDirection.mul( 0.02 ); // Port: Add noiseJitterIdx here for slightly better noise convergence with TRAA (see #31890 for more details)
-			const initialRayStep = fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) );
+			const initialRayStep = originalNoise.select( fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) ), noise.y.add( noise.z ) );
 
 			const ao = float( 0 );
 			const color = vec3( 0 );
@@ -632,7 +647,7 @@ class SSGINode extends Node {
 
 			Loop( { start: uint( 0 ), end: ROTATION_COUNT, type: 'uint', condition: '<' }, ( { i } ) => {
 
-				const rotationAngle = mul( float( i ).add( noiseDirection ).add( this._temporalDirection ), PI.div( float( ROTATION_COUNT ) ) ).toConst();
+				const rotationAngle = mul( float( i ).add( noiseDirection ), PI.div( float( ROTATION_COUNT ) ) ).toConst();
 				const sliceDir = vec3( vec2( cos( rotationAngle ), sin( rotationAngle ) ), 0 ).toConst();
 				const slideDirTexelSize = sliceDir.xy.mul( float( 1 ).div( this._resolution ) ).toConst();
 

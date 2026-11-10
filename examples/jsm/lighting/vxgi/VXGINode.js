@@ -4,6 +4,8 @@ import { Fn, NodeUpdateType, uniform, reference, vec2, vec4, float, uv, mix, pas
 import { VXGIVolume } from './VXGIVolume.js';
 import { createConeTracer, gather, intersectVolume, sampleDirectional } from './VXGIConeTracer.js';
 
+import { bindNoise } from '../../tsl/utils/Noise.js';
+
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -204,6 +206,15 @@ class VXGINode extends Node {
 
 		this._resolution = uniform( new Vector2() );
 		this._frame = uniform( 0 );
+		this._noiseIndex = uniform( 0, 'uint' );
+
+		/**
+		 * Noise algorithm: 0 = analytic R², 1 = original IGN schedule, 2 = animated IGN, 3 = HSN.
+		 *
+		 * @type {UniformNode<uint>}
+		 * @default 1
+		 */
+		this.noiseAlgorithm = uniform( 1, 'uint' );
 		this._cameraProjectionMatrix = uniform( camera.projectionMatrix );
 		this._cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
 		this._cameraWorldMatrix = uniform( camera.matrixWorld );
@@ -389,10 +400,12 @@ class VXGINode extends Node {
 		if ( this.useTemporalFiltering === true ) {
 
 			this._frame.value = frame.frameId % TEMPORAL_CYCLE;
+			this._noiseIndex.value = frame.frameId;
 
 		} else {
 
 			this._frame.value = 0;
+			this._noiseIndex.value = 0;
 
 		}
 
@@ -473,8 +486,10 @@ class VXGINode extends Node {
 			// interleaved gradient noise for both values: its spatial structure converges well under temporal filtering
 
 			const temporalShift = this._frame.mul( TEMPORAL_SHIFT ).toConst();
-			const rotationNoise = interleavedGradientNoise( screenCoordinate.add( temporalShift ) ).toConst();
-			const elevationNoise = interleavedGradientNoise( screenCoordinate.add( temporalShift ).add( vec2( 5.588238, 3.14159 ) ) ).toConst();
+			const noise = bindNoise( this._resolution, this.noiseAlgorithm, 29 )( uvNode, this._noiseIndex ).toVar();
+			const originalNoise = this.noiseAlgorithm.equal( 1 );
+			const rotationNoise = originalNoise.select( interleavedGradientNoise( screenCoordinate.add( temporalShift ) ), noise.x ).toConst();
+			const elevationNoise = originalNoise.select( interleavedGradientNoise( screenCoordinate.add( temporalShift ).add( vec2( 5.588238, 3.14159 ) ) ), noise.y ).toConst();
 
 			const CONE_COUNT = this.coneCount.toConst();
 			const tanHalfAngle = this.coneAngle.mul( 0.5 ).radians().tan().toConst();

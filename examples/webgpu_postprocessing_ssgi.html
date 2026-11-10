@@ -42,6 +42,8 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+			import { noiseAlgorithms } from 'three/addons/tsl/utils/Noise.js';
+
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, renderPipeline, controls;
@@ -226,6 +228,7 @@
 				const types = { Combined: 0, Direct: 3, AO: 1, GI: 2 };
 
 				const gui = renderer.inspector.createParameters( 'SSGI settings' );
+				gui.add( giPass.noiseAlgorithm, 'value', noiseAlgorithms ).name( 'noise algorithm' );
 				gui.add( params, 'output', types ).onChange( updatePostprocessing );
 				gui.add( giPass.sliceCount, 'value', 1, 4, 1 ).name( 'slice count' );
 				gui.add( giPass.stepCount, 'value', 1, 32, 1 ).name( 'step count' );

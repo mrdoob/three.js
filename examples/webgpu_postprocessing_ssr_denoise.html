@@ -61,6 +61,8 @@
 		import * as THREE from 'three/webgpu';
 		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+		import { noiseAlgorithms } from 'three/addons/tsl/utils/Noise.js';
+		import { ENV_RAY_LENGTH_THRESHOLD } from 'three/addons/tsl/utils/SpecularHelpers.js';
 		import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
 		import { traa } from 'three/addons/tsl/display/TRAANode.js';
@@ -153,7 +155,7 @@
 		};
 
 		let camera, scene, model, renderer, postProcessing, ssrNode, denoiseNode, denoised;
-		let controls;
+		let controls, coverage, coverageDenoise;
 		let scenePassNode, combinedOutputNode, scenePassDepth, scenePassVelocity;
 		let gammaUniform, contrastUniform, saturationUniform;
 		const denoiseEnabled = uniform( 1 );
@@ -267,6 +269,14 @@
 				envImportanceSampling: params.ssr.envImportanceSampling,
 				binaryRefine: params.ssr.binaryRefine
 			} ).toInspector( 'SSR' );
+			ssrNode.noiseAlgorithm.value = noiseAlgorithms[ 'Houston Stratified Noise' ];
+
+			coverage = ssrNode.a.greaterThan( 0 ).and( ssrNode.a.lessThan( ENV_RAY_LENGTH_THRESHOLD ) ).toFloat();
+			coverageDenoise = temporalDenoise( vec4( coverage, coverage, coverage, 1 ), {
+				depth: scenePassDepth, normal: sceneNormal, camera, velocity: scenePassVelocity
+			} );
+			coverage.toInspector( 'SSR coverage' );
+			coverageDenoise.toInspector( 'SSR coverage DN' );
 
 			// the reflections are accumulated in time and filtered within the footprint of their reflection lobe,
 			// with the roughness of the scene and the ray length of each pixel ( SSR alpha channel )
@@ -317,15 +327,23 @@
 
 			const outputTypes = {
 				Combined: 0,
-				'Denoised SSR': 4,
+				'SSR DN': 4,
+				'SSR coverage': 10,
+				'SSR coverage DN': 11,
 				'Compare (Denoise)': OUTPUT_COMPARE_DENOISE,
 				'Compare (Reflections)': OUTPUT_COMPARE_SSR,
-				'SSR (Raw)': 1,
+				'SSR': 1,
 				'Ray Length': 7
 			};
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR settings' );
 			ssrGui.add( params, 'output', outputTypes ).onChange( updateOutputNode );
+			ssrGui.add( ssrNode.noiseAlgorithm, 'value', noiseAlgorithms ).name( 'noise algorithm' ).onChange( () => {
+
+				denoiseNode.reset();
+				coverageDenoise.reset();
+
+			} );
 			ssrGui.add( params.ssr, 'quality', 0, 1 ).name( 'quality' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'mirrorBias', 0, 1 ).name( 'mirror bias' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'stepExponent', 1, 4, 0.5 ).name( 'step exponent' ).onChange( applyParams );
@@ -388,6 +406,8 @@
 				denoiseEnabled.value = params.denoise.enabled ? 1 : 0;
 				denoiseNode.luminancePhi.value = params.denoise.luminancePhi;
 				denoiseNode.maxFrames.value = params.denoise.maxFrames;
+				coverageDenoise.luminancePhi.value = params.denoise.luminancePhi;
+				coverageDenoise.maxFrames.value = params.denoise.maxFrames;
 
 			}
 
@@ -435,6 +455,8 @@
 				case 0: node = applyPostProcessing( combinedOutputNode ); break; // Combined
 				case 1: node = applyPostProcessing( vec4( ssrNode.rgb, 1 ) ); break; // SSR (Raw)
 				case 4: node = applyPostProcessing( vec4( denoised, 1 ) ); break; // Denoised SSR
+				case 10: node = vec4( coverage, coverage, coverage, 1 ); break;
+				case 11: node = coverageDenoise; break;
 				case 7: node = vec4( ssrNode.aaa, 1 ); break; // Ray Length (Raw)
 				case OUTPUT_COMPARE_DENOISE: { // Compare (denoised | noisy)
 
