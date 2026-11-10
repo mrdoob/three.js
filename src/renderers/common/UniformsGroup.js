@@ -39,22 +39,22 @@ class UniformsGroup extends UniformBuffer {
 		this._values = null;
 
 		/**
-		 * A signed integer view of the buffer, created on demand.
+		 * An optional signed integer view of the buffer.
 		 *
 		 * @private
 		 * @type {?Int32Array}
 		 * @default null
 		 */
-		this._int32Buffer = null;
+		this._int32View = null;
 
 		/**
-		 * An unsigned integer view of the buffer, created on demand.
+		 * An optional unsigned integer view of the buffer.
 		 *
 		 * @private
 		 * @type {?Uint32Array}
 		 * @default null
 		 */
-		this._uint32Buffer = null;
+		this._uint32View = null;
 
 		/**
 		 * An array of uniform objects.
@@ -275,8 +275,8 @@ class UniformsGroup extends UniformBuffer {
 		super.release();
 
 		this._values = null;
-		this._int32Buffer = null;
-		this._uint32Buffer = null;
+		this._int32View = null;
+		this._uint32View = null;
 
 	}
 
@@ -291,8 +291,8 @@ class UniformsGroup extends UniformBuffer {
 
 		clone._buffer = null;
 		clone._values = null;
-		clone._int32Buffer = null;
-		clone._uint32Buffer = null;
+		clone._int32View = null;
+		clone._uint32View = null;
 		clone._updateRanges = [];
 		clone._updateRangeCache = new Map();
 		clone._addedIndices = new Set();
@@ -563,13 +563,13 @@ class UniformsGroup extends UniformBuffer {
 
 		if ( type === 'int' || type === 'ivec2' || type === 'ivec3' || type === 'ivec4' ) {
 
-			return this._int32Buffer || ( this._int32Buffer = new Int32Array( this.buffer.buffer ) );
+			return this._int32View || ( this._int32View = new Int32Array( this.buffer.buffer ) );
 
 		}
 
 		if ( type === 'uint' || type === 'uvec2' || type === 'uvec3' || type === 'uvec4' ) {
 
-			return this._uint32Buffer || ( this._uint32Buffer = new Uint32Array( this.buffer.buffer ) );
+			return this._uint32View || ( this._uint32View = new Uint32Array( this.buffer.buffer ) );
 
 		}
 
