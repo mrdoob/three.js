@@ -28,6 +28,11 @@ const HIT_DISTANCE_PHI = 8;
  * denoising of TAA instead, see {@link TRAANode}. {@link BilateralBlurNode} is a performant alternative as well. Both
  * come at the cost of lower denoise quality.
  *
+ * The noise of the input should be independent between neighboring pixels. Samples that are correlated across pixels,
+ * e.g. one sequence shifted by a smooth function of the pixel coordinates, leave structure such as bands that neither
+ * the accumulation in time nor the edge-aware filter removes. A low-discrepancy sequence in time, rotated by a random
+ * or stratified offset per pixel ( Cranley-Patterson rotation ), works well.
+ *
  * ```js
  * // SSGI, accumulated in time before TRAA: GI in rgb and AO in alpha
  * const denoised = temporalDenoise( vec4( giPass.getGINode().rgb, giPass.getAONode().r ), { depth, normal, camera, velocity, alpha: true } );
