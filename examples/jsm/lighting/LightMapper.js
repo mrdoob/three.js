@@ -1,5 +1,11 @@
-import { BackSide, BufferAttribute, BufferGeometry, CustomBlending, DoubleSide, FloatType, HalfFloatType, Mesh, MeshLambertNodeMaterial, NearestFilter, NoBlending, NodeMaterial, OneFactor, OrthographicCamera, QuadMesh, RedFormat, RGFormat, RendererUtils, RenderTarget, Scene, Vector2 } from 'three/webgpu';
+import { BackSide, BufferAttribute, BufferGeometry, CustomBlending, DoubleSide, FloatType, HalfFloatType, Mesh, MeshLambertNodeMaterial, NearestFilter, NoBlending, NodeMaterial, OneFactor, OrthographicCamera, QuadMesh, RedFormat, RGFormat, RendererUtils, RenderTarget, Scene, Vector2, warnOnce } from 'three/webgpu';
 import { Fn, If, Loop, attribute, ivec2, lights, luminance, modelViewMatrix, mrt, normalViewGeometry, normalWorldGeometry, output, positionLocal, positionWorld, round, screenCoordinate, texture, textureLoad, uniform, uv, vec2, vec4 } from 'three/tsl';
+
+// half float sums keep their rounding error small up to this many samples, and their weights are scaled
+// down so a sum of this many samples of an irradiance of up to about 4000 stays below the largest half float
+
+const HALF_FLOAT_SAMPLES = 1024;
+const HALF_FLOAT_WEIGHT = 1 / 64;
 
 let _rendererState;
 
@@ -14,7 +20,8 @@ let _rendererState;
  * vary their samples and converge as they accumulate. Call `update()` once per frame
  * to bake progressively, or pass a sample count to bake at once.
  * Samples accumulate in float precision with the 'float32-blendable' renderer feature. Without it,
- * they accumulate in half float precision with jittered weights, so bake at most 1024 samples.
+ * they accumulate in half float precision with jittered weights, up to 1024 samples; further
+ * samples are ignored.
  * Keep the source geometry and GI data static while accumulating. Call `reset()`
  * after changing transforms or lighting. Atlas charts need at least three texels
  * of padding; the resolve fills two texels around covered surfaces.
@@ -342,6 +349,13 @@ class LightMapper {
 
 		for ( let i = 0; i < samples; i ++ ) {
 
+			if ( this._floatSums === false && this.samples >= HALF_FLOAT_SAMPLES ) {
+
+				warnOnce( `LightMapper: Half float sums are limited to ${ HALF_FLOAT_SAMPLES } samples, further samples are ignored. Use a renderer with the 'float32-blendable' feature for more.` );
+				break;
+
+			}
+
 			this._sample.value = this.samples;
 			this._weight.value = this._sampleWeight( this.samples );
 			this._jitter.value.set( halton( this.samples + 1, 2 ) - 0.5, halton( this.samples + 1, 3 ) - 0.5 ).multiplyScalar( 2 / this.size );
@@ -363,7 +377,9 @@ class LightMapper {
 	/**
 	 * Returns the weight of a sample. Similar samples added to a half float sum round in the same
 	 * direction, so their weights are spread over the rounding step of the sum, which grows with it,
-	 * and the samples round up and down evenly. Float sums weigh all samples the same.
+	 * and the samples round up and down evenly. The weights are also scaled down, so the sums of
+	 * bright texels stay below the largest half float, 65504, since the resolve divides by the sum
+	 * of the weights. Float sums weigh all samples the same.
 	 *
 	 * @private
 	 * @param {number} index - The index of the sample.
@@ -373,7 +389,7 @@ class LightMapper {
 
 		if ( this._floatSums ) return 1;
 
-		return 1 + ( 2 * halton( index + 1, 5 ) - 1 ) * Math.min( index / 2048, 1 );
+		return ( 1 + ( 2 * halton( index + 1, 5 ) - 1 ) * Math.min( index / 2048, 1 ) ) * HALF_FLOAT_WEIGHT;
 
 	}
 
