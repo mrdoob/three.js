@@ -44,6 +44,30 @@ class NodeUniformsGroup extends UniformsGroup {
 		 */
 		this.isNodeUniformsGroup = true;
 
+		/**
+		 * The version of the uniform group node the uniforms have been updated for last.
+		 * See {@link NodeManager#updateGroup}.
+		 *
+		 * @type {number}
+		 * @default -1
+		 */
+		this.groupVersion = - 1;
+
+	}
+
+	/**
+	 * Clones this uniforms group. The clone has not been updated yet.
+	 *
+	 * @return {NodeUniformsGroup} The cloned uniforms group.
+	 */
+	clone() {
+
+		const clone = super.clone();
+
+		clone.groupVersion = - 1;
+
+		return clone;
+
 	}
 
 }
