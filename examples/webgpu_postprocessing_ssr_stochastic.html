@@ -281,6 +281,7 @@
 
 			const denoiseGui = renderer.inspector.createParameters( 'Denoising' );
 			denoiseGui.add( params.denoise, 'enabled' ).name( 'Enabled' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'maxFrames', 1, 32, 1 ).name( 'History frames' ).info( 'Maximum denoiser history length; rejection and changes can shorten history per pixel.' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'luminancePhi', 0, 10 ).name( 'Luminance phi' ).onChange( applyParams );
 
 			const sceneGui = renderer.inspector.createParameters( 'Scene' );
