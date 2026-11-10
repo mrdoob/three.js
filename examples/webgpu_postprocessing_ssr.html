@@ -44,9 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec4, velocity, passTexture, colorSpaceToWorking } from 'three/tsl';
-		import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
-		import { ENV_RAY_LENGTH_THRESHOLD } from 'three/addons/tsl/utils/SpecularHelpers.js';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -57,7 +55,6 @@
 		import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 		const params = {
-			output: 0,
 			quality: 0.5,
 			blurQuality: 1,
 			maxDistance: 1,
@@ -151,7 +148,6 @@
 			scenePass.setMRT( mrt( {
 				output: output,
 				normal: packNormalToRGB( normalView ),
-				velocity: velocity,
 				metalrough: vec2( metalness, roughness ) // pack metalness and roughness into a single attachment
 			} ) );
 
@@ -189,25 +185,6 @@
 				roughnessNode: scenePassMetalRough.g
 			} ).toInspector( 'SSR' );
 
-			const ssrTexture = ssrPass.getTextureNode();
-			const guides = {
-				depth: scenePassDepth, normal: sceneNormal, camera,
-				velocity: scenePass.getTextureNode( 'velocity' )
-			};
-			const denoiseNode = temporalDenoise( ssrTexture, {
-				...guides,
-				roughness: sample( ( uv ) => scenePassMetalRough.sample( uv ).g ),
-				hitDistance: sample( ( uv ) => ssrTexture.sample( uv ).a )
-			} );
-			const denoised = denoiseNode.getTextureNode().toInspector( 'SSR DN' );
-
-			// SSR alpha stores ray length, with a sentinel for environment misses.
-			const reflectionBuffer = passTexture( ssrPass, ssrPass.getRenderTarget().texture );
-			const coverage = reflectionBuffer.a.greaterThan( 0 ).and( reflectionBuffer.a.lessThan( ENV_RAY_LENGTH_THRESHOLD ) ).toFloat();
-			const coverageDenoise = temporalDenoise( vec4( coverage, coverage, coverage, 1 ), guides );
-			coverage.toInspector( 'SSR coverage' );
-			coverageDenoise.toInspector( 'SSR coverage DN' );
-
 			// blend SSR over beauty (SSR outputs premultiplied color, so use additive blending)
 
 			const outputNode = smaa( scenePassColor.add( ssrPass.rgb ) );
@@ -228,13 +205,25 @@
 			const ssrFolder = gui.addFolder( 'SSR' );
 			ssrFolder.add( params, 'quality', 0, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'blurQuality', 1, 3, 1 ).onChange( updateParameters );
-			ssrFolder.add( params, 'output', { Combined: 0, SSR: 1, 'SSR DN': 2, 'SSR coverage': 3, 'SSR coverage DN': 4 } ).onChange( updateOutput );
 			ssrFolder.add( params, 'maxDistance', 0, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'intensity', 0, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'thickness', 0, 0.05 ).onChange( updateParameters );
 			ssrFolder.add( params, 'binaryRefine' ).name( 'binary refine' ).onChange( updateParameters );
-			ssrFolder.add( params, 'enabled' ).onChange( updateOutput );
+			ssrFolder.add( params, 'enabled' ).onChange( () => {
 
+				if ( params.enabled === true ) {
+
+					renderPipeline.outputNode = outputNode;
+
+				} else {
+
+					renderPipeline.outputNode = scenePass;
+
+				}
+
+				renderPipeline.needsUpdate = true;
+
+			} );
 			const modelFolder = gui.addFolder( 'Model' );
 			modelFolder.add( params, 'roughness', 0, 1 ).onChange( ( value ) => {
 
@@ -250,14 +239,6 @@
 
 			} );
 
-			function updateOutput() {
-
-				const outputs = [ outputNode, vec4( ssrPass.rgb, 1 ), vec4( denoised.rgb, 1 ), vec4( coverage, coverage, coverage, 1 ), coverageDenoise ];
-				renderPipeline.outputNode = params.enabled ? outputs[ params.output ] : scenePass;
-				renderPipeline.needsUpdate = true;
-
-			}
-
 			updateParameters();
 
 		}
@@ -265,6 +246,8 @@
 		function updateParameters() {
 
 			ssrPass.quality.value = params.quality;
+			// blurQuality is a build-time constant: assigning it recompiles the blur material
+			// (the setter no-ops when the value is unchanged).
 			ssrPass.blurQuality = params.blurQuality;
 			ssrPass.maxDistance.value = params.maxDistance;
 			ssrPass.intensity.value = params.intensity;
