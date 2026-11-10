@@ -928,8 +928,6 @@ function computeMorphedAttributes( object ) {
 		modifiedAttributeArray
 	) {
 
-		if ( attribute === undefined ) return;
-
 		_vA.fromBufferAttribute( attribute, a );
 		_vB.fromBufferAttribute( attribute, b );
 		_vC.fromBufferAttribute( attribute, c );
@@ -1025,7 +1023,7 @@ function computeMorphedAttributes( object ) {
 	let start, end;
 
 	const modifiedPosition = new Float32Array( positionAttribute.count * positionAttribute.itemSize );
-	const modifiedNormal = normalAttribute ? new Float32Array( normalAttribute.count * normalAttribute.itemSize ) : undefined;
+	const modifiedNormal = ( normalAttribute !== undefined ) ? new Float32Array( normalAttribute.count * normalAttribute.itemSize ) : undefined;
 
 	if ( index !== null ) {
 
@@ -1055,14 +1053,18 @@ function computeMorphedAttributes( object ) {
 						modifiedPosition
 					);
 
-					_calculateMorphedAttributeData(
-						object,
-						normalAttribute,
-						morphNormal,
-						morphTargetsRelative,
-						a, b, c,
-						modifiedNormal
-					);
+					if ( normalAttribute !== undefined ) {
+
+						_calculateMorphedAttributeData(
+							object,
+							normalAttribute,
+							morphNormal,
+							morphTargetsRelative,
+							a, b, c,
+							modifiedNormal
+						);
+
+					}
 
 				}
 
@@ -1088,14 +1090,18 @@ function computeMorphedAttributes( object ) {
 					modifiedPosition
 				);
 
-				_calculateMorphedAttributeData(
-					object,
-					normalAttribute,
-					morphNormal,
-					morphTargetsRelative,
-					a, b, c,
-					modifiedNormal
-				);
+				if ( normalAttribute !== undefined ) {
+
+					_calculateMorphedAttributeData(
+						object,
+						normalAttribute,
+						morphNormal,
+						morphTargetsRelative,
+						a, b, c,
+						modifiedNormal
+					);
+
+				}
 
 			}
 
@@ -1129,14 +1135,18 @@ function computeMorphedAttributes( object ) {
 						modifiedPosition
 					);
 
-					_calculateMorphedAttributeData(
-						object,
-						normalAttribute,
-						morphNormal,
-						morphTargetsRelative,
-						a, b, c,
-						modifiedNormal
-					);
+					if ( normalAttribute !== undefined ) {
+
+						_calculateMorphedAttributeData(
+							object,
+							normalAttribute,
+							morphNormal,
+							morphTargetsRelative,
+							a, b, c,
+							modifiedNormal
+						);
+
+					}
 
 				}
 
@@ -1162,14 +1172,18 @@ function computeMorphedAttributes( object ) {
 					modifiedPosition
 				);
 
-				_calculateMorphedAttributeData(
-					object,
-					normalAttribute,
-					morphNormal,
-					morphTargetsRelative,
-					a, b, c,
-					modifiedNormal
-				);
+				if ( normalAttribute !== undefined ) {
+
+					_calculateMorphedAttributeData(
+						object,
+						normalAttribute,
+						morphNormal,
+						morphTargetsRelative,
+						a, b, c,
+						modifiedNormal
+					);
+
+				}
 
 			}
 
@@ -1178,7 +1192,7 @@ function computeMorphedAttributes( object ) {
 	}
 
 	const morphedPositionAttribute = new Float32BufferAttribute( modifiedPosition, 3 );
-	const morphedNormalAttribute = normalAttribute ? new Float32BufferAttribute( modifiedNormal, 3 ) : undefined;
+	const morphedNormalAttribute = ( normalAttribute !== undefined ) ? new Float32BufferAttribute( modifiedNormal, 3 ) : undefined;
 
 	return {
 
