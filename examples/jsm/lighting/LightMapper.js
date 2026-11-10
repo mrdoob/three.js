@@ -13,7 +13,8 @@ let _rendererState;
  * the result. The function also receives the sample index, so stochastic sources can
  * vary their samples and converge as they accumulate. Call `update()` once per frame
  * to bake progressively, or pass a sample count to bake at once.
- * Bake at most 256 samples, since samples accumulate in half float precision.
+ * Samples accumulate in float precision with the 'float32-blendable' renderer feature. Without it,
+ * they accumulate in half float precision, so bake at most 256 samples.
  * Keep the source geometry and GI data static while accumulating. Call `reset()`
  * after changing transforms or lighting. Atlas charts need at least three texels
  * of padding; the resolve fills two texels around covered surfaces.
@@ -85,13 +86,19 @@ class LightMapper {
 		 */
 		this.samples = 0;
 
+		// the samples accumulate as sums, with their count in alpha. Half floats round each sample added to a
+		// large sum by up to an eighth of its value at 256 samples, in the same direction for similar samples,
+		// which shows as bands, so the sums are floats where the renderer can blend them
+
+		const floatSums = renderer.hasFeature( 'float32-blendable' );
+
 		// for the variance, the luminances of the samples and their squares accumulate in a second target of
 		// float sums: half floats would overflow, and the variance of a mean from half floats would be lost
 		// in their rounding
 
-		const accumulateMoments = variance && renderer.hasFeature( 'float32-blendable' );
+		const accumulateMoments = variance && floatSums;
 
-		this._accumulation = new RenderTarget( size, size, { type: HalfFloatType, minFilter: NearestFilter, magFilter: NearestFilter, depthBuffer: false, count: accumulateMoments ? 2 : 1 } );
+		this._accumulation = new RenderTarget( size, size, { type: floatSums ? FloatType : HalfFloatType, minFilter: NearestFilter, magFilter: NearestFilter, depthBuffer: false, count: accumulateMoments ? 2 : 1 } );
 
 		this._renderTarget = new RenderTarget( size, size, { type: HalfFloatType, depthBuffer: false, count: accumulateMoments ? 2 : 1 } );
 		this._renderTarget.texture.channel = 1;
