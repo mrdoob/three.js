@@ -62,6 +62,8 @@ const exceptionList = [
 	'webgpu_morphtargets_face',
 	'webgpu_shadowmap_progressive',
 	'webgpu_lightmap_baking',
+	'webgpu_postprocessing_ssr_animation',
+	'webgpu_postprocessing_ssr_mirror',
 	'webgpu_postprocessing_ssr_stochastic',
 	'webgpu_renderer_pathtracer',
 	'webgpu_vxgi',
