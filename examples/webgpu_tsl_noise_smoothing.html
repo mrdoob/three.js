@@ -37,7 +37,7 @@
 		</div>
 
 		<div class="label" style="left: 0;">White Noise</div>
-		<div class="label" id="noiseLabel" style="right: 0;">Hierarchical Hashed Weyl</div>
+		<div class="label" id="noiseLabel" style="right: 0;">CPRKS</div>
 
 		<script type="importmap">
 			{
@@ -55,12 +55,12 @@
 			import * as THREE from 'three/webgpu';
 			import { Fn, float, hash, interleavedGradientNoise, mix, screenCoordinate, screenSize, screenUV, texture, uint, uniform, vec2, vec3, vec4 } from 'three/tsl';
 
-			import { hierarchicalHashedWeyl } from 'three/addons/tsl/utils/HierarchicalHashedWeyl.js';
+			import { cprks } from 'three/addons/tsl/utils/CPRKS.js';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const modes = { 'Sphere': 0, 'Uniform': 1 };
-			const params = { mode: 'Sphere', noise: 'Hierarchical Hashed Weyl', pixelSize: 2, temporalBlur: true, spatialBlur: true, animate: true };
+			const params = { mode: 'Sphere', noise: 'CPRKS', pixelSize: 2, temporalBlur: true, spatialBlur: true, animate: true };
 
 			let renderer, computeQuad, displayQuad, targets, history, current, display, blurredDisplay;
 			let samples = 0;
@@ -94,7 +94,7 @@
 				// interleaved gradient noise scrolls diagonally per frame, wrapping the index to keep float precision
 
 				const noises = {
-					'Hierarchical Hashed Weyl': hierarchicalHashedWeyl( screenCoordinate, index, 1 ),
+					'CPRKS': cprks( screenCoordinate, index, 1, [ 2654435769 ] ),
 					'Interleaved Gradient Noise': interleavedGradientNoise( screenCoordinate.add( float( index.mod( 256 ) ).mul( 5.588238 ) ) )
 				};
 

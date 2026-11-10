@@ -3,7 +3,7 @@ import { Fn, NodeUpdateType, uniform, reference, vec4, float, uv, mix, passTextu
 
 import { VXGIVolume } from './VXGIVolume.js';
 import { createConeTracer, gather, intersectVolume, sampleDirectional } from './VXGIConeTracer.js';
-import { R2_STEPS, hierarchicalHashedWeyl } from '../../tsl/utils/HierarchicalHashedWeyl.js';
+import { R2_STEPS, cprks } from '../../tsl/utils/CPRKS.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -468,11 +468,12 @@ class VXGINode extends Node {
 			const viewNormal = sampleNormal( uvNode ).toConst();
 			const worldNormal = normalize( this._cameraWorldMatrix.mul( vec4( viewNormal, 0 ) ).xyz ).toConst();
 
-			// Two independently seeded dimensions for cone rotation and elevation, stepped with the R2 sequence.
+			// Two PCG-rotated dimensions for cone rotation and elevation, stepped with the R2 sequence.
 
 			const pixel = uvNode.mul( this._resolution ).floor().toConst();
-			const rotationNoise = hierarchicalHashedWeyl( pixel, this._frame, 117, R2_STEPS[ 0 ] ).toConst();
-			const elevationNoise = hierarchicalHashedWeyl( pixel, this._frame, 118, R2_STEPS[ 1 ] ).toConst();
+			const noise = cprks( pixel, this._frame, 117, R2_STEPS ).toConst();
+			const rotationNoise = noise.x;
+			const elevationNoise = noise.y;
 
 			const CONE_COUNT = this.coneCount.toConst();
 			const tanHalfAngle = this.coneAngle.mul( 0.5 ).radians().tan().toConst();
