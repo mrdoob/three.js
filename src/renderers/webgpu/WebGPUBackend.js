@@ -39,6 +39,7 @@ const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
 const _computePassDescriptor = new GPUComputePassDescriptor();
 const _querySetDescriptor = new GPUQuerySetDescriptor();
 const _shaderModuleDescriptor = new GPUShaderModuleDescriptor();
+const _timerTimestampWrites = new GPURenderPassTimestampWrites();
 const _texelCopyTextureInfoSrc = new GPUTexelCopyTextureInfo();
 const _texelCopyTextureInfoDst = new GPUTexelCopyTextureInfo();
 const _textureDescriptor = new GPUTextureDescriptor();
@@ -2703,7 +2704,7 @@ class WebGPUBackend extends Backend {
 	 */
 	_continueTimestampQuery( descriptor ) {
 
-		if ( this.trackTimestamp === true ) {
+		if ( this.trackTimestamp === true && this._activeTimers === 0 ) {
 
 			descriptor.timestampWrites.beginningOfPassWriteIndex = undefined;
 
@@ -2850,11 +2851,11 @@ class WebGPUBackend extends Backend {
 
 		const index = this._timerQueryIndex % TIMER_QUERY_COUNT;
 
-		_renderPassTimestampWrites.querySet = this._timerQuerySet;
-		_renderPassTimestampWrites.beginningOfPassWriteIndex = index;
-		_renderPassTimestampWrites.endOfPassWriteIndex = index + 1;
+		_timerTimestampWrites.querySet = this._timerQuerySet;
+		_timerTimestampWrites.beginningOfPassWriteIndex = index;
+		_timerTimestampWrites.endOfPassWriteIndex = index + 1;
 
-		descriptor.timestampWrites = _renderPassTimestampWrites;
+		descriptor.timestampWrites = _timerTimestampWrites;
 
 		this._timerQueryIndex += 2;
 
@@ -3439,6 +3440,12 @@ class WebGPUBackend extends Backend {
 			if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 
 			this._continueTimestampQuery( descriptor );
+
+			if ( this._activeTimers > 0 ) {
+
+				this._setTimerQueries( descriptor );
+
+			}
 
 			renderContextData.currentPass = encoder.beginRenderPass( descriptor );
 
