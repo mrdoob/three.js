@@ -778,9 +778,11 @@ export class PrefixSum {
 
 	_computeWithSubgroups( renderer ) {
 
-		renderer.compute( this._computeFunctions.reduceFn );
-		renderer.compute( this._computeFunctions.spineScanFn );
-		renderer.compute( this._computeFunctions.downsweepFn );
+		renderer.compute( [
+			this._computeFunctions.reduceFn,
+			this._computeFunctions.spineScanFn,
+			this._computeFunctions.downsweepFn
+		] );
 
 	}
 

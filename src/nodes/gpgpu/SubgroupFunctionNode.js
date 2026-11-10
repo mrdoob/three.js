@@ -98,7 +98,10 @@ class SubgroupFunctionNode extends Node {
 
 	setup( builder ) {
 
-		builder.allowEarlyReturns = true;
+		// Subgroup operations must be called from subgroup uniform control flow, so the
+		// compute bounds check cannot be injected as an early return before them.
+		// See https://github.com/mrdoob/three.js/pull/33319
+		builder.allowEarlyReturns = false;
 		builder.enableSubGroups();
 
 		return super.setup( builder );
