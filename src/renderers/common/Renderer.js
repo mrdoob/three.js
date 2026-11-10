@@ -3983,7 +3983,9 @@ class Renderer {
 
 		//
 
-		if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
+		const isSinglePass = ( material.forceSinglePass === true || material.isShadowPassMaterial === true );
+
+		if ( material.transparent === true && material.side === DoubleSide && isSinglePass === false ) {
 
 			material.side = BackSide;
 			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, clippingContext, 'backSide' ); // create backSide pass id
