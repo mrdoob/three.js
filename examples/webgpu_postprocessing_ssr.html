@@ -44,8 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec4, velocity, colorSpaceToWorking } from 'three/tsl';
-		import { noiseAlgorithms } from 'three/addons/tsl/utils/Noise.js';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec4, velocity, passTexture, colorSpaceToWorking } from 'three/tsl';
 		import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
 		import { ENV_RAY_LENGTH_THRESHOLD } from 'three/addons/tsl/utils/SpecularHelpers.js';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
@@ -60,6 +59,7 @@
 		const params = {
 			output: 0,
 			quality: 0.5,
+			blurQuality: 1,
 			maxDistance: 1,
 			intensity: 1,
 			thickness: 0.03,
@@ -185,11 +185,9 @@
 			//
 
 			ssrPass = ssr( scenePassColor, scenePassDepth, sceneNormal, {
-				stochastic: true,
 				metalnessNode: scenePassMetalRough.r,
 				roughnessNode: scenePassMetalRough.g
 			} ).toInspector( 'SSR' );
-			ssrPass.noiseAlgorithm.value = noiseAlgorithms[ 'Hierarchical Hashed Weyl' ];
 
 			const ssrTexture = ssrPass.getTextureNode();
 			const guides = {
@@ -204,14 +202,15 @@
 			const denoised = denoiseNode.getTextureNode().toInspector( 'SSR DN' );
 
 			// SSR alpha stores ray length, with a sentinel for environment misses.
-			const coverage = ssrPass.a.greaterThan( 0 ).and( ssrPass.a.lessThan( ENV_RAY_LENGTH_THRESHOLD ) ).toFloat();
+			const reflectionBuffer = passTexture( ssrPass, ssrPass.getRenderTarget().texture );
+			const coverage = reflectionBuffer.a.greaterThan( 0 ).and( reflectionBuffer.a.lessThan( ENV_RAY_LENGTH_THRESHOLD ) ).toFloat();
 			const coverageDenoise = temporalDenoise( vec4( coverage, coverage, coverage, 1 ), guides );
 			coverage.toInspector( 'SSR coverage' );
 			coverageDenoise.toInspector( 'SSR coverage DN' );
 
 			// blend SSR over beauty (SSR outputs premultiplied color, so use additive blending)
 
-			const outputNode = smaa( scenePassColor.add( denoised.rgb ) );
+			const outputNode = smaa( scenePassColor.add( ssrPass.rgb ) );
 
 			renderPipeline.outputNode = outputNode;
 
@@ -228,12 +227,7 @@
 			const gui = renderer.inspector.createParameters( 'Settings' );
 			const ssrFolder = gui.addFolder( 'SSR' );
 			ssrFolder.add( params, 'quality', 0, 1 ).onChange( updateParameters );
-			ssrFolder.add( ssrPass.noiseAlgorithm, 'value', noiseAlgorithms ).name( 'noise algorithm' ).onChange( () => {
-
-				denoiseNode.reset();
-				coverageDenoise.reset();
-
-			} );
+			ssrFolder.add( params, 'blurQuality', 1, 3, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'output', { Combined: 0, SSR: 1, 'SSR DN': 2, 'SSR coverage': 3, 'SSR coverage DN': 4 } ).onChange( updateOutput );
 			ssrFolder.add( params, 'maxDistance', 0, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'intensity', 0, 1 ).onChange( updateParameters );
@@ -271,6 +265,7 @@
 		function updateParameters() {
 
 			ssrPass.quality.value = params.quality;
+			ssrPass.blurQuality = params.blurQuality;
 			ssrPass.maxDistance.value = params.maxDistance;
 			ssrPass.intensity.value = params.intensity;
 			ssrPass.thickness.value = params.thickness;
