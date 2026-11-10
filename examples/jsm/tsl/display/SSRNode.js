@@ -451,10 +451,9 @@ class SSRNode extends Node {
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._blurRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, minFilter: LinearMipmapLinearFilter, magFilter: LinearFilter, count: outputCoverage && ! stochastic ? 2 : 1 } );
-		if ( outputCoverage && ! stochastic ) this._blurRenderTarget.textures[ 1 ].name = 'SSRNode.CoverageBlur';
+		this._blurRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, minFilter: LinearMipmapLinearFilter, magFilter: LinearFilter } );
 		this._blurRenderTarget.texture.name = 'SSRNode.Blur';
-		for ( const texture of this._blurRenderTarget.textures ) texture.mipmaps.push( {}, {}, {}, {}, {} );
+		this._blurRenderTarget.texture.mipmaps.push( {}, {}, {}, {}, {} );
 
 		/**
 		 * The material that is used to render the effect.
@@ -585,10 +584,7 @@ class SSRNode extends Node {
 	 */
 	_buildBlurMaterial() {
 
-		const blurred = boxBlur( texture( this._ssrRenderTarget.texture ), { size: this._blurQuality, separation: this._blurSpread } );
-		this._blurMaterial.fragmentNode = this.outputCoverage
-			? outputStruct( blurred, boxBlur( texture( this._ssrRenderTarget.textures[ 1 ] ), { size: this._blurQuality, separation: this._blurSpread } ) )
-			: blurred;
+		this._blurMaterial.fragmentNode = boxBlur( texture( this._ssrRenderTarget.texture ), { size: this._blurQuality, separation: this._blurSpread } );
 		this._blurMaterial.needsUpdate = true;
 
 	}
@@ -708,18 +704,9 @@ class SSRNode extends Node {
 	 * Returns screen-space hit coverage in the red channel. Requires
 	 * `outputCoverage=true`. Misses have zero coverage; hits include the screen-edge fade.
 	 *
-	 * @param {boolean} [blurred=false] - Return roughness-dependent blurred coverage for mirror tracing.
 	 * @return {PassTextureNode} The coverage texture.
 	 */
-	getCoverageNode( blurred = false ) {
-
-		if ( blurred && this.stochastic === false && this.roughnessNode !== null ) {
-
-			const mips = this._blurRenderTarget.texture.mipmaps.length - 1;
-			const lod = this.roughnessNode.mul( this.roughnessNode ).mul( mips ).clamp( 0, mips );
-			return this._blurredCoverageTextureNode ??= passTexture( this, this._blurRenderTarget.textures[ 1 ] ).level( lod );
-
-		}
+	getCoverageNode() {
 
 		return this._coverageTextureNode ??= passTexture( this, this._ssrRenderTarget.textures[ 1 ] );
 
@@ -1417,9 +1404,7 @@ class SSRNode extends Node {
 
 		}
 
-		this._copyMaterial.fragmentNode = this.outputCoverage && this.stochastic === false
-			? outputStruct( reflectionBuffer, texture( this._ssrRenderTarget.textures[ 1 ] ) )
-			: reflectionBuffer;
+		this._copyMaterial.fragmentNode = reflectionBuffer;
 		this._copyMaterial.needsUpdate = true;
 
 		//

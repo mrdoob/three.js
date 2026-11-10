@@ -269,7 +269,7 @@
 			applyParams();
 			applyPost();
 
-			const outputTypes = { Beauty: 0, SSR: 1, 'SSR DR': 4, 'SSR coverage': 10, 'SSR coverage DR': 11 };
+			const outputTypes = { Beauty: 0, SSR: 1, 'SSR DN': 4, 'SSR coverage': 10, 'SSR coverage DN': 11 };
 
 			const displayGui = renderer.inspector.createParameters( 'Display' );
 			displayGui.add( params, 'output', outputTypes ).name( 'Output' ).onChange( updateOutputNode );

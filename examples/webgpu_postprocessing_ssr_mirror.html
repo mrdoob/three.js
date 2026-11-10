@@ -160,7 +160,6 @@
 			const raw = reflection.getRawTextureNode();
 			const coverage = reflection.getCoverageNode();
 			const blurred = reflection.getTextureNode();
-			const blurredCoverage = reflection.getCoverageNode( true );
 			const blurEnabled = uniform( 1 );
 			const combined = beauty.rgb.add( mix( raw.rgb, blurred.rgb, blurEnabled ) );
 			const spatialAA = smaa( vec4( combined, 1 ) );
@@ -172,9 +171,8 @@
 
 					case 'Beauty': view = spatialAA; break;
 					case 'SSR': view = vec4( raw.rgb, 1 ); break;
-					case 'SSR DR': view = vec4( blurred.rgb, 1 ); break;
+					case 'SSR DN': view = vec4( blurred.rgb, 1 ); break;
 					case 'SSR coverage': view = vec4( coverage.rrr, 1 ); break;
-					case 'SSR coverage DR': view = vec4( blurredCoverage.rrr, 1 ); break;
 
 				}
 
@@ -193,7 +191,7 @@
 			// GUI
 
 			const displayGui = renderer.inspector.createParameters( 'Display' );
-			displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DR', 'SSR coverage', 'SSR coverage DR' ] ).name( 'Output' ).info( 'DR shows the spatially blurred mirror trace or coverage in this example.' ).onChange( updateOutput );
+			displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN', 'SSR coverage' ] ).name( 'Output' ).info( 'DN means denoise; this mirror example uses spatial blur rather than stochastic denoising.' ).onChange( updateOutput );
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
 			ssrGui.add( params, 'steps', 1, 64, 1 ).name( 'Steps' ).info( 'Ray-march steps for one mirror ray per pixel. Binary refinement adds up to 8 steps.' ).onChange( updateParameters );
