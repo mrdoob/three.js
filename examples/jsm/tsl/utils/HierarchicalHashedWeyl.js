@@ -14,7 +14,7 @@ const pixelHash = ( x, y, seed ) => hashUint( x.mul( uint( 0x9e3779b1 ) ).bitXor
 /**
  * Per-dimension temporal steps (0.32 fixed point) of Hierarchical Hashed Weyl (HHW), from the R2 and
  * R4 generalized golden ratio sequences. Each dimension needs its own step so a pixel's samples
- * don't line up over time.
+ * don't line up over time. Use `R2_STEPS` for two values per pixel and `R4_STEPS` for four.
  */
 export const R2_STEPS = [ 3242174889, 2447445413 ];
 export const R4_STEPS = [ 3679390609, 3152041523, 2700274805, 2313257605 ];
