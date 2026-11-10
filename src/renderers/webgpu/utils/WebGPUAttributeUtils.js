@@ -37,6 +37,42 @@ const typeArraysToVertexFormatPrefixForItemSize1 = new Map( [
 
 const _tail = new Uint8Array( 4 );
 
+const _wordArrays = { 1: Uint8Array, 2: Uint16Array, 4: Uint32Array, 8: BigUint64Array };
+
+/**
+ * Copies the items of a typed array into an array with a larger item size. The
+ * additional components of each item are left untouched.
+ *
+ * The components are copied through unsigned integer views, so every value keeps
+ * its exact bits (like `TypedArray.set()` does) without creating a subarray per item.
+ *
+ * @private
+ * @function
+ * @param {TypedArray} array - The source array.
+ * @param {TypedArray} paddedArray - The target array. It must be of the same type as the source array.
+ * @param {number} count - The number of items to copy.
+ * @param {number} itemSize - The item size of the source array.
+ * @param {number} paddedItemSize - The item size of the target array.
+ */
+function copyPaddedItems( array, paddedArray, count, itemSize, paddedItemSize ) {
+
+	const WordArray = _wordArrays[ array.BYTES_PER_ELEMENT ];
+
+	const source = new WordArray( array.buffer, array.byteOffset, array.length );
+	const target = new WordArray( paddedArray.buffer, paddedArray.byteOffset, paddedArray.length );
+
+	for ( let i = 0, sourceOffset = 0, targetOffset = 0; i < count; i ++, sourceOffset += itemSize, targetOffset += paddedItemSize ) {
+
+		for ( let j = 0; j < itemSize; j ++ ) {
+
+			target[ targetOffset + j ] = source[ sourceOffset + j ];
+
+		}
+
+	}
+
+}
+
 /**
  * Writes a range of a typed array into the given GPU buffer. `writeBuffer()` requires
  * the offset and size to be multiples of 4 bytes, so the range is expanded to the
@@ -180,11 +216,7 @@ class WebGPUAttributeUtils {
 
 				const paddedArray = new array.constructor( bufferAttribute.count * paddedItemSize );
 
-				for ( let i = 0; i < bufferAttribute.count; i ++ ) {
-
-					paddedArray.set( array.subarray( i * itemSize, i * itemSize + itemSize ), i * paddedItemSize );
-
-				}
+				copyPaddedItems( array, paddedArray, bufferAttribute.count, itemSize, paddedItemSize );
 
 				if ( bufferAttribute.isStorageBufferAttribute || bufferAttribute.isStorageInstancedBufferAttribute ) {
 
@@ -252,11 +284,7 @@ class WebGPUAttributeUtils {
 
 			array = new array.constructor( bufferAttribute.count * paddedItemSize );
 
-			for ( let i = 0; i < bufferAttribute.count; i ++ ) {
-
-				array.set( bufferAttribute.array.subarray( i * itemSize, i * itemSize + itemSize ), i * paddedItemSize );
-
-			}
+			copyPaddedItems( bufferAttribute.array, array, bufferAttribute.count, itemSize, paddedItemSize );
 
 			if ( bufferAttribute.isStorageBufferAttribute || bufferAttribute.isStorageInstancedBufferAttribute ) {
 
