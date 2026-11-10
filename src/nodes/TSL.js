@@ -145,6 +145,7 @@ export * from './gpgpu/SubgroupFunctionNode.js';
 export * from './accessors/Lights.js';
 export * from './lighting/LightsNode.js';
 export * from './lighting/LightingContextNode.js';
+export * from './lighting/IndirectSpecularNode.js';
 export * from './lighting/ShadowBaseNode.js';
 export { shadow } from './lighting/ShadowNode.js';
 export { BasicShadowFilter, PCFShadowFilter, VSMShadowFilter } from './lighting/ShadowFilterNode.js';
@@ -153,6 +154,7 @@ export * from './lighting/PointLightNode.js';
 
 // pmrem
 export * from './pmrem/PMREMNode.js';
+export { roughnessToMip } from './pmrem/PMREMUtils.js';
 
 // procedural
 export * from './procedural/Checker.js';

@@ -1,7 +1,7 @@
-import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
+import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, property, outputStruct, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
-import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
+import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionDirection, ggxReflectionSample } from '../utils/SpecularHelpers.js';
 import { boxBlur } from './boxBlur.js';
 import ImportanceSampledEnvironment from './ImportanceSampledEnvironment.js';
 
@@ -9,14 +9,13 @@ const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 let _rendererState;
 
-// Maximum ray-march step count; `quality` (0..1) scales it to a fixed per-ray count.
 const MAX_STEPS = 64;
 
 /**
  * @typedef {Object} SSRNodeOptions
  * @property {boolean} [stochastic=false] - When `false`, traces a single mirror reflection and softens roughness with a blur pass (first-generation SSR). When `true`, varies the reflection direction per pixel with stochastic GGX rays (second-generation SSR); higher quality on rough/glossy surfaces but noisier, so it expects a temporal/spatial denoiser downstream.
  * @property {Node<float>} [metalnessNode=null] - Per-pixel metalness. Drives GGX reflection sampling and, with `reflectNonMetals=false`, the non-metal early-out.
- * @property {Node<vec3>} [specularNode=null] - Stochastic mode only: material normal-incidence reflectance (F0), typically an MRT `specularColorBlended` attachment (it already includes IOR, specular intensity and metalness; raw `material.specularColor` reflects too brightly). Defaults to the metalness/base-color approximation.
+ * @property {Node<vec3>} [specularNode=null] - Material normal-incidence reflectance (F0), typically an MRT `specularColorBlended` attachment (it already includes IOR, specular intensity and metalness; raw `material.specularColor` reflects too brightly). Defaults to the metalness/base-color approximation.
  * @property {Node<float>} [specularF90Node=null] - Stochastic mode only: material grazing reflectance, typically an MRT `specularF90` attachment. Defaults to one.
  * @property {Node<float>} [roughnessNode=null] - Per-pixel roughness. Drives GGX sampling and the blur mip selection.
  * @property {boolean} [reflectNonMetals=false] - Only used when `stochastic=false`. When `false`, non-metallic surfaces are discarded for a noticeable performance gain; set `true` to also reflect dielectrics (e.g. marble, polished wood, plastic).
@@ -24,6 +23,7 @@ const MAX_STEPS = 64;
  * @property {boolean} [envImportanceSampling=false] - When `true`, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.
  * @property {Node} [diffuseNode=null] - Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
  * @property {boolean} [binaryRefine=false] - Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
+ * @property {boolean} [outputCoverage=false] - Stochastic tracing with external fallback. Requires `stochastic=true` and no `environmentNode`. RGB is the coverage-normalized average of incoming radiance sampled along GGX directions, without material BRDF weighting; alpha is coverage. Hit distance is in {@link SSRNode#getHitNode}. Source alpha supplies validity.
  * @property {Camera} [camera=null] - Camera the scene is rendered with. Inferred from the color pass when omitted.
  */
 
@@ -65,10 +65,16 @@ class SSRNode extends Node {
 			environmentNode = null,
 			envImportanceSampling = false,
 			diffuseNode = null,
-			binaryRefine = false
+			binaryRefine = false,
+			outputCoverage = false
 		} = options;
 
 		let camera = options.camera ?? null;
+
+		/** @type {boolean} Coverage output requires stochastic tracing and external fallback. Fixed at construction. */
+		this.outputCoverage = outputCoverage;
+		this._coverage = outputCoverage ? property( 'float' ) : null;
+		this._hitDistance = outputCoverage ? property( 'float' ) : null;
 
 		/**
 		 * When `true`, the reflection direction is varied per pixel with stochastic GGX rays
@@ -125,7 +131,7 @@ class SSRNode extends Node {
 		this.metalnessNode = metalnessNode;
 
 		/**
-		 * Stochastic mode only: per-pixel normal-incidence reflectance (F0), typically an MRT
+		 * Per-pixel normal-incidence reflectance (F0), typically an MRT
 		 * `specularColorBlended` attachment, which already includes IOR, specular intensity and
 		 * metalness (raw `material.specularColor` reflects too brightly). When `null`, F0 is
 		 * derived from metalness and the diffuse color.
@@ -421,7 +427,8 @@ class SSRNode extends Node {
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._ssrRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
+		this._ssrRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, count: outputCoverage ? 2 : 1 } );
+		if ( outputCoverage ) this._ssrRenderTarget.textures[ 1 ].name = 'SSRNode.Hit';
 		this._ssrRenderTarget.texture.name = 'SSRNode.SSR';
 
 		/**
@@ -650,7 +657,15 @@ class SSRNode extends Node {
 		if ( this._ssrFn === null ) return;
 
 		this._ssrMaterial.contextNode = context( this._sharedContext );
-		this._ssrMaterial.fragmentNode = this._ssrFn();
+		const result = this.outputCoverage ? Fn( () => {
+
+			const value = this._ssrFn().toVar();
+			this._hitDistance.assign( this._coverage.greaterThan( 0 ).select( value.a, float( ENV_RAY_LENGTH ) ) );
+			return vec4( value.rgb.div( this._coverage.max( 1e-4 ) ), this._coverage );
+
+		} )() : this._ssrFn();
+		this._ssrMaterial.fragmentNode = this.outputCoverage ? outputStruct( result, vec4( this._hitDistance, 0, 0, 0 ) ) : result;
+
 		this._ssrMaterial.needsUpdate = true;
 
 	}
@@ -663,6 +678,18 @@ class SSRNode extends Node {
 	getTextureNode() {
 
 		return ( this.stochastic === false && this.roughnessNode !== null ) ? this._blurredTextureNode : this._textureNode;
+
+	}
+
+	/**
+	 * Returns the hit texture: world-space hit distance in R ({@link ENV_RAY_LENGTH} for misses)
+	 * when `outputCoverage` is enabled.
+	 *
+	 * @return {PassTextureNode} The hit texture.
+	 */
+	getHitNode() {
+
+		return this._hitTextureNode ??= passTexture( this, this._ssrRenderTarget.textures[ 1 ] );
 
 	}
 
@@ -686,9 +713,9 @@ class SSRNode extends Node {
 	/**
 	 * Wires the feedback inputs for multi-bounce reflections: the previous frame's
 	 * denoised result (`history`) and the velocity buffer used to reproject it
-	 * (`velocity`). `history` accepts a texture, e.g. the output of a {@link DenoiseNode}
-	 * (`getTexture()`), or a node with a render target, whose texture is used. Pass `null`
-	 * for both to disable multi-bounce.
+	 * (`velocity`). `history` accepts the producing node (e.g. a
+	 * {@link DenoiseNode}) — its output render target is used — or a raw
+	 * texture. Pass `null` for both to disable multi-bounce.
 	 *
 	 * @param {Texture} history
 	 * @param {Node<vec2>} velocity
@@ -708,6 +735,8 @@ class SSRNode extends Node {
 	 *
 	 * Uses {@link ImportanceSampledEnvironment} (CDF + MIS adapted from
 	 * [three-gpu-pathtracer](https://github.com/gkjohnson/three-gpu-pathtracer)).
+	 *
+	 * Not supported with `outputCoverage`.
 	 *
 	 * @param {Texture|null} hdr - The equirectangular HDR environment map, or null to disable.
 	 * @see {@link https://github.com/gkjohnson/three-gpu-pathtracer}
@@ -874,7 +903,14 @@ class SSRNode extends Node {
 
 		const ssr = Fn( () => {
 
+			if ( this.outputCoverage ) {
+
+				this._coverage.assign( 0 );
+
+			}
+
 			const noise = this.stochastic === true ? sampleMarchNoise( uvNode, this._noiseIndex ) : null;
+
 			// reconstruct at the depth texel center
 
 			const depthSize = vec2( textureSize( this.depthNode ) ).toConst();
@@ -893,7 +929,7 @@ class SSRNode extends Node {
 
 			// The node system samples the metalness/roughness textures at the current uv,
 			// so no explicit sample() is needed here.
-			const metalness = float( this.metalnessNode );
+			const metalness = this.outputCoverage ? null : float( this.metalnessNode );
 
 			if ( this.stochastic === false && this._reflectNonMetals === false ) {
 
@@ -911,11 +947,13 @@ class SSRNode extends Node {
 
 			let viewReflectDir, finalSampleWeight, specDominantFactor;
 			let sampleEnvReflection = null;
+			// The base color only feeds the metalness F0 fallback.
+			const albedo = this.outputCoverage ? null : ( this.specularNode === null && this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ).toVar();
 
 			if ( this.stochastic === false ) {
 
 				viewReflectDir = reflect( viewIncidentDir, viewNormal ).normalize().toVar();
-				finalSampleWeight = vec3( metalness );
+				finalSampleWeight = this.specularNode !== null ? vec3( this.specularNode ) : mix( vec3( 0.04 ), albedo, metalness );
 				specDominantFactor = float( 1 );
 
 			} else {
@@ -924,59 +962,71 @@ class SSRNode extends Node {
 				// mirror bias trades the unbiased GGX lobe for lower variance
 				Xi.y.assign( mix( Xi.y, 0.0, this.mirrorBias.mul( Xi.w.sqrt() ) ) );
 
-				// The base color only feeds the metalness F0 fallback.
-				const albedo = ( this.specularNode === null && this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ).toVar();
-				const ggxSample = ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi, this.specularNode, this.specularF90Node ?? 1 ).toVar();
+				if ( this.outputCoverage ) {
 
-				// Sometimes the GGX sample is facing away from the surface, so we need to re-sample.
-				If( ggxSample.get( 'reflectDir' ).dot( viewNormal ).lessThan( 0 ), () => {
+					viewReflectDir = ggxReflectionDirection( viewNormal, V, roughness, Xi ).toVar();
+					If( viewReflectDir.dot( viewNormal ).lessThan( 0 ), () => {
 
-					ggxSample.assign( ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi.add( Xi.mul( 7 ) ).fract(), this.specularNode, this.specularF90Node ?? 1 ) );
+						viewReflectDir.assign( ggxReflectionDirection( viewNormal, V, roughness, Xi.add( Xi.mul( 7 ) ).fract() ) );
 
-				} );
+					} );
+					specDominantFactor = getSpecularDominantFactor( viewNormal.dot( V ).max( 0 ), roughness ).toVar();
 
-				viewReflectDir = ggxSample.get( 'reflectDir' ).toVar();
-				finalSampleWeight = ggxSample.get( 'sampleWeight' ).toVar();
-				specDominantFactor = getSpecularDominantFactor( ggxSample.get( 'NdotV' ), roughness ).toVar();
+				} else {
 
-				sampleEnvReflection = () => {
+					const ggxSample = ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi, this.specularNode, this.specularF90Node ?? 1 ).toVar();
 
-					if ( this._importanceEnvironment === null ) return vec3( 0 );
+					// Sometimes the GGX sample is facing away from the surface, so we need to re-sample.
+					If( ggxSample.get( 'reflectDir' ).dot( viewNormal ).lessThan( 0 ), () => {
 
-					const envColor = vec3( 0 ).toVar();
+						ggxSample.assign( ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi.add( Xi.mul( 7 ) ).fract(), this.specularNode, this.specularF90Node ?? 1 ) );
 
-					if ( this.envImportanceSampling ) {
+					} );
 
-						const Xi2 = bindAnalyticNoise( this._resolution, 59 )( uvPos, this._noiseIndex );
+					viewReflectDir = ggxSample.get( 'reflectDir' ).toVar();
+					finalSampleWeight = ggxSample.get( 'sampleWeight' ).toVar();
+					specDominantFactor = getSpecularDominantFactor( ggxSample.get( 'NdotV' ), roughness ).toVar();
 
-						envColor.assign( this._importanceEnvironment.sampleEnvironmentMIS( {
-							cameraWorldMatrix: this._cameraWorldMatrix,
-							viewReflectDir,
-							N: viewNormal,
-							V,
-							alpha: ggxSample.get( 'alpha' ),
-							f0: ggxSample.get( 'f0' ),
-							f90: ggxSample.get( 'f90' ),
-							Xi2
-						} ) );
+					sampleEnvReflection = () => {
 
-					} else {
+						if ( this._importanceEnvironment === null ) return vec3( 0 );
 
-						envColor.assign( this._importanceEnvironment.sampleEnvironmentBRDF( {
-							cameraWorldMatrix: this._cameraWorldMatrix,
-							viewReflectDir,
-							N: viewNormal,
-							V,
-							alpha: ggxSample.get( 'alpha' ),
-							f0: ggxSample.get( 'f0' ),
-							f90: ggxSample.get( 'f90' )
-						} ) );
+						const envColor = vec3( 0 ).toVar();
 
-					}
+						if ( this.envImportanceSampling ) {
 
-					return envColor;
+							const Xi2 = bindAnalyticNoise( this._resolution, 59 )( uvPos, this._noiseIndex );
 
-				};
+							envColor.assign( this._importanceEnvironment.sampleEnvironmentMIS( {
+								cameraWorldMatrix: this._cameraWorldMatrix,
+								viewReflectDir,
+								N: viewNormal,
+								V,
+								alpha: ggxSample.get( 'alpha' ),
+								f0: ggxSample.get( 'f0' ),
+								f90: ggxSample.get( 'f90' ),
+								Xi2
+							} ) );
+
+						} else {
+
+							envColor.assign( this._importanceEnvironment.sampleEnvironmentBRDF( {
+								cameraWorldMatrix: this._cameraWorldMatrix,
+								viewReflectDir,
+								N: viewNormal,
+								V,
+								alpha: ggxSample.get( 'alpha' ),
+								f0: ggxSample.get( 'f0' ),
+								f90: ggxSample.get( 'f90' )
+							} ) );
+
+						}
+
+						return envColor;
+
+					};
+
+				}
 
 			}
 
@@ -1000,10 +1050,11 @@ class SSRNode extends Node {
 			// JS: fade the reflection to black, or blend it toward the environment reflection.
 			const applyHitEdgeFade = ( reflectColor, uvS, hitBorderWidth ) => {
 
-				if ( this.screenEdgeFadeBlack ) {
+				if ( this.screenEdgeFadeBlack || this.outputCoverage ) {
 
 					const hitBorderFactor = computeScreenBorderFactor( uvS, this.screenEdgeFade );
 					reflectColor.rgb.mulAssign( hitBorderFactor );
+					if ( this.outputCoverage ) reflectColor.a.mulAssign( hitBorderFactor );
 
 				} else {
 
@@ -1127,6 +1178,8 @@ class SSRNode extends Node {
 				// Exponentially-distributed ray parameter, shared by the sample position and ray depth.
 				const s = sampleFraction( float( i ) ).toVar();
 
+				// The one-texel stride floor can otherwise extend short rays past their
+				// endpoint (including past the near-plane clip).
 				If( s.greaterThan( 1 ), () => {
 
 					Break();
@@ -1212,7 +1265,6 @@ class SSRNode extends Node {
 
 						Break();
 
-
 					} );
 
 				} );
@@ -1287,12 +1339,18 @@ class SSRNode extends Node {
 					// Multi-bounce: add the reprojected previous-frame reflection at the hit point.
 					reflectColor.rgb.assign( reprojectHitPointHistory( uvS, reflectColor.rgb ) );
 
+					if ( this.outputCoverage ) {
+
+						reflectColor.a.assign( reflectColor.a.clamp() );
+						reflectColor.rgb.mulAssign( reflectColor.a );
+
+					}
+
 					if ( this.stochastic === true ) applyHitEdgeFade( reflectColor, uvS, hitBorderWidth );
 
-					// The scatter (GGX) path bakes distance/grazing response into finalSampleWeight.
-					// The mirror/blur path is a plain reflection, so reapply upstream's squared
-					// distance attenuation and grazing Fresnel here to match its falloff.
-					let weightedColor = reflectColor.rgb.mul( finalSampleWeight );
+					// Coverage output keeps incoming radiance; standalone SSR applies reflection weights.
+
+					let weightedColor = this.outputCoverage ? reflectColor.rgb : reflectColor.rgb.mul( finalSampleWeight );
 
 					if ( this.stochastic === false ) {
 
@@ -1303,8 +1361,15 @@ class SSRNode extends Node {
 
 					}
 
+					if ( this.outputCoverage ) {
+
+						this._coverage.assign( reflectColor.a );
+
+					}
+
 					hit.assign( 1 );
-					output.assign( vec4( weightedColor, worldDistance ) );
+					const rayLength = this.outputCoverage ? this._coverage.greaterThan( 0 ).select( worldDistance, float( ENV_RAY_LENGTH ) ) : worldDistance;
+					output.assign( vec4( weightedColor, rayLength ) );
 
 				} );
 
@@ -1313,7 +1378,7 @@ class SSRNode extends Node {
 			// Screen-space ray missed: environment fallback (MIS when CDF env is set up).
 			If( hit.equal( 0 ), () => {
 
-				if ( this.stochastic === true ) {
+				if ( this.stochastic === true && ! this.outputCoverage ) {
 
 					output.assign( vec4( sampleEnvReflection().mul( this.environmentIntensity ), float( ENV_RAY_LENGTH ) ) );
 
@@ -1337,7 +1402,6 @@ class SSRNode extends Node {
 			return output.max( 0 );
 
 		} );
-
 
 		this._ssrFn = ssr;
 		this._sharedContext = builder.getSharedContext();

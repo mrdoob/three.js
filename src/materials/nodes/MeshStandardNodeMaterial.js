@@ -113,7 +113,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 		}
 
-		return envNode ? new EnvironmentNode( envNode ) : null;
+		return envNode || builder.context.indirectSpecularNode ? new EnvironmentNode( envNode ) : null;
 
 	}
 
