@@ -39,7 +39,7 @@
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
-			const params = { output: 'Beauty', animate: true, orbit: false, roughness: 0.18, steps: 32, denoise: true, traa: false, traaFrames: 20, binaryRefine: true, maxDistance: 20, thickness: 0.12, luminancePhi: 3 };
+			const params = { output: 'Beauty', animate: true, orbit: false, roughness: 0.18, steps: 32, denoise: true, traa: true, traaFrames: 20, binaryRefine: true, maxDistance: 20, thickness: 0.12, luminancePhi: 3 };
 			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x18212c );
 			const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 60 );
