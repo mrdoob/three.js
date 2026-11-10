@@ -1133,13 +1133,17 @@ class WebGLState {
 
 		const { gl, currentBoundFramebuffers } = this;
 
-		if ( currentBoundFramebuffers[ target ] !== framebuffer ) {
+		if (
+			currentBoundFramebuffers[ target ] !== framebuffer ||
+			( target === gl.FRAMEBUFFER && currentBoundFramebuffers[ gl.READ_FRAMEBUFFER ] !== framebuffer )
+		) {
 
 			gl.bindFramebuffer( target, framebuffer );
 
 			currentBoundFramebuffers[ target ] = framebuffer;
 
-			// gl.DRAW_FRAMEBUFFER is equivalent to gl.FRAMEBUFFER
+			// gl.FRAMEBUFFER and gl.DRAW_FRAMEBUFFER share the draw binding cache.
+			// Binding gl.FRAMEBUFFER also updates the independently tracked read cache.
 
 			if ( target === gl.DRAW_FRAMEBUFFER ) {
 
@@ -1150,6 +1154,7 @@ class WebGLState {
 			if ( target === gl.FRAMEBUFFER ) {
 
 				currentBoundFramebuffers[ gl.DRAW_FRAMEBUFFER ] = framebuffer;
+				currentBoundFramebuffers[ gl.READ_FRAMEBUFFER ] = framebuffer;
 
 			}
 
