@@ -60,6 +60,7 @@ const LIGHT_STRIDE = 4;
  * instanced and batched meshes are ignored.
  *
  * This class can only be used with {@link WebGPURenderer} and a WebGPU backend.
+ * Requires `three-mesh-bvh` 0.9.18 or later.
  *
  * @three_import import { RayTracedRadiosity, rayTracedRadiosityIrradiance } from 'three/addons/lighting/RayTracedRadiosity.js';
  */
@@ -547,7 +548,7 @@ class RayTracedRadiosity {
 	 */
 	_createTrace() {
 
-		const { raycastFirstHit, sampleTrianglePoint } = this._bvh.fns;
+		const { raycastFirstHit, raycastAnyHit, sampleTrianglePoint } = this._bvh.fns;
 
 		// traces a ray and returns the barycentric coordinates of the closest hit and its triangle plus
 		// one, negated for back faces, or zeros if nothing is hit
@@ -588,7 +589,7 @@ class RayTracedRadiosity {
 			}
 		`;
 
-		// whether a shadow ray reaches a distance, zero means unbounded
+		// shadow rays only need any blocker, not the closest hit; zero distance means unbounded
 
 		this._visibility = wgslTagFn/* wgsl */`
 			// fn
@@ -599,9 +600,7 @@ class RayTracedRadiosity {
 				ray.direction = direction;
 				ray.maxDist = maxDist;
 
-				var hit: ${ rayIntersectionResultStruct };
-
-				return select( 1.0, 0.0, ${ raycastFirstHit }( ray, &hit ) );
+				return select( 1.0, 0.0, ${ raycastAnyHit }( ray ) );
 
 			}
 		`;
