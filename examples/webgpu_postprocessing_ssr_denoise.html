@@ -144,7 +144,8 @@
 
 			denoise: {
 				enabled: true,
-				luminancePhi: 3
+				luminancePhi: 3,
+				maxFrames: 8
 			},
 
 			post: {
@@ -435,6 +436,7 @@
 			const denoiseGui = renderer.inspector.createParameters( 'Denoise settings' );
 			denoiseGui.add( params.denoise, 'enabled' ).name( 'enabled' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'luminancePhi', 0, 10 ).name( 'luminance phi' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'maxFrames', 1, 32, 1 ).name( 'max frames' ).onChange( applyParams );
 
 			// Concise UI for Directional Light controls
 			const lightGui = renderer.inspector.createParameters( 'Light' ).close();
@@ -474,6 +476,7 @@
 
 				denoiseEnabled.value = params.denoise.enabled ? 1 : 0;
 				denoiseNode.luminancePhi.value = params.denoise.luminancePhi;
+				denoiseNode.maxFrames.value = params.denoise.maxFrames;
 
 			}
 
