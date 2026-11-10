@@ -47,7 +47,6 @@
 			const params = {
 				output: 'TRAA',
 				compare: 'Off',
-				historyLength: 20,
 				historySampling: 'catmull-rom',
 				useSubpixelCorrection: true,
 				motion: 'Pan horizontal',
@@ -118,11 +117,6 @@
 				motionFolder.add( params, 'step' ).name( 'Step one frame' );
 
 				controls.traa = gui.addFolder( 'TRAA' );
-				controls.traa.add( params, 'historyLength', [ 1, 2, 4, 8, 16, 20, 32, 64 ] ).name( 'History length' ).onChange( value => {
-
-					traaPass.historyLength.value = value;
-
-				} );
 				// these are baked into the shader, so the node is rebuilt
 				controls.traa.add( params, 'historySampling', [ 'catmull-rom', 'linear' ] ).name( 'History sampling' ).onChange( rebuild );
 				controls.traa.add( params, 'useSubpixelCorrection' ).name( 'Subpixel correction' ).onChange( rebuild );
@@ -139,7 +133,6 @@
 				if ( traaPass !== undefined ) traaPass.dispose();
 
 				traaPass = traa( scenePass.getTextureNode( 'output' ), scenePass.getTextureNode( 'depth' ), scenePass.getTextureNode( 'velocity' ), camera );
-				traaPass.historyLength.value = params.historyLength;
 				traaPass.historySampling = params.historySampling;
 				traaPass.useSubpixelCorrection = params.useSubpixelCorrection;
 				updateOutput();
