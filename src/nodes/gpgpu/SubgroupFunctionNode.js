@@ -76,14 +76,6 @@ class SubgroupFunctionNode extends Node {
 
 	}
 
-	setup( builder ) {
-
-		builder.enableSubGroups();
-
-		return super.setup( builder );
-
-	}
-
 	generateNodeType( builder ) {
 
 		const method = this.method;
@@ -101,6 +93,14 @@ class SubgroupFunctionNode extends Node {
 			return this.getInputType( builder );
 
 		}
+
+	}
+
+	setup( builder ) {
+
+		builder.enableSubGroups();
+
+		return super.setup( builder );
 
 	}
 
