@@ -40,6 +40,7 @@
 			import { vec2, vec3, Fn, texture3D, screenUV, uniform, screenCoordinate, pass, depthPass, mrt, output, velocity, fract, interleavedGradientNoise } from 'three/tsl';
 
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+			import { animatedInterleavedGradientNoise } from 'three/addons/tsl/utils/IGN.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -165,7 +166,9 @@
 				shaderTime = uniform( 0 );
 
 				const temporalJitter2D = vec2( temporalOffset, temporalRotation );
-				volumetricMaterial.offsetNode = fract( interleavedGradientNoise( screenCoordinate.add( temporalJitter2D.mul( 100 ) ) ).add( temporalOffset ) );
+				const currentNoise = fract( interleavedGradientNoise( screenCoordinate.add( temporalJitter2D.mul( 100 ) ) ).add( temporalOffset ) );
+				const animatedNoise = animatedInterleavedGradientNoise();
+				volumetricMaterial.offsetNode = currentNoise;
 				volumetricMaterial.scatteringNode = Fn( ( { positionRay } ) => {
 
 					const timeScaled = vec3( shaderTime, 0, shaderTime.mul( .3 ) );
@@ -260,7 +263,8 @@
 
 				params = {
 					traa: true,
-					animated: true
+					animated: true,
+					noiseAlgorithm: 'IGN + Halton'
 				};
 
 				const gui = renderer.inspector.createParameters( 'Volumetric Lighting' );
@@ -269,6 +273,15 @@
 				gui.add( params, 'traa' ).name( 'TRAA' ).onChange( updatePostProcessing );
 
 				const rayMarching = gui.addFolder( 'Ray Marching' );
+				rayMarching.add( params, 'noiseAlgorithm', [ 'IGN + Halton', 'Animated IGN' ] ).name( 'noise algorithm' ).onChange( ( value ) => {
+
+					volumetricMaterial.offsetNode = value === 'Animated IGN' ? animatedNoise : currentNoise;
+					volumetricMaterial.needsUpdate = true;
+
+					// Restart accumulation when TRAA next resizes to the scene pass.
+					traaPass.setSize( 1, 1 );
+
+				} );
 				rayMarching.add( volumetricMaterial, 'steps', 2, 16, 1 ).name( 'step count' );
 
 				function updatePostProcessing() {
