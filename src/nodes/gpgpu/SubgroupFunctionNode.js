@@ -98,6 +98,7 @@ class SubgroupFunctionNode extends Node {
 
 	setup( builder ) {
 
+		builder.allowEarlyReturns = true;
 		builder.enableSubGroups();
 
 		return super.setup( builder );
