@@ -33,18 +33,27 @@ class WebGPUTexturePassUtils extends DataMap {
 	/**
 	 * Constructs a new utility object.
 	 *
-	 * @param {GPUDevice} device - The WebGPU device.
+	 * @param {WebGPUBackend} backend - The WebGPU backend.
 	 */
-	constructor( device ) {
+	constructor( backend ) {
 
 		super();
+
+		/**
+		 * A reference to the WebGPU backend.
+		 *
+		 * @type {WebGPUBackend}
+		 */
+		this.backend = backend;
 
 		/**
 		 * The WebGPU device.
 		 *
 		 * @type {GPUDevice}
 		 */
-		this.device = device;
+		this.device = backend.device;
+
+		const device = this.device;
 
 		const mipmapSource = `
 struct VarysStruct {
@@ -287,6 +296,12 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 			_renderPassDescriptor.colorAttachments.push( _colorAttachment );
 
+			if ( this.backend._activeTimers > 0 ) {
+
+				this.backend._setTimerQueries( _renderPassDescriptor );
+
+			}
+
 			const passEncoder = commandEncoder.beginRenderPass( _renderPassDescriptor );
 
 			_renderPassDescriptor.reset();
@@ -431,13 +446,23 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 	 */
 	_mipmapRunBundles( commandEncoder, passes ) {
 
+		const backend = this.backend;
 		const levels = passes.length;
 
 		for ( let i = 0; i < levels; i ++ ) {
 
 			const pass = passes[ i ];
+			const descriptor = pass.passDescriptor;
 
-			const passEncoder = commandEncoder.beginRenderPass( pass.passDescriptor );
+			if ( backend._activeTimers > 0 ) {
+
+				backend._setTimerQueries( descriptor );
+
+			}
+
+			const passEncoder = commandEncoder.beginRenderPass( descriptor );
+
+			descriptor.timestampWrites = undefined;
 
 			passEncoder.executeBundles( pass.renderBundles );
 

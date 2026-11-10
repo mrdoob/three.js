@@ -1,4 +1,4 @@
-import { BackSide, BufferAttribute, BufferGeometry, CustomBlending, DoubleSide, FloatType, HalfFloatType, InstancedMesh, Mesh, MeshLambertNodeMaterial, NearestFilter, NoBlending, NodeMaterial, OneFactor, OrthographicCamera, PhongLightingModel, QuadMesh, RedFormat, RendererUtils, RenderTarget, Scene, Vector2, Vector4 } from 'three/webgpu';
+import { BackSide, BufferAttribute, BufferGeometry, CustomBlending, DoubleSide, FloatType, HalfFloatType, InstancedMesh, Mesh, MeshLambertNodeMaterial, NearestFilter, NoBlending, NodeMaterial, OneFactor, OrthographicCamera, PhongLightingModel, QuadMesh, RedFormat, RendererUtils, RenderTarget, Scene, Vector2, Vector4, warnOnce } from 'three/webgpu';
 import { Fn, If, Loop, Stack, attribute, cameraWorldMatrix, float, instanceIndex, ivec2, length, lights, luminance, modelViewMatrix, mrt, normalView, normalViewGeometry, normalWorldGeometry, output, positionLocal, positionWorld, round, screenCoordinate, texture, textureLoad, uniform, vec3, vec4 } from 'three/tsl';
 
 import { lightMapUV } from '../tsl/lighting/DirectionalLightMapNode.js';
@@ -16,6 +16,12 @@ const _identity = /*@__PURE__*/ new Vector4( 1, 1, 0, 0 );
 
 const _chartStrides = /*@__PURE__*/ new WeakMap();
 
+// half float sums keep their rounding error small up to this many samples, and their weights are scaled
+// down so a sum of this many samples of an irradiance of up to about 4000 stays below the largest half float
+
+const HALF_FLOAT_SAMPLES = 1024;
+const HALF_FLOAT_WEIGHT = 1 / 64;
+
 let _rendererState;
 
 /**
@@ -31,6 +37,8 @@ let _rendererState;
  * the result. The function also receives the sample index, so stochastic sources can
  * vary their samples and converge as they accumulate. Call `update()` once per frame
  * to bake progressively, or pass a sample count to bake at once.
+ * Samples accumulate in float precision with the 'float32-blendable' renderer feature. Without it,
+ * they accumulate in half float precision with jittered weights, up to {@link LightMapper#maxSamples}.
  * Call `estimateNoise()` to stop once the light map has converged.
  * The `variance` and `guides` options also bake the inputs of a denoiser like
  * {@link DenoiseNode}: the noise of each texel and the surface that it lies on,
@@ -134,13 +142,13 @@ class LightMapper {
 		if ( directional ) outputs.push( 'direction' );
 
 		/**
-		 * The most samples that the mapper accumulates: 256 without the 'float32-blendable' renderer feature,
-		 * since half float sums lose the precision of single samples beyond, else `Infinity`.
+		 * The most samples that the mapper accumulates: 1024 without the 'float32-blendable' renderer feature,
+		 * since half float sums with jittered weights lose precision beyond, else `Infinity`.
 		 *
 		 * @type {number}
 		 * @readonly
 		 */
-		this.maxSamples = floatBlendable ? Infinity : 256;
+		this.maxSamples = floatBlendable ? Infinity : HALF_FLOAT_SAMPLES;
 
 		/**
 		 * The channel of {@link LightMapper#momentTexture} that holds the moments, `'a'` if it is shared
@@ -232,6 +240,11 @@ class LightMapper {
 		// the light map UVs of each proxy can be scaled and offset, e.g. to bake pages into tiles of one texture
 
 		this._uvTransform = uniform( new Vector4() ).onObjectUpdate( ( { object } ) => _uvTransforms.get( object ) ?? _identity );
+
+		// the weight of the current sample, see _sampleWeight()
+
+		this._weight = uniform( 1 );
+		this._floatSums = floatBlendable;
 
 		this._lights = lights;
 		this._frontMaterial = this._createBakeMaterial( irradianceNode, false, lights );
@@ -516,7 +529,12 @@ class LightMapper {
 
 		const renderer = this.renderer;
 
-		samples = Math.min( samples, this.maxSamples - this.samples );
+		if ( this.samples + samples > this.maxSamples ) {
+
+			warnOnce( `LightMapper: Half float sums are limited to ${ this.maxSamples } samples, further samples are ignored. Use a renderer with the 'float32-blendable' feature for more.` );
+			samples = Math.max( this.maxSamples - this.samples, 0 );
+
+		}
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
@@ -564,6 +582,7 @@ class LightMapper {
 		for ( let i = 0; i < samples; i ++ ) {
 
 			this._sample.value = this.samples;
+			this._weight.value = this._sampleWeight( this.samples );
 			this._jitter.value.set( halton( this.samples + 1, 2 ) - 0.5, halton( this.samples + 1, 3 ) - 0.5 ).multiplyScalar( 2 / this.size );
 
 			for ( const page of this._pages ) {
@@ -675,6 +694,25 @@ class LightMapper {
 		this._noise = Math.sqrt( this._variance / this._varianceSamples / samples );
 
 		return this._noise;
+
+	}
+
+	/**
+	 * Returns the weight of a sample. Similar samples added to a half float sum round in the same
+	 * direction, so their weights are spread over the rounding step of the sum, which grows with it,
+	 * and the samples round up and down evenly. The weights are also scaled down, so the sums of
+	 * bright texels stay below the largest half float, 65504, since the resolve divides by the sum
+	 * of the weights. Float sums weigh all samples the same.
+	 *
+	 * @private
+	 * @param {number} index - The index of the sample.
+	 * @return {number} The weight.
+	 */
+	_sampleWeight( index ) {
+
+		if ( this._floatSums ) return 1;
+
+		return ( 1 + ( 2 * halton( index + 1, 5 ) - 1 ) * Math.min( index / 2048, 1 ) ) * HALF_FLOAT_WEIGHT;
 
 	}
 
@@ -934,7 +972,7 @@ class LightMapper {
 		material.depthTest = false;
 		material.depthWrite = false;
 
-		// additive blending, the sample count accumulates in alpha
+		// additive blending, the sample count, the sum of the sample weights, accumulates in alpha
 
 		material.blending = CustomBlending;
 		material.blendSrc = OneFactor;
@@ -965,7 +1003,8 @@ class LightMapper {
 		} )();
 
 		// the squared luminance of each sample accumulates in a second target, for variance estimates,
-		// and the directions in another one
+		// and the directions in another one. The color and the directions come weighted, see _sampleWeight(), the
+		// moments only accumulate in float sums, whose weights are 1
 
 		const outputs = ( value ) => {
 
@@ -975,7 +1014,7 @@ class LightMapper {
 
 			const moment = this.momentTexture !== null ? luminance( value.rgb ).pow2() : 0;
 
-			if ( direction !== null ) members.direction = vec4( lightDirection !== null ? direction.add( lightDirection ) : direction, moment );
+			if ( direction !== null ) members.direction = vec4( ( lightDirection !== null ? direction.add( lightDirection ) : direction ).mul( this._weight ), moment );
 			else if ( this.momentTexture !== null ) members.moment = moment;
 
 			return mrt( members );
@@ -989,13 +1028,13 @@ class LightMapper {
 			material.lightsNode = lights( directLights ).context( { positionView: modelViewMatrix.mul( positionLocal ).xyz.toVarying() } );
 			material.normalNode = flipNormal ? normalViewGeometry.negate() : normalViewGeometry;
 			material.emissiveNode = irradiance.div( Math.PI );
-			material.outputNode = vec4( output.rgb.mul( Math.PI ), 1 );
+			material.outputNode = vec4( output.rgb.mul( Math.PI ), 1 ).mul( this._weight );
 			if ( this.momentTexture !== null || direction !== null ) material.mrtNode = outputs( material.outputNode );
 			if ( lightDirection !== null ) material.setupLightingModel = () => new DirectionalLambertLightingModel( lightDirection );
 
 		} else {
 
-			material.fragmentNode = outputs( vec4( irradiance, 1 ) );
+			material.fragmentNode = outputs( vec4( irradiance, 1 ).mul( this._weight ) );
 
 		}
 

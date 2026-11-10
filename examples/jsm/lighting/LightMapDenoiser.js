@@ -365,8 +365,10 @@ class LightMapDenoiser {
 
 			const coord = ivec2( screenCoordinate.xy );
 			const sum = samples.load( coord );
+			// the count is the sum of the sample weights, which half float sums scale down, see LightMapper
+
 			const count = sum.a;
-			const mean = sum.rgb.div( count.max( 1 ) );
+			const mean = sum.rgb.div( count.max( 1e-8 ) );
 
 			// the standard deviation of the mean from the variance of the samples
 
