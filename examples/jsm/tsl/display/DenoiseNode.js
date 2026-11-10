@@ -273,6 +273,15 @@ class DenoiseNode extends Node {
 		this.noiseAwareClamp = uniform( true, 'bool' );
 
 		/**
+		 * Whether samples are weighted by `1 / ( 1 + luminance )` in the spatial filter and the temporal blend ( Karis
+		 * average ), so that a rare bright sample, e.g. a firefly, cannot dominate the average. It darkens bright,
+		 * noisy regions slightly.
+		 *
+		 * @type {UniformNode<bool>}
+		 */
+		this.fireflyWeighting = uniform( false, 'bool' );
+
+		/**
 		 * Whether the node filters every frame in which it is used. Otherwise it filters once when
 		 * {@link DenoiseNode#textureNeedsUpdate} is set, e.g. when a light map is baked.
 		 *
@@ -1022,7 +1031,12 @@ class DenoiseNode extends Node {
 					const bounded = vec4( this.historyClamp.select( previousColor.rgb.clamp( minimum, maximum ), previousColor.rgb ), alpha ? previousColor.a.clamp( currentMin.a.sub( alphaRange ), currentMax.a.add( alphaRange ) ) : 1 );
 
 					const a = float( 1 ).div( age ).toVar();
-					result.assign( mix( bounded, current, a ) );
+
+					// the firefly weighting: the weight of each side divided by 1 + its luminance
+
+					const weightCurrent = a.div( luminance( current.rgb ).add( 1 ) );
+					const weightHistory = a.oneMinus().div( luminance( bounded.rgb ).add( 1 ) );
+					result.assign( mix( bounded, current, this.fireflyWeighting.select( weightCurrent.div( weightCurrent.add( weightHistory ) ), a ) ) );
 
 					// the exponential moving variance of the luminance, stable in half floats
 
@@ -1401,7 +1415,8 @@ class DenoiseNode extends Node {
 
 							}
 
-							const weight = similarity.mul( exp( exponent.negate() ) ).mul( kernelWeight ).toVar();
+							const fireflyWeight = this.fireflyWeighting.select( float( 1 ).div( luminance( value.rgb ).add( 1 ) ), 1 );
+							const weight = similarity.mul( exp( exponent.negate() ) ).mul( kernelWeight ).mul( fireflyWeight ).toVar();
 							const deviation2 = weight.pow2().mul( value.a.pow2() ).toVar();
 
 							moments.addAssign( vec3( weight, weight.mul( fx ), weight.mul( fy ) ) );

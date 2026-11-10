@@ -149,7 +149,8 @@
 				maxFrames: 32,
 				antiLagNoiseGate: true,
 				historyClamp: true,
-				noiseAwareClamp: true
+				noiseAwareClamp: true,
+				fireflyWeighting: false
 			},
 
 			post: {
@@ -375,6 +376,7 @@
 			denoiseGui.add( params.denoise, 'antiLagNoiseGate' ).name( 'anti-lag noise gate' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'historyClamp' ).name( 'history clamp' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'noiseAwareClamp' ).name( 'noise-aware clamp' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'fireflyWeighting' ).name( 'firefly weighting' ).onChange( applyParams );
 
 			// Concise UI for Directional Light controls
 			const lightGui = renderer.inspector.createParameters( 'Light' ).close();
@@ -419,6 +421,7 @@
 				denoiseNode.antiLagNoiseGate.value = params.denoise.antiLagNoiseGate;
 				denoiseNode.historyClamp.value = params.denoise.historyClamp;
 				denoiseNode.noiseAwareClamp.value = params.denoise.noiseAwareClamp;
+				denoiseNode.fireflyWeighting.value = params.denoise.fireflyWeighting;
 
 			}
 
