@@ -90,6 +90,7 @@ const ALPHA_BLEND = 2;
  * `openSurfaces`, the back of the faces of closed meshes is black.
  *
  * This class can only be used with {@link WebGPURenderer} and a WebGPU backend.
+ * Requires `three-mesh-bvh` 0.9.18 or later.
  *
  * @three_import import { RayTracedRadiosity, rayTracedRadiosityIrradiance } from 'three/addons/lighting/RayTracedRadiosity.js';
  */
@@ -1353,14 +1354,17 @@ class RayTracedRadiosity {
 			`;
 
 		// the merged geometry is one cluster, so the top level of the BVH is a single leaf that points to
-		// the root of the triangles. The traversal tests both children of a node, descends into the
-		// nearer one and pushes the other one with its entry distance, which is skipped once a closer
-		// hit is found, see "Understanding the Efficiency of Ray Traversal on GPUs" (Aila and Laine, 2009).
-		// Hits at the same distance, e.g. of coplanar triangles, go to the first triangle, so the result
-		// does not depend on the order of the traversal
+		// the root of the triangles. A node stores the bounds of both of its children, followed by the
+		// offset of its right child or of its triangles and by its split axis or its triangle count with a
+		// leaf flag. The traversal tests both children of a node, descends into the nearer one and pushes
+		// the other one with its entry distance, which is skipped once a closer hit is found, see
+		// "Understanding the Efficiency of Ray Traversal on GPUs" (Aila and Laine, 2009). Hits at the same
+		// distance, e.g. of coplanar triangles, go to the first triangle, so the result does not depend on
+		// the order of the traversal
 
 		const nodeArray = nodes.proxyNode.value.array;
-		const root = ( nodeArray[ 7 ] & 0xffff0000 ) !== 0 ? nodeArray[ 6 ] : 0;
+		const info = 2 * bvhNodeBoundsStruct.getLength();
+		const root = ( nodeArray[ info + 1 ] & 0xffff0000 ) !== 0 ? nodeArray[ info ] : 0;
 
 		const traverse = ( name, resultStruct, range, closest ) => wgslTagFn/* wgsl */`
 			// fn
@@ -1373,8 +1377,10 @@ class RayTracedRadiosity {
 				var stackDistance: array<f32, ${ STACK_DEPTH }>;
 				var pointer = 0u;
 
+				// the bounds of a node are stored in its parent, so the root is always entered
+
 				var current = ${ root }u;
-				var pop = ${ boundsDistance }( ray.origin, invDir, ${ nodes }[ current ].bounds, limit ) < 0.0;
+				var pop = false;
 
 				loop {
 
@@ -1411,8 +1417,8 @@ class RayTracedRadiosity {
 
 							let left = current + 1u;
 							let right = current + node.rightChildOrTriangleOffset;
-							let leftDistance = ${ boundsDistance }( ray.origin, invDir, ${ nodes }[ left ].bounds, limit );
-							let rightDistance = ${ boundsDistance }( ray.origin, invDir, ${ nodes }[ right ].bounds, limit );
+							let leftDistance = ${ boundsDistance }( ray.origin, invDir, node.leftBounds, limit );
+							let rightDistance = ${ boundsDistance }( ray.origin, invDir, node.rightBounds, limit );
 
 							if ( leftDistance >= 0.0 && rightDistance >= 0.0 ) {
 
