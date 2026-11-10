@@ -39,7 +39,7 @@
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
-			const params = { output: 'Beauty', animate: true, orbit: false, roughness: 0.18, steps: 32, denoise: true, traa: true, binaryRefine: true, maxDistance: 20, thickness: 0.12, luminancePhi: 3 };
+			const params = { output: 'Beauty', animate: true, orbit: false, roughness: 0.18, quality: 0.5, denoise: true, traa: true, binaryRefine: true, maxDistance: 20, thickness: 0.12, luminancePhi: 3 };
 			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x18212c );
 			const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 60 );
@@ -155,7 +155,7 @@
 			displayGui.add( params, 'traa' ).name( 'TRAA' ).onChange( updateOutput );
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
-			ssrGui.add( params, 'steps', 1, 64, 1 ).name( 'Steps' ).info( 'Maximum ray-march steps for one GGX ray per pixel per frame. Binary refinement adds up to 8 steps.' ).onChange( updateParameters );
+			ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( updateParameters );
 			ssrGui.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( updateParameters );
 			ssrGui.add( params, 'maxDistance', 0.01, 50, 0.01 ).name( 'Max distance' ).onChange( updateParameters );
 			ssrGui.add( params, 'thickness', 0, 0.5, 0.001 ).name( 'Thickness' ).onChange( updateParameters );
@@ -176,7 +176,7 @@
 
 			function updateParameters() {
 
-				reflection.maxSteps.value = params.steps;
+				reflection.quality.value = params.quality;
 				reflection.binaryRefine = params.binaryRefine;
 				reflection.maxDistance.value = params.maxDistance;
 				reflection.thickness.value = params.thickness;

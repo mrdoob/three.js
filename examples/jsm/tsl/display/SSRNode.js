@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
+import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
@@ -8,6 +8,9 @@ import ImportanceSampledEnvironment from './ImportanceSampledEnvironment.js';
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 let _rendererState;
+
+// Maximum ray-march step count; `quality` (0..1) scales it to a fixed per-ray count.
+const MAX_STEPS = 64;
 
 /**
  * @typedef {Object} SSRNodeOptions
@@ -237,14 +240,17 @@ class SSRNode extends Node {
 		this.maxLuminance = uniform( 10 );
 
 		/**
-		 * Maximum ray-march steps per reflection ray, for both mirror and stochastic tracing.
-		 * Must be a positive integer. Rays can terminate early; binary refinement adds
-		 * up to eight extra steps. This does not control the number of rays per pixel.
+		 * This parameter controls how detailed the raymarching process works.
+		 * The value ranges is `[0,1]` where `1` means best quality (the maximum number
+		 * of raymarching iterations/samples) and `0` means no samples at all.
 		 *
-		 * @type {UniformNode<int>}
-		 * @default 32
+		 * A quality of `0.5` is usually sufficient for most use cases. Try to keep
+		 * this parameter as low as possible. Larger values result in noticeable more
+		 * overhead.
+		 *
+		 * @type {UniformNode<float>}
 		 */
-		this.maxSteps = uniform( 32, 'int' );
+		this.quality = uniform( 0.5 );
 
 		/**
 		 * Mirror bias for the stochastic GGX sampling. Concentrates the reflected rays toward
@@ -1057,8 +1063,12 @@ class SSRNode extends Node {
 			// dominant-axis ray length in texels (used for the per-step floor below)
 			const rayLen = max( xLen.abs(), yLen.abs() ).max( 1 ).toVar();
 
-			// Both tracing modes use the explicit per-ray step budget.
-			const totalStep = this.maxSteps.max( 1 ).toConst();
+			// Blur traces a single mirror ray, so spend steps in proportion to the ray's screen-space
+			// length (cheap for the short rays that dominate). Scatter needs a fixed, bounded count for
+			// coherent stochastic sampling; each step then spans the whole ray as rayVec / totalStep.
+			const totalStep = int( this.stochastic === false
+				? trunc( max( abs( xLen ), abs( yLen ) ).mul( this.quality.clamp() ) ).max( int( 1 ) ).toConst()
+				: this.quality.clamp().mul( MAX_STEPS ).max( float( 1 ) ) ).toConst();
 
 			const xSpan = xLen.div( totalStep ).toVar();
 			const ySpan = yLen.div( totalStep ).toVar();
@@ -1112,8 +1122,7 @@ class SSRNode extends Node {
 			const canRefine = bool( false ).toVar();
 
 			// March from d0 toward d1, looking for an intersection with the depth buffer.
-			// Include the last step so a one-step budget can trace a ray.
-			Loop( { start: int( 1 ), end: totalStep, condition: '<=' }, ( { i } ) => {
+			Loop( { start: int( 1 ), end: totalStep }, ( { i } ) => {
 
 				// Exponentially-distributed ray parameter, shared by the sample position and ray depth.
 				const s = sampleFraction( float( i ) ).toVar();

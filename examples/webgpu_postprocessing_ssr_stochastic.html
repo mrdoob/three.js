@@ -79,7 +79,7 @@
 
 			ssr: {
 				resolutionScale: 1,
-				steps: 16,
+				quality: 0.25,
 				mirrorBias: 0,
 				maxDistance: 0.4,
 				intensity: 1,
@@ -274,7 +274,7 @@
 			displayGui.add( params.post, 'traa' ).name( 'TRAA' ).onChange( updateOutputNode );
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
-			ssrGui.add( params.ssr, 'steps', 1, 64, 1 ).name( 'Steps' ).info( 'Maximum ray-march steps for one GGX ray per pixel per frame. Binary refinement adds up to 8 steps.' ).onChange( applyParams );
+			ssrGui.add( params.ssr, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'binaryRefine' ).name( 'Binary refine' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'maxDistance', 0.01, 50, 0.01 ).name( 'Max distance' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'thickness', 0, 0.5, 0.001 ).name( 'Thickness' ).onChange( applyParams );
@@ -320,7 +320,7 @@
 			if ( ! ssrNode ) return;
 
 			ssrNode.resolutionScale = params.ssr.resolutionScale;
-			ssrNode.maxSteps.value = params.ssr.steps;
+			ssrNode.quality.value = params.ssr.quality;
 			ssrNode.mirrorBias.value = params.ssr.mirrorBias;
 			// stepExponent / screenEdgeFadeBlack / binaryRefine are build-time constants: assigning
 			// them recompiles the SSR material (the setters no-op when the value is unchanged).

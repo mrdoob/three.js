@@ -136,12 +136,6 @@ Absolute env luminance cap. HDR env samples above this are scaled down (hue pres
 
 Default is `10`.
 
-### .maxSteps : UniformNode.<int>
-
-Maximum ray-march steps per reflection ray, for both mirror and stochastic tracing. Must be a positive integer. Rays can terminate early; binary refinement adds up to eight extra steps. This does not control the number of rays per pixel.
-
-Default is `32`.
-
 ### .metalnessNode : Node.<float>
 
 Per-pixel metalness, used to drive the GGX reflection sampling and the non-metal early-out. When `null`, the shader treats surfaces as non-metallic.
@@ -155,6 +149,12 @@ Default is `0`.
 ### .normalNode : Node.<vec3>
 
 A node that represents the beauty pass's normals.
+
+### .quality : UniformNode.<float>
+
+This parameter controls how detailed the raymarching process works. The value ranges is `[0,1]` where `1` means best quality (the maximum number of raymarching iterations/samples) and `0` means no samples at all.
+
+A quality of `0.5` is usually sufficient for most use cases. Try to keep this parameter as low as possible. Larger values result in noticeable more overhead.
 
 ### .reflectNonMetals : boolean
 
