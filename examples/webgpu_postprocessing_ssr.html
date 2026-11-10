@@ -44,7 +44,9 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec4, velocity, Fn, colorSpaceToWorking } from 'three/tsl';
+		import { reprojectedRadiance } from 'three/addons/tsl/display/ReprojectedRadianceNode.js';
+		import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -62,11 +64,12 @@
 			thickness: 0.03,
 			binaryRefine: false,
 			roughness: 1,
-			enabled: true
+			enabled: true,
+			maxFrames: 20
 		};
 
 		let camera, scene, model, renderer, renderPipeline, ssrPass;
-		let controls;
+		let controls, radianceHistory, denoiseNode;
 
 		init();
 
@@ -148,7 +151,8 @@
 			scenePass.setMRT( mrt( {
 				output: output,
 				normal: packNormalToRGB( normalView ),
-				metalrough: vec2( metalness, roughness ) // pack metalness and roughness into a single attachment
+				metalrough: vec2( metalness, roughness ), // pack metalness and roughness into a single attachment
+				velocity: velocity
 			} ) );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
@@ -162,6 +166,7 @@
 				return scenePass.getLinearDepthNode();
 
 			} );
+			const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
 			const scenePassMetalRough = scenePass.getTextureNode( 'metalrough' ).toInspector( 'Metalness-Roughness' );
 
 			// optional: optimize bandwidth by reducing the texture precision for normals and metal/roughness
@@ -180,14 +185,40 @@
 
 			//
 
-			ssrPass = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+			radianceHistory = reprojectedRadiance( scenePass, scenePassDepth, sceneNormal, camera );
+			const traceSource = sample( coordinate => {
+
+				const history = radianceHistory.sample( coordinate );
+				// Rejected history contributes no reflected light.
+				return vec4( history.rgb.mul( history.a ), 1 );
+
+			} );
+
+			ssrPass = ssr( traceSource, scenePassDepth, sceneNormal, {
+				camera,
 				metalnessNode: scenePassMetalRough.r,
 				roughnessNode: scenePassMetalRough.g
 			} ).toInspector( 'SSR' );
 
+			const ssrTexture = ssrPass.getTextureNode();
+			denoiseNode = temporalDenoise( ssrTexture, {
+				depth: scenePassDepth,
+				normal: sceneNormal,
+				camera,
+				velocity: scenePassVelocity,
+				roughness: sample( uv => scenePassMetalRough.sample( uv ).g ),
+				hitDistance: sample( uv => ssrTexture.sample( uv ).a )
+			} );
+
 			// blend SSR over beauty (SSR outputs premultiplied color, so use additive blending)
 
-			const outputNode = smaa( scenePassColor.add( ssrPass.rgb ) );
+			const beauty = smaa( scenePassColor.add( denoiseNode.getTextureNode().rgb ) );
+			const outputNode = Fn( ( _, builder ) => {
+
+				radianceHistory.build( builder );
+				return beauty;
+
+			} )();
 
 			renderPipeline.outputNode = outputNode;
 
@@ -209,17 +240,11 @@
 			ssrFolder.add( params, 'intensity', 0, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'thickness', 0, 0.05 ).onChange( updateParameters );
 			ssrFolder.add( params, 'binaryRefine' ).name( 'binary refine' ).onChange( updateParameters );
+			ssrFolder.add( params, 'maxFrames', 1, 32, 1 ).name( 'SSR history frames' ).onChange( updateParameters );
 			ssrFolder.add( params, 'enabled' ).onChange( () => {
 
-				if ( params.enabled === true ) {
-
-					renderPipeline.outputNode = outputNode;
-
-				} else {
-
-					renderPipeline.outputNode = scenePass;
-
-				}
+				denoiseNode.reset();
+				renderPipeline.outputNode = params.enabled ? outputNode : radianceHistory;
 
 				renderPipeline.needsUpdate = true;
 
@@ -245,6 +270,7 @@
 
 		function updateParameters() {
 
+			denoiseNode.maxFrames.value = params.maxFrames;
 			ssrPass.quality.value = params.quality;
 			// blurQuality is a build-time constant: assigning it recompiles the blur material
 			// (the setter no-ops when the value is unchanged).
@@ -258,6 +284,8 @@
 		}
 
 		function onWindowResize() {
+
+			radianceHistory?.reset();
 
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();
