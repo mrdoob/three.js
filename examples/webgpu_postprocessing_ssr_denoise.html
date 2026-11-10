@@ -162,6 +162,16 @@
 		let gammaUniform, contrastUniform, saturationUniform;
 		const denoiseEnabled = uniform( 1 );
 		const traaMaxFrames = uniform( 20 );
+		const previousJitter = new THREE.Vector2();
+		const currentJitter = new THREE.Vector2();
+		const jitterDelta = uniform( new THREE.Vector2() ).onRenderUpdate( () => {
+
+			// TRAA excludes projection jitter from velocity; the scene color still contains it.
+			const e = camera.projectionMatrix.elements;
+			currentJitter.set( - e[ 8 ] * 0.5, e[ 9 ] * 0.5 );
+			return jitterDelta.value.copy( previousJitter ).sub( currentJitter );
+
+		} );
 
 		init();
 
@@ -266,7 +276,7 @@
 			// trace the previous frame's radiance, reprojected with the motion of the hit
 
 			const previousColor = scenePass.getPreviousTextureNode( 'output' );
-			const traceSource = sample( ( uv ) => previousColor.sample( uv.sub( scenePassVelocity.sample( uv ).xy.mul( vec2( 0.5, - 0.5 ) ) ) ) );
+			const traceSource = sample( ( uv ) => previousColor.sample( uv.sub( scenePassVelocity.sample( uv ).xy.mul( vec2( 0.5, - 0.5 ) ) ).add( jitterDelta ) ) );
 
 			ssrNode = ssr( traceSource, scenePassDepth, sceneNormal, {
 				camera,
@@ -513,6 +523,7 @@
 			controls.update();
 
 			postProcessing.render();
+			previousJitter.copy( currentJitter );
 
 		}
 
