@@ -4,6 +4,7 @@ import NodeVarying from './NodeVarying.js';
 import NodeVar from './NodeVar.js';
 import NodeCode from './NodeCode.js';
 import NodeCache from './NodeCache.js';
+import Node from './Node.js';
 import ParameterNode from './ParameterNode.js';
 import StructType from './StructType.js';
 import FunctionNode from '../code/FunctionNode.js';
@@ -135,6 +136,8 @@ const _isMatrixCache = new Map();
 const _isIntegerCache = new Map();
 
 const _checkWriteUsage = ( data ) => {
+
+	if ( data === undefined ) return false;
 
 	if ( data.writeUsageCount > 0 ) return true;
 
@@ -284,9 +287,9 @@ class NodeBuilder {
 		/**
 		 * A dictionary that assigns each node to a unique hash.
 		 *
-		 * @type {Object<number,Node>}
+		 * @type {Map<string,Node>}
 		 */
-		this.hashNodes = {};
+		this.hashNodes = new Map();
 
 		/**
 		 * A reference to a node material observer.
@@ -856,7 +859,7 @@ class NodeBuilder {
 	 */
 	setHashNode( node, hash ) {
 
-		this.hashNodes[ hash ] = node;
+		this.hashNodes.set( hash, node );
 
 	}
 
@@ -871,7 +874,13 @@ class NodeBuilder {
 
 			this.nodes.add( node );
 
-			this.setHashNode( node, node.getHash( this ) );
+			// the default hash is unique per node, so only nodes with a custom hash can be shared
+
+			if ( node.getHash !== Node.prototype.getHash ) {
+
+				this.setHashNode( node, node.getHash( this ) );
+
+			}
 
 		}
 
@@ -1075,7 +1084,7 @@ class NodeBuilder {
 	 */
 	getNodeFromHash( hash ) {
 
-		return this.hashNodes[ hash ];
+		return this.hashNodes.get( hash );
 
 	}
 
@@ -2206,17 +2215,19 @@ class NodeBuilder {
 
 		if ( nodeData === undefined ) {
 
-			nodeData = {};
+			// define all stages upfront so the objects share the same shape
+
+			nodeData = { vertex: undefined, fragment: undefined, compute: undefined, any: undefined };
 
 			cache.setData( node, nodeData );
 
 		}
 
-		if ( nodeData[ shaderStage ] === undefined ) nodeData[ shaderStage ] = new NodeData();
+		let data = nodeData[ shaderStage ];
+
+		if ( data === undefined ) nodeData[ shaderStage ] = data = new NodeData();
 
 		//
-
-		let data = nodeData[ shaderStage ];
 
 		if ( this.subBuildLayers.length === 0 ) return data;
 
