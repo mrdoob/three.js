@@ -24,7 +24,8 @@ const MAX_STEPS = 64;
  * @property {boolean} [envImportanceSampling=false] - When `true`, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.
  * @property {Node} [diffuseNode=null] - Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
  * @property {boolean} [binaryRefine=false] - Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
- * @property {boolean} [outputCoverage=false] - Also writes screen-space hit coverage to a separate texture, available through getCoverageNode(). Requires stochastic tracing. RGB and hit-distance alpha are unchanged.
+ * @property {boolean} [outputCoverage=false] - Also writes screen-space hit coverage to a separate texture, available through getCoverageNode(). RGB and hit-distance alpha are unchanged.
+ * @property {Node<float>} [maxSteps=null] - Optional explicit ray-march step count. When omitted, quality controls the step count as before.
  * @property {Camera} [camera=null] - Camera the scene is rendered with. Inferred from the color pass when omitted.
  */
 
@@ -67,12 +68,11 @@ class SSRNode extends Node {
 			envImportanceSampling = false,
 			diffuseNode = null,
 			binaryRefine = false,
-			outputCoverage = false
+			outputCoverage = false,
+			maxSteps = null
 		} = options;
 
 		let camera = options.camera ?? null;
-
-		if ( outputCoverage && ! stochastic ) throw new Error( 'THREE.SSRNode: Coverage output requires stochastic tracing.' );
 
 		/**
 		 * Whether to write screen-space hit coverage to a separate texture.
@@ -82,6 +82,13 @@ class SSRNode extends Node {
 		 */
 		this.outputCoverage = outputCoverage;
 		this._coverage = outputCoverage ? property( 'float' ) : null;
+
+		/**
+		 * Optional explicit ray-march step count, overriding the quality-based count.
+		 *
+		 * @type {?Node<float>}
+		 */
+		this.maxSteps = maxSteps !== null ? nodeObject( maxSteps ) : null;
 
 		/**
 		 * When `true`, the reflection direction is varied per pixel with stochastic GGX rays
@@ -444,9 +451,10 @@ class SSRNode extends Node {
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._blurRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, minFilter: LinearMipmapLinearFilter, magFilter: LinearFilter } );
+		this._blurRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, minFilter: LinearMipmapLinearFilter, magFilter: LinearFilter, count: outputCoverage && ! stochastic ? 2 : 1 } );
+		if ( outputCoverage && ! stochastic ) this._blurRenderTarget.textures[ 1 ].name = 'SSRNode.CoverageBlur';
 		this._blurRenderTarget.texture.name = 'SSRNode.Blur';
-		this._blurRenderTarget.texture.mipmaps.push( {}, {}, {}, {}, {} );
+		for ( const texture of this._blurRenderTarget.textures ) texture.mipmaps.push( {}, {}, {}, {}, {} );
 
 		/**
 		 * The material that is used to render the effect.
@@ -577,7 +585,10 @@ class SSRNode extends Node {
 	 */
 	_buildBlurMaterial() {
 
-		this._blurMaterial.fragmentNode = boxBlur( texture( this._ssrRenderTarget.texture ), { size: this._blurQuality, separation: this._blurSpread } );
+		const blurred = boxBlur( texture( this._ssrRenderTarget.texture ), { size: this._blurQuality, separation: this._blurSpread } );
+		this._blurMaterial.fragmentNode = this.outputCoverage
+			? outputStruct( blurred, boxBlur( texture( this._ssrRenderTarget.textures[ 1 ] ), { size: this._blurQuality, separation: this._blurSpread } ) )
+			: blurred;
 		this._blurMaterial.needsUpdate = true;
 
 	}
@@ -683,12 +694,32 @@ class SSRNode extends Node {
 	}
 
 	/**
+	 * Returns the unblurred reflection color and hit distance.
+	 *
+	 * @return {PassTextureNode} The raw reflection texture.
+	 */
+	getRawTextureNode() {
+
+		return this._textureNode;
+
+	}
+
+	/**
 	 * Returns screen-space hit coverage in the red channel. Requires
 	 * `outputCoverage=true`. Misses have zero coverage; hits include the screen-edge fade.
 	 *
+	 * @param {boolean} [blurred=false] - Return roughness-dependent blurred coverage for mirror tracing.
 	 * @return {PassTextureNode} The coverage texture.
 	 */
-	getCoverageNode() {
+	getCoverageNode( blurred = false ) {
+
+		if ( blurred && this.stochastic === false && this.roughnessNode !== null ) {
+
+			const mips = this._blurRenderTarget.texture.mipmaps.length - 1;
+			const lod = this.roughnessNode.mul( this.roughnessNode ).mul( mips ).clamp( 0, mips );
+			return this._blurredCoverageTextureNode ??= passTexture( this, this._blurRenderTarget.textures[ 1 ] ).level( lod );
+
+		}
 
 		return this._coverageTextureNode ??= passTexture( this, this._ssrRenderTarget.textures[ 1 ] );
 
@@ -1098,7 +1129,7 @@ class SSRNode extends Node {
 			// Blur traces a single mirror ray, so spend steps in proportion to the ray's screen-space
 			// length (cheap for the short rays that dominate). Scatter needs a fixed, bounded count for
 			// coherent stochastic sampling; each step then spans the whole ray as rayVec / totalStep.
-			const totalStep = int( this.stochastic === false
+			const totalStep = int( this.maxSteps !== null ? this.maxSteps.max( 1 ) : this.stochastic === false
 				? trunc( max( abs( xLen ), abs( yLen ) ).mul( this.quality.clamp() ) ).max( int( 1 ) ).toConst()
 				: this.quality.clamp().mul( MAX_STEPS ).max( float( 1 ) ) ).toConst();
 
@@ -1155,7 +1186,7 @@ class SSRNode extends Node {
 
 			// March from d0 toward d1, looking for an intersection with the depth buffer.
 			// Include the last stochastic step so a one-step budget can trace a ray.
-			Loop( { start: int( 1 ), end: totalStep, condition: this.stochastic ? '<=' : '<' }, ( { i } ) => {
+			Loop( { start: int( 1 ), end: totalStep, condition: this.stochastic || this.maxSteps !== null ? '<=' : '<' }, ( { i } ) => {
 
 				// Exponentially-distributed ray parameter, shared by the sample position and ray depth.
 				const s = sampleFraction( float( i ) ).toVar();
@@ -1386,7 +1417,9 @@ class SSRNode extends Node {
 
 		}
 
-		this._copyMaterial.fragmentNode = reflectionBuffer;
+		this._copyMaterial.fragmentNode = this.outputCoverage && this.stochastic === false
+			? outputStruct( reflectionBuffer, texture( this._ssrRenderTarget.textures[ 1 ] ) )
+			: reflectionBuffer;
 		this._copyMaterial.needsUpdate = true;
 
 		//

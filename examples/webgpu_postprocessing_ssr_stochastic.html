@@ -2,13 +2,13 @@
 <html lang="en">
 
 	<head>
-		<title>three.js webgpu - postprocessing - Screen Space Reflections (SSR) + denoise</title>
+		<title>three.js webgpu - postprocessing - Stochastic Screen Space Reflections (SSR)</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<meta property="og:title" content="three.js webgpu - postprocessing - Screen Space Reflections (SSR) + denoise">
+		<meta property="og:title" content="three.js webgpu - postprocessing - Stochastic Screen Space Reflections (SSR)">
 		<meta property="og:type" content="website">
-		<meta property="og:url" content="https://threejs.org/examples/webgpu_postprocessing_ssr_denoise.html">
-		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_postprocessing_ssr_denoise.jpg">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_postprocessing_ssr_stochastic.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_postprocessing_ssr_stochastic.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
@@ -18,11 +18,12 @@
 		<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 
 		<div class="title-wrapper">
-			<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>SSR + Denoising</span>
+			<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Stochastic SSR</span>
 		</div>
 
 		<small>
-			Screen Space Reflections with Spatiotemporal Denoising by <a href="https://x.com/0beqz" target="_blank" rel="noopener">0beqz</a>.<br />
+			Integrates multiple samples from a GGX stochastic distribution over space and time.<br />
+			Spatiotemporal Denoising by <a href="https://x.com/0beqz" target="_blank" rel="noopener">0beqz</a>.<br />
 			Dungeon - Low Poly Game Level Challenge by
 			Warkarma.<br />
 		</small>
