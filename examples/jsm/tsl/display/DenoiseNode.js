@@ -265,6 +265,14 @@ class DenoiseNode extends Node {
 		this.historyClamp = uniform( true, 'bool' );
 
 		/**
+		 * Temporal: whether the clamp of the long history is at least as wide as the noise of the difference of the
+		 * fast and long means ( 3 sigma ), so that noise alone does not drag the long history after the fast one.
+		 *
+		 * @type {UniformNode<bool>}
+		 */
+		this.noiseAwareClamp = uniform( true, 'bool' );
+
+		/**
 		 * Whether the node filters every frame in which it is used. Otherwise it filters once when
 		 * {@link DenoiseNode#textureNeedsUpdate} is set, e.g. when a light map is baked.
 		 *
@@ -1007,8 +1015,9 @@ class DenoiseNode extends Node {
 					age.assign( mix( age, 1, lag ) );
 					fast.assign( mix( fast, current.rgb, lag ) );
 
-					const minimum = fastMin.min( fast ).min( current.rgb );
-					const maximum = fastMax.max( fast ).max( current.rgb );
+					const margin = this.noiseAwareClamp.select( noise.mul( 3 ), 0 );
+					const minimum = fastMin.min( fast ).min( current.rgb ).min( fast.sub( margin ) );
+					const maximum = fastMax.max( fast ).max( current.rgb ).max( fast.add( margin ) );
 					const alphaRange = currentMax.a.sub( currentMin.a );
 					const bounded = vec4( this.historyClamp.select( previousColor.rgb.clamp( minimum, maximum ), previousColor.rgb ), alpha ? previousColor.a.clamp( currentMin.a.sub( alphaRange ), currentMax.a.add( alphaRange ) ) : 1 );
 
