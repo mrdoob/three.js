@@ -59,7 +59,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation, vec2, Fn, positionPrevious, textureSize, getViewPosition, isBackgroundDepth } from 'three/tsl';
+		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation, vec2, Fn, If, positionPrevious, textureSize, getViewPosition, isBackgroundDepth } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
@@ -126,6 +126,7 @@
 			roughness: 0.3,
 
 			ssr: {
+				traceSource: 'Current',
 				resolutionScale: 1,
 				quality: 0.25,
 				mirrorBias: 0,
@@ -156,6 +157,7 @@
 		let scenePassNode, combinedOutputNode, scenePassDepth, scenePassVelocity;
 		let gammaUniform, contrastUniform, saturationUniform;
 		const denoiseEnabled = uniform( 1 );
+		const tracePreviousFrame = uniform( false );
 		const previousJitter = new THREE.Vector2();
 		const currentJitter = new THREE.Vector2();
 		const currentProjectionInverse = new THREE.Matrix4();
@@ -278,52 +280,65 @@
 
 			const sceneNormal = sample( ( uv ) => unpackRGBToNormal( scenePassNormal.sample( uv ).rgb ) );
 
-			// trace the previous frame's radiance, reprojected with the motion of the hit
+			// Optionally trace the previous frame's radiance, reprojected with the motion of the hit.
 
 			const previousColor = scenePass.getPreviousTextureNode( 'output' );
 			const previousDepth = scenePass.getPreviousTextureNode( 'depth' );
 			const traceSource = sample( uv => Fn( () => {
 
-				const motion = scenePassVelocity.sample( uv ).toConst();
-				const historyUV = uv.sub( motion.xy.mul( vec2( 0.5, - 0.5 ) ) ).add( jitterDelta ).toConst();
-				const size = vec2( textureSize( previousDepth ) );
-				const pixel = historyUV.mul( size ).sub( 0.5 );
-				const base = pixel.floor();
-				const fraction = pixel.fract();
-				const inBounds = p => p.greaterThanEqual( 0 ).all().and( p.lessThanEqual( 1 ).all() );
-				const valid = historyValid.and( inBounds( historyUV ) )
-					.and( size.equal( historySize ).all() )
-					.and( vec2( textureSize( scenePassDepth ) ).equal( historySize ).all() )
-					.and( motion.z.lessThan( camera.near * - 1 ) );
+				const color = vec4( 0 ).toVar();
 
-				// Allow a small pixel footprint for depth variation on sloping surfaces, plus half-float rounding.
-				const pixelDepth = previousProjectionInverse.element( 1 ).y.abs().mul( motion.z.abs() ).mul( 3 ).div( size.y );
-				const tolerance = pixelDepth.max( motion.z.abs().mul( 0.002 ) ).max( 0.001 );
-				const radiance = vec3( 0 ).toVar();
-				const support = float( 0 ).toVar();
+				// Keep the reprojection and depth-validation lookups out of the current-frame path.
+				If( tracePreviousFrame, () => {
 
-				// Validate each bilinear tap so interpolation cannot pull color across an occlusion edge.
-				for ( let y = 0; y <= 1; y ++ ) {
+					const motion = scenePassVelocity.sample( uv ).toConst();
+					const historyUV = uv.sub( motion.xy.mul( vec2( 0.5, - 0.5 ) ) ).add( jitterDelta ).toConst();
+					const size = vec2( textureSize( previousDepth ) );
+					const pixel = historyUV.mul( size ).sub( 0.5 );
+					const base = pixel.floor();
+					const fraction = pixel.fract();
+					const inBounds = p => p.greaterThanEqual( 0 ).all().and( p.lessThanEqual( 1 ).all() );
+					const valid = historyValid.and( inBounds( historyUV ) )
+						.and( size.equal( historySize ).all() )
+						.and( vec2( textureSize( scenePassDepth ) ).equal( historySize ).all() )
+						.and( motion.z.lessThan( camera.near * - 1 ) );
 
-					for ( let x = 0; x <= 1; x ++ ) {
+					// Allow a small pixel footprint for depth variation on sloping surfaces, plus half-float rounding.
+					const pixelDepth = previousProjectionInverse.element( 1 ).y.abs().mul( motion.z.abs() ).mul( 3 ).div( size.y );
+					const tolerance = pixelDepth.max( motion.z.abs().mul( 0.002 ) ).max( 0.001 );
+					const radiance = vec3( 0 ).toVar();
+					const support = float( 0 ).toVar();
 
-						const tapUV = base.add( vec2( x, y ) ).add( 0.5 ).div( size ).toConst();
-						const depth = previousDepth.sample( tapUV ).r;
-						const viewZ = getViewPosition( tapUV, depth, previousProjectionInverse ).z;
-						const accepted = valid.and( inBounds( tapUV ) ).and( isBackgroundDepth( depth ).not() )
-							.and( viewZ.sub( motion.z ).abs().lessThanEqual( tolerance ) );
-						const weightX = x === 0 ? fraction.x.oneMinus() : fraction.x;
-						const weightY = y === 0 ? fraction.y.oneMinus() : fraction.y;
-						const weight = weightX.mul( weightY ).mul( accepted ).toConst();
-						radiance.addAssign( previousColor.sample( tapUV ).rgb.mul( weight ) );
-						support.addAssign( weight );
+					// Validate each bilinear tap so interpolation cannot pull color across an occlusion edge.
+					for ( let y = 0; y <= 1; y ++ ) {
+
+						for ( let x = 0; x <= 1; x ++ ) {
+
+							const tapUV = base.add( vec2( x, y ) ).add( 0.5 ).div( size ).toConst();
+							const depth = previousDepth.sample( tapUV ).r;
+							const viewZ = getViewPosition( tapUV, depth, previousProjectionInverse ).z;
+							const accepted = valid.and( inBounds( tapUV ) ).and( isBackgroundDepth( depth ).not() )
+								.and( viewZ.sub( motion.z ).abs().lessThanEqual( tolerance ) );
+							const weightX = x === 0 ? fraction.x.oneMinus() : fraction.x;
+							const weightY = y === 0 ? fraction.y.oneMinus() : fraction.y;
+							const weight = weightX.mul( weightY ).mul( accepted ).toConst();
+							radiance.addAssign( previousColor.sample( tapUV ).rgb.mul( weight ) );
+							support.addAssign( weight );
+
+						}
 
 					}
 
-				}
+					// Missing history contributes no radiance; never substitute an unrelated surface's color.
+					color.assign( vec4( radiance.div( support.max( 1e-6 ) ), 1 ) );
 
-				// Missing history contributes no radiance; never substitute an unrelated surface's color.
-				return vec4( radiance.div( support.max( 1e-6 ) ), 1 );
+				} ).Else( () => {
+
+					color.assign( scenePassColor.sample( uv ) );
+
+				} );
+
+				return color;
 
 			} )() );
 
@@ -396,6 +411,13 @@
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR settings' );
 			ssrGui.add( params, 'output', outputTypes ).onChange( updateOutputNode );
+			ssrGui.add( params.ssr, 'traceSource', [ 'Current', 'Previous' ] ).name( 'Trace source' ).onChange( () => {
+
+				tracePreviousFrame.value = params.ssr.traceSource === 'Previous';
+				historyValid.value = false;
+				denoiseNode.reset();
+
+			} );
 			ssrGui.add( params.ssr, 'quality', 0, 1 ).name( 'quality' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'mirrorBias', 0, 1 ).name( 'mirror bias' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'stepExponent', 1, 4, 0.5 ).name( 'step exponent' ).onChange( applyParams );
