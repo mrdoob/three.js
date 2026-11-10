@@ -48,7 +48,7 @@
 		import { reprojectedRadiance } from 'three/addons/tsl/display/ReprojectedRadianceNode.js';
 		import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
-		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
+		import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -212,9 +212,10 @@
 
 			// blend SSR over beauty (SSR outputs premultiplied color, so use additive blending)
 
-			const beauty = smaa( scenePassColor.add( denoiseNode.getTextureNode().rgb ) );
+			const beauty = traa( scenePassColor.add( denoiseNode.getTextureNode().rgb ), scenePassDepth, scenePassVelocity, camera );
 			const outputNode = Fn( ( _, builder ) => {
 
+				// Capture history with the jittered projection before TRAA clears it.
 				radianceHistory.build( builder );
 				return beauty;
 
