@@ -46,7 +46,6 @@
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
 			import { bayer16 } from 'three/addons/tsl/math/Bayer.js';
-			import { animatedInterleavedGradientNoise } from 'three/addons/tsl/utils/IGN.js';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
 			let renderer, scene, camera;
@@ -133,9 +132,7 @@
 
 				const volumetricMaterial = new THREE.VolumeNodeMaterial();
 				volumetricMaterial.steps = 12;
-				const bayerNoise = bayer16( screenCoordinate );
-				const animatedNoise = animatedInterleavedGradientNoise();
-				volumetricMaterial.offsetNode = bayerNoise; // Add dithering to reduce banding
+				volumetricMaterial.offsetNode = bayer16( screenCoordinate ); // Add dithering to reduce banding
 				volumetricMaterial.scatteringNode = Fn( ( { positionRay } ) => {
 
 					// Return the amount of fog based on the noise texture
@@ -240,19 +237,12 @@
 
 				const params = {
 					resolution: volumetricPass.getResolutionScale(),
-					denoise: true,
-					noiseAlgorithm: 'Bayer 16'
+					denoise: true
 				};
 
 				const gui = renderer.inspector.createParameters( 'Volumetric Lighting' );
 
 				const rayMarching = gui.addFolder( 'Ray Marching' );
-				rayMarching.add( params, 'noiseAlgorithm', [ 'Bayer 16', 'Animated IGN' ] ).name( 'noise algorithm' ).onChange( ( value ) => {
-
-					volumetricMaterial.offsetNode = value === 'Animated IGN' ? animatedNoise : bayerNoise;
-					volumetricMaterial.needsUpdate = true;
-
-				} );
 				rayMarching.add( params, 'resolution', .1, 1 ).onChange( ( resolution ) => {
 
 					volumetricPass.setResolutionScale( resolution );
