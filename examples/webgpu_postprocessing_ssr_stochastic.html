@@ -101,7 +101,6 @@
 
 			post: {
 				traa: true,
-				traaFrames: 20,
 				grading: { toneMapping: 'AgX', exposure: 1.57, gamma: 0.89, contrast: 1.31, saturation: 1 },
 			},
 		};
@@ -214,7 +213,6 @@
 
 			ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
 				stochastic: true,
-				outputCoverage: true,
 				diffuseNode: scenePassDiffuseColor,
 				metalnessNode: scenePassDiffuseColor.a,
 				roughnessNode: scenePassNormal.a,
@@ -228,9 +226,7 @@
 
 			const ssrTexture = ssrNode.getTextureNode();
 
-			const coverage = ssrNode.getCoverageNode();
-			denoiseNode = temporalDenoise( vec4( ssrTexture.rgb, coverage.r ), {
-				alpha: true,
+			denoiseNode = temporalDenoise( ssrTexture, {
 				depth: scenePassDepth,
 				normal: sceneNormal,
 				camera,
@@ -239,6 +235,8 @@
 				hitDistance: sample( ( uv ) => ssrTexture.sample( uv ).a )
 			} );
 			denoised = mix( ssrNode.rgb, denoiseNode.getTextureNode().rgb, denoiseEnabled ).toInspector( 'Denoise' );
+			// feed the denoised result + velocity back into SSR for multi-bounce reflections
+			ssrNode.setHistory( denoiseNode.getTexture(), scenePassVelocity );
 
 			const denoisePassBlend = vec4( denoised, ssrNode.a.greaterThan( 0 ).toVar() );
 
@@ -269,16 +267,11 @@
 			applyParams();
 			applyPost();
 
-			const outputTypes = { Beauty: 0, SSR: 1, 'SSR DN': 4, 'SSR coverage': 10, 'SSR coverage DN': 11 };
+			const outputTypes = { Beauty: 0, SSR: 1, 'SSR DN': 4 };
 
 			const displayGui = renderer.inspector.createParameters( 'Display' );
 			displayGui.add( params, 'output', outputTypes ).name( 'Output' ).onChange( updateOutputNode );
 			displayGui.add( params.post, 'traa' ).name( 'TRAA' ).onChange( updateOutputNode );
-			displayGui.add( params.post, 'traaFrames', 1, 64, 1 ).name( 'TRAA history frames' ).onChange( value => {
-
-				for ( const temporal of temporalOutputs.values() ) temporal.maxFrames.value = value;
-
-			} );
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
 			ssrGui.add( params.ssr, 'steps', 1, 64, 1 ).name( 'Steps' ).info( 'Maximum ray-march steps for one GGX ray per pixel per frame. Binary refinement adds up to 8 steps.' ).onChange( applyParams );
@@ -373,8 +366,6 @@
 				temporalOutputs.set( source, temporal );
 
 			}
-
-			temporal.maxFrames.value = params.post.traaFrames;
 			return sharpen( temporal, 0 );
 
 		}
@@ -402,8 +393,6 @@
 				case 0: node = applyPostProcessing( combinedOutputNode ); break; // Combined
 				case 1: node = applyGrading( vec4( ssrNode.rgb, 1 ) ); break; // SSR (Raw)
 				case 4: node = applyGrading( vec4( denoiseNode.getTextureNode().rgb, 1 ) ); break; // Denoised SSR
-				case 10: node = vec4( ssrNode.getCoverageNode().rrr, 1 ); break;
-				case 11: node = vec4( denoiseNode.getTextureNode().aaa, 1 ); break;
 
 			}
 

@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, property, outputStruct, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
+import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
@@ -24,7 +24,6 @@ const MAX_STEPS = 64;
  * @property {boolean} [envImportanceSampling=false] - When `true`, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.
  * @property {Node} [diffuseNode=null] - Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
  * @property {boolean} [binaryRefine=false] - Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
- * @property {boolean} [outputCoverage=false] - Also writes screen-space hit coverage to a separate texture, available through getCoverageNode(). RGB and hit-distance alpha are unchanged.
  * @property {Node<float>} [maxSteps=null] - Optional explicit ray-march step count. When omitted, quality controls the step count as before.
  * @property {Camera} [camera=null] - Camera the scene is rendered with. Inferred from the color pass when omitted.
  */
@@ -68,20 +67,10 @@ class SSRNode extends Node {
 			envImportanceSampling = false,
 			diffuseNode = null,
 			binaryRefine = false,
-			outputCoverage = false,
 			maxSteps = null
 		} = options;
 
 		let camera = options.camera ?? null;
-
-		/**
-		 * Whether to write screen-space hit coverage to a separate texture.
-		 * Fixed at construction time.
-		 *
-		 * @type {boolean}
-		 */
-		this.outputCoverage = outputCoverage;
-		this._coverage = outputCoverage ? property( 'float' ) : null;
 
 		/**
 		 * Optional explicit ray-march step count, overriding the quality-based count.
@@ -441,8 +430,7 @@ class SSRNode extends Node {
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._ssrRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, count: outputCoverage ? 2 : 1 } );
-		if ( outputCoverage ) this._ssrRenderTarget.textures[ 1 ].name = 'SSRNode.Coverage';
+		this._ssrRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._ssrRenderTarget.texture.name = 'SSRNode.SSR';
 
 		/**
@@ -671,9 +659,7 @@ class SSRNode extends Node {
 		if ( this._ssrFn === null ) return;
 
 		this._ssrMaterial.contextNode = context( this._sharedContext );
-		this._ssrMaterial.fragmentNode = this.outputCoverage
-			? outputStruct( this._ssrFn(), vec4( this._coverage, 0, 0, 1 ) )
-			: this._ssrFn();
+		this._ssrMaterial.fragmentNode = this._ssrFn();
 		this._ssrMaterial.needsUpdate = true;
 
 	}
@@ -686,29 +672,6 @@ class SSRNode extends Node {
 	getTextureNode() {
 
 		return ( this.stochastic === false && this.roughnessNode !== null ) ? this._blurredTextureNode : this._textureNode;
-
-	}
-
-	/**
-	 * Returns the unblurred reflection color and hit distance.
-	 *
-	 * @return {PassTextureNode} The raw reflection texture.
-	 */
-	getRawTextureNode() {
-
-		return this._textureNode;
-
-	}
-
-	/**
-	 * Returns screen-space hit coverage in the red channel. Requires
-	 * `outputCoverage=true`. Misses have zero coverage; hits include the screen-edge fade.
-	 *
-	 * @return {PassTextureNode} The coverage texture.
-	 */
-	getCoverageNode() {
-
-		return this._coverageTextureNode ??= passTexture( this, this._ssrRenderTarget.textures[ 1 ] );
 
 	}
 
@@ -920,8 +883,6 @@ class SSRNode extends Node {
 
 		const ssr = Fn( () => {
 
-			if ( this.outputCoverage ) this._coverage.assign( 0 );
-
 			const noise = this.stochastic === true ? sampleMarchNoise( uvNode, this._noiseIndex ) : null;
 			// reconstruct at the depth texel center
 
@@ -1052,12 +1013,10 @@ class SSRNode extends Node {
 
 					const hitBorderFactor = computeScreenBorderFactor( uvS, this.screenEdgeFade );
 					reflectColor.rgb.mulAssign( hitBorderFactor );
-					if ( this.outputCoverage ) this._coverage.mulAssign( hitBorderFactor );
 
 				} else {
 
 					const hitBorderFactor = computeScreenBorderFactor( uvS, hitBorderWidth );
-					if ( this.outputCoverage ) this._coverage.mulAssign( hitBorderFactor );
 
 					If( hitBorderFactor.lessThan( 1 ), () => {
 
@@ -1337,8 +1296,6 @@ class SSRNode extends Node {
 
 					// Multi-bounce: add the reprojected previous-frame reflection at the hit point.
 					reflectColor.rgb.assign( reprojectHitPointHistory( uvS, reflectColor.rgb ) );
-
-					if ( this.outputCoverage ) this._coverage.assign( 1 );
 
 					if ( this.stochastic === true ) applyHitEdgeFade( reflectColor, uvS, hitBorderWidth );
 

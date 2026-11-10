@@ -44,7 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec4, uniform, mix } from 'three/tsl';
+		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec4, uniform, mix, passTexture } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -154,11 +154,10 @@
 			const normal = sample( uv => unpackRGBToNormal( packedNormal.sample( uv ).rgb ) );
 			const surfaceRoughness = sample( uv => packedNormal.sample( uv ).a );
 			const reflection = ssr( beauty, depth, normal, {
-				outputCoverage: true, maxSteps: uniform( params.steps ), binaryRefine: params.binaryRefine,
+				maxSteps: uniform( params.steps ), binaryRefine: params.binaryRefine,
 				diffuseNode: albedo, metalnessNode: albedo.a, roughnessNode: surfaceRoughness
 			} ).toInspector( 'SSR' );
-			const raw = reflection.getRawTextureNode();
-			const coverage = reflection.getCoverageNode();
+			const raw = passTexture( reflection, reflection.getRenderTarget().texture );
 			const blurred = reflection.getTextureNode();
 			const blurEnabled = uniform( 1 );
 			const combined = beauty.rgb.add( mix( raw.rgb, blurred.rgb, blurEnabled ) );
@@ -172,12 +171,11 @@
 					case 'Beauty': view = spatialAA; break;
 					case 'SSR': view = vec4( raw.rgb, 1 ); break;
 					case 'SSR DN': view = vec4( blurred.rgb, 1 ); break;
-					case 'SSR coverage': view = vec4( coverage.rrr, 1 ); break;
 
 				}
 
 				pipeline.outputNode = view;
-				pipeline.outputColorTransform = ! params.output.includes( 'coverage' );
+				pipeline.outputColorTransform = true;
 				pipeline.needsUpdate = true;
 
 			}
@@ -191,7 +189,7 @@
 			// GUI
 
 			const displayGui = renderer.inspector.createParameters( 'Display' );
-			displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN', 'SSR coverage' ] ).name( 'Output' ).info( 'DN means denoise; this mirror example uses spatial blur rather than stochastic denoising.' ).onChange( updateOutput );
+			displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN' ] ).name( 'Output' ).info( 'DN means denoise; this mirror example uses spatial blur rather than stochastic denoising.' ).onChange( updateOutput );
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
 			ssrGui.add( params, 'steps', 1, 64, 1 ).name( 'Steps' ).info( 'Ray-march steps for one mirror ray per pixel. Binary refinement adds up to 8 steps.' ).onChange( updateParameters );

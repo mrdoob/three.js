@@ -39,7 +39,7 @@
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
-			const params = { output: 'Beauty', animate: true, orbit: false, roughness: 0.18, steps: 32, denoise: true, traa: true, traaFrames: 20, binaryRefine: true, maxDistance: 20, thickness: 0.12, luminancePhi: 3 };
+			const params = { output: 'Beauty', animate: true, orbit: false, roughness: 0.18, steps: 32, denoise: true, traa: true, binaryRefine: true, maxDistance: 20, thickness: 0.12, luminancePhi: 3 };
 			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x18212c );
 			const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 60 );
@@ -116,16 +116,13 @@
 			const normal = sample( uv => unpackRGBToNormal( packedNormal.sample( uv ).rgb ) );
 			const surfaceRoughness = sample( uv => packedNormal.sample( uv ).a );
 			const reflection = ssr( beauty, depth, normal, {
-				stochastic: true, outputCoverage: true, binaryRefine: params.binaryRefine,
+				stochastic: true, binaryRefine: params.binaryRefine,
 				diffuseNode: albedo, metalnessNode: albedo.a, roughnessNode: surfaceRoughness
 			} ).toInspector( 'SSR' );
 			const raw = reflection.getTextureNode();
-			const coverage = reflection.getCoverageNode();
-			// Filter coverage alongside the existing BRDF-weighted reflection color.
-			// Hit distance remains a separate guide, rather than doubling as coverage.
-			const denoiser = temporalDenoise( vec4( raw.rgb, coverage.r ), {
+			const denoiser = temporalDenoise( raw, {
 				camera, depth, normal, velocity: motion, roughness: surfaceRoughness,
-				alpha: true, hitDistance: sample( uv => raw.sample( uv ).a )
+				hitDistance: sample( uv => raw.sample( uv ).a )
 			} );
 			const filtered = denoiser.getTextureNode();
 			const denoiseEnabled = uniform( 1 );
@@ -141,13 +138,11 @@
 					case 'Beauty': view = params.traa ? temporalAA : spatialAA; break;
 					case 'SSR': view = vec4( raw.rgb, 1 ); break;
 					case 'SSR DN': view = vec4( filtered.rgb, 1 ); break;
-					case 'SSR coverage': view = vec4( coverage.rrr, 1 ); break;
-					case 'SSR coverage DN': view = vec4( filtered.aaa, 1 ); break;
 
 				}
 
 				pipeline.outputNode = view;
-				pipeline.outputColorTransform = ! params.output.includes( 'coverage' );
+				pipeline.outputColorTransform = true;
 				pipeline.needsUpdate = true;
 
 			}
@@ -156,9 +151,8 @@
 			let time = 0;
 
 			const displayGui = renderer.inspector.createParameters( 'Display' );
-			displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN', 'SSR coverage', 'SSR coverage DN' ] ).name( 'Output' ).onChange( updateOutput );
+			displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN' ] ).name( 'Output' ).onChange( updateOutput );
 			displayGui.add( params, 'traa' ).name( 'TRAA' ).onChange( updateOutput );
-			displayGui.add( params, 'traaFrames', 1, 64, 1 ).name( 'TRAA history frames' ).onChange( value => temporalAA.maxFrames.value = value );
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
 			ssrGui.add( params, 'steps', 1, 64, 1 ).name( 'Steps' ).info( 'Maximum ray-march steps for one GGX ray per pixel per frame. Binary refinement adds up to 8 steps.' ).onChange( updateParameters );
