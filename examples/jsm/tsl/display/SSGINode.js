@@ -70,7 +70,7 @@ class SSGINode extends Node {
 		this.beautyNode = beautyNode;
 
 		/**
-		 * Noise algorithm: 0 = analytic R², 1 = original IGN schedule, 2 = animated IGN, 3 = HSN.
+		 * Noise algorithm: 0 = analytic R², 1 = original IGN schedule, 2 = animated IGN, 3 = HHW.
 		 *
 		 * @type {UniformNode<uint>}
 		 * @default 1

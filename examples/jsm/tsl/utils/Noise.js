@@ -1,19 +1,19 @@
 import { Fn, If, array, float, fract, interleavedGradientNoise, rand, uint, vec2, vec4 } from 'three/tsl';
 import { bindAnalyticNoise } from './RNoise.js';
 import { animatedInterleavedGradientNoise } from './IGN.js';
-import { bindHoustonStratifiedNoise } from './HoustonStratifiedNoise.js';
+import { bindHierarchicalHashedWeyl } from './HierarchicalHashedWeyl.js';
 
 /** Noise algorithms available to screen-space effects. */
 export const noiseAlgorithms = {
 	'Analytic R²': 0,
 	'Interleaved Gradient Noise': 1,
 	'Animated Gradient Noise': 2,
-	'Houston Stratified Noise': 3
+	'Hierarchical Hashed Weyl': 3
 };
 
 /**
  * Binds four noise components to an effect's pixel resolution and algorithm uniform.
- * Offset IGN components are correlated; HSN provides independently seeded dimensions.
+ * Offset IGN components are correlated; HHW provides independently seeded dimensions.
  *
  * @param {Node<vec2>} resolution - Effect resolution.
  * @param {UniformNode<uint>} algorithm - Index in `noiseAlgorithms`.
@@ -23,7 +23,7 @@ export const noiseAlgorithms = {
 export function bindNoise( resolution, algorithm, seed = 0 ) {
 
 	const analytic = bindAnalyticNoise( resolution, seed );
-	const houston = bindHoustonStratifiedNoise( resolution, seed );
+	const hierarchical = bindHierarchicalHashedWeyl( resolution, seed );
 
 	return Fn( ( [ uvCoord, index ] ) => {
 
@@ -56,7 +56,7 @@ export function bindNoise( resolution, algorithm, seed = 0 ) {
 
 		} ).Else( () => {
 
-			result.assign( houston( uvCoord, index ) );
+			result.assign( hierarchical( uvCoord, index ) );
 
 		} );
 

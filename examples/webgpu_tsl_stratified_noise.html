@@ -32,12 +32,12 @@
 			</div>
 
 			<small>
-				White noise vs. analytic R² (SSR), <a href="https://ben3d.ca/blog/houston-stratified-noise" target="_blank" rel="noopener">Houston Stratified Noise</a> and animated <a href="https://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare/" target="_blank" rel="noopener">interleaved gradient noise</a> (Jorge Jimenez) by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/>A 1-bit dithered sphere or a uniform noise field, accumulated over time.<br/>Frames accumulated: <span id="frames">0</span>
+				White noise vs. analytic R² (SSR), Hierarchical Hashed Weyl and animated <a href="https://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare/" target="_blank" rel="noopener">interleaved gradient noise</a> (Jorge Jimenez).<br/>A 1-bit dithered sphere or a uniform noise field, accumulated over time.<br/>Frames accumulated: <span id="frames">0</span>
 			</small>
 		</div>
 
 		<div class="label" style="left: 0;">White Noise</div>
-		<div class="label" id="noiseLabel" style="right: 0;">Houston Stratified Noise</div>
+		<div class="label" id="noiseLabel" style="right: 0;">Hierarchical Hashed Weyl</div>
 
 		<script type="importmap">
 			{
@@ -57,13 +57,13 @@
 
 			import { bindAnalyticNoise } from 'three/addons/tsl/utils/RNoise.js';
 			import { animatedInterleavedGradientNoise } from 'three/addons/tsl/utils/IGN.js';
-			import { houstonStratifiedNoise } from 'three/addons/tsl/utils/HoustonStratifiedNoise.js';
+			import { hierarchicalHashedWeyl } from 'three/addons/tsl/utils/HierarchicalHashedWeyl.js';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const modes = { 'Sphere': 0, 'Uniform': 1 };
-			const noises = { 'Houston Stratified Noise': 4, 'Analytic R²': 5, 'Animated IGN': 0, 'IGN + Golden Ratio': 1, 'IGN + 4-Frame Offset': 2, 'Static IGN': 3 };
-			const params = { mode: 'Sphere', noise: 'Houston Stratified Noise', pixelSize: 2, temporalBlur: true, spatialBlur: true, animate: true };
+			const noises = { 'Hierarchical Hashed Weyl': 4, 'Analytic R²': 5, 'Animated IGN': 0, 'IGN + Golden Ratio': 1, 'IGN + 4-Frame Offset': 2, 'Static IGN': 3 };
+			const params = { mode: 'Sphere', noise: 'Hierarchical Hashed Weyl', pixelSize: 2, temporalBlur: true, spatialBlur: true, animate: true };
 
 			let renderer, computeQuad, displayQuad, targets, history, current, display, blurredDisplay;
 			let samples = 0;
@@ -100,11 +100,11 @@
 				const golden = ign.add( index.mul( uint( 2654435769 ) ).shiftRight( 8 ).toFloat().div( 16777216 ) ).fract();
 				const offset4 = ign.add( float( index.bitAnd( 1 ) ).mul( 0.5 ) ).add( float( index.shiftRight( 1 ).bitAnd( 1 ) ).mul( 0.25 ) ).fract();
 				const animated = animatedInterleavedGradientNoise( screenCoordinate, index );
-				const hsn = houstonStratifiedNoise( screenCoordinate, index, 1 );
+				const hhw = hierarchicalHashedWeyl( screenCoordinate, index, 1 );
 				// Match SSR's primary sample dimension and seed.
 				const analytic = bindAnalyticNoise( screenSize, 47 )( screenUV, index ).x;
 
-				const noise = left.select( white, noiseType.equal( 5 ).select( analytic, noiseType.equal( 4 ).select( hsn, noiseType.equal( 0 ).select( animated, noiseType.equal( 1 ).select( golden, noiseType.equal( 2 ).select( offset4, ign ) ) ) ) ) );
+				const noise = left.select( white, noiseType.equal( 5 ).select( analytic, noiseType.equal( 4 ).select( hhw, noiseType.equal( 0 ).select( animated, noiseType.equal( 1 ).select( golden, noiseType.equal( 2 ).select( offset4, ign ) ) ) ) ) );
 
 				// the same shaded sphere over a gradient in each half
 

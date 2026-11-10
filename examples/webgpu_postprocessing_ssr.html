@@ -189,7 +189,7 @@
 				metalnessNode: scenePassMetalRough.r,
 				roughnessNode: scenePassMetalRough.g
 			} ).toInspector( 'SSR' );
-			ssrPass.noiseAlgorithm.value = noiseAlgorithms[ 'Houston Stratified Noise' ];
+			ssrPass.noiseAlgorithm.value = noiseAlgorithms[ 'Hierarchical Hashed Weyl' ];
 
 			const ssrTexture = ssrPass.getTextureNode();
 			const guides = {

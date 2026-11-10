@@ -80,7 +80,7 @@ class SSRNode extends Node {
 		this.stochastic = stochastic;
 
 		/**
-		 * Noise algorithm: 0 = analytic R², 1 = IGN, 2 = animated IGN, 3 = HSN.
+		 * Noise algorithm: 0 = analytic R², 1 = IGN, 2 = animated IGN, 3 = HHW.
 		 * Used by stochastic reflections. Can be changed at runtime.
 		 *
 		 * @type {UniformNode<uint>}

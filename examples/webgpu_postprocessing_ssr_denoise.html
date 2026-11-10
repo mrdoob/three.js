@@ -269,7 +269,7 @@
 				envImportanceSampling: params.ssr.envImportanceSampling,
 				binaryRefine: params.ssr.binaryRefine
 			} ).toInspector( 'SSR' );
-			ssrNode.noiseAlgorithm.value = noiseAlgorithms[ 'Houston Stratified Noise' ];
+			ssrNode.noiseAlgorithm.value = noiseAlgorithms[ 'Hierarchical Hashed Weyl' ];
 
 			coverage = ssrNode.a.greaterThan( 0 ).and( ssrNode.a.lessThan( ENV_RAY_LENGTH_THRESHOLD ) ).toFloat();
 			coverageDenoise = temporalDenoise( vec4( coverage, coverage, coverage, 1 ), {
