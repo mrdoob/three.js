@@ -1,5 +1,11 @@
-import { BackSide, BufferAttribute, BufferGeometry, CustomBlending, DoubleSide, FloatType, HalfFloatType, Mesh, MeshLambertNodeMaterial, NearestFilter, NoBlending, NodeMaterial, OneFactor, OrthographicCamera, QuadMesh, RedFormat, RGFormat, RendererUtils, RenderTarget, Scene, Vector2 } from 'three/webgpu';
+import { BackSide, BufferAttribute, BufferGeometry, CustomBlending, DoubleSide, FloatType, HalfFloatType, Mesh, MeshLambertNodeMaterial, NearestFilter, NoBlending, NodeMaterial, OneFactor, OrthographicCamera, QuadMesh, RedFormat, RGFormat, RendererUtils, RenderTarget, Scene, Vector2, warnOnce } from 'three/webgpu';
 import { Fn, If, Loop, attribute, ivec2, lights, luminance, modelViewMatrix, mrt, normalViewGeometry, normalWorldGeometry, output, positionLocal, positionWorld, round, screenCoordinate, texture, textureLoad, uniform, uv, vec2, vec4 } from 'three/tsl';
+
+// half float sums keep their rounding error small up to this many samples, and their weights are scaled
+// down so a sum of this many samples of an irradiance of up to about 4000 stays below the largest half float
+
+const HALF_FLOAT_SAMPLES = 1024;
+const HALF_FLOAT_WEIGHT = 1 / 64;
 
 let _rendererState;
 
@@ -13,7 +19,9 @@ let _rendererState;
  * the result. The function also receives the sample index, so stochastic sources can
  * vary their samples and converge as they accumulate. Call `update()` once per frame
  * to bake progressively, or pass a sample count to bake at once.
- * Bake at most 256 samples, since samples accumulate in half float precision.
+ * Samples accumulate in float precision with the 'float32-blendable' renderer feature. Without it,
+ * they accumulate in half float precision with jittered weights, up to 1024 samples; further
+ * samples are ignored.
  * Keep the source geometry and GI data static while accumulating. Call `reset()`
  * after changing transforms or lighting. Atlas charts need at least three texels
  * of padding; the resolve fills two texels around covered surfaces.
@@ -85,13 +93,20 @@ class LightMapper {
 		 */
 		this.samples = 0;
 
+		// the samples accumulate as sums, with their count in alpha. Half floats round each sample added to a
+		// large sum by up to an eighth of its value at 256 samples, in the same direction for similar samples,
+		// which shows as bands, so the sums are floats where the renderer can blend them. Half float sums
+		// weigh the samples unevenly instead, see _sampleWeight()
+
+		const floatSums = renderer.hasFeature( 'float32-blendable' );
+
 		// for the variance, the luminances of the samples and their squares accumulate in a second target of
 		// float sums: half floats would overflow, and the variance of a mean from half floats would be lost
 		// in their rounding
 
-		const accumulateMoments = variance && renderer.hasFeature( 'float32-blendable' );
+		const accumulateMoments = variance && floatSums;
 
-		this._accumulation = new RenderTarget( size, size, { type: HalfFloatType, minFilter: NearestFilter, magFilter: NearestFilter, depthBuffer: false, count: accumulateMoments ? 2 : 1 } );
+		this._accumulation = new RenderTarget( size, size, { type: floatSums ? FloatType : HalfFloatType, minFilter: NearestFilter, magFilter: NearestFilter, depthBuffer: false, count: accumulateMoments ? 2 : 1 } );
 
 		this._renderTarget = new RenderTarget( size, size, { type: HalfFloatType, depthBuffer: false, count: accumulateMoments ? 2 : 1 } );
 		this._renderTarget.texture.channel = 1;
@@ -171,6 +186,8 @@ class LightMapper {
 		this._objects = [];
 		this._jitter = uniform( new Vector2() );
 		this._sample = uniform( 0 );
+		this._weight = uniform( 1 );
+		this._floatSums = floatSums;
 		this._charts = 0;
 		this._guidesNeedUpdate = false;
 
@@ -332,7 +349,15 @@ class LightMapper {
 
 		for ( let i = 0; i < samples; i ++ ) {
 
+			if ( this._floatSums === false && this.samples >= HALF_FLOAT_SAMPLES ) {
+
+				warnOnce( `LightMapper: Half float sums are limited to ${ HALF_FLOAT_SAMPLES } samples, further samples are ignored. Use a renderer with the 'float32-blendable' feature for more.` );
+				break;
+
+			}
+
 			this._sample.value = this.samples;
+			this._weight.value = this._sampleWeight( this.samples );
 			this._jitter.value.set( halton( this.samples + 1, 2 ) - 0.5, halton( this.samples + 1, 3 ) - 0.5 ).multiplyScalar( 2 / this.size );
 
 			renderer.render( this._scene, this._camera );
@@ -346,6 +371,25 @@ class LightMapper {
 		this._quad.render( renderer );
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );
+
+	}
+
+	/**
+	 * Returns the weight of a sample. Similar samples added to a half float sum round in the same
+	 * direction, so their weights are spread over the rounding step of the sum, which grows with it,
+	 * and the samples round up and down evenly. The weights are also scaled down, so the sums of
+	 * bright texels stay below the largest half float, 65504, since the resolve divides by the sum
+	 * of the weights. Float sums weigh all samples the same.
+	 *
+	 * @private
+	 * @param {number} index - The index of the sample.
+	 * @return {number} The weight.
+	 */
+	_sampleWeight( index ) {
+
+		if ( this._floatSums ) return 1;
+
+		return ( 1 + ( 2 * halton( index + 1, 5 ) - 1 ) * Math.min( index / 2048, 1 ) ) * HALF_FLOAT_WEIGHT;
 
 	}
 
@@ -482,7 +526,7 @@ class LightMapper {
 		material.depthTest = false;
 		material.depthWrite = false;
 
-		// additive blending, the sample count accumulates in alpha
+		// additive blending, the sample count, the sum of the sample weights, accumulates in alpha
 
 		material.blending = CustomBlending;
 		material.blendSrc = OneFactor;
@@ -504,12 +548,12 @@ class LightMapper {
 			material.lightsNode = lights( directLights ).context( { positionView: modelViewMatrix.mul( positionLocal ).xyz.toVarying() } );
 			material.normalNode = flipNormal ? normalViewGeometry.negate() : normalViewGeometry;
 			material.emissiveNode = irradianceNode( positionWorld, normal, this._sample ).div( Math.PI );
-			material.outputNode = vec4( output.rgb.mul( Math.PI ), 1 );
+			material.outputNode = vec4( output.rgb.mul( Math.PI ), 1 ).mul( this._weight );
 			if ( accumulateMoments ) material.mrtNode = outputs( material.outputNode );
 
 		} else {
 
-			material.fragmentNode = outputs( vec4( irradianceNode( positionWorld, normal, this._sample ), 1 ) );
+			material.fragmentNode = outputs( vec4( irradianceNode( positionWorld, normal, this._sample ), 1 ).mul( this._weight ) );
 
 		}
 
