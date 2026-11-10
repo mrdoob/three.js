@@ -143,12 +143,7 @@
 
 			denoise: {
 				enabled: true,
-				luminancePhi: 3,
-				maxFrames: 20
-			},
-
-			traa: {
-				maxFrames: 20
+				luminancePhi: 3
 			},
 
 			post: {
@@ -161,7 +156,6 @@
 		let scenePassNode, combinedOutputNode, scenePassDepth, scenePassVelocity;
 		let gammaUniform, contrastUniform, saturationUniform;
 		const denoiseEnabled = uniform( 1 );
-		const traaMaxFrames = uniform( 20 );
 		const previousJitter = new THREE.Vector2();
 		const currentJitter = new THREE.Vector2();
 		const currentProjectionInverse = new THREE.Matrix4();
@@ -350,6 +344,7 @@
 			const ssrTexture = ssrNode.getTextureNode();
 
 			denoiseNode = temporalDenoise( ssrTexture, {
+				temporalWeight: 0.05,
 				depth: scenePassDepth,
 				normal: sceneNormal,
 				camera,
@@ -423,8 +418,6 @@
 			const denoiseGui = renderer.inspector.createParameters( 'Denoise settings' );
 			denoiseGui.add( params.denoise, 'enabled' ).name( 'enabled' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'luminancePhi', 0, 10 ).name( 'luminance phi' ).onChange( applyParams );
-			denoiseGui.add( params.denoise, 'maxFrames', 1, 32, 1 ).name( 'SSR frames' ).onChange( applyParams );
-			denoiseGui.add( params.traa, 'maxFrames', 1, 32, 1 ).name( 'TRAA frames' ).onChange( ( value ) => traaMaxFrames.value = value );
 
 			// Concise UI for Directional Light controls
 			const lightGui = renderer.inspector.createParameters( 'Light' ).close();
@@ -464,7 +457,6 @@
 
 				denoiseEnabled.value = params.denoise.enabled ? 1 : 0;
 				denoiseNode.luminancePhi.value = params.denoise.luminancePhi;
-				denoiseNode.maxFrames.value = params.denoise.maxFrames;
 
 			}
 
@@ -485,10 +477,7 @@
 
 		function applyPostProcessing( source ) {
 
-			const traaNode = traa( applyGrading( source ), scenePassDepth, scenePassVelocity, camera );
-			traaNode.maxFrames = traaMaxFrames;
-
-			return sharpen( traaNode, 0 );
+			return sharpen( traa( applyGrading( source ), scenePassDepth, scenePassVelocity, camera ), 0 );
 
 		}
 
