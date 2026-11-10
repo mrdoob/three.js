@@ -1,11 +1,27 @@
 import {
 	BackSide,
 	BoxGeometry,
+	BufferGeometry,
+	Float32BufferAttribute,
+	HalfFloatType,
+	LinearFilter,
+	LinearMipmapLinearFilter,
 	Mesh,
+	OrthographicCamera,
+	RedFormat,
+	RepeatWrapping,
 	ShaderMaterial,
 	UniformsUtils,
-	Vector3
+	Vector3,
+	Vector4,
+	WebGLRenderTarget
 } from 'three';
+
+// The cloud noise is baked into a texture of NOISE_SIZE texels that tiles over NOISE_CELLS noise cells.
+const NOISE_SIZE = 512;
+const NOISE_CELLS = 32;
+
+const _viewport = /*@__PURE__*/ new Vector4();
 
 /**
  * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight](https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight)
@@ -68,9 +84,163 @@ class Sky extends Mesh {
 		 */
 		this.isSky = true;
 
+		// The clouds read their gradient noise from a tiling, mipmapped texture. It is
+		// rendered once on the GPU, the first time the sky is drawn.
+
+		/**
+		 * The render target holding the baked cloud noise.
+		 *
+		 * @private
+		 * @type {WebGLRenderTarget}
+		 */
+		this._noiseTarget = new WebGLRenderTarget( NOISE_SIZE, NOISE_SIZE, {
+			type: HalfFloatType,
+			format: RedFormat,
+			depthBuffer: false,
+			generateMipmaps: true,
+			minFilter: LinearMipmapLinearFilter,
+			magFilter: LinearFilter,
+			wrapS: RepeatWrapping,
+			wrapT: RepeatWrapping
+		} );
+
+		const noiseGeometry = new BufferGeometry();
+		noiseGeometry.setAttribute( 'position', new Float32BufferAttribute( [ - 1, 3, 0, - 1, - 1, 0, 3, - 1, 0 ], 3 ) );
+		noiseGeometry.setAttribute( 'uv', new Float32BufferAttribute( [ 0, 2, 0, 0, 2, 0 ], 2 ) );
+
+		/**
+		 * The full-screen triangle that renders the cloud noise.
+		 *
+		 * @private
+		 * @type {Mesh}
+		 */
+		this._noiseMesh = new Mesh( noiseGeometry, new ShaderMaterial( {
+			name: NoiseShader.name,
+			vertexShader: NoiseShader.vertexShader,
+			fragmentShader: NoiseShader.fragmentShader,
+			depthTest: false,
+			depthWrite: false
+		} ) );
+		this._noiseMesh.frustumCulled = false;
+
+		const noiseCamera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+		const noiseTarget = this._noiseTarget;
+		const noiseMesh = this._noiseMesh;
+		let noiseNeedsUpdate = true;
+
+		material.uniforms.noiseMap.value = noiseTarget.texture;
+
+		material.onBeforeRender = function ( renderer, scene, camera ) {
+
+			if ( noiseNeedsUpdate === true ) {
+
+				noiseNeedsUpdate = false;
+				renderNoise( renderer, camera );
+
+			}
+
+			// the angle covered by one pixel at the centre of the view, and the view direction,
+			// to pick the mipmap level of the cloud noise
+
+			renderer.getCurrentViewport( _viewport );
+
+			material.uniforms.pixelAngle.value = 2 / ( camera.projectionMatrix.elements[ 5 ] * _viewport.w );
+			material.uniforms.cameraDirection.value.setFromMatrixColumn( camera.matrixWorld, 2 ).negate();
+
+		};
+
+		function renderNoise( renderer, camera ) {
+
+			const currentRenderTarget = renderer.getRenderTarget();
+			const currentActiveCubeFace = renderer.getActiveCubeFace();
+			const currentActiveMipmapLevel = renderer.getActiveMipmapLevel();
+			const currentXrEnabled = renderer.xr.enabled;
+			const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+
+			renderer.xr.enabled = false;
+			renderer.shadowMap.autoUpdate = false;
+
+			renderer.setRenderTarget( noiseTarget );
+			renderer.render( noiseMesh, noiseCamera );
+
+			renderer.xr.enabled = currentXrEnabled;
+			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+
+			renderer.setRenderTarget( currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel );
+
+			// restore the viewport of the camera being rendered, e.g. for array cameras
+
+			const viewport = camera.viewport;
+
+			if ( viewport !== undefined ) renderer.state.viewport( viewport );
+
+		}
+
+	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever the sky is no longer used in your app.
+	 */
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
+
+		this._noiseTarget.dispose();
+		this._noiseMesh.geometry.dispose();
+		this._noiseMesh.material.dispose();
+
 	}
 
 }
+
+// Renders tiling gradient noise into the cloud noise texture.
+const NoiseShader = {
+
+	name: 'SkyNoiseShader',
+
+	vertexShader: /* glsl */`
+		varying vec2 vUv;
+
+		void main() {
+
+			vUv = uv;
+			gl_Position = vec4( position.xy, 0.0, 1.0 );
+
+		}`,
+
+	fragmentShader: /* glsl */`
+		varying vec2 vUv;
+
+		const float NOISE_CELLS = ${ NOISE_CELLS }.0;
+
+		// gradient at a lattice corner, wrapped so the texture tiles; sinless hash so every GPU produces the same clouds
+		vec2 gradient( vec2 i ) {
+			vec3 p = fract( mod( i, NOISE_CELLS ).xyx * vec3( 0.1031, 0.1030, 0.0973 ) );
+			p += dot( p, p.yzx + 33.33 );
+			return fract( ( p.xx + p.yz ) * p.zy ) * 2.0 - 1.0;
+		}
+
+		// 2D gradient noise: isotropic lobes like Perlin at value-noise cost
+		float noise( vec2 p ) {
+			vec2 i = floor( p );
+			vec2 f = fract( p );
+			vec2 u = f * f * f * ( f * ( f * 6.0 - 15.0 ) + 10.0 ); // quintic fade
+			float a = dot( gradient( i ), f );
+			float b = dot( gradient( i + vec2( 1.0, 0.0 ) ), f - vec2( 1.0, 0.0 ) );
+			float c = dot( gradient( i + vec2( 0.0, 1.0 ) ), f - vec2( 0.0, 1.0 ) );
+			float d = dot( gradient( i + vec2( 1.0, 1.0 ) ), f - vec2( 1.0, 1.0 ) );
+			return mix( mix( a, b, u.x ), mix( c, d, u.x ), u.y ) * 1.6; // ~[-1,1]
+		}
+
+		void main() {
+
+			gl_FragColor = vec4( noise( vUv * NOISE_CELLS ), 0.0, 0.0, 1.0 );
+
+		}`
+
+};
 
 Sky.SkyShader = {
 
@@ -88,7 +258,10 @@ Sky.SkyShader = {
 		'cloudDensity': { value: 0.4 },
 		'cloudElevation': { value: 0.5 },
 		'showSunDisc': { value: 1 },
-		'time': { value: 0.0 }
+		'time': { value: 0.0 },
+		'noiseMap': { value: null },
+		'pixelAngle': { value: 0.001 },
+		'cameraDirection': { value: new Vector3( 0, 0, - 1 ) }
 	},
 
 	vertexShader: /* glsl */`
@@ -194,24 +367,17 @@ Sky.SkyShader = {
 		uniform float cloudElevation;
 		uniform float showSunDisc;
 		uniform float time;
+		uniform sampler2D noiseMap;
+		uniform float pixelAngle;
+		uniform vec3 cameraDirection;
 
-		// gradient at a lattice corner; sinless hash so every GPU produces the same clouds
-		vec2 gradient( vec2 i ) {
-			vec3 p = fract( i.xyx * vec3( 0.1031, 0.1030, 0.0973 ) );
-			p += dot( p, p.yzx + 33.33 );
-			return fract( ( p.xx + p.yz ) * p.zy ) * 2.0 - 1.0;
-		}
+		const float NOISE_SIZE = ${ NOISE_SIZE }.0;
+		const float NOISE_CELLS = ${ NOISE_CELLS }.0;
+		const float OCTAVE_LEVEL = 1.0566; // log2( 2.08 ), the mipmap step between noise octaves
 
-		// 2D gradient noise: isotropic lobes like Perlin at value-noise cost
-		float noise( vec2 p ) {
-			vec2 i = floor( p );
-			vec2 f = fract( p );
-			vec2 u = f * f * f * ( f * ( f * 6.0 - 15.0 ) + 10.0 ); // quintic fade
-			float a = dot( gradient( i ), f );
-			float b = dot( gradient( i + vec2( 1.0, 0.0 ) ), f - vec2( 1.0, 0.0 ) );
-			float c = dot( gradient( i + vec2( 0.0, 1.0 ) ), f - vec2( 0.0, 1.0 ) );
-			float d = dot( gradient( i + vec2( 1.0, 1.0 ) ), f - vec2( 1.0, 1.0 ) );
-			return mix( mix( a, b, u.x ), mix( c, d, u.x ), u.y ) * 1.6; // ~[-1,1]
+		// gradient noise baked into a tiling texture; level picks the mipmap that fits the pixel footprint
+		float noise( vec2 p, float level ) {
+			return textureLod( noiseMap, p / NOISE_CELLS, level ).r;
 		}
 
 		// Fast scalar value noise for low-frequency macro weather modulation
@@ -238,11 +404,11 @@ Sky.SkyShader = {
 		}
 
 		// 2-octave turret field for directional sun self-shadowing
-		float cloudShadow( vec2 uv, float drift ) {
+		float cloudShadow( vec2 uv, float drift, float level ) {
 			vec2 p = uv * 600.0;
-			float base = 0.58 * noise( p );
+			float base = 0.58 * noise( p, level );
 			p = nextOctave( p, drift );
-			base += 0.32 * noise( p );
+			base += 0.32 * noise( p, level + OCTAVE_LEVEL );
 			return base * 0.72 + 0.5;
 		}
 
@@ -322,15 +488,23 @@ Sky.SkyShader = {
 				vec2 uvBase = direction.xz * ( shellBase / elevation ) * cloudScale + driftUV;
 				vec2 uvTop = direction.xz * ( shellTop / elevation ) * cloudScale + driftUV + vec2( 0.75, 0.3 ) * cloudScale;
 
+				// mipmap level of the cloud noise, from the footprint of one pixel on the cloud layer:
+				// the larger of the tangential and radial rates at which the shell coordinates change with view angle
+				float shell = sqrt( direction.y * direction.y + 0.015 );
+				float tangentialRate = 0.5 * shellBase;
+				float radialRate = direction.y * tangentialRate + ( 1.0 - direction.y * direction.y ) * tangentialRate * tangentialRate * ( 1.0 + direction.y / shell );
+				float footprint = pixelAngle * max( dot( direction, cameraDirection ), 0.05 ) * max( tangentialRate, radialRate );
+				float noiseLevel = log2( footprint * cloudScale * ( 1200.0 * NOISE_SIZE / NOISE_CELLS ) / elevation + 1e-8 );
+
 				float evolve = time * cloudSpeed * 200.0;
 				float covEnv = cloudCoverage * ( 1.0 - cloudCoverage );
 				float minThreshold = 1.0 - min( 1.0, cloudCoverage + covEnv * 0.75 );
 
 				// Evaluate 2-octave macro field at slab base first to reject clear sky in 2 noise calls
 				vec2 pBase = uvBase * 600.0;
-				float macroBase = 0.55 * noise( pBase );
+				float macroBase = 0.55 * noise( pBase, noiseLevel );
 				pBase = nextOctave( pBase, evolve );
-				macroBase = ( macroBase + 0.275 * noise( pBase ) ) * 0.72 + 0.5;
+				macroBase = ( macroBase + 0.275 * noise( pBase, noiseLevel + OCTAVE_LEVEL ) ) * 0.72 + 0.5;
 
 				if ( macroBase + 0.34 > minThreshold ) {
 
@@ -342,9 +516,9 @@ Sky.SkyShader = {
 					if ( localCov > 0.005 && macroBase + 0.34 > threshold ) {
 
 						vec2 pTop = uvTop * 600.0;
-						float macroTop = 0.55 * noise( pTop );
+						float macroTop = 0.55 * noise( pTop, noiseLevel );
 						pTop = nextOctave( pTop, evolve );
-						macroTop = ( macroTop + 0.275 * noise( pTop ) ) * 0.72 + 0.5;
+						macroTop = ( macroTop + 0.275 * noise( pTop, noiseLevel + OCTAVE_LEVEL ) ) * 0.72 + 0.5;
 
 						if ( max( macroBase, macroTop ) + 0.24 > threshold ) {
 
@@ -355,9 +529,9 @@ Sky.SkyShader = {
 							float hProbe = mix( hPeak, 0.18, baseHit * 0.80 );
 
 							vec2 pHit = nextOctave( mix( pBase, pTop, hProbe ), evolve );
-							float n3 = noise( pHit );
+							float n3 = noise( pHit, noiseLevel + 2.0 * OCTAVE_LEVEL );
 							pHit = nextOctave( pHit, evolve );
-							float n4 = noise( pHit );
+							float n4 = noise( pHit, noiseLevel + 3.0 * OCTAVE_LEVEL );
 
 							// Feathery fractal wisps at fringes, transitioning to cauliflower billows on cumulus bodies
 							float detailFade = smoothstep( 0.025, 0.24, direction.y );
@@ -367,9 +541,9 @@ Sky.SkyShader = {
 							if ( detailFade > 0.01 && midMax + 0.10 > threshold ) {
 
 								pHit = nextOctave( pHit, evolve );
-								float n5 = noise( pHit );
+								float n5 = noise( pHit, noiseLevel + 4.0 * OCTAVE_LEVEL );
 								vec2 ep = vec2( pHit.x * 0.8 + pHit.y * 0.6, pHit.y * 0.8 - pHit.x * 0.6 ) * 2.15 - evolve * 0.7;
-								float n6 = noise( ep );
+								float n6 = noise( ep, noiseLevel + 4.0 * OCTAVE_LEVEL + 1.1043 ); // ep is scaled by 2.15, log2( 2.15 ) = 1.1043
 
 								float wispy = 0.65 * n5 + 0.35 * n6;
 								float billow = ( 0.66 * abs( n5 ) + 0.34 * abs( n6 ) - 0.46 ) * 1.45;
@@ -431,7 +605,7 @@ Sky.SkyShader = {
 									vec2 uvHit = mix( uvBase, uvTop, hEff );
 									float sunDist = mix( 0.95, 0.50, max( 0.0, vSunDirection.y ) ) * ( 1.15 - 0.50 * hEff );
 									vec2 sunStep = vSunDirection.xz * ( ( sunDist / elevation ) * cloudScale );
-									float sunRaw = cloudShadow( uvHit + sunStep, evolve );
+									float sunRaw = cloudShadow( uvHit + sunStep, evolve, noiseLevel );
 									float sunColDepth = clamp( ( sunRaw - threshold ) / depthNorm, 0.0, 1.0 );
 									float sunTower = ( 2.25 * sunColDepth ) / ( 1.0 + 1.25 * sunColDepth );
 
