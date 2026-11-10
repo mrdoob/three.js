@@ -45,16 +45,24 @@ const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, dept
 } );
 
 /**
- * The morph target base influence. It is `1` when `morphTargetsRelative`
+ * The morph target base influence of the object. It is `1` when `morphTargetsRelative`
  * is `true`, otherwise `1 - sum( influences )`.
  *
  * @type {UniformNode<float>}
  */
-const morphBase = /*@__PURE__*/ uniform( 1 ).onObjectUpdate( ( { object } ) => {
+const morphBaseInfluence = /*@__PURE__*/ uniform( 1 ).onObjectUpdate( ( { object } ) => {
 
 	return object.geometry.morphTargetsRelative ? 1 : 1 - object.morphTargetInfluences.reduce( ( a, b ) => a + b, 0 );
 
 } );
+
+/**
+ * The morph target base influence used by the vertex. Instanced meshes with
+ * a morph texture read it per instance, see {@link InstancedMesh#setMorphAt}.
+ *
+ * @type {PropertyNode<float>}
+ */
+const morphBase = /*@__PURE__*/ property( 'float', 'morphBase' );
 
 /**
  * The sum of the weighted color morph targets.
@@ -261,6 +269,18 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 
 	const { texture: bufferMap, stride, size } = getEntry( geometry );
 
+	const isInstanced = mesh.count > 1 && ( mesh.morphTexture !== null && mesh.morphTexture !== undefined );
+
+	if ( isInstanced === true ) {
+
+		morphBase.assign( textureLoad( mesh.morphTexture, ivec2( 0, int( instanceIndex ) ) ).r );
+
+	} else {
+
+		morphBase.assign( morphBaseInfluence );
+
+	}
+
 	if ( hasMorphPosition === true ) positionLocal.mulAssign( morphBase );
 	if ( hasMorphNormals === true ) normalLocal.mulAssign( morphBase );
 	if ( hasMorphColors === true ) morphColorSum.assign( 0 );
@@ -271,7 +291,7 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 
 		const influence = float( 0 ).toVar();
 
-		if ( mesh.count > 1 && ( mesh.morphTexture !== null && mesh.morphTexture !== undefined ) ) {
+		if ( isInstanced === true ) {
 
 			influence.assign( textureLoad( mesh.morphTexture, ivec2( int( i ).add( 1 ), int( instanceIndex ) ) ).r );
 
