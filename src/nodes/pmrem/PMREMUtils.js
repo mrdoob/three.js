@@ -18,6 +18,10 @@ const GOLDEN_ANGLE = 2.399963229728653;
  */
 export const roughnessToMip = ( roughness, maxLod ) => {
 
+	// a constant roughness of one always selects the last mip
+
+	if ( roughness && roughness.isConstNode === true && roughness.value === 1 ) return float( maxLod );
+
 	roughness = float( roughness ).clamp();
 
 	return float( maxLod ).mul( roughness ).mul( float( 2.0 ).sub( roughness ) );

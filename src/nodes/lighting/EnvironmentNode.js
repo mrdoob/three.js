@@ -200,9 +200,8 @@ const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 				reflectVec = positionViewDirection.negate().reflect( normalViewNode );
 
 				// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
-				reflectVec = pow4( roughnessNode ).mix( reflectVec, normalViewNode ).normalize();
-
-				reflectVec = reflectVec.transformDirection( cameraWorldMatrix );
+				// transformDirection() normalizes the result
+				reflectVec = pow4( roughnessNode ).mix( reflectVec, normalViewNode ).transformDirection( cameraWorldMatrix );
 
 			}
 
@@ -228,9 +227,7 @@ const createRetroRadianceContext = ( roughnessNode, normalViewNode ) => {
 			if ( retroVec === null ) {
 
 				// The retroreflective lobe returns light toward its source, so the environment is sampled along the view direction
-				retroVec = pow4( roughnessNode ).mix( positionViewDirection, normalViewNode ).normalize();
-
-				retroVec = retroVec.transformDirection( cameraWorldMatrix );
+				retroVec = pow4( roughnessNode ).mix( positionViewDirection, normalViewNode ).transformDirection( cameraWorldMatrix );
 
 			}
 

@@ -471,6 +471,48 @@ class PhysicalLightingModel extends LightingModel {
 		this.dfg = null;
 
 		/**
+		 * The clamped dot product of the normal and the view direction, shared by all lighting paths.
+		 *
+		 * @type {?Node<float>}
+		 * @default null
+		 */
+		this.dotNV = null;
+
+		/**
+		 * The GGX alpha of the base layer, shared by all direct lights.
+		 *
+		 * @type {?Node<float>}
+		 * @default null
+		 */
+		this.ggxAlpha = null;
+
+		/**
+		 * The energy missing from the single-scattering lobe, shared by the multi-scattering terms.
+		 *
+		 * @type {?Node<float>}
+		 * @default null
+		 */
+		this.dfgEms = null;
+
+		/**
+		 * The share of the light left for the diffuse layer by the dielectric scattering terms,
+		 * shared by the indirect lighting paths.
+		 *
+		 * @type {?Node<vec3>}
+		 * @default null
+		 */
+		this.dielectricScatterScale = null;
+
+		/**
+		 * The Lambert BRDF of the diffuse layer, shared by all lighting paths. It is
+		 * `null` when the material uses diffuse roughness.
+		 *
+		 * @type {?Node<vec3>}
+		 * @default null
+		 */
+		this.lambertDiffuse = null;
+
+		/**
 		 * The EON directional albedo, shared by the indirect lighting paths.
 		 *
 		 * @type {?Node}
@@ -588,7 +630,9 @@ class PhysicalLightingModel extends LightingModel {
 
 		//
 
-		const dotNV = normalView.dot( positionViewDirection ).clamp();
+		const dotNV = normalView.dot( positionViewDirection ).clamp().toConst( 'dotNV' );
+		this.dotNV = dotNV;
+		this.ggxAlpha = roughness.max( 0.045 ).pow2().toConst( 'ggxAlpha' );
 		this.dfg = DFGLUT( { roughness, dotNV } ).toConst( 'dfg' );
 
 		// Multi-scattering energy compensation for direct lighting
@@ -596,7 +640,8 @@ class PhysicalLightingModel extends LightingModel {
 		// https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf
 
 		// Energy of the single-scattering lobe in a white furnace ( F0 = F90 = 1 )
-		const Ess = this.dfg.x.add( this.dfg.y );
+		const Ess = this.dfg.x.add( this.dfg.y ).toConst( 'dfgEss' );
+		this.dfgEms = Ess.oneMinus().toConst( 'dfgEms' );
 
 		// Compensate for the energy lost to multiple scattering, tinting the added term by F0 ( equation 16 )
 		this.multiScatteringCompensation = specularColorBlended.mul( Ess.reciprocal().sub( 1.0 ) ).add( 1.0 ).toConst( 'multiScatteringCompensation' );
@@ -605,6 +650,8 @@ class PhysicalLightingModel extends LightingModel {
 		this.multiScatteringDielectric = vec3().toVar( 'multiScatteringDielectric' );
 
 		this.computeMultiscattering( this.singleScatteringDielectric, this.multiScatteringDielectric, specularF90, specularColor, this.iridescenceF0Dielectric );
+		this.dielectricScatterScale = this.singleScatteringDielectric.add( this.multiScatteringDielectric ).oneMinus().toConst( 'dielectricScatterScale' );
+		this.lambertDiffuse = this.diffuseRoughness ? null : BRDF_Lambert( { diffuseColor: diffuseContribution } ).toConst( 'lambertDiffuse' );
 
 		if ( this.diffuseRoughness === true ) {
 
@@ -628,14 +675,13 @@ class PhysicalLightingModel extends LightingModel {
 
 		const FssEss = Fr.mul( fab.x ).add( specularF90.mul( fab.y ) );
 
-		const Ess = fab.x.add( fab.y );
-		const Ems = Ess.oneMinus();
+		const Ems = this.dfgEms;
 
 		const Favg = Fr.add( Fr.oneMinus().mul( 0.047619 ) ); // 1/21
 		const Fms = FssEss.mul( Favg ).div( Ems.mul( Favg ).oneMinus() );
 
-		singleScatter.addAssign( FssEss );
-		multiScatter.addAssign( Fms.mul( Ems ) );
+		singleScatter.assign( FssEss );
+		multiScatter.assign( Fms.mul( Ems ) );
 
 	}
 
@@ -647,7 +693,7 @@ class PhysicalLightingModel extends LightingModel {
 	 */
 	direct( { lightDirection, lightColor, reflectedLight }, /* builder */ ) {
 
-		const dotNL = normalView.dot( lightDirection ).clamp();
+		const dotNL = normalView.dot( lightDirection ).clamp().toConst();
 		const irradiance = dotNL.mul( lightColor ).toVar();
 
 		if ( this.sheen === true ) {
@@ -673,11 +719,11 @@ class PhysicalLightingModel extends LightingModel {
 		}
 
 		// Light reflected by the specular interface is not available to the diffuse layer ( glTF fresnel_mix )
-		const halfDir = lightDirection.add( positionViewDirection ).normalize();
-		const dotVH = positionViewDirection.dot( halfDir ).clamp();
+		const halfDir = lightDirection.add( positionViewDirection ).normalize().toConst();
+		const dotVH = positionViewDirection.dot( halfDir ).clamp().toConst();
 		let F = F_Schlick( { f0: specularColor, f90: specularF90, dotVH } );
 
-		let specularBRDF = BRDF_GGX( { lightDirection, f0: specularColorBlended, f90: specularF90, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
+		let specularBRDF = BRDF_GGX( { lightDirection, f0: specularColorBlended, f90: specularF90, roughness, f: this.iridescenceFresnel, halfDir, dotNL, dotNV: this.dotNV, dotVH, alpha: this.ggxAlpha, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
 
 		if ( this.retroreflection === true ) {
 
@@ -696,7 +742,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		const diffuseBRDF = this.diffuseRoughness
 			? BRDF_EON( { lightDirection, diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness } ).mul( metalness.oneMinus() )
-			: BRDF_Lambert( { diffuseColor: diffuseContribution } );
+			: this.lambertDiffuse;
 
 		reflectedLight.directDiffuse.addAssign( irradiance.mul( diffuseBRDF ).mul( F.oneMinus() ) );
 
@@ -788,14 +834,11 @@ class PhysicalLightingModel extends LightingModel {
 		const { irradiance, reflectedLight } = builder.context;
 
 		// Energy reflected by the specular lobe is not available to the diffuse layer
-		const singleScattering = this.singleScatteringDielectric;
-		const multiScattering = this.multiScatteringDielectric;
-
 		const diffuseBRDF = this.diffuseRoughness
 			? this.eonDirectionalAlbedo.mul( metalness.oneMinus(), 1 / Math.PI )
-			: BRDF_Lambert( { diffuseColor: diffuseContribution } );
+			: this.lambertDiffuse;
 
-		const diffuse = irradiance.mul( diffuseBRDF ).mul( singleScattering.add( multiScattering ).oneMinus() ).toVar();
+		const diffuse = irradiance.mul( diffuseBRDF ).mul( this.dielectricScatterScale ).toVar();
 
 		if ( this.sheen === true ) {
 
@@ -866,15 +909,13 @@ class PhysicalLightingModel extends LightingModel {
 		const multiScattering = mix( multiScatteringDielectric, multiScatteringMetallic, metalness );
 
 		// Diffuse energy conservation uses dielectric path
-		const totalScatteringDielectric = singleScatteringDielectric.add( multiScatteringDielectric );
-
 		const diffuseAlbedo = this.diffuseRoughness
 			? this.eonDirectionalAlbedo.mul( metalness.oneMinus() )
 			: diffuseContribution;
 
-		const diffuse = diffuseAlbedo.mul( totalScatteringDielectric.oneMinus() );
+		const diffuse = diffuseAlbedo.mul( this.dielectricScatterScale );
 
-		const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI );
+		const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI ).toConst();
 
 		const indirectSpecular = radiance.mul( singleScattering ).add( multiScattering.mul( cosineWeightedIrradiance ) ).toVar();
 		const indirectDiffuse = diffuse.mul( cosineWeightedIrradiance ).toVar();
@@ -905,7 +946,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		const { ambientOcclusion, reflectedLight } = builder.context;
 
-		const dotNV = normalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
+		const dotNV = this.dotNV;
 
 		const aoNV = dotNV.add( ambientOcclusion );
 		const aoExp = roughness.mul( - 16.0 ).oneMinus().negate().exp2();
