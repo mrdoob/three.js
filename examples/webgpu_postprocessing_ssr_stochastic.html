@@ -10,9 +10,23 @@
 		<meta property="og:url" content="https://threejs.org/examples/webgpu_postprocessing_ssr_stochastic.html">
 		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_postprocessing_ssr_stochastic.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			#compare-hint {
+				position: fixed;
+				bottom: 20px;
+				width: 100%;
+				text-align: center;
+				color: #e0e0e0;
+				z-index: 1001;
+				pointer-events: none;
+				text-shadow: 1px 1px 5px #000;
+			}
+		</style>
 	</head>
 
 <body>
+
+	<div id="compare-hint" hidden>Hold Shift and move the mouse to scrub the comparison</div>
 
 	<div id="info">
 		<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
@@ -43,7 +57,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, sample, packNormalToRGB, unpackRGBToNormal, velocity, diffuseColor, vec3, vec4, uniform, mix, float, renderOutput, saturation } from 'three/tsl';
+		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
@@ -72,6 +86,28 @@
 			_indirectSpecular.call( this, builder );
 
 		};
+
+		const OUTPUT_COMPARE_DENOISE = 8;
+		const OUTPUT_COMPARE_SSR = 9;
+		const compareHint = document.getElementById( 'compare-hint' );
+		const compareSplit = uniform( 0.5 );
+		const compareResolution = uniform( new THREE.Vector2( window.innerWidth, window.innerHeight ) );
+
+		function isCompareMode() {
+
+			return params.output === OUTPUT_COMPARE_DENOISE || params.output === OUTPUT_COMPARE_SSR;
+
+		}
+
+		function buildCompareNode( left, right ) {
+
+			const compareColor = mix( left, right, step( compareSplit, screenUV.x ) );
+			const lineWidth = float( 1 ).div( compareResolution.x );
+			const onLine = float( 1 ).sub( step( lineWidth, abs( screenUV.x.sub( compareSplit ) ) ) );
+
+			return mix( compareColor, vec4( 1 ), onLine );
+
+		}
 
 		const params = {
 			output: 0,
@@ -107,7 +143,7 @@
 
 		let camera, scene, model, renderer, postProcessing, ssrNode, denoiseNode, denoised;
 		let controls;
-		let combinedOutputNode, scenePassDepth, scenePassVelocity;
+		let combinedOutputNode, scenePassColor, scenePassDepth, scenePassVelocity;
 		let gammaUniform, contrastUniform, saturationUniform;
 		const temporalOutputs = new Map();
 		const denoiseEnabled = uniform( 1 );
@@ -193,7 +229,7 @@
 				velocity: velocity
 			} ) );
 
-			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
+			scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
 			const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal' );
 			scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
 
@@ -263,11 +299,26 @@
 			controls.target.set( 1.0258536154689288, 0.2746440590977971, - 1.0815876858987743 );
 
 			window.addEventListener( 'resize', onWindowResize );
+			renderer.domElement.addEventListener( 'pointermove', onComparePointerMove );
+			renderer.domElement.addEventListener( 'pointerleave', releaseCompareControls );
+			window.addEventListener( 'keyup', event => {
+
+				if ( event.key === 'Shift' ) releaseCompareControls();
+
+			} );
+			window.addEventListener( 'blur', releaseCompareControls );
 
 			applyParams();
 			applyPost();
 
-			const outputTypes = { Beauty: 0, SSR: 1, 'SSR DN': 4 };
+			const outputTypes = {
+				Beauty: 0,
+				SSR: 1,
+				'SSR DN': 4,
+				'Compare (Denoise)': OUTPUT_COMPARE_DENOISE,
+				'Compare (Reflections)': OUTPUT_COMPARE_SSR,
+				'Ray Length': 7
+			};
 
 			const displayGui = renderer.inspector.createParameters( 'Display' );
 			displayGui.add( params, 'output', outputTypes ).name( 'Output' ).onChange( updateOutputNode );
@@ -395,10 +446,23 @@
 				case 0: node = applyPostProcessing( combinedOutputNode ); break; // Combined
 				case 1: node = applyGrading( vec4( ssrNode.rgb, 1 ) ); break; // SSR (Raw)
 				case 4: node = applyGrading( vec4( denoiseNode.getTextureNode().rgb, 1 ) ); break; // Denoised SSR
+				case 7: node = vec4( ssrNode.aaa, 1 ); break; // Ray Length (Raw)
+				case OUTPUT_COMPARE_DENOISE:
+					node = buildCompareNode(
+						applyGrading( vec4( denoiseNode.getTextureNode().rgb, 1 ) ),
+						applyGrading( vec4( ssrNode.rgb, 1 ) )
+					);
+					break;
+				case OUTPUT_COMPARE_SSR:
+					node = buildCompareNode( applyPostProcessing( combinedOutputNode ), applyPostProcessing( scenePassColor ) );
+					break;
 
 			}
 
-			postProcessing.outputColorTransform = false;
+			compareHint.hidden = ! isCompareMode();
+			releaseCompareControls();
+
+			postProcessing.outputColorTransform = params.output === 7;
 			postProcessing.outputNode = node;
 			postProcessing.needsUpdate = true;
 
@@ -410,6 +474,28 @@
 			camera.updateProjectionMatrix();
 
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			compareResolution.value.set( window.innerWidth, window.innerHeight );
+
+		}
+
+		function releaseCompareControls() {
+
+			controls.enabled = true;
+
+		}
+
+		function onComparePointerMove( event ) {
+
+			if ( ! isCompareMode() ) return;
+
+			controls.enabled = ! event.shiftKey;
+
+			if ( event.shiftKey ) {
+
+				const rect = renderer.domElement.getBoundingClientRect();
+				compareSplit.value = Math.max( 0, Math.min( 1, ( event.clientX - rect.left ) / rect.width ) );
+
+			}
 
 		}
 
