@@ -195,11 +195,7 @@ function reduceVertices( object, func, initialValue ) {
 
 					}
 
-					if ( ! child.isSkinnedMesh ) {
-
-						vertex.applyMatrix4( child.matrixWorld );
-
-					}
+					vertex.applyMatrix4( child.matrixWorld );
 
 					value = func( value, vertex );
 

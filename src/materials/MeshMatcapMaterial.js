@@ -127,6 +127,7 @@ class MeshMatcapMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)

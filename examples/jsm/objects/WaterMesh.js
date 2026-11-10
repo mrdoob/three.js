@@ -5,7 +5,7 @@ import {
 	NodeMaterial
 } from 'three/webgpu';
 
-import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, texture, vec2, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
+import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, texture, vec2, vec3, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
 
 /**
  * A basic flat, reflective water effect.
@@ -44,14 +44,6 @@ class WaterMesh extends Mesh {
 		 * @default true
 		 */
 		this.isWaterMesh = true;
-
-		/**
-		 * The effect's resolution scale.
-		 *
-		 * @type {number}
-		 * @default 0.5
-		 */
-		this.resolutionScale = options.resolutionScale !== undefined ? options.resolutionScale : 0.5;
 
 		// Uniforms
 
@@ -133,7 +125,7 @@ class WaterMesh extends Mesh {
 		} );
 
 		const noise = getNoise( positionWorld.xz.mul( this.size ) );
-		const surfaceNormal = normalize( noise.xzy.mul( 1.5, 1.0, 1.5 ) );
+		const surfaceNormal = normalize( noise.xzy.mul( vec3( 1.5, 1.0, 1.5 ) ) );
 
 		const worldToEye = cameraPosition.sub( positionWorld );
 		const eyeDirection = normalize( worldToEye );
@@ -147,6 +139,12 @@ class WaterMesh extends Mesh {
 
 		const distortion = surfaceNormal.xz.mul( float( 0.001 ).add( float( 1.0 ).div( distance ) ) ).mul( this.distortionScale );
 
+		const mirrorSampler = reflector( { resolutionScale: options.resolutionScale !== undefined ? options.resolutionScale : 0.5 } );
+		mirrorSampler.uvNode = mirrorSampler.uvNode.add( distortion );
+		this.add( mirrorSampler.target );
+
+		this._reflector = mirrorSampler.reflector;
+
 		// Material
 
 		material.transparent = true;
@@ -157,12 +155,6 @@ class WaterMesh extends Mesh {
 
 		material.colorNode = Fn( () => {
 
-			const mirrorSampler = reflector();
-			mirrorSampler.uvNode = mirrorSampler.uvNode.add( distortion );
-			mirrorSampler.reflector.resolutionScale = this.resolutionScale;
-
-			this.add( mirrorSampler.target );
-
 			const theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );
 			const rf0 = float( 0.02 );
 			const reflectance = mul( pow( float( 1.0 ).sub( theta ), 5.0 ), float( 1.0 ).sub( rf0 ) ).add( rf0 );
@@ -172,6 +164,24 @@ class WaterMesh extends Mesh {
 			return albedo;
 
 		} )();
+
+	}
+
+	/**
+	 * The effect's resolution scale.
+	 *
+	 * @type {number}
+	 * @default 0.5
+	 */
+	get resolutionScale() {
+
+		return this._reflector.resolutionScale;
+
+	}
+
+	set resolutionScale( value ) {
+
+		this._reflector.resolutionScale = value;
 
 	}
 

@@ -1,4 +1,4 @@
-import { Fn, float, positionView, viewportDepthTexture, perspectiveDepthToViewZ, cameraNear, cameraFar } from 'three/tsl';
+import { Fn, float, positionView, viewportDepthTexture, depthToViewZ, cameraNear, cameraFar } from 'three/tsl';
 
 /**
  * @module SoftParticles
@@ -44,7 +44,7 @@ export function softParticles( { opacity = float( 1 ), distance = 1, contrast = 
 	// Read the opaque scene depth captured before the particle pass and convert both
 	// the scene depth and the particle's depth to view space, so the gap between them
 	// can be measured in world units.
-	const sceneViewZ = perspectiveDepthToViewZ( viewportDepth, cameraNear, cameraFar ).toConst();
+	const sceneViewZ = Fn( ( { camera } ) => depthToViewZ( viewportDepth, cameraNear, cameraFar, camera ) )().toConst();
 	const depthDelta = positionView.z.sub( sceneViewZ ).div( distance ).saturate();
 
 	// Fade out as the particle approaches the scene; stay opaque when well in front of it.
