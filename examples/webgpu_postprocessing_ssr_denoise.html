@@ -59,7 +59,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation, vec2, Fn, positionPrevious, textureSize, getViewPosition, isBackgroundDepth } from 'three/tsl';
+		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation, vec2, ivec2, Fn, positionPrevious, textureSize, getViewPosition, isBackgroundDepth } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
@@ -273,11 +273,6 @@
 			scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
 			const scenePassDiffuseColor = scenePass.getTextureNode( 'diffuseColor' ).toInspector( 'Diffuse Color' );
 
-			// Motion and expected depth must come from one surface at silhouettes.
-			const velocityTexture = scenePass.getTexture( 'velocity' );
-			velocityTexture.minFilter = THREE.NearestFilter;
-			velocityTexture.magFilter = THREE.NearestFilter;
-
 			const normalTexture = scenePass.getTexture( 'normal' );
 			normalTexture.type = THREE.UnsignedByteType;
 
@@ -293,7 +288,12 @@
 				// Allocate history only when this source is compiled for the first time.
 				const previousColor = scenePass.getPreviousTextureNode( 'output' );
 				const previousDepth = scenePass.getPreviousTextureNode( 'depth' );
-				const motion = scenePassVelocity.sample( uv ).toConst();
+
+				// Load motion and expected depth from one surface at silhouettes.
+
+				const motionSize = ivec2( textureSize( scenePassVelocity ) );
+				const motionTexel = ivec2( uv.mul( vec2( motionSize ) ) ).clamp( ivec2( 0 ), motionSize.sub( 1 ) );
+				const motion = scenePassVelocity.load( motionTexel ).toConst();
 				const historyUV = uv.sub( motion.xy.mul( vec2( 0.5, - 0.5 ) ) ).add( jitterDelta ).toConst();
 				const size = vec2( textureSize( previousDepth ) );
 				const pixel = historyUV.mul( size ).sub( 0.5 );
