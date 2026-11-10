@@ -273,13 +273,21 @@ class DenoiseNode extends Node {
 		this.noiseAwareClamp = uniform( true, 'bool' );
 
 		/**
-		 * Whether samples are weighted by `1 / ( 1 + luminance )` in the spatial filter and the temporal blend ( Karis
-		 * average ), so that a rare bright sample, e.g. a firefly, cannot dominate the average. It darkens bright,
-		 * noisy regions slightly.
+		 * Whether samples are weighted by `1 / ( 1 + luminance / ( 4 * reference ) )` in the spatial filter and the
+		 * temporal blend, a Karis average relative to the local level ( the center texel, or the fast history ), so
+		 * that a rare bright sample, e.g. a firefly, cannot dominate the average without darkening common samples.
 		 *
 		 * @type {UniformNode<bool>}
 		 */
 		this.fireflyWeighting = uniform( false, 'bool' );
+
+		/**
+		 * Temporal: how much motion shortens the history: its length is capped at `maxFrames / ( 1 + scale * motion )`,
+		 * with the motion of the texel ( or of its reflection ) in texels per frame. `0` disables it.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.motionHistoryScale = uniform( 0.5 );
 
 		/**
 		 * Whether the node filters every frame in which it is used. Otherwise it filters once when
@@ -1003,6 +1011,12 @@ class DenoiseNode extends Node {
 					const previousFast = sumFast.div( sumWeight ).toVar();
 					const age = min( sumLength.div( sumWeight ).add( 1 ), this.maxFrames ).toVar();
 
+					// motion shortens the history, so that moving reflections do not lag
+
+					// ( without the jitter of the projection, and ignoring sub-texel motion )
+					const motion = historyUV.sub( uv ).sub( this._jitterDelta ).mul( size ).length().sub( 0.25 ).max( 0 );
+					age.assign( age.min( this.maxFrames.div( motion.mul( this.motionHistoryScale ).add( 1 ) ).max( 2 ) ) );
+
 					// color anti-lag ( ReLAX ): a short fast history, loosely bounded by the range of the current
 					// neighborhood, bounds the long history; where they diverge beyond the spread of the fast history,
 					// the long history is dropped
@@ -1032,10 +1046,11 @@ class DenoiseNode extends Node {
 
 					const a = float( 1 ).div( age ).toVar();
 
-					// the firefly weighting: the weight of each side divided by 1 + its luminance
+					// the firefly weighting: the weight of each side divided by 1 + its luminance relative to the fast history
 
-					const weightCurrent = a.div( luminance( current.rgb ).add( 1 ) );
-					const weightHistory = a.oneMinus().div( luminance( bounded.rgb ).add( 1 ) );
+					const fireflyReference = luminance( fast ).mul( 4 ).add( 1e-3 );
+					const weightCurrent = a.div( luminance( current.rgb ).div( fireflyReference ).add( 1 ) );
+					const weightHistory = a.oneMinus().div( luminance( bounded.rgb ).div( fireflyReference ).add( 1 ) );
 					result.assign( mix( bounded, current, this.fireflyWeighting.select( weightCurrent.div( weightCurrent.add( weightHistory ) ), a ) ) );
 
 					// the exponential moving variance of the luminance, stable in half floats
@@ -1415,7 +1430,7 @@ class DenoiseNode extends Node {
 
 							}
 
-							const fireflyWeight = this.fireflyWeighting.select( float( 1 ).div( luminance( value.rgb ).add( 1 ) ), 1 );
+							const fireflyWeight = this.fireflyWeighting.select( float( 1 ).div( luminance( value.rgb ).div( centerLuminance.mul( 4 ).add( 1e-3 ) ).add( 1 ) ), 1 );
 							const weight = similarity.mul( exp( exponent.negate() ) ).mul( kernelWeight ).mul( fireflyWeight ).toVar();
 							const deviation2 = weight.pow2().mul( value.a.pow2() ).toVar();
 

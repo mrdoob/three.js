@@ -7,8 +7,8 @@
  * @see {@link https://github.com/gkjohnson/three-gpu-pathtracer}
  */
 
-import { If, dot, equirectUV, float, luminance, max, normalize, texture, uniform, vec2, vec4 } from 'three/tsl';
-import { ClampToEdgeWrapping, DataTexture, DataUtils, FloatType, HalfFloatType, LinearFilter, RedFormat, RepeatWrapping, TextureSource, Vector2 } from 'three/webgpu';
+import { If, PI, dot, equirectUV, float, log2, luminance, max, normalize, texture, textureSize, uniform, vec2, vec4 } from 'three/tsl';
+import { ClampToEdgeWrapping, DataTexture, DataUtils, FloatType, HalfFloatType, LinearFilter, LinearMipmapLinearFilter, RedFormat, RepeatWrapping, TextureSource, Vector2 } from 'three/webgpu';
 import { D_GTR, F_Schlick, GeometryTerm, SmithG, equirectDirPdf, misPowerHeuristic } from '../utils/SpecularHelpers.js';
 
 function colorToLuminance( r, g, b ) {
@@ -46,6 +46,10 @@ function preprocessEnvMap( envMap ) {
 
 	const map = envMap.clone();
 	map.source = new TextureSource( { ...map.image } );
+
+	// mips for filtered importance sampling
+	map.minFilter = LinearMipmapLinearFilter;
+	map.generateMipmaps = true;
 	const { width, height, data } = map.image;
 
 	let newData = data;
@@ -425,7 +429,8 @@ class ImportanceSampledEnvironment {
 		V,
 		alpha,
 		f0,
-		f90 = float( 1 )
+		f90 = float( 1 ),
+		filtered = null
 	} ) {
 
 		const worldNormal = cameraWorldMatrix.mul( vec4( N, 0 ) ).xyz.normalize().toVar();
@@ -433,14 +438,30 @@ class ImportanceSampledEnvironment {
 		const NdotV = max( float( 0 ), dot( worldNormal, worldV ) ).toVar();
 
 		const L1 = cameraWorldMatrix.mul( vec4( viewReflectDir, float( 0 ) ) ).xyz.normalize().toVar();
-		// Explicit LOD 0: the equirect mapping is singular at the poles (atan undefined when the reflected
-		// ray points straight up/down, e.g. a flat floor under a top-down camera), so derivative-driven mip
-		// selection picks the coarsest, near-average mip and yields a bright streak. Sample full-res instead.
-		const brdfEnvColor = texture( this._mapNode, equirectUV( L1 ) ).level( 0 ).rgb;
 
 		const H1 = normalize( worldV.add( L1 ) ).toVar();
 		const NdotL1 = max( float( 0 ), dot( worldNormal, L1 ) ).toVar();
 		const VdotH1 = max( float( 0 ), dot( worldV, H1 ) ).toVar();
+
+		// Explicit LOD: the equirect mapping is singular at the poles (atan undefined when the reflected
+		// ray points straight up/down, e.g. a flat floor under a top-down camera), so derivative-driven mip
+		// selection picks the coarsest, near-average mip and yields a bright streak. With `filtered`, the LOD is
+		// that of filtered importance sampling ( Křivánek & Colbert ): the mip whose texels cover the solid angle
+		// of the sample, 1 / pdf, so that a rare sample of a small bright source ( the sun ) is not a firefly
+		let lod = float( 0 );
+
+		if ( filtered !== null ) {
+
+			const NdotH1 = max( float( 0 ), dot( worldNormal, H1 ) );
+			const a2 = alpha.mul( alpha );
+			const d = NdotH1.mul( NdotH1 ).mul( a2.sub( 1 ) ).add( 1 );
+			const pdf = a2.div( d.mul( d ).mul( PI ) ).mul( NdotH1 ).div( VdotH1.mul( 4 ).max( 1e-4 ) );
+			const size = vec2( textureSize( this._mapNode, 0 ) );
+			lod = filtered.select( log2( size.x.mul( size.y ).div( pdf.mul( 4 * Math.PI ).max( 1e-8 ) ) ).mul( 0.5 ).max( 0 ), 0 );
+
+		}
+
+		const brdfEnvColor = texture( this._mapNode, equirectUV( L1 ) ).level( lod ).rgb;
 
 		const W1 = F_Schlick( f0, VdotH1, f90 ).mul( GeometryTerm( NdotL1, NdotV, alpha ) ).div( SmithG( NdotV, alpha ).max( float( 1e-4 ) ) );
 

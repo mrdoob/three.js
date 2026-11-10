@@ -138,6 +138,7 @@
 				binaryRefine: false,
 				stepExponent: 3,
 				envImportanceSampling: false,
+				envFilteredSampling: false,
 				screenEdgeFade: 0.2,
 				screenEdgeFadeBlack: false, // for indoor scenes, set to true
 				environmentIntensity: 3.14, // not too sure why exactly, but multiplying by ~PI makes the env map reflections match Blender more
@@ -150,7 +151,8 @@
 				antiLagNoiseGate: true,
 				historyClamp: true,
 				noiseAwareClamp: true,
-				fireflyWeighting: false
+				fireflyWeighting: false,
+				motionHistoryScale: 0.5
 			},
 
 			post: {
@@ -355,6 +357,7 @@
 			ssrGui.add( params.ssr, 'mirrorBias', 0, 1 ).name( 'mirror bias' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'stepExponent', 1, 4, 0.5 ).name( 'step exponent' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'binaryRefine' ).name( 'binary refine' ).onChange( applyParams );
+			ssrGui.add( params.ssr, 'envFilteredSampling' ).name( 'env filtered sampling' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'maxDistance', 0, 5 ).name( 'max distance' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'intensity', 0, 4 ).name( 'intensity' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'thickness', 0, 0.25 ).name( 'thickness' ).onChange( applyParams );
@@ -377,6 +380,7 @@
 			denoiseGui.add( params.denoise, 'historyClamp' ).name( 'history clamp' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'noiseAwareClamp' ).name( 'noise-aware clamp' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'fireflyWeighting' ).name( 'firefly weighting' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'motionHistoryScale', 0, 2 ).name( 'motion history scale' ).onChange( applyParams );
 
 			// Concise UI for Directional Light controls
 			const lightGui = renderer.inspector.createParameters( 'Light' ).close();
@@ -412,6 +416,7 @@
 			ssrNode.screenEdgeFade.value = params.ssr.screenEdgeFade;
 			ssrNode.screenEdgeFadeBlack = params.ssr.screenEdgeFadeBlack;
 			ssrNode.environmentIntensity.value = params.ssr.environmentIntensity;
+			ssrNode.envFilteredSampling.value = params.ssr.envFilteredSampling;
 
 			if ( denoiseNode ) {
 
@@ -422,6 +427,7 @@
 				denoiseNode.historyClamp.value = params.denoise.historyClamp;
 				denoiseNode.noiseAwareClamp.value = params.denoise.noiseAwareClamp;
 				denoiseNode.fireflyWeighting.value = params.denoise.fireflyWeighting;
+				denoiseNode.motionHistoryScale.value = params.denoise.motionHistoryScale;
 
 			}
 

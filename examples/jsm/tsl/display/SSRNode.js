@@ -320,6 +320,14 @@ class SSRNode extends Node {
 		this.noiseAtlas = null;
 
 		/**
+		 * Whether rays that miss read the environment with filtered importance sampling: a blurrier mip for samples
+		 * that stand for a larger solid angle, so that rare samples of a small bright source are not fireflies.
+		 *
+		 * @type {UniformNode<bool>}
+		 */
+		this.envFilteredSampling = uniform( false, 'bool' );
+
+		/**
 		 * HDR environment map for screen-space misses.
 		 *
 		 * @type {?Texture}
@@ -1019,7 +1027,8 @@ class SSRNode extends Node {
 							V,
 							alpha: ggxSample.get( 'alpha' ),
 							f0: ggxSample.get( 'f0' ),
-							f90: ggxSample.get( 'f90' )
+							f90: ggxSample.get( 'f90' ),
+							filtered: this.envFilteredSampling
 						} ) );
 
 					}
