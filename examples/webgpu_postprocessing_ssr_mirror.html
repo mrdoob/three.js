@@ -44,7 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec4, uniform, mix, passTexture } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -55,7 +55,7 @@
 		import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 		const params = {
-			output: 'Beauty', quality: 0.5,
+			output: 'Beauty', enabled: true, quality: 0.5, intensity: 1,
 			maxDistance: 1, thickness: 0.03, binaryRefine: false,
 			roughness: 1, blur: true, blurQuality: 1
 		};
@@ -141,26 +141,50 @@
 
 			const scenePass = pass( scene, camera );
 			scenePass.setMRT( mrt( {
-				output,
-				diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
-				normal: vec4( packNormalToRGB( normalView ), materialRoughness )
+				output: output,
+				normal: packNormalToRGB( normalView ),
+				metalrough: vec2( metalness, roughness ) // pack metalness and roughness into a single attachment
 			} ) );
-			scenePass.getTexture( 'normal' ).type = THREE.UnsignedByteType;
-			scenePass.getTexture( 'diffuseColor' ).type = THREE.UnsignedByteType;
-			const beauty = scenePass.getTextureNode();
-			const depth = scenePass.getTextureNode( 'depth' );
-			const packedNormal = scenePass.getTextureNode( 'normal' );
-			const albedo = scenePass.getTextureNode( 'diffuseColor' );
-			const normal = sample( uv => unpackRGBToNormal( packedNormal.sample( uv ).rgb ) );
-			const surfaceRoughness = sample( uv => packedNormal.sample( uv ).a );
-			const reflection = ssr( beauty, depth, normal, {
-				binaryRefine: params.binaryRefine,
-				diffuseNode: albedo, metalnessNode: albedo.a, roughnessNode: surfaceRoughness
+
+			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
+			const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', ( node ) => {
+
+				return colorSpaceToWorking( node, THREE.SRGBColorSpace );
+
+			} );
+			const scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
+
+				return scenePass.getLinearDepthNode();
+
+			} );
+			const scenePassMetalRough = scenePass.getTextureNode( 'metalrough' ).toInspector( 'Metalness-Roughness' );
+
+			// optional: optimize bandwidth by reducing the texture precision for normals and metal/roughness
+
+			const normalTexture = scenePass.getTexture( 'normal' );
+			normalTexture.type = THREE.UnsignedByteType;
+
+			const metalRoughTexture = scenePass.getTexture( 'metalrough' );
+			metalRoughTexture.type = THREE.UnsignedByteType;
+
+			const sceneNormal = sample( ( uv ) => {
+
+				return unpackRGBToNormal( scenePassNormal.sample( uv ) );
+
+			} );
+
+			//
+
+			const reflection = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+				metalnessNode: scenePassMetalRough.r,
+				roughnessNode: scenePassMetalRough.g,
+				binaryRefine: params.binaryRefine
 			} ).toInspector( 'SSR' );
+
 			const raw = passTexture( reflection, reflection.getRenderTarget().texture );
 			const blurred = reflection.getTextureNode();
 			const blurEnabled = uniform( 1 );
-			const combined = beauty.rgb.add( mix( raw.rgb, blurred.rgb, blurEnabled ) );
+			const combined = scenePassColor.rgb.add( mix( raw.rgb, blurred.rgb, blurEnabled ) );
 			const spatialAA = smaa( vec4( combined, 1 ) );
 
 			function updateOutput() {
@@ -174,7 +198,7 @@
 
 				}
 
-				pipeline.outputNode = view;
+				pipeline.outputNode = params.enabled ? view : scenePass;
 				pipeline.outputColorTransform = true;
 				pipeline.needsUpdate = true;
 
@@ -192,6 +216,8 @@
 			displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN' ] ).name( 'Output' ).info( 'DN means denoise; this mirror example uses spatial blur rather than stochastic denoising.' ).onChange( updateOutput );
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
+			ssrGui.add( params, 'enabled' ).name( 'Enabled' ).onChange( updateOutput );
+			ssrGui.add( params, 'intensity', 0, 1 ).name( 'Intensity' ).onChange( updateParameters );
 			ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( updateParameters );
 			ssrGui.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( updateParameters );
 			ssrGui.add( params, 'maxDistance', 0.01, 50, 0.01 ).name( 'Max distance' ).onChange( updateParameters );
@@ -218,6 +244,7 @@
 			function updateParameters() {
 
 				reflection.quality.value = params.quality;
+				reflection.intensity.value = params.intensity;
 				reflection.binaryRefine = params.binaryRefine;
 				reflection.maxDistance.value = params.maxDistance;
 				reflection.thickness.value = params.thickness;

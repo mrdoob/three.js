@@ -325,6 +325,7 @@
 			displayGui.add( params.post, 'traa' ).name( 'TRAA' ).onChange( updateOutputNode );
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
+			ssrGui.add( params.ssr, 'intensity', 0, 4 ).name( 'Intensity' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'binaryRefine' ).name( 'Binary refine' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'maxDistance', 0.01, 50, 0.01 ).name( 'Max distance' ).onChange( applyParams );
