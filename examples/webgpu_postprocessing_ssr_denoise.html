@@ -344,7 +344,6 @@
 			const ssrTexture = ssrNode.getTextureNode();
 
 			denoiseNode = temporalDenoise( ssrTexture, {
-				temporalWeight: 0.05,
 				depth: scenePassDepth,
 				normal: sceneNormal,
 				camera,

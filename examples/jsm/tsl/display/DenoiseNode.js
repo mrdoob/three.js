@@ -80,7 +80,6 @@ class DenoiseNode extends Node {
 	 * @param {boolean} [options.alpha=false] - Screen space: whether alpha is a second signal to filter, e.g. AO next to GI.
 	 * @param {boolean} [options.coverage=false] - Screen space: whether the input is radiance with its coverage in alpha.
 	 * @param {boolean} [options.temporal=false] - Screen space: whether to accumulate the input in time, see `temporalDenoise()`.
-	 * @param {?number} [options.temporalWeight=null] - Fixed current-frame weight for valid temporal history, in `(0,1]`. When null, derive the weight from the history age.
 	 * @param {('fast'|'quality')} [options.quality='fast'] - The preset of the filter.
 	 */
 	constructor( inputNode, options = {} ) {
@@ -89,10 +88,8 @@ class DenoiseNode extends Node {
 
 		const {
 			depth = null, normal = null, camera = null, position = null, variance = null, velocity = null,
-			roughness = null, hitDistance = null, alpha = false, coverage = false, temporal = false, temporalWeight = null, quality = 'fast'
+			roughness = null, hitDistance = null, alpha = false, coverage = false, temporal = false, quality = 'fast'
 		} = options;
-
-		if ( temporalWeight !== null && ! ( temporalWeight > 0 && temporalWeight <= 1 ) ) throw new Error( 'THREE.DenoiseNode: Temporal weight must be in (0,1].' );
 
 		const screenSpace = position === null;
 
@@ -251,16 +248,6 @@ class DenoiseNode extends Node {
 		 * @type {UniformNode<float>}
 		 */
 		this.maxFrames = uniform( 8 );
-
-		/**
-		 * Fixed current-frame weight for valid temporal history, or `null` to derive it from the history age.
-		 * Set at construction. Age tracking is retained for the variance estimate and fast history.
-		 *
-		 * @type {?number}
-		 * @readonly
-		 * @default null
-		 */
-		this.temporalWeight = temporalWeight;
 
 		/**
 		 * Whether the node filters every frame in which it is used. Otherwise it filters once when
@@ -1004,7 +991,7 @@ class DenoiseNode extends Node {
 					const alphaRange = currentMax.a.sub( currentMin.a );
 					const bounded = vec4( previousColor.rgb.clamp( minimum, maximum ), alpha ? previousColor.a.clamp( currentMin.a.sub( alphaRange ), currentMax.a.add( alphaRange ) ) : 1 );
 
-					const a = this.temporalWeight === null ? float( 1 ).div( age ).toVar() : float( this.temporalWeight );
+					const a = float( 1 ).div( age ).toVar();
 					result.assign( mix( bounded, current, a ) );
 
 					// the exponential moving variance of the luminance, stable in half floats
