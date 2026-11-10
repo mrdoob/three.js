@@ -64,8 +64,8 @@ export const flickerReduction = Fn( ( [ currentColor, historyColor, currentWeigh
 /**
  * Samples a texture with a 5-tap Catmull-Rom filter. Compared to bilinear filtering, this keeps the
  * reprojected history sharp under motion since repeated resampling does not accumulate blur. The four
- * corner taps of the 4×4 footprint are skipped since their weights are negligible. Negative lobes
- * are clamped to avoid ringing artifacts.
+ * corner taps of the 4×4 footprint are skipped since their weights are negligible. The result is
+ * clamped to zero since the negative lobes can produce negative values.
  *
  * Reference: {@link https://gist.github.com/TheRealMJP/c83b8c0f46b63f3a88a5986f4fa982b1}
  *

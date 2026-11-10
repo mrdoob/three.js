@@ -19,9 +19,9 @@
 			</div>
 
 			<small>
-				Aliasing stress scene with isolated camera motions and every TRAA parameter.<br />
-				Motion advances per frame, so the result does not depend on the frame rate.<br />
-				Reference: unjittered 2× or 4× resolution with 4× MSAA, downsampled with a box or Lanczos-3 filter.
+				Aliasing stress scene with scripted camera motions for testing TRAA.<br />
+				The reference is the same frame without jitter at 4× resolution with 4× MSAA, box filtered.<br />
+				Pick an output, then compare it to the reference side by side or as a difference.
 			</small>
 		</div>
 
@@ -39,26 +39,20 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, Loop, float, int, ivec2, mrt, output, pass, renderOutput, screenUV, uniform, velocity, vec2, vec4 } from 'three/tsl';
+			import { mrt, output, pass, renderOutput, screenUV, uniform, velocity, vec2, vec4 } from 'three/tsl';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const params = {
-				view: 'TRAA',
-				deltaGain: 4,
-				referenceScale: 4,
-				referenceFilter: 'Box',
+				output: 'TRAA',
+				compare: 'Off',
 				historyLength: 20,
 				historySampling: 'catmull-rom',
 				useSubpixelCorrection: true,
-				depthThreshold: 0.0005,
-				edgeDepthDiff: 0.001,
-				maxVelocityLength: 128,
 				motion: 'Pan horizontal',
 				speed: 1,
 				paused: false,
-				pixelSize: 1,
 				step: () => advance( 1 ),
 				reset: () => resetHistory()
 			};
@@ -66,8 +60,8 @@
 			const motions = [ 'Static', 'Pan horizontal', 'Pan vertical', 'Orbit', 'Yaw', 'Roll', 'Dolly', 'FOV zoom', 'Sub-pixel drift', 'Objects only' ];
 
 			const matrix = new THREE.Matrix4();
-			const views = [ 'TRAA', 'Reference', 'Split TRAA | Reference', 'Delta TRAA', 'MSAA 4×', 'Delta MSAA 4×', 'No AA', 'Delta No AA', 'Input (jittered)', 'Velocity' ];
-			const deltaGain = uniform( params.deltaGain );
+			const deltaGain = uniform( 4 );
+			const controls = {};
 
 			let camera, referenceCamera, msaaCamera, scene, renderer, renderPipeline, scenePass, referencePass, msaaPass, traaPass, spinner, cutout, blended, morph, instances;
 			let phase = 0;
@@ -106,47 +100,35 @@
 				scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( { output, velocity } ) );
 				referencePass = pass( scene, referenceCamera, { samples: 4 } );
-				referencePass.setResolutionScale( params.referenceScale );
+				referencePass.setResolutionScale( 4 );
 				msaaPass = pass( scene, msaaCamera, { samples: 4 } );
 				// views apply tone mapping themselves so deltas are measured in display space
 				renderPipeline.outputColorTransform = false;
 
-				updatePixelSize();
-				rebuild();
-
 				const gui = renderer.inspector.createParameters( 'TRAA test' );
-				gui.add( params, 'view', views ).name( 'View' ).onChange( updateOutput );
-				gui.add( params, 'referenceScale', { '2×': 2, '4×': 4 } ).name( 'Reference scale' ).onChange( value => {
+				gui.add( params, 'output', [ 'TRAA', 'MSAA 4×', 'No AA', 'Reference' ] ).name( 'Output' ).onChange( updateOutput );
+				controls.compare = gui.add( params, 'compare', [ 'Off', 'Split', 'Difference' ] ).name( 'Compare' ).onChange( updateOutput );
+				controls.compare.info( 'Split shows the output on the left and the reference on the right. Difference shows their absolute difference.' );
+				controls.deltaGain = gui.add( deltaGain, 'value', 1, 32, 1 ).name( 'Difference gain' );
 
-					referencePass.setResolutionScale( value );
-					updateOutput();
+				const motionFolder = gui.addFolder( 'Motion' );
+				motionFolder.add( params, 'motion', motions ).name( 'Motion' ).onChange( resetHistory );
+				motionFolder.add( params, 'speed', 0.1, 4, 0.1 ).name( 'Speed' );
+				motionFolder.add( params, 'paused' ).name( 'Paused' );
+				motionFolder.add( params, 'step' ).name( 'Step one frame' );
 
-				} );
-				gui.add( params, 'referenceFilter', [ 'Box', 'Lanczos-3' ] ).name( 'Reference filter' ).onChange( updateOutput );
-				gui.add( params, 'deltaGain', 1, 32, 1 ).name( 'Delta gain' ).onChange( value => {
-
-					deltaGain.value = value;
-
-				} );
-				gui.add( params, 'motion', motions ).name( 'Motion' ).onChange( resetHistory );
-				gui.add( params, 'speed', 0.1, 4, 0.1 ).name( 'Speed' );
-				gui.add( params, 'paused' ).name( 'Paused' );
-				gui.add( params, 'step' ).name( 'Step one frame' );
-				gui.add( params, 'pixelSize', { '1×': 1, '2×': 2, '4×': 4, '8×': 8 } ).name( 'Pixel zoom' ).onChange( updatePixelSize );
-
-				const traaFolder = gui.addFolder( 'TRAA' );
-				traaFolder.add( params, 'historyLength', [ 1, 2, 4, 8, 16, 20, 32, 64 ] ).name( 'History length' ).onChange( value => {
+				controls.traa = gui.addFolder( 'TRAA' );
+				controls.traa.add( params, 'historyLength', [ 1, 2, 4, 8, 16, 20, 32, 64 ] ).name( 'History length' ).onChange( value => {
 
 					traaPass.historyLength.value = value;
 
 				} );
-				// the remaining parameters are baked into the shader, so the node is rebuilt
-				if ( traaPass.historySampling !== undefined ) traaFolder.add( params, 'historySampling', [ 'catmull-rom', 'linear' ] ).name( 'History sampling' ).onChange( rebuild );
-				traaFolder.add( params, 'useSubpixelCorrection' ).name( 'Subpixel correction' ).onChange( rebuild );
-				traaFolder.add( params, 'depthThreshold', 0, 0.005, 0.0001 ).name( 'Depth threshold' ).onChange( rebuild );
-				traaFolder.add( params, 'edgeDepthDiff', 0, 0.01, 0.0001 ).name( 'Edge depth diff' ).onChange( rebuild );
-				traaFolder.add( params, 'maxVelocityLength', 1, 512, 1 ).name( 'Max velocity (px)' ).onChange( rebuild );
-				traaFolder.add( params, 'reset' ).name( 'Reset history' );
+				// these are baked into the shader, so the node is rebuilt
+				controls.traa.add( params, 'historySampling', [ 'catmull-rom', 'linear' ] ).name( 'History sampling' ).onChange( rebuild );
+				controls.traa.add( params, 'useSubpixelCorrection' ).name( 'Subpixel correction' ).onChange( rebuild );
+				controls.traa.add( params, 'reset' ).name( 'Reset history' );
+
+				rebuild();
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -156,113 +138,51 @@
 
 				if ( traaPass !== undefined ) traaPass.dispose();
 
-				const color = scenePass.getTextureNode( 'output' );
-				traaPass = traa( color, scenePass.getTextureNode( 'depth' ), scenePass.getTextureNode( 'velocity' ), camera );
+				traaPass = traa( scenePass.getTextureNode( 'output' ), scenePass.getTextureNode( 'depth' ), scenePass.getTextureNode( 'velocity' ), camera );
 				traaPass.historyLength.value = params.historyLength;
 				traaPass.historySampling = params.historySampling;
 				traaPass.useSubpixelCorrection = params.useSubpixelCorrection;
-				traaPass.depthThreshold = params.depthThreshold;
-				traaPass.edgeDepthDiff = params.edgeDepthDiff;
-				traaPass.maxVelocityLength = params.maxVelocityLength;
 				updateOutput();
 
 			}
 
 			function updateOutput() {
 
-				const color = scenePass.getTextureNode( 'output' );
-				const display = node => renderOutput( node );
+				// TRAA jitters over one pixel, so a correct resolve converges to the box-filtered reference
+				// each bilinear tap on a texel corner averages 2×2 texels, so four taps form an exact 4×4 box
 				const referenceTexture = referencePass.getTextureNode();
-				const reference = display( params.referenceFilter === 'Box' ? boxDownsample( referenceTexture ) : lanczosDownsample( referenceTexture ) );
-				const delta = node => vec4( display( node ).rgb.sub( reference.rgb ).abs().mul( deltaGain ), 1 );
+				const texel = vec2( 1 ).div( vec2( referenceTexture.size() ) );
+				const taps = [[ - 1, - 1 ], [ 1, - 1 ], [ - 1, 1 ], [ 1, 1 ]].map( offset => referenceTexture.sample( screenUV.add( texel.mul( vec2( ...offset ) ) ) ) );
+				const reference = renderOutput( taps.reduce( ( sum, tap ) => sum.add( tap ) ).div( 4 ) );
+
+				// TRAA jitters the camera only while it is part of the output
 				const selected = {
-					'TRAA': () => display( traaPass ),
-					'Reference': () => reference,
-					'Split TRAA | Reference': () => screenUV.x.lessThan( 0.5 ).select( display( traaPass ), reference ),
-					'Delta TRAA': () => delta( traaPass ),
-					'MSAA 4×': () => display( msaaPass.getTextureNode() ),
-					'Delta MSAA 4×': () => delta( msaaPass.getTextureNode() ),
-					'No AA': () => display( color ),
-					'Delta No AA': () => delta( color ),
-					// TRAA still jitters the camera, but the resolve is not shown
-					'Input (jittered)': () => display( color ),
-					// NDC velocity scaled so a 1 px/frame motion is clearly visible
-					'Velocity': () => vec4( scenePass.getTextureNode( 'velocity' ).xy.mul( renderer.domElement.width * 0.1 ).abs(), 0, 1 )
-				}[ params.view ]();
-				const jittered = ! [ 'Reference', 'MSAA 4×', 'Delta MSAA 4×', 'No AA', 'Delta No AA' ].includes( params.view );
+					'TRAA': traaPass,
+					'MSAA 4×': msaaPass.getTextureNode(),
+					'No AA': scenePass.getTextureNode( 'output' )
+				}[ params.output ];
+				const color = selected ? renderOutput( selected ) : reference;
+				const compare = selected ? params.compare : 'Off';
 
-				renderPipeline.outputNode = Fn( builder => {
-
-					// building TRAA keeps the camera jitter even when its result is not displayed
-					if ( jittered ) traaPass.build( builder );
-					return selected;
-
-				} )();
+				renderPipeline.outputNode = {
+					'Off': color,
+					'Split': screenUV.x.lessThan( 0.5 ).select( color, reference ),
+					'Difference': vec4( color.rgb.sub( reference.rgb ).abs().mul( deltaGain ), 1 )
+				}[ compare ];
 				renderPipeline.needsUpdate = true;
 
-			}
+				// only show the options that affect the current output
 
-			// TRAA jitters over one pixel, so a correct resolve converges to this box-filtered image
-			function boxDownsample( referenceTexture ) {
-
-				// each bilinear tap on a texel corner averages 2×2 texels, so (scale / 2)² taps form an exact box
-				const texel = vec2( 1 ).div( vec2( referenceTexture.size() ) );
-				const offsets = params.referenceScale === 4 ? [ - 1, 1 ] : [ 0 ];
-				const taps = offsets.flatMap( x => offsets.map( y => referenceTexture.sample( screenUV.add( texel.mul( vec2( x, y ) ) ) ) ) );
-				return taps.reduce( ( sum, tap ) => sum.add( tap ) ).div( taps.length );
-
-			}
-
-			// sharper ideal reconstruction: shows how far TRAA is from a well-filtered image
-			function lanczosDownsample( referenceTexture ) {
-
-				const lanczos = x => {
-
-					const px = x.abs().mul( Math.PI ).max( 1e-4 );
-					return x.abs().lessThan( 3 ).select( px.sin().div( px ).mul( px.div( 3 ).sin().div( px.div( 3 ) ) ), 0 );
-
-				};
-
-				return Fn( () => {
-
-					const scale = params.referenceScale, radius = 3 * scale;
-					const size = ivec2( referenceTexture.size() );
-					const center = screenUV.mul( vec2( size ) ).toConst();
-					const base = ivec2( center.floor() ).toConst();
-					const sum = vec4( 0 ).toVar();
-					const total = float( 0 ).toVar();
-
-					Loop( { start: int( - radius ), end: int( radius ), type: 'int', name: 'y' }, ( { y } ) => {
-
-						Loop( { start: int( - radius ), end: int( radius ), type: 'int', name: 'x' }, ( { x } ) => {
-
-							const coordinate = base.add( ivec2( x, y ) ).toConst();
-							const offset = vec2( coordinate ).add( 0.5 ).sub( center ).div( scale );
-							const weight = lanczos( offset.x ).mul( lanczos( offset.y ) ).toConst();
-							sum.addAssign( referenceTexture.load( coordinate.max( ivec2( 0 ) ).min( size.sub( 1 ) ) ).mul( weight ) );
-							total.addAssign( weight );
-
-						} );
-
-					} );
-
-					return sum.div( total ).max( 0 );
-
-				} )();
+				const toggle = ( control, visible ) => visible ? control.show() : control.hide();
+				toggle( controls.compare, selected !== undefined );
+				toggle( controls.deltaGain, compare === 'Difference' );
+				toggle( controls.traa, params.output === 'TRAA' );
 
 			}
 
 			function resetHistory() {
 
 				traaPass?.setSize( 1, 1 );
-
-			}
-
-			function updatePixelSize() {
-
-				renderer.setPixelRatio( 1 / params.pixelSize );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				resetHistory();
 
 			}
 
@@ -470,7 +390,6 @@
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				updateOutput();
 
 			}
 
