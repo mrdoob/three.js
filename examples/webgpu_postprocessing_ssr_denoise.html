@@ -59,7 +59,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation, vec2, Fn, If, positionPrevious, textureSize, getViewPosition, isBackgroundDepth } from 'three/tsl';
+		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation, vec2, Fn, positionPrevious, textureSize, getViewPosition, isBackgroundDepth } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
@@ -157,7 +157,6 @@
 		let scenePassNode, combinedOutputNode, scenePassDepth, scenePassVelocity;
 		let gammaUniform, contrastUniform, saturationUniform;
 		const denoiseEnabled = uniform( 1 );
-		const tracePreviousFrame = uniform( false );
 		const previousJitter = new THREE.Vector2();
 		const currentJitter = new THREE.Vector2();
 		const currentProjectionInverse = new THREE.Matrix4();
@@ -245,7 +244,7 @@
 
 			const scenePass = pass( scene, camera );
 			scenePassNode = scenePass;
-			scenePass.setMRT( mrt( {
+			const sceneOutputs = {
 				output: output,
 				// Store base color (albedo) in RGB + metalness in alpha. The albedo is needed for
 				// metal Fresnel f0; do NOT bake in the (1-metalness) diffuse attenuation here, as
@@ -253,9 +252,15 @@
 				diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
 				// Pack roughness into normal alpha channel to save MRT bandwidth
 				normal: vec4( packNormalToRGB( normalView ).rgb, materialRoughness ),
+				velocity: velocity
+			};
+			const currentMRT = mrt( sceneOutputs );
+			const previousMRT = mrt( {
+				...sceneOutputs,
 				// The hit's previous view depth also follows object motion, including motion toward the camera.
 				velocity: vec4( velocity, velocity.previousCameraViewMatrix.mul( velocity.previousModelWorldMatrix ).mul( vec4( positionPrevious, 1 ) ).z.toVarying(), 0 )
-			} ) );
+			} );
+			scenePass.setMRT( currentMRT );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
 			const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal' );
@@ -282,67 +287,55 @@
 
 			// Optionally trace the previous frame's radiance, reprojected with the motion of the hit.
 
-			const previousColor = scenePass.getPreviousTextureNode( 'output' );
-			const previousDepth = scenePass.getPreviousTextureNode( 'depth' );
-			const traceSource = sample( uv => Fn( () => {
+			const previousTraceSource = sample( uv => Fn( () => {
 
-				const color = vec4( 0 ).toVar();
+				// Allocate history only when this source is compiled for the first time.
+				const previousColor = scenePass.getPreviousTextureNode( 'output' );
+				const previousDepth = scenePass.getPreviousTextureNode( 'depth' );
+				const motion = scenePassVelocity.sample( uv ).toConst();
+				const historyUV = uv.sub( motion.xy.mul( vec2( 0.5, - 0.5 ) ) ).add( jitterDelta ).toConst();
+				const size = vec2( textureSize( previousDepth ) );
+				const pixel = historyUV.mul( size ).sub( 0.5 );
+				const base = pixel.floor();
+				const fraction = pixel.fract();
+				const inBounds = p => p.greaterThanEqual( 0 ).all().and( p.lessThanEqual( 1 ).all() );
+				const valid = historyValid.and( inBounds( historyUV ) )
+					.and( size.equal( historySize ).all() )
+					.and( vec2( textureSize( scenePassDepth ) ).equal( historySize ).all() )
+					.and( motion.z.lessThan( camera.near * - 1 ) );
 
-				// Keep the reprojection and depth-validation lookups out of the current-frame path.
-				If( tracePreviousFrame, () => {
+				// Allow a small pixel footprint for depth variation on sloping surfaces, plus half-float rounding.
+				const pixelDepth = previousProjectionInverse.element( 1 ).y.abs().mul( motion.z.abs() ).mul( 3 ).div( size.y );
+				const tolerance = pixelDepth.max( motion.z.abs().mul( 0.002 ) ).max( 0.001 );
+				const radiance = vec3( 0 ).toVar();
+				const support = float( 0 ).toVar();
 
-					const motion = scenePassVelocity.sample( uv ).toConst();
-					const historyUV = uv.sub( motion.xy.mul( vec2( 0.5, - 0.5 ) ) ).add( jitterDelta ).toConst();
-					const size = vec2( textureSize( previousDepth ) );
-					const pixel = historyUV.mul( size ).sub( 0.5 );
-					const base = pixel.floor();
-					const fraction = pixel.fract();
-					const inBounds = p => p.greaterThanEqual( 0 ).all().and( p.lessThanEqual( 1 ).all() );
-					const valid = historyValid.and( inBounds( historyUV ) )
-						.and( size.equal( historySize ).all() )
-						.and( vec2( textureSize( scenePassDepth ) ).equal( historySize ).all() )
-						.and( motion.z.lessThan( camera.near * - 1 ) );
+				// Validate each bilinear tap so interpolation cannot pull color across an occlusion edge.
+				for ( let y = 0; y <= 1; y ++ ) {
 
-					// Allow a small pixel footprint for depth variation on sloping surfaces, plus half-float rounding.
-					const pixelDepth = previousProjectionInverse.element( 1 ).y.abs().mul( motion.z.abs() ).mul( 3 ).div( size.y );
-					const tolerance = pixelDepth.max( motion.z.abs().mul( 0.002 ) ).max( 0.001 );
-					const radiance = vec3( 0 ).toVar();
-					const support = float( 0 ).toVar();
+					for ( let x = 0; x <= 1; x ++ ) {
 
-					// Validate each bilinear tap so interpolation cannot pull color across an occlusion edge.
-					for ( let y = 0; y <= 1; y ++ ) {
-
-						for ( let x = 0; x <= 1; x ++ ) {
-
-							const tapUV = base.add( vec2( x, y ) ).add( 0.5 ).div( size ).toConst();
-							const depth = previousDepth.sample( tapUV ).r;
-							const viewZ = getViewPosition( tapUV, depth, previousProjectionInverse ).z;
-							const accepted = valid.and( inBounds( tapUV ) ).and( isBackgroundDepth( depth ).not() )
-								.and( viewZ.sub( motion.z ).abs().lessThanEqual( tolerance ) );
-							const weightX = x === 0 ? fraction.x.oneMinus() : fraction.x;
-							const weightY = y === 0 ? fraction.y.oneMinus() : fraction.y;
-							const weight = weightX.mul( weightY ).mul( accepted ).toConst();
-							radiance.addAssign( previousColor.sample( tapUV ).rgb.mul( weight ) );
-							support.addAssign( weight );
-
-						}
+						const tapUV = base.add( vec2( x, y ) ).add( 0.5 ).div( size ).toConst();
+						const depth = previousDepth.sample( tapUV ).r;
+						const viewZ = getViewPosition( tapUV, depth, previousProjectionInverse ).z;
+						const accepted = valid.and( inBounds( tapUV ) ).and( isBackgroundDepth( depth ).not() )
+							.and( viewZ.sub( motion.z ).abs().lessThanEqual( tolerance ) );
+						const weightX = x === 0 ? fraction.x.oneMinus() : fraction.x;
+						const weightY = y === 0 ? fraction.y.oneMinus() : fraction.y;
+						const weight = weightX.mul( weightY ).mul( accepted ).toConst();
+						radiance.addAssign( previousColor.sample( tapUV ).rgb.mul( weight ) );
+						support.addAssign( weight );
 
 					}
 
-					// Missing history contributes no radiance; never substitute an unrelated surface's color.
-					color.assign( vec4( radiance.div( support.max( 1e-6 ) ), 1 ) );
+				}
 
-				} ).Else( () => {
-
-					color.assign( scenePassColor.sample( uv ) );
-
-				} );
-
-				return color;
+				// Missing history contributes no radiance; never substitute an unrelated surface's color.
+				return vec4( radiance.div( support.max( 1e-6 ) ), 1 );
 
 			} )() );
 
-			ssrNode = ssr( traceSource, scenePassDepth, sceneNormal, {
+			ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
 				camera,
 				stochastic: true,
 				diffuseNode: scenePassDiffuseColor,
@@ -413,7 +406,10 @@
 			ssrGui.add( params, 'output', outputTypes ).onChange( updateOutputNode );
 			ssrGui.add( params.ssr, 'traceSource', [ 'Current', 'Previous' ] ).name( 'Trace source' ).onChange( () => {
 
-				tracePreviousFrame.value = params.ssr.traceSource === 'Previous';
+				// Changing the source rebuilds the SSR shader; there is no runtime shader branch.
+				const usePrevious = params.ssr.traceSource === 'Previous';
+				scenePass.setMRT( usePrevious ? previousMRT : currentMRT );
+				ssrNode.colorNode = usePrevious ? previousTraceSource : scenePassColor;
 				historyValid.value = false;
 				denoiseNode.reset();
 
@@ -589,11 +585,16 @@
 			controls.update();
 
 			postProcessing.render();
-			previousJitter.copy( currentJitter );
-			previousProjectionInverse.value.copy( currentProjectionInverse );
-			const { width, height } = scenePassNode.getTexture( 'output' ).image;
-			historySize.value.set( width, height );
-			historyValid.value = true;
+
+			if ( params.ssr.traceSource === 'Previous' ) {
+
+				previousJitter.copy( currentJitter );
+				previousProjectionInverse.value.copy( currentProjectionInverse );
+				const { width, height } = scenePassNode.getTexture( 'output' ).image;
+				historySize.value.set( width, height );
+				historyValid.value = true;
+
+			}
 
 		}
 
