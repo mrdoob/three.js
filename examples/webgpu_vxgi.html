@@ -36,9 +36,11 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, sample, screenUV, builtinGIContext } from 'three/tsl';
+			import { pass, mrt, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, sample, screenUV, builtinGIContext, uniform, mix } from 'three/tsl';
 			import { vxgi } from 'three/addons/lighting/vxgi/VXGINode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+			import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
+			import { loadFASTNoise } from 'three/addons/tsl/utils/FASTNoise.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -81,6 +83,21 @@
 				controls.maxDistance = 100;
 				controls.update();
 
+				// the camera is kept in the URL hash, so a view can be shared and restored
+
+				const cameraHash = location.hash.match( /cam=([^&]+)/ );
+
+				if ( cameraHash ) {
+
+					const v = cameraHash[ 1 ].split( ',' ).map( Number );
+					camera.position.set( v[ 0 ], v[ 1 ], v[ 2 ] );
+					controls.target.set( v[ 3 ], v[ 4 ], v[ 5 ] );
+					controls.update();
+
+				}
+
+				controls.addEventListener( 'change', () => history.replaceState( null, '', location.search + '#cam=' + [ ...camera.position.toArray(), ...controls.target.toArray() ].map( v => v.toFixed( 4 ) ).join( ',' ) ) );
+
 				//
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
@@ -111,14 +128,25 @@
 				// gi
 
 				const giPass = vxgi( prePassDepth, prePassNormal, scene, camera, 64 );
+				giPass.noiseAtlas = await loadFASTNoise( 'textures/noises/fast/gauss1-ema01-spatio-temporal.png' );
+				giPass.noise = new URLSearchParams( location.search ).get( 'noise' ) || 'hhw';
 
 				const ao = giPass.getAONode().toInspector( 'VXGI.AO' );
 				const gi = giPass.getGINode().toInspector( 'VXGI.GI' );
 
+				// denoise: GI in rgb and AO in alpha, accumulated in time
+
+				const denoiseNode = temporalDenoise( vec4( gi.rgb, ao.r ), { depth: prePassDepth, normal: prePassNormal, camera, velocity: prePassVelocity, alpha: true } );
+				const denoised = denoiseNode.getTextureNode().toInspector( 'Denoise' );
+				const denoiseEnabled = uniform( 1 );
+
+				const aoFinal = mix( ao.sample( screenUV ).r, denoised.sample( screenUV ).a, denoiseEnabled );
+				const giFinal = mix( gi.sample( screenUV ).rgb, denoised.sample( screenUV ).rgb, denoiseEnabled );
+
 				// scene pass: AO and indirect irradiance are injected into the materials' lighting
 
 				const scenePass = pass( scene, camera ).toInspector( 'Color' );
-				const giContext = builtinGIContext( ao.sample( screenUV ).r, gi.sample( screenUV ).rgb );
+				const giContext = builtinGIContext( aoFinal, giFinal );
 				scenePass.contextNode = giContext;
 
 				// traa ( resolves the temporal noise of the cone tracing )
@@ -239,6 +267,22 @@
 				gui.add( giPass, 'bounces', 0, 2, 1 ).name( 'bounces' );
 				gui.add( giPass, 'directionalRadiance' ).name( 'directional radiance' );
 				gui.add( giPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );
+				gui.add( giPass, 'noise', { 'Hierarchical Hashed Weyl': 'hhw', 'FAST blue noise': 'fast', 'Interleaved gradient noise': 'ign' } ).name( 'noise' );
+
+				const denoiseParams = { enabled: true };
+				const denoiseGui = renderer.inspector.createParameters( 'Denoise Settings' );
+				denoiseGui.add( denoiseParams, 'enabled' ).onChange( ( value ) => denoiseEnabled.value = value ? 1 : 0 );
+				denoiseGui.add( denoiseNode.maxFrames, 'value', 1, 128, 1 ).name( 'max frames' );
+				denoiseGui.add( denoiseNode.luminancePhi, 'value', 0, 10 ).name( 'luminance phi' );
+				denoiseGui.add( denoiseNode.antiLagNoiseGate, 'value' ).name( 'anti-lag noise gate' );
+				denoiseGui.add( denoiseNode.historyClamp, 'value' ).name( 'history clamp' );
+				denoiseGui.add( denoiseNode.fireflyWeighting, 'value' ).name( 'firefly weighting' );
+				denoiseGui.add( denoiseNode.motionHistoryScale, 'value', 0, 2 ).name( 'motion history scale' );
+
+				const traaGui = renderer.inspector.createParameters( 'TRAA Settings' );
+				traaGui.add( traaPass.historyFrames, 'value', 4, 128, 1 ).name( 'history frames' );
+				traaGui.add( traaPass.varianceClipGamma, 'value', 0.5, 4 ).name( 'variance clip gamma' );
+				traaGui.add( traaPass.subpixelCorrectionAmount, 'value', 0, 0.5 ).name( 'subpixel correction' );
 
 				function updatePostprocessing() {
 
@@ -250,11 +294,11 @@
 
 					} else if ( params.output === 1 ) {
 
-						renderPipeline.outputNode = vec4( vec3( ao ), 1 );
+						renderPipeline.outputNode = vec4( vec3( aoFinal ), 1 );
 
 					} else if ( params.output === 2 ) {
 
-						renderPipeline.outputNode = vec4( gi.rgb, 1 );
+						renderPipeline.outputNode = vec4( giFinal, 1 );
 
 					} else if ( params.output === 3 ) {
 

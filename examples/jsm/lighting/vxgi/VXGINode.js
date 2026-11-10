@@ -1,9 +1,10 @@
 import { RenderTarget, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, HalfFloatType, RGBAFormat, RedFormat, UnsignedByteType } from 'three/webgpu';
-import { Fn, NodeUpdateType, uniform, reference, vec4, float, uv, mix, passTexture, getViewPosition, getNormalFromDepth, normalize, floor, exp2, pow, PI, Loop, If, Break, property, outputStruct, context, projectionDepth } from 'three/tsl';
+import { Fn, NodeUpdateType, uniform, reference, vec2, vec4, float, uint, uv, interleavedGradientNoise, mix, passTexture, getViewPosition, getNormalFromDepth, normalize, floor, exp2, pow, PI, Loop, If, Break, property, outputStruct, context, projectionDepth } from 'three/tsl';
 
 import { VXGIVolume } from './VXGIVolume.js';
 import { createConeTracer, gather, intersectVolume, sampleDirectional } from './VXGIConeTracer.js';
 import { R2_STEPS, hierarchicalHashedWeyl } from '../../tsl/utils/HierarchicalHashedWeyl.js';
+import { fastNoise } from '../../tsl/utils/FASTNoise.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -198,6 +199,24 @@ class VXGINode extends Node {
 		 */
 		this.useTemporalFiltering = true;
 
+		/**
+		 * The noise of the cone rotation and elevation, for comparisons: `'hhw'` ( Hierarchical Hashed Weyl ),
+		 * `'ign'` ( the previous pair of offset interleaved gradient noise ) or `'fast'` ( FAST blue noise, needs
+		 * {@link VXGINode#noiseAtlas} ). Changing it rebuilds the material.
+		 *
+		 * @type {string}
+		 * @default 'hhw'
+		 */
+		this.noise = 'hhw';
+
+		/**
+		 * The FAST noise atlas for `noise = 'fast'`, loaded with `loadFASTNoise()`.
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
+		this.noiseAtlas = null;
+
 		// private uniforms
 
 		this._resolution = uniform( new Vector2() );
@@ -235,6 +254,7 @@ class VXGINode extends Node {
 
 		this._sharedContext = null;
 		this._directional = null;
+		this._builtNoise = null;
 
 		this._aoNode = passTexture( this, aoTexture );
 		this._giNode = passTexture( this, giTexture );
@@ -376,7 +396,7 @@ class VXGINode extends Node {
 
 		// the sampling code depends on the volume's directional setting
 
-		if ( this._sharedContext !== null && this._directional !== this.volume.directionalRadiance ) {
+		if ( this._sharedContext !== null && ( this._directional !== this.volume.directionalRadiance || this._builtNoise !== this.noise ) ) {
 
 			this._setupMaterial();
 
@@ -438,6 +458,7 @@ class VXGINode extends Node {
 
 		const volume = this.volume;
 		const directional = this._directional = volume.directionalRadiance;
+		const noise = this._builtNoise = this.noise;
 		const uvNode = uv();
 
 		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
@@ -471,8 +492,27 @@ class VXGINode extends Node {
 			// Two independently seeded dimensions for cone rotation and elevation, stepped with the R2 sequence.
 
 			const pixel = uvNode.mul( this._resolution ).floor().toConst();
-			const rotationNoise = hierarchicalHashedWeyl( pixel, this._frame, 117, R2_STEPS[ 0 ] ).toConst();
-			const elevationNoise = hierarchicalHashedWeyl( pixel, this._frame, 118, R2_STEPS[ 1 ] ).toConst();
+			let rotationNoise, elevationNoise;
+
+			if ( noise === 'ign' ) {
+
+				// the previous sampler: two offset copies of interleaved gradient noise, on a 64 frame cycle
+				const shifted = pixel.add( float( this._frame.mod( uint( 64 ) ) ).mul( 5.588238 ) ).toConst();
+				rotationNoise = interleavedGradientNoise( shifted ).toConst();
+				elevationNoise = interleavedGradientNoise( shifted.add( vec2( 5.588238, 3.14159 ) ) ).toConst();
+
+			} else if ( noise === 'fast' && this.noiseAtlas !== null ) {
+
+				const values = fastNoise( this.noiseAtlas, new Vector2( 29, 83 ), this._frame ).toConst();
+				rotationNoise = values.x;
+				elevationNoise = values.y;
+
+			} else {
+
+				rotationNoise = hierarchicalHashedWeyl( pixel, this._frame, 117, R2_STEPS[ 0 ] ).toConst();
+				elevationNoise = hierarchicalHashedWeyl( pixel, this._frame, 118, R2_STEPS[ 1 ] ).toConst();
+
+			}
 
 			const CONE_COUNT = this.coneCount.toConst();
 			const tanHalfAngle = this.coneAngle.mul( 0.5 ).radians().tan().toConst();

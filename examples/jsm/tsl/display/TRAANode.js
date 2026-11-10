@@ -122,6 +122,33 @@ class TRAANode extends Node {
 		this.useSubpixelCorrection = true;
 
 		/**
+		 * The length of the history in frames: the minimum weight of the current frame is `1 / historyFrames`.
+		 * Longer histories have less noise and more lag.
+		 *
+		 * @type {UniformNode<float>}
+		 * @default 20
+		 */
+		this.historyFrames = uniform( 20 );
+
+		/**
+		 * The width of the variance clipping box in standard deviations for a static pixel; it falls to 0.5
+		 * under motion. Wider boxes keep more history of noisy inputs.
+		 *
+		 * @type {UniformNode<float>}
+		 * @default 1
+		 */
+		this.varianceClipGamma = uniform( 1 );
+
+		/**
+		 * How much the sub-pixel correction raises the weight of the current frame, at most, when the velocity is
+		 * between texels. It keeps moving geometry sharp, but shortens the history of noisy inputs under motion.
+		 *
+		 * @type {UniformNode<float>}
+		 * @default 0.25
+		 */
+		this.subpixelCorrectionAmount = uniform( 0.25 );
+
+		/**
 		 * The jitter index selects the current camera offset value.
 		 *
 		 * @private
@@ -577,12 +604,12 @@ class TRAANode extends Node {
 			// increase the weight towards the current frame under motion
 
 			const motionFactor = uvNode.sub( historyUV ).mul( textureSize ).length().div( this.maxVelocityLength ).saturate();
-			const currentWeight = float( 0.05 ).toVar(); // A minimum weight
+			const currentWeight = float( 1 ).div( this.historyFrames ).toVar(); // A minimum weight
 
 			if ( this.useSubpixelCorrection ) {
 
 				// Increase the minimum weight towards the current frame when the velocity is more subpixel.
-				currentWeight.addAssign( subpixelCorrection( offsetUV, textureSize ).mul( 0.25 ) );
+				currentWeight.addAssign( subpixelCorrection( offsetUV, textureSize ).mul( this.subpixelCorrectionAmount ) );
 
 			}
 
@@ -590,7 +617,7 @@ class TRAANode extends Node {
 
 			// Perform neighborhood clipping/clamping. We use variance clipping here.
 
-			const varianceGamma = mix( 0.5, 1, motionFactor.oneMinus().pow2() ); // Reasonable gamma range is [0.75, 2]
+			const varianceGamma = mix( 0.5, this.varianceClipGamma, motionFactor.oneMinus().pow2() ); // Reasonable gamma range is [0.75, 2]
 			const clippedHistoryColor = varianceClipping( positionTexel, currentColor, historyColor, varianceGamma );
 
 			// flicker reduction based on luminance weighing
