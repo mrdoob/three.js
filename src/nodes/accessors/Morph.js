@@ -45,7 +45,7 @@ const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, dept
 } );
 
 /**
- * The morph target base influence of the object. It is `1` when `morphTargetsRelative`
+ * The morph target base influence. It is `1` when `morphTargetsRelative`
  * is `true`, otherwise `1 - sum( influences )`.
  *
  * @type {PropertyNode<float>}
