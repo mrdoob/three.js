@@ -1,4 +1,4 @@
-import { Bone, BufferAttribute, BufferGeometry, DynamicDrawUsage, Float16BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Line, Mesh, Points, Skeleton, SkinnedMesh, Vector3 } from 'three';
+import { Bone, BufferAttribute, BufferGeometry, DynamicDrawUsage, Float16BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Skeleton, SkinnedMesh, Vector3 } from 'three';
 import * as BufferGeometryUtils from '../../../../examples/jsm/utils/BufferGeometryUtils.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
