@@ -1910,7 +1910,7 @@ class WebGPUBackend extends Backend {
 	 * and the size of the dispatched workgroup grid in which they are executed.
 	 * Depending on the type of the argument, the dispatch size of a compute call will be determined in different ways.
 	 * - A number will dispatch a workgroup grid sized to fit `dispatchSize` invocations.
-	 * - An array [x, y, z] will directly defines the size of the workgroup grid.
+	 * - An array [x, y, z] will directly define the size of the workgroup grid.
 	 *   The compute call will execute x * y * z * workgroupSize invocations.
 	 * - A IndirectStorageBufferAttribute will run an indirect compute dispatch.
 	 *   In an indirect dispatch, the [x, y, z] dimensions of the workgroup grid are defined by the first three values
