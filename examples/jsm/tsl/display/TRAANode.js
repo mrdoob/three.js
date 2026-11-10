@@ -97,6 +97,15 @@ class TRAANode extends Node {
 		this.depthThreshold = 0.0005;
 
 		/**
+		 * Maximum effective history length. The current frame receives at least
+		 * `1 / maxFrames` of the blend; motion and rejection can shorten history.
+		 *
+		 * @type {UniformNode<float>}
+		 * @default 20
+		 */
+		this.maxFrames = uniform( 20 );
+
+		/**
 		 * The depth difference within the 3×3 neighborhood to consider a pixel as an edge.
 		 *
 		 * @type {number}
@@ -577,7 +586,7 @@ class TRAANode extends Node {
 			// increase the weight towards the current frame under motion
 
 			const motionFactor = uvNode.sub( historyUV ).mul( textureSize ).length().div( this.maxVelocityLength ).saturate();
-			const currentWeight = float( 0.05 ).toVar(); // A minimum weight
+			const currentWeight = this.maxFrames.max( 1 ).reciprocal().toVar(); // A minimum weight
 
 			if ( this.useSubpixelCorrection ) {
 
