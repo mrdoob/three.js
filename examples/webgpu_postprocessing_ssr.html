@@ -44,10 +44,9 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, velocity, colorSpaceToWorking } from 'three/tsl';
-		import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
-		import { traa } from 'three/addons/tsl/display/TRAANode.js';
+		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -63,12 +62,11 @@
 			thickness: 0.03,
 			binaryRefine: false,
 			roughness: 1,
-			enabled: true,
-			maxFrames: 20
+			enabled: true
 		};
 
 		let camera, scene, model, renderer, renderPipeline, ssrPass;
-		let controls, denoiseNode;
+		let controls;
 
 		init();
 
@@ -150,8 +148,7 @@
 			scenePass.setMRT( mrt( {
 				output: output,
 				normal: packNormalToRGB( normalView ),
-				metalrough: vec2( metalness, roughness ), // pack metalness and roughness into a single attachment
-				velocity: velocity
+				metalrough: vec2( metalness, roughness ) // pack metalness and roughness into a single attachment
 			} ) );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
@@ -165,7 +162,6 @@
 				return scenePass.getLinearDepthNode();
 
 			} );
-			const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
 			const scenePassMetalRough = scenePass.getTextureNode( 'metalrough' ).toInspector( 'Metalness-Roughness' );
 
 			// optional: optimize bandwidth by reducing the texture precision for normals and metal/roughness
@@ -184,30 +180,14 @@
 
 			//
 
-			// trace the previous frame's radiance, reprojected with the motion of the hit
-
-			const previousColor = scenePass.getPreviousTextureNode( 'output' );
-			const traceSource = sample( ( uv ) => previousColor.sample( uv.sub( scenePassVelocity.sample( uv ).xy.mul( vec2( 0.5, - 0.5 ) ) ) ) );
-
-			ssrPass = ssr( traceSource, scenePassDepth, sceneNormal, {
-				camera,
+			ssrPass = ssr( scenePassColor, scenePassDepth, sceneNormal, {
 				metalnessNode: scenePassMetalRough.r,
 				roughnessNode: scenePassMetalRough.g
 			} ).toInspector( 'SSR' );
 
-			const ssrTexture = ssrPass.getTextureNode();
-			denoiseNode = temporalDenoise( ssrTexture, {
-				depth: scenePassDepth,
-				normal: sceneNormal,
-				camera,
-				velocity: scenePassVelocity,
-				roughness: sample( uv => scenePassMetalRough.sample( uv ).g ),
-				hitDistance: sample( uv => ssrTexture.sample( uv ).a )
-			} );
-
 			// blend SSR over beauty (SSR outputs premultiplied color, so use additive blending)
 
-			const outputNode = traa( scenePassColor.add( denoiseNode.getTextureNode().rgb ), scenePassDepth, scenePassVelocity, camera );
+			const outputNode = smaa( scenePassColor.add( ssrPass.rgb ) );
 
 			renderPipeline.outputNode = outputNode;
 
@@ -229,11 +209,17 @@
 			ssrFolder.add( params, 'intensity', 0, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'thickness', 0, 0.05 ).onChange( updateParameters );
 			ssrFolder.add( params, 'binaryRefine' ).name( 'binary refine' ).onChange( updateParameters );
-			ssrFolder.add( params, 'maxFrames', 1, 32, 1 ).name( 'SSR history frames' ).onChange( updateParameters );
 			ssrFolder.add( params, 'enabled' ).onChange( () => {
 
-				denoiseNode.reset();
-				renderPipeline.outputNode = params.enabled ? outputNode : scenePass;
+				if ( params.enabled === true ) {
+
+					renderPipeline.outputNode = outputNode;
+
+				} else {
+
+					renderPipeline.outputNode = scenePass;
+
+				}
 
 				renderPipeline.needsUpdate = true;
 
@@ -259,7 +245,6 @@
 
 		function updateParameters() {
 
-			denoiseNode.maxFrames.value = params.maxFrames;
 			ssrPass.quality.value = params.quality;
 			// blurQuality is a build-time constant: assigning it recompiles the blur material
 			// (the setter no-ops when the value is unchanged).
