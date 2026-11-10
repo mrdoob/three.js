@@ -48,13 +48,9 @@ const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, dept
  * The morph target base influence. It is `1` when `morphTargetsRelative`
  * is `true`, otherwise `1 - sum( influences )`.
  *
- * @type {UniformNode<float>}
+ * @type {PropertyNode<float>}
  */
-const morphBase = /*@__PURE__*/ uniform( 1 ).onObjectUpdate( ( { object } ) => {
-
-	return object.geometry.morphTargetsRelative ? 1 : 1 - object.morphTargetInfluences.reduce( ( a, b ) => a + b, 0 );
-
-} );
+const morphBase = /*@__PURE__*/ property( 'float', 'morphBase' );
 
 /**
  * The sum of the weighted color morph targets.
@@ -238,7 +234,7 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 
 	if ( morphTargetsCount === 0 ) return;
 
-	if ( mesh.morphTexture ) builder.objectSpecific = true;
+	if ( mesh.isInstancedMesh === true ) builder.objectSpecific = true;
 
 	// Init
 
@@ -261,6 +257,20 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 
 	const { texture: bufferMap, stride, size } = getEntry( geometry );
 
+	if ( mesh.isInstancedMesh === true ) {
+
+		morphBase.assign( textureLoad( mesh.morphTexture, ivec2( 0, int( instanceIndex ) ) ).r );
+
+	} else {
+
+		morphBase.assign( uniform( 1 ).onObjectUpdate( ( { object } ) => {
+
+			return object.geometry.morphTargetsRelative ? 1 : 1 - object.morphTargetInfluences.reduce( ( a, b ) => a + b, 0 );
+
+		} ) );
+
+	}
+
 	if ( hasMorphPosition === true ) positionLocal.mulAssign( morphBase );
 	if ( hasMorphNormals === true ) normalLocal.mulAssign( morphBase );
 	if ( hasMorphColors === true ) morphColorSum.assign( 0 );
@@ -271,7 +281,7 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 
 		const influence = float( 0 ).toVar();
 
-		if ( mesh.count > 1 && ( mesh.morphTexture !== null && mesh.morphTexture !== undefined ) ) {
+		if ( mesh.isInstancedMesh === true ) {
 
 			influence.assign( textureLoad( mesh.morphTexture, ivec2( int( i ).add( 1 ), int( instanceIndex ) ) ).r );
 
