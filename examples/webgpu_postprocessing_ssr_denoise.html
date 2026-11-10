@@ -64,6 +64,7 @@
 		import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
 		import { traa } from 'three/addons/tsl/display/TRAANode.js';
+		import { loadFASTNoise } from 'three/addons/tsl/utils/FASTNoise.js';
 
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -124,6 +125,7 @@
 		const params = {
 			output: 0,
 			roughness: 0.3,
+			noise: new URLSearchParams( location.search ).get( 'noise' ) || 'hhw',
 
 			ssr: {
 				resolutionScale: 1,
@@ -144,7 +146,9 @@
 			denoise: {
 				enabled: true,
 				luminancePhi: 3,
-				maxFrames: 8
+				maxFrames: 32,
+				antiLagNoiseGate: true,
+				historyClamp: true
 			},
 
 			post: {
@@ -258,6 +262,8 @@
 
 			const sceneNormal = sample( ( uv ) => unpackRGBToNormal( scenePassNormal.sample( uv ).rgb ) );
 
+			const noiseAtlas = await loadFASTNoise( 'textures/noises/fast/gauss1-ema01-spatio-temporal.png' );
+
 			ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
 				stochastic: true,
 				diffuseNode: scenePassDiffuseColor,
@@ -267,6 +273,7 @@
 				envImportanceSampling: params.ssr.envImportanceSampling,
 				binaryRefine: params.ssr.binaryRefine
 			} ).toInspector( 'SSR' );
+			ssrNode.noiseAtlas = noiseAtlas;
 
 			// the reflections are accumulated in time and filtered within the footprint of their reflection lobe,
 			// with the roughness of the scene and the ray length of each pixel ( SSR alpha channel )
@@ -309,6 +316,21 @@
 			camera.rotation.set( - 0.3158233106804791, 0.26820684188431526, 0.08637696823742165 );
 			controls.target.set( 1.0258536154689288, 0.2746440590977971, - 1.0815876858987743 );
 
+			// the camera is kept in the URL hash, so a view can be shared and restored
+
+			const cameraHash = location.hash.match( /cam=([^&]+)/ );
+
+			if ( cameraHash ) {
+
+				const v = cameraHash[ 1 ].split( ',' ).map( Number );
+				camera.position.set( v[ 0 ], v[ 1 ], v[ 2 ] );
+				controls.target.set( v[ 3 ], v[ 4 ], v[ 5 ] );
+				controls.update();
+
+			}
+
+			controls.addEventListener( 'change', () => history.replaceState( null, '', location.search + '#cam=' + [ ...camera.position.toArray(), ...controls.target.toArray() ].map( v => v.toFixed( 4 ) ).join( ',' ) ) );
+
 			window.addEventListener( 'resize', onWindowResize );
 			renderer.domElement.addEventListener( 'pointermove', onComparePointerMove );
 
@@ -326,6 +348,7 @@
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR settings' );
 			ssrGui.add( params, 'output', outputTypes ).onChange( updateOutputNode );
+			ssrGui.add( params, 'noise', { 'Hierarchical Hashed Weyl': 'hhw', 'FAST blue noise': 'fast', 'Analytic R²': 'r2' } ).name( 'noise' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'quality', 0, 1 ).name( 'quality' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'mirrorBias', 0, 1 ).name( 'mirror bias' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'stepExponent', 1, 4, 0.5 ).name( 'step exponent' ).onChange( applyParams );
@@ -347,7 +370,9 @@
 			const denoiseGui = renderer.inspector.createParameters( 'Denoise settings' );
 			denoiseGui.add( params.denoise, 'enabled' ).name( 'enabled' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'luminancePhi', 0, 10 ).name( 'luminance phi' ).onChange( applyParams );
-			denoiseGui.add( params.denoise, 'maxFrames', 1, 32, 1 ).name( 'max frames' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'maxFrames', 1, 128, 1 ).name( 'max frames' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'antiLagNoiseGate' ).name( 'anti-lag noise gate' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'historyClamp' ).name( 'history clamp' ).onChange( applyParams );
 
 			// Concise UI for Directional Light controls
 			const lightGui = renderer.inspector.createParameters( 'Light' ).close();
@@ -369,6 +394,7 @@
 			if ( ! ssrNode ) return;
 
 			ssrNode.resolutionScale = params.ssr.resolutionScale;
+			ssrNode.noise = params.noise;
 			ssrNode.quality.value = params.ssr.quality;
 			ssrNode.mirrorBias.value = params.ssr.mirrorBias;
 			// stepExponent / screenEdgeFadeBlack / binaryRefine are build-time constants: assigning
@@ -388,6 +414,8 @@
 				denoiseEnabled.value = params.denoise.enabled ? 1 : 0;
 				denoiseNode.luminancePhi.value = params.denoise.luminancePhi;
 				denoiseNode.maxFrames.value = params.denoise.maxFrames;
+				denoiseNode.antiLagNoiseGate.value = params.denoise.antiLagNoiseGate;
+				denoiseNode.historyClamp.value = params.denoise.historyClamp;
 
 			}
 

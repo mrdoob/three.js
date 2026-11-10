@@ -1,6 +1,8 @@
 import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindHierarchicalHashedWeyl } from '../utils/HierarchicalHashedWeyl.js';
+import { bindAnalyticNoise } from '../utils/RNoise.js';
+import { fastNoise } from '../utils/FASTNoise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
 import { boxBlur } from './boxBlur.js';
 import ImportanceSampledEnvironment from './ImportanceSampledEnvironment.js';
@@ -299,6 +301,25 @@ class SSRNode extends Node {
 		this._stepExponent = 2;
 
 		/**
+		 * The noise of the stochastic samples, for comparisons: `'hhw'` ( Hierarchical Hashed Weyl ), `'fast'`
+		 * ( FAST blue noise, needs {@link SSRNode#noiseAtlas} ) or `'r2'` ( analytic R² ). Assigning a new value
+		 * recompiles the SSR material.
+		 *
+		 * @private
+		 * @type {string}
+		 * @default 'hhw'
+		 */
+		this._noise = 'hhw';
+
+		/**
+		 * The FAST noise atlas for `noise = 'fast'`, loaded with `loadFASTNoise()`.
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
+		this.noiseAtlas = null;
+
+		/**
 		 * HDR environment map for screen-space misses.
 		 *
 		 * @type {?Texture}
@@ -524,6 +545,28 @@ class SSRNode extends Node {
 		if ( value !== this._stepExponent ) {
 
 			this._stepExponent = value;
+			this._buildSSRMaterial();
+
+		}
+
+	}
+
+	/**
+	 * The noise of the stochastic samples (compile-time constant), see the backing field.
+	 *
+	 * @type {string}
+	 */
+	get noise() {
+
+		return this._noise;
+
+	}
+
+	set noise( value ) {
+
+		if ( value !== this._noise ) {
+
+			this._noise = value;
 			this._buildSSRMaterial();
 
 		}
@@ -853,7 +896,14 @@ class SSRNode extends Node {
 
 		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
 
-		const sampleMarchNoise = this.stochastic === true ? bindHierarchicalHashedWeyl( this._resolution, 47 ) : null;
+		// a sampler of four random values per pixel, read when the SSR material is built so `noise` can change
+		const bindNoise = ( seed ) => {
+
+			if ( this._noise === 'r2' ) return bindAnalyticNoise( this._resolution, seed );
+			if ( this._noise === 'fast' && this.noiseAtlas !== null ) return ( uvCoord, index ) => fastNoise( this.noiseAtlas, new Vector2( seed * 37 % 128, seed * 71 % 128 ), index );
+			return bindHierarchicalHashedWeyl( this._resolution, seed );
+
+		};
 
 		const computeScreenBorderFactor = Fn( ( [ uvCoord, borderWidth ] ) => {
 
@@ -874,7 +924,7 @@ class SSRNode extends Node {
 
 		const ssr = Fn( () => {
 
-			const noise = this.stochastic === true ? sampleMarchNoise( uvNode, this._noiseIndex ) : null;
+			const noise = this.stochastic === true ? bindNoise( 47 )( uvNode, this._noiseIndex ) : null;
 			// reconstruct at the depth texel center
 
 			const depthSize = vec2( textureSize( this.depthNode ) ).toConst();
@@ -947,7 +997,7 @@ class SSRNode extends Node {
 
 					if ( this.envImportanceSampling ) {
 
-						const Xi2 = bindHierarchicalHashedWeyl( this._resolution, 59 )( uvPos, this._noiseIndex );
+						const Xi2 = bindNoise( 59 )( uvPos, this._noiseIndex );
 
 						envColor.assign( this._importanceEnvironment.sampleEnvironmentMIS( {
 							cameraWorldMatrix: this._cameraWorldMatrix,

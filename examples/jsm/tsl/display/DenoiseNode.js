@@ -250,6 +250,21 @@ class DenoiseNode extends Node {
 		this.maxFrames = uniform( 8 );
 
 		/**
+		 * Temporal: whether the anti-lag drops the history only where the fast and long histories differ by more than
+		 * their noise explains. Without it, noisy texels drop their history by chance and never settle.
+		 *
+		 * @type {UniformNode<bool>}
+		 */
+		this.antiLagNoiseGate = uniform( true, 'bool' );
+
+		/**
+		 * Temporal: whether the long history is clamped to the range of the fast history and the current frame.
+		 *
+		 * @type {UniformNode<bool>}
+		 */
+		this.historyClamp = uniform( true, 'bool' );
+
+		/**
 		 * Whether the node filters every frame in which it is used. Otherwise it filters once when
 		 * {@link DenoiseNode#textureNeedsUpdate} is set, e.g. when a light map is baked.
 		 *
@@ -981,7 +996,13 @@ class DenoiseNode extends Node {
 
 					const spread = fastMax.sub( fastMin ).max( range ).max( fast.mul( 0.05 ) ).add( 1e-3 );
 					const excess = previousColor.rgb.sub( fast ).abs().div( spread );
-					const lag = max( excess.x, excess.y, excess.z ).smoothstep( 1, 2 ).toVar();
+					// a noisy texel's fast and long histories also differ by chance: with the noise gate, only a luminance
+					// difference beyond the noise expected of the two means, from the temporal variance or the spatial one
+					// of the neighborhood, is lag
+
+					const noise = max( previousFast.w, m2.sub( m1.mul( m1 ) ) ).max( 0 ).mul( float( 1 ).div( fastAge ).add( float( 1 ).div( age ) ) ).sqrt();
+					const deviation = abs( luminance( previousColor.rgb ).sub( luminance( fast ) ) ).div( noise.add( 1e-4 ) );
+					const lag = max( excess.x, excess.y, excess.z ).smoothstep( 1, 2 ).mul( this.antiLagNoiseGate.select( deviation.smoothstep( 3, 4 ), 1 ) ).toVar();
 
 					age.assign( mix( age, 1, lag ) );
 					fast.assign( mix( fast, current.rgb, lag ) );
@@ -989,7 +1010,7 @@ class DenoiseNode extends Node {
 					const minimum = fastMin.min( fast ).min( current.rgb );
 					const maximum = fastMax.max( fast ).max( current.rgb );
 					const alphaRange = currentMax.a.sub( currentMin.a );
-					const bounded = vec4( previousColor.rgb.clamp( minimum, maximum ), alpha ? previousColor.a.clamp( currentMin.a.sub( alphaRange ), currentMax.a.add( alphaRange ) ) : 1 );
+					const bounded = vec4( this.historyClamp.select( previousColor.rgb.clamp( minimum, maximum ), previousColor.rgb ), alpha ? previousColor.a.clamp( currentMin.a.sub( alphaRange ), currentMax.a.add( alphaRange ) ) : 1 );
 
 					const a = float( 1 ).div( age ).toVar();
 					result.assign( mix( bounded, current, a ) );

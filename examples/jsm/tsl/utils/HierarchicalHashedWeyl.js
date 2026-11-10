@@ -62,10 +62,14 @@ export const hierarchicalHashedWeyl = ( coordinate, index, seed, step = 26544357
  */
 export function bindHierarchicalHashedWeyl( resolution, seed = 0 ) {
 
+	// R4_STEPS[ 1 ] is close to 3/4 and 47/64, so it barely moves the 2×2 and 8×8 strata from frame to frame;
+	// it goes to the fourth value, which is the least sensitive, and the first two get the steps that move most
+	const steps = [ R4_STEPS[ 0 ], R4_STEPS[ 3 ], R4_STEPS[ 2 ], R4_STEPS[ 1 ] ];
+
 	return Fn( ( [ uvCoord, sampleIndex ] ) => {
 
 		const pixel = uvCoord.mul( resolution ).floor();
-		const dimension = ( k ) => hierarchicalHashedWeyl( pixel, sampleIndex, seed * 4 + k + 1, R4_STEPS[ k ] );
+		const dimension = ( k ) => hierarchicalHashedWeyl( pixel, sampleIndex, seed * 4 + k + 1, steps[ k ] );
 
 		return vec4( dimension( 0 ), dimension( 1 ), dimension( 2 ), dimension( 3 ) );
 
