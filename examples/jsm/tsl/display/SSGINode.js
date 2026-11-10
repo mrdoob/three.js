@@ -1,8 +1,6 @@
 import { RenderTarget, Vector2, Node, QuadMesh, NodeMaterial, RendererUtils, MathUtils, RGBFormat, RedFormat, UnsignedInt101111Type, UnsignedByteType } from 'three/webgpu';
 import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, property, outputStruct, context, isBackgroundDepth, min, projectionDepth, textureSize, depthToViewZ } from 'three/tsl';
 
-import { bindNoise } from '../utils/Noise.js';
-
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -68,9 +66,6 @@ class SSGINode extends Node {
 		 * @type {TextureNode}
 		 */
 		this.beautyNode = beautyNode;
-
-		this._noiseAlgorithm = 1;
-		this._noiseIndex = uniform( 0, 'uint' );
 
 		/**
 		 * A node that represents the scene's depth.
@@ -316,8 +311,6 @@ class SSGINode extends Node {
 		 */
 		this._material = new NodeMaterial();
 		this._material.name = 'SSGI';
-		this._sharedContext = null;
-		this._reversedDepthBuffer = false;
 
 		/**
 		 * The AO result of the effect is represented as a separate texture node.
@@ -334,30 +327,6 @@ class SSGINode extends Node {
 		 * @type {PassTextureNode}
 		 */
 		this._giNode = passTexture( this, this._ssgiRenderTarget.textures[ 1 ] );
-
-	}
-
-	/**
-	 * Noise algorithm: 0 = analytic R², 1 = IGN, 2 = animated IGN, 3 = HHW.
-	 * Changing this value rebuilds the effect's shader with only the selected algorithm.
-	 *
-	 * @type {number}
-	 * @default 1
-	 */
-	get noiseAlgorithm() {
-
-		return this._noiseAlgorithm;
-
-	}
-
-	set noiseAlgorithm( value ) {
-
-		if ( value !== this._noiseAlgorithm ) {
-
-			this._noiseAlgorithm = value;
-			if ( this._sharedContext !== null ) this._setupMaterial();
-
-		}
 
 	}
 
@@ -420,8 +389,6 @@ class SSGINode extends Node {
 
 		// update temporal uniforms
 
-		this._noiseIndex.value = this.useTemporalFiltering ? frame.frameId : 0;
-
 		if ( this.useTemporalFiltering === true ) {
 
 			const frameId = frame.frameId;
@@ -471,21 +438,6 @@ class SSGINode extends Node {
 			console.error( 'THREE.SSGINode: The device does not support the "rg11b10ufloat-renderable" feature which is required for SSGI.' );
 
 		}
-
-		this._sharedContext = builder.getSharedContext();
-		this._reversedDepthBuffer = renderer.reversedDepthBuffer;
-		this._setupMaterial();
-
-		return this._aoNode;
-
-	}
-
-	/**
-	 * Builds the TSL code of the effect into the internal pass material.
-	 *
-	 * @private
-	 */
-	_setupMaterial() {
 
 		const uvNode = uv();
 		const MAX_RAY = uint( 32 );
@@ -617,7 +569,7 @@ class SSGINode extends Node {
 				const g = this.depthNode.gather().sample( uvNode ).toConst();
 				const minD = min( min( g.x, g.y ), min( g.z, g.w ) ).toConst();
 				const maxD = max( max( g.x, g.y ), max( g.z, g.w ) ).toConst();
-				const d = this._reversedDepthBuffer === true ? maxD : minD;
+				const d = builder.renderer.reversedDepthBuffer === true ? maxD : minD;
 
 				depth.assign( projectionDepth( d, this._cameraNear, this._cameraFar ) );
 
@@ -647,22 +599,10 @@ class SSGINode extends Node {
 
 			//
 
-			let noiseDirection, initialRayStep;
-
-			if ( this.noiseAlgorithm === 1 ) {
-
-				const noiseOffset = spatialOffsets( screenCoordinate );
-				const noiseJitterIdx = this._temporalDirection.mul( 0.02 ); // Improves convergence with TRAA, see #31890.
-				noiseDirection = interleavedGradientNoise( screenCoordinate ).add( this._temporalDirection );
-				initialRayStep = fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) );
-
-			} else {
-
-				const noise = bindNoise( this._resolution, this.noiseAlgorithm, 13 )( uvNode, this._noiseIndex ).toVar();
-				noiseDirection = noise.x;
-				initialRayStep = noise.y.add( noise.z );
-
-			}
+			const noiseOffset = spatialOffsets( screenCoordinate );
+			const noiseDirection = interleavedGradientNoise( screenCoordinate );
+			const noiseJitterIdx = this._temporalDirection.mul( 0.02 ); // Port: Add noiseJitterIdx here for slightly better noise convergence with TRAA (see #31890 for more details)
+			const initialRayStep = fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) );
 
 			const ao = float( 0 );
 			const color = vec3( 0 );
@@ -692,7 +632,7 @@ class SSGINode extends Node {
 
 			Loop( { start: uint( 0 ), end: ROTATION_COUNT, type: 'uint', condition: '<' }, ( { i } ) => {
 
-				const rotationAngle = mul( float( i ).add( noiseDirection ), PI.div( float( ROTATION_COUNT ) ) ).toConst();
+				const rotationAngle = mul( float( i ).add( noiseDirection ).add( this._temporalDirection ), PI.div( float( ROTATION_COUNT ) ) ).toConst();
 				const sliceDir = vec3( vec2( cos( rotationAngle ), sin( rotationAngle ) ), 0 ).toConst();
 				const slideDirTexelSize = sliceDir.xy.mul( float( 1 ).div( this._resolution ) ).toConst();
 
@@ -734,10 +674,14 @@ class SSGINode extends Node {
 
 		} );
 
-		this._material.contextNode = context( this._sharedContext );
+		this._material.contextNode = context( builder.getSharedContext() );
 		this._material.colorNode = gi();
 		this._material.outputNode = outputNode;
 		this._material.needsUpdate = true;
+
+		//
+
+		return this._aoNode;
 
 	}
 

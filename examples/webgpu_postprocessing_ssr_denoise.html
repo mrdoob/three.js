@@ -61,7 +61,6 @@
 		import * as THREE from 'three/webgpu';
 		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
-		import { noiseAlgorithms } from 'three/addons/tsl/utils/Noise.js';
 		import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
 		import { traa } from 'three/addons/tsl/display/TRAANode.js';
@@ -268,7 +267,6 @@
 				envImportanceSampling: params.ssr.envImportanceSampling,
 				binaryRefine: params.ssr.binaryRefine
 			} ).toInspector( 'SSR' );
-			ssrNode.noiseAlgorithm = noiseAlgorithms[ 'Hierarchical Hashed Weyl' ];
 
 			// the reflections are accumulated in time and filtered within the footprint of their reflection lobe,
 			// with the roughness of the scene and the ray length of each pixel ( SSR alpha channel )
@@ -328,7 +326,6 @@
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR settings' );
 			ssrGui.add( params, 'output', outputTypes ).onChange( updateOutputNode );
-			ssrGui.add( ssrNode, 'noiseAlgorithm', noiseAlgorithms ).name( 'noise algorithm' ).onChange( () => denoiseNode.reset() );
 			ssrGui.add( params.ssr, 'quality', 0, 1 ).name( 'quality' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'mirrorBias', 0, 1 ).name( 'mirror bias' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'stepExponent', 1, 4, 0.5 ).name( 'step exponent' ).onChange( applyParams );

@@ -43,8 +43,6 @@
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
-			import { noiseAlgorithms } from 'three/addons/tsl/utils/Noise.js';
-
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
@@ -227,8 +225,6 @@
 
 				//
 
-				giPass.noiseAlgorithm = noiseAlgorithms[ 'Hierarchical Hashed Weyl' ];
-
 				const params = {
 					output: 0,
 					debug: 0,
@@ -257,7 +253,6 @@
 				const debugTypes = { Off: 0, Radiance: 1, Opacity: 2 };
 
 				const gui = renderer.inspector.createParameters( 'VXGI Settings' );
-				gui.add( giPass, 'noiseAlgorithm', noiseAlgorithms ).name( 'noise algorithm' );
 
 				const effectFolder = gui.addFolder( 'Effect Settings' );
 				effectFolder.add( params, 'output', types ).onChange( updatePostprocessing );

@@ -47,8 +47,6 @@
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
 
-			import { noiseAlgorithms } from 'three/addons/tsl/utils/Noise.js';
-
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const BALL_RADIUS = 0.4;
@@ -181,8 +179,6 @@
 
 				const traaPass = traa( compositePass, scenePassDepth, scenePassVelocity, camera );
 				renderPipeline.outputNode = traaPass;
-				const gui = renderer.inspector.createParameters( 'SSGI settings' );
-				gui.add( giPass, 'noiseAlgorithm', noiseAlgorithms ).name( 'noise algorithm' ).onChange( () => denoiseNode.reset() );
 
 				// light
 

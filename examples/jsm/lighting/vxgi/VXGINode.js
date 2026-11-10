@@ -1,16 +1,13 @@
 import { RenderTarget, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, HalfFloatType, RGBAFormat, RedFormat, UnsignedByteType } from 'three/webgpu';
-import { Fn, NodeUpdateType, uniform, reference, vec2, vec4, float, uv, mix, passTexture, getViewPosition, getNormalFromDepth, screenCoordinate, interleavedGradientNoise, normalize, floor, exp2, pow, PI, Loop, If, Break, property, outputStruct, context, projectionDepth } from 'three/tsl';
+import { Fn, NodeUpdateType, uniform, reference, vec4, float, uv, mix, passTexture, getViewPosition, getNormalFromDepth, normalize, floor, exp2, pow, PI, Loop, If, Break, property, outputStruct, context, projectionDepth } from 'three/tsl';
 
 import { VXGIVolume } from './VXGIVolume.js';
 import { createConeTracer, gather, intersectVolume, sampleDirectional } from './VXGIConeTracer.js';
-
-import { bindNoise } from '../../tsl/utils/Noise.js';
+import { bindHierarchicalHashedWeyl } from '../../tsl/utils/HierarchicalHashedWeyl.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 
-const TEMPORAL_SHIFT = 5.588238;
-const TEMPORAL_CYCLE = 64;
 
 let _rendererState;
 
@@ -205,10 +202,7 @@ class VXGINode extends Node {
 		// private uniforms
 
 		this._resolution = uniform( new Vector2() );
-		this._frame = uniform( 0 );
-		this._noiseIndex = uniform( 0, 'uint' );
-
-		this._noiseAlgorithm = 1;
+		this._frame = uniform( 0, 'uint' );
 		this._cameraProjectionMatrix = uniform( camera.projectionMatrix );
 		this._cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
 		this._cameraWorldMatrix = uniform( camera.matrixWorld );
@@ -245,30 +239,6 @@ class VXGINode extends Node {
 
 		this._aoNode = passTexture( this, aoTexture );
 		this._giNode = passTexture( this, giTexture );
-
-	}
-
-	/**
-	 * Noise algorithm: 0 = analytic R², 1 = IGN, 2 = animated IGN, 3 = HHW.
-	 * Changing this value rebuilds the effect's shader with only the selected algorithm.
-	 *
-	 * @type {number}
-	 * @default 1
-	 */
-	get noiseAlgorithm() {
-
-		return this._noiseAlgorithm;
-
-	}
-
-	set noiseAlgorithm( value ) {
-
-		if ( value !== this._noiseAlgorithm ) {
-
-			this._noiseAlgorithm = value;
-			if ( this._sharedContext !== null ) this._setupMaterial();
-
-		}
 
 	}
 
@@ -417,13 +387,11 @@ class VXGINode extends Node {
 
 		if ( this.useTemporalFiltering === true ) {
 
-			this._frame.value = frame.frameId % TEMPORAL_CYCLE;
-			this._noiseIndex.value = frame.frameId;
+			this._frame.value = frame.frameId;
 
 		} else {
 
 			this._frame.value = 0;
-			this._noiseIndex.value = 0;
 
 		}
 
@@ -501,21 +469,11 @@ class VXGINode extends Node {
 			const viewNormal = sampleNormal( uvNode ).toConst();
 			const worldNormal = normalize( this._cameraWorldMatrix.mul( vec4( viewNormal, 0 ) ).xyz ).toConst();
 
-			let rotationNoise, elevationNoise;
+			// Independently seeded dimensions for cone rotation and elevation.
 
-			if ( this.noiseAlgorithm === 1 ) {
-
-				const temporalShift = this._frame.mul( TEMPORAL_SHIFT ).toConst();
-				rotationNoise = interleavedGradientNoise( screenCoordinate.add( temporalShift ) ).toConst();
-				elevationNoise = interleavedGradientNoise( screenCoordinate.add( temporalShift ).add( vec2( 5.588238, 3.14159 ) ) ).toConst();
-
-			} else {
-
-				const noise = bindNoise( this._resolution, this.noiseAlgorithm, 29 )( uvNode, this._noiseIndex ).toVar();
-				rotationNoise = noise.x.toConst();
-				elevationNoise = noise.y.toConst();
-
-			}
+			const noise = bindHierarchicalHashedWeyl( this._resolution, 29 )( uvNode, this._frame ).toVar();
+			const rotationNoise = noise.x.toConst();
+			const elevationNoise = noise.y.toConst();
 
 			const CONE_COUNT = this.coneCount.toConst();
 			const tanHalfAngle = this.coneAngle.mul( 0.5 ).radians().tan().toConst();
