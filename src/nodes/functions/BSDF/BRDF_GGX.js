@@ -9,16 +9,16 @@ import { iridescence, alphaT, anisotropyT, anisotropyB } from '../../core/Proper
 import { Fn, defined } from '../../tsl/TSLBase.js';
 
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
-const BRDF_GGX = /*@__PURE__*/ Fn( ( { lightDirection, f0, f90, roughness, f, normalView = NormalView, viewDirection = positionViewDirection, USE_IRIDESCENCE, USE_ANISOTROPY } ) => {
+const BRDF_GGX = /*@__PURE__*/ Fn( ( { lightDirection, f0, f90, roughness, f, normalView = NormalView, viewDirection = positionViewDirection, halfDir: halfDirNode, dotNL: dotNLNode, dotNV: dotNVNode, dotVH: dotVHNode, alpha: alphaNode, USE_IRIDESCENCE, USE_ANISOTROPY } ) => {
 
-	const alpha = roughness.max( 0.045 ).pow2(); // punctual lights need a minimum roughness to show a highlight
+	const alpha = alphaNode || roughness.max( 0.045 ).pow2(); // punctual lights need a minimum roughness to show a highlight
 
-	const halfDir = lightDirection.add( viewDirection ).normalize();
+	const halfDir = halfDirNode || lightDirection.add( viewDirection ).normalize();
 
-	const dotNL = normalView.dot( lightDirection ).clamp();
-	const dotNV = normalView.dot( viewDirection ).clamp(); // @ TODO: Move to core dotNV
+	const dotNL = dotNLNode || normalView.dot( lightDirection ).clamp();
+	const dotNV = dotNVNode || normalView.dot( viewDirection ).clamp(); // @ TODO: Move to core dotNV
 	const dotNH = normalView.dot( halfDir ).clamp();
-	const dotVH = viewDirection.dot( halfDir ).clamp();
+	const dotVH = dotVHNode || viewDirection.dot( halfDir ).clamp();
 
 	let F = F_Schlick( { f0, f90, dotVH } );
 	let V, D;
