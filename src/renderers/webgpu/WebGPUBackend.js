@@ -1881,10 +1881,18 @@ class WebGPUBackend extends Backend {
 		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
 		_commandEncoderDescriptor.reset();
 
-		const currentPass = encoder.beginRenderPass( {
+		const descriptor = {
 			colorAttachments,
 			depthStencilAttachment
-		} );
+		};
+
+		if ( this._activeTimers > 0 ) {
+
+			this._setTimerQueries( descriptor );
+
+		}
+
+		const currentPass = encoder.beginRenderPass( descriptor );
 
 		currentPass.end();
 
