@@ -55,14 +55,11 @@
 			import * as THREE from 'three/webgpu';
 			import { Fn, float, hash, interleavedGradientNoise, mix, screenCoordinate, screenSize, screenUV, texture, uint, uniform, vec2, vec3, vec4 } from 'three/tsl';
 
-			import { bindAnalyticNoise } from 'three/addons/tsl/utils/RNoise.js';
-			import { animatedInterleavedGradientNoise } from 'three/addons/tsl/utils/IGN.js';
 			import { hierarchicalHashedWeyl } from 'three/addons/tsl/utils/HierarchicalHashedWeyl.js';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const modes = { 'Sphere': 0, 'Uniform': 1 };
-			const noises = { 'Hierarchical Hashed Weyl': 4, 'Analytic R²': 5, 'Animated IGN': 0, 'IGN + Golden Ratio': 1, 'IGN + 4-Frame Offset': 2, 'Static IGN': 3 };
 			const params = { mode: 'Sphere', noise: 'Hierarchical Hashed Weyl', pixelSize: 2, temporalBlur: true, spatialBlur: true, animate: true };
 
 			let renderer, computeQuad, displayQuad, targets, history, current, display, blurredDisplay;
@@ -76,7 +73,7 @@
 
 			init();
 
-			async function init() {
+			function init() {
 
 				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -93,17 +90,13 @@
 
 				const left = screenUV.x.lessThan( 0.5 );
 				const white = hash( uint( screenCoordinate.x ).add( uint( screenCoordinate.y ).mul( 4096 ) ).add( index.mul( 16777259 ) ) );
-				// static IGN animated three ways: scrolled, rotated by the golden ratio, or offset by a 4-frame table as in GTAO
 
-				const ign = interleavedGradientNoise( screenCoordinate );
-				const golden = ign.add( index.mul( uint( 2654435769 ) ).shiftRight( 8 ).toFloat().div( 16777216 ) ).fract();
-				const offset4 = ign.add( float( index.bitAnd( 1 ) ).mul( 0.5 ) ).add( float( index.shiftRight( 1 ).bitAnd( 1 ) ).mul( 0.25 ) ).fract();
-				const animated = animatedInterleavedGradientNoise( screenCoordinate, index );
-				const hhw = hierarchicalHashedWeyl( screenCoordinate, index, 1 );
-				// Match SSR's primary sample dimension and seed.
-				const analytic = bindAnalyticNoise( screenSize, 47 )( screenUV, index ).x;
+				// interleaved gradient noise scrolls diagonally per frame, wrapping the index to keep float precision
 
-				const noiseNodes = [ animated, golden, offset4, ign, hhw, analytic ];
+				const noises = {
+					'Hierarchical Hashed Weyl': hierarchicalHashedWeyl( screenCoordinate, index, 1 ),
+					'Interleaved Gradient Noise': interleavedGradientNoise( screenCoordinate.add( float( index.mod( 256 ) ).mul( 5.588238 ) ) )
+				};
 
 				// the same shaded sphere over a gradient in each half
 
@@ -122,7 +115,7 @@
 
 				const createComputeNode = () => {
 
-					const noise = left.select( white, noiseNodes[ noises[ params.noise ] ] );
+					const noise = left.select( white, noises[ params.noise ] );
 					const sample = mode.equal( 0 ).select( noise.lessThan( image ).select( 1, 0 ), noise );
 					const accumulated = mix( history.sample( screenUV ).r, sample, blend );
 					return vec4( accumulated, 0, 0, 1 );

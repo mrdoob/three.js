@@ -58,6 +58,7 @@ export const hierarchicalHashedWeyl = ( coordinate, index, seed, step = 26544357
  *
  * @param {UniformNode<Vector2>} resolution
  * @param {number} [seed=0] - Seeds the dimensions so each pass gets independent noise.
+ * @return {Function} Takes a uv and a frame or sample index, returns a `vec4` of samples in [0,1).
  */
 export function bindHierarchicalHashedWeyl( resolution, seed = 0 ) {
 

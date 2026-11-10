@@ -8,7 +8,6 @@ import { bindHierarchicalHashedWeyl } from '../../tsl/utils/HierarchicalHashedWe
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 
-
 let _rendererState;
 
 const _neutralContext = /*@__PURE__*/ context();
@@ -471,9 +470,9 @@ class VXGINode extends Node {
 
 			// Independently seeded dimensions for cone rotation and elevation.
 
-			const noise = bindHierarchicalHashedWeyl( this._resolution, 29 )( uvNode, this._frame ).toVar();
-			const rotationNoise = noise.x.toConst();
-			const elevationNoise = noise.y.toConst();
+			const noise = bindHierarchicalHashedWeyl( this._resolution, 29 )( uvNode, this._frame ).toConst();
+			const rotationNoise = noise.x;
+			const elevationNoise = noise.y;
 
 			const CONE_COUNT = this.coneCount.toConst();
 			const tanHalfAngle = this.coneAngle.mul( 0.5 ).radians().tan().toConst();
