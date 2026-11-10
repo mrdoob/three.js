@@ -44,8 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec4, velocity, Fn, colorSpaceToWorking } from 'three/tsl';
-		import { reprojectedRadiance } from 'three/addons/tsl/display/ReprojectedRadianceNode.js';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, velocity, colorSpaceToWorking } from 'three/tsl';
 		import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { traa } from 'three/addons/tsl/display/TRAANode.js';
@@ -69,7 +68,7 @@
 		};
 
 		let camera, scene, model, renderer, renderPipeline, ssrPass;
-		let controls, radianceHistory, denoiseNode;
+		let controls, denoiseNode;
 
 		init();
 
@@ -185,14 +184,10 @@
 
 			//
 
-			radianceHistory = reprojectedRadiance( scenePass, scenePassDepth, sceneNormal, camera );
-			const traceSource = sample( coordinate => {
+			// trace the previous frame's radiance, reprojected with the motion of the hit
 
-				const history = radianceHistory.sample( coordinate );
-				// Rejected history contributes no reflected light.
-				return vec4( history.rgb.mul( history.a ), 1 );
-
-			} );
+			const previousColor = scenePass.getPreviousTextureNode( 'output' );
+			const traceSource = sample( ( uv ) => previousColor.sample( uv.sub( scenePassVelocity.sample( uv ).xy.mul( vec2( 0.5, - 0.5 ) ) ) ) );
 
 			ssrPass = ssr( traceSource, scenePassDepth, sceneNormal, {
 				camera,
@@ -212,14 +207,7 @@
 
 			// blend SSR over beauty (SSR outputs premultiplied color, so use additive blending)
 
-			const beauty = traa( scenePassColor.add( denoiseNode.getTextureNode().rgb ), scenePassDepth, scenePassVelocity, camera );
-			const outputNode = Fn( ( _, builder ) => {
-
-				// Capture history with the jittered projection before TRAA clears it.
-				radianceHistory.build( builder );
-				return beauty;
-
-			} )();
+			const outputNode = traa( scenePassColor.add( denoiseNode.getTextureNode().rgb ), scenePassDepth, scenePassVelocity, camera );
 
 			renderPipeline.outputNode = outputNode;
 
@@ -245,7 +233,7 @@
 			ssrFolder.add( params, 'enabled' ).onChange( () => {
 
 				denoiseNode.reset();
-				renderPipeline.outputNode = params.enabled ? outputNode : radianceHistory;
+				renderPipeline.outputNode = params.enabled ? outputNode : scenePass;
 
 				renderPipeline.needsUpdate = true;
 
@@ -285,8 +273,6 @@
 		}
 
 		function onWindowResize() {
-
-			radianceHistory?.reset();
 
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();

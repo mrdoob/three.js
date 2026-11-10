@@ -122,6 +122,15 @@ class TRAANode extends Node {
 		this.useSubpixelCorrection = true;
 
 		/**
+		 * The number of frames the history accumulates. The minimum weight of the
+		 * current frame is its reciprocal.
+		 *
+		 * @type {UniformNode<float>}
+		 * @default 20
+		 */
+		this.maxFrames = uniform( 20 );
+
+		/**
 		 * The jitter index selects the current camera offset value.
 		 *
 		 * @private
@@ -577,7 +586,7 @@ class TRAANode extends Node {
 			// increase the weight towards the current frame under motion
 
 			const motionFactor = uvNode.sub( historyUV ).mul( textureSize ).length().div( this.maxVelocityLength ).saturate();
-			const currentWeight = float( 0.05 ).toVar(); // A minimum weight
+			const currentWeight = float( 1 ).div( this.maxFrames ).toVar(); // A minimum weight
 
 			if ( this.useSubpixelCorrection ) {
 

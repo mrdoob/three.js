@@ -59,8 +59,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation, Fn } from 'three/tsl';
-		import { reprojectedRadiance } from 'three/addons/tsl/display/ReprojectedRadianceNode.js';
+		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation, vec2 } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
@@ -148,16 +147,21 @@
 				maxFrames: 20
 			},
 
+			traa: {
+				maxFrames: 20
+			},
+
 			post: {
 				grading: { toneMapping: 'AgX', exposure: 1.57, gamma: 0.89, contrast: 1.31, saturation: 1 },
 			},
 		};
 
 		let camera, scene, model, renderer, postProcessing, ssrNode, denoiseNode, denoised;
-		let controls, radianceHistory;
+		let controls;
 		let scenePassNode, combinedOutputNode, scenePassDepth, scenePassVelocity;
 		let gammaUniform, contrastUniform, saturationUniform;
 		const denoiseEnabled = uniform( 1 );
+		const traaMaxFrames = uniform( 20 );
 
 		init();
 
@@ -259,14 +263,10 @@
 
 			const sceneNormal = sample( ( uv ) => unpackRGBToNormal( scenePassNormal.sample( uv ).rgb ) );
 
-			radianceHistory = reprojectedRadiance( scenePass, scenePassDepth, sceneNormal, camera );
-			const traceSource = sample( coordinate => {
+			// trace the previous frame's radiance, reprojected with the motion of the hit
 
-				const history = radianceHistory.sample( coordinate );
-				// Rejected history contributes no reflected light.
-				return vec4( history.rgb.mul( history.a ), 1 );
-
-			} );
+			const previousColor = scenePass.getPreviousTextureNode( 'output' );
+			const traceSource = sample( ( uv ) => previousColor.sample( uv.sub( scenePassVelocity.sample( uv ).xy.mul( vec2( 0.5, - 0.5 ) ) ) ) );
 
 			ssrNode = ssr( traceSource, scenePassDepth, sceneNormal, {
 				camera,
@@ -358,7 +358,8 @@
 			const denoiseGui = renderer.inspector.createParameters( 'Denoise settings' );
 			denoiseGui.add( params.denoise, 'enabled' ).name( 'enabled' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'luminancePhi', 0, 10 ).name( 'luminance phi' ).onChange( applyParams );
-			denoiseGui.add( params.denoise, 'maxFrames', 1, 32, 1 ).name( 'SSR history frames' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'maxFrames', 1, 32, 1 ).name( 'SSR frames' ).onChange( applyParams );
+			denoiseGui.add( params.traa, 'maxFrames', 1, 32, 1 ).name( 'TRAA frames' ).onChange( ( value ) => traaMaxFrames.value = value );
 
 			// Concise UI for Directional Light controls
 			const lightGui = renderer.inspector.createParameters( 'Light' ).close();
@@ -419,7 +420,10 @@
 
 		function applyPostProcessing( source ) {
 
-			return sharpen( traa( applyGrading( source ), scenePassDepth, scenePassVelocity, camera ), 0 );
+			const traaNode = traa( applyGrading( source ), scenePassDepth, scenePassVelocity, camera );
+			traaNode.maxFrames = traaMaxFrames;
+
+			return sharpen( traaNode, 0 );
 
 		}
 
@@ -470,20 +474,12 @@
 			updateCompareHint( params.output );
 
 			postProcessing.outputColorTransform = ! GRADED_OUTPUTS.has( params.output );
-			postProcessing.outputNode = Fn( ( _, builder ) => {
-
-				// Register history capture before TRAA registers its jitter cleanup.
-				radianceHistory.build( builder );
-				return node;
-
-			} )();
+			postProcessing.outputNode = node;
 			postProcessing.needsUpdate = true;
 
 		}
 
 		function onWindowResize() {
-
-			radianceHistory?.reset();
 
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();
