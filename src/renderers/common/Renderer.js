@@ -3983,10 +3983,7 @@ class Renderer {
 
 		//
 
-		// A shadow pass writes depth, which does not depend on the draw order. Only transmitted
-		// shadows read its color, so other shadow passes render double-sided objects once.
-
-		const isSinglePass = material.forceSinglePass === true || ( material.isShadowPassMaterial === true && this.shadowMap.transmitted !== true );
+		const isSinglePass = ( material.forceSinglePass === true || material.isShadowPassMaterial === true );
 
 		if ( material.transparent === true && material.side === DoubleSide && isSinglePass === false ) {
 
