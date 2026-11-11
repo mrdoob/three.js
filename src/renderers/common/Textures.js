@@ -387,7 +387,7 @@ class Textures extends DataMap {
 		// Normal textures, compressed cube textures and render targets define base level + mips with their mipmap array
 		// Uncompressed cube textures use their mipmap array only for mips (no base level)
 
-		if ( texture.isCubeTexture && texture.mipmaps.length > 0 && ! isRenderTarget ) options.levels ++;
+		if ( ( texture.isCubeTexture || texture.isCubeArrayTexture ) && texture.mipmaps.length > 0 && ! isRenderTarget ) options.levels ++;
 
 		//
 
@@ -554,6 +554,28 @@ class Textures extends DataMap {
 	 * @return {Vector3} The target vector.
 	 */
 	getSize( texture, target = _size ) {
+
+		if ( texture.isCubeArrayTexture ) {
+
+			if ( ! Array.isArray( texture.image ) ) {
+
+				target.width = texture.image.width;
+				target.height = texture.image.height;
+				target.depth = texture.image.depth;
+
+			} else {
+
+				let face = texture.image[ 0 ]?.[ 0 ];
+				if ( face?.isDataTexture ) face = face.image;
+				target.width = face?.width || 1;
+				target.height = face?.height || 1;
+				target.depth = Math.max( texture.depth, 1 ) * 6;
+
+			}
+
+			return target;
+
+		}
 
 		let image = texture.images ? texture.images[ 0 ] : texture.image;
 
