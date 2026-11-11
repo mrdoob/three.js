@@ -60,7 +60,7 @@
 			roughness: 1, blur: true, blurQuality: 1
 		};
 
-		let camera, scene, model, renderer, pipeline;
+		let camera, scene, model, renderer, renderPipeline;
 		let controls;
 
 		init();
@@ -137,7 +137,7 @@
 
 			//
 
-			pipeline = new THREE.RenderPipeline( renderer );
+			renderPipeline = new THREE.RenderPipeline( renderer );
 
 			const scenePass = pass( scene, camera );
 			scenePass.setMRT( mrt( {
@@ -190,6 +190,7 @@
 			function updateOutput() {
 
 				let view;
+		
 				switch ( params.output ) {
 
 					case 'Beauty': view = spatialAA; break;
@@ -198,9 +199,9 @@
 
 				}
 
-				pipeline.outputNode = params.enabled ? view : scenePass;
-				pipeline.outputColorTransform = true;
-				pipeline.needsUpdate = true;
+				renderPipeline.outputNode = params.enabled ? view : scenePass;
+				renderPipeline.outputColorTransform = true;
+				renderPipeline.needsUpdate = true;
 
 			}
 
@@ -220,8 +221,8 @@
 			ssrGui.add( params, 'intensity', 0, 1 ).name( 'Intensity' ).onChange( updateParameters );
 			ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( updateParameters );
 			ssrGui.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( updateParameters );
-			ssrGui.add( params, 'maxDistance', 0.01, 50, 0.01 ).name( 'Max distance' ).onChange( updateParameters );
-			ssrGui.add( params, 'thickness', 0, 0.5, 0.001 ).name( 'Thickness' ).onChange( updateParameters );
+			ssrGui.add( params, 'maxDistance', 0, 1 ).name( 'Max distance' ).onChange( updateParameters );
+			ssrGui.add( params, 'thickness', 0, 0.05 ).name( 'Thickness' ).onChange( updateParameters );
 
 			const blurGui = renderer.inspector.createParameters( 'Blur' );
 			blurGui.add( params, 'blur' ).name( 'Enabled' ).onChange( value => blurEnabled.value = Number( value ) );
@@ -267,7 +268,7 @@
 
 			controls.update();
 
-			pipeline.render();
+			renderPipeline.render();
 
 		}
 
