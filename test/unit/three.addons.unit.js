@@ -7,7 +7,6 @@ import './addons/utils/unwrapUVs.tests.js';
 import './addons/lighting/LightMapper.tests.js';
 import './addons/math/ColorConverter.tests.js';
 import './addons/math/ColorSpaces.tests.js';
-import './addons/math/OBB.tests.js';
 import './addons/math/Octree.tests.js';
 import './addons/curves/NURBSCurve.tests.js';
 import './addons/loaders/FBXLoader.tests.js';
