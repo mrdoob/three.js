@@ -1,6 +1,6 @@
 import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
-import { bindAnalyticNoise } from '../utils/RNoise.js';
+import { bindHierarchicalHashedWeyl } from '../utils/HierarchicalHashedWeyl.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
 import { boxBlur } from './boxBlur.js';
 import ImportanceSampledEnvironment from './ImportanceSampledEnvironment.js';
@@ -688,7 +688,9 @@ class SSRNode extends Node {
 	 * denoised result (`history`) and the velocity buffer used to reproject it
 	 * (`velocity`). `history` accepts a texture, e.g. the output of a {@link DenoiseNode}
 	 * (`getTexture()`), or a node with a render target, whose texture is used. Pass `null`
-	 * for both to disable multi-bounce.
+	 * for both to disable multi-bounce. The alpha of the history is the weight of its
+	 * newest frame, like the output of a temporal `DenoiseNode` without `alpha` or `coverage`:
+	 * the feedback is scaled by `1 - alpha`, so it fades in as the history converges.
 	 *
 	 * @param {Texture} history
 	 * @param {Node<vec2>} velocity
@@ -853,7 +855,7 @@ class SSRNode extends Node {
 
 		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
 
-		const sampleMarchNoise = this.stochastic === true ? bindAnalyticNoise( this._resolution, 47 ) : null;
+		const sampleMarchNoise = this.stochastic === true ? bindHierarchicalHashedWeyl( this._resolution, 47 ) : null;
 
 		const computeScreenBorderFactor = Fn( ( [ uvCoord, borderWidth ] ) => {
 
@@ -947,7 +949,7 @@ class SSRNode extends Node {
 
 					if ( this.envImportanceSampling ) {
 
-						const Xi2 = bindAnalyticNoise( this._resolution, 59 )( uvPos, this._noiseIndex );
+						const Xi2 = bindHierarchicalHashedWeyl( this._resolution, 59 )( uvPos, this._noiseIndex );
 
 						envColor.assign( this._importanceEnvironment.sampleEnvironmentMIS( {
 							cameraWorldMatrix: this._cameraWorldMatrix,

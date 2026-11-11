@@ -192,7 +192,6 @@ const ADDONS_TSL_IMPORTS = {
 	// utils
 	getGroundProjectedNormal: 'three/addons/tsl/utils/GroundedSkybox.js',
 	RaymarchingBox: 'three/addons/tsl/utils/Raymarching.js',
-	bindAnalyticNoise: 'three/addons/tsl/utils/RNoise.js',
 	softParticles: 'three/addons/tsl/utils/SoftParticles.js'
 };
 
