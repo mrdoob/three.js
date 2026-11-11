@@ -60,7 +60,7 @@
 				denoise: { lumaPhi: 0.75, depthPhi: 20, normalPhi: 0.3, roughnessPhi: 100, radius: 1.5, alphaPhi: 5, strength: 0.725, adapt: 0.5, smoothDisocclusions: true, flickerSuppression: 1, adaptiveTrust: 1 }
 			};
 
-			let renderer, camera, plane, pipeline, temporalReprojectNode, denoiseNode, reference, noisy;
+			let renderer, camera, plane, pipeline, scenePass, ssrLike, temporalReprojectNode, denoiseNode, reference, noisy;
 
 			const index = uniform( 0, 'uint' );
 			const noiseType = uniform( 0 );
@@ -153,7 +153,7 @@
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicNodeMaterial() );
 				scene.add( plane );
 
-				const scenePass = pass( scene, camera );
+				scenePass = pass( scene, camera );
 				// the normal with the roughness in alpha, as webgpu_postprocessing_ssr_denoise packs it
 				scenePass.setMRT( mrt( { output, normal: vec4( packNormalToRGB( normalView ).rgb, roughness ), velocity } ) );
 				scenePass.getTexture( 'normal' ).type = THREE.UnsignedByteType;
@@ -212,23 +212,9 @@
 
 				// the input as SSR gives it to the denoiser in webgpu_postprocessing_ssr_denoise: radiance, the ray length in alpha
 
-				const ssrLike = convertToTexture( vec4( noisy, hitDistance ) );
+				ssrLike = convertToTexture( vec4( noisy, hitDistance ) );
 
-				const depth = scenePass.getTextureNode( 'depth' );
-				const normal = scenePass.getTextureNode( 'normal' );
-
-				temporalReprojectNode = temporalReproject( ssrLike, depth, normal, scenePass.getTextureNode( 'velocity' ), camera, { mode: 'specular', accumulate: false } );
-
-				denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
-					depth,
-					normal,
-					raw: ssrLike,
-					metalRoughness: sample( () => vec2( 1, roughness ) ), // metalness, roughness
-					mode: 'specular',
-					accumulate: true
-				} );
-				denoiseNode.alphaSource = 'raylength';
-				temporalReprojectNode.setHistoryTexture( denoiseNode );
+				createDenoiser();
 
 				pipeline = new THREE.RenderPipeline( renderer );
 				pipeline.outputColorTransform = false;
@@ -236,7 +222,7 @@
 				renderer.inspector.createParameters( 'Output' ).add( params, 'left', [ 'Reference', 'Denoised', 'Error' ] ).name( 'left side' ).onChange( updateOutput );
 
 				const gui = renderer.inspector.createParameters( 'Source' );
-				gui.add( params, 'source', [ ...Object.keys( procedural ), ...Object.keys( images ) ] ).onChange( updateSource );
+				gui.add( params, 'source', [ ...Object.keys( procedural ), ...Object.keys( images ) ] ).onChange( onSourceChange );
 				gui.add( params, 'intensity', 0, 100 ).name( 'highlight intensity' ).onChange( updateSource );
 
 				const samplingGui = renderer.inspector.createParameters( 'Source sampling' );
@@ -275,6 +261,44 @@
 				updateOutput();
 
 				renderer.setAnimationLoop( animate );
+
+			}
+
+			// the denoiser keeps history across frames, so it's recreated for each source to start from a clean state
+
+			function createDenoiser() {
+
+				if ( denoiseNode !== undefined ) {
+
+					temporalReprojectNode.dispose();
+					denoiseNode.dispose();
+
+				}
+
+				const depth = scenePass.getTextureNode( 'depth' );
+				const normal = scenePass.getTextureNode( 'normal' );
+
+				temporalReprojectNode = temporalReproject( ssrLike, depth, normal, scenePass.getTextureNode( 'velocity' ), camera, { mode: 'specular', accumulate: false } );
+
+				denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
+					depth,
+					normal,
+					raw: ssrLike,
+					metalRoughness: sample( () => vec2( 1, roughness ) ), // metalness, roughness
+					mode: 'specular',
+					accumulate: true
+				} );
+				denoiseNode.alphaSource = 'raylength';
+				temporalReprojectNode.setHistoryTexture( denoiseNode );
+
+			}
+
+			function onSourceChange() {
+
+				updateSource();
+				createDenoiser();
+				applyParams();
+				updateOutput();
 
 			}
 
