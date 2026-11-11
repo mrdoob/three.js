@@ -79,6 +79,7 @@
 			const haltonOffsets = computeHaltonOffsets( 32 );
 			const unjittered = new THREE.Matrix4();
 			const translation = new THREE.Matrix4();
+			const drawingBufferSize = new THREE.Vector2();
 
 			// procedural sources: the radiance of each pixel, `intensity` for the highlights
 
@@ -139,13 +140,9 @@
 				document.body.appendChild( renderer.domElement );
 
 				const loader = new HDRLoader();
-
-				for ( const name in images ) {
-
-					imageTextures[ name ] = await loader.loadAsync( images[ name ] );
-					imageTextures[ name ].minFilter = imageTextures[ name ].magFilter = THREE.LinearFilter;
-
-				}
+				const names = Object.keys( images );
+				const textures = await Promise.all( names.map( ( name ) => loader.loadAsync( images[ name ] ) ) );
+				names.forEach( ( name, i ) => imageTextures[ name ] = textures[ i ] );
 
 				// a plane that fills the view gives the denoiser its depth and velocity
 
@@ -325,7 +322,7 @@
 				if ( images[ params.source ] !== undefined ) {
 
 					const { width, height } = imageTextures[ params.source ].image;
-					const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+					const size = renderer.getDrawingBufferSize( drawingBufferSize );
 					const panelAspect = size.x / 2 / size.y, imageAspect = width / height;
 
 					// negative y: the rows of the HDR images are stored top-down
@@ -336,7 +333,7 @@
 
 					// one texel per pixel of a half of the screen
 
-					const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+					const size = renderer.getDrawingBufferSize( drawingBufferSize );
 					const width = Math.ceil( size.x / 2 ), height = size.y;
 					const data = new Float32Array( width * height * 4 );
 
@@ -381,7 +378,7 @@
 
 				if ( params.jitter ) {
 
-					const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+					const size = renderer.getDrawingBufferSize( drawingBufferSize );
 					const [ hx, hy ] = haltonOffsets[ index.value % 32 ];
 					const jx = hx - 0.5, jy = hy - 0.5;
 
