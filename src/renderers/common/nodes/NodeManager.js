@@ -73,6 +73,13 @@ class NodeManager extends DataMap {
 		this.callHashCache = new ChainMap();
 
 		/**
+		 * A cache for managing node uniforms group data.
+		 *
+		 * @type {ChainMap}
+		 */
+		this.groupsData = new ChainMap();
+
+		/**
 		 * A cache for managing node objects of
 		 * scene properties like fog or environments.
 		 *
@@ -96,13 +103,20 @@ class NodeManager extends DataMap {
 
 		if ( groupNode.updateType === NodeUpdateType.OBJECT ) return true;
 
-		// check for update, each uniforms group keeps the version it has been updated for
+		// check for update
 
-		const version = groupNode.version;
+		_chainKeys[ 0 ] = groupNode;
+		_chainKeys[ 1 ] = nodeUniformsGroup;
 
-		if ( nodeUniformsGroup.groupVersion !== version ) {
+		let groupData = this.groupsData.get( _chainKeys );
+		if ( groupData === undefined ) this.groupsData.set( _chainKeys, groupData = {} );
 
-			nodeUniformsGroup.groupVersion = version;
+		_chainKeys[ 0 ] = null;
+		_chainKeys[ 1 ] = null;
+
+		if ( groupData.version !== groupNode.version ) {
+
+			groupData.version = groupNode.version;
 
 			return true;
 
