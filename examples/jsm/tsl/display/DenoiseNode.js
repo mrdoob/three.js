@@ -1,5 +1,6 @@
 import { FloatType, HalfFloatType, Matrix4, Node, NodeMaterial, NodeUpdateType, QuadMesh, RendererUtils, RenderTarget, RGFormat, Vector2 } from 'three/webgpu';
 import { Fn, If, Loop, abs, atan, convertToTexture, dot, exp, float, floor, getNormalFromDepth, getViewPosition, isBackgroundDepth, ivec2, length, luminance, max, min, mix, nodeObject, outputStruct, passTexture, pow, property, screenCoordinate, sqrt, texture, textureSize, uniform, vec2, vec3, vec4 } from 'three/tsl';
+import { sampleCatmullRom } from '../utils/TAAUtils.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
@@ -307,6 +308,15 @@ class DenoiseNode extends Node {
 		 * @type {UniformNode<float>}
 		 */
 		this.clampSigma = uniform( 0 );
+
+		/**
+		 * Temporal: whether the history is resampled with a 5-tap Catmull-Rom filter where its four bilinear taps lie on
+		 * the same surface, as in NRD and TRAA. A bilinear filter blurs the history a little in every frame in which it moves by a
+		 * fraction of a texel, e.g. with the jitter of TRAA, and the blur adds up over a long history.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.historyCatmullRom = uniform( 0 );
 
 		/**
 		 * Whether the node filters every frame in which it is used. Otherwise it filters once when
@@ -1075,6 +1085,12 @@ class DenoiseNode extends Node {
 				If( sumWeight.greaterThan( 0.01 ), () => {
 
 					const previousColor = sumColor.div( sumWeight ).toVar();
+
+					If( this.historyCatmullRom.greaterThan( 0 ).and( sumWeight.greaterThan( 0.999 ) ), () => {
+
+						previousColor.assign( sampleCatmullRom( this._historyColor, historyUV, size ) );
+
+					} );
 					const previousFast = sumFast.div( sumWeight ).toVar();
 					const age = min( sumLength.div( sumWeight ).add( 1 ), this.maxFrames ).toVar();
 
