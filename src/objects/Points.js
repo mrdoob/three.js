@@ -133,14 +133,16 @@ class Points extends Object3D {
 		const matrixWorld = this.matrixWorld;
 		const threshold = raycaster.params.Points.threshold;
 		const drawRange = geometry.drawRange;
+		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
 
 		// Checking boundingSphere distance to ray
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
 		_sphere.copy( geometry.boundingSphere );
+		// Expand in local space to match the per-point distance test.
+		_sphere.radius += Math.abs( localThreshold );
 		_sphere.applyMatrix4( matrixWorld );
-		_sphere.radius += threshold;
 
 		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
 
@@ -149,7 +151,6 @@ class Points extends Object3D {
 		_inverseMatrix.copy( matrixWorld ).invert();
 		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
-		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
 		const localThresholdSq = localThreshold * localThreshold;
 
 		const index = geometry.index;

@@ -3,6 +3,8 @@ import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 import { Material } from '../../../../src/materials/Material.js';
 import { Points } from '../../../../src/objects/Points.js';
+import { Raycaster } from '../../../../src/core/Raycaster.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
 
 export default QUnit.module( 'Objects', () => {
 
@@ -39,6 +41,81 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PUBLIC
+		QUnit.test( 'raycast/non-uniform scale', ( assert ) => {
+
+			for ( const indexed of [ false, true ] ) {
+
+				const geometry = new BufferGeometry();
+				geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0 ], 3 ) );
+				if ( indexed ) geometry.setIndex( [ 0 ] );
+
+				const points = new Points( geometry );
+				points.scale.set( 1, 1, 0.1 );
+				points.updateMatrixWorld();
+
+				const raycaster = new Raycaster( new Vector3( 0.12, - 1, 0 ), new Vector3( 0, 1, 0 ) );
+				raycaster.params.Points.threshold = 0.1;
+
+				const hits = raycaster.intersectObject( points );
+				assert.strictEqual( hits.length, 1, `The bounding sphere preserves a per-point hit (indexed: ${ indexed })` );
+				if ( hits.length > 0 ) assert.strictEqual( hits[ 0 ].index, 0 );
+				assert.strictEqual( geometry.boundingSphere.radius, 0, 'Raycasting does not expand the geometry bound' );
+
+			}
+
+		} );
+
+		QUnit.test( 'raycast/negative scale', ( assert ) => {
+
+			const geometry = new BufferGeometry();
+			geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0 ], 3 ) );
+			const points = new Points( geometry );
+			points.scale.set( - 1, - 1, - 0.1 );
+			points.updateMatrixWorld();
+
+			const raycaster = new Raycaster( new Vector3( 0.12, - 1, 0 ), new Vector3( 0, 1, 0 ) );
+			raycaster.params.Points.threshold = 0.1;
+			assert.strictEqual( raycaster.intersectObject( points ).length, 1, 'Negative local threshold still has a positive radius' );
+
+		} );
+
+		QUnit.test( 'raycast/parent scale', ( assert ) => {
+
+			const geometry = new BufferGeometry();
+			geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0 ], 3 ) );
+			const points = new Points( geometry );
+			const parent = new Object3D();
+			parent.scale.setScalar( 2 );
+			parent.add( points );
+			parent.updateMatrixWorld();
+
+			const raycaster = new Raycaster( new Vector3( 0.15, - 1, 0 ), new Vector3( 0, 1, 0 ) );
+			raycaster.params.Points.threshold = 0.1;
+			assert.strictEqual( raycaster.intersectObject( points ).length, 1, 'World-space bounds include inherited scaling' );
+
+		} );
+
+		QUnit.test( 'raycast/threshold and distance bounds', ( assert ) => {
+
+			const geometry = new BufferGeometry();
+			geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0 ], 3 ) );
+			const points = new Points( geometry );
+			points.scale.set( 1, 1, 0.1 );
+			points.updateMatrixWorld();
+
+			const raycaster = new Raycaster( new Vector3( 0.15, - 1, 0 ), new Vector3( 0, 1, 0 ) );
+			raycaster.params.Points.threshold = 0.1;
+			assert.strictEqual( raycaster.intersectObject( points ).length, 0, 'A larger bound does not create a per-point hit' );
+
+			raycaster.ray.origin.x = 0.12;
+			raycaster.far = 0.9;
+			assert.strictEqual( raycaster.intersectObject( points ).length, 0, 'Far clipping is preserved' );
+			raycaster.far = Infinity;
+			raycaster.near = 1.1;
+			assert.strictEqual( raycaster.intersectObject( points ).length, 0, 'Near clipping is preserved' );
+
+		} );
+
 		QUnit.test( 'isPoints', ( assert ) => {
 
 			const object = new Points();
