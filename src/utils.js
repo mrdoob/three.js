@@ -73,6 +73,66 @@ function arrayNeedsUint32( array ) {
 }
 
 /**
+ * Adds a value to an array that is used as a binary min-heap.
+ *
+ * @private
+ * @param {Array<number>} heap - The min-heap.
+ * @param {number} value - The value to add.
+ */
+function minHeapPush( heap, value ) {
+
+	let i = heap.length;
+	heap.push( value );
+
+	while ( i > 0 ) {
+
+		const parent = ( i - 1 ) >> 1;
+		if ( heap[ parent ] <= value ) break;
+
+		heap[ i ] = heap[ parent ];
+		i = parent;
+
+	}
+
+	heap[ i ] = value;
+
+}
+
+/**
+ * Removes and returns the smallest value of an array that is used as a binary min-heap.
+ *
+ * @private
+ * @param {Array<number>} heap - The min-heap.
+ * @return {number|undefined} The smallest value, or `undefined` if the heap is empty.
+ */
+function minHeapPop( heap ) {
+
+	const smallest = heap[ 0 ];
+	const last = heap.pop();
+	const length = heap.length;
+
+	if ( length === 0 ) return smallest;
+
+	let i = 0;
+	let child;
+
+	while ( ( child = 2 * i + 1 ) < length ) {
+
+		if ( child + 1 < length && heap[ child + 1 ] < heap[ child ] ) child ++;
+		if ( heap[ child ] >= last ) break;
+
+		heap[ i ] = heap[ child ];
+		i = child;
+
+	}
+
+	heap[ i ] = last;
+
+	return smallest;
+
+}
+
+/**
  * Map of typed array constructor names to their constructors.
  * This mapping enables dynamic creation of typed arrays based on string type names.
  *
@@ -479,15 +539,15 @@ function toReversedProjectionMatrix( projectionMatrix ) {
  * @type {Object}
  */
 const ReversedDepthFuncs = {
-	[ NeverDepth ]: AlwaysDepth,
+	[ NeverDepth ]: NeverDepth,
 	[ LessDepth ]: GreaterDepth,
-	[ EqualDepth ]: NotEqualDepth,
+	[ EqualDepth ]: EqualDepth,
 	[ LessEqualDepth ]: GreaterEqualDepth,
 
-	[ AlwaysDepth ]: NeverDepth,
+	[ AlwaysDepth ]: AlwaysDepth,
 	[ GreaterDepth ]: LessDepth,
-	[ NotEqualDepth ]: EqualDepth,
+	[ NotEqualDepth ]: NotEqualDepth,
 	[ GreaterEqualDepth ]: LessEqualDepth,
 };
 
-export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, createCanvasElement, setConsoleFunction, getConsoleFunction, log, warn, error, warnOnce, probeAsync, yieldToMain, toNormalizedProjectionMatrix, toReversedProjectionMatrix, isTypedArray, ReversedDepthFuncs };
+export { arrayMin, arrayMax, arrayNeedsUint32, minHeapPush, minHeapPop, getTypedArray, createElementNS, createCanvasElement, setConsoleFunction, getConsoleFunction, log, warn, error, warnOnce, probeAsync, yieldToMain, toNormalizedProjectionMatrix, toReversedProjectionMatrix, isTypedArray, ReversedDepthFuncs };
