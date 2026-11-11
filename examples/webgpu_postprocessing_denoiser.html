@@ -68,12 +68,7 @@
 			const roughness = uniform( params.roughness );
 			const hitDistance = uniform( params.hitDistance );
 
-			// the same image in each half of the screen: the chosen output on the left, the noisy input on the right
-
-			const panelSize = vec2( screenSize.x.mul( 0.5 ), screenSize.y );
-			const panelUV = vec2( screenUV.x.mul( 2 ).fract(), screenUV.y );
-
-			// the source at an offset in pixels, fit into the panel at its own aspect ratio, black outside
+			// the source is fit into each half of the screen at its own aspect ratio
 
 			const fit = uniform( new THREE.Vector2( 1, 1 ) );
 
@@ -82,15 +77,6 @@
 			const jitter = uniform( new THREE.Vector2() );
 			const unjittered = new THREE.Matrix4();
 			const translation = new THREE.Matrix4();
-
-			const sourceAt = ( offset ) => {
-
-				const uv = panelUV.add( offset.add( jitter ).div( panelSize ) ).sub( 0.5 ).mul( fit ).add( 0.5 ).toVar();
-				const inside = uv.greaterThanEqual( vec2( 0 ) ).all().and( uv.lessThanEqual( vec2( 1 ) ).all() );
-
-				return inside.select( source.sample( uv ).rgb, vec3( 0 ) );
-
-			};
 
 			// procedural sources: the radiance of each pixel, `intensity` for the highlights
 
@@ -146,7 +132,6 @@
 
 				renderer = new THREE.WebGPURenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				renderer.inspector = new Inspector();
 				renderer.toneMapping = THREE.AgXToneMapping;
 				document.body.appendChild( renderer.domElement );
@@ -173,6 +158,21 @@
 				// the normal with the roughness in alpha, as webgpu_postprocessing_ssr_denoise packs it
 				scenePass.setMRT( mrt( { output, normal: vec4( packNormalToRGB( normalView ).rgb, roughness ), velocity } ) );
 				scenePass.getTexture( 'normal' ).type = THREE.UnsignedByteType;
+
+				// the same image in each half of the screen: the chosen output on the left, the noisy input on the right.
+				// The source at an offset in pixels, black outside the image
+
+				const panelSize = vec2( screenSize.x.mul( 0.5 ), screenSize.y );
+				const panelUV = vec2( screenUV.x.mul( 2 ).fract(), screenUV.y );
+
+				const sourceAt = ( offset ) => {
+
+					const uv = panelUV.add( offset.add( jitter ).div( panelSize ) ).sub( 0.5 ).mul( fit ).add( 0.5 ).toVar();
+					const inside = uv.greaterThanEqual( vec2( 0 ) ).all().and( uv.lessThanEqual( vec2( 1 ) ).all() );
+
+					return inside.select( source.sample( uv ).rgb, vec3( 0 ) );
+
+				};
 
 				// the reference is the mean of the samples: the source, averaged over the sample disc
 
@@ -275,6 +275,8 @@
 				applyParams();
 				updateOutput();
 
+				renderer.setAnimationLoop( animate );
+
 			}
 
 			function applyParams() {
@@ -370,8 +372,6 @@
 			}
 
 			function animate() {
-
-				if ( pipeline === undefined ) return;
 
 				index.value ++;
 
