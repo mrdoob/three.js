@@ -1,5 +1,5 @@
 import { BackSide, BufferAttribute, BufferGeometry, CustomBlending, DoubleSide, FloatType, HalfFloatType, Mesh, MeshLambertNodeMaterial, NearestFilter, NoBlending, NodeMaterial, OneFactor, OrthographicCamera, QuadMesh, RedFormat, RGFormat, RendererUtils, RenderTarget, Scene, Vector2, warnOnce } from 'three/webgpu';
-import { Fn, If, Loop, attribute, ivec2, lights, luminance, modelViewMatrix, mrt, normalViewGeometry, normalWorldGeometry, output, positionLocal, positionWorld, round, screenCoordinate, texture, textureLoad, uniform, uv, vec2, vec4 } from 'three/tsl';
+import { Fn, If, Loop, attribute, float, ivec2, lights, luminance, modelViewMatrix, mrt, normalViewGeometry, normalWorldGeometry, output, positionLocal, positionWorld, round, screenCoordinate, texture, textureLoad, uniform, uv, vec2, vec4 } from 'three/tsl';
 
 // half float sums keep their rounding error small up to this many samples, and their weights are scaled
 // down so a sum of this many samples of an irradiance of up to about 4000 stays below the largest half float
@@ -24,7 +24,8 @@ let _rendererState;
  * samples are ignored.
  * Keep the source geometry and GI data static while accumulating. Call `reset()`
  * after changing transforms or lighting. Atlas charts need at least three texels
- * of padding; the resolve fills two texels around covered surfaces.
+ * of padding; the resolve fills two texels around covered surfaces. The alpha of the light map
+ * is its coverage, e.g. for {@link SeamStitchGenerator} and {@link GutterFillGenerator}.
  * Irradiance uses linear BT.709/sRGB primaries in lux.
  * Do not include material ambient occlusion, base color, or exposure in the source
  * irradiance. Material occlusion is applied once at runtime. Keep any contributions
@@ -128,7 +129,8 @@ class LightMapper {
 		/**
 		 * The baked light map. It stores linear diffuse irradiance in lux, without baked
 		 * albedo, material ambient occlusion, or display exposure, and uses `uv1`.
-		 * Values are not divided by pi, matching the runtime light map input.
+		 * Values are not divided by pi, matching the runtime light map input. Alpha is the
+		 * coverage: 1 at the texels with samples, 0 at the padding and elsewhere.
 		 *
 		 * @type {Texture}
 		 */
@@ -205,6 +207,7 @@ class LightMapper {
 
 			const coord = ivec2( screenCoordinate.xy );
 			const center = textureLoad( accumulation, coord ).toVar();
+			const covered = center.a.greaterThan( 0 ).toVar();
 			const sum = vec4( 0 ).toVar();
 
 			If( center.a.equal( 0 ), () => {
@@ -225,7 +228,9 @@ class LightMapper {
 
 			} );
 
-			return vec4( center.rgb.div( center.a.max( 1e-4 ) ), 1 );
+			// the coverage in alpha: the filled padding is not covered
+
+			return vec4( center.rgb.div( center.a.max( 1e-4 ) ), covered.select( float( 1 ), float( 0 ) ) );
 
 		} );
 
