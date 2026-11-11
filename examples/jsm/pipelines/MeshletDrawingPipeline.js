@@ -3528,9 +3528,10 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		super.begin( camera, renderContext );
 		this._checkedGeometries = new WeakSet();
 
-		// the vertices of disposed geometries are reclaimed before the render call
+		// reclaim before an outer render: a nested render's parent can still hold
+		// draw commands referring to the old pool buffers
 
-		this._geometryPool.update();
+		if ( this.renderer._callDepth <= 0 ) this._geometryPool.update();
 
 		const renderer = this.renderer;
 		const renderTarget = renderer.getRenderTarget();
