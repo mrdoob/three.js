@@ -1339,7 +1339,8 @@
 
 						} else {
 
-							passInfoString = `${renderer.info.compute.frameCalls} pass in ${computeTime.toFixed( 6 )}ms<br>`;
+							const computeTimeText = computeTime === null ? 'N/A' : `${computeTime.toFixed( 6 )}ms`;
+							passInfoString = `${renderer.info.compute.frameCalls} pass in ${computeTimeText}<br>`;
 
 						}
 

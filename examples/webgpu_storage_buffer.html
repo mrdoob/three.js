@@ -232,10 +232,14 @@
 					renderer.render( scene, camera );
 					const renderTime = renderTimer.end();
 
+					const [ computeDuration, renderDuration ] = await Promise.all( [ computeTime, renderTime ] );
+					const computeTimeText = computeDuration === null ? 'N/A' : `${computeDuration.toFixed( 6 )}ms`;
+					const renderTimeText = renderDuration === null ? 'N/A' : `${renderDuration.toFixed( 6 )}ms`;
+
 					timestamps[ forceWebGL ? 'webgl' : 'webgpu' ].innerHTML = `
 
-							Compute ${renderer.info.compute.frameCalls} pass in ${( await computeTime ).toFixed( 6 )}ms<br>
-							Draw ${renderer.info.render.drawCalls} pass in ${( await renderTime ).toFixed( 6 )}ms`;
+							Compute ${renderer.info.compute.frameCalls} pass in ${computeTimeText}<br>
+							Draw ${renderer.info.render.drawCalls} pass in ${renderTimeText}`;
 
 					setTimeout( stepAnimation, 1000 );
 			
