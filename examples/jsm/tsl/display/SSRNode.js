@@ -1,10 +1,29 @@
-import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, outputStruct, passTexture, property, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
-import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RedFormat, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
+import { Break, Continue, D_GGX, EnvironmentBRDF, F_Schlick, Fn, If, Loop, V_GGX_SmithCorrelated, abs, bool, cos, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, outputStruct, passTexture, property, reference, reflect, sin, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
+import { FloatType, HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindHierarchicalHashedWeyl } from '../utils/HierarchicalHashedWeyl.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
 import { boxBlur } from './boxBlur.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
+
+// octahedral encoding of a unit vector in [-1,1]², for the directions of missed rays
+const octEncode = ( n ) => {
+
+	const p = n.xy.div( abs( n.x ).add( abs( n.y ) ).add( abs( n.z ) ) );
+	return n.z.lessThan( 0 ).select( vec2( 1 ).sub( abs( p.yx ) ).mul( p.sign() ), p );
+
+};
+
+const octDecode = ( e ) => {
+
+	const v = vec3( e, float( 1 ).sub( abs( e.x ) ).sub( abs( e.y ) ) ).toVar();
+
+	If( v.z.lessThan( 0 ), () => v.xy.assign( vec2( 1 ).sub( abs( v.yx ) ).mul( v.xy.sign() ) ) );
+
+	return v.normalize();
+
+};
+
 const _size = /*@__PURE__*/ new Vector2();
 let _rendererState;
 
@@ -20,6 +39,7 @@ const MAX_STEPS = 64;
  * @property {Node<float>} [roughnessNode=null] - Per-pixel roughness. Drives GGX sampling and the blur mip selection.
  * @property {boolean} [reflectNonMetals=false] - Only used when `stochastic=false`. When `false`, non-metallic surfaces are discarded for a noticeable performance gain; set `true` to also reflect dielectrics (e.g. marble, polished wood, plastic).
  * @property {Node} [diffuseNode=null] - Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
+ * @property {boolean} [rayReuse=false] - Stochastic mode only: each pixel combines its ray with the rays of its neighbors, weighted by its own BRDF over their pdf (ray reuse of Frostbite's stochastic SSR), for several samples of its lobe per ray. Build-time only.
  * @property {boolean} [binaryRefine=false] - Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
  * @property {Camera} [camera=null] - Camera the scene is rendered with. Inferred from the color pass when omitted.
  */
@@ -62,7 +82,8 @@ class SSRNode extends Node {
 			roughnessNode = null,
 			reflectNonMetals = false,
 			diffuseNode = null,
-			binaryRefine = false
+			binaryRefine = false,
+			rayReuse = false
 		} = options;
 
 		let camera = options.camera ?? null;
@@ -283,6 +304,23 @@ class SSRNode extends Node {
 		this._binaryRefine = binaryRefine;
 
 		/**
+		 * Stochastic mode only: whether each pixel combines its ray with the rays of its neighbors (ray reuse,
+		 * Stachowiak 2015), weighted by its own BRDF over their pdf. Fixed at construction time.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 */
+		this.rayReuse = rayReuse && stochastic;
+
+		/**
+		 * The radius in pixels within which rays are reused, see {@link SSRNode#rayReuse}.
+		 *
+		 * @type {UniformNode<float>}
+		 * @default 3
+		 */
+		this.reuseRadius = uniform( 3 );
+
+		/**
 		 * Non-linear step distribution exponent. `1` = uniform steps; `> 1` concentrates
 		 * samples near the ray origin — where most short-range reflections are missed — and
 		 * spaces them out toward maxDistance, as `s = (i / steps) ^ stepExponent`.
@@ -383,8 +421,27 @@ class SSRNode extends Node {
 		 */
 		this._ssrRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, count: 2 } );
 		this._ssrRenderTarget.textures[ 0 ].name = 'SSRNode.SSR';
-		this._ssrRenderTarget.textures[ 1 ].name = 'SSRNode.HitDistance';
-		this._ssrRenderTarget.textures[ 1 ].format = RedFormat;
+		this._ssrRenderTarget.textures[ 1 ].name = 'SSRNode.Ray';
+		this._ssrRenderTarget.textures[ 1 ].type = FloatType;
+
+		/**
+		 * With {@link SSRNode#rayReuse}, the render target of the reflections resolved from the rays of each
+		 * pixel and its neighbors.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
+		this._resolveRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
+		this._resolveRenderTarget.texture.name = 'SSRNode.Resolve';
+
+		/**
+		 * With {@link SSRNode#rayReuse}, the material that resolves the reflections.
+		 *
+		 * @private
+		 * @type {NodeMaterial}
+		 */
+		this._resolveMaterial = new NodeMaterial();
+		this._resolveMaterial.name = 'SSRNode.Resolve';
 
 		/**
 		 * The render target for the blurred SSR reflections.
@@ -417,8 +474,8 @@ class SSRNode extends Node {
 
 		// the two outputs of the SSR material, assigned by the fragment `Fn`
 		this._ssrOutput = property( 'vec4' );
-		this._ssrHitDistance = property( 'float' );
-		this._ssrOutputNode = outputStruct( this._ssrOutput, this._ssrHitDistance );
+		this._ssrRay = property( 'vec4' ); // hit distance, pdf, hit uv
+		this._ssrOutputNode = outputStruct( this._ssrOutput, this._ssrRay );
 
 		/**
 		 * The blur material.
@@ -453,6 +510,7 @@ class SSRNode extends Node {
 		 * @type {PassTextureNode}
 		 */
 		this._hitDistanceNode = passTexture( this, this._ssrRenderTarget.textures[ 1 ] );
+		this._resolveTextureNode = passTexture( this, this._resolveRenderTarget.texture );
 
 		let blurredTextureNode = null;
 
@@ -633,6 +691,8 @@ class SSRNode extends Node {
 	 */
 	getTextureNode() {
 
+		if ( this.rayReuse ) return this._resolveTextureNode;
+
 		return ( this.stochastic === false && this.roughnessNode !== null ) ? this._blurredTextureNode : this._textureNode;
 
 	}
@@ -662,6 +722,7 @@ class SSRNode extends Node {
 
 		this._resolution.value.set( width, height );
 		this._ssrRenderTarget.setSize( width, height );
+		this._resolveRenderTarget.setSize( width, height );
 		this._blurRenderTarget.setSize( width, height );
 
 	}
@@ -702,6 +763,17 @@ class SSRNode extends Node {
 		renderer.setRenderTarget( ssrRenderTarget );
 		_quadMesh.name = 'SSR [ Reflections ]';
 		_quadMesh.render( renderer );
+
+		// ray reuse (optional)
+
+		if ( this.rayReuse ) {
+
+			_quadMesh.material = this._resolveMaterial;
+			renderer.setRenderTarget( this._resolveRenderTarget );
+			_quadMesh.name = 'SSR [ Resolve ]';
+			_quadMesh.render( renderer );
+
+		}
 
 		// blur (optional)
 
@@ -821,6 +893,8 @@ class SSRNode extends Node {
 			const V = viewIncidentDir.negate().normalize().toVar();
 
 			let viewReflectDir, finalSampleWeight, specDominantFactor;
+			const rayPdf = float( 0 ).toVar();
+			const hitUV = vec2( 0 ).toVar();
 
 			if ( this.stochastic === false ) {
 
@@ -848,6 +922,7 @@ class SSRNode extends Node {
 				viewReflectDir = ggxSample.get( 'reflectDir' ).toVar();
 				finalSampleWeight = ggxSample.get( 'sampleWeight' ).toVar();
 				specDominantFactor = getSpecularDominantFactor( ggxSample.get( 'NdotV' ), roughness ).toVar();
+				rayPdf.assign( ggxSample.get( 'pdf' ) );
 
 			}
 
@@ -1154,7 +1229,10 @@ class SSRNode extends Node {
 
 					hit.assign( 1 );
 					hitDistance.assign( worldDistance );
-					output.assign( vec4( weightedColor, coverage ) );
+					hitUV.assign( uvS );
+
+					// ray reuse weighs the radiance of the hit per pixel in the resolve pass
+					output.assign( vec4( this.rayReuse ? reflectColor.rgb : weightedColor, coverage ) );
 
 				} );
 
@@ -1172,21 +1250,131 @@ class SSRNode extends Node {
 
 			}
 
-			const lum = luminance( output.rgb ).max( 1e-4 ).toVar();
-			output.rgb.mulAssign( this.maxLuminance.div( lum ).min( 1 ) );
+			// with ray reuse, the resolve pass clamps and scales the weighted result
+			if ( this.rayReuse === false ) {
 
-			// scale the reflection color by the user-controlled intensity
-			output.rgb.mulAssign( this.intensity );
+				const lum = luminance( output.rgb ).max( 1e-4 ).toVar();
+				output.rgb.mulAssign( this.maxLuminance.div( lum ).min( 1 ) );
+
+				// scale the reflection color by the user-controlled intensity
+				output.rgb.mulAssign( this.intensity );
+
+			} else {
+
+				// misses keep their direction for the resolve pass, hits their uv
+				If( hit.equal( 0 ), () => {
+
+					hitUV.assign( octEncode( viewReflectDir ) );
+
+				} );
+
+			}
 
 			output.a.mulAssign( roughness.smoothstep( this.maxRoughness, this.maxRoughness.sub( 0.2 ) ) );
 
 			this._ssrOutput.assign( output.max( 0 ) );
-			this._ssrHitDistance.assign( hitDistance );
+			this._ssrRay.assign( vec4( hitDistance, rayPdf, hitUV ) );
 
 			return vec4( 0 );
 
 		} );
 
+
+		// ray reuse ( Stachowiak 2015 ): the radiance of the hits of the rays of the pixel and its neighbors, weighted by
+		// the BRDF of the pixel over the pdf of each ray ( a ratio estimator ), times the pre-integrated BRDF of the pixel.
+		// The coverage is the mean coverage of the rays
+
+		if ( this.rayReuse ) {
+
+			const radiances = texture( this._ssrRenderTarget.textures[ 0 ] );
+			const rays = texture( this._ssrRenderTarget.textures[ 1 ] );
+			const sampleReuseNoise = bindHierarchicalHashedWeyl( this._resolution, 61 );
+
+			const resolve = Fn( () => {
+
+				const depthSize = vec2( textureSize( this.depthNode ) ).toConst();
+				const uvPos = uvNode.mul( depthSize ).floor().add( 0.5 ).div( depthSize ).toVar();
+				const depth = sampleDepth( uvPos ).toVar();
+
+				isBackgroundDepth( depth ).discard();
+
+				const position = getViewPosition( uvPos, depth, this._cameraProjectionMatrixInverse ).toVar();
+				const N = this.normalNode.sample( uvPos ).rgb.normalize().toVar();
+				const V = ( this.camera.isPerspectiveCamera ? position.normalize().negate() : vec3( 0, 0, 1 ) ).toVar();
+				const roughness = float( this.roughnessNode ).toVar();
+				const alpha = roughness.mul( roughness ).max( 0.001 ).toVar();
+				const NdotV = dot( N, V ).max( 1e-4 ).toVar();
+
+				const metalness = float( this.metalnessNode );
+				const albedo = this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 );
+				const f0 = this.specularNode !== null ? this.specularNode.sample( uvPos ).rgb : mix( vec3( 0.04 ), albedo, metalness );
+				const f90 = float( this.specularF90Node ?? 1 );
+
+				const sumRadiance = vec3( 0 ).toVar();
+				const sumWeight = float( 0 ).toVar();
+				const sumHitWeight = float( 0 ).toVar();
+
+				const angle = sampleReuseNoise( uvPos, this._noiseIndex ).x.mul( Math.PI * 2 ).toVar();
+				const invResolution = vec2( 1 ).div( this._resolution ).toConst();
+
+				// the pixel and 7 neighbors on a rotated spiral
+
+				for ( let i = 0; i < 8; i ++ ) {
+
+					const radius = this.reuseRadius.mul( Math.sqrt( i / 7 ) );
+					const theta = angle.add( i * 2.39996 );
+					// at a texel center: a filtered fetch would blend the rays of different texels
+					const q = uvPos.add( vec2( cos( theta ), sin( theta ) ).mul( radius ).mul( invResolution ) ).mul( this._resolution ).floor().add( 0.5 ).mul( invResolution ).toVar();
+
+					If( q.greaterThanEqual( vec2( 0 ) ).all().and( q.lessThanEqual( vec2( 1 ) ).all() ), () => {
+
+						const sample = radiances.sample( q ).toVar();
+						const ray = rays.sample( q ).toVar();
+
+						If( ray.y.greaterThan( 0 ), () => {
+
+							// the direction from this pixel: to the hit point of a hit, the direction of a miss
+							const isHit = ray.x.lessThan( 1e3 );
+							const hitPosition = getViewPosition( ray.zw, sampleDepth( ray.zw ), this._cameraProjectionMatrixInverse );
+							const L = isHit.select( hitPosition.sub( position ).normalize(), octDecode( ray.zw ) ).toVar();
+							const NdotL = dot( N, L ).toVar();
+
+							If( NdotL.greaterThan( 0 ), () => {
+
+								const H = V.add( L ).normalize();
+								const brdf = D_GGX( { alpha, dotNH: dot( N, H ).max( 0 ) } ).mul( V_GGX_SmithCorrelated( { alpha, dotNL: NdotL, dotNV: NdotV } ) );
+								const fresnel = luminance( F_Schlick( { f0, f90, dotVH: dot( V, H ).max( 0 ) } ) );
+								const weight = brdf.mul( fresnel ).mul( NdotL ).div( ray.y ).toVar();
+								const coverage = isHit.select( sample.a, 0 );
+
+								sumWeight.addAssign( weight );
+								sumHitWeight.addAssign( weight.mul( coverage ) );
+								sumRadiance.addAssign( sample.rgb.mul( weight.mul( coverage ) ) );
+
+							} );
+
+						} );
+
+					} );
+
+				}
+
+				const radiance = sumHitWeight.greaterThan( 0 ).select( sumRadiance.div( sumHitWeight ), vec3( 0 ) );
+				const albedoBRDF = EnvironmentBRDF( { dotNV: NdotV, specularColor: f0, specularF90: f90, roughness } );
+				const output = radiance.mul( albedoBRDF ).toVar();
+
+				const lum = luminance( output ).max( 1e-4 );
+				output.mulAssign( this.maxLuminance.div( lum ).min( 1 ).mul( this.intensity ) );
+
+				return vec4( output, sumHitWeight.div( sumWeight.max( 1e-6 ) ) );
+
+			} );
+
+			this._resolveMaterial.contextNode = context( builder.getSharedContext() );
+			this._resolveMaterial.fragmentNode = resolve();
+			this._resolveMaterial.needsUpdate = true;
+
+		}
 
 		this._ssrFn = ssr;
 		this._sharedContext = builder.getSharedContext();
@@ -1224,6 +1412,8 @@ class SSRNode extends Node {
 		super.dispose();
 
 		this._ssrRenderTarget.dispose();
+		this._resolveRenderTarget.dispose();
+		this._resolveMaterial.dispose();
 		this._blurRenderTarget.dispose();
 
 		this._ssrMaterial.dispose();

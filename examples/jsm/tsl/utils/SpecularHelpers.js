@@ -1,4 +1,4 @@
-import { Fn, If, clamp, cos, cross, dot, float, log, max, mix, normalize, reflect, sin, sqrt, struct, vec3 } from 'three/tsl';
+import { D_GGX, Fn, If, clamp, cos, cross, dot, float, log, max, mix, normalize, reflect, sin, sqrt, struct, vec3 } from 'three/tsl';
 
 /**
  * Specular / microfacet BRDF helpers: VNDF sampling, Smith geometry, Fresnel,
@@ -110,12 +110,14 @@ export const getSpecularDominantFactor = Fn( ( [ NoV, roughness ] ) => {
 
 /**
  * A single GGX reflection sample: `reflectDir` and `sampleWeight` drive the SSR ray-march
- * and compositing, `NdotV` the specular dominant factor.
+ * and compositing, `NdotV` the specular dominant factor, and `pdf` the reuse of the ray by
+ * neighboring pixels.
  */
 const ggxReflectionStruct = struct( {
 	reflectDir: 'vec3', // view-space reflected ray direction
 	sampleWeight: 'vec3', // chromatic weight (incl. Fresnel tint) to multiply gathered radiance by
-	NdotV: 'float'
+	NdotV: 'float',
+	pdf: 'float' // solid-angle pdf of the reflected direction, bounded VNDF (Eto & Tokuyoshi eq. 8)
 } );
 
 // Core of `ggxReflectionSample()` with explicit F0/F90.
@@ -171,12 +173,14 @@ const ggxReflectionSampleWithReflectance = Fn( ( [ N, V, roughness, f0, f90, Xi 
 	const s2B = sB.mul( sB ).toVar();
 	const kB = a2.oneMinus().mul( s2B ).div( s2B.add( a2.mul( NdotV ).mul( NdotV ) ) ).toVar();
 	const tB = sqrt( a2.mul( sinV2 ).add( NdotV.mul( NdotV ) ) ).toVar();
+	const pdf = D_GGX( { alpha: ax, dotNH: dot( N, H ).max( 0 ) } ).div( kB.mul( NdotV ).add( tB ).mul( 2 ) );
+
 	const glossyWeight = fresnelWeight
 		.mul( GeometryTerm( NdotL, NdotV, ax ) )
 		.mul( kB.mul( NdotV ).add( tB ) )
 		.div( float( 2.0 ).mul( NdotV ).max( 1e-4 ) ).toVar();
 
-	return ggxReflectionStruct( viewReflectDir, glossyWeight, NdotV );
+	return ggxReflectionStruct( viewReflectDir, glossyWeight, NdotV, pdf );
 
 } );
 
