@@ -547,15 +547,6 @@ class NodeBuilder {
 		this.currentFunctionNode = null;
 
 		/**
-		 * The parameters of the function whose code is built, by the uniform nodes they replace.
-		 *
-		 * @private
-		 * @type {?Map<UniformNode, ParameterNode>}
-		 * @default null
-		 */
-		this._functionParameters = null;
-
-		/**
 		 * The builder's context.
 		 *
 		 * @type {Object}
@@ -2391,20 +2382,17 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns an instance of {@link NodeUniform} for the given uniform node. In the code of a
-	 * function with layout, it returns the parameter that replaces the uniform, e.g. of a texture input.
+	 * Returns an instance of {@link NodeUniform} for the given uniform node.
 	 *
 	 * @param {UniformNode} node - The uniform node.
 	 * @param {string} type - The uniform type.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
 	 * @param {?string} name - The name of the uniform.
-	 * @return {NodeUniform|ParameterNode} The node uniform, or the parameter that replaces it.
+	 * @return {NodeUniform|ParameterNode} The node uniform, or the parameter that replaces it in the code of a function.
 	 */
 	getUniformFromNode( node, type, shaderStage = this.shaderStage, name = null ) {
 
-		const parameter = this._functionParameters !== null ? this._functionParameters.get( node ) : undefined;
-
-		if ( parameter !== undefined ) return parameter;
+		if ( node.isParameterNode === true ) return node;
 
 		const nodeData = this.getDataFromNode( node, shaderStage, this.globalCache );
 
@@ -2840,22 +2828,17 @@ class NodeBuilder {
 
 		const layout = shaderNode.layout;
 
-		const previousParameters = this._functionParameters;
-		const functionParameters = new Map();
-
 		const parameters = layout.inputs.map( ( input ) => {
 
 			const node = _createLayoutParameter( input );
 
 			if ( node.isTextureNode === true ) {
 
-				this.setHashNode( node, node.getUniformHash( this ) );
-
 				for ( const [ name, parameterNode ] of Object.entries( this.getTextureParameters( input.name, node ) ) ) {
 
 					if ( parameterNode.isUniformNode === true ) {
 
-						functionParameters.set( parameterNode, new ParameterNode( parameterNode.getInputType( this ), name ) );
+						this.setHashNode( new ParameterNode( parameterNode.getNodeType( this ), name ), parameterNode.getUniformHash( this ) );
 
 					}
 
@@ -2871,16 +2854,12 @@ class NodeBuilder {
 
 		//
 
-		this._functionParameters = functionParameters;
-
 		shaderNode.layout = null;
 
 		const callNode = shaderNode.call( inputs );
 		const flowData = this.flowStagesNode( callNode, layout.type );
 
 		shaderNode.layout = layout;
-
-		this._functionParameters = previousParameters;
 
 		return flowData;
 

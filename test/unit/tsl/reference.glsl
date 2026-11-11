@@ -1604,17 +1604,15 @@ vec3 fn0 ( sampler2D map, bool map_flipY, vec2 coord ) {
 
 	vec2 nodeVar0;
 	vec2 nodeVar1;
-	bool nodeVar2;
-	vec2 nodeVar3;
-	vec4 nodeVar4;
+	vec2 nodeVar2;
+	vec4 nodeVar3;
 
 	nodeVar0 = coord;
-	nodeVar2 = bool( map_flipY );
 
-	if ( nodeVar2 ) {
+	if ( map_flipY ) {
 
-		nodeVar3 = nodeVar0;
-		nodeVar1 = vec2( nodeVar3.x, 1.0 - nodeVar3.y );
+		nodeVar2 = nodeVar0;
+		nodeVar1 = vec2( nodeVar2.x, 1.0 - nodeVar2.y );
 
 	} else {
 
@@ -1622,9 +1620,9 @@ vec3 fn0 ( sampler2D map, bool map_flipY, vec2 coord ) {
 
 	}
 
-	nodeVar4 = texture( map, nodeVar1 );
+	nodeVar3 = texture( map, nodeVar1 );
 
-	return nodeVar4.xyz;
+	return nodeVar3.xyz;
 
 }
 
@@ -1641,17 +1639,15 @@ vec3 fn0 ( sampler2D map, bool map_flipY, vec2 coord ) {
 
 	vec2 nodeVar0;
 	vec2 nodeVar1;
-	bool nodeVar2;
-	vec2 nodeVar3;
-	vec4 nodeVar4;
+	vec2 nodeVar2;
+	vec4 nodeVar3;
 
 	nodeVar0 = coord;
-	nodeVar2 = bool( map_flipY );
 
-	if ( nodeVar2 ) {
+	if ( map_flipY ) {
 
-		nodeVar3 = nodeVar0;
-		nodeVar1 = vec2( nodeVar3.x, 1.0 - nodeVar3.y );
+		nodeVar2 = nodeVar0;
+		nodeVar1 = vec2( nodeVar2.x, 1.0 - nodeVar2.y );
 
 	} else {
 
@@ -1659,19 +1655,15 @@ vec3 fn0 ( sampler2D map, bool map_flipY, vec2 coord ) {
 
 	}
 
-	nodeVar4 = texture( map, nodeVar1 );
+	nodeVar3 = texture( map, nodeVar1 );
 
-	return nodeVar4.xyz;
+	return nodeVar3.xyz;
 
 }
 
 vec3 fn1 ( sampler2D map, bool map_flipY, vec2 coord ) {
 
-	bool nodeVar0;
-
-	nodeVar0 = bool( map_flipY );
-
-	return ( ( fn0( map, nodeVar0, coord ) + fn0( map, nodeVar0, ( coord + vec2( 0.01 ) ) ) ) * vec3( 0.5 ) );
+	return ( ( fn0( map, map_flipY, coord ) + fn0( map, map_flipY, ( coord + vec2( 0.01 ) ) ) ) * vec3( 0.5 ) );
 
 }
 
@@ -1696,17 +1688,15 @@ vec3 fn1 ( sampler3D map, bool map_flipY, vec3 coord ) {
 
 	vec3 nodeVar0;
 	vec3 nodeVar1;
-	bool nodeVar2;
-	vec3 nodeVar3;
-	vec4 nodeVar4;
+	vec3 nodeVar2;
+	vec4 nodeVar3;
 
 	nodeVar0 = coord;
-	nodeVar2 = bool( map_flipY );
 
-	if ( nodeVar2 ) {
+	if ( map_flipY ) {
 
-		nodeVar3 = nodeVar0;
-		nodeVar1 = vec3( nodeVar3.x, 1.0 - nodeVar3.y, nodeVar3.z );
+		nodeVar2 = nodeVar0;
+		nodeVar1 = vec3( nodeVar2.x, 1.0 - nodeVar2.y, nodeVar2.z );
 
 	} else {
 
@@ -1714,9 +1704,9 @@ vec3 fn1 ( sampler3D map, bool map_flipY, vec3 coord ) {
 
 	}
 
-	nodeVar4 = texture( map, nodeVar1 );
+	nodeVar3 = texture( map, nodeVar1 );
 
-	return nodeVar4.xyz;
+	return nodeVar3.xyz;
 
 }
 
@@ -1731,17 +1721,15 @@ vec3 fn0 ( sampler2D map, bool map_flipY, vec2 coord ) {
 
 	vec2 nodeVar0;
 	vec2 nodeVar1;
-	bool nodeVar2;
-	vec2 nodeVar3;
-	vec4 nodeVar4;
+	vec2 nodeVar2;
+	vec4 nodeVar3;
 
 	nodeVar0 = coord;
-	nodeVar2 = bool( map_flipY );
 
-	if ( nodeVar2 ) {
+	if ( map_flipY ) {
 
-		nodeVar3 = nodeVar0;
-		nodeVar1 = vec2( nodeVar3.x, 1.0 - nodeVar3.y );
+		nodeVar2 = nodeVar0;
+		nodeVar1 = vec2( nodeVar2.x, 1.0 - nodeVar2.y );
 
 	} else {
 
@@ -1749,9 +1737,9 @@ vec3 fn0 ( sampler2D map, bool map_flipY, vec2 coord ) {
 
 	}
 
-	nodeVar4 = texture( map, nodeVar1 );
+	nodeVar3 = texture( map, nodeVar1 );
 
-	return nodeVar4.xyz;
+	return nodeVar3.xyz;
 
 }
 
