@@ -315,6 +315,34 @@ export function builtinGIContext( aoNode, giNode, node = null ) {
 }
 
 /**
+ * TSL function for defining a built-in reflection context for a given node. Where the reflection node has
+ * coverage ( alpha ), its radiance replaces the specular radiance of the environment, before the lighting
+ * model applies the specular BRDF, e.g. for screen-space reflections. Transparent materials keep the
+ * environment.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec4>} reflectionNode - The reflected radiance in RGB and its coverage in alpha.
+ * @param {Node} [node=null] - The node whose context should be modified.
+ * @returns {ContextNode}
+ */
+export function builtinReflectionContext( reflectionNode, node = null ) {
+
+	return context( node, {
+
+		getRadiance: ( radiance, { material } ) => {
+
+			if ( material.transparent === true ) return radiance;
+
+			return radiance.mix( reflectionNode.rgb, reflectionNode.a );
+
+		}
+
+	} );
+
+}
+
+/**
  * TSL function for defining a label context value for a given node.
  *
  * @tsl
@@ -339,3 +367,4 @@ addMethodChaining( 'setName', setName );
 addMethodChaining( 'builtinShadowContext', ( node, shadowNode, light ) => builtinShadowContext( shadowNode, light, node ) );
 addMethodChaining( 'builtinAOContext', ( node, aoValue ) => builtinAOContext( aoValue, node ) );
 addMethodChaining( 'builtinGIContext', ( node, aoValue, giValue ) => builtinGIContext( aoValue, giValue, node ) );
+addMethodChaining( 'builtinReflectionContext', ( node, reflectionValue ) => builtinReflectionContext( reflectionValue, node ) );

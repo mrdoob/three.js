@@ -39,6 +39,7 @@ const MAX_STEPS = 64;
  * @property {Node<float>} [roughnessNode=null] - Per-pixel roughness. Drives GGX sampling and the blur mip selection.
  * @property {boolean} [reflectNonMetals=false] - Only used when `stochastic=false`. When `false`, non-metallic surfaces are discarded for a noticeable performance gain; set `true` to also reflect dielectrics (e.g. marble, polished wood, plastic).
  * @property {Node} [diffuseNode=null] - Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
+ * @property {boolean} [applyBRDF=true] - Stochastic mode only: whether the reflections are weighted by the specular BRDF of the surface. Without it, they are the radiance reflected along the lobe, for materials to apply their own BRDF, e.g. with `builtinReflectionContext()`. Build-time only.
  * @property {boolean} [rayReuse=false] - Stochastic mode only: each pixel combines its ray with the rays of its neighbors, weighted by its own BRDF over their pdf (ray reuse of Frostbite's stochastic SSR), for several samples of its lobe per ray. Build-time only.
  * @property {boolean} [binaryRefine=false] - Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
  * @property {Camera} [camera=null] - Camera the scene is rendered with. Inferred from the color pass when omitted.
@@ -83,7 +84,8 @@ class SSRNode extends Node {
 			reflectNonMetals = false,
 			diffuseNode = null,
 			binaryRefine = false,
-			rayReuse = false
+			rayReuse = false,
+			applyBRDF = true
 		} = options;
 
 		let camera = options.camera ?? null;
@@ -311,6 +313,15 @@ class SSRNode extends Node {
 		 * @readonly
 		 */
 		this.rayReuse = rayReuse && stochastic;
+
+		/**
+		 * Stochastic mode only: whether the reflections are weighted by the specular BRDF of the surface, or are the
+		 * radiance reflected along its lobe, for materials to apply their own BRDF. Fixed at construction time.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 */
+		this.applyBRDF = applyBRDF || ! stochastic;
 
 		/**
 		 * The radius in pixels within which rays are reused, see {@link SSRNode#rayReuse}.
@@ -1231,8 +1242,8 @@ class SSRNode extends Node {
 					hitDistance.assign( worldDistance );
 					hitUV.assign( uvS );
 
-					// ray reuse weighs the radiance of the hit per pixel in the resolve pass
-					output.assign( vec4( this.rayReuse ? reflectColor.rgb : weightedColor, coverage ) );
+					// ray reuse weighs the radiance of the hit per pixel in the resolve pass, materials without applyBRDF
+					output.assign( vec4( this.rayReuse || ! this.applyBRDF ? reflectColor.rgb : weightedColor, coverage ) );
 
 				} );
 
@@ -1361,7 +1372,7 @@ class SSRNode extends Node {
 
 				const radiance = sumHitWeight.greaterThan( 0 ).select( sumRadiance.div( sumHitWeight ), vec3( 0 ) );
 				const albedoBRDF = EnvironmentBRDF( { dotNV: NdotV, specularColor: f0, specularF90: f90, roughness } );
-				const output = radiance.mul( albedoBRDF ).toVar();
+				const output = ( this.applyBRDF ? radiance.mul( albedoBRDF ) : radiance ).toVar();
 
 				const lum = luminance( output ).max( 1e-4 );
 				output.mulAssign( this.maxLuminance.div( lum ).min( 1 ).mul( this.intensity ) );

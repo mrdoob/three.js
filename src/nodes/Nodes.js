@@ -113,6 +113,7 @@ export { default as EnvironmentNode } from './lighting/EnvironmentNode.js';
 export { default as HemisphereLightNode } from './lighting/HemisphereLightNode.js';
 export { default as IESSpotLightNode } from './lighting/IESSpotLightNode.js';
 export { default as IrradianceNode } from './lighting/IrradianceNode.js';
+export { default as RadianceNode } from './lighting/RadianceNode.js';
 export { default as LightingContextNode } from './lighting/LightingContextNode.js';
 export { default as LightingNode } from './lighting/LightingNode.js';
 export { default as LightProbeNode } from './lighting/LightProbeNode.js';
