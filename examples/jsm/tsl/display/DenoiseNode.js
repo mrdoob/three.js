@@ -900,6 +900,14 @@ class DenoiseNode extends Node {
 			const currentMax = vec4( - 1e9 ).toVar();
 			const neighborMax = float( 0 ).toVar();
 
+			// coverage: the statistics of the radiance of the covered neighbors, weighted by coverage, as missing
+			// samples are no data, not black
+
+			const radiance = ( v ) => v.a.greaterThan( 1e-4 ).select( v.rgb.div( v.a ), vec3( 0 ) );
+			const coveredMin = vec3( 1e9 ).toVar();
+			const coveredMax = vec3( - 1e9 ).toVar();
+			const covered = float( 0 ).toVar();
+
 			for ( const [ dx, dy ] of [[ 1, 0 ], [ - 1, 0 ], [ 0, 1 ], [ 0, - 1 ], [ 1, 1 ], [ - 1, - 1 ], [ 1, - 1 ], [ - 1, 1 ], [ 0, 0 ]] ) {
 
 				if ( dx === 0 && dy === 0 ) {
@@ -925,10 +933,33 @@ class DenoiseNode extends Node {
 				currentMin.assign( currentMin.min( n ) );
 				currentMax.assign( currentMax.max( n ) );
 
+				if ( coverage ) {
+
+					If( n.a.greaterThan( 0 ), () => {
+
+						const r = radiance( n );
+						const lr = luminance( r );
+						coveredMin.assign( coveredMin.min( r ) );
+						coveredMax.assign( coveredMax.max( r ) );
+						m1.addAssign( lr.mul( n.a ).sub( l ) );
+						m2.addAssign( lr.mul( lr ).mul( n.a ).sub( l.mul( l ) ) );
+						covered.addAssign( n.a );
+
+					} ).Else( () => {
+
+						m1.subAssign( l );
+						m2.subAssign( l.mul( l ) );
+
+					} );
+
+				}
+
 			}
 
-			m1.divAssign( 9 );
-			m2.divAssign( 9 );
+			m1.divAssign( coverage ? covered.max( 1e-4 ) : 9 );
+			m2.divAssign( coverage ? covered.max( 1e-4 ) : 9 );
+
+			if ( coverage ) fast.assign( radiance( current ) );
 
 			If( surface.w.greaterThan( 0 ).and( this._historyValid ), () => {
 
@@ -1024,6 +1055,51 @@ class DenoiseNode extends Node {
 					// the long history is dropped
 
 					const fastAge = age.min( FAST_FRAMES );
+					const a = float( 1 ).div( age ).toVar();
+
+					if ( coverage ) {
+
+						// coverage: anti-lag and clamp on the radiance, only in frames with data; the clamped radiance keeps
+						// the coverage of the history, so that the two cannot drift apart
+
+						const previousRadiance = radiance( previousColor ).toVar();
+						const currentRadiance = radiance( current ).toVar();
+						const hit = current.a.greaterThan( 0 );
+						const neighbors = covered.greaterThan( 0 );
+						const range = coveredMax.sub( coveredMin ).max( 0 );
+
+						fast.assign( previousFast.rgb );
+
+						If( hit, () => {
+
+							fast.assign( mix( currentRadiance, previousFast.rgb.clamp( coveredMin.sub( range ), coveredMax.add( range ) ), fastAge.sub( 1 ).div( fastAge ) ) );
+
+							const spread = fastMax.sub( fastMin ).max( range ).max( fast.mul( 0.05 ) ).add( 1e-3 );
+							const excess = previousRadiance.sub( fast ).abs().div( spread );
+							const lag = max( excess.x, excess.y, excess.z ).smoothstep( 1, 2 );
+
+							age.assign( mix( age, 1, lag ) );
+							a.assign( float( 1 ).div( age ) );
+							fast.assign( mix( fast, currentRadiance, lag ) );
+
+						} );
+
+						const minimum = fastMin.min( fast ).min( hit.select( currentRadiance, fast ) );
+						const maximum = fastMax.max( fast ).max( hit.select( currentRadiance, fast ) );
+						const boundedRadiance = neighbors.select( previousRadiance.clamp( minimum, maximum ), previousRadiance );
+
+						result.assign( mix( vec4( boundedRadiance.mul( previousColor.a ), previousColor.a ), current, a ) );
+
+						const d = luminance( currentRadiance ).sub( luminance( previousRadiance ) );
+						variance.assign( hit.select( float( 1 ).sub( a ).mul( previousFast.w.add( a.mul( d ).mul( d ) ) ), previousFast.w ) );
+						historyLength.assign( age );
+
+						if ( this._specular ) hitFactor.assign( mix( sumHit.div( sumWeight ), currentHitFactor, a ) );
+
+						return;
+
+					}
+
 					const range = currentMax.rgb.sub( currentMin.rgb );
 					fast.assign( mix( current.rgb, previousFast.rgb.clamp( currentMin.rgb.sub( range ), currentMax.rgb.add( range ) ), fastAge.sub( 1 ).div( fastAge ) ) );
 
@@ -1039,7 +1115,7 @@ class DenoiseNode extends Node {
 					const alphaRange = currentMax.a.sub( currentMin.a );
 					const bounded = vec4( previousColor.rgb.clamp( minimum, maximum ), alpha ? previousColor.a.clamp( currentMin.a.sub( alphaRange ), currentMax.a.add( alphaRange ) ) : 1 );
 
-					const a = float( 1 ).div( age ).toVar();
+					a.assign( float( 1 ).div( age ) );
 					result.assign( mix( bounded, current, a ) );
 
 					// the exponential moving variance of the luminance, stable in half floats
@@ -1314,7 +1390,8 @@ class DenoiseNode extends Node {
 
 				const normalRoughness = centerTexel.normal().toVar();
 				const normal = normalRoughness.xyz;
-				const centerLuminance = luminance( center.rgb ).toVar();
+				// coverage: the luminance of the radiance, so that partial coverage is no edge
+				const centerLuminance = ( this.coverage ? luminance( center.rgb ).div( centerAlpha.x.max( 1e-4 ) ) : luminance( center.rgb ) ).toVar();
 
 				// SVGF: the deviation of a texel is blurred over the 3x3 texels of the same surface first, where it was not
 				// yet, so that a single lucky sample does not stop the filter
@@ -1403,10 +1480,11 @@ class DenoiseNode extends Node {
 							const offset = other.xyz.sub( surface.xyz );
 							const plane = abs( dot( normal, offset ) ).div( length( offset ).add( 1e-9 ) );
 							const similarity = pow( max( dot( normal, otherNormal.xyz ), 0 ), normalPhi );
-							const difference = abs( luminance( value.rgb ).sub( centerLuminance ) ).mul( luminanceScale ).toVar();
-
 							const valueAlpha = alpha ? ( direct ? vec4( tapLoaded.a, 0, 0, 0 ) : inputAlpha.load( q ) ).toVar() : null;
-							if ( alpha && ! direct ) difference.addAssign( abs( valueAlpha.x.sub( centerAlpha.x ) ).mul( alphaScale ) );
+							const valueLuminance = this.coverage ? luminance( value.rgb ).div( valueAlpha.x.max( 1e-4 ) ) : luminance( value.rgb );
+							const difference = abs( valueLuminance.sub( centerLuminance ) ).mul( luminanceScale ).toVar();
+
+							if ( alpha && ! direct && ! this.coverage ) difference.addAssign( abs( valueAlpha.x.sub( centerAlpha.x ) ).mul( alphaScale ) );
 
 							let exponent = plane.div( this.planePhi ).add( difference );
 							if ( roughness ) exponent = exponent.add( abs( otherNormal.w.sub( normalRoughness.w ) ).mul( ROUGHNESS_PHI ) );

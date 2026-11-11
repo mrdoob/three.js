@@ -41,7 +41,7 @@
 			const params = {
 				source: 'Memorial',
 				left: 'Denoised',
-				output: 'Reference',
+				right: 'Noisy',
 				intensity: 20,
 				noise: 'Hierarchical Hashed Weyl',
 				sampling: 'Coverage',
@@ -237,8 +237,8 @@
 
 				const gui = renderer.inspector.createParameters( 'Source' );
 				gui.add( params, 'source', [ ...Object.keys( procedural ), ...Object.keys( images ) ] ).onChange( updateSource );
-				gui.add( params, 'left', [ 'Denoised', 'Coverage' ] ).name( 'left side' ).onChange( updateOutput );
-				gui.add( params, 'output', [ 'Reference', 'Noisy', 'Error' ] ).name( 'right side' ).onChange( updateOutput );
+				gui.add( params, 'left', [ 'Reference', 'Denoised', 'Denoised Coverage', 'Error' ] ).name( 'left side' ).onChange( updateOutput );
+				gui.add( params, 'right', [ 'Noisy', 'Coverage' ] ).name( 'right side' ).onChange( updateOutput );
 				gui.add( params, 'intensity', 0, 100 ).name( 'highlight intensity' ).onChange( updateSource );
 
 				const samplingGui = renderer.inspector.createParameters( 'Sampling' );
@@ -287,28 +287,26 @@
 			function updateOutput() {
 
 				const denoised = denoiseNode.getTextureNode();
-				const right = step( 0.5, screenUV.x );
+				const toneMapped = ( radiance ) => renderOutput( vec4( radiance, 1 ) ).rgb;
 
-				// tone mapped radiance
+				// the error of the denoised result relative to the reference: red too bright, blue too dark
 
-				const views = { Noisy: noisy.rgb.mul( noisy.a ), Reference: reference, Error: reference };
-				const radiance = mix( denoised.rgb, views[ params.output ], right );
-				let color = renderOutput( vec4( radiance, 1 ) ).rgb;
+				const luma = ( v ) => v.dot( vec3( 0.2126, 0.7152, 0.0722 ) );
+				const error = luma( denoised.rgb ).sub( luma( reference ) ).div( luma( reference ).add( 0.02 ) );
 
-				// raw: the coverage of the denoised result, and its error relative to the reference ( red too bright,
-				// blue too dark ), read from the same pixel of the left side
+				const left = {
+					Reference: () => toneMapped( reference ),
+					Denoised: () => toneMapped( denoised.rgb ),
+					'Denoised Coverage': () => vec3( denoised.a ),
+					Error: () => vec3( error.max( 0 ), 0, error.negate().max( 0 ) )
+				}[ params.left ]();
 
-				if ( params.left === 'Coverage' ) color = right.greaterThan( 0 ).select( color, vec3( denoised.a ) );
+				const right = {
+					Noisy: () => toneMapped( noisy.rgb.mul( noisy.a ) ),
+					Coverage: () => vec3( noisy.a )
+				}[ params.right ]();
 
-				if ( params.output === 'Error' ) {
-
-					const lumaReference = reference.dot( vec3( 0.2126, 0.7152, 0.0722 ) );
-					const lumaDenoised = denoised.sample( vec2( screenUV.x.sub( 0.5 ), screenUV.y ) ).rgb.dot( vec3( 0.2126, 0.7152, 0.0722 ) );
-					const error = lumaDenoised.sub( lumaReference ).div( lumaReference.add( 0.02 ) );
-					color = right.greaterThan( 0 ).select( vec3( error.max( 0 ), 0, error.negate().max( 0 ) ), color );
-
-				}
-
+				let color = mix( left, right, step( 0.5, screenUV.x ) );
 				color = abs( screenCoordinate.x.sub( screenSize.x.mul( 0.5 ) ) ).lessThan( 1 ).select( vec3( 1, 0.3, 0.1 ), color );
 
 				pipeline.outputNode = vec4( color, 1 );
