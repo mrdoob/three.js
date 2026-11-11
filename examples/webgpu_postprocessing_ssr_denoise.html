@@ -148,7 +148,8 @@
 				fireflyClamp: 0,
 				toneMappedWeights: 0,
 				lobeLuminanceRelax: 0,
-				historyRadius: 0
+				historyRadius: 0,
+				clampSigma: 0
 			},
 
 			post: {
@@ -433,6 +434,7 @@
 			denoiseGui.add( params.denoise, 'toneMappedWeights', 0, 1 ).name( 'tone mapped weights' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'lobeLuminanceRelax', 0, 1 ).name( 'lobe luminance relax' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'historyRadius', 0, 1 ).name( 'history radius' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'clampSigma', 0, 4 ).name( 'clamp sigma' ).onChange( applyParams );
 
 			// Concise UI for Directional Light controls
 			const lightGui = renderer.inspector.createParameters( 'Light' ).close();
@@ -474,7 +476,7 @@
 				denoiseNode.maxFrames.value = params.denoise.maxFrames;
 				denoiseNode.iterations = params.denoise.spatialPasses;
 
-				for ( const key of [ 'historyDeviation', 'fireflyClamp', 'toneMappedWeights', 'lobeLuminanceRelax', 'historyRadius' ] ) denoiseNode[ key ].value = params.denoise[ key ];
+				for ( const key of [ 'historyDeviation', 'fireflyClamp', 'toneMappedWeights', 'lobeLuminanceRelax', 'historyRadius', 'clampSigma' ] ) denoiseNode[ key ].value = params.denoise[ key ];
 
 			}
 

@@ -54,7 +54,7 @@
 				hitDistance: 0.05,
 				resetOnChange: false,
 				spatialPasses: 2,
-				denoise: { luminancePhi: 3, maxFrames: 8, historyDeviation: 0, fireflyClamp: 0, toneMappedWeights: 0, lobeLuminanceRelax: 0, historyRadius: 0 }
+				denoise: { luminancePhi: 3, maxFrames: 8, historyDeviation: 0, fireflyClamp: 0, toneMappedWeights: 0, lobeLuminanceRelax: 0, historyRadius: 0, clampSigma: 0 }
 			};
 
 			let renderer, camera, plane, pipeline, denoiseNode, reference, noisy;
@@ -264,6 +264,7 @@
 				denoiseGui.add( params.denoise, 'toneMappedWeights', 0, 1 ).name( 'tone mapped weights' ).onChange( applyParams );
 				denoiseGui.add( params.denoise, 'lobeLuminanceRelax', 0, 1 ).name( 'lobe luminance relax' ).onChange( applyParams );
 				denoiseGui.add( params.denoise, 'historyRadius', 0, 1 ).name( 'history radius' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'clampSigma', 0, 4 ).name( 'clamp sigma' ).onChange( applyParams );
 
 				window.addEventListener( 'resize', onWindowResize );
 

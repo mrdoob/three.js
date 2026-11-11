@@ -300,6 +300,15 @@ class DenoiseNode extends Node {
 		this.historyRadius = uniform( 0 );
 
 		/**
+		 * Temporal, coverage: above 0, the history is clipped to this many standard deviations of the noise of a frame
+		 * around the fast history ( variance clipping, as in NRD ), instead of the range of the 3x3 neighborhood. Rare
+		 * bright samples, e.g. of a highlight in a glossy reflection, then converge instead of being clamped away.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.clampSigma = uniform( 0 );
+
+		/**
 		 * Whether the node filters every frame in which it is used. Otherwise it filters once when
 		 * {@link DenoiseNode#textureNeedsUpdate} is set, e.g. when a light map is baked.
 		 *
@@ -1087,13 +1096,17 @@ class DenoiseNode extends Node {
 						const neighbors = covered.greaterThan( 0 );
 						const range = coveredMax.sub( coveredMin ).max( 0 );
 
+						// variance clipping: the standard deviation of the noise of a frame, scaled
+						const sigma = sqrt( previousFast.w.max( 0 ) ).mul( this.clampSigma ).toVar();
+						const clipping = this.clampSigma.greaterThan( 0 );
+
 						fast.assign( previousFast.rgb );
 
 						If( hit, () => {
 
-							fast.assign( mix( currentRadiance, previousFast.rgb.clamp( coveredMin.sub( range ), coveredMax.add( range ) ), fastAge.sub( 1 ).div( fastAge ) ) );
+							fast.assign( mix( currentRadiance, previousFast.rgb.clamp( coveredMin.sub( range ).sub( sigma ), coveredMax.add( range ).add( sigma ) ), fastAge.sub( 1 ).div( fastAge ) ) );
 
-							const spread = fastMax.sub( fastMin ).max( range ).max( fast.mul( 0.05 ) ).add( 1e-3 );
+							const spread = fastMax.sub( fastMin ).max( range ).max( fast.mul( 0.05 ) ).max( vec3( sigma ) ).add( 1e-3 );
 							const excess = previousRadiance.sub( fast ).abs().div( spread );
 							const lag = max( excess.x, excess.y, excess.z ).smoothstep( 1, 2 );
 
@@ -1105,7 +1118,10 @@ class DenoiseNode extends Node {
 
 						const minimum = fastMin.min( fast ).min( hit.select( currentRadiance, fast ) );
 						const maximum = fastMax.max( fast ).max( hit.select( currentRadiance, fast ) );
-						const boundedRadiance = neighbors.select( previousRadiance.clamp( minimum, maximum ), previousRadiance );
+						const fastLuminance = luminance( fast );
+						const previousLuminance = luminance( previousRadiance );
+						const clipped = previousRadiance.mul( previousLuminance.clamp( fastLuminance.sub( sigma ).max( 0 ), fastLuminance.add( sigma ) ).div( previousLuminance.max( 1e-6 ) ) );
+						const boundedRadiance = clipping.select( clipped, neighbors.select( previousRadiance.clamp( minimum, maximum ), previousRadiance ) );
 
 						result.assign( mix( vec4( boundedRadiance.mul( previousColor.a ), previousColor.a ), current, a ) );
 
