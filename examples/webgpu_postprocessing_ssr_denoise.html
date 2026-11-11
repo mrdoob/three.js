@@ -61,6 +61,7 @@
 		import * as THREE from 'three/webgpu';
 		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation, property, convertToTexture, texture, vec2, ivec2, Fn, positionPrevious, textureSize, getViewPosition, isBackgroundDepth } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+		import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 		import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
 		import { traa } from 'three/addons/tsl/display/TRAANode.js';
@@ -126,7 +127,8 @@
 			roughness: 0.3,
 
 			ssr: {
-				resolutionScale: 1,
+				resolution: 1,
+				jointUpsample: true,
 				quality: 0.25,
 				mirrorBias: 0.5,
 				maxRoughness: 1,
@@ -163,7 +165,8 @@
 			},
 		};
 
-		let camera, scene, model, renderer, postProcessing, ssrNode, denoiseNode, reflection, scenePassEnvSpecular, hitDistanceTexture;
+		let camera, scene, model, renderer, postProcessing, ssrNode, denoiseNode, reflection, rawReflection, scenePassEnvSpecular, hitDistanceTexture;
+		const jointUpsample = uniform( 1 );
 		let controls;
 		let scenePassNode, combinedOutputNode, scenePassDepth, scenePassVelocity;
 		let gammaUniform, contrastUniform, saturationUniform;
@@ -370,7 +373,13 @@
 				hitDistance: sample( ( uv ) => hitDistanceTexture.sample( uv ).r ),
 				coverage: true
 			} );
-			reflection = mix( ssrTexture, denoiseNode.getTextureNode(), denoiseEnabled ).toInspector( 'Denoise' );
+			// SSR and the denoiser run at a reduced resolution; a joint bilateral filter, guided by the full resolution
+			// depth and normals, brings them back without bleeding across edges
+
+			const upsample = ( node ) => mix( node.sample( screenUV ), jointBilateralUpsample( node, scenePassDepth, sceneNormal, scenePassDepth, sceneNormal, camera, { coverage: true } ).sample( screenUV ), jointUpsample );
+
+			rawReflection = upsample( ssrTexture );
+			reflection = mix( rawReflection, upsample( denoiseNode.getTextureNode() ), denoiseEnabled ).toInspector( 'Denoise' );
 
 			// where SSR has no coverage, the env map specular of the beauty pass fills in
 			const specular = mix( scenePassEnvSpecular.rgb, reflection.rgb, reflection.a );
@@ -414,6 +423,8 @@
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR settings' );
 			ssrGui.add( params, 'output', outputTypes ).onChange( updateOutputNode );
+			ssrGui.add( params.ssr, 'resolution', { full: 1, half: 2, third: 3 } ).name( 'resolution' ).onChange( applyParams );
+			ssrGui.add( params.ssr, 'jointUpsample' ).name( 'joint upsample' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'quality', 0, 1 ).name( 'quality' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'mirrorBias', 0, 1 ).name( 'mirror bias' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'maxRoughness', 0, 1 ).name( 'max roughness' ).onChange( applyParams );
@@ -468,7 +479,8 @@
 
 			if ( ! ssrNode ) return;
 
-			ssrNode.resolutionScale = params.ssr.resolutionScale;
+			ssrNode.resolutionScale = 1 / params.ssr.resolution;
+			jointUpsample.value = params.ssr.jointUpsample ? 1 : 0;
 			ssrNode.quality.value = params.ssr.quality;
 			ssrNode.mirrorBias.value = params.ssr.mirrorBias;
 			ssrNode.maxRoughness.value = params.ssr.maxRoughness;
@@ -537,14 +549,14 @@
 			switch ( params.output ) {
 
 				case 0: node = applyPostProcessing( combinedOutputNode ); break; // Combined
-				case 1: node = applyPostProcessing( vec4( ssrNode.rgb.mul( ssrNode.a ), 1 ) ); break; // SSR (Raw)
+				case 1: node = applyPostProcessing( vec4( rawReflection.rgb.mul( rawReflection.a ), 1 ) ); break; // SSR (Raw)
 				case 4: node = applyPostProcessing( vec4( reflection.rgb.mul( reflection.a ), 1 ) ); break; // Denoised SSR
 				case 5: node = vec4( reflection.aaa, 1 ); break; // SSR Coverage
 				case 6: node = applyPostProcessing( vec4( scenePassEnvSpecular.rgb, 1 ) ); break; // Env Specular
 				case 7: node = vec4( hitDistanceTexture.rrr, 1 ); break; // Ray Length (Raw)
 				case OUTPUT_COMPARE_DENOISE: { // Compare (denoised | noisy)
 
-					const noisySSR = applyPostProcessing( vec4( ssrNode.rgb.mul( ssrNode.a ), 1 ) );
+					const noisySSR = applyPostProcessing( vec4( rawReflection.rgb.mul( rawReflection.a ), 1 ) );
 					const denoisedSSR = applyPostProcessing( vec4( reflection.rgb.mul( reflection.a ), 1 ) );
 					node = buildCompareNode( denoisedSSR, noisySSR );
 					break;
