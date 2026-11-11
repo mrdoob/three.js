@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - radiance cascades</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Radiance Cascades</span>
+			</div>
+
+			<small>Real-time global illumination with <a href="https://arxiv.org/abs/2607.20384" target="_blank" rel="noopener">split radiance cascades</a>, after <a href="https://github.com/entropylost/chandra" target="_blank" rel="noopener">chandra</a>, traced through a BVH (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>).<br/>Sponza by Frank Meinl, Crytek (CC BY 3.0), with the materials of chandra.<br/><span id="status"></span></small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/",
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/index.js",
+					"three-mesh-bvh/webgpu": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/webgpu/index.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { Fn, OnBeforeFrameUpdate } from 'three/tsl';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { RealtimeRadianceCascades } from 'three/addons/lighting/RealtimeRadianceCascades.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { DRACOLoader, DRACO_GLTF_CONFIG } from 'three/addons/loaders/DRACOLoader.js';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
+
+			let renderer, renderPipeline, camera, controls, scene, cascades, world, compositeNode, outputNode, traaPass;
+
+			const status = document.getElementById( 'status' );
+
+			const params = {
+				scene: 'Sponza',
+				view: 'Lit',
+				rays: '1 per 4 pixels',
+				traa: true,
+				adaptiveQuality: true,
+				quality: 1,
+				halfResolution: false,
+				secondary: true,
+				smoothing: 0.97,
+				probeSize: 12,
+				intensity: 1,
+				sunAngle: 40,
+				animateSun: false,
+				autoRotate: false
+			};
+
+			const rayStrides = { '1 per 4 pixels': 2, '1 per pixel': 1 };
+			const views = { 'Lit': 0, 'Indirect': 1, 'Irradiance': 2, 'Probes': 3, 'Levels': 4 };
+			const scenes = { 'Sponza': createSponza, 'Courtyard': createCourtyard, 'Cornell Box': () => createCornellBox( 'panel' ), 'Cornell Box (Rect Area Light)': () => createCornellBox( 'rect' ), 'Cornell Box (Spot Light)': () => createCornellBox( 'spot' ) };
+
+			let sponza = null, sky = null, rectAreaLights = null;
+
+			init();
+
+			async function init() {
+
+				// the passes that trace rays bind 9 storage buffers, one more than the default limit (Chrome on macOS
+				// supports 10), and the probes take larger ones than the default 128 MB
+
+				const adapter = await navigator.gpu?.requestAdapter();
+				const requiredLimits = adapter ? { maxStorageBuffersPerShaderStage: adapter.limits.maxStorageBuffersPerShaderStage, maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize, maxBufferSize: adapter.limits.maxBufferSize } : {};
+
+				renderer = new THREE.WebGPURenderer( { requiredLimits, trackTimestamp: true, powerPreference: 'high-performance' } );
+				renderer.setPixelRatio( Math.min( window.devicePixelRatio, 1 ) );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.05, 200 );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				const gui = renderer.inspector.createParameters( 'Radiance Cascades' );
+				// the options of the cascades change at run time, only the scene loads and builds its BVH again
+
+				gui.add( params, 'scene', Object.keys( scenes ) ).name( 'Scene' ).onChange( setScene );
+
+				const qualityFolder = gui.addFolder( 'Quality' );
+				qualityFolder.add( params, 'probeSize', [ 6, 8, 12, 16 ] ).name( 'Probe Size (px)' ).onChange( () => Object.assign( cascades, probeLayout() ) );
+				qualityFolder.add( params, 'rays', Object.keys( rayStrides ) ).name( 'Rays' ).onChange( updateCascades );
+				qualityFolder.add( params, 'smoothing', 0, 1, 0.01 ).name( 'Temporal Smoothing' ).onChange( updateCascades );
+				qualityFolder.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( () => {
+
+					// the slider shows the adaptive quality, moving it fixes the quality
+
+					if ( params.quality === shownQuality ) return;
+
+					shownQuality = shownHalf = null;
+					params.adaptiveQuality = false;
+					updateQuality();
+
+				} ).listen();
+				qualityFolder.add( params, 'adaptiveQuality' ).name( 'Adaptive Quality' ).onChange( updateQuality ).listen();
+				qualityFolder.add( params, 'halfResolution' ).name( 'Half Resolution' ).onChange( () => {
+
+					if ( params.halfResolution === shownHalf ) return;
+
+					shownQuality = shownHalf = null;
+					params.adaptiveQuality = false;
+					updateQuality();
+
+				} ).listen();
+				qualityFolder.add( params, 'secondary' ).name( 'Secondary Bounces' ).onChange( updateCascades );
+				qualityFolder.add( params, 'traa' ).name( 'TRAA' ).onChange( updateOutput );
+
+				const visualizationFolder = gui.addFolder( 'Visualization' );
+				visualizationFolder.add( params, 'view', Object.keys( views ) ).name( 'View' ).onChange( () => cascades.mode.value = views[ params.view ] );
+				visualizationFolder.add( params, 'intensity', 0, 4 ).name( 'Indirect' ).onChange( () => cascades.intensity.value = params.intensity );
+				visualizationFolder.add( params, 'sunAngle', 5, 175 ).name( 'Sun Angle' ).onChange( updateSun ).listen();
+				visualizationFolder.add( params, 'animateSun' ).name( 'Animate Sun' );
+				visualizationFolder.add( params, 'autoRotate' ).name( 'Auto Rotate' ).onChange( () => controls.autoRotate = params.autoRotate );
+
+				await setScene();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				renderer.setAnimationLoop( animate );
+
+			}
+
+			async function setScene() {
+
+				status.textContent = `Loading ${ params.scene }…`;
+
+				// the meshes, lines and lights of the last scene, whose geometries, materials and shadow maps are disposed
+				// after the switch unless the new scene uses them
+
+				const previous = [];
+				world?.root.traverse( ( object ) => ( object.isMesh || object.isLine || object.isLight ) && previous.push( object ) );
+
+				let next;
+
+				try {
+
+					next = await scenes[ params.scene ]();
+
+				} catch ( error ) {
+
+					status.textContent = `${ params.scene } could not be loaded: ${ error.message ?? error }`;
+					return;
+
+				}
+
+				// building the BVH of a large scene blocks the page for a while, the status shows it first
+
+				status.textContent = `Building the BVH of ${ params.scene }…`;
+				await new Promise( ( resolve ) => requestAnimationFrame( () => setTimeout( resolve ) ) );
+
+				world = next;
+
+				// one scene for all, since a new one would leave the background mesh of the last one to the renderer
+
+				scene ??= new THREE.Scene();
+				scene.clear();
+				scene.background = world.background ?? new THREE.Color( 0 );
+				scene.add( world.root );
+
+				const used = new Set();
+				world.root.traverse( ( object ) => object.isMesh || object.isLine ? used.add( object.geometry ).add( object.material ) : used.add( object ) );
+
+				for ( const object of previous ) {
+
+					if ( object.isLight ) {
+
+						if ( used.has( object ) === false ) object.dispose();
+
+					} else {
+
+						if ( used.has( object.geometry ) === false ) object.geometry.dispose();
+						if ( used.has( object.material ) === false ) object.material.dispose();
+
+					}
+
+				}
+
+				camera.position.copy( world.camera );
+				camera.fov = world.fov ?? 50;
+				camera.updateProjectionMatrix();
+				controls.target.copy( world.target );
+				controls.update();
+
+				renderer.toneMappingExposure = world.exposure ?? 1;
+				if ( world.sunAngle !== undefined ) params.sunAngle = world.sunAngle;
+
+				if ( cascades === undefined ) {
+
+					cascades = new RealtimeRadianceCascades( { ...probeLayout(), ...cascadeOptions() } );
+					cascades.mode.value = views[ params.view ];
+					cascades.intensity.value = params.intensity;
+					updateQuality();
+
+				} else {
+
+					Object.assign( cascades, probeLayout(), cascadeOptions() );
+
+				}
+
+				// the rays see the sky of the background
+
+				const start = performance.now();
+
+				cascades.setScene( renderer, scene );
+
+				updateOutput();
+				updateSun();
+
+				status.textContent = `BVH built in ${ ( performance.now() - start ).toFixed( 0 ) } ms, ${ ( cascades.memory / 2 ** 20 ).toFixed( 0 ) } MB of probes`;
+
+			}
+
+			function probeLayout() {
+
+				// the probes are about probeSize pixels wide on the screen at the far edge of each level of detail, and twice
+				// as wide at the near edge. Three levels finer than the scene's first one keep them small near the camera too.
+				// The window can resize without changing them, the levels of detail coarsen if the probes do not fit
+
+				const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+				const focal = size.y / 2 / Math.tan( THREE.MathUtils.degToRad( camera.fov / 2 ) );
+				const tiles = size.x * size.y / params.probeSize ** 2;
+
+				return {
+					levelDistance: world.levelDistance / 8,
+					levels: 11,
+					spacing: world.levelDistance / 8 * params.probeSize / focal,
+					maxProbes: Math.max( 4096, Math.ceil( tiles * 4.5 ) )
+				};
+
+			}
+
+			function cascadeOptions() {
+
+				return {
+					rayStride: rayStrides[ params.rays ],
+					secondary: params.secondary,
+					blendingRadius: 2,
+					orientations: true,
+					qualityDecay: params.smoothing
+				};
+
+			}
+
+			function updateCascades() {
+
+				Object.assign( cascades, cascadeOptions() );
+
+			}
+
+			function updateQuality() {
+
+				// the quality adapts to the frame rate of the display, or is fixed
+
+				cascades.adaptiveQuality = params.adaptiveQuality;
+				cascades.quality = params.quality;
+				cascades.halfResolution = params.halfResolution;
+
+			}
+
+			function updateOutput() {
+
+				// the composite changes when the cascades rebuild their passes for changed options, and TRAA needs the
+				// velocity texture of the G-buffer
+
+				cascades.velocity = params.traa;
+
+				const composite = cascades.getCompositeNode();
+
+				if ( composite !== compositeNode ) {
+
+					compositeNode = composite;
+
+					// the cascades render the G-buffer and run their passes in the render pipeline, before the composite, so
+					// that the jitter of the camera that TRAA applies for the pipeline applies to the G-buffer
+
+					outputNode = Fn( () => {
+
+						OnBeforeFrameUpdate( () => cascades.update( renderer, scene, camera ) );
+
+						return composite;
+
+					} )();
+
+					// the texture of the composite that traa() renders is disposed too
+
+					traaPass?.beautyNode.dispose();
+					traaPass?.dispose();
+					traaPass = params.traa ? traa( outputNode, cascades.getTextureNode( 'depth' ), cascades.getTextureNode( 'velocity' ), camera ) : null;
+
+				}
+
+				const output = params.traa ? traaPass : outputNode;
+
+				if ( renderPipeline.outputNode !== output ) {
+
+					renderPipeline.outputNode = output;
+					renderPipeline.needsUpdate = true;
+
+				}
+
+			}
+
+			function updateSun() {
+
+				if ( world?.sun === undefined ) return;
+
+				// the sun turns over the sky from the horizon on the side of its azimuth to the other one
+
+				const angle = THREE.MathUtils.degToRad( params.sunAngle );
+				const [ x, z ] = world.sunAzimuth ?? [ 0.5, 0.6 ];
+				world.sun.position.set( Math.cos( angle ) * x, Math.sin( angle ), Math.cos( angle ) * z ).normalize().multiplyScalar( world.sunDistance ?? 30 ).add( world.sun.target.position );
+				world.sun.shadow.needsUpdate = true;
+
+			}
+
+			async function createCornellBox( light ) {
+
+				// the Cornell Box of webgpu_lightmap_baking, lit only by the emissive panel, whose light reaches the
+				// surfaces through the cascades, or by a rect area light of the same light or a spot light, which light
+				// them directly and bounce through the cascades. The front wall faces inwards, the camera sees through its back
+
+				const root = new THREE.Group();
+
+				const white = new THREE.MeshStandardMaterial( { color: 0xcccccc } );
+				const red = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+				const green = new THREE.MeshStandardMaterial( { color: 0x00ff00 } );
+
+				function wall( width, height, material, x, y, z, rx, ry ) {
+
+					const mesh = new THREE.Mesh( new THREE.PlaneGeometry( width, height ), material );
+					mesh.position.set( x, y, z );
+					mesh.rotation.set( rx, ry, 0 );
+					root.add( mesh );
+
+				}
+
+				wall( 6, 6, white, 0, 0, 0, - Math.PI / 2, 0 );
+				wall( 6, 6, white, 0, 5, 0, Math.PI / 2, 0 );
+				wall( 6, 5, white, 0, 2.5, - 3, 0, 0 );
+				wall( 6, 5, white, 0, 2.5, 3, 0, Math.PI );
+				wall( 6, 5, red, - 3, 2.5, 0, 0, Math.PI / 2 );
+				wall( 6, 5, green, 3, 2.5, 0, 0, - Math.PI / 2 );
+
+				const tallBox = new THREE.Mesh( new THREE.BoxGeometry( 1.2, 2.5, 1.2 ), new THREE.MeshStandardMaterial( { color: 0xeeeeee } ) );
+				tallBox.position.set( - 0.8, 1.25, - 0.8 );
+				tallBox.rotation.y = Math.PI / 8;
+				root.add( tallBox );
+
+				const sphere = new THREE.Mesh( new THREE.SphereGeometry( 0.65, 32, 32 ), new THREE.MeshStandardMaterial( { color: 0x0044ff, roughness: 0.15 } ) );
+				sphere.position.set( 1, 0.65, 0.5 );
+				root.add( sphere );
+
+				if ( light === 'rect' ) {
+
+					// the textures of the direct light of rect area lights, the rays do not need them
+
+					rectAreaLights ??= Promise.all( [ import( 'three/addons/lights/RectAreaLightTexturesLib.js' ), import( 'three/addons/helpers/RectAreaLightHelper.js' ) ] ).then( ( [ { RectAreaLightTexturesLib }, { RectAreaLightHelper } ] ) => {
+
+						THREE.RectAreaLightNode.setLTC( RectAreaLightTexturesLib.init() );
+
+						return RectAreaLightHelper;
+
+					} );
+
+					const RectAreaLightHelper = await rectAreaLights;
+
+					// it shines down, and the rays leave out its helper
+
+					const rect = new THREE.RectAreaLight( 0xffffff, 20, 2, 2 );
+					rect.rotation.x = - Math.PI / 2;
+					rect.position.y = 4.99;
+					rect.add( new RectAreaLightHelper( rect ) );
+					root.add( rect );
+
+				} else if ( light === 'spot' ) {
+
+					const spot = new THREE.SpotLight( 0xffffff, 80, 0, Math.PI / 6, 0.5 );
+					spot.position.set( 0, 4.9, 0 );
+					spot.castShadow = true;
+					spot.shadow.mapSize.setScalar( 1024 );
+					spot.shadow.bias = - 0.0005;
+					spot.shadow.autoUpdate = false;
+					root.add( spot, spot.target );
+
+				} else {
+
+					const panel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
+					panel.rotation.x = Math.PI / 2;
+					panel.position.y = 4.99;
+					root.add( panel );
+
+				}
+
+				return {
+					root, background: new THREE.Color( 0x111111 ),
+					camera: new THREE.Vector3( 0, 2.5, 8 ), target: new THREE.Vector3( 0, 2.5, 0 ),
+					levelDistance: 4
+				};
+
+			}
+
+			async function createCourtyard() {
+
+				// the two storey cloister at sunrise of webgpu_lightmap_baking, lit only by the sky, through the cascades
+
+				const background = await loadSky();
+
+				const root = new THREE.Group();
+
+				const stone = new THREE.MeshStandardMaterial( { color: 0xddd0b8 } );
+				const plaster = new THREE.MeshStandardMaterial( { color: 0xd9a066 } );
+				const tiles = new THREE.MeshStandardMaterial( { color: 0xb59a7e } );
+				const water = new THREE.MeshStandardMaterial( { color: 0x3c7a8a } );
+				const leaves = new THREE.MeshStandardMaterial( { color: 0x4a7a32 } );
+				const banners = [ 0xb02a20, 0x2a4ab0, 0xd8a020, 0x2a8a50 ].map( ( color ) => new THREE.MeshStandardMaterial( { color } ) );
+
+				function add( parent, geometry, material, x, y, z ) {
+
+					const mesh = new THREE.Mesh( geometry, material );
+					mesh.position.set( x, y, z );
+					parent.add( mesh );
+					return mesh;
+
+				}
+
+				// the courtyard facade of a wing in one piece: arches down to the floor below, and above a parapet upstairs
+
+				const arches = [ - 4.5, - 1.5, 1.5, 4.5 ];
+				const facadeShape = new THREE.Shape().moveTo( - 6.5, 0 );
+
+				for ( const x of arches ) facadeShape.lineTo( x - 1, 0 ).lineTo( x - 1, 2.4 ).absarc( x, 2.4, 1, Math.PI, 0, true ).lineTo( x + 1, 0 );
+
+				facadeShape.lineTo( 6, 0 ).lineTo( 6, 7.5 ).lineTo( - 6.5, 7.5 ).closePath();
+
+				for ( const x of arches ) facadeShape.holes.push( new THREE.Path().moveTo( x + 0.9, 5.2 ).lineTo( x + 0.9, 5.8 ).absarc( x, 5.8, 0.9, 0, Math.PI ).lineTo( x - 0.9, 5.2 ).closePath() );
+
+				const facade = new THREE.ExtrudeGeometry( facadeShape, { depth: 0.5, bevelEnabled: false, curveSegments: 16 } );
+				const floorSlab = new THREE.BoxGeometry( 15.5, 0.3, 2.5 );
+				const roof = new THREE.BoxGeometry( 15.2, 0.3, 3.8 );
+				const banner = new THREE.PlaneGeometry( 0.7, 2.4 );
+
+				// four wings, each one covers the corner on its left so that the walls do not overlap
+
+				for ( let i = 0; i < 4; i ++ ) {
+
+					const wing = new THREE.Group();
+					wing.rotation.y = - i * Math.PI / 2;
+					root.add( wing );
+
+					add( wing, facade, stone, 0, 0, - 6.5 );
+					add( wing, floorSlab, stone, - 1.25, 4.15, - 7.75 );
+					add( wing, roof, stone, - 1.9, 7.65, - 7.6 );
+
+					for ( const x of [ - 3, 0, 3 ] ) add( wing, banner, banners[ i ], x, 6.25, - 5.95 );
+
+				}
+
+				add( root, new THREE.PlaneGeometry( 19, 19 ), tiles, 0, 0, 0 ).rotation.x = - Math.PI / 2;
+
+				// fountain
+
+				const octagon = ( radius ) => Array.from( { length: 8 }, ( v, i ) => new THREE.Vector2( radius, 0 ).rotateAround( new THREE.Vector2(), ( i + 0.5 ) * Math.PI / 4 ) );
+
+				const basin = new THREE.Shape( octagon( 1.9 ) );
+				basin.holes.push( new THREE.Path( octagon( 1.6 ) ) );
+
+				add( root, new THREE.ExtrudeGeometry( basin, { depth: 0.55, bevelEnabled: false } ), stone, 0, 0, 0 ).rotation.x = - Math.PI / 2;
+				add( root, new THREE.ShapeGeometry( new THREE.Shape( octagon( 1.6 ) ) ), water, 0, 0.4, 0 ).rotation.x = - Math.PI / 2;
+				add( root, new THREE.CylinderGeometry( 0.2, 0.3, 1.3, 16 ), stone, 0, 0.65, 0 );
+				add( root, new THREE.CylinderGeometry( 0.8, 0.3, 0.3, 16 ), stone, 0, 1.45, 0 );
+				add( root, new THREE.SphereGeometry( 0.25, 16, 12 ), stone, 0, 1.85, 0 );
+
+				// cypresses in planters
+
+				for ( const [ x, z ] of [[ - 4.6, - 4.6 ], [ 4.6, - 4.6 ], [ 4.6, 4.6 ], [ - 4.6, 4.6 ]] ) {
+
+					add( root, new THREE.BoxGeometry( 1.2, 0.6, 1.2 ), plaster, x, 0.3, z );
+					add( root, new THREE.ConeGeometry( 0.55, 3.2, 12 ), leaves, x, 2.2, z );
+
+				}
+
+				return {
+					root, background,
+					camera: new THREE.Vector3( - 5.6, 1.6, 1.5 ), target: new THREE.Vector3( 3, 3.4, - 2.5 ),
+					levelDistance: 6
+				};
+
+			}
+
+			async function createSponza() {
+
+				// chandra's Sponza in Y-up meters, with one flat color per material. Its red and cyan curtains are
+				// emitters, with chandra's albedo of 0.7
+
+				sponza ??= new GLTFLoader().setDRACOLoader( new DRACOLoader().setDecoderPath( DRACO_GLTF_CONFIG ) ).loadAsync( 'models/gltf/Sponza.glb' ).then( ( gltf ) => {
+
+					gltf.scene.traverse( ( object ) => {
+
+						if ( object.isMesh !== true ) return;
+
+						object.castShadow = object.receiveShadow = true;
+
+						const { material } = object;
+						if ( material.name === 'emitter_red' ) material.emissive.setRGB( 1, 0, 0 ).multiplyScalar( 10 * 0.7 );
+						if ( material.name === 'emitter_cyan' ) material.emissive.setRGB( 0, 1, 1 ).multiplyScalar( 7 * 0.7 );
+
+					} );
+
+					return gltf;
+
+				} );
+
+				const [ gltf, background ] = await Promise.all( [ sponza, loadSky() ] );
+
+				const root = new THREE.Group();
+				root.add( gltf.scene );
+
+				// the sun lights the surfaces directly with a shadow map over the whole scene
+
+				const sphere = new THREE.Box3().setFromObject( gltf.scene ).getBoundingSphere( new THREE.Sphere() );
+
+				const sun = new THREE.DirectionalLight( 0xffffff, 10 * Math.PI );
+				sun.castShadow = true;
+				sun.shadow.mapSize.setScalar( 4096 );
+				sun.shadow.camera.left = sun.shadow.camera.bottom = - sphere.radius;
+				sun.shadow.camera.right = sun.shadow.camera.top = sphere.radius;
+				sun.shadow.camera.near = 0.5;
+				sun.shadow.camera.far = sphere.radius * 2 + 1;
+				sun.shadow.bias = - 0.0002;
+				sun.shadow.normalBias = 0.02;
+				sun.target.position.copy( sphere.center );
+				root.add( sun, sun.target );
+
+				// the scene does not move, so the shadow map renders again only when the sun does, see updateSun(). That
+				// spares drawing the scene twice in every frame
+
+				sun.shadow.autoUpdate = false;
+
+				const toSun = new THREE.Vector3( 0.5, 1, 0.1 ).normalize();
+				const azimuth = new THREE.Vector2( toSun.x, toSun.z ).normalize();
+				const position = new THREE.Vector3( - 9.372, 6.134, - 0.945 );
+
+				return {
+					root, sun, background,
+					camera: position, target: new THREE.Vector3( 0.879, - 0.457, 0.136 ).multiplyScalar( 6 ).add( position ),
+					levelDistance: 8, fov: THREE.MathUtils.radToDeg( 1.15 ), exposure: 0.3,
+					sunAzimuth: [ azimuth.x, azimuth.y ], sunAngle: THREE.MathUtils.radToDeg( Math.asin( toSun.y ) ), sunDistance: sphere.radius + 0.5
+				};
+
+			}
+
+			function loadSky() {
+
+				sky ??= new HDRLoader().loadAsync( 'textures/equirectangular/blouberg_sunrise_2_1k.hdr' ).then( ( texture ) => {
+
+					texture.mapping = THREE.EquirectangularReflectionMapping;
+					return texture;
+
+				} );
+
+				return sky;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			let frames = 0, lastGPUTime = null, shownQuality = null, shownHalf = null;
+
+			async function animate() {
+
+				controls.update();
+
+				if ( params.animateSun ) {
+
+					params.sunAngle = 90 + Math.sin( performance.now() / 4000 ) * 70;
+					updateSun();
+
+				}
+
+				// the options apply before the render pipeline, in which the cascades render the G-buffer, whose depth TRAA
+				// reads: the inspector sets params at once but calls onChange a moment later, so a frame can see a change
+				// before its handler
+
+				updateOutput();
+				renderPipeline.render();
+
+				// the controls show the adaptive quality, unless they were just changed and their handler is still to come
+
+				const edited = shownQuality !== null && ( params.quality !== shownQuality || params.halfResolution !== shownHalf );
+
+				if ( cascades.adaptiveQuality && ! edited ) {
+
+					params.quality = shownQuality = Math.round( cascades.quality * 100 ) / 100;
+					params.halfResolution = shownHalf = cascades.halfResolution;
+
+				}
+
+				if ( ++ frames % 30 === 0 ) {
+
+					const gpuTime = await cascades.readGPUTime( renderer ) ?? lastGPUTime;
+					const probes = await cascades.readStats( renderer );
+
+					lastGPUTime = gpuTime;
+					const full = probes.some( ( count, n ) => count >= cascades.capacities[ n ] ) ? ' (full: probes are dropped)' : '';
+					const bias = cascades.lodBias > 0 ? `, levels of detail ${ cascades.lodBias.toFixed( 2 ) } octaves coarser to fit` : '';
+					const target = cascades.adaptiveQuality ? ` for ${ ( 1000 / cascades.activeTargetFrameTime ).toFixed( 0 ) } FPS` : '';
+					const half = cascades.halfResolution ? ' at half resolution' : '';
+					status.textContent = `quality ${ cascades.quality.toFixed( 2 ) }${ half }${ target }, probes per cascade: ${ probes.join( ', ' ) }${ full }${ bias }, ${ cascades.newProbes } new, ${ ( cascades.memory / 2 ** 20 ).toFixed( 0 ) } MB${ gpuTime !== null ? `, ${ gpuTime.toFixed( 2 ) } ms on the GPU` : '' }.`;
+
+				}
+
+			}
+
+		</script>
+	</body>
+</html>

@@ -164,6 +164,7 @@
 	"webgpu_postprocessing_ssgi_ballpool": [ "community", "physics" ],
 	"webgpu_postprocessing_sss": [ "shadow" ],
 	"webgpu_postprocessing_traa": [ "taa", "anti-aliasing" ],
+	"webgpu_radiance_cascades": [ "global illumination", "indirect diffuse", "ray tracing", "bvh" ],
 	"webgpu_refraction": [ "water" ],
 	"webgpu_rtt": [ "renderTarget" ],
 	"webgpu_shadow_contact": [ "soft" ],
