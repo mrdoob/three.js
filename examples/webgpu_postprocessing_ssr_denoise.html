@@ -131,7 +131,7 @@
 				mirrorBias: 0.5,
 				maxRoughness: 1,
 				rayReuse: new URLSearchParams( location.search ).get( 'rayReuse' ) !== '0',
-				reuseRadius: 3,
+				reuseRadius: 16,
 				maxDistance: 0.4,
 				intensity: 1,
 				thickness: 0.1,
@@ -418,7 +418,7 @@
 			ssrGui.add( params.ssr, 'mirrorBias', 0, 1 ).name( 'mirror bias' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'maxRoughness', 0, 1 ).name( 'max roughness' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'rayReuse' ).name( 'ray reuse (reloads)' ).onChange( ( value ) => location.search = value ? '' : '?rayReuse=0' );
-			ssrGui.add( params.ssr, 'reuseRadius', 0, 16 ).name( 'reuse radius' ).onChange( applyParams );
+			ssrGui.add( params.ssr, 'reuseRadius', 0, 32 ).name( 'reuse radius' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'stepExponent', 1, 4, 0.5 ).name( 'step exponent' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'binaryRefine' ).name( 'binary refine' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'maxDistance', 0, 5 ).name( 'max distance' ).onChange( applyParams );

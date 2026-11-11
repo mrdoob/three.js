@@ -67,7 +67,7 @@
 				highlightIntensity: 100,
 				environmentIntensity: 1,
 				resetOnChange: true,
-				ssr: { quality: 0.5, maxDistance: 1, binaryRefine: false, mirrorBias: 0.5, maxRoughness: 1, reuseRadius: 3 },
+				ssr: { quality: 0.5, maxDistance: 1, binaryRefine: false, mirrorBias: 0.5, maxRoughness: 1, reuseRadius: 16 },
 				denoise: {
 					enabled: true, luminancePhi: 3, maxFrames: 20, spatialPasses: 2, historyDeviation: 0, fireflyClamp: 0,
 					toneMappedWeights: 0, lobeLuminanceRelax: 0, historyRadius: 0, clampSigma: 0, historyCatmullRom: 0, antilagSigma: 0, antilagReset: 0
@@ -267,7 +267,7 @@
 				ssrGui.add( params.ssr, 'mirrorBias', 0, 1 ).name( 'mirror bias' ).onChange( applyParams );
 				ssrGui.add( params.ssr, 'maxRoughness', 0, 1 ).name( 'max roughness' ).onChange( applyParams );
 				ssrGui.add( params, 'rayReuse' ).name( 'ray reuse (reloads)' ).onChange( ( value ) => location.search = value ? '' : '?rayReuse=0' );
-				ssrGui.add( params.ssr, 'reuseRadius', 0, 16 ).name( 'reuse radius' ).onChange( applyParams );
+				ssrGui.add( params.ssr, 'reuseRadius', 0, 32 ).name( 'reuse radius' ).onChange( applyParams );
 
 				const denoiseGui = renderer.inspector.createParameters( 'Denoiser' );
 				denoiseGui.add( params.denoise, 'enabled' ).onChange( applyParams );
