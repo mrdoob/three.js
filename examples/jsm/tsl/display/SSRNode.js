@@ -251,6 +251,16 @@ class SSRNode extends Node {
 		this.mirrorBias = uniform( 0 );
 
 		/**
+		 * The roughness above which no reflections are traced. The coverage fades out over the last 0.2 below it, so that
+		 * the caller's fallback, e.g. the environment map, takes over on rough surfaces, like the max roughness of SSR in
+		 * Unreal or the roughness threshold of AMD's SSSR. `1` traces all surfaces.
+		 *
+		 * @type {UniformNode<float>}
+		 * @default 1
+		 */
+		this.maxRoughness = uniform( 1 );
+
+		/**
 		 * The quality of the blur. Must be an integer in the range `[1,3]`.
 		 *
 		 * Baked into the blur shader as a compile-time constant so the `(size*2+1)²`
@@ -800,6 +810,9 @@ class SSRNode extends Node {
 			}
 
 			const roughness = float( this.roughnessNode );
+
+			// too rough: no reflection, the fallback takes over
+			roughness.greaterThan( this.maxRoughness ).discard();
 			const glossiness = min( roughness.div( 0.25 ), 1 ).oneMinus();
 			// Only the fade-to-black miss path reads this, and that path is baked out otherwise.
 			const surfaceBorderFactor = this.screenEdgeFadeBlack ? computeScreenBorderFactor( uvPos, this.screenEdgeFade ) : null;
@@ -1164,6 +1177,8 @@ class SSRNode extends Node {
 
 			// scale the reflection color by the user-controlled intensity
 			output.rgb.mulAssign( this.intensity );
+
+			output.a.mulAssign( roughness.smoothstep( this.maxRoughness, this.maxRoughness.sub( 0.2 ) ) );
 
 			this._ssrOutput.assign( output.max( 0 ) );
 			this._ssrHitDistance.assign( hitDistance );
