@@ -539,14 +539,14 @@ function toReversedProjectionMatrix( projectionMatrix ) {
  * @type {Object}
  */
 const ReversedDepthFuncs = {
-	[ NeverDepth ]: NeverDepth,
+	[ NeverDepth ]: AlwaysDepth,
 	[ LessDepth ]: GreaterDepth,
-	[ EqualDepth ]: EqualDepth,
+	[ EqualDepth ]: NotEqualDepth,
 	[ LessEqualDepth ]: GreaterEqualDepth,
 
-	[ AlwaysDepth ]: AlwaysDepth,
+	[ AlwaysDepth ]: NeverDepth,
 	[ GreaterDepth ]: LessDepth,
-	[ NotEqualDepth ]: NotEqualDepth,
+	[ NotEqualDepth ]: EqualDepth,
 	[ GreaterEqualDepth ]: LessEqualDepth,
 };
 
