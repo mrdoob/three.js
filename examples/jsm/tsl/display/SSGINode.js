@@ -2,6 +2,7 @@ import { RenderTarget, Vector2, Node, QuadMesh, NodeMaterial, RendererUtils, Mat
 import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, property, outputStruct, context, isBackgroundDepth, min, projectionDepth, textureSize, depthToViewZ } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
+const _neutralContext = /*@__PURE__*/ context();
 const _size = /*@__PURE__*/ new Vector2();
 
 // From Activision GTAO paper: https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
@@ -382,6 +383,12 @@ class SSGINode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
+		// this node is usually updated while a scene pass renders whose context injects the
+		// AO/GI of this node into the materials; the nested renders below must not inherit it
+
+		const currentContextNode = renderer.contextNode;
+		renderer.contextNode = _neutralContext;
+
 		//
 
 		const size = renderer.getDrawingBufferSize( _size );
@@ -418,6 +425,8 @@ class SSGINode extends Node {
 		_quadMesh.render( renderer );
 
 		// restore
+
+		renderer.contextNode = currentContextNode;
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );
 
