@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, If, Loop, PI, abs, convertToTexture, cos, float, hash, int, mix, mrt, normalView, output, packNormalToRGB, pass, renderOutput, sample, screenCoordinate, screenSize, screenUV, sin, sqrt, step, texture, uint, uniform, vec2, vec3, vec4, velocity } from 'three/tsl';
+			import { Fn, If, Loop, PI, abs, convertToTexture, cos, float, hash, int, mix, mrt, normalView, output, packNormalToRGB, pass, renderOutput, sample, screenCoordinate, screenSize, screenUV, sin, sqrt, step, texture, uint, uniform, vec2, vec3, vec4 } from 'three/tsl';
 
 			import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 			import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
@@ -50,6 +50,7 @@
 				left: 'Denoised',
 				intensity: 20,
 				jitter: true,
+				motion: 'None',
 				// the defaults of webgpu_postprocessing_ssr_denoise
 				temporalReproject: { maxFrames: 16, clampIntensity: 0.25, flickerSuppression: 1, hitPointReprojection: true },
 				denoise: { lumaPhi: 0.75, depthPhi: 20, normalPhi: 0.3, roughnessPhi: 100, radius: 1.5, alphaPhi: 5, strength: 0.725, adapt: 0.5, smoothDisocclusions: true, flickerSuppression: 1, adaptiveTrust: 1 }
@@ -66,8 +67,16 @@
 			const fit = uniform( new THREE.Vector2( 1, 1 ) );
 			const jitter = uniform( new THREE.Vector2() );
 
+			// the motion of the image: a translation in pixels in xy, a scale in z
+
+			const transform = uniform( new THREE.Vector3( 0, 0, 1 ) );
+			const previousTransform = uniform( new THREE.Vector3( 0, 0, 1 ) );
+
+			const motionPeriod = 120; // frames
+			const motionRadius = 25; // pixels
+			const zoomAmplitude = 0.1;
+
 			const haltonOffsets = computeHaltonOffsets( 32 );
-			const unjittered = new THREE.Matrix4();
 			const drawingBufferSize = new THREE.Vector2();
 
 			// the radiance of each pixel, `intensity` for the highlights
@@ -127,7 +136,23 @@
 				renderer.toneMapping = THREE.AgXToneMapping;
 				document.body.appendChild( renderer.domElement );
 
-				// a plane that fills the view gives the denoiser its depth, normal and velocity
+				// the same image in each half of the screen, positions in pixels from the center of the half
+
+				const panelSize = vec2( screenSize.x.mul( 0.5 ), screenSize.y );
+				const panelPosition = vec2( screenUV.x.mul( 2 ).fract(), screenUV.y ).sub( 0.5 ).mul( panelSize );
+
+				// the motion vectors of the image, unjittered and in NDC like those of the velocity node
+
+				const imageVelocity = Fn( () => {
+
+					const imagePosition = panelPosition.sub( transform.xy ).div( transform.z );
+					const previousPosition = imagePosition.mul( previousTransform.z ).add( previousTransform.xy );
+
+					return panelPosition.sub( previousPosition ).div( screenSize ).mul( vec2( 2, - 2 ) );
+
+				} )();
+
+				// a plane that fills the view gives the denoiser its depth and normal
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.z = 1;
@@ -138,17 +163,14 @@
 
 				scenePass = pass( scene, camera );
 				// roughness in alpha, as webgpu_postprocessing_ssr_denoise packs it
-				scenePass.setMRT( mrt( { output, normal: vec4( packNormalToRGB( normalView ).rgb, roughness ), velocity } ) );
+				scenePass.setMRT( mrt( { output, normal: vec4( packNormalToRGB( normalView ).rgb, roughness ), velocity: imageVelocity } ) );
 				scenePass.getTexture( 'normal' ).type = THREE.UnsignedByteType;
 
-				// the source at an offset in pixels, in each half of the screen, black outside the image
-
-				const panelSize = vec2( screenSize.x.mul( 0.5 ), screenSize.y );
-				const panelUV = vec2( screenUV.x.mul( 2 ).fract(), screenUV.y );
+				// the source at an offset in pixels, moved with the image, black outside the image
 
 				const sourceAt = ( offset ) => {
 
-					const uv = panelUV.add( offset.add( jitter ).div( panelSize ) ).sub( 0.5 ).mul( fit ).add( 0.5 ).toVar();
+					const uv = panelPosition.add( offset ).add( jitter ).sub( transform.xy ).div( transform.z.mul( panelSize ) ).mul( fit ).add( 0.5 ).toVar();
 					const inside = uv.greaterThanEqual( vec2( 0 ) ).all().and( uv.lessThanEqual( vec2( 1 ) ).all() );
 
 					return inside.select( source.sample( uv ).rgb, vec3( 0 ) );
@@ -205,6 +227,7 @@
 				const gui = renderer.inspector.createParameters( 'Source' );
 				gui.add( params, 'source', [ ...Object.keys( procedural ), ...Object.keys( images ) ] ).onChange( onSourceChange );
 				gui.add( params, 'intensity', 0, 100 ).name( 'highlight intensity' ).onChange( updateSource );
+				gui.add( params, 'motion', [ 'None', 'Circle', 'Linear', 'Zoom' ] );
 
 				const samplingGui = renderer.inspector.createParameters( 'Source sampling' );
 				samplingGui.add( noiseType, 'value', { 'Hierarchical Hashed Weyl': 0, White: 1 } ).name( 'noise' );
@@ -380,20 +403,31 @@
 
 				index.value ++;
 
-				// like TRAA: render with the jittered projection, compute the velocity with the unjittered one
+				const s = Math.sin( index.value * 2 * Math.PI / motionPeriod );
+				const c = Math.cos( index.value * 2 * Math.PI / motionPeriod );
+
+				const motions = {
+					None: [ 0, 0, 1 ],
+					Circle: [ motionRadius * s, motionRadius * c, 1 ],
+					Linear: [ motionRadius * s, 0, 1 ],
+					Zoom: [ 0, 0, 1 + zoomAmplitude * s ]
+				};
+
+				previousTransform.value.copy( transform.value );
+				transform.value.fromArray( motions[ params.motion ] );
+
+				// like TRAA's camera jitter, which the velocity leaves out
 
 				const size = renderer.getDrawingBufferSize( drawingBufferSize );
 				const [ hx, hy ] = params.jitter ? haltonOffsets[ index.value % 32 ] : [ 0.5, 0.5 ];
 				const jx = hx - 0.5, jy = hy - 0.5;
 
-				velocity.setProjectionMatrix( unjittered.copy( camera.projectionMatrix ) );
 				camera.setViewOffset( size.x, size.y, jx, jy, size.x, size.y );
 				jitter.value.set( jx, - jy );
 
 				pipeline.render();
 
 				camera.clearViewOffset();
-				velocity.setProjectionMatrix( null );
 
 			}
 
