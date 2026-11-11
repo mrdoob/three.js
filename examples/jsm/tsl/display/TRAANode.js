@@ -481,6 +481,10 @@ class TRAANode extends Node {
 		this._previousDepthRenderTarget.depthTexture.format = this.depthNode.value.format;
 		this._previousDepthRenderTarget.depthTexture.type = this.depthNode.value.type;
 
+		// copyTextureToTexture() requires matching sample counts, so mirror the MSAA setting of the scene depth
+
+		this._previousDepthRenderTarget.samples = this.depthNode.value.renderTarget !== null ? this.depthNode.value.renderTarget.samples : 0;
+
 		if ( builder.context.velocity !== undefined ) {
 
 			this._velocityNode = builder.context.velocity;
