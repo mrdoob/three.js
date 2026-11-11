@@ -1,0 +1,422 @@
+<html lang="en">
+	<head>
+		<title>three.js webgpu - postprocessing - denoiser</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Denoiser</span>
+			</div>
+
+			<small>Validates the SSR denoiser on synthetic input: one sparse, jittered sample per pixel of a known image, compared to its reference.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { Fn, If, Loop, PI, abs, convertToTexture, cos, float, hash, int, mix, mrt, normalView, output, packNormalToRGB, pass, renderOutput, sample, screenCoordinate, screenSize, screenUV, sin, sqrt, step, texture, uint, uniform, vec2, vec3, vec4, velocity } from 'three/tsl';
+
+			import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
+			import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
+			import { R4_STEPS, hierarchicalHashedWeyl } from 'three/addons/tsl/utils/HierarchicalHashedWeyl.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			const params = {
+				source: 'Memorial',
+				left: 'Denoised',
+				intensity: 20,
+				noise: 'Hierarchical Hashed Weyl',
+				density: 0.5,
+				sampleRadius: 6,
+				jitter: true,
+				roughness: 0.3,
+				hitDistance: 0.05,
+				// the defaults of webgpu_postprocessing_ssr_denoise
+				temporalReproject: { maxFrames: 16, clampIntensity: 0.25, flickerSuppression: 1, hitPointReprojection: true },
+				denoise: { lumaPhi: 0.75, depthPhi: 20, normalPhi: 0.3, roughnessPhi: 100, radius: 1.5, alphaPhi: 5, strength: 0.725, adapt: 0.5, smoothDisocclusions: true, flickerSuppression: 1, adaptiveTrust: 1 }
+			};
+
+			let renderer, camera, plane, pipeline, temporalReprojectNode, denoiseNode, reference, noisy;
+
+			const index = uniform( 0, 'uint' );
+			const noiseType = uniform( 0 );
+			const density = uniform( params.density );
+			const sampleRadius = uniform( params.sampleRadius );
+			const roughness = uniform( params.roughness );
+			const hitDistance = uniform( params.hitDistance );
+
+			// the same image in each half of the screen: the chosen output on the left, the noisy input on the right
+
+			const panelSize = vec2( screenSize.x.mul( 0.5 ), screenSize.y );
+			const panelUV = vec2( screenUV.x.mul( 2 ).fract(), screenUV.y );
+
+			// the source at an offset in pixels, fit into the panel at its own aspect ratio, black outside
+
+			const fit = uniform( new THREE.Vector2( 1, 1 ) );
+
+			// the sub-pixel jitter of the camera, like TRAA's: the image moves with it, in pixels
+
+			const jitter = uniform( new THREE.Vector2() );
+			const unjittered = new THREE.Matrix4();
+			const translation = new THREE.Matrix4();
+
+			const sourceAt = ( offset ) => {
+
+				const uv = panelUV.add( offset.add( jitter ).div( panelSize ) ).sub( 0.5 ).mul( fit ).add( 0.5 ).toVar();
+				const inside = uv.greaterThanEqual( vec2( 0 ) ).all().and( uv.lessThanEqual( vec2( 1 ) ).all() );
+
+				return inside.select( source.sample( uv ).rgb, vec3( 0 ) );
+
+			};
+
+			// procedural sources: the radiance of each pixel, `intensity` for the highlights
+
+			const procedural = {
+
+				// a dark and a bright half, with highlight discs of growing radius on both
+				Highlights: ( x, y, width, height ) => {
+
+					let value = x < width / 2 ? 0.02 : 0.5;
+
+					[ 1, 2, 3, 5, 8 ].forEach( ( radius, i ) => {
+
+						const cy = height * ( i + 1 ) / 6;
+
+						for ( const cx of [ width / 4, width * 3 / 4 ] ) {
+
+							if ( ( x - cx ) ** 2 + ( y - cy ) ** 2 <= radius * radius ) value = params.intensity;
+
+						}
+
+					} );
+
+					return value;
+
+				},
+
+				// a lit sphere with a highlight over a dark gradient
+				Sphere: ( x, y, width, height ) => {
+
+					const r = height * 0.35;
+					const px = ( x - width / 2 ) / r, py = ( y - height / 2 ) / r;
+					const z2 = 1 - px * px - py * py;
+
+					if ( z2 < 0 ) return 0.02 * x / width;
+					if ( Math.hypot( px + 0.3, py - 0.35 ) < 0.08 ) return params.intensity;
+
+					const diffuse = ( - 0.5 * px + 0.6 * py + 0.6 * Math.sqrt( z2 ) ) / Math.hypot( 0.5, 0.6, 0.6 );
+					return Math.max( 0, diffuse ) * 0.5 + 0.01;
+
+				}
+
+			};
+
+			const images = { Memorial: 'textures/memorial.hdr', Quarry: 'textures/equirectangular/quarry_01_1k.hdr', 'Venice Sunset': 'textures/equirectangular/venice_sunset_1k.hdr' };
+			const imageTextures = {};
+
+			const proceduralTexture = new THREE.DataTexture( new Float32Array( 4 ), 1, 1, THREE.RGBAFormat, THREE.FloatType );
+			const source = texture( proceduralTexture );
+
+			init();
+
+			async function init() {
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				renderer.toneMapping = THREE.AgXToneMapping;
+				document.body.appendChild( renderer.domElement );
+
+				const loader = new HDRLoader();
+
+				for ( const name in images ) {
+
+					imageTextures[ name ] = await loader.loadAsync( images[ name ] );
+					imageTextures[ name ].minFilter = imageTextures[ name ].magFilter = THREE.LinearFilter;
+
+				}
+
+				// a plane that fills the view gives the denoiser its depth and velocity
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera.position.z = 1;
+
+				const scene = new THREE.Scene();
+				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicNodeMaterial() );
+				scene.add( plane );
+
+				const scenePass = pass( scene, camera );
+				// the normal with the roughness in alpha, as webgpu_postprocessing_ssr_denoise packs it
+				scenePass.setMRT( mrt( { output, normal: vec4( packNormalToRGB( normalView ).rgb, roughness ), velocity } ) );
+				scenePass.getTexture( 'normal' ).type = THREE.UnsignedByteType;
+
+				// the reference is the mean of the samples: the source, averaged over the sample disc
+
+				reference = Fn( () => {
+
+					const sum = vec4( 0 ).toVar();
+					const r = int( sampleRadius.floor() );
+
+					Loop( { start: r.negate(), end: r, condition: '<=', name: 'y' }, { start: r.negate(), end: r, condition: '<=', name: 'x' }, ( { x, y } ) => {
+
+						If( float( x.mul( x ).add( y.mul( y ) ) ).lessThanEqual( sampleRadius.mul( sampleRadius ) ), () => {
+
+							sum.addAssign( vec4( sourceAt( vec2( x, y ) ), 1 ) );
+
+						} );
+
+					} );
+
+					return sum.rgb.div( sum.a );
+
+				} )();
+
+				// one sample per pixel and frame, at a random point of the sample disc ( like the lobe of a rough reflection ). It
+				// hits with the probability `density` ( 0: no pixel, 1: every pixel ). A miss is black and a hit is scaled by
+				// 1 / density to keep the mean unbiased, so the reference is the mean of the samples
+
+				noisy = Fn( () => {
+
+					const white = ( k ) => hash( uint( screenCoordinate.x ).add( uint( screenCoordinate.y ).mul( 4096 ) ).add( index.mul( 16777259 ) ).add( k * 7919 ) );
+					const noise = ( k ) => mix( hierarchicalHashedWeyl( screenCoordinate, index, k + 1, R4_STEPS[ k ] ), white( k ), noiseType );
+
+					const angle = noise( 0 ).mul( PI.mul( 2 ) );
+					const offset = vec2( cos( angle ), sin( angle ) ).mul( sqrt( noise( 1 ) ).mul( sampleRadius ) );
+
+					return noise( 2 ).lessThan( density ).select( sourceAt( offset ).div( density ), vec3( 0 ) );
+
+				} )();
+
+				// the input as SSR gives it to the denoiser in webgpu_postprocessing_ssr_denoise: radiance, the ray length in alpha
+
+				const ssrLike = convertToTexture( vec4( noisy, hitDistance ) );
+
+				const depth = scenePass.getTextureNode( 'depth' );
+				const normal = scenePass.getTextureNode( 'normal' );
+
+				temporalReprojectNode = temporalReproject( ssrLike, depth, normal, scenePass.getTextureNode( 'velocity' ), camera, { mode: 'specular', accumulate: false } );
+
+				denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
+					depth,
+					normal,
+					raw: ssrLike,
+					metalRoughness: sample( () => vec2( 1, roughness ) ), // metalness, roughness
+					mode: 'specular',
+					accumulate: true
+				} );
+				denoiseNode.alphaSource = 'raylength';
+				temporalReprojectNode.setHistoryTexture( denoiseNode );
+
+				pipeline = new THREE.RenderPipeline( renderer );
+				pipeline.outputColorTransform = false;
+
+				renderer.inspector.createParameters( 'Output' ).add( params, 'left', [ 'Reference', 'Denoised', 'Error' ] ).name( 'left side' ).onChange( updateOutput );
+
+				const gui = renderer.inspector.createParameters( 'Source' );
+				gui.add( params, 'source', [ ...Object.keys( procedural ), ...Object.keys( images ) ] ).onChange( updateSource );
+				gui.add( params, 'intensity', 0, 100 ).name( 'highlight intensity' ).onChange( updateSource );
+
+				const samplingGui = renderer.inspector.createParameters( 'Source sampling' );
+				samplingGui.add( params, 'noise', [ 'Hierarchical Hashed Weyl', 'White' ] ).onChange( applyParams );
+				samplingGui.add( params, 'density', 0, 1 ).onChange( applyParams );
+				samplingGui.add( params, 'sampleRadius', 0, 16 ).name( 'sample radius' ).onChange( applyParams );
+				samplingGui.add( params, 'jitter' ).name( 'camera jitter' ).onChange( applyParams );
+
+				const surfaceGui = renderer.inspector.createParameters( 'Denoiser surface inputs' );
+				surfaceGui.add( params, 'roughness', 0, 1 ).onChange( applyParams );
+				surfaceGui.add( params, 'hitDistance', 0, 2 ).name( 'hit distance' ).onChange( applyParams );
+
+				const denoiseGui = renderer.inspector.createParameters( 'Denoiser' );
+				denoiseGui.add( params.denoise, 'lumaPhi', 0, 3 ).name( 'luma phi' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'depthPhi', 0, 50 ).name( 'depth phi' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'normalPhi', 0.01, 1, 0.01 ).name( 'normal phi' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'roughnessPhi', 0, 500 ).name( 'roughness phi' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'alphaPhi', 0, 15 ).name( 'ray length phi' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'radius', 0, 3 ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'strength', 0.5, 0.95 ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'adapt', 0, 1 ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'smoothDisocclusions' ).name( 'smooth disocclusions' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'flickerSuppression', 0, 1 ).name( 'flicker suppression' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'adaptiveTrust', 0, 1 ).name( 'adaptive trust' ).onChange( applyParams );
+
+				const temporalGui = renderer.inspector.createParameters( 'Temporal reproject' );
+				temporalGui.add( params.temporalReproject, 'maxFrames', 1, 64, 1 ).name( 'max frames' ).onChange( applyParams );
+				temporalGui.add( params.temporalReproject, 'clampIntensity', 0, 1 ).name( 'clamp intensity' ).onChange( applyParams );
+				temporalGui.add( params.temporalReproject, 'flickerSuppression', 0, 1 ).name( 'flicker suppression' ).onChange( applyParams );
+				temporalGui.add( params.temporalReproject, 'hitPointReprojection' ).name( 'hit point reprojection' ).onChange( applyParams );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				onWindowResize();
+				applyParams();
+				updateOutput();
+
+			}
+
+			function applyParams() {
+
+				noiseType.value = params.noise === 'White' ? 1 : 0;
+				density.value = params.density;
+				sampleRadius.value = params.sampleRadius;
+				roughness.value = params.roughness;
+				hitDistance.value = params.hitDistance;
+
+				for ( const key in params.temporalReproject ) temporalReprojectNode[ key ].value = params.temporalReproject[ key ];
+				for ( const key in params.denoise ) denoiseNode[ key ].value = params.denoise[ key ];
+
+			}
+
+			function updateOutput() {
+
+				const denoised = denoiseNode.getTextureNode();
+				const toneMapped = ( radiance ) => renderOutput( vec4( radiance, 1 ) ).rgb;
+
+				// the error of the denoised result relative to the reference: red too bright, blue too dark
+
+				const luma = ( v ) => v.dot( vec3( 0.2126, 0.7152, 0.0722 ) );
+				const error = luma( denoised.rgb ).sub( luma( reference ) ).div( luma( reference ).add( 0.02 ) );
+
+				const left = {
+					Reference: () => toneMapped( reference ),
+					Denoised: () => toneMapped( denoised.rgb ),
+					Error: () => vec3( error.max( 0 ), 0, error.negate().max( 0 ) )
+				}[ params.left ]();
+
+				const right = toneMapped( noisy );
+
+				let color = mix( left, right, step( 0.5, screenUV.x ) );
+				color = abs( screenCoordinate.x.sub( screenSize.x.mul( 0.5 ) ) ).lessThan( 1 ).select( vec3( 1, 0.3, 0.1 ), color );
+
+				pipeline.outputNode = vec4( color, 1 );
+				pipeline.needsUpdate = true;
+
+			}
+
+			function updateSource() {
+
+				if ( images[ params.source ] !== undefined ) {
+
+					const { width, height } = imageTextures[ params.source ].image;
+					const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+					const panelAspect = size.x / 2 / size.y, imageAspect = width / height;
+
+					// negative y: the rows of the HDR images are stored top-down
+					fit.value.set( Math.max( panelAspect / imageAspect, 1 ), - Math.max( imageAspect / panelAspect, 1 ) );
+					source.value = imageTextures[ params.source ];
+
+				} else {
+
+					// one texel per pixel of a half of the screen
+
+					const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+					const width = Math.ceil( size.x / 2 ), height = size.y;
+					const data = new Float32Array( width * height * 4 );
+
+					for ( let y = 0; y < height; y ++ ) {
+
+						for ( let x = 0; x < width; x ++ ) {
+
+							const value = procedural[ params.source ]( x + 0.5, y + 0.5, width, height );
+							data.set( [ value, value, value, 1 ], ( y * width + x ) * 4 );
+
+						}
+
+					}
+
+					proceduralTexture.image = { data, width, height };
+					proceduralTexture.needsUpdate = true;
+					fit.value.set( 1, 1 );
+					source.value = proceduralTexture;
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				const height = 2 * Math.tan( THREE.MathUtils.degToRad( camera.fov / 2 ) );
+				plane.scale.set( height * camera.aspect, height, 1 );
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				updateSource();
+
+			}
+
+			function animate() {
+
+				if ( pipeline === undefined ) return;
+
+				index.value ++;
+
+				// TRAA-like: the jittered projection renders, the velocity uses the unjittered one
+
+				if ( params.jitter ) {
+
+					const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+					const jx = halton( index.value % 32 + 1, 2 ) - 0.5, jy = halton( index.value % 32 + 1, 3 ) - 0.5;
+
+					unjittered.copy( camera.projectionMatrix );
+					velocity.setProjectionMatrix( unjittered );
+					camera.projectionMatrix.premultiply( translation.makeTranslation( - 2 * jx / size.x, 2 * jy / size.y, 0 ) );
+					camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
+					jitter.value.set( jx, - jy );
+
+				} else {
+
+					jitter.value.set( 0, 0 );
+
+				}
+
+				pipeline.render();
+
+				if ( params.jitter ) {
+
+					camera.projectionMatrix.copy( unjittered );
+					camera.projectionMatrixInverse.copy( unjittered ).invert();
+					velocity.setProjectionMatrix( null );
+
+				}
+
+			}
+
+			function halton( index, base ) {
+
+				let result = 0, f = 1;
+
+				for ( let i = index; i > 0; i = Math.floor( i / base ) ) {
+
+					f /= base;
+					result += f * ( i % base );
+
+				}
+
+				return result;
+
+			}
+
+		</script>
+
+	</body>
+</html>
