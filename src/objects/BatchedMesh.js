@@ -11,56 +11,11 @@ import { Frustum } from '../math/Frustum.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Color } from '../math/Color.js';
 import { FrustumArray } from '../math/FrustumArray.js';
+import { minHeapPush, minHeapPop } from '../utils.js';
 
 function ascIdSort( a, b ) {
 
 	return a - b;
-
-}
-
-// min-heap helpers for the available id lists
-function pushId( heap, id ) {
-
-	let i = heap.length;
-	heap.push( id );
-
-	while ( i > 0 ) {
-
-		const parent = ( i - 1 ) >> 1;
-		if ( heap[ parent ] <= id ) break;
-
-		heap[ i ] = heap[ parent ];
-		i = parent;
-
-	}
-
-	heap[ i ] = id;
-
-}
-
-function popSmallestId( heap ) {
-
-	const smallest = heap[ 0 ];
-	const last = heap.pop();
-	const length = heap.length;
-
-	if ( length === 0 ) return smallest;
-
-	let i = 0;
-	let child;
-	while ( ( child = 2 * i + 1 ) < length ) {
-
-		if ( child + 1 < length && heap[ child + 1 ] < heap[ child ] ) child ++;
-		if ( heap[ child ] >= last ) break;
-
-		heap[ i ] = heap[ child ];
-		i = child;
-
-	}
-
-	heap[ i ] = last;
-
-	return smallest;
 
 }
 
@@ -631,7 +586,7 @@ class BatchedMesh extends Mesh {
 		// Prioritize using previously freed instance ids
 		if ( this._availableInstanceIds.length > 0 ) {
 
-			drawId = popSmallestId( this._availableInstanceIds );
+			drawId = minHeapPop( this._availableInstanceIds );
 			this._instanceInfo[ drawId ] = instanceInfo;
 
 		} else {
@@ -726,7 +681,7 @@ class BatchedMesh extends Mesh {
 		let geometryId;
 		if ( this._availableGeometryIds.length > 0 ) {
 
-			geometryId = popSmallestId( this._availableGeometryIds );
+			geometryId = minHeapPop( this._availableGeometryIds );
 			geometryInfoList[ geometryId ] = geometryInfo;
 
 
@@ -892,7 +847,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		geometryInfoList[ geometryId ].active = false;
-		pushId( this._availableGeometryIds, geometryId );
+		minHeapPush( this._availableGeometryIds, geometryId );
 		this._visibilityChanged = true;
 
 		return this;
@@ -910,7 +865,7 @@ class BatchedMesh extends Mesh {
 		this.validateInstanceId( instanceId );
 
 		this._instanceInfo[ instanceId ].active = false;
-		pushId( this._availableInstanceIds, instanceId );
+		minHeapPush( this._availableInstanceIds, instanceId );
 		this._visibilityChanged = true;
 
 		return this;
