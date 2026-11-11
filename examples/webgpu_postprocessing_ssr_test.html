@@ -31,10 +31,9 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { diffuseColor, fract, passTexture, materialMetalness, materialRoughness, mix, mrt, normalView, output, packNormalToRGB, pass, positionWorld, property, renderOutput, sample, step, texture, uniform, unpackRGBToNormal, vec3, vec4, velocity, screenUV } from 'three/tsl';
+			import { diffuseColor, fract, passTexture, materialMetalness, materialRoughness, mix, mrt, normalView, output, packNormalToRGB, pass, positionWorld, property, renderOutput, sample, step, texture, uniform, unpackRGBToNormal, vec3, vec4, velocity } from 'three/tsl';
 
 			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
-			import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 			import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -68,7 +67,7 @@
 				highlightIntensity: 100,
 				environmentIntensity: 1,
 				resetOnChange: true,
-				ssr: { resolution: 1, jointUpsample: true, quality: 0.5, maxDistance: 1, binaryRefine: false, mirrorBias: 0.5, maxRoughness: 1, reuseRadius: 16 },
+				ssr: { quality: 0.5, maxDistance: 1, binaryRefine: false, mirrorBias: 0.5, maxRoughness: 1, reuseRadius: 16 },
 				denoise: {
 					enabled: true, luminancePhi: 3, maxFrames: 20, spatialPasses: 2, historyDeviation: 0, fireflyClamp: 0,
 					toneMappedWeights: 0, lobeLuminanceRelax: 0, historyRadius: 0, clampSigma: 0, historyCatmullRom: 0, antilagSigma: 0, antilagReset: 0
@@ -80,7 +79,6 @@
 
 			const highlightIntensity = uniform( params.highlightIntensity );
 			const denoiseEnabled = uniform( 1 );
-			const jointUpsample = uniform( 1 );
 
 			// the reference: the running sum of the raw SSR ( premultiplied by its coverage ) while the camera is still,
 			// accumulated in the frame like TRAA's history
@@ -240,13 +238,7 @@
 					coverage: true
 				} );
 
-				// SSR and the denoiser run at a reduced resolution; a joint bilateral filter, guided by the full resolution
-				// depth and normals, brings them back without bleeding across edges
-
-				const upsample = ( node ) => mix( node.sample( screenUV ), jointBilateralUpsample( node, depth, sceneNormal, depth, sceneNormal, camera, { coverage: true } ).sample( screenUV ), jointUpsample );
-
-				raw = upsample( ssrNode.getTextureNode() );
-				reflection = mix( raw, upsample( denoiseNode.getTextureNode() ), denoiseEnabled );
+				reflection = mix( raw, denoiseNode.getTextureNode(), denoiseEnabled );
 				combined = color.rgb.add( mix( environment.rgb, reflection.rgb, reflection.a ) );
 
 				accumulateNode = new AccumulateNode( raw );
@@ -269,8 +261,6 @@
 				gui.add( params, 'resetOnChange' ).name( 'reset on change' );
 
 				const ssrGui = renderer.inspector.createParameters( 'SSR' );
-				ssrGui.add( params.ssr, 'resolution', { full: 1, half: 2, third: 3 } ).name( 'resolution' ).onChange( applyParams );
-				ssrGui.add( params.ssr, 'jointUpsample' ).name( 'joint upsample' ).onChange( applyParams );
 				ssrGui.add( params.ssr, 'quality', 0, 1 ).onChange( applyParams );
 				ssrGui.add( params.ssr, 'maxDistance', 0, 10 ).name( 'max distance' ).onChange( applyParams );
 				ssrGui.add( params.ssr, 'binaryRefine' ).name( 'binary refine' ).onChange( applyParams );
@@ -308,8 +298,6 @@
 				highlightIntensity.value = params.highlightIntensity;
 				scene.environmentIntensity = params.environmentIntensity;
 
-				ssrNode.resolutionScale = 1 / params.ssr.resolution;
-				jointUpsample.value = params.ssr.jointUpsample ? 1 : 0;
 				ssrNode.quality.value = params.ssr.quality;
 				ssrNode.mirrorBias.value = params.ssr.mirrorBias;
 				ssrNode.maxRoughness.value = params.ssr.maxRoughness;
