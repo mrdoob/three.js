@@ -155,7 +155,7 @@ class ReflectorNode extends TextureNode {
 
 	clone() {
 
-		const newNode = new this.constructor( this.reflectorNode );
+		const newNode = new this.constructor( { reflector: this._reflectorBaseNode } );
 		newNode.uvNode = this.uvNode;
 		newNode.levelNode = this.levelNode;
 		newNode.biasNode = this.biasNode;
@@ -165,7 +165,6 @@ class ReflectorNode extends TextureNode {
 		newNode.gradNode = this.gradNode;
 		newNode.gatherNode = this.gatherNode;
 		newNode.offsetNode = this.offsetNode;
-		newNode._reflectorBaseNode = this._reflectorBaseNode;
 
 		return newNode;
 
