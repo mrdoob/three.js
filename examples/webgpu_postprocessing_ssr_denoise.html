@@ -130,6 +130,8 @@
 				quality: 0.25,
 				mirrorBias: 0,
 				maxRoughness: 1,
+				rayReuse: new URLSearchParams( location.search ).has( 'rayReuse' ),
+				reuseRadius: 3,
 				maxDistance: 0.4,
 				intensity: 1,
 				thickness: 0.1,
@@ -349,7 +351,8 @@
 				diffuseNode: scenePassDiffuseColor,
 				metalnessNode: scenePassDiffuseColor.a,
 				roughnessNode: scenePassNormal.a,
-				binaryRefine: params.ssr.binaryRefine
+				binaryRefine: params.ssr.binaryRefine,
+				rayReuse: params.ssr.rayReuse
 			} ).toInspector( 'SSR' );
 
 			// the reflections ( SSR radiance with its coverage in alpha ) are accumulated in time and filtered within
@@ -414,6 +417,8 @@
 			ssrGui.add( params.ssr, 'quality', 0, 1 ).name( 'quality' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'mirrorBias', 0, 1 ).name( 'mirror bias' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'maxRoughness', 0, 1 ).name( 'max roughness' ).onChange( applyParams );
+			ssrGui.add( params.ssr, 'rayReuse' ).name( 'ray reuse (reloads)' ).onChange( ( value ) => location.search = value ? '?rayReuse' : '' );
+			ssrGui.add( params.ssr, 'reuseRadius', 0, 16 ).name( 'reuse radius' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'stepExponent', 1, 4, 0.5 ).name( 'step exponent' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'binaryRefine' ).name( 'binary refine' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'maxDistance', 0, 5 ).name( 'max distance' ).onChange( applyParams );
@@ -467,6 +472,7 @@
 			ssrNode.quality.value = params.ssr.quality;
 			ssrNode.mirrorBias.value = params.ssr.mirrorBias;
 			ssrNode.maxRoughness.value = params.ssr.maxRoughness;
+			ssrNode.reuseRadius.value = params.ssr.reuseRadius;
 			// stepExponent / screenEdgeFadeBlack / binaryRefine are build-time constants: assigning
 			// them recompiles the SSR material (the setters no-op when the value is unchanged).
 			ssrNode.stepExponent = params.ssr.stepExponent;
