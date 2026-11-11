@@ -623,6 +623,9 @@ class OrbitControls extends Controls {
 		this.object.position.copy( this.position0 );
 		this.object.zoom = this.zoom0;
 
+		this._sphericalDelta.set( 0, 0, 0 );
+		this._panOffset.set( 0, 0, 0 );
+
 		this.object.updateProjectionMatrix();
 		this.dispatchEvent( _changeEvent );
 
