@@ -212,7 +212,8 @@
 					size: sculptor.getSize(),
 					strength: sculptor.getStrength(),
 					detail: sculptor.getDetail(),
-					negative: sculptor.getNegative()
+					negative: sculptor.getNegative(),
+					mirror: sculptor.mirror
 				};
 				const actions = { export: exportGLTF };
 				const gui = renderer.inspector.createParameters( 'Sculptor' );
@@ -247,6 +248,12 @@
 				gui.add( params, 'detail', 0, 1 ).onChange( function ( value ) {
 
 					sculptor.setDetail( value );
+
+				} );
+
+				gui.add( params, 'mirror' ).onChange( function ( value ) {
+
+					sculptor.mirror = value;
 
 				} );
 

@@ -57,9 +57,10 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
+		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
-		import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
+		import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
+		import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
 		import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -129,10 +130,26 @@
 				environmentIntensity: 3.14, // not too sure why exactly, but multiplying by ~PI makes the env map reflections match Blender more
 			},
 
+			temporalReproject: {
+				maxFrames: 16,
+				clampIntensity: 0.25,
+				flickerSuppression: 1,
+				hitPointReprojection: true,
+			},
+
 			denoise: {
 				enabled: true,
-				luminancePhi: 3,
-				maxFrames: 8
+				lumaPhi: 0.75,
+				depthPhi: 20,
+				normalPhi: 0.3,
+				roughnessPhi: 100,
+				radius: 1.5,
+				alphaPhi: 5,
+				strength: 0.725,
+				adapt: 0.5,
+				smoothDisocclusions: true,
+				flickerSuppression: 1,
+				adaptiveTrust: 1
 			},
 
 			post: {
@@ -141,12 +158,11 @@
 			},
 		};
 
-		let camera, scene, model, renderer, postProcessing, ssrNode, denoiseNode, denoised;
+		let camera, scene, model, renderer, postProcessing, ssrNode, temporalReprojectNode, denoiseNode;
 		let controls;
 		let combinedOutputNode, scenePassColor, scenePassDepth, scenePassVelocity;
 		let gammaUniform, contrastUniform, saturationUniform;
 		const temporalOutputs = new Map();
-		const denoiseEnabled = uniform( 1 );
 
 		init();
 
@@ -247,6 +263,12 @@
 
 			const sceneNormal = sample( ( uv ) => unpackRGBToNormal( scenePassNormal.sample( uv ).rgb ) );
 
+			// metalness in diffuseColor.a, roughness in normal.a (no separate metalrough MRT)
+			const scenePassMetalRough = sample( ( uv ) => vec2(
+				scenePassDiffuseColor.sample( uv ).a,
+				scenePassNormal.sample( uv ).a
+			) ).toInspector( 'Metalness/Roughness' );
+
 			ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
 				stochastic: true,
 				diffuseNode: scenePassDiffuseColor,
@@ -257,24 +279,27 @@
 				binaryRefine: params.ssr.binaryRefine
 			} ).toInspector( 'SSR' );
 
-			// the reflections are accumulated in time and filtered within the footprint of their reflection lobe,
-			// with the roughness of the scene and the ray length of each pixel ( SSR alpha channel )
-
-			const ssrTexture = ssrNode.getTextureNode();
-
-			denoiseNode = temporalDenoise( ssrTexture, {
-				depth: scenePassDepth,
-				normal: sceneNormal,
-				camera,
-				velocity: scenePassVelocity,
-				roughness: sample( ( uv ) => scenePassNormal.sample( uv ).a ),
-				hitDistance: sample( ( uv ) => ssrTexture.sample( uv ).a )
+			temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
+				mode: 'specular',
+				accumulate: false
 			} );
-			denoised = mix( ssrNode.rgb, denoiseNode.getTextureNode().rgb, denoiseEnabled ).toInspector( 'Denoise' );
-			// feed the denoised result + velocity back into SSR for multi-bounce reflections
-			ssrNode.setHistory( denoiseNode.getTexture(), scenePassVelocity );
+			temporalReprojectNode.toInspector( 'Temporal Reproject' );
 
-			const denoisePassBlend = vec4( denoised, ssrNode.a.greaterThan( 0 ).toVar() );
+			denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
+				depth: scenePassDepth,
+				normal: scenePassNormal,
+				raw: ssrNode,
+				metalRoughness: scenePassMetalRough,
+				mode: 'specular',
+				accumulate: true,
+			} );
+			denoiseNode.alphaSource = 'raylength'; // SSR alpha channel contains ray length
+			denoiseNode.toInspector( 'Denoise' );
+			// feed the denoised result + velocity back into SSR for multi-bounce reflections
+			ssrNode.setHistory( denoiseNode, scenePassVelocity );
+			temporalReprojectNode.setHistoryTexture( denoiseNode );
+
+			const denoisePassBlend = vec4( denoiseNode.rgb, ssrNode.a.greaterThan( 0 ).toVar() );
 
 			gammaUniform = uniform( params.post.grading.gamma );
 			contrastUniform = uniform( params.post.grading.contrast );
@@ -317,7 +342,8 @@
 				'SSR DN': 4,
 				'Compare (Denoise)': OUTPUT_COMPARE_DENOISE,
 				'Compare (Reflections)': OUTPUT_COMPARE_SSR,
-				'Ray Length': 7
+				'Ray Length': 7,
+				'Accumulation Speed (Alpha)': 6
 			};
 
 			const displayGui = renderer.inspector.createParameters( 'Display' );
@@ -333,8 +359,19 @@
 
 			const denoiseGui = renderer.inspector.createParameters( 'Denoising' );
 			denoiseGui.add( params.denoise, 'enabled' ).name( 'Enabled' ).onChange( applyParams );
-			denoiseGui.add( params.denoise, 'maxFrames', 1, 32, 1 ).name( 'History frames' ).info( 'Maximum denoiser history length; rejection and changes can shorten history per pixel.' ).onChange( applyParams );
-			denoiseGui.add( params.denoise, 'luminancePhi', 0, 10 ).name( 'Luminance phi' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'lumaPhi', 0, 3 ).name( 'Luma phi' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'depthPhi', 0, 50 ).name( 'Depth phi' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'normalPhi', 0.01, 1, 0.01 ).name( 'Normal phi' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'alphaPhi', 0, 15 ).name( 'Ray length phi' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'radius', 0, 3 ).name( 'Radius' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'strength', 0.5, 0.95 ).name( 'Strength' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'adapt', 0, 1 ).name( 'Adapt' ).onChange( applyParams );
+
+			const temporalReprojectGui = renderer.inspector.createParameters( 'Temporal reprojection' ).close();
+			temporalReprojectGui.add( params.temporalReproject, 'maxFrames', 1, 128, 1 ).name( 'History frames' ).onChange( applyParams );
+			temporalReprojectGui.add( params.temporalReproject, 'clampIntensity', 0, 1 ).name( 'Clamp intensity' ).onChange( applyParams );
+			temporalReprojectGui.add( params.temporalReproject, 'flickerSuppression', 0, 1 ).name( 'Flicker suppression' ).onChange( applyParams );
+			temporalReprojectGui.add( params.temporalReproject, 'hitPointReprojection' ).name( 'Hit point reprojection' ).onChange( applyParams );
 
 			const sceneGui = renderer.inspector.createParameters( 'Scene' );
 			sceneGui.add( params, 'roughness', 0, 1 ).name( 'Roughness' ).onChange( value => {
@@ -386,11 +423,28 @@
 			ssrNode.screenEdgeFadeBlack = params.ssr.screenEdgeFadeBlack;
 			ssrNode.environmentIntensity.value = params.ssr.environmentIntensity;
 
+			if ( temporalReprojectNode ) {
+
+				temporalReprojectNode.maxFrames.value = params.temporalReproject.maxFrames;
+				temporalReprojectNode.clampIntensity.value = params.temporalReproject.clampIntensity;
+				temporalReprojectNode.flickerSuppression.value = params.temporalReproject.flickerSuppression;
+				temporalReprojectNode.hitPointReprojection.value = params.temporalReproject.hitPointReprojection;
+
+			}
+
 			if ( denoiseNode ) {
 
-				denoiseEnabled.value = params.denoise.enabled ? 1 : 0;
-				denoiseNode.luminancePhi.value = params.denoise.luminancePhi;
-				denoiseNode.maxFrames.value = params.denoise.maxFrames;
+				denoiseNode.lumaPhi.value = params.denoise.lumaPhi;
+				denoiseNode.depthPhi.value = params.denoise.depthPhi;
+				denoiseNode.normalPhi.value = params.denoise.normalPhi;
+				denoiseNode.roughnessPhi.value = params.denoise.roughnessPhi;
+				denoiseNode.radius.value = params.denoise.enabled ? params.denoise.radius : 0;
+				denoiseNode.alphaPhi.value = params.denoise.alphaPhi;
+				denoiseNode.strength.value = params.denoise.strength;
+				denoiseNode.adapt.value = params.denoise.adapt;
+				denoiseNode.smoothDisocclusions.value = params.denoise.smoothDisocclusions;
+				denoiseNode.flickerSuppression.value = params.denoise.flickerSuppression;
+				denoiseNode.adaptiveTrust.value = params.denoise.adaptiveTrust;
 
 			}
 
@@ -446,11 +500,12 @@
 
 				case 0: node = applyPostProcessing( combinedOutputNode ); break; // Combined
 				case 1: node = applyGrading( vec4( ssrNode.rgb, 1 ) ); break; // SSR (Raw)
-				case 4: node = applyGrading( vec4( denoiseNode.getTextureNode().rgb, 1 ) ); break; // Denoised SSR
+				case 4: node = applyGrading( vec4( denoiseNode.rgb, 1 ) ); break; // Denoised SSR
+				case 6: node = vec4( denoiseNode.aaa, 1 ); break; // Samples (Alpha)
 				case 7: node = vec4( ssrNode.aaa, 1 ); break; // Ray Length (Raw)
 				case OUTPUT_COMPARE_DENOISE:
 					node = buildCompareNode(
-						applyGrading( vec4( denoiseNode.getTextureNode().rgb, 1 ) ),
+						applyGrading( vec4( denoiseNode.rgb, 1 ) ),
 						applyGrading( vec4( ssrNode.rgb, 1 ) )
 					);
 					break;
@@ -463,7 +518,7 @@
 			compareHint.hidden = ! isCompareMode();
 			releaseCompareControls();
 
-			postProcessing.outputColorTransform = params.output === 7;
+			postProcessing.outputColorTransform = params.output === 6 || params.output === 7;
 			postProcessing.outputNode = node;
 			postProcessing.needsUpdate = true;
 
