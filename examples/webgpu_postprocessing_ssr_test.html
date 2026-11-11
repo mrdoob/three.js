@@ -67,7 +67,7 @@
 				highlightIntensity: 20,
 				environmentIntensity: 1,
 				resetOnChange: true,
-				ssr: { quality: 0.5, maxDistance: 1, mirrorBias: 0, maxRoughness: 1, reuseRadius: 3 },
+				ssr: { quality: 0.5, maxDistance: 1, binaryRefine: false, mirrorBias: 0, maxRoughness: 1, reuseRadius: 3 },
 				denoise: {
 					enabled: true, luminancePhi: 3, maxFrames: 8, spatialPasses: 2, historyDeviation: 0, fireflyClamp: 0,
 					toneMappedWeights: 0, lobeLuminanceRelax: 0, historyRadius: 0, clampSigma: 0, historyCatmullRom: 0, antilagSigma: 4.5, antilagReset: 0.5
@@ -263,6 +263,7 @@
 				const ssrGui = renderer.inspector.createParameters( 'SSR' );
 				ssrGui.add( params.ssr, 'quality', 0, 1 ).onChange( applyParams );
 				ssrGui.add( params.ssr, 'maxDistance', 0, 10 ).name( 'max distance' ).onChange( applyParams );
+				ssrGui.add( params.ssr, 'binaryRefine' ).name( 'binary refine' ).onChange( applyParams );
 				ssrGui.add( params.ssr, 'mirrorBias', 0, 1 ).name( 'mirror bias' ).onChange( applyParams );
 				ssrGui.add( params.ssr, 'maxRoughness', 0, 1 ).name( 'max roughness' ).onChange( applyParams );
 				ssrGui.add( params, 'rayReuse' ).name( 'ray reuse (reloads)' ).onChange( ( value ) => location.search = value ? '?rayReuse' : '' );
@@ -302,6 +303,7 @@
 				ssrNode.maxRoughness.value = params.ssr.maxRoughness;
 				ssrNode.reuseRadius.value = params.ssr.reuseRadius;
 				ssrNode.maxDistance.value = params.ssr.maxDistance;
+				ssrNode.binaryRefine = params.ssr.binaryRefine; // a compile-time constant: a change rebuilds the shader
 
 				const { enabled, spatialPasses, ...options } = params.denoise;
 
