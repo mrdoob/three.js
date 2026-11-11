@@ -40,6 +40,7 @@
 
 			const params = {
 				source: 'Memorial',
+				left: 'Denoised',
 				output: 'Reference',
 				intensity: 20,
 				noise: 'Hierarchical Hashed Weyl',
@@ -47,6 +48,7 @@
 				samples: 1,
 				sparsity: 0.5,
 				blurRadius: 0,
+				jitter: false,
 				roughness: 0.3,
 				hitDistance: 0.5,
 				spatialPasses: 2,
@@ -73,9 +75,15 @@
 
 			const fit = uniform( new THREE.Vector2( 1, 1 ) );
 
+			// the sub-pixel jitter of the camera, like TRAA's: the image moves with it, in pixels
+
+			const jitter = uniform( new THREE.Vector2() );
+			const unjittered = new THREE.Matrix4();
+			const translation = new THREE.Matrix4();
+
 			const sourceAt = ( offset ) => {
 
-				const uv = panelUV.add( offset.div( panelSize ) ).sub( 0.5 ).mul( fit ).add( 0.5 ).toVar();
+				const uv = panelUV.add( offset.add( jitter ).div( panelSize ) ).sub( 0.5 ).mul( fit ).add( 0.5 ).toVar();
 				const inside = uv.greaterThanEqual( vec2( 0 ) ).all().and( uv.lessThanEqual( vec2( 1 ) ).all() );
 
 				return inside.select( source.sample( uv ).rgb, vec3( 0 ) );
@@ -229,7 +237,8 @@
 
 				const gui = renderer.inspector.createParameters( 'Source' );
 				gui.add( params, 'source', [ ...Object.keys( procedural ), ...Object.keys( images ) ] ).onChange( updateSource );
-				gui.add( params, 'output', [ 'Reference', 'Noisy' ] ).name( 'right side' ).onChange( updateOutput );
+				gui.add( params, 'left', [ 'Denoised', 'Coverage' ] ).name( 'left side' ).onChange( updateOutput );
+				gui.add( params, 'output', [ 'Reference', 'Noisy', 'Error' ] ).name( 'right side' ).onChange( updateOutput );
 				gui.add( params, 'intensity', 0, 100 ).name( 'highlight intensity' ).onChange( updateSource );
 
 				const samplingGui = renderer.inspector.createParameters( 'Sampling' );
@@ -238,6 +247,7 @@
 				samplingGui.add( params, 'samples', 1, 16, 1 ).name( 'samples per pixel' ).onChange( applyParams );
 				samplingGui.add( params, 'sparsity', 0, 0.99 ).onChange( applyParams );
 				samplingGui.add( params, 'blurRadius', 0, 12 ).name( 'blur radius' ).onChange( applyParams );
+				samplingGui.add( params, 'jitter' ).name( 'camera jitter' ).onChange( applyParams );
 
 				const denoiseGui = renderer.inspector.createParameters( 'Denoiser' );
 				denoiseGui.add( params, 'roughness', 0, 1 ).onChange( applyParams );
@@ -276,12 +286,32 @@
 
 			function updateOutput() {
 
-				const views = { Noisy: noisy.rgb.mul( noisy.a ), Reference: reference };
+				const denoised = denoiseNode.getTextureNode();
+				const right = step( 0.5, screenUV.x );
 
-				let color = mix( denoiseNode.getTextureNode().rgb, views[ params.output ], step( 0.5, screenUV.x ) );
+				// tone mapped radiance
+
+				const views = { Noisy: noisy.rgb.mul( noisy.a ), Reference: reference, Error: reference };
+				const radiance = mix( denoised.rgb, views[ params.output ], right );
+				let color = renderOutput( vec4( radiance, 1 ) ).rgb;
+
+				// raw: the coverage of the denoised result, and its error relative to the reference ( red too bright,
+				// blue too dark ), read from the same pixel of the left side
+
+				if ( params.left === 'Coverage' ) color = right.greaterThan( 0 ).select( color, vec3( denoised.a ) );
+
+				if ( params.output === 'Error' ) {
+
+					const lumaReference = reference.dot( vec3( 0.2126, 0.7152, 0.0722 ) );
+					const lumaDenoised = denoised.sample( vec2( screenUV.x.sub( 0.5 ), screenUV.y ) ).rgb.dot( vec3( 0.2126, 0.7152, 0.0722 ) );
+					const error = lumaDenoised.sub( lumaReference ).div( lumaReference.add( 0.02 ) );
+					color = right.greaterThan( 0 ).select( vec3( error.max( 0 ), 0, error.negate().max( 0 ) ), color );
+
+				}
+
 				color = abs( screenCoordinate.x.sub( screenSize.x.mul( 0.5 ) ) ).lessThan( 1 ).select( vec3( 1, 0.3, 0.1 ), color );
 
-				pipeline.outputNode = renderOutput( vec4( color, 1 ) );
+				pipeline.outputNode = vec4( color, 1 );
 				pipeline.needsUpdate = true;
 
 			}
@@ -346,7 +376,50 @@
 				if ( pipeline === undefined ) return;
 
 				index.value ++;
+
+				// TRAA-like: the jittered projection renders, the velocity uses the unjittered one
+
+				if ( params.jitter ) {
+
+					const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+					const jx = halton( index.value % 32 + 1, 2 ) - 0.5, jy = halton( index.value % 32 + 1, 3 ) - 0.5;
+
+					unjittered.copy( camera.projectionMatrix );
+					velocity.setProjectionMatrix( unjittered );
+					camera.projectionMatrix.premultiply( translation.makeTranslation( - 2 * jx / size.x, 2 * jy / size.y, 0 ) );
+					camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
+					jitter.value.set( jx, - jy );
+
+				} else {
+
+					jitter.value.set( 0, 0 );
+
+				}
+
 				pipeline.render();
+
+				if ( params.jitter ) {
+
+					camera.projectionMatrix.copy( unjittered );
+					camera.projectionMatrixInverse.copy( unjittered ).invert();
+					velocity.setProjectionMatrix( null );
+
+				}
+
+			}
+
+			function halton( index, base ) {
+
+				let result = 0, f = 1;
+
+				for ( let i = index; i > 0; i = Math.floor( i / base ) ) {
+
+					f /= base;
+					result += f * ( i % base );
+
+				}
+
+				return result;
 
 			}
 
