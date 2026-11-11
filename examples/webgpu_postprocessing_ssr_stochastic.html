@@ -158,7 +158,7 @@
 			},
 		};
 
-		let camera, scene, model, renderer, postProcessing, ssrNode, temporalReprojectNode, denoiseNode;
+		let camera, scene, model, renderer, renderPipeline, ssrNode, temporalReprojectNode, denoiseNode;
 		let controls;
 		let combinedOutputNode, scenePassColor, scenePassDepth, scenePassVelocity;
 		let gammaUniform, contrastUniform, saturationUniform;
@@ -231,7 +231,7 @@
 
 			scene.environmentIntensity = 1;
 
-			postProcessing = new THREE.RenderPipeline( renderer );
+			renderPipeline = new THREE.RenderPipeline( renderer );
 
 			const scenePass = pass( scene, camera );
 			scenePass.setMRT( mrt( {
@@ -311,8 +311,8 @@
 			outputNode.toInspector( 'Combined SSR' );
 			combinedOutputNode = outputNode;
 
-			postProcessing.outputNode = applyPostProcessing( combinedOutputNode );
-			postProcessing.outputColorTransform = false;
+			renderPipeline.outputNode = applyPostProcessing( combinedOutputNode );
+			renderPipeline.outputColorTransform = false;
 
 			controls = new OrbitControls( camera, renderer.domElement );
 			controls.enableDamping = true;
@@ -354,8 +354,8 @@
 			ssrGui.add( params.ssr, 'intensity', 0, 4 ).name( 'Intensity' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'binaryRefine' ).name( 'Binary refine' ).onChange( applyParams );
-			ssrGui.add( params.ssr, 'maxDistance', 0.01, 50, 0.01 ).name( 'Max distance' ).onChange( applyParams );
-			ssrGui.add( params.ssr, 'thickness', 0, 0.5, 0.001 ).name( 'Thickness' ).onChange( applyParams );
+			ssrGui.add( params.ssr, 'maxDistance', 0, 5 ).name( 'Max distance' ).onChange( applyParams );
+			ssrGui.add( params.ssr, 'thickness', 0, 0.25 ).name( 'Thickness' ).onChange( applyParams );
 
 			const denoiseGui = renderer.inspector.createParameters( 'Denoising' );
 			denoiseGui.add( params.denoise, 'enabled' ).name( 'Enabled' ).onChange( applyParams );
@@ -492,17 +492,17 @@
 
 		function updateOutputNode() {
 
-			if ( ! postProcessing ) return;
+			if ( ! renderPipeline ) return;
 
 			let node;
 
 			switch ( params.output ) {
 
-				case 0: node = applyPostProcessing( combinedOutputNode ); break; // Combined
-				case 1: node = applyGrading( vec4( ssrNode.rgb, 1 ) ); break; // SSR (Raw)
-				case 4: node = applyGrading( vec4( denoiseNode.rgb, 1 ) ); break; // Denoised SSR
-				case 6: node = vec4( denoiseNode.aaa, 1 ); break; // Samples (Alpha)
-				case 7: node = vec4( ssrNode.aaa, 1 ); break; // Ray Length (Raw)
+				case 0: node = applyPostProcessing( combinedOutputNode ); break; // Beauty
+				case 1: node = applyGrading( vec4( ssrNode.rgb, 1 ) ); break; // SSR
+				case 4: node = applyGrading( vec4( denoiseNode.rgb, 1 ) ); break; // SSR DN
+				case 6: node = vec4( denoiseNode.aaa, 1 ); break; // Accumulation Speed (Alpha)
+				case 7: node = vec4( ssrNode.aaa, 1 ); break; // Ray Length
 				case OUTPUT_COMPARE_DENOISE:
 					node = buildCompareNode(
 						applyGrading( vec4( denoiseNode.rgb, 1 ) ),
@@ -518,9 +518,9 @@
 			compareHint.hidden = ! isCompareMode();
 			releaseCompareControls();
 
-			postProcessing.outputColorTransform = params.output === 6 || params.output === 7;
-			postProcessing.outputNode = node;
-			postProcessing.needsUpdate = true;
+			renderPipeline.outputColorTransform = params.output === 6 || params.output === 7;
+			renderPipeline.outputNode = node;
+			renderPipeline.needsUpdate = true;
 
 		}
 
@@ -559,7 +559,7 @@
 
 			controls.update();
 
-			postProcessing.render();
+			renderPipeline.render();
 
 		}
 
