@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - postprocessing - TRAA test</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			canvas { image-rendering: pixelated; }
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>TRAA test</span>
+			</div>
+
+			<small>
+				Aliasing stress scene with scripted camera motions for testing TRAA.<br />
+				The reference is the same frame without jitter at 4× resolution with 4× MSAA, box filtered.<br />
+				Pick an output, then compare it to the reference side by side or as a difference.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { mrt, output, pass, renderOutput, screenUV, uniform, velocity, vec2, vec4 } from 'three/tsl';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			const params = {
+				output: 'TRAA',
+				compare: 'Off',
+				historySampling: 'catmull-rom',
+				useSubpixelCorrection: true,
+				motion: 'Pan horizontal',
+				speed: 1,
+				paused: false,
+				step: () => advance( 1 ),
+				reset: () => resetHistory()
+			};
+
+			const motions = [ 'Static', 'Pan horizontal', 'Pan vertical', 'Orbit', 'Yaw', 'Roll', 'Dolly', 'FOV zoom', 'Sub-pixel drift', 'Objects only' ];
+
+			const matrix = new THREE.Matrix4();
+			const deltaGain = uniform( 4 );
+			const controls = {};
+
+			let camera, referenceCamera, msaaCamera, scene, renderer, renderPipeline, scenePass, referencePass, msaaPass, traaPass, spinner, cutout, blended, morph, instances;
+			let phase = 0;
+
+			init();
+
+			async function init() {
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+				await renderer.init();
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
+				// TRAA only jitters `camera`, so the comparison passes use copies
+				referenceCamera = camera.clone();
+				msaaCamera = camera.clone();
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x202428 );
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+				scene.environmentIntensity = 0.6;
+				pmremGenerator.dispose();
+				scene.add( new THREE.HemisphereLight( 0xffffff, 0x333344, 1.5 ) );
+				const light = new THREE.PointLight( 0xffffff, 60 );
+				light.position.set( 2, 4, 4 );
+				scene.add( light );
+
+				createScene();
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				scenePass = pass( scene, camera );
+				scenePass.setMRT( mrt( { output, velocity } ) );
+				referencePass = pass( scene, referenceCamera, { samples: 4 } );
+				referencePass.setResolutionScale( 4 );
+				msaaPass = pass( scene, msaaCamera, { samples: 4 } );
+				// views apply tone mapping themselves so deltas are measured in display space
+				renderPipeline.outputColorTransform = false;
+
+				const gui = renderer.inspector.createParameters( 'TRAA test' );
+				gui.add( params, 'output', [ 'TRAA', 'MSAA 4×', 'No AA', 'Reference' ] ).name( 'Output' ).onChange( updateOutput );
+				controls.compare = gui.add( params, 'compare', [ 'Off', 'Split', 'Difference' ] ).name( 'Compare' ).onChange( updateOutput );
+				controls.compare.info( 'Split shows the output on the left and the reference on the right. Difference shows their absolute difference.' );
+				controls.deltaGain = gui.add( deltaGain, 'value', 1, 32, 1 ).name( 'Difference gain' );
+
+				const motionFolder = gui.addFolder( 'Motion' );
+				motionFolder.add( params, 'motion', motions ).name( 'Motion' ).onChange( resetHistory );
+				motionFolder.add( params, 'speed', 0.1, 4, 0.1 ).name( 'Speed' );
+				motionFolder.add( params, 'paused' ).name( 'Paused' );
+				motionFolder.add( params, 'step' ).name( 'Step one frame' );
+
+				controls.traa = gui.addFolder( 'TRAA' );
+				// these are baked into the shader, so the node is rebuilt
+				controls.traa.add( params, 'historySampling', [ 'catmull-rom', 'linear' ] ).name( 'History sampling' ).onChange( rebuild );
+				controls.traa.add( params, 'useSubpixelCorrection' ).name( 'Subpixel correction' ).onChange( rebuild );
+				controls.traa.add( params, 'reset' ).name( 'Reset history' );
+
+				rebuild();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function rebuild() {
+
+				if ( traaPass !== undefined ) traaPass.dispose();
+
+				traaPass = traa( scenePass.getTextureNode( 'output' ), scenePass.getTextureNode( 'depth' ), scenePass.getTextureNode( 'velocity' ), camera );
+				traaPass.historySampling = params.historySampling;
+				traaPass.useSubpixelCorrection = params.useSubpixelCorrection;
+				updateOutput();
+
+			}
+
+			function updateOutput() {
+
+				// TRAA jitters over one pixel, so a correct resolve converges to the box-filtered reference
+				// each bilinear tap on a texel corner averages 2×2 texels, so four taps form an exact 4×4 box
+				const referenceTexture = referencePass.getTextureNode();
+				const texel = vec2( 1 ).div( vec2( referenceTexture.size() ) );
+				const taps = [[ - 1, - 1 ], [ 1, - 1 ], [ - 1, 1 ], [ 1, 1 ]].map( offset => referenceTexture.sample( screenUV.add( texel.mul( vec2( ...offset ) ) ) ) );
+				const reference = renderOutput( taps.reduce( ( sum, tap ) => sum.add( tap ) ).div( 4 ) );
+
+				// TRAA jitters the camera only while it is part of the output
+				const selected = {
+					'TRAA': traaPass,
+					'MSAA 4×': msaaPass.getTextureNode(),
+					'No AA': scenePass.getTextureNode( 'output' )
+				}[ params.output ];
+				const color = selected ? renderOutput( selected ) : reference;
+				const compare = selected ? params.compare : 'Off';
+
+				renderPipeline.outputNode = {
+					'Off': color,
+					'Split': screenUV.x.lessThan( 0.5 ).select( color, reference ),
+					'Difference': vec4( color.rgb.sub( reference.rgb ).abs().mul( deltaGain ), 1 )
+				}[ compare ];
+				renderPipeline.needsUpdate = true;
+
+				// only show the options that affect the current output
+
+				const toggle = ( control, visible ) => visible ? control.show() : control.hide();
+				toggle( controls.compare, selected !== undefined );
+				toggle( controls.deltaGain, compare === 'Difference' );
+				toggle( controls.traa, params.output === 'TRAA' );
+
+			}
+
+			function resetHistory() {
+
+				traaPass?.setSize( 1, 1 );
+
+			}
+
+			function createScene() {
+
+				// fine checkerboard floor: moiré in the distance, edge crawl up close
+				const checker = new THREE.DataTexture( new Uint8Array( [ 255, 255, 255, 255, 0, 0, 0, 255, 0, 0, 0, 255, 255, 255, 255, 255 ] ), 2, 2 );
+				checker.wrapS = checker.wrapT = THREE.RepeatWrapping;
+				checker.repeat.set( 200, 200 );
+				checker.magFilter = THREE.NearestFilter;
+				// no mipmaps: the 2× reference would otherwise sample a sharper mip level
+				checker.generateMipmaps = false;
+				checker.minFilter = THREE.LinearFilter;
+				checker.colorSpace = THREE.SRGBColorSpace;
+				checker.needsUpdate = true;
+				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 40, 40 ), new THREE.MeshStandardMaterial( { map: checker, roughness: 0.8 } ) );
+				floor.rotation.x = - Math.PI / 2;
+				floor.position.y = - 1;
+				scene.add( floor );
+
+				// Siemens star: all spatial frequencies and orientations
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = canvas.height = 1024;
+				const context = canvas.getContext( '2d' );
+				context.fillStyle = '#fff';
+				context.fillRect( 0, 0, 1024, 1024 );
+				context.fillStyle = '#000';
+				for ( let i = 0; i < 72; i += 2 ) {
+
+					context.beginPath();
+					context.moveTo( 512, 512 );
+					context.arc( 512, 512, 500, i * Math.PI / 36, ( i + 1 ) * Math.PI / 36 );
+					context.fill();
+
+				}
+
+				const star = new THREE.CanvasTexture( canvas );
+				star.colorSpace = THREE.SRGBColorSpace;
+				star.generateMipmaps = false;
+				star.minFilter = THREE.LinearFilter;
+				const starMesh = new THREE.Mesh( new THREE.PlaneGeometry( 1.6, 1.6 ), new THREE.MeshBasicMaterial( { map: star } ) );
+				starMesh.position.set( - 2, 0.2, 0 );
+				scene.add( starMesh );
+
+				// thin geometry from several pixels down to well below one pixel
+				const lines = new THREE.Group();
+				for ( let i = 0; i < 12; i ++ ) {
+
+					const radius = 0.02 * Math.pow( 0.7, i );
+					const rod = new THREE.Mesh( new THREE.CylinderGeometry( radius, radius, 2, 8 ), new THREE.MeshStandardMaterial( { color: 0xffffff, roughness: 0.4 } ) );
+					rod.position.set( - 0.9 + i * 0.12, 0, 0 );
+					rod.rotation.z = 0.15;
+					lines.add( rod );
+
+				}
+
+				// thin tube rings rather than lines: line primitives stay 1 px wide in the high-resolution reference
+				const cage = new THREE.Group();
+				const cageMaterial = new THREE.MeshBasicMaterial( { color: 0x88ccff } );
+				for ( let i = 0; i < 12; i ++ ) {
+
+					const ring = new THREE.Mesh( new THREE.TorusGeometry( 0.45, 0.002, 4, 128 ), cageMaterial );
+					ring.rotation.y = i * Math.PI / 12;
+					cage.add( ring );
+
+				}
+
+				cage.position.set( 0.6, 0.7, - 0.5 );
+				lines.add( cage );
+				scene.add( lines );
+
+				// hard, high-contrast silhouettes and creases
+				const box = new THREE.Mesh( new THREE.BoxGeometry( 0.8, 0.8, 0.8 ), new THREE.MeshStandardMaterial( { color: 0xff4422, roughness: 0.5 } ) );
+				box.position.set( 1.4, - 0.5, 0.4 );
+				box.rotation.set( 0.4, 0.6, 0 );
+				scene.add( box );
+
+				// specular aliasing: tight highlights on high curvature
+				// tangent-space ripples alias the highlights at the pixel scale
+				const waveData = new Uint8Array( 256 * 256 * 4 );
+				for ( let y = 0; y < 256; y ++ ) {
+
+					for ( let x = 0; x < 256; x ++ ) {
+
+						const u = x / 256 * Math.PI * 6;
+						const v = y / 256 * Math.PI * 6;
+						const phase = u * 12 + 0.4 * Math.sin( v * 3 );
+						const nx = - 0.65 * Math.cos( phase );
+						const ny = - 0.9 * Math.cos( v * 6 ) - 0.2 * Math.cos( phase ) * Math.cos( v * 3 );
+						const length = Math.hypot( nx, ny, 1 );
+						waveData.set( [ ( nx / length * 0.5 + 0.5 ) * 255, ( ny / length * 0.5 + 0.5 ) * 255, ( 1 / length * 0.5 + 0.5 ) * 255, 255 ], ( y * 256 + x ) * 4 );
+
+					}
+
+				}
+
+				const waves = new THREE.DataTexture( waveData, 256, 256 );
+				waves.wrapS = waves.wrapT = THREE.RepeatWrapping;
+				waves.generateMipmaps = false;
+				waves.minFilter = THREE.LinearFilter;
+				waves.needsUpdate = true;
+				const knot = new THREE.Mesh( new THREE.TorusKnotGeometry( 0.35, 0.08, 256, 32 ), new THREE.MeshStandardMaterial( { color: 0xcccccc, metalness: 1, roughness: 0.05, normalMap: waves } ) );
+				knot.position.set( 2.3, 0.4, - 0.3 );
+				scene.add( knot );
+
+				// HDR thin emitter exercises the luminance-weighted resolve
+				const emitter = new THREE.Mesh( new THREE.BoxGeometry( 1.5, 0.01, 0.01 ), new THREE.MeshBasicMaterial( { color: new THREE.Color( 20, 15, 8 ) } ) );
+				emitter.position.set( 0, 1.3, - 0.3 );
+				emitter.rotation.z = 0.05;
+				scene.add( emitter );
+
+				// object motion with disocclusion behind the blades
+				spinner = new THREE.Group();
+				for ( let i = 0; i < 4; i ++ ) {
+
+					const blade = new THREE.Mesh( new THREE.BoxGeometry( 0.7, 0.06, 0.02 ), new THREE.MeshStandardMaterial( { color: 0x44ff88 } ) );
+					blade.position.x = 0.35;
+					const arm = new THREE.Group();
+					arm.rotation.z = i * Math.PI / 2;
+					arm.add( blade );
+					spinner.add( arm );
+
+				}
+
+				spinner.position.set( - 2, 0.2, 0.3 );
+				scene.add( spinner );
+
+				// alpha-tested edges come from the texture, not the geometry
+				const cutoutData = new Uint8Array( 64 * 64 * 4 );
+				for ( let i = 0; i < 64 * 64; i ++ ) cutoutData.set( [ 255, 180, 30, ( ( i % 64 >> 1 ) + ( i >> 7 ) ) % 2 ? 0 : 255 ], i * 4 );
+				const cutoutMap = new THREE.DataTexture( cutoutData, 64, 64 );
+				cutoutMap.magFilter = THREE.NearestFilter;
+				cutoutMap.needsUpdate = true;
+				cutout = new THREE.Mesh( new THREE.PlaneGeometry( 0.7, 0.7 ), new THREE.MeshBasicMaterial( { map: cutoutMap, alphaTest: 0.5, side: THREE.DoubleSide } ) );
+				cutout.position.set( - 0.9, - 0.55, 0.6 );
+				scene.add( cutout );
+
+				// blended surfaces write no depth, so the history behind them is reprojected wrongly
+				blended = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.9 ), new THREE.MeshBasicMaterial( { color: 0x44aaff, transparent: true, opacity: 0.45, depthWrite: false } ) );
+				blended.position.set( - 0.3, 0, 0.3 );
+				scene.add( blended );
+
+				// morph and instanced motion need per-vertex velocity
+				const morphGeometry = new THREE.PlaneGeometry( 0.7, 0.7, 20, 20 );
+				const morphPosition = morphGeometry.attributes.position.clone();
+				for ( let i = 0; i < morphPosition.count; i ++ ) morphPosition.setZ( i, 0.2 * Math.sin( morphPosition.getX( i ) * 18 ) );
+				morphGeometry.morphAttributes.position = [ morphPosition ];
+				morph = new THREE.Mesh( morphGeometry, new THREE.MeshStandardMaterial( { map: cutoutMap, side: THREE.DoubleSide } ) );
+				morph.position.set( 0.3, - 0.55, 0.8 );
+				scene.add( morph );
+
+				instances = new THREE.InstancedMesh( new THREE.BoxGeometry( 0.07, 0.07, 0.07 ), new THREE.MeshStandardMaterial( { color: 0xffffff } ), 12 );
+				instances.position.copy( morph.position );
+				scene.add( instances );
+
+			}
+
+			function advance( frames ) {
+
+				phase += frames * params.speed / 60;
+				const s = Math.sin( phase );
+
+				camera.position.set( 0.3, 0.6, 5 );
+				camera.up.set( 0, 1, 0 );
+				camera.fov = 40;
+				const target = new THREE.Vector3( 0.3, 0.1, 0 );
+
+				switch ( params.motion ) {
+
+					case 'Pan horizontal': camera.position.x += s * 1.5; target.x += s * 1.5; break;
+					case 'Pan vertical': camera.position.y += s * 0.8; target.y += s * 0.8; break;
+					case 'Orbit': camera.position.set( 0.3 + Math.sin( s ) * 5, 0.6, Math.cos( s ) * 5 ); break;
+					// the camera turns in place, so every pixel reprojects to a new sub-pixel position
+					case 'Yaw': target.sub( camera.position ).applyAxisAngle( camera.up, s * 0.3 ).add( camera.position ); break;
+					case 'Roll': camera.up.set( Math.sin( s * 0.5 ), Math.cos( s * 0.5 ), 0 ); break;
+					case 'Dolly': camera.position.z += s * 2.5; break;
+					case 'FOV zoom': camera.fov = 40 + s * 25; break;
+					// ~0.25 px/frame at 1080p and speed 1: stresses subpixel correction
+					case 'Sub-pixel drift': camera.position.x += phase % 10 * 0.05; target.x += phase % 10 * 0.05; break;
+
+				}
+
+				camera.lookAt( target );
+				camera.updateProjectionMatrix();
+
+				if ( params.motion !== 'Static' ) spinner.rotation.z -= frames * params.speed * 0.05;
+
+				const t = params.motion === 'Static' ? 0 : phase;
+				cutout.rotation.z = t * 0.25;
+				blended.position.x = - 0.3 + 0.6 * Math.sin( t * 1.2 );
+				morph.morphTargetInfluences[ 0 ] = 0.5 + 0.5 * Math.sin( t );
+
+				for ( let i = 0; i < 12; i ++ ) {
+
+					const angle = i * Math.PI / 6 + t * 0.5;
+					instances.setMatrixAt( i, matrix.makeTranslation( 0.5 * Math.cos( angle ), 0.5 * Math.sin( angle ), 0.2 ) );
+
+				}
+
+				instances.instanceMatrix.needsUpdate = true;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				advance( params.paused ? 0 : 1 );
+				referenceCamera.copy( camera );
+				msaaCamera.copy( camera );
+				renderPipeline.render();
+
+			}
+
+		</script>
+
+	</body>
+</html>
