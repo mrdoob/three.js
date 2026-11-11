@@ -176,8 +176,7 @@ class DenoiseNode extends Node {
 
 		/**
 		 * Whether alpha is a second signal to filter, e.g. AO next to GI. Otherwise the alpha of the output is 1, or with
-		 * `temporal` the weight of the current frame in the history, `1 / history length`, which damps the feedback of
-		 * multi-bounce reflections where the history is short, see {@link SSRNode#setHistory}.
+		 * `temporal` the weight of the current frame in the history, `1 / history length`.
 		 *
 		 * @type {boolean}
 		 * @readonly

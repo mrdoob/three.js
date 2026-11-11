@@ -1,27 +1,18 @@
-import { EPSILON, Fn, If, PI, clamp, cos, cross, dot, equirectUV, float, log, max, mix, normalize, pow, reflect, sin, sqrt, struct, vec3 } from 'three/tsl';
+import { Fn, If, clamp, cos, cross, dot, float, log, max, mix, normalize, reflect, sin, sqrt, struct, vec3 } from 'three/tsl';
 
 /**
- * Specular / microfacet BRDF helpers: VNDF sampling, GTR distribution, Smith geometry,
- * Fresnel, reflection importance sampling, parallax-corrected ray-length terms, and
- * equirectangular environment sampling / MIS helpers.
+ * Specular / microfacet BRDF helpers: VNDF sampling, Smith geometry, Fresnel,
+ * reflection importance sampling and parallax-corrected ray-length terms.
  * Pure TSL functions of their inputs (no scene/camera state).
  */
 
 /**
- * Sentinel ray length the SSR pass writes for environment misses (no screen-space hit), set far above
- * any real hit distance so a single magnitude test separates misses from hits and survives `.max( 0 )`.
+ * Sentinel hit distance the SSR pass writes for misses (no screen-space hit), set far above any
+ * real hit distance so a single magnitude test separates misses from hits.
  *
  * @type {number}
  */
 export const ENV_RAY_LENGTH = 1e4;
-
-/**
- * Classification threshold for {@link ENV_RAY_LENGTH}: above this is an env miss, below a real hit.
- * An order of magnitude under the sentinel, robust to fp16 storage and bilinear blending at borders.
- *
- * @type {number}
- */
-export const ENV_RAY_LENGTH_THRESHOLD = 1e3;
 
 // Bounded-VNDF sampler (Eto & Tokuyoshi 2023; spherical-cap form, Dupuy & Benyoub 2023)
 const SampleGGXVNDF = Fn( ( [ V, ax, ay, r1, r2 ] ) => {
@@ -65,19 +56,6 @@ const SampleGGXVNDF = Fn( ( [ V, ax, ay, r1, r2 ] ) => {
 	return: 'vec3'
 } );
 
-// Generalized Trowbridge-Reitz (GTR). For GGX set k=2.
-// D_GTR(roughness, NoH, k) where roughness = α (not α²).
-export const D_GTR = Fn( ( [ roughness, NoH, k ] ) => {
-
-	// see: Filament - Normal distribution function (specular D) - 4.4.1
-	const a2 = roughness.mul( roughness ).toVar(); // α²
-	const NoH2 = NoH.mul( NoH ).toVar();
-	const base = NoH2.mul( a2.sub( float( 1.0 ) ) ).add( float( 1.0 ) ).toVar();
-	// a² / (π * base^k)
-	return a2.div( PI.mul( pow( base, k ) ) ).toVar(); // float
-
-}, { roughness: 'float', NoH: 'float', k: 'float', return: 'float' } );
-
 // Smith G1 (Heitz): expects alpha (not squared); it squares internally
 export const SmithG = Fn( ( [ NDotX, alpha ] ) => {
 
@@ -101,22 +79,6 @@ export const GeometryTerm = Fn( ( [ NoL, NoV, alphaG ] ) => {
 	return G1v.mul( G1l ).toVar();
 
 }, { NoL: 'float', NoV: 'float', alphaG: 'float', return: 'float' } );
-
-// Bounded VNDF direction PDF (reflection mapping), matching SampleGGXVNDF above.
-// p(L) = D_GTR(roughness, NoH, 2) / ( 2 * (k * N·V + t) )   (Eto & Tokuyoshi eq. 8)
-// with the isotropic cap bound k and t = ‖(α·V.xy, V.z)‖. Here 'roughness' is α, not α².
-const GGXVNDFPdf = Fn( ( [ NoH, NoV, roughness ] ) => {
-
-	const D = D_GTR( roughness, NoH, float( 2.0 ) ).toVar();
-	const a2 = roughness.mul( roughness ).toVar();
-	const sinV2 = max( float( 0.0 ), float( 1.0 ).sub( NoV.mul( NoV ) ) ).toVar(); // ‖V.xy‖²
-	const s = float( 1.0 ).add( sqrt( sinV2 ) ).toVar();
-	const s2 = s.mul( s ).toVar();
-	const k = float( 1.0 ).sub( a2 ).mul( s2 ).div( s2.add( a2.mul( NoV ).mul( NoV ) ) ).toVar();
-	const t = sqrt( a2.mul( sinV2 ).add( NoV.mul( NoV ) ) ).toVar();
-	return D.div( max( float( EPSILON ), float( 2.0 ).mul( k.mul( NoV ).add( t ) ) ) ).toVar();
-
-}, { NoH: 'float', NoV: 'float', roughness: 'float', return: 'float' } );
 
 /**
  * Fresnel reflectance for the Schlick approximation.
@@ -147,18 +109,13 @@ export const getSpecularDominantFactor = Fn( ( [ NoV, roughness ] ) => {
 }, { NoV: 'float', roughness: 'float', return: 'float' } );
 
 /**
- * Everything a single GGX reflection sample produces. `reflectDir` and `sampleWeight`
- * drive the SSR ray-march and compositing; `pdf`, `NdotV`, `alpha` and `f0` are the GGX
- * terms the env-miss MIS fallback needs so the caller never re-derives microfacet math.
+ * A single GGX reflection sample: `reflectDir` and `sampleWeight` drive the SSR ray-march
+ * and compositing, `NdotV` the specular dominant factor.
  */
 const ggxReflectionStruct = struct( {
 	reflectDir: 'vec3', // view-space reflected ray direction
 	sampleWeight: 'vec3', // chromatic weight (incl. Fresnel tint) to multiply gathered radiance by
-	pdf: 'float', // VNDF direction pdf (for MIS against the env CDF)
-	NdotV: 'float',
-	alpha: 'float', // GGX alpha (roughness²), clamped
-	f90: 'float',
-	f0: 'vec3' // Fresnel reflectance at normal incidence
+	NdotV: 'float'
 } );
 
 // Core of `ggxReflectionSample()` with explicit F0/F90.
@@ -198,15 +155,11 @@ const ggxReflectionSampleWithReflectance = Fn( ( [ N, V, roughness, f0, f90, Xi 
 
 	const NdotV = max( float( 0.0 ), dot( N, V ) ).toVar();
 	const NdotL = max( float( 0.0 ), dot( N, L ) ).toVar();
-	const NdotH = max( float( 0.0 ), dot( N, H ) ).toVar();
 	const VdotH = max( float( 0.0 ), dot( V, H ) ).toVar();
 
 	// Chromatic Fresnel reflectance: for metals f0 = albedo, so the reflection is tinted and desaturates
 	// toward white at grazing angles. Kept as vec3 so colored metals reflect with the correct chroma.
 	const fresnelWeight = F_Schlick( f0, VdotH, f90 ).toVar(); // vec3
-
-	// Bounded-VNDF direction pdf — still needed for the env-miss MIS path.
-	const pdf = GGXVNDFPdf( NdotH, NdotV, ax ).toVar();
 
 	// Numerically stable importance weight: brdf·NdotL/pdf ≡ fresnel·G2·(k·NdotV + t)/(2·NdotV), which
 	// cancels the GGX D analytically. Evaluating D explicitly is catastrophic at low roughness
@@ -223,14 +176,13 @@ const ggxReflectionSampleWithReflectance = Fn( ( [ N, V, roughness, f0, f90, Xi 
 		.mul( kB.mul( NdotV ).add( tB ) )
 		.div( float( 2.0 ).mul( NdotV ).max( 1e-4 ) ).toVar();
 
-	return ggxReflectionStruct( viewReflectDir, glossyWeight, pdf, NdotV, ax, f90, f0 );
+	return ggxReflectionStruct( viewReflectDir, glossyWeight, NdotV );
 
 } );
 
 /**
  * Importance-samples the GGX/VNDF specular lobe for one pixel and returns the reflected
- * ray direction plus the Monte-Carlo weight to apply to the gathered radiance, along with
- * the GGX terms the SSR env-miss MIS fallback needs.
+ * ray direction plus the Monte-Carlo weight to apply to the gathered radiance.
  *
  * @tsl
  * @param {Node<vec3>} N - View-space shading normal (normalized).
@@ -246,57 +198,3 @@ const ggxReflectionSampleWithReflectance = Fn( ( [ N, V, roughness, f0, f90, Xi 
 export const ggxReflectionSample = ( N, V, roughness, metalness, albedo, Xi, f0 = null, f90 = 1 ) =>
 
 	ggxReflectionSampleWithReflectance( N, V, roughness, f0 ?? mix( vec3( 0.04 ), albedo, metalness ), float( f90 ), Xi );
-
-// Equirectangular environment sampling
-
-/**
- * Equirectangular direction / UV / PDF helpers and MIS weighting shared by environment sampling code.
- * Env-miss MIS integration lives in {@link ImportanceSampledEnvironment}.
- *
- * Equirectangular parameterization helpers used with CDF importance sampling are adapted from
- * [three-gpu-pathtracer](https://github.com/gkjohnson/three-gpu-pathtracer).
- *
- * @see {@link https://github.com/gkjohnson/three-gpu-pathtracer}
- */
-
-// uv -> direction (equirectangular)
-export const equirectUvToDir = Fn( ( [ uvIn ] ) => {
-
-	const phi = uvIn.x.mul( Math.PI * 2 ).sub( Math.PI );
-	const lat = uvIn.y.sub( 0.5 ).mul( Math.PI );
-	const cosLat = cos( lat );
-	return normalize( vec3(
-		cosLat.mul( cos( phi ) ),
-		sin( lat ),
-		cosLat.mul( sin( phi ) )
-	) );
-
-}, { uv: 'vec2', return: 'vec3' } );
-
-// Solid-angle PDF of a direction under equirectangular parameterization.
-export const equirectDirPdf = Fn( ( [ direction ] ) => {
-
-	const uvDir = equirectUV( direction );
-	const sinTheta = sin( uvDir.y.mul( Math.PI ) );
-	return sinTheta.abs().lessThan( float( EPSILON ) ).select(
-		float( 0 ),
-		float( 1 ).div( float( 2 * Math.PI * Math.PI ).mul( sinTheta ) )
-	);
-
-}, { direction: 'vec3', return: 'float' } );
-
-/**
- * MIS power heuristic with β = 2: `pdfA² / (pdfA² + pdfB²)`.
- * Weights the contribution of the strategy that produced `pdfA` against the other strategy.
- *
- * @see Eric Veach, *Optimally Combining Sampling Techniques for Monte Carlo Rendering*
- * @tsl
- */
-export const misPowerHeuristic = Fn( ( [ pdfA, pdfB ] ) => {
-
-	const pdfASq = pdfA.mul( pdfA );
-	const pdfBSq = pdfB.mul( pdfB );
-	return pdfASq.div( pdfASq.add( pdfBSq ) );
-
-}, { pdfA: 'float', pdfB: 'float', return: 'float' } );
-

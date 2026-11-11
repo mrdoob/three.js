@@ -59,7 +59,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
+		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation, property, convertToTexture, texture, vec2, ivec2, Fn, positionPrevious, textureSize, getViewPosition, isBackgroundDepth } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
@@ -70,29 +70,29 @@
 		import { Inspector } from 'three/addons/inspector/Inspector.js';
 		import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
-		// Disable env map specular (radiance and clearcoat radiance) for every PBR material
-		// in this scene, since SSR provides the specular reflections instead. Diffuse env
-		// (irradiance) is left untouched. Equivalent to zeroing EnvironmentNode contributions,
-		// but scoped to this example rather than modifying the core library.
+		// Render the env map specular of every PBR material into its own MRT target instead of the beauty,
+		// so that it fills in where SSR has no coverage. Clearcoat env radiance is dropped. Scoped to this
+		// example rather than modifying the core library.
+		const envSpecular = property( 'vec3', 'EnvSpecular', vec3( 0 ) );
+
 		const _indirectSpecular = THREE.PhysicalLightingModel.prototype.indirectSpecular;
 		THREE.PhysicalLightingModel.prototype.indirectSpecular = function ( builder ) {
 
-			builder.context.radiance = vec3( 0 );
+			const { reflectedLight } = builder.context;
 
-			if ( this.clearcoatRadiance ) {
+			if ( this.clearcoatRadiance ) this.clearcoatRadiance.assign( vec3( 0 ) );
 
-				this.clearcoatRadiance.assign( vec3( 0 ) );
-
-			}
-
+			envSpecular.assign( vec3( 0 ) );
+			builder.context.reflectedLight = { ...reflectedLight, indirectSpecular: envSpecular };
 			_indirectSpecular.call( this, builder );
+			builder.context.reflectedLight = reflectedLight;
 
 		};
 
 		const OUTPUT_COMPARE_DENOISE = 8;
 		const OUTPUT_COMPARE_SSR = 9;
 
-		const GRADED_OUTPUTS = new Set( [ 0, 1, 3, 4, OUTPUT_COMPARE_DENOISE, OUTPUT_COMPARE_SSR ] );
+		const GRADED_OUTPUTS = new Set( [ 0, 1, 3, 4, 6, OUTPUT_COMPARE_DENOISE, OUTPUT_COMPARE_SSR ] );
 
 		const compareHint = document.getElementById( 'compare-hint' );
 
@@ -135,10 +135,8 @@
 				maxLuminance: 35,
 				binaryRefine: false,
 				stepExponent: 3,
-				envImportanceSampling: false,
 				screenEdgeFade: 0.2,
 				screenEdgeFadeBlack: false, // for indoor scenes, set to true
-				environmentIntensity: 3.14, // not too sure why exactly, but multiplying by ~PI makes the env map reflections match Blender more
 			},
 
 			denoise: {
@@ -152,11 +150,26 @@
 			},
 		};
 
-		let camera, scene, model, renderer, postProcessing, ssrNode, denoiseNode, denoised;
+		let camera, scene, model, renderer, postProcessing, ssrNode, denoiseNode, reflection, scenePassEnvSpecular, hitDistanceTexture;
 		let controls;
 		let scenePassNode, combinedOutputNode, scenePassDepth, scenePassVelocity;
 		let gammaUniform, contrastUniform, saturationUniform;
 		const denoiseEnabled = uniform( 1 );
+		const previousJitter = new THREE.Vector2();
+		const currentJitter = new THREE.Vector2();
+		const currentProjectionInverse = new THREE.Matrix4();
+		const previousProjectionInverse = uniform( new THREE.Matrix4() );
+		const historyValid = uniform( false );
+		const historySize = uniform( new THREE.Vector2() );
+		const jitterDelta = uniform( new THREE.Vector2() ).onRenderUpdate( () => {
+
+			// TRAA excludes projection jitter from velocity; the scene color still contains it.
+			const e = camera.projectionMatrix.elements;
+			currentJitter.set( - e[ 8 ] * 0.5, e[ 9 ] * 0.5 );
+			currentProjectionInverse.copy( camera.projectionMatrixInverse );
+			return jitterDelta.value.copy( previousJitter ).sub( currentJitter );
+
+		} );
 
 		init();
 
@@ -189,7 +202,8 @@
 
 			} );
 
-			renderer = new THREE.WebGPURenderer();
+			// five MRT targets need 40 bytes per sample, above the default limit of 32
+			renderer = new THREE.WebGPURenderer( { requiredLimits: { maxColorAttachmentBytesPerSample: 40 } } );
 			renderer.inspector = new Inspector();
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.toneMapping = THREE.AgXToneMapping;
@@ -231,13 +245,15 @@
 			scenePassNode = scenePass;
 			scenePass.setMRT( mrt( {
 				output: output,
+				envSpecular: vec4( envSpecular, 1 ),
 				// Store base color (albedo) in RGB + metalness in alpha. The albedo is needed for
 				// metal Fresnel f0; do NOT bake in the (1-metalness) diffuse attenuation here, as
 				// that zeroes metals and destroys their specular tint (f0 would become 0 → black).
 				diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
 				// Pack roughness into normal alpha channel to save MRT bandwidth
 				normal: vec4( packNormalToRGB( normalView ).rgb, materialRoughness ),
-				velocity: velocity
+				// The hit's previous view depth also follows object motion, including motion toward the camera.
+				velocity: vec4( velocity, velocity.previousCameraViewMatrix.mul( velocity.previousModelWorldMatrix ).mul( vec4( positionPrevious, 1 ) ).z.toVarying(), 0 )
 			} ) );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
@@ -249,6 +265,7 @@
 			} );
 			scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
 			const scenePassDiffuseColor = scenePass.getTextureNode( 'diffuseColor' ).toInspector( 'Diffuse Color' );
+			scenePassEnvSpecular = scenePass.getTextureNode( 'envSpecular' ).toInspector( 'Env Specular' );
 
 			const normalTexture = scenePass.getTexture( 'normal' );
 			normalTexture.type = THREE.UnsignedByteType;
@@ -258,20 +275,77 @@
 
 			const sceneNormal = sample( ( uv ) => unpackRGBToNormal( scenePassNormal.sample( uv ).rgb ) );
 
-			ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+			// SSR traces the previous frame's lit color ( beauty and reflections, so multi-bounce comes for free ),
+			// reprojected with the motion of the hit. Alpha is the share of valid history, which scales the coverage.
+
+			let lit = null;
+
+			const previousLit = sample( uv => Fn( () => {
+
+				const previousColor = texture( lit.value );
+				const previousDepth = scenePass.getPreviousTextureNode( 'depth' );
+
+				// Load motion and expected depth from one surface at silhouettes.
+
+				const motionSize = ivec2( textureSize( scenePassVelocity ) );
+				const motionTexel = ivec2( uv.mul( vec2( motionSize ) ) ).clamp( ivec2( 0 ), motionSize.sub( 1 ) );
+				const motion = scenePassVelocity.load( motionTexel ).toConst();
+				const historyUV = uv.sub( motion.xy.mul( vec2( 0.5, - 0.5 ) ) ).add( jitterDelta ).toConst();
+				const size = vec2( textureSize( previousDepth ) );
+				const pixel = historyUV.mul( size ).sub( 0.5 );
+				const base = pixel.floor();
+				const fraction = pixel.fract();
+				const inBounds = p => p.greaterThanEqual( 0 ).all().and( p.lessThanEqual( 1 ).all() );
+				const valid = historyValid.and( inBounds( historyUV ) )
+					.and( size.equal( historySize ).all() )
+					.and( vec2( textureSize( scenePassDepth ) ).equal( historySize ).all() )
+					.and( motion.z.lessThan( camera.near * - 1 ) );
+
+				// Allow a small pixel footprint for depth variation on sloping surfaces, plus half-float rounding.
+				const pixelDepth = previousProjectionInverse.element( 1 ).y.abs().mul( motion.z.abs() ).mul( 3 ).div( size.y );
+				const tolerance = pixelDepth.max( motion.z.abs().mul( 0.002 ) ).max( 0.001 );
+				const radiance = vec3( 0 ).toVar();
+				const support = float( 0 ).toVar();
+
+				// Validate each bilinear tap so interpolation cannot pull color across an occlusion edge.
+				for ( let y = 0; y <= 1; y ++ ) {
+
+					for ( let x = 0; x <= 1; x ++ ) {
+
+						const tapUV = base.add( vec2( x, y ) ).add( 0.5 ).div( size ).toConst();
+						const depth = previousDepth.sample( tapUV ).r;
+						const viewZ = getViewPosition( tapUV, depth, previousProjectionInverse ).z;
+						const accepted = valid.and( inBounds( tapUV ) ).and( isBackgroundDepth( depth ).not() )
+							.and( viewZ.sub( motion.z ).abs().lessThanEqual( tolerance ) );
+						const weightX = x === 0 ? fraction.x.oneMinus() : fraction.x;
+						const weightY = y === 0 ? fraction.y.oneMinus() : fraction.y;
+						const weight = weightX.mul( weightY ).mul( accepted ).toConst();
+						radiance.addAssign( previousColor.sample( tapUV ).rgb.mul( weight ) );
+						support.addAssign( weight );
+
+					}
+
+				}
+
+				// Missing history has no coverage; never substitute an unrelated surface's color.
+				return vec4( radiance.div( support.max( 1e-6 ) ), support );
+
+			} )() );
+
+			ssrNode = ssr( previousLit, scenePassDepth, sceneNormal, {
+				camera,
 				stochastic: true,
 				diffuseNode: scenePassDiffuseColor,
 				metalnessNode: scenePassDiffuseColor.a,
 				roughnessNode: scenePassNormal.a,
-				environmentNode: hdrTexture,
-				envImportanceSampling: params.ssr.envImportanceSampling,
 				binaryRefine: params.ssr.binaryRefine
 			} ).toInspector( 'SSR' );
 
-			// the reflections are accumulated in time and filtered within the footprint of their reflection lobe,
-			// with the roughness of the scene and the ray length of each pixel ( SSR alpha channel )
+			// the reflections ( SSR radiance with its coverage in alpha ) are accumulated in time and filtered within
+			// the footprint of their reflection lobe, with the roughness of the scene and the hit distance of each pixel
 
 			const ssrTexture = ssrNode.getTextureNode();
+			hitDistanceTexture = ssrNode.getHitDistanceNode();
 
 			denoiseNode = temporalDenoise( ssrTexture, {
 				depth: scenePassDepth,
@@ -279,23 +353,21 @@
 				camera,
 				velocity: scenePassVelocity,
 				roughness: sample( ( uv ) => scenePassNormal.sample( uv ).a ),
-				hitDistance: sample( ( uv ) => ssrTexture.sample( uv ).a )
+				hitDistance: sample( ( uv ) => hitDistanceTexture.sample( uv ).r ),
+				coverage: true
 			} );
-			denoised = mix( ssrNode.rgb, denoiseNode.getTextureNode().rgb, denoiseEnabled ).toInspector( 'Denoise' );
-			// feed the denoised result + velocity back into SSR for multi-bounce reflections
-			ssrNode.setHistory( denoiseNode.getTexture(), scenePassVelocity );
+			reflection = mix( ssrTexture, denoiseNode.getTextureNode(), denoiseEnabled ).toInspector( 'Denoise' );
 
-			const denoisePassBlend = vec4( denoised, ssrNode.a.greaterThan( 0 ).toVar() );
+			// where SSR has no coverage, the env map specular of the beauty pass fills in
+			const specular = mix( scenePassEnvSpecular.rgb, reflection.rgb, reflection.a );
 
 			gammaUniform = uniform( params.post.grading.gamma );
 			contrastUniform = uniform( params.post.grading.contrast );
 			saturationUniform = uniform( params.post.grading.saturation );
 
-			const litColor = scenePassColor.rgb.add( denoisePassBlend.rgb );
-
-			const outputNode = vec4( litColor, 1 );
-			outputNode.toInspector( 'Combined SSR' );
-			combinedOutputNode = outputNode;
+			lit = convertToTexture( vec4( scenePassColor.rgb.add( specular ), 1 ) );
+			lit.toInspector( 'Combined SSR' );
+			combinedOutputNode = lit;
 
 			postProcessing.outputNode = applyPostProcessing( combinedOutputNode );
 			postProcessing.outputColorTransform = false;
@@ -321,6 +393,8 @@
 				'Compare (Denoise)': OUTPUT_COMPARE_DENOISE,
 				'Compare (Reflections)': OUTPUT_COMPARE_SSR,
 				'SSR (Raw)': 1,
+				'SSR Coverage': 5,
+				'Env Specular': 6,
 				'Ray Length': 7
 			};
 
@@ -333,7 +407,6 @@
 			ssrGui.add( params.ssr, 'maxDistance', 0, 5 ).name( 'max distance' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'intensity', 0, 4 ).name( 'intensity' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'thickness', 0, 0.25 ).name( 'thickness' ).onChange( applyParams );
-			ssrGui.add( params.ssr, 'environmentIntensity', 0, 10 ).name( 'env intensity' ).onChange( applyParams );
 			ssrGui.add( params, 'roughness', 0, 1 ).onChange( ( value ) => {
 
 				scene.traverse( ( object ) => {
@@ -381,7 +454,6 @@
 			ssrNode.maxLuminance.value = params.ssr.maxLuminance;
 			ssrNode.screenEdgeFade.value = params.ssr.screenEdgeFade;
 			ssrNode.screenEdgeFadeBlack = params.ssr.screenEdgeFadeBlack;
-			ssrNode.environmentIntensity.value = params.ssr.environmentIntensity;
 
 			if ( denoiseNode ) {
 
@@ -433,13 +505,15 @@
 			switch ( params.output ) {
 
 				case 0: node = applyPostProcessing( combinedOutputNode ); break; // Combined
-				case 1: node = applyPostProcessing( vec4( ssrNode.rgb, 1 ) ); break; // SSR (Raw)
-				case 4: node = applyPostProcessing( vec4( denoised, 1 ) ); break; // Denoised SSR
-				case 7: node = vec4( ssrNode.aaa, 1 ); break; // Ray Length (Raw)
+				case 1: node = applyPostProcessing( vec4( ssrNode.rgb.mul( ssrNode.a ), 1 ) ); break; // SSR (Raw)
+				case 4: node = applyPostProcessing( vec4( reflection.rgb.mul( reflection.a ), 1 ) ); break; // Denoised SSR
+				case 5: node = vec4( reflection.aaa, 1 ); break; // SSR Coverage
+				case 6: node = applyPostProcessing( vec4( scenePassEnvSpecular.rgb, 1 ) ); break; // Env Specular
+				case 7: node = vec4( hitDistanceTexture.rrr, 1 ); break; // Ray Length (Raw)
 				case OUTPUT_COMPARE_DENOISE: { // Compare (denoised | noisy)
 
-					const noisySSR = applyPostProcessing( vec4( ssrNode.rgb, 1 ) );
-					const denoisedSSR = applyPostProcessing( vec4( denoised, 1 ) );
+					const noisySSR = applyPostProcessing( vec4( ssrNode.rgb.mul( ssrNode.a ), 1 ) );
+					const denoisedSSR = applyPostProcessing( vec4( reflection.rgb.mul( reflection.a ), 1 ) );
 					node = buildCompareNode( denoisedSSR, noisySSR );
 					break;
 
@@ -471,6 +545,7 @@
 
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			compareResolution.value.set( window.innerWidth, window.innerHeight );
+			historyValid.value = false;
 
 		}
 
@@ -498,6 +573,12 @@
 			controls.update();
 
 			postProcessing.render();
+
+			previousJitter.copy( currentJitter );
+			previousProjectionInverse.value.copy( currentProjectionInverse );
+			const { width, height } = scenePassNode.getTexture( 'output' ).image;
+			historySize.value.set( width, height );
+			historyValid.value = true;
 
 		}
 
