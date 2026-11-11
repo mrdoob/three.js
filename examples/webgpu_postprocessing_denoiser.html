@@ -49,12 +49,7 @@
 				source: 'Memorial',
 				left: 'Denoised',
 				intensity: 20,
-				noise: 'Hierarchical Hashed Weyl',
-				density: 0.4,
-				sampleRadius: 6,
 				jitter: true,
-				roughness: 0.3,
-				hitDistance: 0.05,
 				// the defaults of webgpu_postprocessing_ssr_denoise
 				temporalReproject: { maxFrames: 16, clampIntensity: 0.25, flickerSuppression: 1, hitPointReprojection: true },
 				denoise: { lumaPhi: 0.75, depthPhi: 20, normalPhi: 0.3, roughnessPhi: 100, radius: 1.5, alphaPhi: 5, strength: 0.725, adapt: 0.5, smoothDisocclusions: true, flickerSuppression: 1, adaptiveTrust: 1 }
@@ -64,28 +59,21 @@
 
 			const index = uniform( 0, 'uint' );
 			const noiseType = uniform( 0 );
-			const density = uniform( params.density );
-			const sampleRadius = uniform( params.sampleRadius );
-			const roughness = uniform( params.roughness );
-			const hitDistance = uniform( params.hitDistance );
-
-			// the source is fit into each half of the screen at its own aspect ratio
-
+			const density = uniform( 0.4 );
+			const sampleRadius = uniform( 6 );
+			const roughness = uniform( 0.3 );
+			const hitDistance = uniform( 0.05 );
 			const fit = uniform( new THREE.Vector2( 1, 1 ) );
-
-			// the sub-pixel jitter of the camera, like TRAA's: the image moves with it, in pixels
-
 			const jitter = uniform( new THREE.Vector2() );
+
 			const haltonOffsets = computeHaltonOffsets( 32 );
 			const unjittered = new THREE.Matrix4();
-			const translation = new THREE.Matrix4();
 			const drawingBufferSize = new THREE.Vector2();
 
-			// procedural sources: the radiance of each pixel, `intensity` for the highlights
+			// the radiance of each pixel, `intensity` for the highlights
 
 			const procedural = {
 
-				// a dark and a bright half, with highlight discs of growing radius on both
 				Highlights: ( x, y, width, height ) => {
 
 					let value = x < width / 2 ? 0.02 : 0.5;
@@ -106,7 +94,6 @@
 
 				},
 
-				// a lit sphere with a highlight over a dark gradient
 				Sphere: ( x, y, width, height ) => {
 
 					const r = height * 0.35;
@@ -140,7 +127,7 @@
 				renderer.toneMapping = THREE.AgXToneMapping;
 				document.body.appendChild( renderer.domElement );
 
-				// a plane that fills the view gives the denoiser its depth and velocity
+				// a plane that fills the view gives the denoiser its depth, normal and velocity
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.z = 1;
@@ -150,12 +137,11 @@
 				scene.add( plane );
 
 				scenePass = pass( scene, camera );
-				// the normal with the roughness in alpha, as webgpu_postprocessing_ssr_denoise packs it
+				// roughness in alpha, as webgpu_postprocessing_ssr_denoise packs it
 				scenePass.setMRT( mrt( { output, normal: vec4( packNormalToRGB( normalView ).rgb, roughness ), velocity } ) );
 				scenePass.getTexture( 'normal' ).type = THREE.UnsignedByteType;
 
-				// the same image in each half of the screen: the chosen output on the left, the noisy input on the right.
-				// The source at an offset in pixels, black outside the image
+				// the source at an offset in pixels, in each half of the screen, black outside the image
 
 				const panelSize = vec2( screenSize.x.mul( 0.5 ), screenSize.y );
 				const panelUV = vec2( screenUV.x.mul( 2 ).fract(), screenUV.y );
@@ -169,7 +155,7 @@
 
 				};
 
-				// the reference is the mean of the samples: the source, averaged over the sample disc
+				// the reference: the source averaged over the sample disc
 
 				reference = Fn( () => {
 
@@ -190,9 +176,8 @@
 
 				} )();
 
-				// one sample per pixel and frame, at a random point of the sample disc ( like the lobe of a rough reflection ). It
-				// hits with the probability `density` ( 0: no pixel, 1: every pixel ). A miss is black and a hit is scaled by
-				// 1 / density to keep the mean unbiased, so the reference is the mean of the samples
+				// one sample per pixel and frame at a random point of the sample disc ( like the lobe of a rough reflection ). It hits
+				// with the probability `density` and is then scaled by 1 / density, so the mean of the samples is the reference
 
 				noisy = Fn( () => {
 
@@ -206,14 +191,12 @@
 
 				} )();
 
-				// the input as SSR gives it to the denoiser in webgpu_postprocessing_ssr_denoise: radiance, the ray length in alpha
+				// the denoiser input as SSR gives it: radiance, the ray length in alpha
 
 				ssrLike = convertToTexture( vec4( noisy, hitDistance ) );
 
 				pipeline = new THREE.RenderPipeline( renderer );
 				pipeline.outputColorTransform = false;
-
-				// loads the initial source and builds the denoiser, as choosing a source does
 
 				await onSourceChange();
 
@@ -224,14 +207,14 @@
 				gui.add( params, 'intensity', 0, 100 ).name( 'highlight intensity' ).onChange( updateSource );
 
 				const samplingGui = renderer.inspector.createParameters( 'Source sampling' );
-				samplingGui.add( params, 'noise', [ 'Hierarchical Hashed Weyl', 'White' ] ).onChange( applyParams );
-				samplingGui.add( params, 'density', 0, 1 ).onChange( applyParams );
-				samplingGui.add( params, 'sampleRadius', 0, 16 ).name( 'sample radius' ).onChange( applyParams );
-				samplingGui.add( params, 'jitter' ).name( 'camera jitter' ).onChange( applyParams );
+				samplingGui.add( noiseType, 'value', { 'Hierarchical Hashed Weyl': 0, White: 1 } ).name( 'noise' );
+				samplingGui.add( density, 'value', 0, 1 ).name( 'density' );
+				samplingGui.add( sampleRadius, 'value', 0, 16 ).name( 'sample radius' );
+				samplingGui.add( params, 'jitter' ).name( 'camera jitter' );
 
 				const surfaceGui = renderer.inspector.createParameters( 'Denoiser surface inputs' );
-				surfaceGui.add( params, 'roughness', 0, 1 ).onChange( applyParams );
-				surfaceGui.add( params, 'hitDistance', 0, 2 ).name( 'hit distance' ).onChange( applyParams );
+				surfaceGui.add( roughness, 'value', 0, 1 ).name( 'roughness' );
+				surfaceGui.add( hitDistance, 'value', 0, 2 ).name( 'hit distance' );
 
 				const denoiseGui = renderer.inspector.createParameters( 'Denoiser' );
 				denoiseGui.add( params.denoise, 'lumaPhi', 0, 3 ).name( 'luma phi' ).onChange( applyParams );
@@ -260,7 +243,7 @@
 
 			}
 
-			// the denoiser keeps history across frames, so it's recreated for each source to start from a clean state
+			// recreated for each source, so no history carries over
 
 			function createDenoiser() {
 
@@ -310,12 +293,6 @@
 
 			function applyParams() {
 
-				noiseType.value = params.noise === 'White' ? 1 : 0;
-				density.value = params.density;
-				sampleRadius.value = params.sampleRadius;
-				roughness.value = params.roughness;
-				hitDistance.value = params.hitDistance;
-
 				for ( const key in params.temporalReproject ) temporalReprojectNode[ key ].value = params.temporalReproject[ key ];
 				for ( const key in params.denoise ) denoiseNode[ key ].value = params.denoise[ key ];
 
@@ -323,23 +300,21 @@
 
 			function updateOutput() {
 
-				const denoised = denoiseNode.getTextureNode();
+				const denoised = denoiseNode.getTextureNode().rgb;
 				const toneMapped = ( radiance ) => renderOutput( vec4( radiance, 1 ) ).rgb;
 
-				// the error of the denoised result relative to the reference: red too bright, blue too dark
+				// red: too bright, blue: too dark
 
 				const luma = ( v ) => v.dot( vec3( 0.2126, 0.7152, 0.0722 ) );
-				const error = luma( denoised.rgb ).sub( luma( reference ) ).div( luma( reference ).add( 0.02 ) );
+				const error = luma( denoised ).sub( luma( reference ) ).div( luma( reference ).add( 0.02 ) );
 
 				const left = {
-					Reference: () => toneMapped( reference ),
-					Denoised: () => toneMapped( denoised.rgb ),
-					Error: () => vec3( error.max( 0 ), 0, error.negate().max( 0 ) )
-				}[ params.left ]();
+					Reference: toneMapped( reference ),
+					Denoised: toneMapped( denoised ),
+					Error: vec3( error.max( 0 ), 0, error.negate().max( 0 ) )
+				}[ params.left ];
 
-				const right = toneMapped( noisy );
-
-				let color = mix( left, right, step( 0.5, screenUV.x ) );
+				let color = mix( left, toneMapped( noisy ), step( 0.5, screenUV.x ) );
 				color = abs( screenCoordinate.x.sub( screenSize.x.mul( 0.5 ) ) ).lessThan( 1 ).select( vec3( 1, 0.3, 0.1 ), color );
 
 				pipeline.outputNode = vec4( color, 1 );
@@ -349,23 +324,22 @@
 
 			function updateSource() {
 
+				const size = renderer.getDrawingBufferSize( drawingBufferSize );
+
 				if ( images[ params.source ] !== undefined ) {
 
-					if ( imageTextures[ params.source ] === undefined ) return; // still loading, onSourceChange() applies it
+					const imageTexture = imageTextures[ params.source ];
 
-					const { width, height } = imageTextures[ params.source ].image;
-					const size = renderer.getDrawingBufferSize( drawingBufferSize );
-					const panelAspect = size.x / 2 / size.y, imageAspect = width / height;
+					if ( imageTexture === undefined ) return; // still loading, onSourceChange() applies it
+
+					const panelAspect = size.x / 2 / size.y, imageAspect = imageTexture.image.width / imageTexture.image.height;
 
 					// negative y: the rows of the HDR images are stored top-down
 					fit.value.set( Math.max( panelAspect / imageAspect, 1 ), - Math.max( imageAspect / panelAspect, 1 ) );
-					source.value = imageTextures[ params.source ];
+					source.value = imageTexture;
 
 				} else {
 
-					// one texel per pixel of a half of the screen
-
-					const size = renderer.getDrawingBufferSize( drawingBufferSize );
 					const width = Math.ceil( size.x / 2 ), height = size.y;
 					const data = new Float32Array( width * height * 4 );
 
@@ -406,35 +380,20 @@
 
 				index.value ++;
 
-				// TRAA-like: the jittered projection renders, the velocity uses the unjittered one
+				// like TRAA: render with the jittered projection, compute the velocity with the unjittered one
 
-				if ( params.jitter ) {
+				const size = renderer.getDrawingBufferSize( drawingBufferSize );
+				const [ hx, hy ] = params.jitter ? haltonOffsets[ index.value % 32 ] : [ 0.5, 0.5 ];
+				const jx = hx - 0.5, jy = hy - 0.5;
 
-					const size = renderer.getDrawingBufferSize( drawingBufferSize );
-					const [ hx, hy ] = haltonOffsets[ index.value % 32 ];
-					const jx = hx - 0.5, jy = hy - 0.5;
-
-					unjittered.copy( camera.projectionMatrix );
-					velocity.setProjectionMatrix( unjittered );
-					camera.projectionMatrix.premultiply( translation.makeTranslation( - 2 * jx / size.x, 2 * jy / size.y, 0 ) );
-					camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
-					jitter.value.set( jx, - jy );
-
-				} else {
-
-					jitter.value.set( 0, 0 );
-
-				}
+				velocity.setProjectionMatrix( unjittered.copy( camera.projectionMatrix ) );
+				camera.setViewOffset( size.x, size.y, jx, jy, size.x, size.y );
+				jitter.value.set( jx, - jy );
 
 				pipeline.render();
 
-				if ( params.jitter ) {
-
-					camera.projectionMatrix.copy( unjittered );
-					camera.projectionMatrixInverse.copy( unjittered ).invert();
-					velocity.setProjectionMatrix( null );
-
-				}
+				camera.clearViewOffset();
+				velocity.setProjectionMatrix( null );
 
 			}
 
