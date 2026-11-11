@@ -281,6 +281,25 @@ class DenoiseNode extends Node {
 		this.toneMappedWeights = uniform( 0 );
 
 		/**
+		 * Reflections: how much the luminance edge stop relaxes on glossy and rough surfaces ( fully from a roughness of
+		 * 0.25, none below 0.05 ), so that the filter blurs within the footprint of the reflection lobe and highlights
+		 * reconstruct as smooth gradients instead of hard dots. At 1, the lobe footprint, the normals and the hit distances
+		 * alone bound the filter there, like ReBLUR, which has no luminance edge stop.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.lobeLuminanceRelax = uniform( 0 );
+
+		/**
+		 * Reflections: how much the lobe footprint of the filter shrinks with the history, by `1 / sqrt( 1 + N )` of the
+		 * history length N ( ReBLUR ). Accumulated samples of the lobe converge to its integral over time, so the spatial
+		 * filter is only needed while the history is short, and details reconstruct as the history grows.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.historyRadius = uniform( 0 );
+
+		/**
 		 * Whether the node filters every frame in which it is used. Otherwise it filters once when
 		 * {@link DenoiseNode#textureNeedsUpdate} is set, e.g. when a light map is baked.
 		 *
@@ -1440,7 +1459,11 @@ class DenoiseNode extends Node {
 						// lobe angle times the hit distance factor, times the texels per unit of the factor
 
 						centerHit = this._guideNormal.load( coord ).w.toVar();
-						footprint = a.mul( 1.7 ).mul( centerHit ).mul( this._footprintScale ).max( 0.5 ).toVar();
+						const historyShrink = mix( 1, float( 1 ).div( sqrt( this._lengthAt( coord ).add( 1 ) ) ), this.historyRadius );
+						footprint = a.mul( 1.7 ).mul( centerHit ).mul( this._footprintScale ).mul( historyShrink ).max( 0.5 ).toVar();
+
+						const glossy = normalRoughness.w.smoothstep( 0.05, 0.25 );
+						luminanceScale.mulAssign( float( 1 ).sub( this.lobeLuminanceRelax.mul( glossy ) ) );
 
 					}
 

@@ -48,11 +48,13 @@
 				samples: 1,
 				sparsity: 0.5,
 				blurRadius: 0,
-				jitter: false,
+				blurFromRoughness: true,
+				jitter: true,
 				roughness: 0.3,
-				hitDistance: 0.5,
+				hitDistance: 0.05,
+				resetOnChange: false,
 				spatialPasses: 2,
-				denoise: { luminancePhi: 3, maxFrames: 8, historyDeviation: 0, fireflyClamp: 0, toneMappedWeights: 0 }
+				denoise: { luminancePhi: 3, maxFrames: 8, historyDeviation: 0, fireflyClamp: 0, toneMappedWeights: 0, lobeLuminanceRelax: 0, historyRadius: 0 }
 			};
 
 			let renderer, camera, plane, pipeline, denoiseNode, reference, noisy;
@@ -246,10 +248,12 @@
 				samplingGui.add( params, 'sampling', [ 'Coverage', 'Sparse', 'Uniform' ] ).onChange( applyParams );
 				samplingGui.add( params, 'samples', 1, 16, 1 ).name( 'samples per pixel' ).onChange( applyParams );
 				samplingGui.add( params, 'sparsity', 0, 0.99 ).onChange( applyParams );
-				samplingGui.add( params, 'blurRadius', 0, 12 ).name( 'blur radius' ).onChange( applyParams );
+				samplingGui.add( params, 'blurRadius', 0, 16 ).name( 'blur radius' ).onChange( applyParams );
+				samplingGui.add( params, 'blurFromRoughness' ).name( 'blur from roughness' ).onChange( applyParams );
 				samplingGui.add( params, 'jitter' ).name( 'camera jitter' ).onChange( applyParams );
 
 				const denoiseGui = renderer.inspector.createParameters( 'Denoiser' );
+				denoiseGui.add( params, 'resetOnChange' ).name( 'reset on change' );
 				denoiseGui.add( params, 'roughness', 0, 1 ).onChange( applyParams );
 				denoiseGui.add( params, 'hitDistance', 0, 2 ).name( 'hit distance' ).onChange( applyParams );
 				denoiseGui.add( params.denoise, 'luminancePhi', 0, 10 ).name( 'luminance phi' ).onChange( applyParams );
@@ -258,6 +262,8 @@
 				denoiseGui.add( params.denoise, 'historyDeviation', 0, 1 ).name( 'history deviation' ).onChange( applyParams );
 				denoiseGui.add( params.denoise, 'fireflyClamp', 0, 8 ).name( 'firefly clamp' ).onChange( applyParams );
 				denoiseGui.add( params.denoise, 'toneMappedWeights', 0, 1 ).name( 'tone mapped weights' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'lobeLuminanceRelax', 0, 1 ).name( 'lobe luminance relax' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'historyRadius', 0, 1 ).name( 'history radius' ).onChange( applyParams );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -273,14 +279,14 @@
 				sampling.value = [ 'Coverage', 'Sparse', 'Uniform' ].indexOf( params.sampling );
 				samples.value = params.samples;
 				sparsity.value = params.sparsity;
-				blurRadius.value = params.blurRadius;
+				blurRadius.value = params.blurFromRoughness ? lobeRadius() : params.blurRadius;
 				roughness.value = params.roughness;
 				hitDistance.value = params.hitDistance;
 
 				denoiseNode.iterations = params.spatialPasses;
 				for ( const key in params.denoise ) denoiseNode[ key ].value = params.denoise[ key ];
 
-				denoiseNode.reset();
+				if ( params.resetOnChange ) denoiseNode.reset();
 
 			}
 
@@ -352,7 +358,7 @@
 
 				}
 
-				denoiseNode.reset();
+				if ( params.resetOnChange ) denoiseNode.reset();
 
 			}
 
@@ -403,6 +409,18 @@
 					velocity.setProjectionMatrix( null );
 
 				}
+
+			}
+
+			// the footprint of the reflection lobe on screen in pixels, as the denoiser estimates it from the roughness and the
+			// hit distance ( the plane is at a distance of 1 ), capped to keep the reference affordable
+
+			function lobeRadius() {
+
+				const height = renderer.getDrawingBufferSize( new THREE.Vector2() ).y;
+				const pixelsPerRadian = height / 2 / Math.tan( THREE.MathUtils.degToRad( camera.fov / 2 ) );
+
+				return Math.min( params.roughness ** 2 * 1.7 * params.hitDistance / ( params.hitDistance + 1 ) * pixelsPerRadian, 16 );
 
 			}
 
