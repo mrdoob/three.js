@@ -52,7 +52,7 @@
 				jitter: true,
 				motion: 'None',
 				// the defaults of webgpu_postprocessing_ssr_denoise
-				temporalReproject: { maxFrames: 16, clampIntensity: 0.25, flickerSuppression: 1, hitPointReprojection: true },
+				temporalReproject: { maxFrames: 16, clampIntensity: 0.25, flickerSuppression: 1 },
 				denoise: { lumaPhi: 0.75, depthPhi: 20, normalPhi: 0.3, roughnessPhi: 100, radius: 1.5, alphaPhi: 5, strength: 0.725, adapt: 0.5, smoothDisocclusions: true, flickerSuppression: 1, adaptiveTrust: 1 }
 			};
 
@@ -256,8 +256,6 @@
 				temporalGui.add( params.temporalReproject, 'maxFrames', 1, 64, 1 ).name( 'max frames' ).onChange( applyParams );
 				temporalGui.add( params.temporalReproject, 'clampIntensity', 0, 1 ).name( 'clamp intensity' ).onChange( applyParams );
 				temporalGui.add( params.temporalReproject, 'flickerSuppression', 0, 1 ).name( 'flicker suppression' ).onChange( applyParams );
-				temporalGui.add( params.temporalReproject, 'hitPointReprojection' ).name( 'hit point reprojection' ).onChange( applyParams );
-
 				window.addEventListener( 'resize', onWindowResize );
 
 				onWindowResize();
@@ -280,7 +278,9 @@
 				const depth = scenePass.getTextureNode( 'depth' );
 				const normal = scenePass.getTextureNode( 'normal' );
 
-				temporalReprojectNode = temporalReproject( ssrLike, depth, normal, scenePass.getTextureNode( 'velocity' ), camera, { mode: 'specular', accumulate: false } );
+				// the image moves with the surface, which the hit point reprojection doesn't model: it follows the camera only
+
+				temporalReprojectNode = temporalReproject( ssrLike, depth, normal, scenePass.getTextureNode( 'velocity' ), camera, { mode: 'specular', accumulate: false, hitPointReprojection: false } );
 
 				denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
 					depth,
