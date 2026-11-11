@@ -21,6 +21,13 @@ import { warn, error } from '../../../utils.js';
 
 import { GPUShaderStage } from '../utils/WebGPUConstants.js';
 
+// The WGSL types of the texture inputs of a function layout.
+const layoutTextureTypes = {
+	texture: 'texture_2d<f32>',
+	cubeTexture: 'texture_cube<f32>',
+	texture3D: 'texture_3d<f32>'
+};
+
 const accessNames = {
 	[ NodeAccess.READ_ONLY ]: 'read',
 	[ NodeAccess.WRITE_ONLY ]: 'write',
@@ -343,6 +350,14 @@ class WGSLNodeBuilder extends NodeBuilder {
 		 * @type {Map<string,Object>}
 		 */
 		this.scopedArrays = new Map();
+
+		/**
+		 * The texture nodes that need a sampler although their texture is unfilterable,
+		 * e.g. textures with `NearestFilter` passed to a function with layout.
+		 *
+		 * @type {Set<TextureNode>}
+		 */
+		this.samplerNodes = new Set();
 
 		/**
 		 * A flag that indicates that early returns are allowed.
@@ -856,9 +871,23 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	isUnfilterable( texture ) {
 
+		return this.isUnfilterableFormat( texture ) ||
+			( this.isSampleCompare( texture ) === false && texture.minFilter === NearestFilter && texture.magFilter === NearestFilter );
+
+	}
+
+	/**
+	 * Returns `true` if the format of the given texture can't be sampled with a filtering sampler,
+	 * e.g. an integer texture. Unlike {@link WGSLNodeBuilder#isUnfilterable}, the filters of the
+	 * texture are ignored.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {boolean} Whether the format of the given texture is unfilterable or not.
+	 */
+	isUnfilterableFormat( texture ) {
+
 		return this.getComponentTypeFromTexture( texture ) !== 'float' ||
-			( ! this.isAvailable( 'float32Filterable' ) && texture.type === FloatType ) ||
-			( this.isSampleCompare( texture ) === false && texture.minFilter === NearestFilter && texture.magFilter === NearestFilter ) ||
+			( texture.type === FloatType && ! this.isAvailable( 'float32Filterable' ) ) ||
 			this.renderer.backend.utils.getTextureSampleData( texture ).primarySamples > 1 ||
 			texture.normalized === true && ( texture.type === ShortType || texture.type === UnsignedShortType );
 
@@ -1384,6 +1413,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 	getUniformFromNode( node, type, shaderStage, name = null ) {
 
 		const uniformNode = super.getUniformFromNode( node, type, shaderStage, name );
+
+		if ( uniformNode.isParameterNode === true ) return uniformNode;
+
 		const nodeData = this.getDataFromNode( node, shaderStage, this.globalCache );
 
 		if ( nodeData.uniformGPU === undefined ) {
@@ -1429,7 +1461,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
 				// Also textureGather always need sampler.
-				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false ) || node.gatherNode !== null;
+				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false ) || node.gatherNode !== null || this.samplerNodes.has( node );
 
 				if ( needsSampler ) {
 
@@ -1561,6 +1593,29 @@ class WGSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Returns the parameters that pass a texture to a function: the texture and its sampler.
+	 *
+	 * @param {string} name - The name of the texture parameter.
+	 * @param {TextureNode} textureNode - The texture node.
+	 * @return {Object<string,Node>} The nodes of the parameters, by name.
+	 */
+	getTextureParameters( name, textureNode ) {
+
+		if ( this.isUnfilterableFormat( textureNode.value ) ) {
+
+			error( `TSL: The texture passed to '${ name }' must have a filterable format, e.g. not an integer or multisampled texture.` );
+
+		}
+
+		// the function samples the texture with a sampler, also if the texture has no filter
+
+		this.samplerNodes.add( textureNode.getSharedNode( this ) );
+
+		return { [ name ]: textureNode, [ name + '_sampler' ]: textureNode.convert( 'sampler' ) };
+
+	}
+
+	/**
 	 * Builds the given shader node.
 	 *
 	 * @param {ShaderNodeInternal} shaderNode - The shader node.
@@ -1575,7 +1630,19 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		for ( const input of layout.inputs ) {
 
-			parameters.push( input.name + ' : ' + this.getType( input.type ) );
+			const textureType = layoutTextureTypes[ input.type ];
+
+			if ( textureType !== undefined ) {
+
+				// see getTextureParameters()
+
+				parameters.push( input.name + ' : ' + textureType, input.name + '_sampler : sampler' );
+
+			} else {
+
+				parameters.push( input.name + ' : ' + this.getType( input.type ) );
+
+			}
 
 		}
 
@@ -2232,7 +2299,7 @@ ${ flowData.code }
 
 				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
 				// Also textureGather always need sampler.
-				const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && textureNode.isStorageTextureNode !== true ) || textureNode.gatherNode !== null;
+				const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && textureNode.isStorageTextureNode !== true ) || textureNode.gatherNode !== null || this.samplerNodes.has( textureNode );
 
 				if ( needsSampler ) {
 

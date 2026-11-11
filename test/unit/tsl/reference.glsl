@@ -1597,3 +1597,165 @@ float fn0 ( vec3 value ) {
 }
 
 fn0( vec3( 1.0, 0.24620132669705552, 0.0 ) )
+
+// layout texture input
+
+vec3 fn0 ( sampler2D map, bool map_flipY, vec2 coord ) {
+
+	vec2 nodeVar0;
+	vec2 nodeVar1;
+	bool nodeVar2;
+	vec2 nodeVar3;
+	vec4 nodeVar4;
+
+	nodeVar0 = coord;
+	nodeVar2 = bool( map_flipY );
+
+	if ( nodeVar2 ) {
+
+		nodeVar3 = nodeVar0;
+		nodeVar1 = vec2( nodeVar3.x, 1.0 - nodeVar3.y );
+
+	} else {
+
+		nodeVar1 = nodeVar0;
+
+	}
+
+	nodeVar4 = texture( map, nodeVar1 );
+
+	return nodeVar4.xyz;
+
+}
+
+bool nodeVar0;
+bool nodeVar1;
+nodeVar0 = bool( nodeUniform1 );
+nodeVar1 = bool( nodeUniform3 );
+
+( fn0( nodeUniform0, nodeVar0, nodeVarying0 ) + fn0( nodeUniform2, nodeVar1, nodeVarying0.yx ) )
+
+// layout nested texture input
+
+vec3 fn0 ( sampler2D map, bool map_flipY, vec2 coord ) {
+
+	vec2 nodeVar0;
+	vec2 nodeVar1;
+	bool nodeVar2;
+	vec2 nodeVar3;
+	vec4 nodeVar4;
+
+	nodeVar0 = coord;
+	nodeVar2 = bool( map_flipY );
+
+	if ( nodeVar2 ) {
+
+		nodeVar3 = nodeVar0;
+		nodeVar1 = vec2( nodeVar3.x, 1.0 - nodeVar3.y );
+
+	} else {
+
+		nodeVar1 = nodeVar0;
+
+	}
+
+	nodeVar4 = texture( map, nodeVar1 );
+
+	return nodeVar4.xyz;
+
+}
+
+vec3 fn1 ( sampler2D map, bool map_flipY, vec2 coord ) {
+
+	bool nodeVar0;
+
+	nodeVar0 = bool( map_flipY );
+
+	return ( ( fn0( map, nodeVar0, coord ) + fn0( map, nodeVar0, ( coord + vec2( 0.01 ) ) ) ) * vec3( 0.5 ) );
+
+}
+
+bool nodeVar0;
+nodeVar0 = bool( nodeUniform1 );
+
+fn1( nodeUniform0, nodeVar0, nodeVarying0 )
+
+// layout cube and volume texture inputs
+
+vec3 fn0 ( samplerCube map, vec3 direction ) {
+
+	vec4 nodeVar0;
+
+	nodeVar0 = texture( map, vec3( ( - direction.x ), direction.yz ) );
+
+	return nodeVar0.xyz;
+
+}
+
+vec3 fn1 ( sampler3D map, bool map_flipY, vec3 coord ) {
+
+	vec3 nodeVar0;
+	vec3 nodeVar1;
+	bool nodeVar2;
+	vec3 nodeVar3;
+	vec4 nodeVar4;
+
+	nodeVar0 = coord;
+	nodeVar2 = bool( map_flipY );
+
+	if ( nodeVar2 ) {
+
+		nodeVar3 = nodeVar0;
+		nodeVar1 = vec3( nodeVar3.x, 1.0 - nodeVar3.y, nodeVar3.z );
+
+	} else {
+
+		nodeVar1 = nodeVar0;
+
+	}
+
+	nodeVar4 = texture( map, nodeVar1 );
+
+	return nodeVar4.xyz;
+
+}
+
+bool nodeVar0;
+nodeVar0 = bool( nodeUniform2 );
+
+( fn0( nodeUniform0, vec3( nodeVarying0, 1.0 ) ) + fn1( nodeUniform1, nodeVar0, vec3( nodeVarying0, 0.5 ) ) )
+
+// layout nearest texture input
+
+vec3 fn0 ( sampler2D map, bool map_flipY, vec2 coord ) {
+
+	vec2 nodeVar0;
+	vec2 nodeVar1;
+	bool nodeVar2;
+	vec2 nodeVar3;
+	vec4 nodeVar4;
+
+	nodeVar0 = coord;
+	nodeVar2 = bool( map_flipY );
+
+	if ( nodeVar2 ) {
+
+		nodeVar3 = nodeVar0;
+		nodeVar1 = vec2( nodeVar3.x, 1.0 - nodeVar3.y );
+
+	} else {
+
+		nodeVar1 = nodeVar0;
+
+	}
+
+	nodeVar4 = texture( map, nodeVar1 );
+
+	return nodeVar4.xyz;
+
+}
+
+bool nodeVar0;
+nodeVar0 = bool( nodeUniform1 );
+
+fn0( nodeUniform0, nodeVar0, nodeVarying0 )

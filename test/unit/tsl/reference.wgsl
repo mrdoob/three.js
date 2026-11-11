@@ -1682,3 +1682,75 @@ fn fn0 ( value : vec3<f32> ) -> f32 {
 }
 
 fn0( vec3<f32>( 1.0, 0.24620132669705552, 0.0 ) )
+
+// layout texture input
+
+fn fn0 ( map : texture_2d<f32>, map_sampler : sampler, coord : vec2<f32> ) -> vec3<f32> {
+
+	var nodeVar0 : vec4<f32>;
+
+	nodeVar0 = textureSample( map, map_sampler, coord );
+
+	return nodeVar0.xyz;
+
+}
+
+( fn0( nodeUniform0, nodeUniform0_sampler, nodeVarying0 ) + fn0( nodeUniform1, nodeUniform1_sampler, nodeVarying0.yx ) )
+
+// layout nested texture input
+
+fn fn0 ( map : texture_2d<f32>, map_sampler : sampler, coord : vec2<f32> ) -> vec3<f32> {
+
+	var nodeVar0 : vec4<f32>;
+
+	nodeVar0 = textureSample( map, map_sampler, coord );
+
+	return nodeVar0.xyz;
+
+}
+
+fn fn1 ( map : texture_2d<f32>, map_sampler : sampler, coord : vec2<f32> ) -> vec3<f32> {
+
+	return ( ( fn0( map, map_sampler, coord ) + fn0( map, map_sampler, ( coord + vec2<f32>( 0.01 ) ) ) ) * vec3<f32>( 0.5 ) );
+
+}
+
+fn1( nodeUniform0, nodeUniform0_sampler, nodeVarying0 )
+
+// layout cube and volume texture inputs
+
+fn fn0 ( map : texture_cube<f32>, map_sampler : sampler, direction : vec3<f32> ) -> vec3<f32> {
+
+	var nodeVar0 : vec4<f32>;
+
+	nodeVar0 = textureSample( map, map_sampler, vec3<f32>( ( - direction.x ), direction.yz ) );
+
+	return nodeVar0.xyz;
+
+}
+
+fn fn1 ( map : texture_3d<f32>, map_sampler : sampler, coord : vec3<f32> ) -> vec3<f32> {
+
+	var nodeVar0 : vec4<f32>;
+
+	nodeVar0 = textureSample( map, map_sampler, coord );
+
+	return nodeVar0.xyz;
+
+}
+
+( fn0( nodeUniform0, nodeUniform0_sampler, vec3<f32>( nodeVarying0, 1.0 ) ) + fn1( nodeUniform1, nodeUniform1_sampler, vec3<f32>( nodeVarying0, 0.5 ) ) )
+
+// layout nearest texture input
+
+fn fn0 ( map : texture_2d<f32>, map_sampler : sampler, coord : vec2<f32> ) -> vec3<f32> {
+
+	var nodeVar0 : vec4<f32>;
+
+	nodeVar0 = textureSample( map, map_sampler, coord );
+
+	return nodeVar0.xyz;
+
+}
+
+fn0( nodeUniform0, nodeUniform0_sampler, nodeVarying0 )
