@@ -41,6 +41,7 @@
 			import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 			import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 			import { R4_STEPS, hierarchicalHashedWeyl } from 'three/addons/tsl/utils/HierarchicalHashedWeyl.js';
+			import { bindAnalyticNoise } from 'three/addons/tsl/utils/RNoise.js';
 			import { computeHaltonOffsets } from 'three/addons/tsl/utils/TAAUtils.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -204,7 +205,8 @@
 				noisy = Fn( () => {
 
 					const white = ( k ) => hash( uint( screenCoordinate.x ).add( uint( screenCoordinate.y ).mul( 4096 ) ).add( index.mul( 16777259 ) ).add( k * 7919 ) );
-					const noise = ( k ) => mix( hierarchicalHashedWeyl( screenCoordinate, index, k + 1, R4_STEPS[ k ] ), white( k ), noiseType );
+					const rNoise = bindAnalyticNoise( screenSize )( screenUV, index );
+					const noise = ( k ) => noiseType.equal( 2 ).select( rNoise.element( k ), noiseType.equal( 1 ).select( white( k ), hierarchicalHashedWeyl( screenCoordinate, index, k + 1, R4_STEPS[ k ] ) ) );
 
 					const angle = noise( 0 ).mul( PI.mul( 2 ) );
 					const offset = vec2( cos( angle ), sin( angle ) ).mul( sqrt( noise( 1 ) ).mul( sampleRadius ) );
@@ -230,7 +232,7 @@
 				gui.add( params, 'motion', [ 'None', 'Circle', 'Linear', 'Zoom' ] );
 
 				const samplingGui = renderer.inspector.createParameters( 'Source sampling' );
-				samplingGui.add( noiseType, 'value', { 'Hierarchical Hashed Weyl': 0, White: 1 } ).name( 'noise' );
+				samplingGui.add( noiseType, 'value', { 'Hierarchical Hashed Weyl': 0, White: 1, RNoise: 2 } ).name( 'noise' );
 				samplingGui.add( density, 'value', 0, 1 ).name( 'density' );
 				samplingGui.add( sampleRadius, 'value', 0, 16 ).name( 'sample radius' );
 				samplingGui.add( params, 'jitter' ).name( 'camera jitter' );
