@@ -1,0 +1,394 @@
+<html lang="en">
+	<head>
+		<title>three.js webgpu - postprocessing - SSR test scene</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>SSR test scene</span>
+			</div>
+
+			<small>Glossy reflections of small bright sources and stripes, with a reference accumulated while the camera is still.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { diffuseColor, fract, passTexture, materialMetalness, materialRoughness, mix, mrt, normalView, output, packNormalToRGB, pass, positionWorld, property, renderOutput, sample, step, texture, uniform, unpackRGBToNormal, vec3, vec4, velocity } from 'three/tsl';
+
+			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+			import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			// the env map specular of the PBR materials goes to its own MRT target, to fill in where SSR has no coverage
+
+			const envSpecular = property( 'vec3', 'EnvSpecular', vec3( 0 ) );
+
+			const _indirectSpecular = THREE.PhysicalLightingModel.prototype.indirectSpecular;
+			THREE.PhysicalLightingModel.prototype.indirectSpecular = function ( builder ) {
+
+				const { reflectedLight } = builder.context;
+
+				if ( this.clearcoatRadiance ) this.clearcoatRadiance.assign( vec3( 0 ) );
+
+				envSpecular.assign( vec3( 0 ) );
+				builder.context.reflectedLight = { ...reflectedLight, indirectSpecular: envSpecular };
+				_indirectSpecular.call( this, builder );
+				builder.context.reflectedLight = reflectedLight;
+
+			};
+
+			const params = {
+				output: 'Combined',
+				motion: 'Static',
+				traa: true,
+				roughness: 0.4,
+				highlightIntensity: 20,
+				environmentIntensity: 1,
+				resetOnChange: true,
+				ssr: { quality: 0.5, mirrorBias: 0, maxRoughness: 1 },
+				denoise: {
+					enabled: true, luminancePhi: 3, maxFrames: 8, spatialPasses: 2, historyDeviation: 0, fireflyClamp: 0,
+					toneMappedWeights: 0, lobeLuminanceRelax: 0, historyRadius: 0, clampSigma: 0, historyCatmullRom: 0
+				}
+			};
+
+			let renderer, scene, camera, controls, pipeline, scenePass, ssrNode, denoiseNode, floor;
+			let raw, reflection, combined, accumulateNode;
+
+			const highlightIntensity = uniform( params.highlightIntensity );
+			const denoiseEnabled = uniform( 1 );
+
+			// the reference: the running sum of the raw SSR ( premultiplied by its coverage ) while the camera is still,
+			// accumulated in the frame like TRAA's history
+
+			class AccumulateNode extends THREE.Node {
+
+				constructor( inputNode ) {
+
+					super( 'vec4' );
+
+					this.inputNode = inputNode;
+					this.updateBeforeType = THREE.NodeUpdateType.FRAME;
+
+					// the number of frames in the sum, 0 to start over
+					this.count = uniform( 0 );
+
+					this._targets = [ 0, 1 ].map( () => new THREE.RenderTarget( 1, 1, { type: THREE.FloatType, depthBuffer: false } ) );
+					this._previous = texture( this._targets[ 1 ].texture );
+					this._quad = new THREE.QuadMesh( new THREE.NodeMaterial() );
+					this._textureNode = passTexture( this, this._targets[ 0 ].texture );
+
+				}
+
+				getTextureNode() {
+
+					return this._textureNode;
+
+				}
+
+				updateBefore( { renderer } ) {
+
+					const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+					for ( const target of this._targets ) target.setSize( size.x, size.y );
+
+					this._targets.reverse();
+					this._previous.value = this._targets[ 1 ].texture;
+					this._textureNode.value = this._targets[ 0 ].texture;
+
+					const target = renderer.getRenderTarget();
+					renderer.setRenderTarget( this._targets[ 0 ] );
+					this._quad.render( renderer );
+					renderer.setRenderTarget( target );
+
+					this.count.value ++;
+
+				}
+
+				setup() {
+
+					const frame = vec4( this.inputNode.rgb.mul( this.inputNode.a ), 1 );
+					this._quad.material.fragmentNode = this._previous.mul( step( 0.5, this.count ) ).add( frame );
+
+					return this._textureNode;
+
+				}
+
+			}
+
+			const timer = new THREE.Timer();
+			const cameraHome = new THREE.Vector3( 0, 1.1, 3.2 );
+			const target = new THREE.Vector3( 0, 0.2, - 1 );
+
+			init();
+
+			async function init() {
+
+				// five render targets need 40 bytes per sample, above the default limit of 32
+				renderer = new THREE.WebGPURenderer( { requiredLimits: { maxColorAttachmentBytesPerSample: 40 } } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.inspector = new Inspector();
+				renderer.toneMapping = THREE.AgXToneMapping;
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 30 );
+				camera.position.copy( cameraHome );
+
+				scene = new THREE.Scene();
+				scene.environment = new THREE.PMREMGenerator( renderer ).fromScene( new RoomEnvironment(), 0.04 ).texture;
+				scene.environmentIntensity = params.environmentIntensity;
+				scene.background = new THREE.Color( 0x000000 );
+
+				// a glossy metal floor reflects everything else
+
+				floor = new THREE.Mesh( new THREE.PlaneGeometry( 10, 10 ), new THREE.MeshStandardNodeMaterial( { color: 0xb0b0b0, metalness: 1, roughness: params.roughness } ) );
+				floor.rotation.x = - Math.PI / 2;
+				scene.add( floor );
+
+				// small bright sources of growing size, like highlights
+
+				const lightMaterial = new THREE.MeshBasicNodeMaterial();
+				lightMaterial.colorNode = vec3( 1, 0.9, 0.8 ).mul( highlightIntensity );
+
+				[ 0.02, 0.04, 0.08, 0.15, 0.3 ].forEach( ( radius, i ) => {
+
+					const sphere = new THREE.Mesh( new THREE.SphereGeometry( radius, 24, 12 ), lightMaterial );
+					sphere.position.set( - 2 + i, 0.6, - 1.2 );
+					scene.add( sphere );
+
+				} );
+
+				// a striped wall: edges and detail to reconstruct
+
+				const wallMaterial = new THREE.MeshStandardNodeMaterial( { roughness: 1 } );
+				wallMaterial.colorNode = mix( vec3( 0.03 ), vec3( 0.7 ), step( 0.5, fract( positionWorld.x.mul( 1.5 ) ) ) );
+
+				const wall = new THREE.Mesh( new THREE.PlaneGeometry( 10, 3 ), wallMaterial );
+				wall.position.set( 0, 1.5, - 3 );
+				scene.add( wall );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 2 );
+				light.position.set( 0, 3, 4 );
+				scene.add( light );
+
+				// G-buffer: the beauty without env specular, the env specular, albedo and metalness, normal and roughness
+
+				scenePass = pass( scene, camera );
+				scenePass.setMRT( mrt( {
+					output,
+					envSpecular: vec4( envSpecular, 1 ),
+					diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
+					normal: vec4( packNormalToRGB( normalView ).rgb, materialRoughness ),
+					velocity
+				} ) );
+
+				const color = scenePass.getTextureNode( 'output' );
+				const normal = scenePass.getTextureNode( 'normal' );
+				const depth = scenePass.getTextureNode( 'depth' );
+				const motion = scenePass.getTextureNode( 'velocity' );
+				const albedo = scenePass.getTextureNode( 'diffuseColor' );
+				const environment = scenePass.getTextureNode( 'envSpecular' );
+
+				scenePass.getTexture( 'normal' ).type = THREE.UnsignedByteType;
+				scenePass.getTexture( 'diffuseColor' ).type = THREE.UnsignedByteType;
+
+				const sceneNormal = sample( ( uv ) => unpackRGBToNormal( normal.sample( uv ).rgb ) );
+
+				ssrNode = ssr( color, depth, sceneNormal, {
+					stochastic: true,
+					diffuseNode: albedo,
+					metalnessNode: albedo.a,
+					roughnessNode: normal.a
+				} );
+
+				raw = ssrNode.getTextureNode();
+				const hitDistance = ssrNode.getHitDistanceNode();
+
+				denoiseNode = temporalDenoise( raw, {
+					depth,
+					normal: sceneNormal,
+					camera,
+					velocity: motion,
+					roughness: sample( ( uv ) => normal.sample( uv ).a ),
+					hitDistance: sample( ( uv ) => hitDistance.sample( uv ).r ),
+					coverage: true
+				} );
+
+				reflection = mix( raw, denoiseNode.getTextureNode(), denoiseEnabled );
+				combined = color.rgb.add( mix( environment.rgb, reflection.rgb, reflection.a ) );
+
+				accumulateNode = new AccumulateNode( raw );
+
+				pipeline = new THREE.RenderPipeline( renderer );
+				pipeline.outputColorTransform = false;
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.copy( target );
+				controls.update();
+				controls.addEventListener( 'change', reset );
+
+				const gui = renderer.inspector.createParameters( 'Scene' );
+				gui.add( params, 'output', [ 'Combined', 'SSR (Raw)', 'Denoised', 'Reference', 'Error', 'Coverage' ] ).onChange( updateOutput );
+				gui.add( params, 'motion', [ 'Static', 'Orbit', 'Strafe' ] ).name( 'camera motion' ).onChange( reset );
+				gui.add( params, 'traa' ).name( 'TRAA' ).onChange( updateOutput );
+				gui.add( params, 'roughness', 0, 1 ).onChange( applyParams );
+				gui.add( params, 'highlightIntensity', 0, 200 ).name( 'highlight intensity' ).onChange( applyParams );
+				gui.add( params, 'environmentIntensity', 0, 2 ).name( 'env intensity' ).onChange( applyParams );
+				gui.add( params, 'resetOnChange' ).name( 'reset on change' );
+
+				const ssrGui = renderer.inspector.createParameters( 'SSR' );
+				ssrGui.add( params.ssr, 'quality', 0, 1 ).onChange( applyParams );
+				ssrGui.add( params.ssr, 'mirrorBias', 0, 1 ).name( 'mirror bias' ).onChange( applyParams );
+				ssrGui.add( params.ssr, 'maxRoughness', 0, 1 ).name( 'max roughness' ).onChange( applyParams );
+
+				const denoiseGui = renderer.inspector.createParameters( 'Denoiser' );
+				denoiseGui.add( params.denoise, 'enabled' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'luminancePhi', 0, 10 ).name( 'luminance phi' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'maxFrames', 1, 64, 1 ).name( 'max frames' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'spatialPasses', 1, 3, 1 ).name( 'spatial passes' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'historyDeviation', 0, 1 ).name( 'history deviation' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'fireflyClamp', 0, 8 ).name( 'firefly clamp' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'toneMappedWeights', 0, 1 ).name( 'tone mapped weights' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'lobeLuminanceRelax', 0, 1 ).name( 'lobe luminance relax' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'historyRadius', 0, 1 ).name( 'history radius' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'clampSigma', 0, 4 ).name( 'clamp sigma' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'historyCatmullRom', 0, 1, 1 ).name( 'catmull-rom history' ).onChange( applyParams );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				applyParams();
+				updateOutput();
+				renderer.setAnimationLoop( animate );
+
+			}
+
+			function applyParams() {
+
+				floor.material.roughness = params.roughness;
+				highlightIntensity.value = params.highlightIntensity;
+				scene.environmentIntensity = params.environmentIntensity;
+
+				ssrNode.quality.value = params.ssr.quality;
+				ssrNode.mirrorBias.value = params.ssr.mirrorBias;
+				ssrNode.maxRoughness.value = params.ssr.maxRoughness;
+
+				const { enabled, spatialPasses, ...options } = params.denoise;
+
+				denoiseEnabled.value = enabled ? 1 : 0;
+				denoiseNode.iterations = spatialPasses;
+				for ( const key in options ) denoiseNode[ key ].value = options[ key ];
+
+				if ( params.resetOnChange ) {
+
+					denoiseNode.reset();
+					reset();
+
+				}
+
+			}
+
+			function updateOutput() {
+
+				const luma = ( v ) => v.dot( vec3( 0.2126, 0.7152, 0.0722 ) );
+				const premultiplied = ( v ) => v.rgb.mul( v.a );
+				const reference = accumulateNode.getTextureNode().rgb.div( accumulateNode.count.max( 1 ) );
+
+				// the error of the denoised reflections relative to the reference: red too bright, blue too dark
+				const error = luma( premultiplied( reflection ) ).sub( luma( reference ) ).div( luma( reference ).add( 0.02 ) );
+
+				const views = {
+					Combined: () => combined,
+					'SSR (Raw)': () => premultiplied( raw ),
+					Denoised: () => premultiplied( reflection ),
+					Reference: () => reference
+				};
+
+				let node;
+
+				if ( params.output === 'Error' ) node = vec4( error.max( 0 ), 0, error.negate().max( 0 ), 1 );
+				else if ( params.output === 'Coverage' ) node = vec4( vec3( reflection.a ), 1 );
+				else {
+
+					node = vec4( views[ params.output ](), 1 );
+					if ( params.traa ) node = traa( node, scenePass.getTextureNode( 'depth' ), scenePass.getTextureNode( 'velocity' ), camera );
+					node = renderOutput( node );
+
+				}
+
+				pipeline.outputNode = node;
+				pipeline.needsUpdate = true;
+
+				reset();
+
+			}
+
+			function reset() {
+
+				if ( accumulateNode ) accumulateNode.count.value = 0;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				reset();
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				const time = timer.getElapsed();
+
+				if ( params.motion === 'Orbit' ) {
+
+					const angle = Math.sin( time * 0.3 ) * 0.5;
+					camera.position.set( Math.sin( angle ) * 4.2, cameraHome.y, Math.cos( angle ) * 4.2 - 1 );
+					camera.lookAt( target );
+
+				} else if ( params.motion === 'Strafe' ) {
+
+					camera.position.set( Math.sin( time * 0.5 ) * 1.5, cameraHome.y, cameraHome.z );
+					camera.lookAt( target );
+
+				}
+
+				pipeline.render();
+
+				// the reference only holds while the camera is still
+
+				if ( params.motion !== 'Static' ) reset();
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -66,6 +66,7 @@ const exceptionList = [
 	'webgpu_lightmap_baking',
 	'webgpu_postprocessing_denoiser',
 	'webgpu_postprocessing_ssr_denoise',
+	'webgpu_postprocessing_ssr_test',
 	'webgpu_renderer_pathtracer',
 	'webgpu_vxgi',
 	'webgpu_vxgi_sponza',
