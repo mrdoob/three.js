@@ -4,7 +4,6 @@ import NodeVarying from './NodeVarying.js';
 import NodeVar from './NodeVar.js';
 import NodeCode from './NodeCode.js';
 import NodeCache from './NodeCache.js';
-import Node from './Node.js';
 import ParameterNode from './ParameterNode.js';
 import StructType from './StructType.js';
 import FunctionNode from '../code/FunctionNode.js';
@@ -136,8 +135,6 @@ const _isMatrixCache = new Map();
 const _isIntegerCache = new Map();
 
 const _checkWriteUsage = ( data ) => {
-
-	if ( data === undefined ) return false;
 
 	if ( data.writeUsageCount > 0 ) return true;
 
@@ -285,9 +282,9 @@ class NodeBuilder {
 		this.updateAfterNodes = [];
 
 		/**
-		 * A dictionary that assigns each node to a unique hash.
+		 * A map that assigns each node to a unique hash.
 		 *
-		 * @type {Map<string,Node>}
+		 * @type {Map<number,Node>}
 		 */
 		this.hashNodes = new Map();
 
@@ -874,13 +871,7 @@ class NodeBuilder {
 
 			this.nodes.add( node );
 
-			// the default hash is unique per node, so only nodes with a custom hash can be shared
-
-			if ( node.getHash !== Node.prototype.getHash ) {
-
-				this.setHashNode( node, node.getHash( this ) );
-
-			}
+			this.setHashNode( node, node.getHash( this ) );
 
 		}
 
@@ -1412,7 +1403,9 @@ class NodeBuilder {
 
 			for ( const shaderStage in nodeData ) {
 
-				if ( _checkWriteUsage( nodeData[ shaderStage ] ) ) {
+				const data = nodeData[ shaderStage ];
+
+				if ( data !== undefined && _checkWriteUsage( data ) ) {
 
 					return true;
 
@@ -2215,19 +2208,17 @@ class NodeBuilder {
 
 		if ( nodeData === undefined ) {
 
-			// define all stages upfront so the objects share the same shape
-
 			nodeData = { vertex: undefined, fragment: undefined, compute: undefined, any: undefined };
 
 			cache.setData( node, nodeData );
 
 		}
 
-		let data = nodeData[ shaderStage ];
-
-		if ( data === undefined ) nodeData[ shaderStage ] = data = new NodeData();
+		if ( nodeData[ shaderStage ] === undefined ) nodeData[ shaderStage ] = new NodeData();
 
 		//
+
+		let data = nodeData[ shaderStage ];
 
 		if ( this.subBuildLayers.length === 0 ) return data;
 
