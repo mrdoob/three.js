@@ -282,11 +282,11 @@ class NodeBuilder {
 		this.updateAfterNodes = [];
 
 		/**
-		 * A dictionary that assigns each node to a unique hash.
+		 * A map that assigns each node to a unique hash.
 		 *
-		 * @type {Object<number,Node>}
+		 * @type {Map<number,Node>}
 		 */
-		this.hashNodes = {};
+		this.hashNodes = new Map();
 
 		/**
 		 * A reference to a node material observer.
@@ -856,7 +856,7 @@ class NodeBuilder {
 	 */
 	setHashNode( node, hash ) {
 
-		this.hashNodes[ hash ] = node;
+		this.hashNodes.set( hash, node );
 
 	}
 
@@ -1075,7 +1075,7 @@ class NodeBuilder {
 	 */
 	getNodeFromHash( hash ) {
 
-		return this.hashNodes[ hash ];
+		return this.hashNodes.get( hash );
 
 	}
 
@@ -1403,7 +1403,9 @@ class NodeBuilder {
 
 			for ( const shaderStage in nodeData ) {
 
-				if ( _checkWriteUsage( nodeData[ shaderStage ] ) ) {
+				const data = nodeData[ shaderStage ];
+
+				if ( data !== undefined && _checkWriteUsage( data ) ) {
 
 					return true;
 
@@ -2206,7 +2208,7 @@ class NodeBuilder {
 
 		if ( nodeData === undefined ) {
 
-			nodeData = {};
+			nodeData = { vertex: undefined, fragment: undefined, compute: undefined, any: undefined };
 
 			cache.setData( node, nodeData );
 
