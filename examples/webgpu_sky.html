@@ -48,7 +48,7 @@
 
 			let sky, sun;
 
-			let sphere, cubeCamera;
+			let spheres, cubeCamera;
 
 			init();
 
@@ -129,11 +129,22 @@
 				const cubeRenderTarget = new THREE.CubeRenderTarget( 256, { type: THREE.HalfFloatType } );
 				cubeCamera = new THREE.CubeCamera( 1, 1000, cubeRenderTarget );
 
-				sphere = new THREE.Mesh(
-					new THREE.SphereGeometry( 400, 64, 32 ),
-					new THREE.MeshBasicNodeMaterial( { envMap: cubeRenderTarget.texture } )
-				);
-				scene.add( sphere );
+				// Metal spheres from smooth to rough, lit by the captured sky.
+
+				spheres = new THREE.Group();
+				scene.add( spheres );
+
+				const geometry = new THREE.SphereGeometry( 140, 64, 32 );
+
+				for ( let i = 0; i < 5; i ++ ) {
+
+					const material = new THREE.MeshStandardNodeMaterial( { envMap: cubeRenderTarget.texture, metalness: 1, roughness: i / 4 } );
+
+					const sphere = new THREE.Mesh( geometry, material );
+					sphere.position.x = ( i - 2 ) * 340;
+					spheres.add( sphere );
+
+				}
 
 				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -166,9 +177,9 @@
 
 			function animate() {
 
-				sphere.visible = false;
+				spheres.visible = false;
 				cubeCamera.update( renderer, scene );
-				sphere.visible = true;
+				spheres.visible = true;
 
 				renderer.render( scene, camera );
 
