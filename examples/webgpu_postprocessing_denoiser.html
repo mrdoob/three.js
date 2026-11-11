@@ -124,7 +124,8 @@
 			};
 
 			const images = { Memorial: 'textures/memorial.hdr', Quarry: 'textures/equirectangular/quarry_01_1k.hdr', 'Venice Sunset': 'textures/equirectangular/venice_sunset_1k.hdr' };
-			const imageTextures = {};
+			const imageTextures = {}; // loaded on first use
+			const loader = new HDRLoader();
 
 			const proceduralTexture = new THREE.DataTexture( new Float32Array( 4 ), 1, 1, THREE.RGBAFormat, THREE.FloatType );
 			const source = texture( proceduralTexture );
@@ -138,11 +139,6 @@
 				renderer.inspector = new Inspector();
 				renderer.toneMapping = THREE.AgXToneMapping;
 				document.body.appendChild( renderer.domElement );
-
-				const loader = new HDRLoader();
-				const names = Object.keys( images );
-				const textures = await Promise.all( names.map( ( name ) => loader.loadAsync( images[ name ] ) ) );
-				names.forEach( ( name, i ) => imageTextures[ name ] = textures[ i ] );
 
 				// a plane that fills the view gives the denoiser its depth and velocity
 
@@ -214,10 +210,12 @@
 
 				ssrLike = convertToTexture( vec4( noisy, hitDistance ) );
 
-				createDenoiser();
-
 				pipeline = new THREE.RenderPipeline( renderer );
 				pipeline.outputColorTransform = false;
+
+				// loads the initial source and builds the denoiser, as choosing a source does
+
+				await onSourceChange();
 
 				renderer.inspector.createParameters( 'Output' ).add( params, 'left', [ 'Reference', 'Denoised', 'Error' ] ).name( 'left side' ).onChange( updateOutput );
 
@@ -257,8 +255,6 @@
 				window.addEventListener( 'resize', onWindowResize );
 
 				onWindowResize();
-				applyParams();
-				updateOutput();
 
 				renderer.setAnimationLoop( animate );
 
@@ -293,7 +289,17 @@
 
 			}
 
-			function onSourceChange() {
+			async function onSourceChange() {
+
+				const name = params.source;
+
+				if ( images[ name ] !== undefined && imageTextures[ name ] === undefined ) {
+
+					imageTextures[ name ] = await loader.loadAsync( images[ name ] );
+
+					if ( name !== params.source ) return; // another source was chosen while loading
+
+				}
 
 				updateSource();
 				createDenoiser();
@@ -344,6 +350,8 @@
 			function updateSource() {
 
 				if ( images[ params.source ] !== undefined ) {
+
+					if ( imageTextures[ params.source ] === undefined ) return; // still loading, onSourceChange() applies it
 
 					const { width, height } = imageTextures[ params.source ].image;
 					const size = renderer.getDrawingBufferSize( drawingBufferSize );
