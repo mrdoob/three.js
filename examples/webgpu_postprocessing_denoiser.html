@@ -41,6 +41,7 @@
 			import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 			import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 			import { R4_STEPS, hierarchicalHashedWeyl } from 'three/addons/tsl/utils/HierarchicalHashedWeyl.js';
+			import { computeHaltonOffsets } from 'three/addons/tsl/utils/TAAUtils.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -75,6 +76,7 @@
 			// the sub-pixel jitter of the camera, like TRAA's: the image moves with it, in pixels
 
 			const jitter = uniform( new THREE.Vector2() );
+			const haltonOffsets = computeHaltonOffsets( 32 );
 			const unjittered = new THREE.Matrix4();
 			const translation = new THREE.Matrix4();
 
@@ -380,7 +382,8 @@
 				if ( params.jitter ) {
 
 					const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
-					const jx = halton( index.value % 32 + 1, 2 ) - 0.5, jy = halton( index.value % 32 + 1, 3 ) - 0.5;
+					const [ hx, hy ] = haltonOffsets[ index.value % 32 ];
+					const jx = hx - 0.5, jy = hy - 0.5;
 
 					unjittered.copy( camera.projectionMatrix );
 					velocity.setProjectionMatrix( unjittered );
@@ -403,21 +406,6 @@
 					velocity.setProjectionMatrix( null );
 
 				}
-
-			}
-
-			function halton( index, base ) {
-
-				let result = 0, f = 1;
-
-				for ( let i = index; i > 0; i = Math.floor( i / base ) ) {
-
-					f /= base;
-					result += f * ( i % base );
-
-				}
-
-				return result;
 
 			}
 
