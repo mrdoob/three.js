@@ -334,7 +334,7 @@ export function builtinReflectionContext( reflectionNode, node = null ) {
 
 			if ( material.transparent === true ) return radiance;
 
-			return radiance.mix( reflectionNode.rgb, reflectionNode.a );
+			return reflectionNode.a.mix( radiance, reflectionNode.rgb );
 
 		}
 
