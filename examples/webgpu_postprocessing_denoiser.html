@@ -1,0 +1,356 @@
+<html lang="en">
+	<head>
+		<title>three.js webgpu - postprocessing - denoiser</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Denoiser</span>
+			</div>
+
+			<small>Noisy samples of a known image, reconstructed by the denoiser in time and space.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { Fn, If, Loop, PI, abs, convertToTexture, cos, float, hash, int, mix, mrt, output, pass, renderOutput, sample, screenCoordinate, screenSize, screenUV, sin, sqrt, step, texture, uint, uniform, vec2, vec3, vec4, velocity } from 'three/tsl';
+
+			import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
+			import { R4_STEPS, hierarchicalHashedWeyl } from 'three/addons/tsl/utils/HierarchicalHashedWeyl.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			const params = {
+				source: 'Memorial',
+				output: 'Reference',
+				intensity: 20,
+				noise: 'Hierarchical Hashed Weyl',
+				sampling: 'Coverage',
+				samples: 1,
+				sparsity: 0.5,
+				blurRadius: 0,
+				roughness: 0.3,
+				hitDistance: 0.5,
+				spatialPasses: 2,
+				denoise: { luminancePhi: 3, maxFrames: 8, historyDeviation: 0, fireflyClamp: 0, toneMappedWeights: 0 }
+			};
+
+			let renderer, camera, plane, pipeline, denoiseNode, reference, noisy;
+
+			const index = uniform( 0, 'uint' );
+			const noiseType = uniform( 0 );
+			const sampling = uniform( 0, 'int' );
+			const samples = uniform( params.samples, 'int' );
+			const sparsity = uniform( params.sparsity );
+			const blurRadius = uniform( params.blurRadius );
+			const roughness = uniform( params.roughness );
+			const hitDistance = uniform( params.hitDistance );
+
+			// the same image in each half of the screen: the reconstruction on the left, the chosen output on the right
+
+			const panelSize = vec2( screenSize.x.mul( 0.5 ), screenSize.y );
+			const panelUV = vec2( screenUV.x.mul( 2 ).fract(), screenUV.y );
+
+			// the source at an offset in pixels, fit into the panel at its own aspect ratio, black outside
+
+			const fit = uniform( new THREE.Vector2( 1, 1 ) );
+
+			const sourceAt = ( offset ) => {
+
+				const uv = panelUV.add( offset.div( panelSize ) ).sub( 0.5 ).mul( fit ).add( 0.5 ).toVar();
+				const inside = uv.greaterThanEqual( vec2( 0 ) ).all().and( uv.lessThanEqual( vec2( 1 ) ).all() );
+
+				return inside.select( source.sample( uv ).rgb, vec3( 0 ) );
+
+			};
+
+			// procedural sources: the radiance of each pixel, `intensity` for the highlights
+
+			const procedural = {
+
+				// a dark and a bright half, with highlight discs of growing radius on both
+				Highlights: ( x, y, width, height ) => {
+
+					let value = x < width / 2 ? 0.02 : 0.5;
+
+					[ 1, 2, 3, 5, 8 ].forEach( ( radius, i ) => {
+
+						const cy = height * ( i + 1 ) / 6;
+
+						for ( const cx of [ width / 4, width * 3 / 4 ] ) {
+
+							if ( ( x - cx ) ** 2 + ( y - cy ) ** 2 <= radius * radius ) value = params.intensity;
+
+						}
+
+					} );
+
+					return value;
+
+				},
+
+				// a lit sphere with a highlight over a dark gradient
+				Sphere: ( x, y, width, height ) => {
+
+					const r = height * 0.35;
+					const px = ( x - width / 2 ) / r, py = ( y - height / 2 ) / r;
+					const z2 = 1 - px * px - py * py;
+
+					if ( z2 < 0 ) return 0.02 * x / width;
+					if ( Math.hypot( px + 0.3, py - 0.35 ) < 0.08 ) return params.intensity;
+
+					const diffuse = ( - 0.5 * px + 0.6 * py + 0.6 * Math.sqrt( z2 ) ) / Math.hypot( 0.5, 0.6, 0.6 );
+					return Math.max( 0, diffuse ) * 0.5 + 0.01;
+
+				}
+
+			};
+
+			const images = { Memorial: 'textures/memorial.hdr', Quarry: 'textures/equirectangular/quarry_01_1k.hdr', 'Venice Sunset': 'textures/equirectangular/venice_sunset_1k.hdr' };
+			const imageTextures = {};
+
+			const proceduralTexture = new THREE.DataTexture( new Float32Array( 4 ), 1, 1, THREE.RGBAFormat, THREE.FloatType );
+			const source = texture( proceduralTexture );
+
+			init();
+
+			async function init() {
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				renderer.toneMapping = THREE.AgXToneMapping;
+				document.body.appendChild( renderer.domElement );
+
+				const loader = new HDRLoader();
+
+				for ( const name in images ) {
+
+					imageTextures[ name ] = await loader.loadAsync( images[ name ] );
+					imageTextures[ name ].minFilter = imageTextures[ name ].magFilter = THREE.LinearFilter;
+
+				}
+
+				// a plane that fills the view gives the denoiser its depth and velocity
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera.position.z = 1;
+
+				const scene = new THREE.Scene();
+				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicNodeMaterial() );
+				scene.add( plane );
+
+				const scenePass = pass( scene, camera );
+				scenePass.setMRT( mrt( { output, velocity } ) );
+
+				// the reference is the mean of the samples: the source, averaged over the blur disc
+
+				reference = Fn( () => {
+
+					const sum = vec4( 0 ).toVar();
+					const r = int( blurRadius.floor() );
+
+					Loop( { start: r.negate(), end: r, condition: '<=', name: 'y' }, { start: r.negate(), end: r, condition: '<=', name: 'x' }, ( { x, y } ) => {
+
+						If( float( x.mul( x ).add( y.mul( y ) ) ).lessThanEqual( blurRadius.mul( blurRadius ) ), () => {
+
+							sum.addAssign( vec4( sourceAt( vec2( x, y ) ), 1 ) );
+
+						} );
+
+					} );
+
+					return sum.rgb.div( sum.a );
+
+				} )();
+
+				// each sample reads the source at a random point of the blur disc ( like the lobe of a rough reflection ). It
+				// misses with the probability `sparsity`. Coverage: a miss has no data ( coverage in alpha, like SSR ). Sparse:
+				// a miss is black, and hits are scaled to keep the mean. Uniform: no misses, a continuous weight instead
+
+				noisy = Fn( () => {
+
+					const sum = vec3( 0 ).toVar();
+					const coverage = float( 0 ).toVar();
+
+					Loop( samples, ( { i } ) => {
+
+						const sampleIndex = index.mul( 16 ).add( uint( i ) );
+						const white = ( k ) => hash( uint( screenCoordinate.x ).add( uint( screenCoordinate.y ).mul( 4096 ) ).add( sampleIndex.mul( 16777259 ) ).add( k * 7919 ) );
+						const noise = ( k ) => mix( hierarchicalHashedWeyl( screenCoordinate, sampleIndex, k + 1, R4_STEPS[ k ] ), white( k ), noiseType );
+
+						const angle = noise( 0 ).mul( PI.mul( 2 ) );
+						const offset = vec2( cos( angle ), sin( angle ) ).mul( sqrt( noise( 1 ) ).mul( blurRadius ) );
+						const value = sourceAt( offset );
+
+						const u = noise( 2 );
+						const hit = step( sparsity, u );
+						const weight = sampling.equal( 0 ).select( hit, sampling.equal( 1 ).select( hit.div( sparsity.oneMinus() ), u.mul( 2 ) ) );
+
+						sum.addAssign( value.mul( weight ) );
+						coverage.addAssign( sampling.equal( 0 ).select( hit, 1 ) );
+
+					} );
+
+					return vec4( sum.div( coverage.max( 1e-6 ) ), coverage.div( float( samples ) ) );
+
+				} )();
+
+				denoiseNode = temporalDenoise( convertToTexture( noisy ), {
+					depth: scenePass.getTextureNode( 'depth' ),
+					camera,
+					velocity: scenePass.getTextureNode( 'velocity' ),
+					roughness: sample( () => roughness ),
+					hitDistance: sample( () => hitDistance ),
+					coverage: true
+				} );
+
+				pipeline = new THREE.RenderPipeline( renderer );
+				pipeline.outputColorTransform = false;
+
+				const gui = renderer.inspector.createParameters( 'Source' );
+				gui.add( params, 'source', [ ...Object.keys( procedural ), ...Object.keys( images ) ] ).onChange( updateSource );
+				gui.add( params, 'output', [ 'Reference', 'Noisy' ] ).name( 'right side' ).onChange( updateOutput );
+				gui.add( params, 'intensity', 0, 100 ).name( 'highlight intensity' ).onChange( updateSource );
+
+				const samplingGui = renderer.inspector.createParameters( 'Sampling' );
+				samplingGui.add( params, 'noise', [ 'Hierarchical Hashed Weyl', 'White' ] ).onChange( applyParams );
+				samplingGui.add( params, 'sampling', [ 'Coverage', 'Sparse', 'Uniform' ] ).onChange( applyParams );
+				samplingGui.add( params, 'samples', 1, 16, 1 ).name( 'samples per pixel' ).onChange( applyParams );
+				samplingGui.add( params, 'sparsity', 0, 0.99 ).onChange( applyParams );
+				samplingGui.add( params, 'blurRadius', 0, 12 ).name( 'blur radius' ).onChange( applyParams );
+
+				const denoiseGui = renderer.inspector.createParameters( 'Denoiser' );
+				denoiseGui.add( params, 'roughness', 0, 1 ).onChange( applyParams );
+				denoiseGui.add( params, 'hitDistance', 0, 2 ).name( 'hit distance' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'luminancePhi', 0, 10 ).name( 'luminance phi' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'maxFrames', 1, 64, 1 ).name( 'max frames' ).onChange( applyParams );
+				denoiseGui.add( params, 'spatialPasses', 1, 3, 1 ).name( 'spatial passes' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'historyDeviation', 0, 1 ).name( 'history deviation' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'fireflyClamp', 0, 8 ).name( 'firefly clamp' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'toneMappedWeights', 0, 1 ).name( 'tone mapped weights' ).onChange( applyParams );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				onWindowResize();
+				applyParams();
+				updateOutput();
+
+			}
+
+			function applyParams() {
+
+				noiseType.value = params.noise === 'White' ? 1 : 0;
+				sampling.value = [ 'Coverage', 'Sparse', 'Uniform' ].indexOf( params.sampling );
+				samples.value = params.samples;
+				sparsity.value = params.sparsity;
+				blurRadius.value = params.blurRadius;
+				roughness.value = params.roughness;
+				hitDistance.value = params.hitDistance;
+
+				denoiseNode.iterations = params.spatialPasses;
+				for ( const key in params.denoise ) denoiseNode[ key ].value = params.denoise[ key ];
+
+				denoiseNode.reset();
+
+			}
+
+			function updateOutput() {
+
+				const views = { Noisy: noisy.rgb.mul( noisy.a ), Reference: reference };
+
+				let color = mix( denoiseNode.getTextureNode().rgb, views[ params.output ], step( 0.5, screenUV.x ) );
+				color = abs( screenCoordinate.x.sub( screenSize.x.mul( 0.5 ) ) ).lessThan( 1 ).select( vec3( 1, 0.3, 0.1 ), color );
+
+				pipeline.outputNode = renderOutput( vec4( color, 1 ) );
+				pipeline.needsUpdate = true;
+
+			}
+
+			function updateSource() {
+
+				if ( images[ params.source ] !== undefined ) {
+
+					const { width, height } = imageTextures[ params.source ].image;
+					const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+					const panelAspect = size.x / 2 / size.y, imageAspect = width / height;
+
+					// negative y: the rows of the HDR images are stored top-down
+					fit.value.set( Math.max( panelAspect / imageAspect, 1 ), - Math.max( imageAspect / panelAspect, 1 ) );
+					source.value = imageTextures[ params.source ];
+
+				} else {
+
+					// one texel per pixel of a half of the screen
+
+					const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+					const width = Math.ceil( size.x / 2 ), height = size.y;
+					const data = new Float32Array( width * height * 4 );
+
+					for ( let y = 0; y < height; y ++ ) {
+
+						for ( let x = 0; x < width; x ++ ) {
+
+							const value = procedural[ params.source ]( x + 0.5, y + 0.5, width, height );
+							data.set( [ value, value, value, 1 ], ( y * width + x ) * 4 );
+
+						}
+
+					}
+
+					proceduralTexture.image = { data, width, height };
+					proceduralTexture.needsUpdate = true;
+					fit.value.set( 1, 1 );
+					source.value = proceduralTexture;
+
+				}
+
+				denoiseNode.reset();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				const height = 2 * Math.tan( THREE.MathUtils.degToRad( camera.fov / 2 ) );
+				plane.scale.set( height * camera.aspect, height, 1 );
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				updateSource();
+
+			}
+
+			function animate() {
+
+				if ( pipeline === undefined ) return;
+
+				index.value ++;
+				pipeline.render();
+
+			}
+
+		</script>
+
+	</body>
+</html>

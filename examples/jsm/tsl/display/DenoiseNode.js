@@ -256,6 +256,31 @@ class DenoiseNode extends Node {
 		this.maxFrames = uniform( 8 );
 
 		/**
+		 * Temporal: how much the edge stop follows the noise of the accumulated history, the noise of a frame over the
+		 * square root of the history length, instead of the noise of a frame. At 1, the edge stop tightens as the history
+		 * converges, so that details sharpen over time instead of staying blurred.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.historyDeviation = uniform( 0 );
+
+		/**
+		 * Temporal: above 0, the luminance of each input texel is clamped to this multiple of the brightest of its 8
+		 * neighbors before it is accumulated, so that isolated bright samples ( fireflies ) do not spread. 0 disables it.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.fireflyClamp = uniform( 0 );
+
+		/**
+		 * How much the filter weights each tap by `1 / ( 1 + luminance )`, so that bright taps spread less into dark
+		 * neighbors. Biased toward darker values.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.toneMappedWeights = uniform( 0 );
+
+		/**
 		 * Whether the node filters every frame in which it is used. Otherwise it filters once when
 		 * {@link DenoiseNode#textureNeedsUpdate} is set, e.g. when a light map is baked.
 		 *
@@ -871,13 +896,30 @@ class DenoiseNode extends Node {
 
 			const m1 = float( 0 ).toVar();
 			const m2 = float( 0 ).toVar();
-			const currentMin = current.toVar();
-			const currentMax = current.toVar();
+			const currentMin = vec4( 1e9 ).toVar();
+			const currentMax = vec4( - 1e9 ).toVar();
+			const neighborMax = float( 0 ).toVar();
 
 			for ( const [ dx, dy ] of [[ 1, 0 ], [ - 1, 0 ], [ 0, 1 ], [ 0, - 1 ], [ 1, 1 ], [ - 1, - 1 ], [ 1, - 1 ], [ - 1, 1 ], [ 0, 0 ]] ) {
 
+				if ( dx === 0 && dy === 0 ) {
+
+					// fireflies: the center, last, no brighter than a multiple of its brightest neighbor
+
+					If( this.fireflyClamp.greaterThan( 0 ), () => {
+
+						const limit = neighborMax.mul( this.fireflyClamp );
+						current.rgb.mulAssign( limit.div( luminance( current.rgb ).max( 1e-6 ) ).min( 1 ) );
+						result.assign( current );
+						fast.assign( current.rgb );
+
+					} );
+
+				}
+
 				const n = ( dx === 0 && dy === 0 ) ? current : load( coord.add( ivec2( dx, dy ) ).clamp( ivec2( 0 ), ivec2( size ).sub( 1 ) ) ).toVar();
 				const l = luminance( n.rgb );
+				if ( dx !== 0 || dy !== 0 ) neighborMax.assign( neighborMax.max( l ) );
 				m1.addAssign( l );
 				m2.addAssign( l.mul( l ) );
 				currentMin.assign( currentMin.min( n ) );
@@ -1019,7 +1061,8 @@ class DenoiseNode extends Node {
 			// without alpha, the color is the input of the filter: the standard deviation of its noise in alpha, -1
 			// without data. With alpha, the fast history has it, for the first pass of the 'fast' preset
 
-			if ( ! alpha ) result.a.assign( surface.w.greaterThan( 0 ).select( sqrt( frameVariance ), - 1 ) );
+			const historyScale = mix( 1, historyLength.max( 1 ), this.historyDeviation );
+			if ( ! alpha ) result.a.assign( surface.w.greaterThan( 0 ).select( sqrt( frameVariance.div( historyScale ) ), - 1 ) );
 
 			return [ result, vec4( fast, this._direct ? frameVariance : variance ), ...this._packGuides( guides, surface.w.greaterThan( 0 ).select( historyLength, 0 ), hitFactor ) ];
 
@@ -1261,7 +1304,8 @@ class DenoiseNode extends Node {
 			const rays = this.positionNode === null ? this._rays( coord ) : null;
 			const centerTexel = this._texelAt( coord, rays );
 			const surface = centerTexel.surface.toVar();
-			const center = direct ? vec4( loaded.rgb, surface.w.greaterThan( 0 ).select( sqrt( this._currentFast.load( coord ).w.max( 0 ) ), - 1 ) ).toVar() : loaded;
+			const historyScale = direct ? mix( 1, this._lengthAt( coord ).max( 1 ), this.historyDeviation ) : null;
+			const center = direct ? vec4( loaded.rgb, surface.w.greaterThan( 0 ).select( sqrt( this._currentFast.load( coord ).w.max( 0 ).div( historyScale ) ), - 1 ) ).toVar() : loaded;
 			const centerAlpha = alpha ? ( direct ? vec4( loaded.a, 0, 0, 0 ) : inputAlpha.load( coord ) ).toVar() : null;
 			const result = center.toVar();
 			const resultAlpha = alpha ? centerAlpha.toVar() : null;
@@ -1377,7 +1421,8 @@ class DenoiseNode extends Node {
 
 							}
 
-							const weight = similarity.mul( exp( exponent.negate() ) ).mul( kernelWeight ).toVar();
+							const toneMap = mix( 1, float( 1 ).div( luminance( value.rgb ).add( 1 ) ), this.toneMappedWeights );
+							const weight = similarity.mul( exp( exponent.negate() ) ).mul( kernelWeight ).mul( toneMap ).toVar();
 							const deviation2 = weight.pow2().mul( value.a.pow2() ).toVar();
 
 							moments.addAssign( vec3( weight, weight.mul( fx ), weight.mul( fy ) ) );
