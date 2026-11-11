@@ -31,7 +31,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { diffuseColor, fract, passTexture, materialMetalness, materialRoughness, mix, mrt, normalView, output, packNormalToRGB, pass, positionWorld, property, renderOutput, sample, step, texture, uniform, unpackRGBToNormal, vec3, vec4, velocity } from 'three/tsl';
+			import { builtinReflectionContext, diffuseColor, fract, passTexture, materialMetalness, materialRoughness, mix, mrt, normalView, output, packNormalToRGB, pass, positionWorld, renderOutput, sample, screenUV, step, texture, uniform, unpackRGBToNormal, vec3, vec4, velocity } from 'three/tsl';
 
 			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 			import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
@@ -39,24 +39,6 @@
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
-
-			// the env map specular of the PBR materials goes to its own MRT target, to fill in where SSR has no coverage
-
-			const envSpecular = property( 'vec3', 'EnvSpecular', vec3( 0 ) );
-
-			const _indirectSpecular = THREE.PhysicalLightingModel.prototype.indirectSpecular;
-			THREE.PhysicalLightingModel.prototype.indirectSpecular = function ( builder ) {
-
-				const { reflectedLight } = builder.context;
-
-				if ( this.clearcoatRadiance ) this.clearcoatRadiance.assign( vec3( 0 ) );
-
-				envSpecular.assign( vec3( 0 ) );
-				builder.context.reflectedLight = { ...reflectedLight, indirectSpecular: envSpecular };
-				_indirectSpecular.call( this, builder );
-				builder.context.reflectedLight = reflectedLight;
-
-			};
 
 			const params = {
 				rayReuse: new URLSearchParams( location.search ).get( 'rayReuse' ) !== '0',
@@ -145,8 +127,7 @@
 
 			async function init() {
 
-				// five render targets need 40 bytes per sample, above the default limit of 32
-				renderer = new THREE.WebGPURenderer( { requiredLimits: { maxColorAttachmentBytesPerSample: 40 } } );
+				renderer = new THREE.WebGPURenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.inspector = new Inspector();
 				renderer.toneMapping = THREE.AgXToneMapping;
@@ -194,12 +175,12 @@
 				light.position.set( 0, 3, 4 );
 				scene.add( light );
 
-				// G-buffer: the beauty without env specular, the env specular, albedo and metalness, normal and roughness
+				// G-buffer: the lit scene without SSR ( which SSR traces, in the current frame so that no
+				// feedback of earlier frames enters the reference ), albedo and metalness, normal and roughness
 
 				scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
 					output,
-					envSpecular: vec4( envSpecular, 1 ),
 					diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
 					normal: vec4( packNormalToRGB( normalView ).rgb, materialRoughness ),
 					velocity
@@ -210,7 +191,6 @@
 				const depth = scenePass.getTextureNode( 'depth' );
 				const motion = scenePass.getTextureNode( 'velocity' );
 				const albedo = scenePass.getTextureNode( 'diffuseColor' );
-				const environment = scenePass.getTextureNode( 'envSpecular' );
 
 				scenePass.getTexture( 'normal' ).type = THREE.UnsignedByteType;
 				scenePass.getTexture( 'diffuseColor' ).type = THREE.UnsignedByteType;
@@ -222,7 +202,9 @@
 					diffuseNode: albedo,
 					metalnessNode: albedo.a,
 					roughnessNode: normal.a,
-					rayReuse: params.rayReuse
+					rayReuse: params.rayReuse,
+					// the radiance of the reflections, without the BRDF: the materials apply theirs
+					applyBRDF: false
 				} );
 
 				raw = ssrNode.getTextureNode();
@@ -239,7 +221,13 @@
 				} );
 
 				reflection = mix( raw, denoiseNode.getTextureNode(), denoiseEnabled );
-				combined = color.rgb.add( mix( environment.rgb, reflection.rgb, reflection.a ) );
+
+				// the beauty: the materials take the reflections into their specular BRDF, in place of the environment
+				// where SSR has coverage
+
+				const beautyPass = pass( scene, camera );
+				beautyPass.contextNode = builtinReflectionContext( mix( raw.sample( screenUV ), denoiseNode.getTextureNode().sample( screenUV ), denoiseEnabled ) );
+				combined = beautyPass.getTextureNode().rgb;
 
 				accumulateNode = new AccumulateNode( raw );
 
