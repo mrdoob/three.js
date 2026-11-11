@@ -151,7 +151,9 @@
 				lobeLuminanceRelax: 0,
 				historyRadius: 0,
 				clampSigma: 0,
-				historyCatmullRom: 0
+				historyCatmullRom: 0,
+				antilagSigma: 4.5,
+				antilagReset: 0.5
 			},
 
 			post: {
@@ -439,6 +441,8 @@
 			denoiseGui.add( params.denoise, 'historyRadius', 0, 1 ).name( 'history radius' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'clampSigma', 0, 4 ).name( 'clamp sigma' ).onChange( applyParams );
 			denoiseGui.add( params.denoise, 'historyCatmullRom', 0, 1, 1 ).name( 'catmull-rom history' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'antilagSigma', 0, 8 ).name( 'anti-lag sigma' ).onChange( applyParams );
+			denoiseGui.add( params.denoise, 'antilagReset', 0, 1 ).name( 'anti-lag reset' ).onChange( applyParams );
 
 			// Concise UI for Directional Light controls
 			const lightGui = renderer.inspector.createParameters( 'Light' ).close();
@@ -481,7 +485,7 @@
 				denoiseNode.maxFrames.value = params.denoise.maxFrames;
 				denoiseNode.iterations = params.denoise.spatialPasses;
 
-				for ( const key of [ 'historyDeviation', 'fireflyClamp', 'toneMappedWeights', 'lobeLuminanceRelax', 'historyRadius', 'clampSigma', 'historyCatmullRom' ] ) denoiseNode[ key ].value = params.denoise[ key ];
+				for ( const key of [ 'historyDeviation', 'fireflyClamp', 'toneMappedWeights', 'lobeLuminanceRelax', 'historyRadius', 'clampSigma', 'historyCatmullRom', 'antilagSigma', 'antilagReset' ] ) denoiseNode[ key ].value = params.denoise[ key ];
 
 			}
 

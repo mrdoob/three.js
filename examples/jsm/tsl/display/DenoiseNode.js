@@ -319,6 +319,23 @@ class DenoiseNode extends Node {
 		this.historyCatmullRom = uniform( 0 );
 
 		/**
+		 * Temporal: the anti-lag drops the history where it differs from the fast history by more than the range of the
+		 * fast history plus this many standard deviations of the 3x3 neighborhood, and half a standard deviation of the
+		 * temporal noise ( 4.5, as in ReLAX ). At 0, a history that moves by a fraction of a texel, e.g. with the jitter of
+		 * TRAA or a moving camera, is dropped for rare bright samples, which then dominate and brighten highlights.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.antilagSigma = uniform( 4.5 );
+
+		/**
+		 * Temporal: the share of the history the anti-lag drops, 1 for all of it ( 0.5, as in ReLAX ).
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.antilagReset = uniform( 0.5 );
+
+		/**
 		 * Whether the node filters every frame in which it is used. Otherwise it filters once when
 		 * {@link DenoiseNode#textureNeedsUpdate} is set, e.g. when a light map is baked.
 		 *
@@ -999,6 +1016,10 @@ class DenoiseNode extends Node {
 
 			if ( coverage ) fast.assign( radiance( current ) );
 
+			// ReLAX's anti-lag threshold: standard deviations of the neighborhood and of the temporal noise
+			const spatialSigma = sqrt( max( m2.sub( m1.mul( m1 ) ), 0 ) ).toVar();
+			const relaxSpread = ( temporalVariance ) => this.antilagSigma.greaterThan( 0 ).select( spatialSigma.mul( this.antilagSigma ).add( sqrt( temporalVariance.max( 0 ) ).mul( 0.5 ) ), 0 );
+
 			If( surface.w.greaterThan( 0 ).and( this._historyValid ), () => {
 
 				// the current surface in the previous view
@@ -1114,6 +1135,7 @@ class DenoiseNode extends Node {
 
 						// variance clipping: the standard deviation of the noise of a frame, scaled
 						const sigma = sqrt( previousFast.w.max( 0 ) ).mul( this.clampSigma ).toVar();
+						const relaxSigma = relaxSpread( previousFast.w );
 						const clipping = this.clampSigma.greaterThan( 0 );
 
 						fast.assign( previousFast.rgb );
@@ -1122,9 +1144,9 @@ class DenoiseNode extends Node {
 
 							fast.assign( mix( currentRadiance, previousFast.rgb.clamp( coveredMin.sub( range ).sub( sigma ), coveredMax.add( range ).add( sigma ) ), fastAge.sub( 1 ).div( fastAge ) ) );
 
-							const spread = fastMax.sub( fastMin ).max( range ).max( fast.mul( 0.05 ) ).max( vec3( sigma ) ).add( 1e-3 );
+							const spread = fastMax.sub( fastMin ).max( range ).max( fast.mul( 0.05 ) ).max( vec3( sigma ) ).add( relaxSigma ).add( 1e-3 );
 							const excess = previousRadiance.sub( fast ).abs().div( spread );
-							const lag = max( excess.x, excess.y, excess.z ).smoothstep( 1, 2 );
+							const lag = max( excess.x, excess.y, excess.z ).smoothstep( 1, 2 ).mul( this.antilagReset );
 
 							age.assign( mix( age, 1, lag ) );
 							a.assign( float( 1 ).div( age ) );
@@ -1154,9 +1176,9 @@ class DenoiseNode extends Node {
 					const range = currentMax.rgb.sub( currentMin.rgb );
 					fast.assign( mix( current.rgb, previousFast.rgb.clamp( currentMin.rgb.sub( range ), currentMax.rgb.add( range ) ), fastAge.sub( 1 ).div( fastAge ) ) );
 
-					const spread = fastMax.sub( fastMin ).max( range ).max( fast.mul( 0.05 ) ).add( 1e-3 );
+					const spread = fastMax.sub( fastMin ).max( range ).max( fast.mul( 0.05 ) ).add( relaxSpread( previousFast.w ) ).add( 1e-3 );
 					const excess = previousColor.rgb.sub( fast ).abs().div( spread );
-					const lag = max( excess.x, excess.y, excess.z ).smoothstep( 1, 2 ).toVar();
+					const lag = max( excess.x, excess.y, excess.z ).smoothstep( 1, 2 ).mul( this.antilagReset ).toVar();
 
 					age.assign( mix( age, 1, lag ) );
 					fast.assign( mix( fast, current.rgb, lag ) );

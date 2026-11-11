@@ -70,7 +70,7 @@
 				ssr: { quality: 0.5, mirrorBias: 0, maxRoughness: 1, reuseRadius: 3 },
 				denoise: {
 					enabled: true, luminancePhi: 3, maxFrames: 8, spatialPasses: 2, historyDeviation: 0, fireflyClamp: 0,
-					toneMappedWeights: 0, lobeLuminanceRelax: 0, historyRadius: 0, clampSigma: 0, historyCatmullRom: 0
+					toneMappedWeights: 0, lobeLuminanceRelax: 0, historyRadius: 0, clampSigma: 0, historyCatmullRom: 0, antilagSigma: 4.5, antilagReset: 0.5
 				}
 			};
 
@@ -279,6 +279,8 @@
 				denoiseGui.add( params.denoise, 'historyRadius', 0, 1 ).name( 'history radius' ).onChange( applyParams );
 				denoiseGui.add( params.denoise, 'clampSigma', 0, 4 ).name( 'clamp sigma' ).onChange( applyParams );
 				denoiseGui.add( params.denoise, 'historyCatmullRom', 0, 1, 1 ).name( 'catmull-rom history' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'antilagSigma', 0, 8 ).name( 'anti-lag sigma' ).onChange( applyParams );
+				denoiseGui.add( params.denoise, 'antilagReset', 0, 1 ).name( 'anti-lag reset' ).onChange( applyParams );
 
 				window.addEventListener( 'resize', onWindowResize );
 
