@@ -52,7 +52,7 @@
 				ssr: { quality: 0.5, maxDistance: 1, binaryRefine: false, mirrorBias: 0.5, maxRoughness: 1, reuseRadius: 16 },
 				denoise: {
 					enabled: true, luminancePhi: 3, maxFrames: 20, spatialPasses: 2, historyDeviation: 0, fireflyClamp: 0,
-					toneMappedWeights: 0, lobeLuminanceRelax: 0, historyRadius: 0, clampSigma: 0, historyCatmullRom: 0, antilagSigma: 0, antilagReset: 0
+					lobeLuminanceRelax: 0, historyRadius: 0, clampSigma: 0, historyCatmullRom: 0, antilagSigma: 0, antilagReset: 0
 				}
 			};
 
@@ -264,7 +264,6 @@
 				denoiseGui.add( params.denoise, 'spatialPasses', 1, 3, 1 ).name( 'spatial passes' ).onChange( applyParams );
 				denoiseGui.add( params.denoise, 'historyDeviation', 0, 1 ).name( 'history deviation' ).onChange( applyParams );
 				denoiseGui.add( params.denoise, 'fireflyClamp', 0, 8 ).name( 'firefly clamp' ).onChange( applyParams );
-				denoiseGui.add( params.denoise, 'toneMappedWeights', 0, 1 ).name( 'tone mapped weights' ).onChange( applyParams );
 				denoiseGui.add( params.denoise, 'lobeLuminanceRelax', 0, 1 ).name( 'lobe luminance relax' ).onChange( applyParams );
 				denoiseGui.add( params.denoise, 'historyRadius', 0, 1 ).name( 'history radius' ).onChange( applyParams );
 				denoiseGui.add( params.denoise, 'clampSigma', 0, 4 ).name( 'clamp sigma' ).onChange( applyParams );

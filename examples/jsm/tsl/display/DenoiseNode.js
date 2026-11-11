@@ -274,14 +274,6 @@ class DenoiseNode extends Node {
 		this.fireflyClamp = uniform( 0 );
 
 		/**
-		 * How much the filter weights each tap by `1 / ( 1 + luminance )`, so that bright taps spread less into dark
-		 * neighbors. Biased toward darker values.
-		 *
-		 * @type {UniformNode<float>}
-		 */
-		this.toneMappedWeights = uniform( 0 );
-
-		/**
 		 * Reflections: how much the luminance edge stop relaxes on glossy and rough surfaces ( fully from a roughness of
 		 * 0.25, none below 0.05 ), so that the filter blurs within the footprint of the reflection lobe and highlights
 		 * reconstruct as smooth gradients instead of hard dots. At 1, the lobe footprint, the normals and the hit distances
@@ -1576,8 +1568,7 @@ class DenoiseNode extends Node {
 
 							}
 
-							const toneMap = mix( 1, float( 1 ).div( luminance( value.rgb ).add( 1 ) ), this.toneMappedWeights );
-							const weight = similarity.mul( exp( exponent.negate() ) ).mul( kernelWeight ).mul( toneMap ).toVar();
+							const weight = similarity.mul( exp( exponent.negate() ) ).mul( kernelWeight ).toVar();
 							const deviation2 = weight.pow2().mul( value.a.pow2() ).toVar();
 
 							moments.addAssign( vec3( weight, weight.mul( fx ), weight.mul( fy ) ) );
