@@ -371,9 +371,19 @@ class RenderTarget extends EventDispatcher {
 
 			for ( let i = 0, il = this.textures.length; i < il; i ++ ) {
 
-				this.textures[ i ].image.width = width;
-				this.textures[ i ].image.height = height;
-				this.textures[ i ].image.depth = depth;
+				const image = this.textures[ i ].image;
+
+				// cube textures hold one image per face
+
+				const images = Array.isArray( image ) ? image : [ image ];
+
+				for ( let j = 0, jl = images.length; j < jl; j ++ ) {
+
+					images[ j ].width = width;
+					images[ j ].height = height;
+					images[ j ].depth = depth;
+
+				}
 
 				if ( this.textures[ i ].isData3DTexture !== true ) { // Fix for #31693
 
@@ -381,7 +391,7 @@ class RenderTarget extends EventDispatcher {
 					// Maybe a method `isArrayTexture()` or just a getter could replace a flag since
 					// both are evaluated on each call?
 
-					this.textures[ i ].isArrayTexture = this.textures[ i ].image.depth > 1;
+					this.textures[ i ].isArrayTexture = depth > 1;
 
 				}
 

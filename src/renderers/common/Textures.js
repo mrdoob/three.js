@@ -180,13 +180,19 @@ class Textures extends DataMap {
 
 		if ( depthTexture && depthTexture.renderTarget === renderTarget ) {
 
-			const image = depthTexture.image;
+			// cube depth textures hold one image per face
 
-			if ( textureNeedsUpdate === true || image.width !== mipWidth || image.height !== mipHeight ) {
+			const images = Array.isArray( depthTexture.image ) ? depthTexture.image : [ depthTexture.image ];
 
-				image.width = mipWidth;
-				image.height = mipHeight;
-				image.depth = useArrayDepth ? size.depth : 1;
+			if ( textureNeedsUpdate === true || images[ 0 ].width !== mipWidth || images[ 0 ].height !== mipHeight ) {
+
+				for ( const image of images ) {
+
+					image.width = mipWidth;
+					image.height = mipHeight;
+					image.depth = useArrayDepth ? size.depth : 1;
+
+				}
 
 				depthTexture.needsUpdate = true;
 
