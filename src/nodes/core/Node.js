@@ -7,7 +7,10 @@ import { warn, error } from '../../utils.js';
 
 import StackTrace from './StackTrace.js';
 
-const _propertyHashes = new Map();
+const _parentBuildStage = {
+	analyze: 'setup',
+	generate: 'analyze'
+};
 
 let _nodeId = 0;
 
@@ -715,17 +718,7 @@ class Node extends EventDispatcher {
 
 			for ( const { property, childNode } of this._getChildren( ignores ) ) {
 
-				let propertyHash = _propertyHashes.get( property );
-
-				if ( propertyHash === undefined ) {
-
-					propertyHash = hashString( property.slice( 0, - 4 ) );
-
-					_propertyHashes.set( property, propertyHash );
-
-				}
-
-				values.push( propertyHash, childNode.getCacheKey( force, ignores ) );
+				values.push( hashString( property.slice( 0, - 4 ) ), childNode.getCacheKey( force, ignores ) );
 
 			}
 
@@ -920,10 +913,6 @@ class Node extends EventDispatcher {
 	 */
 	getShared( builder ) {
 
-		// nodes with the default hash are never registered, see NodeBuilder.addNode()
-
-		if ( this.getHash === Node.prototype.getHash && ! builder.context.overrideNodes ) return this;
-
 		const hash = this.getHash( builder );
 		const nodeFromHash = builder.getNodeFromHash( hash );
 
@@ -1034,9 +1023,7 @@ class Node extends EventDispatcher {
 
 			const nodeProperties = builder.getNodeProperties( this );
 
-			for ( const property in nodeProperties ) {
-
-				const childNode = nodeProperties[ property ];
+			for ( const childNode of Object.values( nodeProperties ) ) {
 
 				if ( childNode && childNode.isNode === true ) {
 
@@ -1157,41 +1144,22 @@ class Node extends EventDispatcher {
 
 		if ( this.assignable === true && this._declaresAssignable() ) this._updateAssignable( builder, nodeData );
 
-		const buildStage = builder.getBuildStage();
+		nodeData.buildStages = nodeData.buildStages || { setup: false, analyze: false, generate: false };
+		nodeData.buildStages[ builder.buildStage ] = true;
 
-		// the finished build stages are tracked as bits: setup (1), analyze (2) and generate (4)
+		const parentBuildStage = _parentBuildStage[ builder.buildStage ];
 
-		const buildStages = nodeData.buildStages | 0;
-
-		let parentBuildStage = null;
-
-		if ( buildStage === 'setup' ) {
-
-			nodeData.buildStages = buildStages | 1;
-
-		} else if ( buildStage === 'analyze' ) {
-
-			nodeData.buildStages = buildStages | 2;
-
-			if ( ( buildStages & 1 ) === 0 ) parentBuildStage = 'setup';
-
-		} else if ( buildStage === 'generate' ) {
-
-			nodeData.buildStages = buildStages | 4;
-
-			if ( ( buildStages & 2 ) === 0 ) parentBuildStage = 'analyze';
-
-		}
-
-		if ( parentBuildStage !== null ) {
+		if ( parentBuildStage && nodeData.buildStages[ parentBuildStage ] !== true ) {
 
 			// force parent build stage (setup or analyze)
+
+			const previousBuildStage = builder.getBuildStage();
 
 			builder.setBuildStage( parentBuildStage );
 
 			this.build( builder );
 
-			builder.setBuildStage( buildStage );
+			builder.setBuildStage( previousBuildStage );
 
 		}
 
@@ -1205,6 +1173,8 @@ class Node extends EventDispatcher {
 			- "generate"	-> String
 		*/
 		let result = null;
+
+		const buildStage = builder.getBuildStage();
 
 		if ( buildStage === 'setup' ) {
 
@@ -1228,9 +1198,7 @@ class Node extends EventDispatcher {
 
 				}*/
 
-				for ( const property in properties ) {
-
-					const childNode = properties[ property ];
+				for ( const childNode of Object.values( properties ) ) {
 
 					if ( childNode && childNode.isNode === true ) {
 
