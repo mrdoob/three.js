@@ -59,7 +59,7 @@
 			};
 
 			const params = {
-				rayReuse: new URLSearchParams( location.search ).has( 'rayReuse' ),
+				rayReuse: new URLSearchParams( location.search ).get( 'rayReuse' ) !== '0',
 				output: 'Combined',
 				motion: 'Static',
 				traa: true,
@@ -67,7 +67,7 @@
 				highlightIntensity: 100,
 				environmentIntensity: 1,
 				resetOnChange: true,
-				ssr: { quality: 0.5, maxDistance: 1, binaryRefine: false, mirrorBias: 0, maxRoughness: 1, reuseRadius: 3 },
+				ssr: { quality: 0.5, maxDistance: 1, binaryRefine: false, mirrorBias: 0.5, maxRoughness: 1, reuseRadius: 3 },
 				denoise: {
 					enabled: true, luminancePhi: 3, maxFrames: 8, spatialPasses: 2, historyDeviation: 0, fireflyClamp: 0,
 					toneMappedWeights: 0, lobeLuminanceRelax: 0, historyRadius: 0, clampSigma: 0, historyCatmullRom: 0, antilagSigma: 4.5, antilagReset: 0.5
@@ -266,7 +266,7 @@
 				ssrGui.add( params.ssr, 'binaryRefine' ).name( 'binary refine' ).onChange( applyParams );
 				ssrGui.add( params.ssr, 'mirrorBias', 0, 1 ).name( 'mirror bias' ).onChange( applyParams );
 				ssrGui.add( params.ssr, 'maxRoughness', 0, 1 ).name( 'max roughness' ).onChange( applyParams );
-				ssrGui.add( params, 'rayReuse' ).name( 'ray reuse (reloads)' ).onChange( ( value ) => location.search = value ? '?rayReuse' : '' );
+				ssrGui.add( params, 'rayReuse' ).name( 'ray reuse (reloads)' ).onChange( ( value ) => location.search = value ? '' : '?rayReuse=0' );
 				ssrGui.add( params.ssr, 'reuseRadius', 0, 16 ).name( 'reuse radius' ).onChange( applyParams );
 
 				const denoiseGui = renderer.inspector.createParameters( 'Denoiser' );
