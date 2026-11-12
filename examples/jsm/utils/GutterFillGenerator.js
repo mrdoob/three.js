@@ -1,5 +1,5 @@
 import { HalfFloatType, NodeMaterial, QuadMesh, RendererUtils, RenderTarget, RGBAFormat, StorageTexture, Vector2 } from 'three/webgpu';
-import { Fn, If, float, globalId, ivec2, mix, screenCoordinate, storageTexture, texture, textureStore, uniform, uvec2, vec2, vec4 } from 'three/tsl';
+import { Fn, If, Return, float, globalId, ivec2, mix, screenCoordinate, storageTexture, texture, textureStore, uniform, uvec2, vec2, vec4 } from 'three/tsl';
 
 // the passes run in square workgroups of this many threads per side, one thread per texel
 const WORKGROUP_SIZE = 8;
@@ -17,8 +17,8 @@ let _rendererState;
  *
  * The coverage of the map is read from its alpha: texels with an alpha above zero are covered, e.g. in a
  * light map of {@link LightMapper} or a map stitched by {@link SeamStitchGenerator}. The fill is a push-pull
- * in a chain of levels: the map is halved down to one texel, averaging the covered texels, then, from the
- * coarsest level to the finest, the uncovered texels of each level are filled from the level below,
+ * in one chain of levels: the map is halved down to one texel, averaging the covered texels, then, from
+ * the coarsest level to the finest, the uncovered texels of each level are filled from the level below,
  * upsampled with filtering. The covered texels keep their values, the filled texels have an alpha of zero.
  *
  * Like {@link PMREMGenerator}, the generator can fill many maps, and the caller owns the results.
@@ -52,17 +52,19 @@ class GutterFillGenerator {
 		 */
 		this.renderer = renderer;
 
-		// the levels below the map, counted from the coarsest one, the same for every map: a map twice the size
-		// only adds a level on top. Each level has its texture and passes, created as the maps need them
+		// the levels below the map, counted from the coarsest one so that maps of all sizes share them: a map twice
+		// the size only adds a level on top. Each level has its texture, and its passes once a map needs them
 
+		this._width = 0;
+		this._height = 0;
 		this._levels = [];
 		this._passes = [];
 
-		this._map = texture();
-		this._mapSize = uniform( new Vector2() );
-		this._top = texture();
+		this._source = texture();
+		this._sourceSize = uniform( new Vector2() );
+		this._firstLevel = texture();
 
-		this._fill = createFillMaterial( this._map, this._top, this._mapSize );
+		this._fill = createFillMaterial( this._source, this._firstLevel, this._sourceSize );
 
 	}
 
@@ -79,63 +81,32 @@ class GutterFillGenerator {
 		const renderer = this.renderer;
 		const { width, height } = source.image;
 
-		if ( renderTarget === null ) renderTarget = new RenderTarget( width, height, { type: HalfFloatType, depthBuffer: false } );
+		this._setSize( width, height );
 
-		renderTarget.setSize( width, height );
+		if ( renderTarget === null ) {
+
+			renderTarget = new RenderTarget( width, height, { type: HalfFloatType, depthBuffer: false } );
+
+		} else {
+
+			renderTarget.setSize( width, height );
+
+		}
+
 		renderTarget.texture.channel = source.channel;
 
-		this._map.value = source;
-		this._mapSize.value.set( width, height );
-
-		// the levels down to one texel, like the mip levels of a texture, sized from the coarsest one
-
-		const levelCount = Math.floor( Math.log2( Math.max( width, height, 2 ) ) );
-		const top = levelCount - 1;
-		const { _levels: levels, _passes: passes } = this;
-
-		for ( let i = 0; i < levelCount; i ++ ) {
-
-			if ( i === levels.length ) {
-
-				levels.push( createLevel() );
-
-			}
-
-			const level = levels[ i ];
-			const levelWidth = Math.max( 1, width >> ( levelCount - i ) );
-			const levelHeight = Math.max( 1, height >> ( levelCount - i ) );
-
-			level.size.value.set( levelWidth, levelHeight );
-			level.texture.setSize( levelWidth, levelHeight );
-			level.dispatchSize[ 0 ] = Math.ceil( levelWidth / WORKGROUP_SIZE );
-			level.dispatchSize[ 1 ] = Math.ceil( levelHeight / WORKGROUP_SIZE );
-
-		}
-
-		this._top.value = levels[ top ].texture;
-
-		// push: from the finest level to the coarsest, each level averages the covered texels of the level above, the
-		// map for the top one. Pull: from the coarsest level but one to the finest, each level averages them again,
-		// which are still the pushed ones, and fills the texels without any from the level below. All passes run in
-		// one compute pass, whose dispatches see the writes of the previous ones
-
-		passes.length = 0;
-
-		for ( let i = top; i >= 0; i -- ) {
-
-			passes.push( this._getPass( i, i === top, false ) );
-
-		}
-
-		for ( let i = 1; i <= top; i ++ ) {
-
-			passes.push( this._getPass( i, i === top, true ) );
-
-		}
+		this._source.value = source;
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		renderer.compute( passes );
+		// push and pull in one compute pass, whose dispatches see the writes of the previous ones, then the
+		// filled map
+
+		if ( this._passes.length > 0 ) {
+
+			renderer.compute( this._passes );
+
+		}
 
 		_quadMesh.material = this._fill;
 		renderer.setRenderTarget( renderTarget );
@@ -151,6 +122,116 @@ class GutterFillGenerator {
 	 * Frees all internal resources.
 	 */
 	dispose() {
+
+		this._disposeLevels();
+
+	}
+
+	/**
+	 * Sizes the levels and collects the passes of a map size.
+	 *
+	 * @private
+	 * @param {number} width - The width of the map.
+	 * @param {number} height - The height of the map.
+	 */
+	_setSize( width, height ) {
+
+		if ( this._width === width && this._height === height ) {
+
+			return;
+
+		}
+
+		this._width = width;
+		this._height = height;
+
+		this._sourceSize.value.set( width, height );
+
+		// level i is half the size of level i + 1, rounded down, like the levels of a texture, down to level 0 of one
+		// texel. The textures of the levels are only reallocated when their size changes
+
+		const levels = this._levels;
+		const count = Math.floor( Math.log2( Math.max( width, height, 2 ) ) );
+		const top = count - 1;
+
+		for ( let i = 0; i < count; i ++ ) {
+
+			if ( i === levels.length ) {
+
+				levels.push( createLevel() );
+
+			}
+
+			const level = levels[ i ];
+			const w = Math.max( 1, width >> ( count - i ) );
+			const h = Math.max( 1, height >> ( count - i ) );
+
+			level.size.value.set( w, h );
+			level.texture.setSize( w, h );
+			level.dispatchSize[ 0 ] = Math.ceil( w / WORKGROUP_SIZE );
+			level.dispatchSize[ 1 ] = Math.ceil( h / WORKGROUP_SIZE );
+
+		}
+
+		this._firstLevel.value = levels[ top ].texture;
+
+		// push: each level averages the covered texels of the level above. Pull: from the coarsest level to the
+		// finest, each level averages them again, which are still the pushed ones, and fills the texels without
+		// any from the level below. Each pass reads and writes different levels
+
+		this._passes.length = 0;
+
+		for ( let i = top; i >= 0; i -- ) {
+
+			this._passes.push( this._getPass( i, i === top, false ) );
+
+		}
+
+		for ( let i = 1; i <= top; i ++ ) {
+
+			this._passes.push( this._getPass( i, i === top, true ) );
+
+		}
+
+	}
+
+	/**
+	 * Returns a pass of a level, created on first use. The top level reads the map, the others the level above.
+	 *
+	 * @private
+	 * @param {number} index - The level, counted from the coarsest one.
+	 * @param {boolean} top - Whether the level is the top one.
+	 * @param {boolean} isPull - Whether to return the pull pass, or the push pass.
+	 * @return {ComputeNode} The pass.
+	 */
+	_getPass( index, top, isPull ) {
+
+		const levels = this._levels;
+		const level = levels[ index ];
+		const slot = ( top ? 2 : 0 ) + ( isPull ? 1 : 0 );
+
+		if ( level.passes[ slot ] === null ) {
+
+			const texel = top ? readSource( this._source ) : levels[ index + 1 ].read;
+			const above = uvec2( top ? this._sourceSize : levels[ index + 1 ].size );
+			const size = uvec2( level.size );
+
+			level.passes[ slot ] = isPull ?
+				pull( texel, above, size, levels[ index - 1 ].read, uvec2( levels[ index - 1 ].size ), level.target, level.dispatchSize ) :
+				push( texel, above, size, level.target, level.dispatchSize );
+
+		}
+
+		return level.passes[ slot ];
+
+	}
+
+	/**
+	 * Frees the levels and the passes.
+	 *
+	 * @private
+	 */
+	_disposeLevels() {
 
 		this._fill.dispose();
 
@@ -169,37 +250,6 @@ class GutterFillGenerator {
 			}
 
 		}
-
-	}
-
-	/**
-	 * Returns a pass of a level, creating it on first use. The top level reads the map, the others the level above.
-	 *
-	 * @private
-	 * @param {number} index - The level, counted from the coarsest one.
-	 * @param {boolean} top - Whether the level is the top one.
-	 * @param {boolean} pull - Whether to return the pull pass, or the push pass.
-	 * @return {ComputeNode} The pass.
-	 */
-	_getPass( index, top, pull ) {
-
-		const levels = this._levels;
-		const level = levels[ index ];
-		const slot = ( top ? 2 : 0 ) + ( pull ? 1 : 0 );
-
-		if ( level.passes[ slot ] === null ) {
-
-			const texel = top ? readMap( this._map ) : levels[ index + 1 ].read;
-			const above = uvec2( top ? this._mapSize : levels[ index + 1 ].size );
-			const size = uvec2( level.size );
-
-			level.passes[ slot ] = pull ?
-				createPull( texel, levels[ index - 1 ].read, level.target, above, size, uvec2( levels[ index - 1 ].size ), level.dispatchSize ) :
-				createPush( texel, level.target, above, size, level.dispatchSize );
-
-		}
-
-		return level.passes[ slot ];
 
 	}
 
@@ -233,18 +283,18 @@ function createLevel() {
 }
 
 /**
- * Returns a function that reads a texel of the map premultiplied by its coverage, an alpha of 1 or 0, like the
- * levels store them.
+ * Returns a function that reads the texels of the map with their coverage, an alpha of 1 or 0, like the levels
+ * store them.
  *
  * @private
- * @param {TextureNode} map - The map.
+ * @param {TextureNode} source - The map.
  * @return {function(Node<ivec2>): Node<vec4>} The function.
  */
-function readMap( map ) {
+function readSource( source ) {
 
 	return ( coord ) => {
 
-		const value = map.load( coord ).toVar();
+		const value = source.load( coord ).toVar();
 		const covered = value.a.greaterThan( 0 ).select( float( 1 ), float( 0 ) );
 
 		return vec4( value.rgb.mul( covered ), covered );
@@ -259,55 +309,42 @@ function readMap( map ) {
  *
  * @private
  * @param {function(Node<ivec2>): Node<vec4>} texel - Reads a texel of the level above, premultiplied by its coverage.
- * @param {Node<uvec2>} above - The size of the level above.
- * @param {Node<uvec2>} size - The size of the level.
+ * @param {Node<uvec2>} above - The width and height of the level above.
+ * @param {Node<uvec2>} size - The width and height of the level.
  * @param {Node<uvec2>} coord - The texel.
  * @return {Node<vec4>} The average, premultiplied by its coverage.
  */
 function average( texel, above, size, coord ) {
 
+	const start = ivec2( coord.mul( above ).div( size ) ).toVar();
+	const end = ivec2( coord.add( 1 ).mul( above ).div( size ) ).toVar();
 	const sum = vec4( 0 ).toVar();
 
-	// the branch is the same for every texel of a level, so the levels after an even size only pay for the 2x2 texels
+	sum.addAssign( texel( start ) );
+	sum.addAssign( texel( start.add( ivec2( 1, 0 ) ) ) );
+	sum.addAssign( texel( start.add( ivec2( 0, 1 ) ) ) );
+	sum.addAssign( texel( start.add( ivec2( 1, 1 ) ) ) );
 
-	If( above.x.equal( size.x.mul( 2 ) ).and( above.y.equal( size.y.mul( 2 ) ) ), () => {
+	// the third texel only spans the last texel of a level after an odd size. The branch is the same for every texel
+	// of a level, so the levels after an even size skip it
 
-		const start = ivec2( coord.mul( 2 ) ).toVar();
-
-		sum.addAssign( texel( start ) );
-		sum.addAssign( texel( start.add( ivec2( 1, 0 ) ) ) );
-		sum.addAssign( texel( start.add( ivec2( 0, 1 ) ) ) );
-		sum.addAssign( texel( start.add( ivec2( 1, 1 ) ) ) );
-
-	} ).Else( () => {
-
-		const start = ivec2( coord.mul( above ).div( size ) ).toVar();
-		const end = ivec2( coord.add( 1 ).mul( above ).div( size ) ).toVar();
+	If( above.x.notEqual( size.x.mul( 2 ) ).or( above.y.notEqual( size.y.mul( 2 ) ) ), () => {
 
 		for ( let y = 0; y < 3; y ++ ) {
 
 			for ( let x = 0; x < 3; x ++ ) {
 
-				const offset = start.add( ivec2( x, y ) );
-				const inside = offset.x.lessThan( end.x ).and( offset.y.lessThan( end.y ) );
-
 				if ( x < 2 && y < 2 ) {
 
-					// the first 2x2 texels are always read, and skipped after a size of one
-
-					sum.addAssign( texel( offset.min( end.sub( 1 ) ) ).mul( inside.select( float( 1 ), float( 0 ) ) ) );
-
-				} else {
-
-					// the third texel only spans the last texel of a level after an odd size
-
-					If( inside, () => {
-
-						sum.addAssign( texel( offset ) );
-
-					} );
+					continue;
 
 				}
+
+				If( start.x.add( x ).lessThan( end.x ).and( start.y.add( y ).lessThan( end.y ) ), () => {
+
+					sum.addAssign( texel( start.add( ivec2( x, y ) ) ) );
+
+				} );
 
 			}
 
@@ -322,17 +359,17 @@ function average( texel, above, size, coord ) {
 }
 
 /**
- * Creates the compute node that pushes a level: the average of the covered texels of the level above.
+ * Returns the compute node that pushes a level: the average of the covered texels of the level above.
  *
  * @private
  * @param {function(Node<ivec2>): Node<vec4>} texel - Reads a texel of the level above, premultiplied by its coverage.
+ * @param {Node<uvec2>} above - The width and height of the level above.
+ * @param {Node<uvec2>} size - The width and height of the level.
  * @param {StorageTextureNode} target - The level.
- * @param {Node<uvec2>} above - The size of the level above.
- * @param {Node<uvec2>} size - The size of the level.
- * @param {Array<number>} dispatchSize - The dispatch size, set for each map.
+ * @param {Array<number>} dispatchSize - The dispatch size, set for each map size.
  * @return {ComputeNode} The compute node.
  */
-function createPush( texel, target, above, size, dispatchSize ) {
+function push( texel, above, size, target, dispatchSize ) {
 
 	return Fn( () => {
 
@@ -340,31 +377,33 @@ function createPush( texel, target, above, size, dispatchSize ) {
 
 		// skip the threads of the last workgroups past the edge of the level
 
-		If( coord.x.lessThan( size.x ).and( coord.y.lessThan( size.y ) ), () => {
+		If( coord.x.greaterThanEqual( size.x ).or( coord.y.greaterThanEqual( size.y ) ), () => {
 
-			textureStore( target, coord, average( texel, above, size, coord ) );
+			Return();
 
 		} );
+
+		textureStore( target, coord, average( texel, above, size, coord ) );
 
 	} )().compute( dispatchSize, [ WORKGROUP_SIZE, WORKGROUP_SIZE, 1 ] ).setName( 'GutterFill.push' );
 
 }
 
 /**
- * Creates the compute node that pulls a level: the average of the covered texels of the level above, or where
+ * Returns the compute node that pulls a level: the average of the covered texels of the level above, or where
  * there are none, the filled level below, upsampled with filtering.
  *
  * @private
  * @param {function(Node<ivec2>): Node<vec4>} texel - Reads a texel of the level above, premultiplied by its coverage.
+ * @param {Node<uvec2>} above - The width and height of the level above.
+ * @param {Node<uvec2>} size - The width and height of the level.
  * @param {function(Node<ivec2>): Node<vec4>} belowTexel - Reads a texel of the filled level below.
+ * @param {Node<uvec2>} below - The width and height of the level below.
  * @param {StorageTextureNode} target - The level.
- * @param {Node<uvec2>} above - The size of the level above.
- * @param {Node<uvec2>} size - The size of the level.
- * @param {Node<uvec2>} below - The size of the level below.
- * @param {Array<number>} dispatchSize - The dispatch size, set for each map.
+ * @param {Array<number>} dispatchSize - The dispatch size, set for each map size.
  * @return {ComputeNode} The compute node.
  */
-function createPull( texel, belowTexel, target, above, size, below, dispatchSize ) {
+function pull( texel, above, size, belowTexel, below, target, dispatchSize ) {
 
 	return Fn( () => {
 
@@ -372,56 +411,61 @@ function createPull( texel, belowTexel, target, above, size, below, dispatchSize
 
 		// skip the threads of the last workgroups past the edge of the level
 
-		If( coord.x.lessThan( size.x ).and( coord.y.lessThan( size.y ) ), () => {
+		If( coord.x.greaterThanEqual( size.x ).or( coord.y.greaterThanEqual( size.y ) ), () => {
 
-			const value = average( texel, above, size, coord ).toVar();
-
-			If( value.a.equal( 0 ), () => {
-
-				// the bilinear sample of the level below at the center of the texel
-
-				const position = vec2( coord ).add( 0.5 ).mul( vec2( below ) ).div( vec2( size ) ).sub( 0.5 ).toVar();
-				const base = ivec2( position.floor() ).toVar();
-				const f = position.fract().toVar();
-				const last = ivec2( below ).sub( 1 );
-				const tap = ( x, y ) => belowTexel( base.add( ivec2( x, y ) ).clamp( ivec2( 0 ), last ) ).rgb;
-
-				value.assign( vec4( mix( mix( tap( 0, 0 ), tap( 1, 0 ), f.x ), mix( tap( 0, 1 ), tap( 1, 1 ), f.x ), f.y ), 0 ) );
-
-			} );
-
-			textureStore( target, coord, value );
+			Return();
 
 		} );
+
+		const value = average( texel, above, size, coord ).toVar();
+
+		If( value.a.equal( 0 ), () => {
+
+			// the bilinear sample of the level below at the center of the texel
+
+			const position = vec2( coord ).add( 0.5 ).mul( vec2( below ).div( vec2( size ) ) ).sub( 0.5 ).toVar();
+			const base = ivec2( position.floor() ).toVar();
+			const f = position.fract().toVar();
+			const tap = ( x, y ) => belowTexel( base.add( ivec2( x, y ) ).clamp( ivec2( 0 ), ivec2( below ).sub( 1 ) ) ).rgb;
+
+			value.assign( vec4( mix( mix( tap( 0, 0 ), tap( 1, 0 ), f.x ), mix( tap( 0, 1 ), tap( 1, 1 ), f.x ), f.y ), 0 ) );
+
+		} );
+
+		textureStore( target, coord, value );
 
 	} )().compute( dispatchSize, [ WORKGROUP_SIZE, WORKGROUP_SIZE, 1 ] ).setName( 'GutterFill.pull' );
 
 }
 
 /**
- * Creates the material that keeps the covered texels of a map and fills the others from the filled top level,
+ * Creates the material that keeps the covered texels of a map and fills the others from the filled first level,
  * upsampled with filtering.
  *
  * @private
- * @param {TextureNode} map - The map.
- * @param {TextureNode} top - The filled top level.
- * @param {UniformNode<vec2>} mapSize - The size of the map.
+ * @param {TextureNode} source - The map.
+ * @param {?TextureNode} levels - The filled first level.
+ * @param {Node<vec2>} size - The width and height of the map.
  * @return {NodeMaterial} The material.
  */
-function createFillMaterial( map, top, mapSize ) {
+function createFillMaterial( source, levels, size ) {
 
 	const fill = Fn( () => {
 
 		const coord = ivec2( screenCoordinate.xy );
-		const result = map.load( coord ).toVar();
+		const result = source.load( coord ).toVar();
 
-		If( result.a.lessThanEqual( 0 ), () => {
+		if ( levels !== null ) {
 
-			const uv = vec2( coord ).add( 0.5 ).div( mapSize );
+			If( result.a.lessThanEqual( 0 ), () => {
 
-			result.assign( vec4( top.sample( uv ).level( 0 ).rgb, 0 ) );
+				const uv = vec2( coord ).add( 0.5 ).div( size );
 
-		} );
+				result.assign( vec4( levels.sample( uv ).level( 0 ).rgb, 0 ) );
+
+			} );
+
+		}
 
 		return result;
 
