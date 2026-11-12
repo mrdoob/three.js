@@ -99,7 +99,7 @@ class FunctionCallNode extends Node {
 
 		const params = [];
 
-		const functionNode = this.functionNode;
+		const functionNode = builder.getFunctionNode( this.functionNode );
 
 		const inputs = functionNode.getInputs( builder );
 		const parameters = this.parameters;
