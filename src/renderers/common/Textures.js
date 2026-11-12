@@ -121,6 +121,41 @@ class Textures extends DataMap {
 
 	}
 
+	createData( object ) {
+
+		if ( object.isRenderTarget === true ) {
+
+			return {
+				initialized: false,
+				depthInitialized: false,
+				width: 0,
+				height: 0,
+				sampleCount: 0,
+				depth: false,
+				stencil: false,
+				textures: null,
+				depthTexture: null,
+				depthTextureMips: {},
+				renderTarget: null,
+				onDispose: null,
+				ref: null
+			};
+
+		}
+
+		return {
+			initialized: false,
+			needsCreate: true,
+			isDefaultTexture: false,
+			version: - 1,
+			generation: - 1,
+			bindGroups: null,
+			onDispose: null,
+			ref: null
+		};
+
+	}
+
 	/**
 	 * Updates the given render target. Based on the given render target configuration,
 	 * it updates the texture states representing the attachments of the framebuffer.
@@ -133,7 +168,7 @@ class Textures extends DataMap {
 		const renderTargetData = this.get( renderTarget );
 
 		const sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
-		const depthTextureMips = renderTargetData.depthTextureMips || ( renderTargetData.depthTextureMips = {} );
+		const depthTextureMips = renderTargetData.depthTextureMips;
 
 		const textures = renderTarget.textures;
 
@@ -431,12 +466,13 @@ class Textures extends DataMap {
 
 					}
 
-					if ( textureData.isDefaultTexture === undefined || textureData.isDefaultTexture === true ) {
+					if ( textureData.needsCreate === true ) {
 
 						backend.createTexture( texture, options );
 
 						if ( textureData.isDefaultTexture === true ) this.info.updateTexture( texture, options );
 
+						textureData.needsCreate = false;
 						textureData.isDefaultTexture = false;
 						textureData.generation = texture.version;
 
@@ -466,6 +502,7 @@ class Textures extends DataMap {
 
 				backend.createDefaultTexture( texture );
 
+				textureData.needsCreate = true;
 				textureData.isDefaultTexture = true;
 				textureData.generation = texture.version;
 

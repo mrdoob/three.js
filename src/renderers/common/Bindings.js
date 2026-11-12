@@ -80,6 +80,34 @@ class Bindings extends DataMap {
 
 	}
 
+	createData( object ) {
+
+		if ( object.isBindGroup === true ) {
+
+			return {
+				bindGroup: null,
+				usedTimes: 0,
+				renderContext: null,
+				cacheKey: - 1
+			};
+
+		}
+
+		if ( object.isTexture === true ) {
+
+			return {
+				needsMipmap: false
+			};
+
+		}
+
+		return {
+			initialized: false,
+			bindings: null
+		};
+
+	}
+
 	/**
 	 * Returns the bind groups for the given render object.
 	 *
@@ -121,7 +149,7 @@ class Bindings extends DataMap {
 
 			// bind groups are created once per compute node version
 
-			if ( computeNodeData.bindings !== undefined ) {
+			if ( computeNodeData.bindings !== null ) {
 
 				this._destroyBindings( computeNodeData.bindings );
 
@@ -317,7 +345,7 @@ class Bindings extends DataMap {
 
 			const groupData = this.get( bindGroup );
 
-			if ( groupData.bindGroup === undefined ) {
+			if ( groupData.bindGroup === null ) {
 
 				// initialize
 
@@ -400,7 +428,7 @@ class Bindings extends DataMap {
 							// untrack destroyed bind group from its texture
 
 							const textureData = this.textures.get( binding.texture );
-							if ( textureData.bindGroups !== undefined ) textureData.bindGroups.delete( bindGroup );
+							if ( textureData.bindGroups !== null ) textureData.bindGroups.delete( bindGroup );
 
 						}
 
@@ -410,7 +438,7 @@ class Bindings extends DataMap {
 
 				}
 
-				if ( groupData.cacheKey !== undefined ) {
+				if ( groupData.renderContext !== null ) {
 
 					const bindGroupsCache = this._sharedBindGroups.get( groupData.renderContext );
 					bindGroupsCache.delete( groupData.cacheKey );

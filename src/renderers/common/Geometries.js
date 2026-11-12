@@ -163,6 +163,16 @@ class Geometries extends DataMap {
 
 	}
 
+	createData() {
+
+		return {
+			initialized: false,
+			onDispose: null,
+			ref: null
+		};
+
+	}
+
 	/**
 	 * Returns `true` if the given geometry is initialized.
 	 *

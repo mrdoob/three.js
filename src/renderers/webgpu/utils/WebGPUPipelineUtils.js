@@ -78,6 +78,8 @@ class WebGPUPipelineUtils {
 		const utils = backend.utils;
 
 		const pipelineData = backend.get( pipeline );
+		pipelineData.pipeline = null;
+		pipelineData.error = false;
 
 		// bind group layouts
 
@@ -389,6 +391,8 @@ class WebGPUPipelineUtils {
 		const computeProgram = backend.get( pipeline.computeProgram ).module;
 
 		const pipelineGPU = backend.get( pipeline );
+		pipelineGPU.pipeline = null;
+		pipelineGPU.error = false;
 
 		// bind group layouts
 
