@@ -30,6 +30,15 @@ class NodeFrame {
 		this.deltaTime = 0;
 
 		/**
+		 * The timestamp of the previous `update()` call in milliseconds,
+		 * or `null` before the first frame.
+		 *
+		 * @type {?number}
+		 * @default null
+		 */
+		this.lastTime = null;
+
+		/**
 		 * The frame ID.
 		 *
 		 * @type {number}
@@ -307,7 +316,7 @@ class NodeFrame {
 
 		this.frameId ++;
 
-		if ( this.lastTime === undefined ) this.lastTime = performance.now();
+		if ( this.lastTime === null ) this.lastTime = performance.now();
 
 		this.deltaTime = ( performance.now() - this.lastTime ) / 1000;
 

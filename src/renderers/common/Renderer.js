@@ -318,7 +318,7 @@ class Renderer {
 		 * @type {ContextNode}
 		 * @property {Object} value - The context value object.
 		 */
-		this.contextNode = context();
+		this.contextNode = context( { modelViewMatrix: undefined, modelNormalViewMatrix: undefined } );
 
 		/**
 		 * The node library defines how certain library objects like materials, lights
@@ -1276,7 +1276,19 @@ class Renderer {
 			mrt: this._mrt,
 			contextNode: this.contextNode,
 			renderContext: this._currentRenderContext,
-			item: null
+			item: null,
+			previousRenderTarget: null,
+			previousActiveCubeFace: 0,
+			previousActiveMipmapLevel: 0,
+			previousMRT: null,
+			previousContextNode: null,
+			previousRenderContext: null,
+			previousRenderObjectFunction: null,
+			previousHandleObjectFunction: null,
+			previousCompilationPromises: null,
+			previousRenderId: 0,
+			previousPrecompilationState: null,
+			materialSide: - 1
 		};
 
 	}
@@ -1547,8 +1559,8 @@ class Renderer {
 
 		} else if ( this.highPrecision ) {
 
-			delete contextNodeData.modelViewMatrix;
-			delete contextNodeData.modelNormalViewMatrix;
+			contextNodeData.modelViewMatrix = undefined;
+			contextNodeData.modelNormalViewMatrix = undefined;
 
 		}
 
