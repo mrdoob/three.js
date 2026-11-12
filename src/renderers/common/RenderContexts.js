@@ -53,9 +53,10 @@ class RenderContexts {
 
 			const format = renderTarget.texture?.format;
 			const type = renderTarget.texture?.type;
+			const colorSpace = renderTarget.texture?.colorSpace;
 			const count = renderTarget.textures.length;
 
-			attachmentState = `${ count }:${ format }:${ type }:${ renderTarget.samples }:${ renderTarget.depthBuffer }:${ renderTarget.stencilBuffer }`;
+			attachmentState = `${ count }:${ format }:${ type }:${ colorSpace }:${ renderTarget.samples }:${ renderTarget.depthBuffer }:${ renderTarget.stencilBuffer }`;
 
 		}
 
