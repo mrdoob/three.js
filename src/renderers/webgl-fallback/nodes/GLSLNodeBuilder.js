@@ -402,7 +402,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 		if ( textureNode.isCubeTextureNode === true ) return { [ name ]: textureNode };
 
-		return { [ name ]: textureNode, [ name + '_flipY' ]: textureNode.getFlipYUniform() };
+		return { [ name ]: textureNode, [ name + '_flipY' ]: textureNode._getFlipYUniform() };
 
 	}
 

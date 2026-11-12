@@ -411,7 +411,7 @@ class TextureNode extends UniformNode {
 
 		if ( builder.isFlipY() ) {
 
-			const flipYUniform = this.getFlipYUniform();
+			const flipYUniform = this._getFlipYUniform();
 
 			uvNode = uvNode.toVar();
 
@@ -435,9 +435,10 @@ class TextureNode extends UniformNode {
 	 * Returns the uniform that defines whether the texture is flipped on the y-axis.
 	 * Only required for WebGL, see {@link NodeBuilder#isFlipY}.
 	 *
+	 * @private
 	 * @return {UniformNode<bool>} The y-flip uniform.
 	 */
-	getFlipYUniform() {
+	_getFlipYUniform() {
 
 		const baseNode = this.getBase();
 
