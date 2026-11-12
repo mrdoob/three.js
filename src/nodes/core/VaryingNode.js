@@ -175,16 +175,16 @@ class VaryingNode extends Node {
 
 		// TODO: Node.build() could pass through the output node of setup() directly, so overrides of analyze() and generate() don't need to handle it twice
 
-		if ( builder.getNodeProperties( this ).outputNode ) return super.analyze( builder );
+		const properties = builder.getNodeProperties( this );
+
+		if ( properties.outputNode ) return super.analyze( builder );
 
 		this.setupVarying( builder );
 
 		// The vertex value is generated once, so it is analyzed once, however many times the varying is read.
-		const vertexData = builder.getDataFromNode( this, NodeShaderStage.VERTEX, builder.globalCache );
+		if ( properties.vertexAnalyzed !== true ) {
 
-		if ( vertexData.analyzed !== true ) {
-
-			vertexData.analyzed = true;
+			properties.vertexAnalyzed = true;
 
 			builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
 
