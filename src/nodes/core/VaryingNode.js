@@ -139,6 +139,7 @@ class VaryingNode extends Node {
 
 			properties.varying = varying = builder.getVaryingFromNode( this, name, type, interpolationType, interpolationSampling );
 			properties.node = subBuild( this.node, 'VERTEX' );
+			properties.vertexAnalyzed = false;
 
 		}
 
@@ -182,7 +183,7 @@ class VaryingNode extends Node {
 		this.setupVarying( builder );
 
 		// The vertex value is generated once, so it is analyzed once, however many times the varying is read.
-		if ( properties.vertexAnalyzed !== true ) {
+		if ( properties.vertexAnalyzed === false ) {
 
 			properties.vertexAnalyzed = true;
 
