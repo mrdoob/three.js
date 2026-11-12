@@ -337,17 +337,26 @@ class WebGPUBindingUtils {
 
 					const mipLevelCount = binding.store ? 1 : textureData.texture.mipLevelCount;
 					const baseMipLevel = binding.store ? binding.mipLevel : 0;
-					let propertyName = `view-${ textureData.texture.width }-${ textureData.texture.height }`;
+					let viewKey = `${ textureData.texture.width }-${ textureData.texture.height }`;
 
 					if ( textureData.texture.depthOrArrayLayers > 1 ) {
 
-						propertyName += `-${ textureData.texture.depthOrArrayLayers }`;
+						viewKey += `-${ textureData.texture.depthOrArrayLayers }`;
 
 					}
 
-					propertyName += `-${ mipLevelCount }-${ baseMipLevel }`;
+					viewKey += `-${ mipLevelCount }-${ baseMipLevel }`;
 
-					resourceGPU = textureData[ propertyName ];
+					let views = textureData.views;
+
+					if ( views === null ) {
+
+						views = new Map();
+						textureData.views = views;
+
+					}
+
+					resourceGPU = views.get( viewKey );
 
 					if ( resourceGPU === undefined ) {
 
@@ -380,7 +389,8 @@ class WebGPUBindingUtils {
 						_viewDescriptor.mipLevelCount = mipLevelCount;
 						_viewDescriptor.baseMipLevel = baseMipLevel;
 
-						resourceGPU = textureData[ propertyName ] = textureData.texture.createView( _viewDescriptor );
+						resourceGPU = textureData.texture.createView( _viewDescriptor );
+						views.set( viewKey, resourceGPU );
 
 						_viewDescriptor.reset();
 
