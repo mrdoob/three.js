@@ -1,5 +1,5 @@
 import { Node, NodeMaterial, NodeUpdateType, RenderTarget, Vector2, HalfFloatType, RedFormat, QuadMesh, RendererUtils } from 'three/webgpu';
-import { convertToTexture, nodeObject, Fn, uniform, smoothstep, step, texture, max, uniformArray, outputStruct, property, vec4, vec3, uv, Loop, min, mix, float, context } from 'three/tsl';
+import { convertToTexture, nodeObject, Fn, uniform, smoothstep, step, texture, max, uniformArray, outputStruct, vec4, vec3, vec2, uv, Loop, min, mix, context } from 'three/tsl';
 import { gaussianBlur } from './GaussianBlurNode.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -365,31 +365,24 @@ class DepthOfFieldNode extends Node {
 
 		// CoC, near and far fields
 
-		const nearField = property( 'float' );
-		const farField = property( 'float' );
-
-		const outputNode = outputStruct( nearField, farField );
-
 		const CoC = Fn( () => {
 
 			const signedDist = this.viewZNode.negate().sub( this.focusDistanceNode );
 			const CoC = smoothstep( 0, this.focalLengthNode, signedDist.abs() );
 
-			nearField.assign( step( signedDist, 0 ).mul( CoC ) );
-			farField.assign( step( 0, signedDist ).mul( CoC ) );
-
-			return float( 0 );
+			return vec2( step( signedDist, 0 ).mul( CoC ), step( 0, signedDist ).mul( CoC ) );
 
 		} );
 
+		const fields = CoC().toConst();
+
 		this._CoCMaterial.contextNode = sharedContext;
-		this._CoCMaterial.colorNode = CoC();
-		this._CoCMaterial.outputNode = outputNode;
+		this._CoCMaterial.fragmentNode = outputStruct( fields.x, fields.y );
 		this._CoCMaterial.needsUpdate = true;
 
 		// blurred CoC for near field
 
-		this._CoCBlurredMaterial.colorNode = this._CoCBlurNode;
+		this._CoCBlurredMaterial.fragmentNode = this._CoCBlurNode;
 		this._CoCBlurredMaterial.needsUpdate = true;
 
 		// bokeh 64 blur pass
