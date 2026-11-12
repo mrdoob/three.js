@@ -1,5 +1,5 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
-import { exp, float, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, ivec2, mix, property, outputStruct, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
+import { exp, float, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, ivec2, mix, outputStruct, struct, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
 import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -530,10 +530,7 @@ class TAAUNode extends Node {
 		// also supplies the moments used for variance clipping of the
 		// reprojected history, so no second neighborhood read is needed.
 
-		const colorOutput = property( 'vec4' );
-		const lockOutput = property( 'vec4' );
-
-		const outputNode = outputStruct( colorOutput, lockOutput );
+		const outputs = struct( { color: 'vec4', lock: 'vec4' } );
 
 		const resolve = Fn( () => {
 
@@ -647,32 +644,21 @@ class TAAUNode extends Node {
 
 			const output = flickerReduction( currentColor, lockedHistoryColor, currentWeight );
 
-			colorOutput.assign( output );
-			lockOutput.assign( lock );
-
-			return vec4( 0 ); // temporary solution until TSL does not complain anymore
+			return outputs( output, lock );
 
 		} );
+
+		const resolved = resolve().toConst();
 
 		// materials
 
 		const sharedContext = context( builder.getSharedContext() );
 
 		this._resolveMaterial.contextNode = sharedContext;
-		this._resolveMaterial.colorNode = resolve();
-		this._resolveMaterial.outputNode = outputNode;
-
-		this._seedMaterial.colorNode = Fn( () => {
-
-			colorOutput.assign( this.beautyNode.sample( uv() ) );
-			lockOutput.assign( 0 );
-
-			return vec4( 0 );
-
-		} )();
+		this._resolveMaterial.fragmentNode = outputStruct( resolved.get( 'color' ), resolved.get( 'lock' ) );
 
 		this._seedMaterial.contextNode = sharedContext;
-		this._seedMaterial.outputNode = outputNode;
+		this._seedMaterial.fragmentNode = outputStruct( this.beautyNode.sample( uv() ), vec4( 0 ) );
 
 		return this._textureNode;
 
