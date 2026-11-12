@@ -72,8 +72,15 @@ class Backend {
 		 *
 		 * @type {boolean}
 		 * @default false
+		 * @deprecated since r188. Use {@link GPUTimer} instead.
 		 */
 		this.trackTimestamp = ( parameters.trackTimestamp === true );
+
+		if ( this.trackTimestamp === true ) {
+
+			warnOnce( 'WebGPURenderer: "trackTimestamp" has been deprecated. Use "GPUTimer" instead.' ); // @deprecated r188
+
+		}
 
 	}
 
@@ -627,6 +634,32 @@ class Backend {
 		const queryPool = this._getQueryPool( uid );
 
 		return queryPool.hasTimestampQuery( uid );
+
+	}
+
+	/**
+	 * Starts a GPU timer measurement. Backends that support timing return the measurement,
+	 * others return `null`.
+	 *
+	 * @return {?(number|Object)} The measurement, specific to the backend.
+	 */
+	beginTimer() {
+
+		return null;
+
+	}
+
+	/**
+	 * Ends the given measurement and returns its GPU time in milliseconds, or `null` when the
+	 * backend doesn't support timing.
+	 *
+	 * @async
+	 * @param {?(number|Object)} measurement - The measurement returned by {@link Backend#beginTimer}.
+	 * @return {Promise<?number>} The GPU time in milliseconds.
+	 */
+	async endTimer( /* measurement */ ) {
+
+		return null;
 
 	}
 

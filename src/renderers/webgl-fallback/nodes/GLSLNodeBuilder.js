@@ -94,6 +94,8 @@ const glslMethods = {
 	floatunpack_unorm_4x8: 'tsl_unpackUnorm4x8'
 };
 
+const samplerTypes = new Set( [ 'texture', 'texture3D', 'cubeTexture', 'cubeDepthTexture' ] );
+
 // The GLSL types of the texture inputs of a function layout.
 const layoutTextureTypes = {
 	texture: 'sampler2D',
@@ -1004,57 +1006,9 @@ ${ flowData.code }
 			let snippet = null;
 			let group = false;
 
-			if ( uniform.type === 'texture' || uniform.type === 'texture3D' ) {
+			if ( samplerTypes.has( uniform.type ) ) {
 
-				const textureNode = uniform.node;
-				const texture = textureNode.value;
-
-				const componentType = this.getComponentTypeFromTexture( texture );
-				const typePrefix = componentType === 'float' ? '' : componentType.charAt( 0 );
-
-				if ( uniform.type === 'texture3D' && texture.isArrayTexture === false ) {
-
-					snippet = `${typePrefix}sampler3D ${ uniform.name };`;
-
-				} else if ( texture.compareFunction && textureNode.isSampleCompare() ) {
-
-					if ( texture.isArrayTexture === true ) {
-
-						snippet = `sampler2DArrayShadow ${ uniform.name };`;
-
-					} else {
-
-						snippet = `sampler2DShadow ${ uniform.name };`;
-
-					}
-
-				} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
-
-					snippet = `${typePrefix}sampler2DArray ${ uniform.name };`;
-
-				} else {
-
-					snippet = `${typePrefix}sampler2D ${ uniform.name };`;
-
-				}
-
-			} else if ( uniform.type === 'cubeTexture' ) {
-
-				snippet = `samplerCube ${ uniform.name };`;
-
-			} else if ( uniform.type === 'cubeDepthTexture' ) {
-
-				const texture = uniform.node.value;
-
-				if ( texture.compareFunction ) {
-
-					snippet = `samplerCubeShadow ${ uniform.name };`;
-
-				} else {
-
-					snippet = `samplerCube ${ uniform.name };`;
-
-				}
+				snippet = `${ this._getSamplerType( uniform.node, uniform.type ) } ${ uniform.name };`;
 
 			} else if ( uniform.type === 'buffer' ) {
 
@@ -1139,6 +1093,42 @@ ${ flowData.code }
 		output += bindingSnippets.join( '\n' );
 
 		return output;
+
+	}
+
+	/**
+	 * Returns the GLSL sampler type of a texture node.
+	 *
+	 * @private
+	 * @param {TextureNode} textureNode - The texture node.
+	 * @param {string} type - The input type of the texture node.
+	 * @return {string} The sampler type.
+	 */
+	_getSamplerType( textureNode, type ) {
+
+		const texture = textureNode.value;
+
+		if ( type === 'cubeTexture' ) return 'samplerCube';
+		if ( type === 'cubeDepthTexture' ) return texture.compareFunction ? 'samplerCubeShadow' : 'samplerCube';
+
+		const componentType = this.getComponentTypeFromTexture( texture );
+		const typePrefix = componentType === 'float' ? '' : componentType.charAt( 0 );
+
+		if ( type === 'texture3D' && texture.isArrayTexture === false ) {
+
+			return `${typePrefix}sampler3D`;
+
+		} else if ( texture.compareFunction && textureNode.isSampleCompare() ) {
+
+			return texture.isArrayTexture === true ? 'sampler2DArrayShadow' : 'sampler2DShadow';
+
+		} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
+
+			return `${typePrefix}sampler2DArray`;
+
+		}
+
+		return `${typePrefix}sampler2D`;
 
 	}
 

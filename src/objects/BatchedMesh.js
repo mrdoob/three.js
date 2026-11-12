@@ -11,6 +11,7 @@ import { Frustum } from '../math/Frustum.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Color } from '../math/Color.js';
 import { FrustumArray } from '../math/FrustumArray.js';
+import { minHeapPush, minHeapPop } from '../utils.js';
 
 function ascIdSort( a, b ) {
 
@@ -255,7 +256,7 @@ class BatchedMesh extends Mesh {
 		this._instanceInfo = [];
 		this._geometryInfo = [];
 
-		// instance, geometry ids that have been set as inactive, and are available to be overwritten
+		// instance, geometry ids that have been set as inactive, and are available to be overwritten (stored as min-heaps)
 		this._availableInstanceIds = [];
 		this._availableGeometryIds = [];
 
@@ -594,9 +595,7 @@ class BatchedMesh extends Mesh {
 		// Prioritize using previously freed instance ids
 		if ( this._availableInstanceIds.length > 0 ) {
 
-			this._availableInstanceIds.sort( ascIdSort );
-
-			drawId = this._availableInstanceIds.shift();
+			drawId = minHeapPop( this._availableInstanceIds );
 			this._instanceInfo[ drawId ] = instanceInfo;
 
 		} else {
@@ -691,9 +690,7 @@ class BatchedMesh extends Mesh {
 		let geometryId;
 		if ( this._availableGeometryIds.length > 0 ) {
 
-			this._availableGeometryIds.sort( ascIdSort );
-
-			geometryId = this._availableGeometryIds.shift();
+			geometryId = minHeapPop( this._availableGeometryIds );
 			geometryInfoList[ geometryId ] = geometryInfo;
 
 
@@ -859,7 +856,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		geometryInfoList[ geometryId ].active = false;
-		this._availableGeometryIds.push( geometryId );
+		minHeapPush( this._availableGeometryIds, geometryId );
 		this._visibilityChanged = true;
 
 		return this;
@@ -877,7 +874,7 @@ class BatchedMesh extends Mesh {
 		this.validateInstanceId( instanceId );
 
 		this._instanceInfo[ instanceId ].active = false;
-		this._availableInstanceIds.push( instanceId );
+		minHeapPush( this._availableInstanceIds, instanceId );
 		this._visibilityChanged = true;
 
 		return this;
@@ -1279,7 +1276,7 @@ class BatchedMesh extends Mesh {
 	*/
 	setInstanceCount( maxInstanceCount ) {
 
-		// shrink the available instances as much as possible
+		// shrink the available instances as much as possible. a sorted array is still a valid min-heap
 		const availableInstanceIds = this._availableInstanceIds;
 		const instanceInfo = this._instanceInfo;
 		availableInstanceIds.sort( ascIdSort );

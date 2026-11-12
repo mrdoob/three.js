@@ -4,13 +4,13 @@
 <head>
 
 	<head>
-		<title>three.js webgpu - postprocessing - Screen Space Reflections (SSR)</title>
+		<title>three.js webgpu - postprocessing - Mirror Screen Space Reflections (SSR)</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<meta property="og:title" content="three.js webgpu - postprocessing - Screen Space Reflections (SSR)">
+		<meta property="og:title" content="three.js webgpu - postprocessing - Mirror Screen Space Reflections (SSR)">
 		<meta property="og:type" content="website">
-		<meta property="og:url" content="https://threejs.org/examples/webgpu_postprocessing_ssr.html">
-		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_postprocessing_ssr.jpg">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_postprocessing_ssr_mirror.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_postprocessing_ssr_mirror.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
@@ -20,11 +20,11 @@
 			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 
 			<div class="title-wrapper">
-				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>SSR</span>
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Mirror SSR</span>
 			</div>
 
 			<small>
-				Screen Space Reflections.<br />
+				One mirror trace per pixel, followed by a roughness-dependent blur post-process.<br />
 				<a href="https://skfb.ly/6tqYD" target="_blank" rel="noopener">Steampunk Camera</a> by
 				<a href="https://sketchfab.com/lumoize" target="_blank" rel="noopener">dylanheyes</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.
 			</small>
@@ -44,7 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -55,17 +55,12 @@
 		import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 		const params = {
-			quality: 0.5,
-			blurQuality: 1,
-			maxDistance: 1,
-			intensity: 1,
-			thickness: 0.03,
-			binaryRefine: false,
-			roughness: 1,
-			enabled: true
+			output: 'Beauty', enabled: true, quality: 0.5, intensity: 1,
+			maxDistance: 1, thickness: 0.03, binaryRefine: false,
+			roughness: 1, blur: true, blurQuality: 1
 		};
 
-		let camera, scene, model, renderer, renderPipeline, ssrPass;
+		let camera, scene, model, renderer, renderPipeline;
 		let controls;
 
 		init();
@@ -180,18 +175,35 @@
 
 			//
 
-			ssrPass = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+			const reflection = ssr( scenePassColor, scenePassDepth, sceneNormal, {
 				metalnessNode: scenePassMetalRough.r,
-				roughnessNode: scenePassMetalRough.g
+				roughnessNode: scenePassMetalRough.g,
+				binaryRefine: params.binaryRefine
 			} ).toInspector( 'SSR' );
 
-			// blend SSR over beauty (SSR outputs premultiplied color, so use additive blending)
+			const raw = passTexture( reflection, reflection.getRenderTarget().texture );
+			const blurred = reflection.getTextureNode();
+			const blurEnabled = uniform( 1 );
+			const combined = scenePassColor.rgb.add( mix( raw.rgb, blurred.rgb, blurEnabled ) );
+			const spatialAA = smaa( vec4( combined, 1 ) );
 
-			const outputNode = smaa( scenePassColor.add( ssrPass.rgb ) );
+			function updateOutput() {
 
-			renderPipeline.outputNode = outputNode;
+				let view;
+		
+				switch ( params.output ) {
 
-			//
+					case 'Beauty': view = spatialAA; break;
+					case 'SSR': view = vec4( raw.rgb, 1 ); break;
+					case 'SSR DN': view = vec4( blurred.rgb, 1 ); break;
+
+				}
+
+				renderPipeline.outputNode = params.enabled ? view : scenePass;
+				renderPipeline.outputColorTransform = true;
+				renderPipeline.needsUpdate = true;
+
+			}
 
 			controls = new OrbitControls( camera, renderer.domElement );
 			controls.enableDamping = true;
@@ -201,59 +213,45 @@
 
 			// GUI
 
-			const gui = renderer.inspector.createParameters( 'Settings' );
-			const ssrFolder = gui.addFolder( 'SSR' );
-			ssrFolder.add( params, 'quality', 0, 1 ).onChange( updateParameters );
-			ssrFolder.add( params, 'blurQuality', 1, 3, 1 ).onChange( updateParameters );
-			ssrFolder.add( params, 'maxDistance', 0, 1 ).onChange( updateParameters );
-			ssrFolder.add( params, 'intensity', 0, 1 ).onChange( updateParameters );
-			ssrFolder.add( params, 'thickness', 0, 0.05 ).onChange( updateParameters );
-			ssrFolder.add( params, 'binaryRefine' ).name( 'binary refine' ).onChange( updateParameters );
-			ssrFolder.add( params, 'enabled' ).onChange( () => {
+			const displayGui = renderer.inspector.createParameters( 'Display' );
+			displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN' ] ).name( 'Output' ).info( 'DN means denoise; this mirror example uses spatial blur rather than stochastic denoising.' ).onChange( updateOutput );
 
-				if ( params.enabled === true ) {
+			const ssrGui = renderer.inspector.createParameters( 'SSR' );
+			ssrGui.add( params, 'enabled' ).name( 'Enabled' ).onChange( updateOutput );
+			ssrGui.add( params, 'intensity', 0, 1 ).name( 'Intensity' ).onChange( updateParameters );
+			ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( updateParameters );
+			ssrGui.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( updateParameters );
+			ssrGui.add( params, 'maxDistance', 0, 1 ).name( 'Max distance' ).onChange( updateParameters );
+			ssrGui.add( params, 'thickness', 0, 0.05 ).name( 'Thickness' ).onChange( updateParameters );
 
-					renderPipeline.outputNode = outputNode;
+			const blurGui = renderer.inspector.createParameters( 'Blur' );
+			blurGui.add( params, 'blur' ).name( 'Enabled' ).onChange( value => blurEnabled.value = Number( value ) );
+			blurGui.add( params, 'blurQuality', 1, 3, 1 ).name( 'Quality' ).onChange( updateParameters );
 
-				} else {
+			const sceneGui = renderer.inspector.createParameters( 'Scene' );
+			sceneGui.add( params, 'roughness', 0, 1 ).name( 'Roughness' ).onChange( value => {
 
-					renderPipeline.outputNode = scenePass;
+				model?.traverse( object => {
 
-				}
-
-				renderPipeline.needsUpdate = true;
-
-			} );
-			const modelFolder = gui.addFolder( 'Model' );
-			modelFolder.add( params, 'roughness', 0, 1 ).onChange( ( value ) => {
-
-				model.traverse( function ( object ) {
-
-					if ( object.material ) {
-
-						object.material.roughness = value;
-
-					}
+					if ( object.material ) object.material.roughness = value;
 
 				} );
 
 			} );
 
 			updateParameters();
+			updateOutput();
 
-		}
+			function updateParameters() {
 
-		function updateParameters() {
+				reflection.quality.value = params.quality;
+				reflection.intensity.value = params.intensity;
+				reflection.binaryRefine = params.binaryRefine;
+				reflection.maxDistance.value = params.maxDistance;
+				reflection.thickness.value = params.thickness;
+				reflection.blurQuality = params.blurQuality;
 
-			ssrPass.quality.value = params.quality;
-			// blurQuality is a build-time constant: assigning it recompiles the blur material
-			// (the setter no-ops when the value is unchanged).
-			ssrPass.blurQuality = params.blurQuality;
-			ssrPass.maxDistance.value = params.maxDistance;
-			ssrPass.intensity.value = params.intensity;
-			ssrPass.thickness.value = params.thickness;
-			// build-time constant: assigning it recompiles the SSR material (setter no-ops if unchanged)
-			ssrPass.binaryRefine = params.binaryRefine;
+			}
 
 		}
 

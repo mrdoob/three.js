@@ -149,7 +149,7 @@ class Points extends Object3D {
 		_inverseMatrix.copy( matrixWorld ).invert();
 		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
-		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+		const localThreshold = threshold / matrixWorld.getMaxScaleOnAxis();
 		const localThresholdSq = localThreshold * localThreshold;
 
 		const index = geometry.index;

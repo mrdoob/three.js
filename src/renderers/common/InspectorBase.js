@@ -112,7 +112,7 @@ class InspectorBase extends EventDispatcher {
 	 * When a compute operation is performed.
 	 *
 	 * @param {ComputeNode} computeNode - The compute node being executed.
-	 * @param {number|Array<number>} dispatchSizeOrCount - The dispatch size or count.
+	 * @param {number|Array<number>|IndirectStorageBufferAttribute} dispatchSizeOrCount - The dispatch size or count.
 	 */
 	computeAsync( /*computeNode, dispatchSizeOrCount*/ ) { }
 

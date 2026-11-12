@@ -39,6 +39,24 @@ class UniformsGroup extends UniformBuffer {
 		this._values = null;
 
 		/**
+		 * An optional signed integer view of the buffer.
+		 *
+		 * @private
+		 * @type {?Int32Array}
+		 * @default null
+		 */
+		this._int32View = null;
+
+		/**
+		 * An optional unsigned integer view of the buffer.
+		 *
+		 * @private
+		 * @type {?Uint32Array}
+		 * @default null
+		 */
+		this._uint32View = null;
+
+		/**
 		 * An array of uniform objects.
 		 *
 		 * The order of uniforms in this array must match the order of uniforms in the shader.
@@ -257,6 +275,8 @@ class UniformsGroup extends UniformBuffer {
 		super.release();
 
 		this._values = null;
+		this._int32View = null;
+		this._uint32View = null;
 
 	}
 
@@ -271,6 +291,8 @@ class UniformsGroup extends UniformBuffer {
 
 		clone._buffer = null;
 		clone._values = null;
+		clone._int32View = null;
+		clone._uint32View = null;
 		clone._updateRanges = [];
 		clone._updateRangeCache = new Map();
 		clone._addedIndices = new Set();
@@ -539,8 +561,18 @@ class UniformsGroup extends UniformBuffer {
 	 */
 	_getBufferForType( type ) {
 
-		if ( type === 'int' || type === 'ivec2' || type === 'ivec3' || type === 'ivec4' ) return new Int32Array( this.buffer.buffer );
-		if ( type === 'uint' || type === 'uvec2' || type === 'uvec3' || type === 'uvec4' ) return new Uint32Array( this.buffer.buffer );
+		if ( type === 'int' || type === 'ivec2' || type === 'ivec3' || type === 'ivec4' ) {
+
+			return this._int32View || ( this._int32View = new Int32Array( this.buffer.buffer ) );
+
+		}
+
+		if ( type === 'uint' || type === 'uvec2' || type === 'uvec3' || type === 'uvec4' ) {
+
+			return this._uint32View || ( this._uint32View = new Uint32Array( this.buffer.buffer ) );
+
+		}
+
 		return this.buffer;
 
 	}

@@ -371,17 +371,20 @@ class RenderTarget extends EventDispatcher {
 
 			for ( let i = 0, il = this.textures.length; i < il; i ++ ) {
 
-				this.textures[ i ].image.width = width;
-				this.textures[ i ].image.height = height;
-				this.textures[ i ].image.depth = depth;
+				const texture = this.textures[ i ];
+				const image = texture.images ? texture.images[ 0 ] : texture.image;
 
-				if ( this.textures[ i ].isData3DTexture !== true ) { // Fix for #31693
+				image.width = width;
+				image.height = height;
+				image.depth = depth;
+
+				if ( texture.isData3DTexture !== true ) { // Fix for #31693
 
 					// TODO: Reconsider setting isArrayTexture flag here and in the ctor of Texture.
 					// Maybe a method `isArrayTexture()` or just a getter could replace a flag since
 					// both are evaluated on each call?
 
-					this.textures[ i ].isArrayTexture = this.textures[ i ].image.depth > 1;
+					texture.isArrayTexture = image.depth > 1;
 
 				}
 

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - noise smoothing</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - noise smoothing">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_tsl_noise_smoothing.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_tsl_noise_smoothing.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			.label {
+				position: absolute;
+				bottom: 20px;
+				width: 50%;
+				text-align: center;
+				color: #fff;
+				font: 600 14px 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+				text-shadow: 0 0 4px #000, 0 0 4px #000;
+				pointer-events: none;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Noise Smoothing</span>
+			</div>
+
+			<small>
+				Compare how spatial smoothing and temporal accumulation reduce noise in a dithered sphere or a uniform field.<br/>Frames accumulated: <span id="frames">0</span>
+			</small>
+		</div>
+
+		<div class="label" style="left: 0;">White Noise</div>
+		<div class="label" id="noiseLabel" style="right: 0;">Hierarchical Hashed Weyl</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { Fn, float, hash, interleavedGradientNoise, mix, screenCoordinate, screenSize, screenUV, texture, uint, uniform, vec2, vec3, vec4 } from 'three/tsl';
+
+			import { hierarchicalHashedWeyl } from 'three/addons/tsl/utils/HierarchicalHashedWeyl.js';
+			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			const modes = { 'Sphere': 0, 'Uniform': 1 };
+			const params = { mode: 'Sphere', noise: 'Hierarchical Hashed Weyl', pixelSize: 2, temporalBlur: true, spatialBlur: true, animate: true };
+
+			let renderer, computeQuad, displayQuad, targets, history, current, display, blurredDisplay;
+			let samples = 0;
+
+			const framesElement = document.getElementById( 'frames' );
+
+			const mode = uniform( modes[ params.mode ] );
+			const index = uniform( 0, 'uint' );
+			const blend = uniform( 1 );
+
+			init();
+
+			function init() {
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				targets = [ 0, 1 ].map( () => new THREE.RenderTarget( 1, 1, { type: THREE.FloatType, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, depthBuffer: false } ) );
+				history = texture( targets[ 1 ].texture );
+				current = texture( targets[ 0 ].texture );
+
+				// noise
+
+				const left = screenUV.x.lessThan( 0.5 );
+				const white = hash( uint( screenCoordinate.x ).add( uint( screenCoordinate.y ).mul( 4096 ) ).add( index.mul( 16777259 ) ) );
+
+				// interleaved gradient noise scrolls diagonally per frame, wrapping the index to keep float precision
+
+				const noises = {
+					'Hierarchical Hashed Weyl': hierarchicalHashedWeyl( screenCoordinate, index, 1 ),
+					'Interleaved Gradient Noise': interleavedGradientNoise( screenCoordinate.add( float( index.mod( 256 ) ).mul( 5.588238 ) ) )
+				};
+
+				// the same shaded sphere over a gradient in each half
+
+				const image = Fn( () => {
+
+					const p = vec2( screenUV.x.mul( 2 ).fract().sub( 0.5 ).mul( screenSize.x.div( screenSize.y ).mul( 0.5 ) ), screenUV.y.sub( 0.5 ) );
+					const r = float( 0.3 );
+					const z = r.mul( r ).sub( p.dot( p ) );
+					const normal = vec3( p.x, p.y.negate(), z.max( 0 ).sqrt() ).div( r );
+					const shading = normal.dot( vec3( - 0.5, 0.6, 0.6 ).normalize() ).max( 0 ).mul( 0.9 ).add( 0.03 );
+					return z.greaterThan( 0 ).select( shading, screenUV.x.mul( 2 ).fract().mul( 0.5 ) );
+
+				} )();
+
+				// 1 sample per frame, accumulated with a running average
+
+				const createComputeNode = () => {
+
+					const noise = left.select( white, noises[ params.noise ] );
+					const sample = mode.equal( 0 ).select( noise.lessThan( image ).select( 1, 0 ), noise );
+					const accumulated = mix( history.sample( screenUV ).r, sample, blend );
+					return vec4( accumulated, 0, 0, 1 );
+
+				};
+
+				computeQuad = new THREE.QuadMesh( new THREE.NodeMaterial() );
+				computeQuad.material.fragmentNode = createComputeNode();
+
+				// sigma = 0 selects a sigma = 1 Gaussian with kernel radius 3
+
+				const divider = screenCoordinate.x.sub( screenSize.x.mul( 0.5 ) ).abs().lessThan( 1 );
+				const output = ( channel ) => divider.select( vec4( 1, 0.3, 0.1, 1 ), vec4( vec3( channel ), 1 ) );
+
+				display = output( current.sample( screenUV ).r );
+				blurredDisplay = output( gaussianBlur( current, null, 0 ).r );
+
+				displayQuad = new THREE.QuadMesh( new THREE.NodeMaterial() );
+				displayQuad.material.fragmentNode = params.spatialBlur ? blurredDisplay : display;
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( params, 'mode', Object.keys( modes ) ).onChange( ( value ) => {
+
+					mode.value = modes[ value ];
+					samples = 0;
+
+				} );
+				gui.add( params, 'noise', Object.keys( noises ) ).onChange( ( value ) => {
+
+					computeQuad.material.fragmentNode = createComputeNode();
+					computeQuad.material.needsUpdate = true;
+					document.getElementById( 'noiseLabel' ).textContent = value;
+					samples = 0;
+
+				} );
+				gui.add( params, 'pixelSize', 1, 8, 1 ).name( 'pixel size' ).onChange( onWindowResize );
+				gui.add( params, 'temporalBlur' ).name( 'temporal blur' ).onChange( () => samples = 0 );
+				gui.add( params, 'spatialBlur' ).name( 'spatial blur' ).onChange( ( value ) => {
+
+					displayQuad.material.fragmentNode = value ? blurredDisplay : display;
+					displayQuad.material.needsUpdate = true;
+
+				} );
+				gui.add( params, 'animate' ).onChange( () => samples = 0 );
+
+				onWindowResize();
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				const size = renderer.getDrawingBufferSize( new THREE.Vector2() ).divideScalar( params.pixelSize ).ceil();
+				for ( const target of targets ) target.setSize( size.x, size.y );
+				samples = 0;
+
+			}
+
+			function animate() {
+
+				if ( computeQuad === undefined ) return;
+
+				if ( samples === 0 ) index.value = 0;
+				else if ( params.animate ) index.value ++;
+
+				// temporal blur is a running average of every sample since the last reset
+
+				samples ++;
+				blend.value = params.temporalBlur ? 1 / samples : 1;
+				framesElement.textContent = params.temporalBlur ? samples : 1;
+
+				renderer.setRenderTarget( targets[ 0 ] );
+				computeQuad.render( renderer );
+				renderer.setRenderTarget( null );
+				displayQuad.render( renderer );
+
+				targets.reverse();
+				history.value = targets[ 1 ].texture;
+				current.value = targets[ 0 ].texture;
+
+			}
+
+		</script>
+
+	</body>
+</html>
