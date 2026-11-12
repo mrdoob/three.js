@@ -71,8 +71,7 @@ class ContextNode extends Node {
 
 	_isPassThrough( builder ) {
 
-		// An assignment target context is a reference, not a value.
-		return this.value.assign !== true && this.getNodeType( builder ) !== 'void';
+		return this.getNodeType( builder ) !== 'void';
 
 	}
 

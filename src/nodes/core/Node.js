@@ -205,7 +205,9 @@ class Node extends EventDispatcher {
 
 		const { outputNode } = builder.getNodeProperties( this );
 
-		return outputNode !== null && outputNode !== undefined && outputNode.isNode === true && outputNode.isStackNode !== true && this.getNodeType( builder ) !== 'void';
+		if ( ! outputNode || outputNode.isNode !== true || outputNode.isStackNode === true ) return false;
+
+		return this.getNodeType( builder ) !== 'void';
 
 	}
 

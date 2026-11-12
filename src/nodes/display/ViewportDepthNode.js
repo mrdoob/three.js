@@ -67,13 +67,6 @@ class ViewportDepthNode extends Node {
 
 	}
 
-	_isPassThrough( builder ) {
-
-		// `depthBase()` refers to the fragment depth output, the other scopes are expressions.
-		return this.scope !== ViewportDepthNode.DEPTH_BASE && super._isPassThrough( builder );
-
-	}
-
 	generate( builder ) {
 
 		const { scope } = this;

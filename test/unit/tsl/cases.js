@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, context, determinant, float, grayscale, hue, int, inverse, ivec3, linearDepth, mat2, mat3, mat4, mix, mul, overloadingFn, overrideNode, sample, saturation, screenUV, select, time, transpose, uint, uniform, uv, vec2, vec3, vec4, vibrance } from '../../../src/Three.TSL.js';
+import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, context, determinant, float, grayscale, hue, instancedArray, int, inverse, ivec3, linearDepth, mat2, mat3, mat4, mix, mul, overloadingFn, overrideNode, sample, saturation, screenUV, select, time, transpose, uint, uniform, uv, vec2, vec3, vec4, vibrance } from '../../../src/Three.TSL.js';
 
 // Create a fresh graph for every test and backend.
 export const cases = {
@@ -1532,17 +1532,9 @@ export const cases = {
 
 	},
 
-	// Non-cacheable pass-through wrappers propagate multiple uses to their inner expression.
+	// Pass-through nodes propagate every read to their inner expression, which is then cached.
 
-	'linearDepth wrapper reuse': () => {
-
-		const d = linearDepth( uv().x );
-
-		return d.mul( d ).add( d );
-
-	},
-
-	'swizzle wrapper reuse': () => {
+	'swizzle reuse': () => {
 
 		const sx = screenUV.x;
 
@@ -1550,15 +1542,7 @@ export const cases = {
 
 	},
 
-	'context wrapper reuse': () => {
-
-		const c = context( uv().mul( 2 ).sub( 1 ), {} );
-
-		return c.mul( c ).add( c );
-
-	},
-
-	'nested wrapper reuse': () => {
+	'nested swizzle reuse': () => {
 
 		const sx = uv().mul( 2 ).xy.x;
 
@@ -1566,9 +1550,33 @@ export const cases = {
 
 	},
 
-	// A node whose setup returns an output node is a pass-through node by default.
+	'context reuse': () => {
 
-	'sample wrapper reuse': () => {
+		const c = context( uv().mul( 2 ).sub( 1 ), {} );
+
+		return c.mul( c ).add( c );
+
+	},
+
+	'storage element reuse': () => {
+
+		const element = instancedArray( 4 ).element( int( uniform( 1 ) ).add( 1 ) );
+
+		return element.mul( element ).add( element );
+
+	},
+
+	// Nodes whose setup returns an output node are pass-through nodes by default.
+
+	'linearDepth reuse': () => {
+
+		const d = linearDepth( uv().x );
+
+		return d.mul( d ).add( d );
+
+	},
+
+	'sample reuse': () => {
 
 		const s = sample( ( coord ) => coord.mul( 2 ).add( 1 ) );
 
@@ -1578,7 +1586,7 @@ export const cases = {
 
 	// A value cached inside a block is declared again where it is reused outside of it.
 
-	'wrapper reuse across blocks': () => Fn( () => {
+	'swizzle reuse across blocks': () => Fn( () => {
 
 		const sx = uv().mul( 2 ).x;
 		const result = float( 0 ).toVar();
@@ -1593,9 +1601,9 @@ export const cases = {
 
 	} )(),
 
-	// Reads after an assignment through the wrapper still propagate to the inner expression.
+	// Reads after an assignment through the same node still reach the inner expression.
 
-	'wrapper reuse around assignment': () => Fn( () => {
+	'element reuse around assignment': () => Fn( () => {
 
 		const values = array( [ float( 1 ), float( 2 ), float( 3 ) ] ).toVar();
 		const element = values.element( int( uniform( 1 ) ).add( 1 ) );
