@@ -16,6 +16,7 @@ import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compatibility, CustomBlending } from '../../constants.js';
 import { Color } from '../../math/Color.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
+import WebGPUUniformBufferPool from './utils/WebGPUUniformBufferPool.js';
 import { error, warnOnce } from '../../utils.js';
 
 import GPUBufferDescriptor from './descriptors/GPUBufferDescriptor.js';
@@ -34,6 +35,7 @@ import GPUExtent3D from './descriptors/GPUExtent3D.js';
 
 const _clearValue = { r: 0, g: 0, b: 0, a: 1 };
 const _blendConstant = { r: 0, g: 0, b: 0, a: 0 };
+const _dynamicOffset = new Uint32Array( 1 );
 const _bufferDescriptor = new GPUBufferDescriptor();
 const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
 const _computePassDescriptor = new GPUComputePassDescriptor();
@@ -200,6 +202,8 @@ class WebGPUBackend extends Backend {
 			[ Compatibility.TEXTURE_COMPARE ]: compatibilityTextureCompare
 		};
 
+		this.uniformBufferPool = null;
+
 	}
 
 	/**
@@ -305,6 +309,7 @@ class WebGPUBackend extends Backend {
 		};
 
 		this.device = device;
+		this.uniformBufferPool = new WebGPUUniformBufferPool( device );
 
 		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
 
@@ -1171,7 +1176,7 @@ class WebGPUBackend extends Backend {
 	 */
 	_resetRenderContextData( renderContextData ) {
 
-		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+		renderContextData.currentSets = { attributes: {}, bindingGroups: [], dynamicOffsets: [], pipeline: null, index: null };
 
 		if ( renderContextData.currentBlendColor === undefined ) renderContextData.currentBlendColor = new Color();
 
@@ -1205,6 +1210,7 @@ class WebGPUBackend extends Backend {
 			const bundleSets = {
 				attributes: {},
 				bindingGroups: [],
+				dynamicOffsets: [],
 				pipeline: null,
 				index: null
 			};
@@ -1606,6 +1612,8 @@ class WebGPUBackend extends Backend {
 
 		}
 
+		if ( this.uniformBufferPool !== null ) this.uniformBufferPool.flush();
+
 		submit( this.device, renderContextData.encoder.finish() );
 
 		// pass and encoder are only valid between beginRender() and finishRender()
@@ -1975,10 +1983,18 @@ class WebGPUBackend extends Backend {
 
 		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
 
-			const bindGroup = bindings[ i ];
-			const bindingsData = this.get( bindGroup );
+			const bindingsData = this.get( bindings[ i ] );
 
-			passEncoderGPU.setBindGroup( i, bindingsData.group );
+			if ( bindingsData.dynamicOffset >= 0 ) {
+
+				_dynamicOffset[ 0 ] = bindingsData.dynamicOffset;
+				passEncoderGPU.setBindGroup( i, bindingsData.group, _dynamicOffset, 0, 1 );
+
+			} else {
+
+				passEncoderGPU.setBindGroup( i, bindingsData.group );
+
+			}
 
 		}
 
@@ -2065,6 +2081,8 @@ class WebGPUBackend extends Backend {
 
 		groupData.passEncoderGPU.end();
 
+		if ( this.uniformBufferPool !== null ) this.uniformBufferPool.flush();
+
 		submit( this.device, groupData.cmdEncoderGPU.finish() );
 
 	}
@@ -2103,6 +2121,7 @@ class WebGPUBackend extends Backend {
 		// bind groups
 
 		const currentBindingGroups = currentSets.bindingGroups;
+		const currentDynamicOffsets = currentSets.dynamicOffsets;
 
 		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
 
@@ -2112,13 +2131,26 @@ class WebGPUBackend extends Backend {
 
 			// compare native bind groups
 
-			const bindGroup = bindings[ i ];
-			const bindGroupGPU = this.get( bindGroup ).group;
+			const bindingsData = this.get( bindings[ i ] );
+			const bindGroupGPU = bindingsData.group;
+			const dynamicOffset = bindingsData.dynamicOffset;
 
-			if ( currentBindingGroups[ i ] !== bindGroupGPU ) {
+			if ( dynamicOffset >= 0 ) {
+
+				if ( currentBindingGroups[ i ] !== bindGroupGPU || currentDynamicOffsets[ i ] !== dynamicOffset ) {
+
+					_dynamicOffset[ 0 ] = dynamicOffset;
+					passEncoderGPU.setBindGroup( i, bindGroupGPU, _dynamicOffset, 0, 1 );
+					currentBindingGroups[ i ] = bindGroupGPU;
+					currentDynamicOffsets[ i ] = dynamicOffset;
+
+				}
+
+			} else if ( currentBindingGroups[ i ] !== bindGroupGPU ) {
 
 				passEncoderGPU.setBindGroup( i, bindGroupGPU );
 				currentBindingGroups[ i ] = bindGroupGPU;
+				currentDynamicOffsets[ i ] = - 1;
 
 			}
 
@@ -2964,7 +2996,7 @@ class WebGPUBackend extends Backend {
 		renderContextData._currentPass = renderContextData.currentPass;
 		renderContextData._currentSets = renderContextData.currentSets;
 
-		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+		renderContextData.currentSets = { attributes: {}, bindingGroups: [], dynamicOffsets: [], pipeline: null, index: null };
 		renderContextData.currentPass = this.pipelineUtils.createBundleEncoder( renderContext );
 
 	}
@@ -3020,6 +3052,15 @@ class WebGPUBackend extends Backend {
 
 		if ( uniformBufferData.buffer === undefined ) {
 
+			if ( this.uniformBufferPool.canPool( uniformBuffer ) === true ) {
+
+				const allocation = this.uniformBufferPool.allocate( uniformBuffer );
+				uniformBufferData.buffer = allocation.bufferGPU;
+				uniformBufferData.allocation = allocation;
+				return;
+
+			}
+
 			const byteLength = uniformBuffer.byteLength;
 
 			const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
@@ -3055,6 +3096,7 @@ class WebGPUBackend extends Backend {
 			_bufferDescriptor.reset();
 
 			uniformBufferData.buffer = bufferGPU;
+			uniformBufferData.allocation = null;
 
 		}
 
@@ -3069,7 +3111,15 @@ class WebGPUBackend extends Backend {
 
 		const uniformBufferData = this.get( uniformBuffer );
 
-		uniformBufferData.buffer.destroy();
+		if ( uniformBufferData.allocation !== null ) {
+
+			this.uniformBufferPool.free( uniformBufferData.allocation );
+
+		} else {
+
+			uniformBufferData.buffer.destroy();
+
+		}
 
 		this.delete( uniformBuffer );
 
@@ -3551,6 +3601,7 @@ class WebGPUBackend extends Backend {
 
 		this.bindingUtils.dispose();
 		this.textureUtils.dispose();
+		if ( this.uniformBufferPool !== null ) this.uniformBufferPool.dispose();
 
 		if ( this._timerQuerySet !== null ) {
 
