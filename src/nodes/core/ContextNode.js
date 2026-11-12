@@ -69,6 +69,13 @@ class ContextNode extends Node {
 
 	}
 
+	_isPassThrough( builder ) {
+
+		// An assignment target context is a reference, not a value.
+		return this.value.assign !== true && this.getNodeType( builder ) !== 'void';
+
+	}
+
 	/**
 	 * This method is overwritten to ensure it returns the reference to {@link ContextNode#node}.
 	 *
@@ -132,7 +139,7 @@ class ContextNode extends Node {
 
 		const usageCount = builder.increaseUsage( this );
 
-		if ( usageCount === 1 || ( usageCount === 2 && builder.isContextAssign() === false && this.getNodeType( builder ) !== 'void' ) ) {
+		if ( usageCount === 1 || this._propagatesUsage( builder ) ) {
 
 			const previousContext = builder.addContext( this.value );
 

@@ -1615,3 +1615,36 @@ vec2 nodeConst0 = ( vec2( gl_FragCoord.xy.x, ( nodeUniform0.y - gl_FragCoord.xy.
 vec2 nodeConst0 = ( ( nodeVarying0 * vec2( 2.0 ) ) - vec2( 1.0 ) );
 
 ( ( nodeConst0 * nodeConst0 ) + nodeConst0 )
+
+// nested wrapper reuse
+
+vec2 nodeConst0 = ( nodeVarying0 * vec2( 2.0 ) );
+
+( ( nodeConst0.x * nodeConst0.x ) + nodeConst0.x )
+
+// wrapper reuse across blocks
+
+float nodeVar0;
+nodeVar0 = 0.0;
+
+if ( ( nodeUniform0 > 0.0 ) ) {
+
+	vec2 nodeConst0 = ( nodeVarying0 * vec2( 2.0 ) );
+	nodeVar0 = nodeConst0.x;
+
+}
+
+vec2 nodeConst0 = ( nodeVarying0 * vec2( 2.0 ) );
+
+( ( nodeVar0 + nodeConst0.x ) + nodeConst0.x )
+
+// wrapper reuse around assignment
+
+float[ 3 ] nodeVar0;
+float nodeVar1;
+nodeVar0 = float[ 3 ]( 1.0, 2.0, 3.0 );
+int nodeConst0 = ( int( nodeUniform0 ) + 1 );
+nodeVar1 = nodeVar0[ nodeConst0 ];
+nodeVar0[ nodeConst0 ] = 5.0;
+
+( nodeVar1 + nodeVar0[ nodeConst0 ] )

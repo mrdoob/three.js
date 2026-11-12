@@ -41,6 +41,14 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 	}
 
+	_isPassThrough( /*builder*/ ) {
+
+		// Storage elements are memory accesses that can be written by other invocations,
+		// and the WebGL fallback reads them from a PBO, so their reuse is not propagated.
+		return false;
+
+	}
+
 	/**
 	 * The storage buffer node.
 	 *

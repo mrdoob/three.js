@@ -63,6 +63,12 @@ class SplitNode extends Node {
 
 	}
 
+	_isPassThrough( /*builder*/ ) {
+
+		return true;
+
+	}
+
 	/**
 	 * Returns the vector length which is computed based on the requested components.
 	 *

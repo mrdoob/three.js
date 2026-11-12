@@ -55,6 +55,12 @@ class ArrayElementNode extends Node {
 
 	}
 
+	_isPassThrough( /*builder*/ ) {
+
+		return true;
+
+	}
+
 	/**
 	 * Returns the scope of the array-like node so assignments to elements
 	 * mark the underlying value as mutable.

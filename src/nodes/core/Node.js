@@ -190,31 +190,38 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * Whether a non-cacheable node passes through to its inner expression on every evaluation
-	 * without owning a shader variable, so a second use in `analyze()` must propagate usage
-	 * to its inner expression.
+	 * Whether this node passes through to its inner expression every time it is generated,
+	 * without owning a shader variable, e.g. a swizzle or an element access. Such a node is not
+	 * cacheable itself, so its reuse must reach the inner expression, which can then be cached.
+	 * Non-cacheable nodes override this method to opt in.
 	 *
 	 * @private
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {boolean} Whether `analyze()` propagates on second use.
+	 * @return {boolean} Whether this node is a pass-through node.
 	 */
-	_analyzesPassThrough( builder ) {
+	_isPassThrough( /*builder*/ ) {
 
-		if ( this.isCacheable( builder ) === true || builder.isContextAssign() === true ) return false;
+		return false;
 
-		if ( this.isSplitNode === true || this.isMemberNode === true || ( this.isArrayElementNode === true && this.isStorageArrayElementNode !== true ) ) {
+	}
 
-			return true;
+	/**
+	 * Whether `analyze()` must analyze the children of this pass-through node again, because
+	 * the node is read once more. Every read reaches the inner expression, so its usage count
+	 * matches the number of reads and it can be cached when it is read more than once.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether the reuse of this node is propagated to its children.
+	 */
+	_propagatesUsage( builder ) {
 
-		}
+		if ( builder.isContextAssign() === true || this.isCacheable( builder ) === true || this._isPassThrough( builder ) !== true ) return false;
 
-		const nodeData = builder.getDataFromNode( this );
+		// An assignable node declared as a variable owns its value.
+		if ( this.assignable === true && this._declaresAssignable() && this._isVariable( builder, builder.getDataFromNode( this ) ) ) return false;
 
-		if ( this.assignable === true && this._declaresAssignable() && this._isVariable( builder, nodeData ) ) return false;
-
-		const { outputNode } = builder.getNodeProperties( this );
-
-		return outputNode !== null && outputNode !== undefined && outputNode.isNode === true && outputNode.isStackNode !== true && this.getNodeType( builder ) !== 'void';
+		return true;
 
 	}
 
@@ -1046,7 +1053,7 @@ class Node extends EventDispatcher {
 
 		}
 
-		if ( usageCount === 1 ) {
+		if ( usageCount === 1 || this._propagatesUsage( builder ) ) {
 
 			// node flow children
 
@@ -1057,28 +1064,6 @@ class Node extends EventDispatcher {
 				if ( childNode && childNode.isNode === true ) {
 
 					childNode.build( builder, this );
-
-				}
-
-			}
-
-		} else if ( usageCount === 2 && this._analyzesPassThrough( builder ) ) {
-
-			const nodeProperties = builder.getNodeProperties( this );
-
-			if ( nodeProperties.outputNode && nodeProperties.outputNode.isNode === true ) {
-
-				nodeProperties.outputNode.build( builder, this );
-
-			} else {
-
-				for ( const childNode of Object.values( nodeProperties ) ) {
-
-					if ( childNode && childNode.isNode === true ) {
-
-						childNode.build( builder, this );
-
-					}
 
 				}
 

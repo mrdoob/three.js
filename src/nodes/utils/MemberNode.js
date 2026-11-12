@@ -56,6 +56,12 @@ class MemberNode extends Node {
 
 	}
 
+	_isPassThrough( /*builder*/ ) {
+
+		return true;
+
+	}
+
 	/**
 	 * Returns the scope of the struct so assignments to members
 	 * mark the underlying value as mutable.

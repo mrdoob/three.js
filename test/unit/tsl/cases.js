@@ -1556,6 +1556,45 @@ export const cases = {
 
 		return c.mul( c ).add( c );
 
-	}
+	},
+
+	'nested wrapper reuse': () => {
+
+		const sx = uv().mul( 2 ).xy.x;
+
+		return sx.mul( sx ).add( sx );
+
+	},
+
+	// A value cached inside a block is declared again where it is reused outside of it.
+
+	'wrapper reuse across blocks': () => Fn( () => {
+
+		const sx = uv().mul( 2 ).x;
+		const result = float( 0 ).toVar();
+
+		If( uniform( 1 ).greaterThan( 0 ), () => {
+
+			result.assign( sx );
+
+		} );
+
+		return result.add( sx ).add( sx );
+
+	} )(),
+
+	// Reads after an assignment through the wrapper still propagate to the inner expression.
+
+	'wrapper reuse around assignment': () => Fn( () => {
+
+		const values = array( [ float( 1 ), float( 2 ), float( 3 ) ] ).toVar();
+		const element = values.element( int( uniform( 1 ) ).add( 1 ) );
+		const previous = element.toVar();
+
+		element.assign( 5 );
+
+		return previous.add( element );
+
+	} )()
 
 };

@@ -1700,3 +1700,38 @@ let nodeConst0 = ( fragCoord.xy / render.nodeUniform0 );
 let nodeConst0 = ( ( nodeVarying0 * vec2<f32>( 2.0 ) ) - vec2<f32>( 1.0 ) );
 
 ( ( nodeConst0 * nodeConst0 ) + nodeConst0 )
+
+// nested wrapper reuse
+
+let nodeConst0 = ( nodeVarying0 * vec2<f32>( 2.0 ) );
+
+( ( nodeConst0.x * nodeConst0.x ) + nodeConst0.x )
+
+// wrapper reuse across blocks
+
+var nodeVar0 : f32;
+
+nodeVar0 = 0.0;
+
+if ( ( object.nodeUniform0 > 0.0 ) ) {
+
+	let nodeConst0 = ( nodeVarying0 * vec2<f32>( 2.0 ) );
+	nodeVar0 = nodeConst0.x;
+
+}
+
+let nodeConst0 = ( nodeVarying0 * vec2<f32>( 2.0 ) );
+
+( ( nodeVar0 + nodeConst0.x ) + nodeConst0.x )
+
+// wrapper reuse around assignment
+
+var nodeVar0 : array< f32, 3 >;
+var nodeVar1 : f32;
+
+nodeVar0 = array< f32, 3 >( 1.0, 2.0, 3.0 );
+let nodeConst0 = ( i32( object.nodeUniform0 ) + 1 );
+nodeVar1 = nodeVar0[ nodeConst0 ];
+nodeVar0[ nodeConst0 ] = 5.0;
+
+( nodeVar1 + nodeVar0[ nodeConst0 ] )

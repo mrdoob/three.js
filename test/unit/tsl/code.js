@@ -2,6 +2,7 @@ import WGSLNodeBuilder from '../../../src/renderers/webgpu/nodes/WGSLNodeBuilder
 import GLSLNodeBuilder from '../../../src/renderers/webgl-fallback/nodes/GLSLNodeBuilder.js';
 import { BufferAttribute } from '../../../src/core/BufferAttribute.js';
 import { BufferGeometry } from '../../../src/core/BufferGeometry.js';
+import { PerspectiveCamera } from '../../../src/cameras/PerspectiveCamera.js';
 import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../../../src/constants.js';
 
 export const builders = {
@@ -17,6 +18,7 @@ export function generateCode( createNode, language ) {
 	const geometry = new BufferGeometry();
 	geometry.setAttribute( 'uv', new BufferAttribute( new Float32Array( 2 ), 2 ) );
 	const builder = new builders[ language ]( { geometry }, renderer );
+	builder.camera = new PerspectiveCamera();
 	builder.setShaderStage( 'fragment' );
 
 	const flow = builder.flowStagesNode( createNode() );
