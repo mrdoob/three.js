@@ -470,6 +470,8 @@ class WebGPUTextureUtils {
 
 		textureData.textureDescriptorGPU = textureDescriptorGPU;
 
+		if ( textureData.views !== null ) textureData.views.clear();
+
 	}
 
 	/**

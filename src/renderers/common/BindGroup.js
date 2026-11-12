@@ -38,6 +38,15 @@ class BindGroup {
 		 */
 		this.id = _id ++;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isBindGroup = true;
+
 	}
 
 	/**
