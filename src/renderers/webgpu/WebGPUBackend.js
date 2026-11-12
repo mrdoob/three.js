@@ -2880,7 +2880,9 @@ class WebGPUBackend extends Backend {
 
 		const timestamps = new BigUint64Array( readBuffer.getMappedRange() );
 
-		for ( const timer of timers ) {
+		for ( let i = 0, l = timers.length; i < l; i ++ ) {
+
+			const timer = timers[ i ];
 
 			// Passes don't run in the order they took queries. A nested pass (a shadow map) runs before its
 			// parent. So take the earliest begin and latest end.
