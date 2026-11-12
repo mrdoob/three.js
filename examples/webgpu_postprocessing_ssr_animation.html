@@ -339,55 +339,75 @@
 					'Previous (Camera)': previousCamera
 				};
 
-				// ssr
-
-				const ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
-					stochastic: true,
-					diffuseNode: scenePassDiffuseColor,
-					metalnessNode: scenePassDiffuseColor.a,
-					roughnessNode: sceneRoughness,
-					binaryRefine: params.binaryRefine
-				} ).toInspector( 'SSR' );
-
-				const ssrTexture = ssrNode.getTextureNode();
-
-				// denoise
-
-				const temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
-					mode: 'specular',
-					accumulate: false
-				} );
-				temporalReprojectNode.maxFrames.value = 16;
-				temporalReprojectNode.clampIntensity.value = 0.25;
-
-				const denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
-					depth: scenePassDepth,
-					normal: scenePassNormal,
-					raw: ssrNode,
-					metalRoughness: sceneMetalRough,
-					mode: 'specular',
-					accumulate: true
-				} );
-				denoiseNode.depthPhi.value = 20;
-				denoiseNode.normalPhi.value = 0.3;
-				denoiseNode.radius.value = 1.5;
-				denoiseNode.alphaPhi.value = 5;
-				denoiseNode.strength.value = 0.725;
-				denoiseNode.adaptiveTrust.value = 1;
-
-				// feed the denoised result + velocity back into SSR for multi-bounce reflections
-
-				ssrNode.setHistory( denoiseNode, scenePassVelocity );
-				temporalReprojectNode.setHistoryTexture( denoiseNode );
-
-				// composite
-
+				let ssrNode, ssrTexture, temporalReprojectNode, denoiseNode, temporalAA, spatialAA;
 				const denoiseEnabled = uniform( 1 );
 
-				const combined = scenePassColor.rgb.add( mix( ssrTexture.rgb, denoiseNode.rgb, denoiseEnabled ) );
+				function updateTraceSource() {
 
-				const temporalAA = traa( vec4( combined, 1 ), scenePassDepth, scenePassVelocity, camera );
-				const spatialAA = smaa( vec4( combined, 1 ) );
+					// Replace the effect graph so changing its input stays local to this example.
+					for ( const effect of [ ssrNode, temporalReprojectNode, denoiseNode, temporalAA, spatialAA ] ) {
+
+						if ( effect !== undefined ) effect.dispose();
+
+					}
+
+					const useVelocity = params.traceSource === 'Previous (Velocity)' || params.traceSource === 'Previous (Buffer)';
+					scenePass.setMRT( useVelocity ? previousMRT : currentMRT );
+					historyValid.value = false;
+
+					// ssr
+
+					ssrNode = ssr( traceSources[ params.traceSource ], scenePassDepth, sceneNormal, {
+						camera,
+						stochastic: true,
+						diffuseNode: scenePassDiffuseColor,
+						metalnessNode: scenePassDiffuseColor.a,
+						roughnessNode: sceneRoughness,
+						binaryRefine: params.binaryRefine
+					} ).toInspector( 'SSR' );
+
+					ssrTexture = ssrNode.getTextureNode();
+
+					// denoise
+
+					temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
+						mode: 'specular',
+						accumulate: false
+					} );
+					temporalReprojectNode.maxFrames.value = 16;
+					temporalReprojectNode.clampIntensity.value = 0.25;
+
+					denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
+						depth: scenePassDepth,
+						normal: scenePassNormal,
+						raw: ssrNode,
+						metalRoughness: sceneMetalRough,
+						mode: 'specular',
+						accumulate: true
+					} );
+					denoiseNode.depthPhi.value = 20;
+					denoiseNode.normalPhi.value = 0.3;
+					denoiseNode.radius.value = 1.5;
+					denoiseNode.alphaPhi.value = 5;
+					denoiseNode.strength.value = 0.725;
+					denoiseNode.adaptiveTrust.value = 1;
+
+					// feed the denoised result + velocity back into SSR for multi-bounce reflections
+
+					ssrNode.setHistory( denoiseNode, scenePassVelocity );
+					temporalReprojectNode.setHistoryTexture( denoiseNode );
+
+					// composite
+
+					const combined = scenePassColor.rgb.add( mix( ssrTexture.rgb, denoiseNode.rgb, denoiseEnabled ) );
+
+					temporalAA = traa( vec4( combined, 1 ), scenePassDepth, scenePassVelocity, camera );
+					spatialAA = smaa( vec4( combined, 1 ) );
+
+					updateParameters();
+					updateOutput();
+
+				}
 
 				function updateOutput() {
 
@@ -425,17 +445,7 @@
 				displayGui.add( params, 'traa' ).name( 'TRAA' ).onChange( updateOutput );
 
 				const ssrGui = renderer.inspector.createParameters( 'SSR' );
-				ssrGui.add( params, 'traceSource', Object.keys( traceSources ) ).name( 'Trace source' ).onChange( () => {
-
-					const useVelocity = params.traceSource === 'Previous (Velocity)' || params.traceSource === 'Previous (Buffer)';
-					scenePass.setMRT( useVelocity ? previousMRT : currentMRT );
-					// Changing the source rebuilds the SSR shader without a runtime selector branch.
-					ssrNode.colorNode = traceSources[ params.traceSource ];
-					historyValid.value = false;
-					// Seed fresh temporal history on the next render.
-					temporalReprojectNode.setSize( 0, 0 );
-
-				} );
+				ssrGui.add( params, 'traceSource', Object.keys( traceSources ) ).name( 'Trace source' ).onChange( updateTraceSource );
 				ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( updateParameters );
 				ssrGui.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( updateParameters );
 				ssrGui.add( params, 'maxDistance', 0.01, 50, 0.01 ).name( 'Max distance' ).onChange( updateParameters );
@@ -460,8 +470,7 @@
 				sceneGui.add( params, 'animate' ).name( 'Animation' );
 				sceneGui.add( params, 'orbit' ).name( 'Orbit camera' );
 
-				updateParameters();
-				updateOutput();
+				updateTraceSource();
 
 				//
 

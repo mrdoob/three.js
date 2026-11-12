@@ -90,10 +90,9 @@ class SSRNode extends Node {
 		/**
 		 * The node that represents the beauty pass.
 		 *
-		 * @private
 		 * @type {Node<vec4>}
 		 */
-		this._colorNode = colorNode;
+		this.colorNode = colorNode;
 
 		/**
 		 * A node that represents the scene's diffuse color (typically the MRT `diffuseColor` attachment).
@@ -509,28 +508,6 @@ class SSRNode extends Node {
 	}
 
 	/**
-	 * The node that represents the beauty pass. Assigning a new node rebuilds the SSR material.
-	 *
-	 * @type {Node<vec4>}
-	 */
-	get colorNode() {
-
-		return this._colorNode;
-
-	}
-
-	set colorNode( value ) {
-
-		if ( value !== this._colorNode ) {
-
-			this._colorNode = value;
-			this._buildSSRMaterial();
-
-		}
-
-	}
-
-	/**
 	 * Non-linear step distribution exponent (compile-time constant). See the backing
 	 * field for details. Assigning a new value recompiles the SSR material.
 	 *
@@ -664,8 +641,7 @@ class SSRNode extends Node {
 	 * Rebuilds the SSR material's node graph by re-invoking the fragment `Fn`, which
 	 * re-bakes the compile-time constants ({@link SSRNode#binaryRefine},
 	 * {@link SSRNode#stepExponent}, {@link SSRNode#screenEdgeFadeBlack}) at their current
-	 * values, and picks up changes to {@link SSRNode#colorNode}.
-	 * A no-op until {@link SSRNode#setup} has captured the `Fn`.
+	 * values. A no-op until {@link SSRNode#setup} has captured the `Fn`.
 	 *
 	 * @private
 	 */
