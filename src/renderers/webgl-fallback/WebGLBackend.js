@@ -158,6 +158,10 @@ class WebGLBackend extends Backend {
 		 */
 		this.disjoint = null;
 
+		// GPU timers. A timer is one TIME_ELAPSED query around everything issued between its begin and end.
+		// The extension allows a single active query, so timers can't overlap here
+		this._timerQuery = null;
+
 		/**
 		* A reference to the `KHR_parallel_shader_compile` extension. `null` if the
 		* device does not support the extension.
@@ -415,7 +419,13 @@ class WebGLBackend extends Backend {
 	 */
 	initTimestampQuery( type, uid ) {
 
-		if ( ! this.disjoint || ! this.trackTimestamp ) return;
+		// TODO: only one TIME_ELAPSED query can be active, so passes inside a timer are missing from
+		// trackTimestamp. Remove once trackTimestamp is replaced by timers
+		if ( ! this.disjoint || ! this.trackTimestamp || this._timerQuery !== null ) {
+
+			return;
+
+		}
 
 		if ( ! this.timestampQueryPool[ type ] ) {
 
@@ -446,11 +456,86 @@ class WebGLBackend extends Backend {
 	 */
 	prepareTimestampBuffer( type, uid ) {
 
-		if ( ! this.disjoint || ! this.trackTimestamp ) return;
+		if ( ! this.disjoint || ! this.trackTimestamp || this._timerQuery !== null ) {
+
+			return;
+
+		}
 
 		const timestampQueryPool = this.timestampQueryPool[ type ];
 
 		timestampQueryPool.endQuery( uid );
+
+	}
+
+	/**
+	 * Starts a GPU timer measurement.
+	 *
+	 * @return {?WebGLQuery} The query timing the measurement, or `null` without the
+	 * `EXT_disjoint_timer_query_webgl2` extension or while another timer is running.
+	 */
+	beginTimer() {
+
+		if ( this.disjoint === null ) {
+
+			return null;
+
+		}
+
+		if ( this._timerQuery !== null ) {
+
+			warnOnce( 'WebGLBackend: GPU timers can not overlap in WebGL.' );
+			return null;
+
+		}
+
+		const gl = this.gl;
+		const query = gl.createQuery();
+
+		gl.beginQuery( this.disjoint.TIME_ELAPSED_EXT, query );
+
+		this._timerQuery = query;
+
+		return query;
+
+	}
+
+	/**
+	 * Ends the given measurement and returns its GPU time in milliseconds.
+	 *
+	 * @async
+	 * @param {?WebGLQuery} query - The value returned by {@link WebGLBackend#beginTimer}.
+	 * @return {Promise<?number>} The GPU time in milliseconds, or `null` if the GPU clock was unreliable.
+	 */
+	async endTimer( query ) {
+
+		if ( query === null ) {
+
+			return null;
+
+		}
+
+		const gl = this.gl;
+
+		gl.endQuery( this.disjoint.TIME_ELAPSED_EXT );
+		gl.flush();
+
+		this._timerQuery = null;
+
+		// the result arrives a frame or more later
+
+		while ( gl.getQueryParameter( query, gl.QUERY_RESULT_AVAILABLE ) === false ) {
+
+			await new Promise( resolve => setTimeout( resolve, 1 ) );
+
+		}
+
+		const disjoint = gl.getParameter( this.disjoint.GPU_DISJOINT_EXT );
+		const elapsed = disjoint ? null : gl.getQueryParameter( query, gl.QUERY_RESULT ) / 1e6;
+
+		gl.deleteQuery( query );
+
+		return elapsed;
 
 	}
 

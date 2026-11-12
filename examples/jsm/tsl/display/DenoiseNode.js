@@ -1,5 +1,5 @@
 import { FloatType, HalfFloatType, Matrix4, Node, NodeMaterial, NodeUpdateType, QuadMesh, RendererUtils, RenderTarget, RGFormat, Vector2 } from 'three/webgpu';
-import { Fn, If, Loop, abs, atan, convertToTexture, dot, exp, float, floor, getNormalFromDepth, getViewPosition, isBackgroundDepth, ivec2, length, luminance, max, min, mix, nodeObject, outputStruct, passTexture, pow, property, screenCoordinate, sqrt, texture, textureSize, uniform, vec2, vec3, vec4 } from 'three/tsl';
+import { Fn, If, Loop, abs, atan, convertToTexture, dot, exp, float, floor, getNormalFromDepth, getViewPosition, isBackgroundDepth, ivec2, length, luminance, max, min, mix, nodeObject, outputStruct, passTexture, pow, screenCoordinate, sqrt, struct, texture, textureSize, uniform, vec2, vec3, vec4 } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
@@ -27,6 +27,11 @@ const HIT_DISTANCE_PHI = 8;
  * devices. Performance-restricted use cases should avoid per-frame denoising with this node and rely on the basic
  * denoising of TAA instead, see {@link TRAANode}. {@link BilateralBlurNode} is a performant alternative as well. Both
  * come at the cost of lower denoise quality.
+ *
+ * The noise of the input should be independent between neighboring pixels. Samples that are correlated across pixels,
+ * e.g. one sequence shifted by a smooth function of the pixel coordinates, leave structure such as bands that neither
+ * the accumulation in time nor the edge-aware filter removes. A low-discrepancy sequence in time, rotated by a random
+ * or stratified offset per pixel ( Cranley-Patterson rotation ), works well.
  *
  * ```js
  * // SSGI, accumulated in time before TRAA: GI in rgb and AO in alpha
@@ -170,7 +175,9 @@ class DenoiseNode extends Node {
 		this.hitDistanceNode = hitDistance;
 
 		/**
-		 * Whether alpha is a second signal to filter, e.g. AO next to GI. Otherwise the alpha of the output is 1.
+		 * Whether alpha is a second signal to filter, e.g. AO next to GI. Otherwise the alpha of the output is 1, or with
+		 * `temporal` the weight of the current frame in the history, `1 / history length`, which damps the feedback of
+		 * multi-bounce reflections where the history is short, see {@link SSRNode#setHistory}.
 		 *
 		 * @type {boolean}
 		 * @readonly
@@ -1438,7 +1445,11 @@ class DenoiseNode extends Node {
 
 				if ( this.coverage ) return vec4( resultAlpha.x.greaterThan( 1e-4 ).select( result.rgb.div( resultAlpha.x.max( 1e-4 ) ), vec3( 0 ) ), resultAlpha.x.clamp() );
 
-				return vec4( result.rgb, alpha ? resultAlpha.x : 1 );
+				if ( alpha ) return vec4( result.rgb, resultAlpha.x );
+
+				// in time: the weight of the current frame in the history, e.g. for the feedback of multi-bounce reflections
+
+				return vec4( result.rgb, this.temporal ? float( 1 ).div( this._lengthAt( coord ).max( 1 ) ) : 1 );
 
 			}
 
@@ -1575,18 +1586,14 @@ function createMaterial( name, count, body ) {
 
 	}
 
-	const outputs = [];
-	for ( let i = 0; i < count; i ++ ) outputs.push( property( 'vec4' ) );
+	const layout = {};
+	for ( let i = 0; i < count; i ++ ) layout[ 'm' + i ] = 'vec4';
 
-	material.colorNode = Fn( () => {
+	const outputs = struct( layout );
 
-		const values = body();
-		for ( let i = 0; i < count; i ++ ) outputs[ i ].assign( values[ i ] );
-		return vec4( 0 );
+	const result = Fn( () => outputs( ...body().slice( 0, count ) ) )().toConst();
 
-	} )();
-
-	material.outputNode = outputStruct( ...outputs );
+	material.fragmentNode = outputStruct( ...Object.keys( layout ).map( ( name ) => result.get( name ) ) );
 
 	return material;
 

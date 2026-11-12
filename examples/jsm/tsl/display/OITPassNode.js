@@ -236,7 +236,7 @@ class OITPassNode extends PassNode {
 
 		const accumColor = accumNode.rgb.div( accumNode.a.max( 1e-5 ) );
 
-		return vec4( mix( accumColor, beautyNode.rgb, revealageNode ), beautyNode.a );
+		return mix( vec4( accumColor, 1 ), beautyNode, revealageNode );
 
 	}
 

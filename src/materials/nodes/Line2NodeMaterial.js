@@ -547,9 +547,10 @@ class Line2NodeMaterial extends NodeMaterial {
 	 */
 	setupPosition( builder ) {
 
-		const localPosition = modelWorldMatrixInverse.mul( cameraWorldMatrix ).mul( cameraProjectionMatrixInverse ).mul( mvpLine );
+		const viewPosition = cameraProjectionMatrixInverse.mul( mvpLine );
+		const localPosition = modelWorldMatrixInverse.mul( cameraWorldMatrix ).mul( vec4( viewPosition.xyz.div( viewPosition.w ), 1 ) );
 
-		positionLocal.assign( localPosition.xyz.div( localPosition.w ) );
+		positionLocal.assign( localPosition.xyz );
 
 		if ( builder.needsPreviousData() ) {
 

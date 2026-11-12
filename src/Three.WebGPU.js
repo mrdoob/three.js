@@ -33,6 +33,7 @@ export { default as NodeMaterialLoader } from './loaders/nodes/NodeMaterialLoade
 export { default as InspectorBase } from './renderers/common/InspectorBase.js';
 export { default as CanvasTarget } from './renderers/common/CanvasTarget.js';
 export { default as BlendMode } from './renderers/common/BlendMode.js';
+export { default as GPUTimer } from './renderers/common/GPUTimer.js';
 export { default as GLSLNodeBuilder } from './renderers/webgl-fallback/nodes/GLSLNodeBuilder.js';
 export { default as BasicNodeLibrary } from './renderers/webgpu/nodes/BasicNodeLibrary.js';
 export { default as StandardNodeLibrary } from './renderers/webgpu/nodes/StandardNodeLibrary.js';

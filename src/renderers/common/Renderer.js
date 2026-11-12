@@ -3210,9 +3210,15 @@ class Renderer {
 	 *
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
 	 * @param {number|Array<number>|IndirectStorageBufferAttribute} [dispatchSize=null]
-	 * - A single number representing count, or
-	 * - An array [x, y, z] representing dispatch size, or
-	 * - A IndirectStorageBufferAttribute for indirect dispatch size.
+	 * An argument that defines the number of compute invocations executed in a compute call
+	 * and the size of the dispatched workgroup grid in which they are executed.
+	 * Depending on the type of the argument, the dispatch size of a compute call will be determined in different ways.
+	 * - A number will dispatch a workgroup grid sized to fit `dispatchSize` invocations.
+	 * - An array [x, y, z] will directly define the size of the workgroup grid.
+	 *   The compute call will execute x * y * z * workgroupSize invocations.
+	 * - A IndirectStorageBufferAttribute will run an indirect compute dispatch.
+	 *   In an indirect dispatch, the [x, y, z] dimensions of the workgroup grid are defined by the first three values
+	 *   stored in the IndirectStorageBufferAttribute.
 	 * @return {Promise|undefined} A Promise that resolve when the compute has finished. Only returned when the renderer has not been initialized.
 	 */
 	compute( computeNodes, dispatchSize = null ) {
@@ -3335,9 +3341,15 @@ class Renderer {
 	 * @async
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
 	 * @param {number|Array<number>|IndirectStorageBufferAttribute} [dispatchSize=null]
-	 * - A single number representing count, or
-	 * - An array [x, y, z] representing dispatch size, or
-	 * - A IndirectStorageBufferAttribute for indirect dispatch size.
+	 * An argument that defines the number of compute invocations executed in a compute call
+	 * and the size of the dispatched workgroup grid in which they are executed.
+	 * Depending on the type of the argument, the dispatch size of a compute call will be determined in different ways.
+	 * - A number will dispatch a workgroup grid sized to fit `dispatchSize` invocations.
+	 * - An array [x, y, z] will directly define the size of the workgroup grid.
+	 *   The compute call will execute x * y * z * workgroupSize invocations.
+	 * - A IndirectStorageBufferAttribute will run an indirect compute dispatch.
+	 *   In an indirect dispatch, the [x, y, z] dimensions of the workgroup grid are defined by the first three values
+	 *   stored in the IndirectStorageBufferAttribute.
 	 * @return {Promise} A Promise that resolve when the compute has finished.
 	 */
 	async computeAsync( computeNodes, dispatchSize = null ) {
@@ -3983,7 +3995,9 @@ class Renderer {
 
 		//
 
-		if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
+		const isSinglePass = ( material.forceSinglePass === true || material.isShadowPassMaterial === true );
+
+		if ( material.transparent === true && material.side === DoubleSide && isSinglePass === false ) {
 
 			material.side = BackSide;
 			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, clippingContext, 'backSide' ); // create backSide pass id
