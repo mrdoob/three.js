@@ -180,12 +180,14 @@ class WebGPUBackend extends Backend {
 		this.occludedResolveCache = new Map();
 
 		// GPU timers. While a timer is active every pass writes its begin and end timestamps to the next
-		// two queries of this set, created on first use and used as a ring
+		// two queries of this set, created on first use and used as a ring. Measurements that end in the
+		// same task are read back together
 
 		this._timerQuerySet = null;
 		this._timerResolveBuffer = null;
 		this._timerQueryIndex = 0;
 		this._activeTimers = 0;
+		this._pendingTimers = [];
 
 		// compatibility checks
 
@@ -2766,7 +2768,8 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Ends the given measurement and returns its GPU time in milliseconds.
+	 * Ends the given measurement and returns its GPU time in milliseconds. The queries of all
+	 * measurements that end in the same task are read back together.
 	 *
 	 * @async
 	 * @param {?number} startIndex - The value returned by {@link WebGPUBackend#beginTimer}.
@@ -2783,19 +2786,72 @@ class WebGPUBackend extends Backend {
 		this._activeTimers --;
 
 		const endIndex = this._timerQueryIndex;
-		const queryCount = endIndex - startIndex;
 
-		if ( queryCount > TIMER_QUERY_COUNT ) {
+		if ( endIndex === startIndex ) {
 
-			warnOnce( `WebGPUBackend: A GPU timer can measure at most ${ TIMER_QUERY_COUNT / 2 } passes.` );
-			return null;
+			return 0;
 
 		}
 
-		// read back the queries of this measurement. The queries are a ring, so a range past the end of
-		// the set continues at the start and is read in two steps
+		return new Promise( resolve => {
+
+			this._pendingTimers.push( { startIndex, endIndex, resolve } );
+
+			if ( this._pendingTimers.length === 1 ) {
+
+				queueMicrotask( () => this._flushTimers() );
+
+			}
+
+		} );
+
+	}
+
+	/**
+	 * Reads back the queries of the pending measurements in one step and resolves their results.
+	 *
+	 * @private
+	 * @async
+	 */
+	async _flushTimers() {
 
 		const device = this.device;
+		const pending = this._pendingTimers;
+		this._pendingTimers = [];
+
+		// the queries are a ring, so a measurement that reaches further back than the ring holds has been
+		// overwritten by later passes
+
+		const endIndex = pending[ pending.length - 1 ].endIndex;
+		const timers = [];
+		let startIndex = endIndex;
+
+		for ( const timer of pending ) {
+
+			if ( endIndex - timer.startIndex > TIMER_QUERY_COUNT ) {
+
+				warnOnce( `WebGPUBackend: A GPU timer can measure at most ${ TIMER_QUERY_COUNT / 2 } passes.` );
+				timer.resolve( null );
+
+			} else {
+
+				startIndex = Math.min( startIndex, timer.startIndex );
+				timers.push( timer );
+
+			}
+
+		}
+
+		if ( timers.length === 0 ) {
+
+			return;
+
+		}
+
+		// read back the queries of all measurements. A range past the end of the set continues at the
+		// start and is read in two steps
+
+		const queryCount = endIndex - startIndex;
 		const firstQuery = startIndex % TIMER_QUERY_COUNT;
 		const firstCount = Math.min( queryCount, TIMER_QUERY_COUNT - firstQuery );
 		const secondCount = queryCount - firstCount;
@@ -2824,34 +2880,41 @@ class WebGPUBackend extends Backend {
 
 		const timestamps = new BigUint64Array( readBuffer.getMappedRange() );
 
-		// Passes don't run in the order they took queries. A nested pass (a shadow map) runs before its
-		// parent. So take the earliest begin and latest end.
+		for ( const timer of timers ) {
 
-		let earliestBegin = 0n;
-		let latestEnd = 0n;
+			// Passes don't run in the order they took queries. A nested pass (a shadow map) runs before its
+			// parent. So take the earliest begin and latest end.
 
-		for ( let i = 0; i < queryCount; i += 2 ) {
+			const first = timer.startIndex - startIndex;
+			const last = timer.endIndex - startIndex;
 
-			const passBegin = timestamps[ i ];
-			const passEnd = timestamps[ i + 1 ];
+			let earliestBegin = timestamps[ first ];
+			let latestEnd = timestamps[ first + 1 ];
 
-			if ( i === 0 || passBegin < earliestBegin ) {
+			for ( let i = first + 2; i < last; i += 2 ) {
 
-				earliestBegin = passBegin;
+				const passBegin = timestamps[ i ];
+				const passEnd = timestamps[ i + 1 ];
+
+				if ( passBegin < earliestBegin ) {
+
+					earliestBegin = passBegin;
+
+				}
+
+				if ( passEnd > latestEnd ) {
+
+					latestEnd = passEnd;
+
+				}
 
 			}
 
-			if ( passEnd > latestEnd ) {
-
-				latestEnd = passEnd;
-
-			}
+			timer.resolve( Number( latestEnd - earliestBegin ) / 1e6 );
 
 		}
 
 		readBuffer.destroy();
-
-		return Number( latestEnd - earliestBegin ) / 1e6;
 
 	}
 
