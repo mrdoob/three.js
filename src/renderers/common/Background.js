@@ -168,7 +168,9 @@ class Background extends DataMap {
 
 		//
 
-		const environmentBlendMode = renderer.xr.getEnvironmentBlendMode();
+		// the blend mode of a XR session only affects the session's frame, not render targets
+
+		const environmentBlendMode = renderer.getRenderTarget() === null ? renderer.xr.getEnvironmentBlendMode() : undefined;
 
 		if ( environmentBlendMode === 'additive' ) {
 
