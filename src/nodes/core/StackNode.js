@@ -70,6 +70,14 @@ class StackNode extends Node {
 		this.parent = parent;
 
 		/**
+		 * The sub-build name associated with this stack, if any.
+		 *
+		 * @type {?string}
+		 * @default null
+		 */
+		this.subBuild = null;
+
+		/**
 		 * The current conditional node.
 		 *
 		 * @private
