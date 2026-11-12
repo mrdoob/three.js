@@ -419,23 +419,9 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 		const parameters = [];
 
-		for ( const input of layout.inputs ) {
+		for ( const { name, type } of flowData.parameters ) {
 
-			const textureType = layoutTextureTypes[ input.type ];
-
-			if ( textureType !== undefined ) {
-
-				// see getTextureParameters()
-
-				parameters.push( textureType + ' ' + input.name );
-
-				if ( input.type !== 'cubeTexture' ) parameters.push( 'bool ' + input.name + '_flipY' );
-
-			} else {
-
-				parameters.push( this.getType( input.type ) + ' ' + input.name );
-
-			}
+			parameters.push( ( layoutTextureTypes[ type ] || this.getType( type ) ) + ' ' + name );
 
 		}
 

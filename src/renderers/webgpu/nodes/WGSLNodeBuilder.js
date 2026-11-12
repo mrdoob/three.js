@@ -1462,11 +1462,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 				texture.mipLevel = texture.store ? node.mipLevel : 0;
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
-				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-				// Also textureGather always need sampler.
-				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false ) || node.gatherNode !== null || this.samplerNodes.has( node );
-
-				if ( needsSampler ) {
+				if ( this._needsSampler( node ) ) {
 
 					const sampler = new NodeSampler( `${ uniformNode.name }_sampler`, uniformNode.node, group );
 					sampler.setVisibility( gpuShaderStageLib[ shaderStage ] );
@@ -1631,21 +1627,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		const parameters = [];
 
-		for ( const input of layout.inputs ) {
+		for ( const { name, type } of flowData.parameters ) {
 
-			const textureType = layoutTextureTypes[ input.type ];
-
-			if ( textureType !== undefined ) {
-
-				// see getTextureParameters()
-
-				parameters.push( input.name + ' : ' + textureType, input.name + '_sampler : sampler' );
-
-			} else {
-
-				parameters.push( input.name + ' : ' + this.getType( input.type ) );
-
-			}
+			parameters.push( name + ' : ' + ( layoutTextureTypes[ type ] || this.getType( type ) ) );
 
 		}
 
@@ -2390,6 +2374,23 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Whether the given texture node is bound with a sampler. Cube textures always need samplers
+	 * (they use textureSampleLevel, not textureLoad), textureGather too, and the textures passed
+	 * to functions with layout, see {@link WGSLNodeBuilder#getTextureParameters}.
+	 *
+	 * @private
+	 * @param {TextureNode} textureNode - The texture node.
+	 * @return {boolean} Whether the texture node needs a sampler or not.
+	 */
+	_needsSampler( textureNode ) {
+
+		const texture = textureNode.value;
+
+		return texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && textureNode.isStorageTextureNode !== true ) || textureNode.gatherNode !== null || this.samplerNodes.has( textureNode );
+
+	}
+
+	/**
 	 * Returns the WGSL types of the binding of a texture node.
 	 *
 	 * @private
@@ -2402,13 +2403,9 @@ ${ flowData.code }
 		const backend = this.renderer.backend;
 		const texture = textureNode.value;
 
-		// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-		// Also textureGather always need sampler.
-		const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && textureNode.isStorageTextureNode !== true ) || textureNode.gatherNode !== null || this.samplerNodes.has( textureNode );
-
 		let samplerType = null;
 
-		if ( needsSampler ) {
+		if ( this._needsSampler( textureNode ) ) {
 
 			samplerType = this.isSampleCompare( texture ) && textureNode.isSampleCompare() ? 'sampler_comparison' : 'sampler';
 

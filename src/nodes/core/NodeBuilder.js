@@ -2842,7 +2842,9 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Generates a code flow based on a TSL function: Fn().
+	 * Generates a code flow based on a TSL function: Fn(). The flow also has the parameters of the
+	 * function code: the inputs of the layout, each texture input with the parameters of
+	 * {@link NodeBuilder#getTextureParameters}.
 	 *
 	 * @param {ShaderNodeInternal} shaderNode - A function code will be generated based on the input.
 	 * @return {Object}
@@ -2851,7 +2853,9 @@ class NodeBuilder {
 
 		const layout = shaderNode.layout;
 
-		const parameters = layout.inputs.map( ( input ) => {
+		const parameters = [];
+
+		const nodes = layout.inputs.map( ( input ) => {
 
 			const node = _createLayoutParameter( input );
 
@@ -2859,13 +2863,23 @@ class NodeBuilder {
 
 				for ( const [ name, parameterNode ] of Object.entries( this.getTextureParameters( input.name, node ) ) ) {
 
+					const type = parameterNode.getNodeType( this );
+
 					if ( parameterNode.isUniformNode === true ) {
 
-						this.setHashNode( new ParameterNode( parameterNode.getNodeType( this ), name ), parameterNode.getUniformHash( this ) );
+						// the clones of the uniform resolve to the parameter, see UniformNode#getSharedNode()
+
+						this.setHashNode( new ParameterNode( type, name ), parameterNode.getUniformHash( this ) );
 
 					}
 
+					parameters.push( { name, type: parameterNode === node ? input.type : type } ); // the texture has the type of the input, e.g. 'texture'
+
 				}
+
+			} else {
+
+				parameters.push( input );
 
 			}
 
@@ -2873,7 +2887,7 @@ class NodeBuilder {
 
 		} );
 
-		const inputs = _createLayoutInputs( layout, parameters );
+		const inputs = _createLayoutInputs( layout, nodes );
 
 		//
 
@@ -2883,6 +2897,8 @@ class NodeBuilder {
 		const flowData = this.flowStagesNode( callNode, layout.type );
 
 		shaderNode.layout = layout;
+
+		flowData.parameters = parameters;
 
 		return flowData;
 
@@ -2910,11 +2926,9 @@ class NodeBuilder {
 	 * @private
 	 * @param {Object} layout - The layout of the function.
 	 * @param {Array<Node>|Object<string,Node>} inputs - The inputs of the call.
-	 * @return {Array<Node>|Object<string,Node>} The parameters of the call.
+	 * @return {Array<Node>} The parameters of the call.
 	 */
 	_getLayoutCallParameters( layout, inputs ) {
-
-		if ( layout.inputs.some( input => _layoutTextureNodes[ input.type ] !== undefined ) === false ) return inputs;
 
 		const parameters = [];
 
