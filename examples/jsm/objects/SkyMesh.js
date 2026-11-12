@@ -363,10 +363,11 @@ class SkyMesh extends Mesh {
 
 			const L0 = vec3( 0.1 ).mul( Fex );
 
-			// composition + solar disc with photospheric limb darkening
+			// composition + solar disc with photospheric limb darkening: a linear law per channel
+			// ( u ~ 0.54, 0.62, 0.73 ), normalized so the disc keeps its average color
 			const mu2 = clamp( cosTheta.sub( sunAngularDiameterCos ).mul( 23082.0 ), 0.0, 1.0 );
 			const mu = sqrt( mu2 );
-			const sundisc = smoothstep( 0.0, 0.1, mu2 ).mul( vec3( 1.0, mix( 0.72, 1.0, mu ), mu2 ) ).mul( this.showSunDisc ).mul( smoothstep( - 0.002, 0.002, direction.y ) );
+			const sundisc = smoothstep( 0.0, 0.1, mu2 ).mul( vec3( 0.561, 0.479, 0.3568 ).add( vec3( 0.6585, 0.7815, 0.9648 ).mul( mu ) ) ).mul( this.showSunDisc ).mul( smoothstep( - 0.002, 0.002, direction.y ) );
 			const sundiscColor = min( vSunE.mul( Fex ), 80.0 ).mul( 760.0 ).mul( sundisc );
 
 			const skyInscatter = Lin.mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) ).toVar();

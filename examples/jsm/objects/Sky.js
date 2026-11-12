@@ -466,10 +466,11 @@ Sky.SkyShader = {
 			// nightsky
 			vec3 L0 = vec3( 0.1 ) * Fex;
 
-			// composition + solar disc with photospheric limb darkening
+			// composition + solar disc with photospheric limb darkening: a linear law per channel
+			// ( u ~ 0.54, 0.62, 0.73 ), normalized so the disc keeps its average color
 			float mu2 = clamp( ( cosTheta - sunAngularDiameterCos ) * 23082.0, 0.0, 1.0 );
 			float mu = sqrt( mu2 );
-			vec3 sundisc = smoothstep( 0.0, 0.1, mu2 ) * vec3( 1.0, mix( 0.72, 1.0, mu ), mu2 ) * showSunDisc * smoothstep( -0.002, 0.002, direction.y );
+			vec3 sundisc = smoothstep( 0.0, 0.1, mu2 ) * ( vec3( 0.561, 0.479, 0.3568 ) + vec3( 0.6585, 0.7815, 0.9648 ) * mu ) * showSunDisc * smoothstep( -0.002, 0.002, direction.y );
 			vec3 sundiscColor = ( 760.0 * sundisc ) * min( vSunE * Fex, 80.0 );
 
 			vec3 skyInscatter = Lin * 0.04 + vec3( 0.0, 0.0003, 0.00075 );
