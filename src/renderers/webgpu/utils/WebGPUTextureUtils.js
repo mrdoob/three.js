@@ -665,6 +665,10 @@ class WebGPUTextureUtils {
 				}
 
 
+			} else if ( options.updateRows !== undefined && options.updateRows.length > 0 ) {
+
+				this._copyBufferRowsToTexture( options.updateRows, options.image, textureData.texture, textureDescriptorGPU );
+
 			} else {
 
 				this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY );
@@ -1138,6 +1142,46 @@ class WebGPUTextureUtils {
 			this._flipY( textureGPU, textureDescriptorGPU, originDepth );
 
 		}
+
+	}
+
+	/**
+	 * Uploads rows of a data texture to the GPU memory.
+	 *
+	 * @private
+	 * @param {Array<number>} rows - The first row and row count of each run of rows.
+	 * @param {Object} image - An object defining the image buffer data.
+	 * @param {GPUTexture} textureGPU - The GPU texture.
+	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
+	 */
+	_copyBufferRowsToTexture( rows, image, textureGPU, textureDescriptorGPU ) {
+
+		const device = this.backend.device;
+
+		const bytesPerRow = image.width * this._getBytesPerTexel( textureDescriptorGPU.format );
+
+		_texelCopyTextureInfo.texture = textureGPU;
+		_texelCopyBufferLayout.bytesPerRow = bytesPerRow;
+		_extent3D.width = image.width;
+
+		for ( let i = 0; i < rows.length; i += 2 ) {
+
+			_texelCopyTextureInfo.origin.y = rows[ i ];
+			_texelCopyBufferLayout.offset = rows[ i ] * bytesPerRow;
+			_extent3D.height = rows[ i + 1 ];
+
+			device.queue.writeTexture(
+				_texelCopyTextureInfo,
+				image.data,
+				_texelCopyBufferLayout,
+				_extent3D
+			);
+
+		}
+
+		_texelCopyTextureInfo.reset();
+		_texelCopyBufferLayout.reset();
+		_extent3D.reset();
 
 	}
 

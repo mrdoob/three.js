@@ -5,8 +5,18 @@ import { DepthTexture } from '../../textures/DepthTexture.js';
 import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, UnsignedByteType, FloatType, SRGBTransfer } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { warn } from '../../utils.js';
+import { getByteLength } from '../../extras/TextureUtils.js';
 
 const _size = /*@__PURE__*/ new Vector3();
+
+/**
+ * The version of each texture at which an upload last cleared its update ranges.
+ * The ranges only hold the changes since that upload, whichever renderer made it.
+ *
+ * @private
+ * @type {WeakMap<Texture, number>}
+ */
+const _updateRangesVersions = /*@__PURE__*/ new WeakMap();
 
 /**
  * Returns the mipmaps of the given texture. Compressed cube textures
@@ -19,6 +29,58 @@ const _size = /*@__PURE__*/ new Vector3();
 function getMipmaps( texture ) {
 
 	return texture.isCompressedCubeTexture === true ? texture.image[ 0 ].mipmaps : texture.mipmaps;
+
+}
+
+/**
+ * Returns the rows of a data texture which are covered by its update ranges,
+ * sorted and merged, as pairs of first row and row count. An empty array means
+ * the texture must be uploaded as a whole.
+ *
+ * @private
+ * @param {Texture} texture - The texture.
+ * @param {Object} image - The image of the texture.
+ * @return {Array<number>} The first row and row count of each run of updated rows.
+ */
+function getUpdateRows( texture, image ) {
+
+	const rows = [];
+
+	if ( texture.isDataTexture !== true || texture.flipY === true || texture.mipmaps.length > 0 || texture.updateRanges.length === 0 ) return rows;
+
+	if ( texture.format === DepthFormat || texture.format === DepthStencilFormat ) return rows;
+
+	// update ranges only map to rows if the image data are tightly packed
+
+	const byteLength = getByteLength( image.width, image.height, texture.format, texture.type );
+	const bytesPerRow = byteLength / image.height;
+
+	if ( image.data.byteLength !== byteLength || bytesPerRow % texture.unpackAlignment !== 0 ) return rows;
+
+	const elementsPerRow = bytesPerRow / image.data.BYTES_PER_ELEMENT;
+	const updateRanges = texture.updateRanges.sort( ( a, b ) => a.start - b.start );
+
+	for ( let i = 0; i < updateRanges.length; i ++ ) {
+
+		const range = updateRanges[ i ];
+
+		const start = Math.floor( range.start / elementsPerRow );
+		const end = Math.min( Math.ceil( ( range.start + range.count ) / elementsPerRow ), image.height );
+		const last = rows.length - 2;
+
+		if ( last >= 0 && start <= rows[ last ] + rows[ last + 1 ] ) {
+
+			rows[ last + 1 ] = Math.max( rows[ last + 1 ], end - rows[ last ] );
+
+		} else if ( end > start ) {
+
+			rows.push( start, end - start );
+
+		}
+
+	}
+
+	return rows;
 
 }
 
@@ -444,9 +506,18 @@ class Textures extends DataMap {
 
 					if ( texture.source.dataReady === true ) {
 
+						// a renderer which did not make the last upload misses the changes of the cleared update ranges
+
+						if ( textureData.uploadVersion === undefined || textureData.uploadVersion !== _updateRangesVersions.get( texture ) ) texture.clearUpdateRanges();
+
+						options.updateRows = getUpdateRows( texture, image );
+
 						backend.updateTexture( texture, options );
 
 						texture.clearUpdateRanges();
+
+						_updateRangesVersions.set( texture, texture.version );
+						textureData.uploadVersion = texture.version;
 
 					}
 

@@ -729,6 +729,18 @@ class WebGLTextureUtils {
 
 				}
 
+			} else if ( options.updateRows !== undefined && options.updateRows.length > 0 ) {
+
+				const rows = options.updateRows;
+				const data = options.image.data;
+				const elementsPerRow = data.length / height;
+
+				for ( let i = 0; i < rows.length; i += 2 ) {
+
+					gl.texSubImage2D( glTextureType, 0, 0, rows[ i ], width, rows[ i + 1 ], glFormat, glType, data, rows[ i ] * elementsPerRow );
+
+				}
+
 			} else {
 
 				const image = getImage( options.image );
