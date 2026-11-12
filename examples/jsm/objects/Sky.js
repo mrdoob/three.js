@@ -626,8 +626,10 @@ Sky.SkyShader = {
 
 									float optDepth = densitySum * stepSigma;
 									float powder = mix( 1.0 - 0.36 * exp( -optDepth * 1.3 ), 1.0, max( 0.0, cosTheta ) );
+									// direct sunlight fades exponentially with depth; multiply scattered sunlight
+									// fades with the slower two-stream law, which keeps thick clouds gray
 									float scatter = exp( -tau ) * phase * powder
-										+ 0.48 * exp( -tau * 0.32 ) * mix( 1.0, min( phase, 1.3 ), 0.28 );
+										+ 0.48 / ( 1.0 + 0.32 * tau ) * mix( 1.0, min( phase, 1.3 ), 0.28 );
 
 									// Attenuate overhead sky ambient through column above hEff to shade flat cloud bases
 									float dayFactor = max( smoothstep( -0.1, 0.02, vSunDirection.y ), 0.03 );

@@ -572,8 +572,10 @@ class SkyMesh extends Mesh {
 
 									const optDepth = densitySum.mul( stepSigma );
 									const powder = mix( sub( 1.0, exp( optDepth.mul( - 1.3 ) ).mul( 0.36 ) ), 1.0, max( 0.0, cosTheta ) );
+									// direct sunlight fades exponentially with depth; multiply scattered sunlight
+									// fades with the slower two-stream law, which keeps thick clouds gray
 									const scatter = exp( tau.negate() ).mul( phase ).mul( powder )
-										.add( float( 0.48 ).mul( exp( tau.mul( - 0.32 ) ) ).mul( mix( 1.0, min( phase, 1.3 ), 0.28 ) ) );
+										.add( float( 0.48 ).div( tau.mul( 0.32 ).add( 1.0 ) ).mul( mix( 1.0, min( phase, 1.3 ), 0.28 ) ) );
 
 									// Attenuate overhead sky ambient through column above hEff to shade flat cloud bases
 									const dayFactor = max( smoothstep( - 0.1, 0.02, vSunDirection.y ), 0.03 );
