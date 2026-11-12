@@ -95,29 +95,11 @@ Node.prototype.get = function ( value ) {
 
 const proto = {};
 
-// Cache of the swizzle and element nodes, a proxy of a node has its own cache
-
-const _swizzleCache = new WeakMap();
-
-function getSwizzleCache( node ) {
-
-	let cache = _swizzleCache.get( node );
-
-	if ( cache === undefined ) {
-
-		cache = new Map();
-
-		_swizzleCache.set( node, cache );
-
-	}
-
-	return cache;
-
-}
-
 // Set swizzle properties for xyzw, rgba, and stpq.
 
 function setProtoSwizzle( property, altA, altB ) {
+
+	const swizzleCache = new WeakMap();
 
 	// swizzle properties
 
@@ -125,17 +107,13 @@ function setProtoSwizzle( property, altA, altB ) {
 
 		get() {
 
-			const cache = getSwizzleCache( this );
-
-			//
-
-			let split = cache.get( property );
+			let split = swizzleCache.get( this );
 
 			if ( split === undefined ) {
 
 				split = new SplitNode( this, property );
 
-				cache.set( property, split );
+				swizzleCache.set( this, split );
 
 			}
 
@@ -227,21 +205,19 @@ for ( let a = 0; a < 4; a ++ ) {
 
 for ( let i = 0; i < 32; i ++ ) {
 
+	const elementCache = new WeakMap();
+
 	proto[ i ] = {
 
 		get() {
 
-			const cache = getSwizzleCache( this );
-
-			//
-
-			let element = cache[ i ];
+			let element = elementCache.get( this );
 
 			if ( element === undefined ) {
 
 				element = new ArrayElementNode( this, new ConstNode( i, 'uint' ) );
 
-				cache[ i ] = element;
+				elementCache.set( this, element );
 
 			}
 
@@ -344,15 +320,14 @@ const ShaderNodeObjects = function ( objects, altType = null ) {
 const ShaderNodeArray = function ( array, altType = null ) {
 
 	const len = array.length;
-	const output = new Array( len );
 
 	for ( let i = 0; i < len; i ++ ) {
 
-		output[ i ] = nodeObject( array[ i ], altType );
+		array[ i ] = nodeObject( array[ i ], altType );
 
 	}
 
-	return output;
+	return array;
 
 };
 
