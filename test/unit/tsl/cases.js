@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, context, determinant, float, grayscale, hue, int, inverse, ivec3, mat2, mat3, mat4, mix, mul, overloadingFn, overrideNode, saturation, select, time, transpose, uint, uniform, uv, vec2, vec3, vec4, vibrance } from '../../../src/Three.TSL.js';
+import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, context, determinant, float, grayscale, hue, int, inverse, ivec3, linearDepth, mat2, mat3, mat4, mix, mul, overloadingFn, overrideNode, saturation, screenUV, select, time, transpose, uint, uniform, uv, vec2, vec3, vec4, vibrance } from '../../../src/Three.TSL.js';
 
 // Create a fresh graph for every test and backend.
 export const cases = {
@@ -1529,6 +1529,32 @@ export const cases = {
 		] );
 
 		return brightness( color( 0xff8800 ) );
+
+	},
+
+	// Non-cacheable pass-through wrappers propagate multiple uses to their inner expression.
+
+	'linearDepth wrapper reuse': () => {
+
+		const d = linearDepth( uv().x );
+
+		return d.mul( d ).add( d );
+
+	},
+
+	'swizzle wrapper reuse': () => {
+
+		const sx = screenUV.x;
+
+		return sx.mul( sx ).add( sx );
+
+	},
+
+	'context wrapper reuse': () => {
+
+		const c = context( uv().mul( 2 ).sub( 1 ), {} );
+
+		return c.mul( c ).add( c );
 
 	}
 

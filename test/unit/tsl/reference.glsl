@@ -1597,3 +1597,21 @@ float fn0 ( vec3 value ) {
 }
 
 fn0( vec3( 1.0, 0.24620132669705552, 0.0 ) )
+
+// linearDepth wrapper reuse
+
+float nodeConst0 = ( ( ( ( cameraNear * cameraFar ) / ( ( ( cameraFar - cameraNear ) * nodeVarying0.x ) - cameraFar ) ) + cameraNear ) / ( cameraNear - cameraFar ) );
+
+( ( nodeConst0 * nodeConst0 ) + nodeConst0 )
+
+// swizzle wrapper reuse
+
+vec2 nodeConst0 = ( vec2( gl_FragCoord.xy.x, ( nodeUniform0.y - gl_FragCoord.xy.y ) ) / nodeUniform0 );
+
+( ( nodeConst0.x * nodeConst0.x ) + nodeConst0.x )
+
+// context wrapper reuse
+
+vec2 nodeConst0 = ( ( nodeVarying0 * vec2( 2.0 ) ) - vec2( 1.0 ) );
+
+( ( nodeConst0 * nodeConst0 ) + nodeConst0 )

@@ -190,6 +190,35 @@ class Node extends EventDispatcher {
 	}
 
 	/**
+	 * Whether a non-cacheable node passes through to its inner expression on every evaluation
+	 * without owning a shader variable, so a second use in `analyze()` must propagate usage
+	 * to its inner expression.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether `analyze()` propagates on second use.
+	 */
+	_analyzesPassThrough( builder ) {
+
+		if ( this.isCacheable( builder ) === true || builder.isContextAssign() === true ) return false;
+
+		if ( this.isSplitNode === true || this.isMemberNode === true || ( this.isArrayElementNode === true && this.isStorageArrayElementNode !== true ) ) {
+
+			return true;
+
+		}
+
+		const nodeData = builder.getDataFromNode( this );
+
+		if ( this.assignable === true && this._declaresAssignable() && this._isVariable( builder, nodeData ) ) return false;
+
+		const { outputNode } = builder.getNodeProperties( this );
+
+		return outputNode !== null && outputNode !== undefined && outputNode.isNode === true && outputNode.isStackNode !== true && this.getNodeType( builder ) !== 'void';
+
+	}
+
+	/**
 	 * Makes this node assignable and adds it to the current stack,
 	 * so it can be declared where it was created if it is assigned later.
 	 * Only use it with nodes that are not shared, see {@link Node#assignable}.
@@ -1028,6 +1057,28 @@ class Node extends EventDispatcher {
 				if ( childNode && childNode.isNode === true ) {
 
 					childNode.build( builder, this );
+
+				}
+
+			}
+
+		} else if ( usageCount === 2 && this._analyzesPassThrough( builder ) ) {
+
+			const nodeProperties = builder.getNodeProperties( this );
+
+			if ( nodeProperties.outputNode && nodeProperties.outputNode.isNode === true ) {
+
+				nodeProperties.outputNode.build( builder, this );
+
+			} else {
+
+				for ( const childNode of Object.values( nodeProperties ) ) {
+
+					if ( childNode && childNode.isNode === true ) {
+
+						childNode.build( builder, this );
+
+					}
 
 				}
 

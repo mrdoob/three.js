@@ -132,7 +132,7 @@ class ContextNode extends Node {
 
 		const usageCount = builder.increaseUsage( this );
 
-		if ( usageCount === 1 ) {
+		if ( usageCount === 1 || ( usageCount === 2 && builder.isContextAssign() === false && this.getNodeType( builder ) !== 'void' ) ) {
 
 			const previousContext = builder.addContext( this.value );
 

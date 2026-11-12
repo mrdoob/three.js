@@ -1682,3 +1682,21 @@ fn fn0 ( value : vec3<f32> ) -> f32 {
 }
 
 fn0( vec3<f32>( 1.0, 0.24620132669705552, 0.0 ) )
+
+// linearDepth wrapper reuse
+
+let nodeConst0 = ( ( ( ( render.cameraNear * render.cameraFar ) / ( ( ( render.cameraFar - render.cameraNear ) * nodeVarying0.x ) - render.cameraFar ) ) + render.cameraNear ) / ( render.cameraNear - render.cameraFar ) );
+
+( ( nodeConst0 * nodeConst0 ) + nodeConst0 )
+
+// swizzle wrapper reuse
+
+let nodeConst0 = ( fragCoord.xy / render.nodeUniform0 );
+
+( ( nodeConst0.x * nodeConst0.x ) + nodeConst0.x )
+
+// context wrapper reuse
+
+let nodeConst0 = ( ( nodeVarying0 * vec2<f32>( 2.0 ) ) - vec2<f32>( 1.0 ) );
+
+( ( nodeConst0 * nodeConst0 ) + nodeConst0 )
