@@ -179,7 +179,16 @@ class VaryingNode extends Node {
 
 		this.setupVarying( builder );
 
-		builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
+		// The vertex value is generated once, so it is analyzed once, however many times the varying is read.
+		const vertexData = builder.getDataFromNode( this, NodeShaderStage.VERTEX, builder.globalCache );
+
+		if ( vertexData.analyzed !== true ) {
+
+			vertexData.analyzed = true;
+
+			builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
+
+		}
 
 	}
 
