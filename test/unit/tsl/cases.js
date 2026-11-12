@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, context, determinant, float, grayscale, hue, int, inverse, ivec3, mat2, mat3, mat4, mix, mul, overloadingFn, overrideNode, saturation, select, time, transpose, uint, uniform, uv, vec2, vec3, vec4, vibrance } from '../../../src/Three.TSL.js';
+import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, context, determinant, distance, float, grayscale, hue, int, inverse, ivec3, length, mat2, mat3, mat4, mix, mul, overloadingFn, overrideNode, saturation, select, time, transpose, uint, uniform, uv, vec2, vec3, vec4, vibrance } from '../../../src/Three.TSL.js';
 
 // Create a fresh graph for every test and backend.
 export const cases = {
@@ -1529,6 +1529,169 @@ export const cases = {
 		] );
 
 		return brightness( color( 0xff8800 ) );
+
+	},
+
+	// Pure layout-less functions with parameters are emitted as shader functions.
+
+	'auto function loop and break': () => {
+
+		const accumulate = Fn( ( [ scale, limit ] ) => {
+
+			const sum = float( 0 ).toVar();
+
+			Loop( 4, ( { i } ) => {
+
+				sum.addAssign( scale.mul( float( i ) ) );
+
+				If( sum.greaterThan( limit ), () => {
+
+					Break();
+
+				} );
+
+			} );
+
+			return sum;
+
+		} );
+
+		return accumulate( uv().x, 2 ).add( accumulate( uv().y, 4 ) );
+
+	},
+
+	'auto function polymorphic': () => {
+
+		const squareBias = Fn( ( [ value ] ) => value.mul( value ).add( value ) );
+
+		const scalarPart = squareBias( uv().x ).add( squareBias( uv().y ) );
+		const vectorPart = squareBias( vec3( uv(), 1 ) ).add( squareBias( vec3( 1, 2, 3 ) ) );
+		const singlePair = squareBias( uv() );
+
+		return vectorPart.add( vec3( singlePair, scalarPart ) );
+
+	},
+
+	'auto function nested calls': () => {
+
+		const hashStep = Fn( ( [ x ] ) => x.mul( 1.618 ).fract() );
+		const octave = Fn( ( [ a, b ] ) => hashStep( a ).add( hashStep( b ) ).mul( 0.5 ) );
+
+		return octave( uv().x, uv().y ).add( octave( 1, 2 ) ).add( hashStep( hashStep( 3 ) ) );
+
+	},
+
+	'auto function object parameters': () => {
+
+		const weighted = Fn( ( { base, weight } ) => base.mul( weight ).add( 0.25 ) );
+
+		return weighted( { base: uv().x, weight: 2 } ).add( weighted( { weight: 0.5, base: uv().y } ) );
+
+	},
+
+	// Parameters get generated names, so object keys can't shadow built-in functions.
+
+	'auto function builtin parameter name': () => {
+
+		const fade = Fn( ( { distance: d, length: l } ) => distance( vec2( d ), vec2( l ) ).add( length( vec2( d, l ) ) ) );
+
+		return fade( { distance: uv().x, length: uv().y } ).add( fade( { distance: 1, length: 2 } ) );
+
+	},
+
+	// Layout-less functions closing over external state or mutating parameters stay inline.
+
+	'auto function external closure inline': () => Fn( () => {
+
+		const counter = float( 0 ).toVar( 'counter' );
+		const factor = uniform( 2 );
+
+		const stepCounter = Fn( ( [ delta ] ) => {
+
+			counter.addAssign( delta );
+
+			return counter;
+
+		} );
+
+		const scaleUniform = Fn( ( [ x ] ) => x.mul( factor ) );
+		const sampleCoord = Fn( ( [ offset ] ) => uv().x.add( offset ) );
+
+		const a = stepCounter( 1 ).add( stepCounter( 2 ) );
+		const b = scaleUniform( 3 ).add( scaleUniform( 4 ) );
+		const c = sampleCoord( 0.1 ).add( sampleCoord( 0.2 ) );
+
+		return a.add( b ).add( c );
+
+	} )(),
+
+	'auto function mutated parameter inline': () => Fn( () => {
+
+		const bump = Fn( ( [ x ] ) => {
+
+			x.addAssign( 1 );
+
+			return x.mul( 2 );
+
+		} );
+
+		const first = float( 1 ).toVar( 'first' );
+		const second = float( 2 ).toVar( 'second' );
+
+		return vec4( bump( first ), bump( second ), first, second );
+
+	} )(),
+
+	'auto function variable named like a parameter inline': () => Fn( () => {
+
+		const scaled = Fn( ( [ x ] ) => x.mul( 2 ).toVar( 'p0' ).add( x ) );
+		const summed = Fn( ( [ x, y ] ) => {
+
+			const sum = float( 0 ).toVar( 'sum' );
+
+			Loop( { start: 0, end: 3, name: 'p1' }, ( { p1 } ) => {
+
+				sum.addAssign( x.mul( y ).add( float( p1 ) ) );
+
+			} );
+
+			return sum;
+
+		} );
+
+		return scaled( uv().x ).add( summed( uv().x, uv().y ) );
+
+	} )(),
+
+	'auto function variadic inline': () => {
+
+		const sum = Fn( ( values ) => {
+
+			let total = float( 0 );
+
+			for ( let i = 0; i < values.length; i ++ ) total = total.add( values[ i ] );
+
+			return total;
+
+		} );
+
+		return sum( uv().x, uv().y, 1 );
+
+	},
+
+	'auto function isolate argument inline': () => {
+
+		const sampleOffset = Fn( ( { coord, scale } ) => {
+
+			const at = ( offset ) => coord.isolate().context( { getUV: () => uv().add( offset ) } );
+
+			return vec2( at( 0.1 ).sub( at( 0.0 ) ), at( 0.2 ).sub( at( 0.0 ) ) ).mul( scale );
+
+		} );
+
+		const customUV = Fn( ( builder ) => builder.context.getUV ? builder.context.getUV() : uv() )();
+
+		return sampleOffset( { coord: customUV.x, scale: 2 } );
 
 	}
 

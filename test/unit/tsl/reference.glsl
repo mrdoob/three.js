@@ -376,14 +376,28 @@ result
 
 // external variable in branches of the same condition
 
+vec4 fn0 ( float p0 ) {
+
+	float nodeVar0;
+
+	nodeVar0 = 0.0;
+
+	for ( int i = 0; i < 4; i ++ ) {
+
+		nodeVar0 = ( nodeVar0 + ( p0 * float( i ) ) );
+
+	}
+
+	return vec4( nodeVar0 );
+
+}
+
 vec3 diffuse;
 vec3 nodeVar0;
 vec4 nodeVar1;
-float nodeVar2;
-float nodeVar3;
 vec4 room;
 vec3 emissive;
-vec3 nodeVar4;
+vec3 nodeVar2;
 diffuse = vec3( 1.0, 1.0, 1.0 );
 bool nodeConst0 = ( nodeUniform0 > 0.5 );
 
@@ -391,27 +405,11 @@ if ( nodeConst0 ) {
 
 	if ( ( nodeVarying0.x > 0.5 ) ) {
 
-		nodeVar2 = 0.0;
-
-		for ( int i = 0; i < 4; i ++ ) {
-
-			nodeVar2 = ( nodeVar2 + ( 1.0 * float( i ) ) );
-
-		}
-
-		nodeVar1 = vec4( nodeVar2 );
+		nodeVar1 = fn0( 1.0 );
 
 	} else {
 
-		nodeVar3 = 0.0;
-
-		for ( int i = 0; i < 4; i ++ ) {
-
-			nodeVar3 = ( nodeVar3 + ( 2.0 * float( i ) ) );
-
-		}
-
-		nodeVar1 = vec4( nodeVar3 );
+		nodeVar1 = fn0( 2.0 );
 
 	}
 
@@ -429,15 +427,15 @@ emissive = vec3( 0.0, 0.0, 0.0 );
 
 if ( nodeConst0 ) {
 
-	nodeVar4 = ( room.xyz * vec3( room.w ) );
+	nodeVar2 = ( room.xyz * vec3( room.w ) );
 
 } else {
 
-	nodeVar4 = vec3( 0.0, 0.0, 0.0 );
+	nodeVar2 = vec3( 0.0, 0.0, 0.0 );
 
 }
 
-emissive = nodeVar4;
+emissive = nodeVar2;
 
 ( diffuse + emissive )
 
@@ -663,17 +661,29 @@ nodeVar0
 
 // function inline reuse
 
-float nodeConst0 = ( 3.0 * 3.0 );
+float fn0 ( float p0 ) {
+
+	return ( p0 * p0 );
+
+}
+
+float nodeConst0 = fn0( 3.0 );
 
 ( nodeConst0 + nodeConst0 )
 
 // function inside loop
 
+int fn0 ( int p0 ) {
+
+	return ( p0 * p0 );
+
+}
+
 float nodeVar0 = 0.0;
 
 for ( int i = 0; i < 4; i ++ ) {
 
-	nodeVar0 = ( nodeVar0 + float( ( i * i ) ) );
+	nodeVar0 = ( nodeVar0 + float( fn0( i ) ) );
 
 }
 
@@ -922,19 +932,25 @@ nodeVar2
 
 // function with loop inside loop
 
+float fn0 ( int p0 ) {
+
+	float nodeVar0 = 0.0;
+
+	for ( int j = 0; j < 3; j ++ ) {
+
+		nodeVar0 = ( nodeVar0 + float( p0 ) );
+
+	}
+
+	return nodeVar0;
+
+}
+
 float nodeVar0 = 0.0;
 
 for ( int i = 0; i < 4; i ++ ) {
 
-	float nodeVar1 = 0.0;
-
-	for ( int j = 0; j < 3; j ++ ) {
-
-		nodeVar1 = ( nodeVar1 + float( i ) );
-
-	}
-
-	nodeVar0 = ( nodeVar0 + nodeVar1 );
+	nodeVar0 = ( nodeVar0 + fn0( i ) );
 
 }
 
@@ -1062,33 +1078,39 @@ nodeVar2
 
 // function loop default parameter
 
-float nodeVar0 = 0.0;
+float fn0 ( int p0 ) {
 
-for ( int i = 0; i < 3; i ++ ) {
+	float nodeVar0 = 0.0;
 
-	nodeVar0 = ( nodeVar0 + float( i ) );
+	for ( int i = 0; i < p0; i ++ ) {
+
+		nodeVar0 = ( nodeVar0 + float( i ) );
+
+	}
+
+	return nodeVar0;
 
 }
 
-float nodeVar1 = nodeVar0;
-float nodeVar2 = 0.0;
+float nodeVar0 = fn0( 3 );
+float nodeVar1 = 0.0;
 
 for ( int i = 0; i < 5; i ++ ) {
 
-	nodeVar2 = ( nodeVar2 + float( i ) );
+	nodeVar1 = ( nodeVar1 + float( i ) );
 
 }
 
-float nodeVar3 = nodeVar2;
-float nodeVar4 = 0.0;
+float nodeVar2 = nodeVar1;
+float nodeVar3 = 0.0;
 
 for ( int i = 0; i < 4; i ++ ) {
 
-	nodeVar4 = ( nodeVar4 + ( nodeVar1 + nodeVar3 ) );
+	nodeVar3 = ( nodeVar3 + ( nodeVar0 + nodeVar2 ) );
 
 }
 
-nodeVar4
+nodeVar3
 
 // cached value after function loop
 
@@ -1597,3 +1619,130 @@ float fn0 ( vec3 value ) {
 }
 
 fn0( vec3( 1.0, 0.24620132669705552, 0.0 ) )
+
+// auto function loop and break
+
+float fn0 ( float p0, float p1 ) {
+
+	float nodeVar0;
+
+	nodeVar0 = 0.0;
+
+	for ( int i = 0; i < 4; i ++ ) {
+
+		nodeVar0 = ( nodeVar0 + ( p0 * float( i ) ) );
+
+		if ( ( nodeVar0 > p1 ) ) {
+
+			break;
+
+		}
+
+	}
+
+	return nodeVar0;
+
+}
+
+( fn0( nodeVarying0.x, 2.0 ) + fn0( nodeVarying0.y, 4.0 ) )
+
+// auto function polymorphic
+
+vec3 fn0 ( vec3 p0 ) {
+
+	return ( ( p0 * p0 ) + p0 );
+
+}
+
+vec2 fn1 ( vec2 p0 ) {
+
+	return ( ( p0 * p0 ) + p0 );
+
+}
+
+float fn2 ( float p0 ) {
+
+	return ( ( p0 * p0 ) + p0 );
+
+}
+
+( ( fn0( vec3( nodeVarying0, 1.0 ) ) + fn0( vec3( 1.0, 2.0, 3.0 ) ) ) + vec3( fn1( nodeVarying0 ), ( fn2( nodeVarying0.x ) + fn2( nodeVarying0.y ) ) ) )
+
+// auto function nested calls
+
+float fn0 ( float p0 ) {
+
+	return fract( ( p0 * 1.618 ) );
+
+}
+
+float fn1 ( float p0, float p1 ) {
+
+	return ( ( fn0( p0 ) + fn0( p1 ) ) * 0.5 );
+
+}
+
+( ( fn1( nodeVarying0.x, nodeVarying0.y ) + fn1( 1.0, 2.0 ) ) + fn0( fn0( 3.0 ) ) )
+
+// auto function object parameters
+
+float fn0 ( float p0, float p1 ) {
+
+	return ( ( p0 * p1 ) + 0.25 );
+
+}
+
+( fn0( nodeVarying0.x, 2.0 ) + fn0( nodeVarying0.y, 0.5 ) )
+
+// auto function builtin parameter name
+
+float fn0 ( float p0, float p1 ) {
+
+	return ( distance( vec2( p0 ), vec2( p1 ) ) + length( vec2( p0, p1 ) ) );
+
+}
+
+( fn0( nodeVarying0.x, nodeVarying0.y ) + fn0( 1.0, 2.0 ) )
+
+// auto function external closure inline
+
+float counter;
+counter = 0.0;
+counter = ( counter + 1.0 );
+counter = ( counter + 2.0 );
+
+( ( ( counter + counter ) + ( ( 3.0 * nodeUniform0 ) + ( 4.0 * nodeUniform0 ) ) ) + ( ( nodeVarying0.x + 0.1 ) + ( nodeVarying0.x + 0.2 ) ) )
+
+// auto function mutated parameter inline
+
+float first;
+float second;
+first = 1.0;
+second = 2.0;
+first = ( first + 1.0 );
+second = ( second + 1.0 );
+
+vec4( ( first * 2.0 ), ( second * 2.0 ), first, second )
+
+// auto function variable named like a parameter inline
+
+float p0;
+float sum;
+p0 = ( nodeVarying0.x * 2.0 );
+sum = 0.0;
+
+for ( int p1 = 0; p1 < 3; p1 ++ ) {
+
+	sum = ( sum + ( ( nodeVarying0.x * nodeVarying0.y ) + float( p1 ) ) );
+
+}
+
+( ( p0 + nodeVarying0.x ) + sum )
+
+// auto function variadic inline
+
+( ( ( 0.0 + nodeVarying0.x ) + nodeVarying0.y ) + 1.0 )
+
+// auto function isolate argument inline
+
+( vec2( ( ( nodeVarying0 + vec2( 0.1 ) ).x - ( nodeVarying0 + vec2( 0.0 ) ).x ), ( ( nodeVarying0 + vec2( 0.2 ) ).x - ( nodeVarying0 + vec2( 0.0 ) ).x ) ) * vec2( 2.0 ) )

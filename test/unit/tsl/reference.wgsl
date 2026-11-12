@@ -395,14 +395,28 @@ result
 
 // external variable in branches of the same condition
 
+fn fn0 ( p0 : f32 ) -> vec4<f32> {
+
+	var nodeVar0 : f32;
+
+	nodeVar0 = 0.0;
+
+	for ( var i : i32 = 0; i < 4; i ++ ) {
+
+		nodeVar0 = ( nodeVar0 + ( p0 * f32( i ) ) );
+
+	}
+
+	return vec4<f32>( nodeVar0 );
+
+}
+
 var diffuse : vec3<f32>;
 var nodeVar0 : vec3<f32>;
 var nodeVar1 : vec4<f32>;
-var nodeVar2 : f32;
-var nodeVar3 : f32;
 var room : vec4<f32>;
 var emissive : vec3<f32>;
-var nodeVar4 : vec3<f32>;
+var nodeVar2 : vec3<f32>;
 
 diffuse = vec3<f32>( 1.0, 1.0, 1.0 );
 let nodeConst0 = ( object.nodeUniform0 > 0.5 );
@@ -411,27 +425,11 @@ if ( nodeConst0 ) {
 
 	if ( ( nodeVarying0.x > 0.5 ) ) {
 
-		nodeVar2 = 0.0;
-
-		for ( var i : i32 = 0; i < 4; i ++ ) {
-
-			nodeVar2 = ( nodeVar2 + ( 1.0 * f32( i ) ) );
-
-		}
-
-		nodeVar1 = vec4<f32>( nodeVar2 );
+		nodeVar1 = fn0( 1.0 );
 
 	} else {
 
-		nodeVar3 = 0.0;
-
-		for ( var i : i32 = 0; i < 4; i ++ ) {
-
-			nodeVar3 = ( nodeVar3 + ( 2.0 * f32( i ) ) );
-
-		}
-
-		nodeVar1 = vec4<f32>( nodeVar3 );
+		nodeVar1 = fn0( 2.0 );
 
 	}
 
@@ -449,15 +447,15 @@ emissive = vec3<f32>( 0.0, 0.0, 0.0 );
 
 if ( nodeConst0 ) {
 
-	nodeVar4 = ( room.xyz * vec3<f32>( room.w ) );
+	nodeVar2 = ( room.xyz * vec3<f32>( room.w ) );
 
 } else {
 
-	nodeVar4 = vec3<f32>( 0.0, 0.0, 0.0 );
+	nodeVar2 = vec3<f32>( 0.0, 0.0, 0.0 );
 
 }
 
-emissive = nodeVar4;
+emissive = nodeVar2;
 
 ( diffuse + emissive )
 
@@ -688,17 +686,29 @@ nodeVar0
 
 // function inline reuse
 
-let nodeConst0 = ( 3.0 * 3.0 );
+fn fn0 ( p0 : f32 ) -> f32 {
+
+	return ( p0 * p0 );
+
+}
+
+let nodeConst0 = fn0( 3.0 );
 
 ( nodeConst0 + nodeConst0 )
 
 // function inside loop
 
+fn fn0 ( p0 : i32 ) -> i32 {
+
+	return ( p0 * p0 );
+
+}
+
 var nodeVar0 : f32 = 0.0;
 
 for ( var i : i32 = 0; i < 4; i ++ ) {
 
-	nodeVar0 = ( nodeVar0 + f32( ( i * i ) ) );
+	nodeVar0 = ( nodeVar0 + f32( fn0( i ) ) );
 
 }
 
@@ -993,19 +1003,25 @@ nodeVar2
 
 // function with loop inside loop
 
+fn fn0 ( p0 : i32 ) -> f32 {
+
+	var nodeVar0 : f32 = 0.0;
+
+	for ( var j : i32 = 0; j < 3; j ++ ) {
+
+		nodeVar0 = ( nodeVar0 + f32( p0 ) );
+
+	}
+
+	return nodeVar0;
+
+}
+
 var nodeVar0 : f32 = 0.0;
 
 for ( var i : i32 = 0; i < 4; i ++ ) {
 
-	var nodeVar1 : f32 = 0.0;
-
-	for ( var j : i32 = 0; j < 3; j ++ ) {
-
-		nodeVar1 = ( nodeVar1 + f32( i ) );
-
-	}
-
-	nodeVar0 = ( nodeVar0 + nodeVar1 );
+	nodeVar0 = ( nodeVar0 + fn0( i ) );
 
 }
 
@@ -1133,33 +1149,39 @@ nodeVar2
 
 // function loop default parameter
 
-var nodeVar0 : f32 = 0.0;
+fn fn0 ( p0 : i32 ) -> f32 {
 
-for ( var i : i32 = 0; i < 3; i ++ ) {
+	var nodeVar0 : f32 = 0.0;
 
-	nodeVar0 = ( nodeVar0 + f32( i ) );
+	for ( var i : i32 = 0; i < p0; i ++ ) {
+
+		nodeVar0 = ( nodeVar0 + f32( i ) );
+
+	}
+
+	return nodeVar0;
 
 }
 
-var nodeVar1 : f32 = nodeVar0;
-var nodeVar2 : f32 = 0.0;
+var nodeVar0 : f32 = fn0( 3 );
+var nodeVar1 : f32 = 0.0;
 
 for ( var i : i32 = 0; i < 5; i ++ ) {
 
-	nodeVar2 = ( nodeVar2 + f32( i ) );
+	nodeVar1 = ( nodeVar1 + f32( i ) );
 
 }
 
-var nodeVar3 : f32 = nodeVar2;
-var nodeVar4 : f32 = 0.0;
+var nodeVar2 : f32 = nodeVar1;
+var nodeVar3 : f32 = 0.0;
 
 for ( var i : i32 = 0; i < 4; i ++ ) {
 
-	nodeVar4 = ( nodeVar4 + ( nodeVar1 + nodeVar3 ) );
+	nodeVar3 = ( nodeVar3 + ( nodeVar0 + nodeVar2 ) );
 
 }
 
-nodeVar4
+nodeVar3
 
 // cached value after function loop
 
@@ -1682,3 +1704,133 @@ fn fn0 ( value : vec3<f32> ) -> f32 {
 }
 
 fn0( vec3<f32>( 1.0, 0.24620132669705552, 0.0 ) )
+
+// auto function loop and break
+
+fn fn0 ( p0 : f32, p1 : f32 ) -> f32 {
+
+	var nodeVar0 : f32;
+
+	nodeVar0 = 0.0;
+
+	for ( var i : i32 = 0; i < 4; i ++ ) {
+
+		nodeVar0 = ( nodeVar0 + ( p0 * f32( i ) ) );
+
+		if ( ( nodeVar0 > p1 ) ) {
+
+			break;
+
+		}
+
+	}
+
+	return nodeVar0;
+
+}
+
+( fn0( nodeVarying0.x, 2.0 ) + fn0( nodeVarying0.y, 4.0 ) )
+
+// auto function polymorphic
+
+fn fn0 ( p0 : vec3<f32> ) -> vec3<f32> {
+
+	return ( ( p0 * p0 ) + p0 );
+
+}
+
+fn fn1 ( p0 : vec2<f32> ) -> vec2<f32> {
+
+	return ( ( p0 * p0 ) + p0 );
+
+}
+
+fn fn2 ( p0 : f32 ) -> f32 {
+
+	return ( ( p0 * p0 ) + p0 );
+
+}
+
+( ( fn0( vec3<f32>( nodeVarying0, 1.0 ) ) + fn0( vec3<f32>( 1.0, 2.0, 3.0 ) ) ) + vec3<f32>( fn1( nodeVarying0 ), ( fn2( nodeVarying0.x ) + fn2( nodeVarying0.y ) ) ) )
+
+// auto function nested calls
+
+fn fn0 ( p0 : f32 ) -> f32 {
+
+	return fract( ( p0 * 1.618 ) );
+
+}
+
+fn fn1 ( p0 : f32, p1 : f32 ) -> f32 {
+
+	return ( ( fn0( p0 ) + fn0( p1 ) ) * 0.5 );
+
+}
+
+( ( fn1( nodeVarying0.x, nodeVarying0.y ) + fn1( 1.0, 2.0 ) ) + fn0( fn0( 3.0 ) ) )
+
+// auto function object parameters
+
+fn fn0 ( p0 : f32, p1 : f32 ) -> f32 {
+
+	return ( ( p0 * p1 ) + 0.25 );
+
+}
+
+( fn0( nodeVarying0.x, 2.0 ) + fn0( nodeVarying0.y, 0.5 ) )
+
+// auto function builtin parameter name
+
+fn fn0 ( p0 : f32, p1 : f32 ) -> f32 {
+
+	return ( distance( vec2<f32>( p0 ), vec2<f32>( p1 ) ) + length( vec2<f32>( p0, p1 ) ) );
+
+}
+
+( fn0( nodeVarying0.x, nodeVarying0.y ) + fn0( 1.0, 2.0 ) )
+
+// auto function external closure inline
+
+var counter : f32;
+
+counter = 0.0;
+counter = ( counter + 1.0 );
+counter = ( counter + 2.0 );
+
+( ( ( counter + counter ) + ( ( 3.0 * object.nodeUniform0 ) + ( 4.0 * object.nodeUniform0 ) ) ) + ( ( nodeVarying0.x + 0.1 ) + ( nodeVarying0.x + 0.2 ) ) )
+
+// auto function mutated parameter inline
+
+var first : f32;
+var second : f32;
+
+first = 1.0;
+second = 2.0;
+first = ( first + 1.0 );
+second = ( second + 1.0 );
+
+vec4<f32>( ( first * 2.0 ), ( second * 2.0 ), first, second )
+
+// auto function variable named like a parameter inline
+
+var p0 : f32;
+var sum : f32;
+
+p0 = ( nodeVarying0.x * 2.0 );
+sum = 0.0;
+
+for ( var p1 : i32 = 0; p1 < 3; p1 ++ ) {
+
+	sum = ( sum + ( ( nodeVarying0.x * nodeVarying0.y ) + f32( p1 ) ) );
+
+}
+
+( ( p0 + nodeVarying0.x ) + sum )
+
+// auto function variadic inline
+
+( ( ( 0.0 + nodeVarying0.x ) + nodeVarying0.y ) + 1.0 )
+
+// auto function isolate argument inline
+
+( vec2<f32>( ( ( nodeVarying0 + vec2<f32>( 0.1 ) ).x - ( nodeVarying0 + vec2<f32>( 0.0 ) ).x ), ( ( nodeVarying0 + vec2<f32>( 0.2 ) ).x - ( nodeVarying0 + vec2<f32>( 0.0 ) ).x ) ) * vec2<f32>( 2.0 ) )
