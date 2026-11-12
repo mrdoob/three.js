@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, context, determinant, float, grayscale, hue, int, inverse, ivec3, linearDepth, mat2, mat3, mat4, mix, mul, overloadingFn, overrideNode, saturation, screenUV, select, time, transpose, uint, uniform, uv, vec2, vec3, vec4, vibrance } from '../../../src/Three.TSL.js';
+import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, context, determinant, float, grayscale, hue, int, inverse, ivec3, linearDepth, mat2, mat3, mat4, mix, mul, overloadingFn, overrideNode, sample, saturation, screenUV, select, time, transpose, uint, uniform, uv, vec2, vec3, vec4, vibrance } from '../../../src/Three.TSL.js';
 
 // Create a fresh graph for every test and backend.
 export const cases = {
@@ -1563,6 +1563,16 @@ export const cases = {
 		const sx = uv().mul( 2 ).xy.x;
 
 		return sx.mul( sx ).add( sx );
+
+	},
+
+	// A node whose setup returns an output node is a pass-through node by default.
+
+	'sample wrapper reuse': () => {
+
+		const s = sample( ( coord ) => coord.mul( 2 ).add( 1 ) );
+
+		return s.mul( s ).add( s );
 
 	},
 

@@ -1622,6 +1622,12 @@ vec2 nodeConst0 = ( nodeVarying0 * vec2( 2.0 ) );
 
 ( ( nodeConst0.x * nodeConst0.x ) + nodeConst0.x )
 
+// sample wrapper reuse
+
+vec2 nodeConst0 = ( ( nodeVarying0 * vec2( 2.0 ) ) + vec2( 1.0 ) );
+
+( ( nodeConst0 * nodeConst0 ) + nodeConst0 )
+
 // wrapper reuse across blocks
 
 float nodeVar0;

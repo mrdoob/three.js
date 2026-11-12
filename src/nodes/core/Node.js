@@ -193,15 +193,19 @@ class Node extends EventDispatcher {
 	 * Whether this node passes through to its inner expression every time it is generated,
 	 * without owning a shader variable, e.g. a swizzle or an element access. Such a node is not
 	 * cacheable itself, so its reuse must reach the inner expression, which can then be cached.
-	 * Non-cacheable nodes override this method to opt in.
+	 *
+	 * By default, a node is a pass-through node if its setup returned an output node with a value.
+	 * Nodes that store or consume their value, like variables or assignments, have no output node.
 	 *
 	 * @private
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {boolean} Whether this node is a pass-through node.
 	 */
-	_isPassThrough( /*builder*/ ) {
+	_isPassThrough( builder ) {
 
-		return false;
+		const { outputNode } = builder.getNodeProperties( this );
+
+		return outputNode !== null && outputNode !== undefined && outputNode.isNode === true && outputNode.isStackNode !== true && this.getNodeType( builder ) !== 'void';
 
 	}
 

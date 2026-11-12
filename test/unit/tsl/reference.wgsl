@@ -1707,6 +1707,12 @@ let nodeConst0 = ( nodeVarying0 * vec2<f32>( 2.0 ) );
 
 ( ( nodeConst0.x * nodeConst0.x ) + nodeConst0.x )
 
+// sample wrapper reuse
+
+let nodeConst0 = ( ( nodeVarying0 * vec2<f32>( 2.0 ) ) + vec2<f32>( 1.0 ) );
+
+( ( nodeConst0 * nodeConst0 ) + nodeConst0 )
+
 // wrapper reuse across blocks
 
 var nodeVar0 : f32;
