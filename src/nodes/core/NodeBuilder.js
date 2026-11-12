@@ -145,9 +145,16 @@ class NodeData {
 		this.forceDeclaration = undefined;
 		this.variable = undefined;
 		this.cacheVariable = undefined;
+		this.varying = undefined;
+		this.bufferAttribute = undefined;
+		this.code = undefined;
 		this.uniform = undefined;
+		this.uniformGPU = undefined;
+		this.nodeFunction = undefined;
+		this.functionPropertyName = undefined;
 		this.subBuilds = undefined;
 		this.subBuildsCache = undefined;
+		this.subBuildVariables = undefined;
 
 	}
 
@@ -1165,19 +1172,18 @@ class NodeBuilder {
 	 */
 	getSharedContext() {
 
-		const context = { ...this.context };
-
-		delete context.material;
-		delete context.getUV;
-		delete context.getOutput;
-		delete context.getTextureLevel;
-		delete context.getAO;
-		delete context.getGI;
-		delete context.getShadow;
-		delete context.nodeLoop;
-		delete context.nodeBlock;
-
-		return context;
+		return {
+			...this.context,
+			material: undefined,
+			getUV: undefined,
+			getOutput: undefined,
+			getTextureLevel: undefined,
+			getAO: undefined,
+			getGI: undefined,
+			getShadow: undefined,
+			nodeLoop: undefined,
+			nodeBlock: undefined
+		};
 
 	}
 
@@ -2233,7 +2239,7 @@ class NodeBuilder {
 
 		if ( nodeData === undefined ) {
 
-			nodeData = { vertex: undefined, fragment: undefined, compute: undefined, any: undefined };
+			nodeData = { vertex: undefined, fragment: undefined, compute: undefined, any: undefined, null: undefined };
 
 			cache.setData( node, nodeData );
 
@@ -2435,8 +2441,11 @@ class NodeBuilder {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 		const subBuildVariable = this.getSubBuildProperty( property, nodeData.subBuilds );
+		const isSubBuild = subBuildVariable !== property;
 
-		let nodeVar = nodeData[ subBuildVariable ];
+		let nodeVar = isSubBuild
+			? ( nodeData.subBuildVariables !== undefined ? nodeData.subBuildVariables.get( subBuildVariable ) : undefined )
+			: nodeData[ property ];
 
 		if ( nodeVar === undefined ) {
 
@@ -2455,7 +2464,7 @@ class NodeBuilder {
 
 			//
 
-			if ( subBuildVariable !== property ) {
+			if ( isSubBuild ) {
 
 				name = this.getSubBuildProperty( name, nodeData.subBuilds );
 
@@ -2475,7 +2484,17 @@ class NodeBuilder {
 
 			this.registerDeclaration( nodeVar );
 
-			nodeData[ subBuildVariable ] = nodeVar;
+			if ( isSubBuild ) {
+
+				if ( nodeData.subBuildVariables === undefined ) nodeData.subBuildVariables = new Map();
+
+				nodeData.subBuildVariables.set( subBuildVariable, nodeVar );
+
+			} else {
+
+				nodeData[ property ] = nodeVar;
+
+			}
 
 		}
 
@@ -2550,8 +2569,11 @@ class NodeBuilder {
 
 		const nodeData = this.getDataFromNode( node, 'any' );
 		const subBuildVarying = this.getSubBuildProperty( 'varying', nodeData.subBuilds );
+		const isSubBuild = subBuildVarying !== 'varying';
 
-		let nodeVarying = nodeData[ subBuildVarying ];
+		let nodeVarying = isSubBuild
+			? ( nodeData.subBuildVariables !== undefined ? nodeData.subBuildVariables.get( subBuildVarying ) : undefined )
+			: nodeData.varying;
 
 		if ( nodeVarying === undefined ) {
 
@@ -2562,7 +2584,7 @@ class NodeBuilder {
 
 			//
 
-			if ( subBuildVarying !== 'varying' ) {
+			if ( isSubBuild ) {
 
 				name = this.getSubBuildProperty( name, nodeData.subBuilds );
 
@@ -2576,7 +2598,17 @@ class NodeBuilder {
 
 			this.registerDeclaration( nodeVarying );
 
-			nodeData[ subBuildVarying ] = nodeVarying;
+			if ( isSubBuild ) {
+
+				if ( nodeData.subBuildVariables === undefined ) nodeData.subBuildVariables = new Map();
+
+				nodeData.subBuildVariables.set( subBuildVarying, nodeVarying );
+
+			} else {
+
+				nodeData.varying = nodeVarying;
+
+			}
 
 		}
 
@@ -3321,8 +3353,7 @@ class NodeBuilder {
 
 		this.setShaderStage( shaderStage );
 
-		const context = { ...this.context };
-		delete context.nodeBlock;
+		const context = { ...this.context, nodeBlock: undefined };
 
 		this.flowBlock = null;
 		this.cache = this.globalCache;

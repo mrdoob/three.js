@@ -274,7 +274,7 @@ class BufferAttributeNode extends InputNode {
 		const nodeType = this.getNodeType( builder );
 		const nodeName = builder.context.nodeName;
 
-		if ( nodeName !== undefined ) delete builder.context.nodeName; // deleting when consumed
+		if ( nodeName !== undefined ) builder.context.nodeName = undefined; // clearing when consumed
 
 		const nodeAttribute = builder.getBufferAttributeFromNode( this, nodeType, nodeName );
 		const propertyName = builder.getPropertyName( nodeAttribute );
