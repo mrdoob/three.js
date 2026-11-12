@@ -159,11 +159,14 @@ class Attributes extends DataMap {
 
 		} else {
 
-			if ( data.version < attribute.version || attribute.usage === DynamicDrawUsage ) {
+			// dynamic attributes are uploaded once per frame, not once per render call
+
+			if ( data.version < attribute.version || ( attribute.usage === DynamicDrawUsage && data.frame !== this.info.frame ) ) {
 
 				this.backend.updateAttribute( attribute );
 
 				data.version = attribute.version;
+				data.frame = this.info.frame;
 
 			}
 
