@@ -338,7 +338,8 @@ Water.WaterShader = {
 			float halfCycle = config.z;
 			float scale = config.w;
 
-			vec3 toEye = normalize( vToEye );
+			float distance = length( vToEye );
+			vec3 toEye = vToEye / distance;
 
 			// determine flow direction
 			vec2 flow;
@@ -365,14 +366,20 @@ Water.WaterShader = {
 			float reflectance = reflectivity + ( 1.0 - reflectivity ) * pow( ( 1.0 - theta ), 5.0 );
 
 			// calculate final uv coords
-			vec3 coord = vCoord.xyz / vCoord.w;
-			vec2 uv = coord.xy + coord.z * normal.xz * 0.05;
+			vec2 viewRight = vec2( viewMatrix[ 0 ][ 0 ], viewMatrix[ 2 ][ 0 ] );
+			vec2 normalTilt = vec2(
+				normal.x * viewRight.x + normal.z * viewRight.y,
+				normal.z * viewRight.x - normal.x * viewRight.y
+			);
+			vec2 offset = normalTilt * ( 0.05 / ( 1.0 + 0.02 * distance ) );
 
-			vec4 reflectColor = texture2D( tReflectionMap, vec2( 1.0 - uv.x, uv.y ) );
-			vec4 refractColor = texture2D( tRefractionMap, uv );
+			vec2 coord = vCoord.xy / vCoord.w;
 
-			// multiply water color with the mix of both textures
-			gl_FragColor = vec4( color, 1.0 ) * mix( refractColor, reflectColor, reflectance );
+			vec4 reflectColor = texture2D( tReflectionMap, vec2( 1.0 - coord.x - offset.x, coord.y - offset.y ) );
+			vec4 refractColor = texture2D( tRefractionMap, vec2( coord.x - offset.x, coord.y + offset.y ) );
+
+			// tint transmitted light only; dielectric surface reflections stay achromatic
+			gl_FragColor = vec4( mix( refractColor.rgb * color, reflectColor.rgb, reflectance ), 1.0 );
 
 			#include <tonemapping_fragment>
 			#include <colorspace_fragment>
