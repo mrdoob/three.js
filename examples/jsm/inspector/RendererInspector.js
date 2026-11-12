@@ -474,6 +474,9 @@ export class RendererInspector extends InspectorBase {
 
 		super.dispose();
 
+		this.frames = [];
+		this.framesLib = {};
+
 	}
 
 }
