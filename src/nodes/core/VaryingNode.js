@@ -139,6 +139,7 @@ class VaryingNode extends Node {
 
 			properties.varying = varying = builder.getVaryingFromNode( this, name, type, interpolationType, interpolationSampling );
 			properties.node = subBuild( this.node, 'VERTEX' );
+			properties.vertexAnalyzed = false;
 
 		}
 
@@ -175,11 +176,20 @@ class VaryingNode extends Node {
 
 		// TODO: Node.build() could pass through the output node of setup() directly, so overrides of analyze() and generate() don't need to handle it twice
 
-		if ( builder.getNodeProperties( this ).outputNode ) return super.analyze( builder );
+		const properties = builder.getNodeProperties( this );
+
+		if ( properties.outputNode ) return super.analyze( builder );
 
 		this.setupVarying( builder );
 
-		builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
+		// The vertex value is generated once, so it is analyzed once, however many times the varying is read.
+		if ( properties.vertexAnalyzed === false ) {
+
+			properties.vertexAnalyzed = true;
+
+			builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
+
+		}
 
 	}
 
