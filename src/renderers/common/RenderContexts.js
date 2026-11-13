@@ -54,18 +54,18 @@ class RenderContexts {
 
 		} else {
 
-			const format = renderTarget.texture?.format;
-			const type = renderTarget.texture?.type;
-			const count = renderTarget.textures.length;
+			// Keep the complete attachment state in the context registry key.
+			// Pipeline state depends on each attachment's exact format and type,
+			// while texture names can also affect the node build (see buildState below).
 
-			// Texture names are part of the attachment state as well: two
-			// targets that only differ in a texture name must not share a
-			// render context, since the name can end up in the node build
-			// (see buildState below).
+			const textureStates = renderTarget.textures.map( ( texture ) => [ texture.format, texture.type, texture.name ] );
 
-			const names = renderTarget.textures.map( ( texture ) => texture.name ).join( ',' );
-
-			attachmentState = `${ count }:${ format }:${ type }:${ renderTarget.samples }:${ renderTarget.depthBuffer }:${ renderTarget.stencilBuffer }:${ names }`;
+			attachmentState = JSON.stringify( [
+				renderTarget.samples,
+				renderTarget.depthBuffer,
+				renderTarget.stencilBuffer,
+				textureStates
+			] );
 
 			// A node build only reads the output types of the target textures
 			// (`NodeBuilder.getOutputType()`), the texture names used for MRT
@@ -75,7 +75,10 @@ class RenderContexts {
 			// backend keys separately (`WebGPUBackend.getRenderCacheKey()`),
 			// so they must not split the node build cache. See #35388.
 
-			buildState = `${ renderTarget.textures.map( ( texture ) => getTextureType( texture ) + ':' + texture.name ).join( ',' ) }:${ renderTarget.depthBuffer }`;
+			buildState = JSON.stringify( [
+				renderTarget.textures.map( ( texture ) => [ getTextureType( texture ), texture.name ] ),
+				renderTarget.depthBuffer
+			] );
 
 		}
 
