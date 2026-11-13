@@ -158,7 +158,14 @@ class GutterFillGenerator {
 
 			if ( i === levels.length ) {
 
-				levels.push( createLevel() );
+				// a level's texture and its passes, created on first use: push and pull reading the level above,
+				// then push and pull reading the map
+				const levelTexture = new StorageTexture( 1, 1 );
+				levelTexture.type = HalfFloatType;
+				levelTexture.format = RGBAFormat;
+				levelTexture.generateMipmaps = false;
+
+				levels.push( { texture: levelTexture, passes: [ null, null, null, null ] } );
 
 			}
 
@@ -167,8 +174,6 @@ class GutterFillGenerator {
 			const h = Math.max( 1, height >> ( count - i ) );
 
 			level.texture.setSize( w, h );
-			level.dispatchSize[ 0 ] = Math.ceil( w / WORKGROUP_SIZE );
-			level.dispatchSize[ 1 ] = Math.ceil( h / WORKGROUP_SIZE );
 
 		}
 
@@ -195,7 +200,8 @@ class GutterFillGenerator {
 	}
 
 	/**
-	 * Returns a pass of a level, created on first use. The top level reads the map, the others the level above.
+	 * Returns a pass of a level, created on first use, with one thread per texel of the level. The top level reads
+	 * the map, the others the level above.
 	 *
 	 * @private
 	 * @param {number} index - The level, counted from the coarsest one.
@@ -209,18 +215,34 @@ class GutterFillGenerator {
 		const level = levels[ index ];
 		const slot = ( top ? 2 : 0 ) + ( isPull ? 1 : 0 );
 
-		if ( level.passes[ slot ] === null ) {
+		const { width, height } = level.texture.image;
+		const dispatchSize = [ Math.ceil( width / WORKGROUP_SIZE ), Math.ceil( height / WORKGROUP_SIZE ), 1 ];
 
-			const texel = top ? readSource( this._source ) : levels[ index + 1 ].read;
-			const above = top ? this._source.size() : levels[ index + 1 ].size;
+		if ( level.passes[ slot ] !== null ) {
 
-			// the size of the level written is read from its write node, since a read only node would make the pass
-			// bind the texture read only
-			const size = level.target.size();
+			level.passes[ slot ].dispatchSize = dispatchSize;
 
-			level.passes[ slot ] = isPull ?
-				pull( texel, above, size, levels[ index - 1 ].read, levels[ index - 1 ].size, level.target, level.dispatchSize ) :
-				push( texel, above, size, level.target, level.dispatchSize );
+		} else {
+
+			// the pass writes its level and reads the levels next to it, each through one node. The size of the level
+			// written is read from its write node, since a read only node would make the pass bind it read only
+			const target = storageTexture( level.texture );
+			const size = target.size();
+
+			const aboveNode = top ? null : storageTexture( levels[ index + 1 ].texture ).setAccess( 'readOnly' );
+			const texel = top ? readSource( this._source ) : ( coord ) => aboveNode.load( coord );
+			const above = top ? this._source.size() : aboveNode.size();
+
+			if ( isPull ) {
+
+				const belowNode = storageTexture( levels[ index - 1 ].texture ).setAccess( 'readOnly' );
+				level.passes[ slot ] = pull( texel, above, size, ( coord ) => belowNode.load( coord ), belowNode.size(), target, dispatchSize );
+
+			} else {
+
+				level.passes[ slot ] = push( texel, above, size, target, dispatchSize );
+
+			}
 
 		}
 
@@ -254,33 +276,6 @@ class GutterFillGenerator {
 		}
 
 	}
-
-}
-
-/**
- * Creates a level: its texture, its size, the nodes that read and write it, and its passes, created on first
- * use: push and pull reading the level above, then push and pull reading the map.
- *
- * @private
- * @return {Object} The level.
- */
-function createLevel() {
-
-	const levelTexture = new StorageTexture( 1, 1 );
-	levelTexture.type = HalfFloatType;
-	levelTexture.format = RGBAFormat;
-	levelTexture.generateMipmaps = false;
-
-	const read = storageTexture( levelTexture ).setAccess( 'readOnly' );
-
-	return {
-		texture: levelTexture,
-		size: read.size(),
-		target: storageTexture( levelTexture ),
-		read: ( coord ) => read.load( coord ),
-		dispatchSize: [ 1, 1, 1 ],
-		passes: [ null, null, null, null ],
-	};
 
 }
 
@@ -368,7 +363,7 @@ function average( texel, above, size, coord ) {
  * @param {Node<uvec2>} above - The width and height of the level above.
  * @param {Node<uvec2>} size - The width and height of the level.
  * @param {StorageTextureNode} target - The level.
- * @param {Array<number>} dispatchSize - The dispatch size, set for each map size.
+ * @param {Array<number>} dispatchSize - The dispatch size, reassigned when the map size changes.
  * @return {ComputeNode} The compute node.
  */
 function push( texel, above, size, target, dispatchSize ) {
@@ -400,7 +395,7 @@ function push( texel, above, size, target, dispatchSize ) {
  * @param {function(Node<ivec2>): Node<vec4>} belowTexel - Reads a texel of the filled level below.
  * @param {Node<uvec2>} below - The width and height of the level below.
  * @param {StorageTextureNode} target - The level.
- * @param {Array<number>} dispatchSize - The dispatch size, set for each map size.
+ * @param {Array<number>} dispatchSize - The dispatch size, reassigned when the map size changes.
  * @return {ComputeNode} The compute node.
  */
 function pull( texel, above, size, belowTexel, below, target, dispatchSize ) {
