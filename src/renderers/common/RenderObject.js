@@ -882,6 +882,14 @@ class RenderObject {
 
 		}
 
+		if ( material.alphaToCoverage === true ) {
+
+			const samples = renderer.currentSamples;
+
+			cacheKey += samples > 1 ? 'msaa,' : samples > 0 ? 'single-sample,' : 'no-samples,';
+
+		}
+
 		cacheKey += this.clippingContextCacheKey + ',';
 
 		if ( object.geometry ) {
