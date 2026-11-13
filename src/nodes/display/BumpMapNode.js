@@ -1,7 +1,8 @@
 import Node from '../core/Node.js';
 import { uv } from '../accessors/UV.js';
-import { normalView } from '../accessors/Normal.js';
+import { normalLocal, normalView } from '../accessors/Normal.js';
 import { positionView } from '../accessors/Position.js';
+import { modelNormalMatrix } from '../accessors/ModelNode.js';
 import { faceDirection } from './FrontFacingNode.js';
 import { Fn, nodeProxy, float, vec2 } from '../tsl/TSLBase.js';
 
@@ -28,9 +29,10 @@ const perturbNormalArb = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const { surf_pos, surf_norm, dHdxy } = inputs;
 
-	// normalize is done to ensure that the bump map looks the same regardless of the texture's scale
-	const vSigmaX = surf_pos.dFdx().normalize();
-	const vSigmaY = surf_pos.dFdy().normalize();
+	// the surface derivatives are not normalized so the bump height keeps its units and the
+	// slope stays the same at any view distance
+	const vSigmaX = surf_pos.dFdx();
+	const vSigmaY = surf_pos.dFdy();
 	const vN = surf_norm; // normalized
 
 	const R1 = vSigmaY.cross( vN );
@@ -104,7 +106,10 @@ class BumpMapNode extends Node {
 
 		if ( builder.material.wireframe === true ) return this.normalNode;
 
-		const bumpScale = this.scaleNode !== null ? this.scaleNode : 1;
+		// the scale is a height in local units, so it's divided by the object's scale along the normal. The
+		// attribute normal is unit length, and the batch, instance and model transforms stretch it from there
+		const normalScale = float( 1 ).div( modelNormalMatrix.mul( normalLocal ).length() ).toVarying( 'v_bumpScale' );
+		const bumpScale = normalScale.mul( this.scaleNode !== null ? this.scaleNode : 1 );
 		const dHdxy = dHdxy_fwd( { textureNode: this.textureNode, bumpScale } );
 
 		return perturbNormalArb( {

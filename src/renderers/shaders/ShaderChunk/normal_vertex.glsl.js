@@ -17,4 +17,11 @@ export default /* glsl */`
 	#endif
 
 #endif
+
+#ifdef USE_BUMPMAP
+
+	// the object's scale along the normal, from the same transforms the normal goes through
+	vBumpScale = length( objectNormal ) / length( transformedNormal );
+
+#endif
 `;
