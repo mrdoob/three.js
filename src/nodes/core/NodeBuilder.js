@@ -29,7 +29,6 @@ import { Color } from '../../math/Color.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
-import { Float16BufferAttribute } from '../../core/BufferAttribute.js';
 import { warn, error } from '../../utils.js';
 
 let _id = 0;
@@ -1911,7 +1910,7 @@ class NodeBuilder {
 
 		let arrayType;
 
-		if ( ! ( attribute instanceof Float16BufferAttribute ) && normalized !== true ) {
+		if ( normalized !== true ) {
 
 			arrayType = this.getTypeFromArray( array );
 
