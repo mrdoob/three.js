@@ -1,5 +1,5 @@
 import { FloatType, HalfFloatType, Matrix4, Node, NodeMaterial, NodeUpdateType, QuadMesh, RendererUtils, RenderTarget, RGFormat, Vector2 } from 'three/webgpu';
-import { Fn, If, Loop, abs, atan, convertToTexture, dot, exp, float, floor, getNormalFromDepth, getViewPosition, isBackgroundDepth, ivec2, length, luminance, max, min, mix, nodeObject, outputStruct, passTexture, pow, property, screenCoordinate, sqrt, texture, textureSize, uniform, vec2, vec3, vec4 } from 'three/tsl';
+import { Fn, If, Loop, abs, atan, convertToTexture, dot, exp, float, floor, getNormalFromDepth, getViewPosition, isBackgroundDepth, ivec2, length, luminance, max, min, mix, nodeObject, outputStruct, passTexture, pow, screenCoordinate, sqrt, struct, texture, textureSize, uniform, vec2, vec3, vec4 } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
@@ -1586,18 +1586,14 @@ function createMaterial( name, count, body ) {
 
 	}
 
-	const outputs = [];
-	for ( let i = 0; i < count; i ++ ) outputs.push( property( 'vec4' ) );
+	const layout = {};
+	for ( let i = 0; i < count; i ++ ) layout[ 'm' + i ] = 'vec4';
 
-	material.colorNode = Fn( () => {
+	const outputs = struct( layout );
 
-		const values = body();
-		for ( let i = 0; i < count; i ++ ) outputs[ i ].assign( values[ i ] );
-		return vec4( 0 );
+	const result = Fn( () => outputs( ...body().slice( 0, count ) ) )().toConst();
 
-	} )();
-
-	material.outputNode = outputStruct( ...outputs );
+	material.fragmentNode = outputStruct( ...Object.keys( layout ).map( ( name ) => result.get( name ) ) );
 
 	return material;
 

@@ -13,6 +13,7 @@ import { Matrix4 } from '../../math/Matrix4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { warnOnce } from '../../utils.js';
+import { resetRendererState, restoreRendererState } from '../../renderers/common/RendererUtils.js';
 
 const _reflectorPlane = new Plane();
 const _normal = new Vector3();
@@ -334,6 +335,14 @@ class ReflectorBaseNode extends Node {
 		 */
 		this.hasOutput = false;
 
+		/**
+		 * The renderer state saved and restored around the reflector render.
+		 *
+		 * @private
+		 * @type {Object}
+		 */
+		this._rendererState = {};
+
 	}
 
 	isCacheable( /*builder*/ ) {
@@ -571,13 +580,11 @@ class ReflectorBaseNode extends Node {
 
 		material.visible = false;
 
-		const currentRenderTarget = renderer.getRenderTarget();
-		const currentMRT = renderer.getMRT();
-		const currentAutoClear = renderer.autoClear;
+		resetRendererState( renderer, this._rendererState );
 
-		renderer.setMRT( null );
+		renderer.setClearColor( this._rendererState.clearColor, this._rendererState.clearAlpha );
+
 		renderer.setRenderTarget( renderTarget );
-		renderer.autoClear = true;
 
 		const previousName = scene.name;
 
@@ -599,9 +606,7 @@ class ReflectorBaseNode extends Node {
 
 		scene.name = previousName;
 
-		renderer.setMRT( currentMRT );
-		renderer.setRenderTarget( currentRenderTarget );
-		renderer.autoClear = currentAutoClear;
+		restoreRendererState( renderer, this._rendererState );
 
 		material.visible = true;
 
