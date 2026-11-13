@@ -233,8 +233,10 @@
 
 				renderer.render( scene, camera );
 
-				renderer.compute( computeInitDrawBuffer );
-				renderer.compute( computeDrawBuffer );
+				renderer.compute( [
+					computeInitDrawBuffer,
+					computeDrawBuffer
+				] );
 
 			}
 
