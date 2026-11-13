@@ -2768,12 +2768,12 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Ends the given measurement and returns its GPU time in milliseconds. The queries of all
-	 * measurements that end in the same task are read back together.
+	 * Ends the given measurement and returns its GPU start and end times and their difference in
+	 * milliseconds. The queries of all measurements that end in the same task are read back together.
 	 *
 	 * @async
 	 * @param {?number} startIndex - The value returned by {@link WebGPUBackend#beginTimer}.
-	 * @return {Promise<?number>} The GPU time in milliseconds.
+	 * @return {Promise<?{start: ?number, end: ?number, delta: number}>} The GPU times in milliseconds.
 	 */
 	async endTimer( startIndex ) {
 
@@ -2789,7 +2789,7 @@ class WebGPUBackend extends Backend {
 
 		if ( endIndex === startIndex ) {
 
-			return 0;
+			return { start: null, end: null, delta: 0 };
 
 		}
 
@@ -2912,7 +2912,11 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			timer.resolve( Number( latestEnd - earliestBegin ) / 1e6 );
+			timer.resolve( {
+				start: Number( earliestBegin ) / 1e6,
+				end: Number( latestEnd ) / 1e6,
+				delta: Number( latestEnd - earliestBegin ) / 1e6,
+			} );
 
 		}
 

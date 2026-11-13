@@ -643,12 +643,12 @@ class Backend {
 	}
 
 	/**
-	 * Ends the given measurement and returns its GPU time in milliseconds, or `null` when the
-	 * backend doesn't support timing.
+	 * Ends the given measurement and returns its GPU start and end times and their difference in
+	 * milliseconds, or `null` when the backend doesn't support timing.
 	 *
 	 * @async
 	 * @param {?(number|Object)} measurement - The measurement returned by {@link Backend#beginTimer}.
-	 * @return {Promise<?number>} The GPU time in milliseconds.
+	 * @return {Promise<?{start: ?number, end: ?number, delta: number}>} The GPU times in milliseconds.
 	 */
 	async endTimer( /* measurement */ ) {
 

@@ -504,11 +504,13 @@ class WebGLBackend extends Backend {
 
 	/**
 	 * Ends the given measurement and returns its GPU time in milliseconds. The queries of all
-	 * measurements that end in the same task are read back together.
+	 * measurements that end in the same task are read back together. A TIME_ELAPSED query only measures
+	 * the duration, so "start" and "end" are `null`.
 	 *
 	 * @async
 	 * @param {?WebGLQuery} query - The value returned by {@link WebGLBackend#beginTimer}.
-	 * @return {Promise<?number>} The GPU time in milliseconds, or `null` if the GPU clock was unreliable.
+	 * @return {Promise<?{start: null, end: null, delta: number}>} The GPU time in milliseconds, or `null`
+	 * if the GPU clock was unreliable.
 	 */
 	async endTimer( query ) {
 
@@ -568,7 +570,7 @@ class WebGLBackend extends Backend {
 
 			const { query, resolve } = timers[ i ];
 
-			resolve( disjoint ? null : gl.getQueryParameter( query, gl.QUERY_RESULT ) / 1e6 );
+			resolve( disjoint ? null : { start: null, end: null, delta: gl.getQueryParameter( query, gl.QUERY_RESULT ) / 1e6 } );
 
 			gl.deleteQuery( query );
 
