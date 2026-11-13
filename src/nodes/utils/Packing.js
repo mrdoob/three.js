@@ -25,7 +25,7 @@ export const unpackRGBToNormal = ( node ) => nodeObject( node ).mul( 2.0 ).sub( 
 /**
  * Encodes a nonzero direction as signed octahedral coordinates in `[-1, 1]`
  * (Cigolle et al., {@link https://jcgt.org/published/0003/02/01/ A Survey of Efficient Representations for Independent Unit Vectors}, 2014).
- * Store the result in an RG16F texture. The input does not need to be normalized.
+ * Store the result in a signed two-channel format such as RG16F or RG16 snorm. The input does not need to be normalized.
  *
  * @tsl
  * @function
