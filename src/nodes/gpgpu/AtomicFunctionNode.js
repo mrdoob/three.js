@@ -199,6 +199,12 @@ class AtomicFunctionNode extends Node {
 
 	}
 
+	static get ATOMIC_EXCHANGE() {
+
+		return 'atomicExchange';
+
+	}
+
 }
 
 export default AtomicFunctionNode;
@@ -253,7 +259,8 @@ export const atomicLoad = ( pointerNode ) => atomicFunc( AtomicFunctionNode.ATOM
 export const atomicStore = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_STORE, pointerNode, valueNode );
 
 /**
- * Increments the value stored in the atomic variable.
+ * Increments the value stored in the atomic variable
+ * and returns the value stored in the atomic variable before the operation.
  *
  * @tsl
  * @function
@@ -264,7 +271,8 @@ export const atomicStore = ( pointerNode, valueNode ) => atomicFunc( AtomicFunct
 export const atomicAdd = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_ADD, pointerNode, valueNode );
 
 /**
- * Decrements the value stored in the atomic variable.
+ * Decrements the value stored in the atomic variable
+ * and returns the value stored in the atomic variable before the operation.
  *
  * @tsl
  * @function
@@ -275,7 +283,8 @@ export const atomicAdd = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctio
 export const atomicSub = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_SUB, pointerNode, valueNode );
 
 /**
- * Stores in an atomic variable the maximum between its current value and a parameter.
+ * Stores, in an atomic variable, the maximum between its current value and a parameter
+ * and returns the value stored in the atomic variable before the operation.
  *
  * @tsl
  * @function
@@ -286,7 +295,8 @@ export const atomicSub = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctio
 export const atomicMax = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_MAX, pointerNode, valueNode );
 
 /**
- * Stores in an atomic variable the minimum between its current value and a parameter.
+ * Stores, in an atomic variable, the minimum between its current value and a parameter
+ * and returns the value stored in the atomic variable before the operation.
  *
  * @tsl
  * @function
@@ -297,7 +307,8 @@ export const atomicMax = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctio
 export const atomicMin = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_MIN, pointerNode, valueNode );
 
 /**
- * Stores in an atomic variable the bitwise AND of its value with a parameter.
+ * Stores, in an atomic variable, the bitwise AND of its value with a parameter
+ * and returns the value stored in the atomic variable before the operation.
  *
  * @tsl
  * @function
@@ -308,7 +319,8 @@ export const atomicMin = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctio
 export const atomicAnd = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_AND, pointerNode, valueNode );
 
 /**
- * Stores in an atomic variable the bitwise OR of its value with a parameter.
+ * Stores, in an atomic variable, the bitwise OR of its value with a parameter.
+ * and returns the value stored in the atomic variable before the operation.
  *
  * @tsl
  * @function
@@ -320,6 +332,7 @@ export const atomicOr = ( pointerNode, valueNode ) => atomicFunc( AtomicFunction
 
 /**
  * Stores in an atomic variable the bitwise XOR of its value with a parameter.
+ * and returns the value stored in the atomic variable before the operation.
  *
  * @tsl
  * @function
@@ -328,3 +341,15 @@ export const atomicOr = ( pointerNode, valueNode ) => atomicFunc( AtomicFunction
  * @returns {AtomicFunctionNode}
  */
 export const atomicXor = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_XOR, pointerNode, valueNode );
+
+/**
+ * Stores a value in the atomic variable and returns the original
+ * value stored in the atomic variable before the operation.
+ *
+ * @tsl
+ * @function
+ * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
+ * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @returns {AtomicFunctionNode}
+ */
+export const atomicExchange = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_EXCHANGE, pointerNode, valueNode );
