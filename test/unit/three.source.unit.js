@@ -234,6 +234,9 @@ import './src/renderers/WebGLArrayRenderTarget.tests.js';
 import './src/renderers/WebGLCubeRenderTarget.tests.js';
 import './src/renderers/WebGLRenderTarget.tests.js';
 
+//src/renderers/webgpu
+import './src/renderers/webgpu/WebGPUBackend.tests.js';
+
 //src/renderers/common
 import './src/renderers/common/ClippingContext.tests.js';
 import './src/renderers/common/RenderContexts.tests.js';
