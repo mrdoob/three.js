@@ -1,5 +1,5 @@
-import { HalfFloatType, NodeMaterial, QuadMesh, RendererUtils, RenderTarget, RGBAFormat, StorageTexture, Vector2 } from 'three/webgpu';
-import { Fn, If, float, globalId, ivec2, mix, screenCoordinate, storageTexture, texture, textureStore, uniform, uvec2, vec2, vec4 } from 'three/tsl';
+import { HalfFloatType, NodeMaterial, QuadMesh, RendererUtils, RenderTarget, RGBAFormat, StorageTexture } from 'three/webgpu';
+import { Fn, If, float, globalId, ivec2, mix, screenCoordinate, storageTexture, texture, textureStore, uvec2, vec2, vec4 } from 'three/tsl';
 
 // the passes run in square workgroups of this many threads per side, one thread per texel
 const WORKGROUP_SIZE = 8;
@@ -64,10 +64,9 @@ class GutterFillGenerator {
 		this._passes = [];
 
 		this._source = texture();
-		this._sourceSize = uniform( new Vector2() );
 		this._firstLevel = texture();
 
-		this._fill = createFillMaterial( this._source, this._firstLevel, this._sourceSize );
+		this._fill = createFillMaterial( this._source, this._firstLevel );
 
 	}
 
@@ -148,8 +147,6 @@ class GutterFillGenerator {
 		this._width = width;
 		this._height = height;
 
-		this._sourceSize.value.set( width, height );
-
 		// level i is half the size of level i + 1, rounded down, like the levels of a texture, down to level 0 of one
 		// texel. The textures of the levels are only reallocated when their size changes
 
@@ -169,7 +166,6 @@ class GutterFillGenerator {
 			const w = Math.max( 1, width >> ( count - i ) );
 			const h = Math.max( 1, height >> ( count - i ) );
 
-			level.size.value.set( w, h );
 			level.texture.setSize( w, h );
 			level.dispatchSize[ 0 ] = Math.ceil( w / WORKGROUP_SIZE );
 			level.dispatchSize[ 1 ] = Math.ceil( h / WORKGROUP_SIZE );
@@ -216,11 +212,14 @@ class GutterFillGenerator {
 		if ( level.passes[ slot ] === null ) {
 
 			const texel = top ? readSource( this._source ) : levels[ index + 1 ].read;
-			const above = uvec2( top ? this._sourceSize : levels[ index + 1 ].size );
-			const size = uvec2( level.size );
+			const above = top ? this._source.size() : levels[ index + 1 ].size;
+
+			// the size of the level written is read from its write node, since a read only node would make the pass
+			// bind the texture read only
+			const size = level.target.size();
 
 			level.passes[ slot ] = isPull ?
-				pull( texel, above, size, levels[ index - 1 ].read, uvec2( levels[ index - 1 ].size ), level.target, level.dispatchSize ) :
+				pull( texel, above, size, levels[ index - 1 ].read, levels[ index - 1 ].size, level.target, level.dispatchSize ) :
 				push( texel, above, size, level.target, level.dispatchSize );
 
 		}
@@ -276,7 +275,7 @@ function createLevel() {
 
 	return {
 		texture: levelTexture,
-		size: uniform( new Vector2() ),
+		size: read.size(),
 		target: storageTexture( levelTexture ),
 		read: ( coord ) => read.load( coord ),
 		dispatchSize: [ 1, 1, 1 ],
@@ -444,10 +443,9 @@ function pull( texel, above, size, belowTexel, below, target, dispatchSize ) {
  * @private
  * @param {TextureNode} source - The map.
  * @param {TextureNode} levels - The filled first level.
- * @param {Node<vec2>} size - The width and height of the map.
  * @return {NodeMaterial} The material.
  */
-function createFillMaterial( source, levels, size ) {
+function createFillMaterial( source, levels ) {
 
 	const fill = Fn( () => {
 
@@ -456,7 +454,7 @@ function createFillMaterial( source, levels, size ) {
 
 		If( result.a.lessThanEqual( 0 ), () => {
 
-			const uv = vec2( coord ).add( 0.5 ).div( size );
+			const uv = vec2( coord ).add( 0.5 ).div( vec2( source.size() ) );
 
 			result.assign( vec4( levels.sample( uv ).level( 0 ).rgb, 0 ) );
 
