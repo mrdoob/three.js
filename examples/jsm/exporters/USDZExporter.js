@@ -591,7 +591,7 @@ function buildNode( object, parentNode, materials, usedNames, files, options ) {
 
 		const resolvedMaterials = meshMaterials.map( ( m ) => materials[ m.uuid ] );
 
-		if ( isMultiMaterial === false ) {
+		if ( meshMaterials.length === 1 ) {
 
 			const geometryFileName = `geometries/Geometry_${geometry.id}.usda`;
 
