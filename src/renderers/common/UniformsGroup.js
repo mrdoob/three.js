@@ -82,6 +82,15 @@ class UniformsGroup extends UniformBuffer {
 		 */
 		this._addedIndices = new Set();
 
+		/**
+		 * Whether this group's buffer is backed by a pooled slab view.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._isPooled = false;
+
 	}
 
 	/**
@@ -90,6 +99,8 @@ class UniformsGroup extends UniformBuffer {
 	 * @param {Uniform} uniform - The uniform.
 	 */
 	addUniformUpdateRange( uniform ) {
+
+		if ( this._isPooled === true ) return;
 
 		const index = uniform.index;
 
@@ -116,6 +127,8 @@ class UniformsGroup extends UniformBuffer {
 	 * Clears all update ranges of this buffer.
 	 */
 	clearUpdateRanges() {
+
+		if ( this._isPooled === true ) return;
 
 		this._addedIndices.clear();
 
@@ -277,6 +290,7 @@ class UniformsGroup extends UniformBuffer {
 		this._values = null;
 		this._int32View = null;
 		this._uint32View = null;
+		this._isPooled = false;
 
 	}
 
@@ -296,6 +310,7 @@ class UniformsGroup extends UniformBuffer {
 		clone._updateRanges = [];
 		clone._updateRangeCache = new Map();
 		clone._addedIndices = new Set();
+		clone._isPooled = false;
 
 		return clone;
 
@@ -563,13 +578,13 @@ class UniformsGroup extends UniformBuffer {
 
 		if ( type === 'int' || type === 'ivec2' || type === 'ivec3' || type === 'ivec4' ) {
 
-			return this._int32View || ( this._int32View = new Int32Array( this.buffer.buffer ) );
+			return this._int32View || ( this._int32View = new Int32Array( this.buffer.buffer, this.buffer.byteOffset, this.buffer.length ) );
 
 		}
 
 		if ( type === 'uint' || type === 'uvec2' || type === 'uvec3' || type === 'uvec4' ) {
 
-			return this._uint32View || ( this._uint32View = new Uint32Array( this.buffer.buffer ) );
+			return this._uint32View || ( this._uint32View = new Uint32Array( this.buffer.buffer, this.buffer.byteOffset, this.buffer.length ) );
 
 		}
 
