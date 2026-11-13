@@ -11,7 +11,7 @@ export default QUnit.module( 'Renderers', () => {
 			backend.utils = {
 				getSampleCountRenderContext: () => 1,
 				getCurrentColorSpace: () => 'srgb',
-				getCurrentColorFormat: ( context ) => context.textures[ 0 ].format,
+				getCurrentColorFormats: ( context ) => context.textures.map( ( texture ) => texture.format ),
 				getCurrentDepthStencilFormat: () => 'depth24plus',
 				getPrimitiveTopology: () => 'triangle-list',
 				getStripIndexFormat: () => undefined
