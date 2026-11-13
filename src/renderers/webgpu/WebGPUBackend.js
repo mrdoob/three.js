@@ -39,15 +39,11 @@ const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
 const _computePassDescriptor = new GPUComputePassDescriptor();
 const _querySetDescriptor = new GPUQuerySetDescriptor();
 const _shaderModuleDescriptor = new GPUShaderModuleDescriptor();
-const _timerTimestampWrites = new GPURenderPassTimestampWrites();
 const _texelCopyTextureInfoSrc = new GPUTexelCopyTextureInfo();
 const _texelCopyTextureInfoDst = new GPUTexelCopyTextureInfo();
 const _textureDescriptor = new GPUTextureDescriptor();
 const _viewDescriptor = new GPUTextureViewDescriptor();
 const _extent3D = new GPUExtent3D();
-
-// number of timestamp queries available to GPU timers, two per pass
-const TIMER_QUERY_COUNT = 4096;
 
 /**
  * A backend implementation targeting WebGPU.
@@ -69,7 +65,7 @@ class WebGPUBackend extends Backend {
 	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
 	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
 	 * @property {boolean} [forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
-	 * @property {boolean} [trackTimestamp=false] - Whether to track timestamps with a Timestamp Query API or not.
+	 * @property {boolean} [trackTimestamp=false] - Whether to track timestamps with a Timestamp Query API or not. Deprecated since r188, use {@link GPUTimer} instead.
 	 * @property {string} [powerPreference=undefined] - The power preference.
 	 * @property {Object} [requiredLimits=undefined] - Specifies the limits that are required by the device request. The request will fail if the adapter cannot provide these limits.
 	 * @property {GPUDevice} [device=undefined] - If there is an existing GPU device on app level, it can be passed to the renderer as a parameter.
@@ -178,14 +174,6 @@ class WebGPUBackend extends Backend {
 		 * @type {Map<number,GPUBuffer>}
 		 */
 		this.occludedResolveCache = new Map();
-
-		// GPU timers. While a timer is active every pass writes its begin and end timestamps to the next
-		// two queries of this set, created on first use and used as a ring
-
-		this._timerQuerySet = null;
-		this._timerResolveBuffer = null;
-		this._timerQueryIndex = 0;
-		this._activeTimers = 0;
 
 		// compatibility checks
 
@@ -404,7 +392,7 @@ class WebGPUBackend extends Backend {
 	 */
 	get hasTimestamp() {
 
-		return true;
+		return this.device !== null && this.hasFeature( GPUFeatureName.TimestampQuery );
 
 	}
 
@@ -1127,12 +1115,6 @@ class WebGPUBackend extends Backend {
 			renderContextData.bundleSets = undefined;
 			renderContextData.arrayCameraRenderStages = undefined;
 
-			if ( this._activeTimers > 0 ) {
-
-				this._setTimerQueries( descriptor );
-
-			}
-
 			const currentPass = encoder.beginRenderPass( descriptor );
 			renderContextData.currentPass = currentPass;
 
@@ -1494,12 +1476,6 @@ class WebGPUBackend extends Backend {
 
 						layerDescriptor.depthStencilAttachment.stencilLoadOp = stageIndex === 0 ? stencilLoadOp : GPULoadOp.Load;
 						layerDescriptor.depthStencilAttachment.stencilStoreOp = isLastStage ? stencilStoreOp : GPUStoreOp.Store;
-
-					}
-
-					if ( this._activeTimers > 0 ) {
-
-						this._setTimerQueries( layerDescriptor );
 
 					}
 
@@ -1881,18 +1857,10 @@ class WebGPUBackend extends Backend {
 		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
 		_commandEncoderDescriptor.reset();
 
-		const descriptor = {
+		const currentPass = encoder.beginRenderPass( {
 			colorAttachments,
 			depthStencilAttachment
-		};
-
-		if ( this._activeTimers > 0 ) {
-
-			this._setTimerQueries( descriptor );
-
-		}
-
-		const currentPass = encoder.beginRenderPass( descriptor );
+		} );
 
 		currentPass.end();
 
@@ -1920,12 +1888,6 @@ class WebGPUBackend extends Backend {
 		_commandEncoderDescriptor.label = label;
 
 		this.initTimestampQuery( TimestampQuery.COMPUTE, computeGroup, _computePassDescriptor );
-
-		if ( this._activeTimers > 0 ) {
-
-			this._setTimerQueries( _computePassDescriptor );
-
-		}
 
 		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( _commandEncoderDescriptor );
 		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( _computePassDescriptor );
@@ -2658,7 +2620,8 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Inits a time stamp query for the given render context.
+	 * Inits a time stamp query for the given render context. While GPU timers are active, the
+	 * pass writes its begin and end timestamps to the timestamp query pool.
 	 *
 	 * @param {string} type - The type of the timestamp query (e.g. 'render', 'compute').
 	 * @param {RenderContext|ComputeNode|Array<ComputeNode>} renderContext - The render context or compute group.
@@ -2666,33 +2629,20 @@ class WebGPUBackend extends Backend {
 	 */
 	initTimestampQuery( type, renderContext, descriptor ) {
 
-		// TODO: a pass can only write one set of timestamps, so passes inside a timer write to the timer
-		// queries and are missing from trackTimestamp. Remove once trackTimestamp is replaced by timers
-		if ( this._activeTimers > 0 ) {
+		const contextData = this.get( renderContext );
+		const uidTimer = this._beginTimestampUID( type ); // @deprecated r188
 
-			return;
+		const timestampQueryPool = this.timestampQueryPool[ type ];
+		const baseOffset = timestampQueryPool !== null ? timestampQueryPool.allocateQueries() : null;
 
-		}
+		this._endTimestampUID( type, uidTimer, contextData.timestampUID ); // @deprecated r188
 
-		if ( this.trackTimestamp === false ) {
+		if ( baseOffset === null ) {
 
 			descriptor.timestampWrites = undefined;
 			return;
 
 		}
-
-		if ( ! this.timestampQueryPool[ type ] ) {
-
-			// TODO: Variable maxQueries?
-			this.timestampQueryPool[ type ] = new WebGPUTimestampQueryPool( this.device, type, 2048 );
-
-		}
-
-		const timestampQueryPool = this.timestampQueryPool[ type ];
-
-		const contextData = this.get( renderContext );
-
-		const baseOffset = timestampQueryPool.allocateQueriesForContext( contextData.timestampUID );
 
 		if ( contextData.timestampWrites === undefined ) {
 
@@ -2718,7 +2668,7 @@ class WebGPUBackend extends Backend {
 	 */
 	_continueTimestampQuery( descriptor ) {
 
-		if ( this.trackTimestamp === true && this._activeTimers === 0 ) {
+		if ( descriptor.timestampWrites !== undefined ) {
 
 			descriptor.timestampWrites.beginningOfPassWriteIndex = undefined;
 
@@ -2727,151 +2677,14 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Starts a GPU timer measurement.
+	 * Creates a timestamp query pool of the given type.
 	 *
-	 * @return {?number} The query index the measurement starts at, or `null` without timestamp queries.
+	 * @param {string} type - The type of the timestamp query (e.g. 'render', 'compute').
+	 * @return {WebGPUTimestampQueryPool} The timestamp query pool.
 	 */
-	beginTimer() {
+	createTimestampQueryPool( type ) {
 
-		if ( this.hasFeature( GPUFeatureName.TimestampQuery ) === false ) {
-
-			return null;
-
-		}
-
-		if ( this._timerQuerySet === null ) {
-
-			_querySetDescriptor.label = 'timerQuerySet';
-			_querySetDescriptor.type = 'timestamp';
-			_querySetDescriptor.count = TIMER_QUERY_COUNT;
-
-			this._timerQuerySet = this.device.createQuerySet( _querySetDescriptor );
-
-			_querySetDescriptor.reset();
-
-			_bufferDescriptor.label = 'timerResolveBuffer';
-			_bufferDescriptor.size = TIMER_QUERY_COUNT * 8;
-			_bufferDescriptor.usage = GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC;
-
-			this._timerResolveBuffer = this.device.createBuffer( _bufferDescriptor );
-
-			_bufferDescriptor.reset();
-
-		}
-
-		this._activeTimers ++;
-
-		return this._timerQueryIndex;
-
-	}
-
-	/**
-	 * Ends the given measurement and returns its GPU time in milliseconds.
-	 *
-	 * @async
-	 * @param {?number} startIndex - The value returned by {@link WebGPUBackend#beginTimer}.
-	 * @return {Promise<?number>} The GPU time in milliseconds.
-	 */
-	async endTimer( startIndex ) {
-
-		if ( startIndex === null ) {
-
-			return null;
-
-		}
-
-		this._activeTimers --;
-
-		const endIndex = this._timerQueryIndex;
-		const queryCount = endIndex - startIndex;
-
-		if ( queryCount > TIMER_QUERY_COUNT ) {
-
-			warnOnce( `WebGPUBackend: A GPU timer can measure at most ${ TIMER_QUERY_COUNT / 2 } passes.` );
-			return null;
-
-		}
-
-		// read back the queries of this measurement. The queries are a ring, so a range past the end of
-		// the set continues at the start and is read in two steps
-
-		const device = this.device;
-		const firstQuery = startIndex % TIMER_QUERY_COUNT;
-		const firstCount = Math.min( queryCount, TIMER_QUERY_COUNT - firstQuery );
-		const secondCount = queryCount - firstCount;
-
-		_bufferDescriptor.size = queryCount * 8;
-		_bufferDescriptor.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
-
-		const readBuffer = device.createBuffer( _bufferDescriptor );
-
-		_bufferDescriptor.reset();
-
-		const encoder = device.createCommandEncoder();
-		encoder.resolveQuerySet( this._timerQuerySet, firstQuery, firstCount, this._timerResolveBuffer, 0 );
-		encoder.copyBufferToBuffer( this._timerResolveBuffer, 0, readBuffer, 0, firstCount * 8 );
-
-		if ( secondCount > 0 ) {
-
-			encoder.resolveQuerySet( this._timerQuerySet, 0, secondCount, this._timerResolveBuffer, 0 );
-			encoder.copyBufferToBuffer( this._timerResolveBuffer, 0, readBuffer, firstCount * 8, secondCount * 8 );
-
-		}
-
-		submit( device, encoder.finish() );
-
-		await readBuffer.mapAsync( GPUMapMode.READ );
-
-		const timestamps = new BigUint64Array( readBuffer.getMappedRange() );
-
-		// Passes don't run in the order they took queries. A nested pass (a shadow map) runs before its
-		// parent. So take the earliest begin and latest end.
-
-		let earliestBegin = 0n;
-		let latestEnd = 0n;
-
-		for ( let i = 0; i < queryCount; i += 2 ) {
-
-			const passBegin = timestamps[ i ];
-			const passEnd = timestamps[ i + 1 ];
-
-			if ( i === 0 || passBegin < earliestBegin ) {
-
-				earliestBegin = passBegin;
-
-			}
-
-			if ( passEnd > latestEnd ) {
-
-				latestEnd = passEnd;
-
-			}
-
-		}
-
-		readBuffer.destroy();
-
-		return Number( latestEnd - earliestBegin ) / 1e6;
-
-	}
-
-	/**
-	 * Points the pass descriptor at the next two timer queries.
-	 *
-	 * @private
-	 * @param {Object} descriptor - The render or compute pass descriptor.
-	 */
-	_setTimerQueries( descriptor ) {
-
-		const index = this._timerQueryIndex % TIMER_QUERY_COUNT;
-
-		_timerTimestampWrites.querySet = this._timerQuerySet;
-		_timerTimestampWrites.beginningOfPassWriteIndex = index;
-		_timerTimestampWrites.endOfPassWriteIndex = index + 1;
-
-		descriptor.timestampWrites = _timerTimestampWrites;
-
-		this._timerQueryIndex += 2;
+		return new WebGPUTimestampQueryPool( this.device, type, 2048 );
 
 	}
 
@@ -3455,12 +3268,6 @@ class WebGPUBackend extends Backend {
 
 			this._continueTimestampQuery( descriptor );
 
-			if ( this._activeTimers > 0 ) {
-
-				this._setTimerQueries( descriptor );
-
-			}
-
 			renderContextData.currentPass = encoder.beginRenderPass( descriptor );
 
 			this._resetRenderContextData( renderContextData );
@@ -3551,13 +3358,6 @@ class WebGPUBackend extends Backend {
 
 		this.bindingUtils.dispose();
 		this.textureUtils.dispose();
-
-		if ( this._timerQuerySet !== null ) {
-
-			this._timerQuerySet.destroy();
-			this._timerResolveBuffer.destroy();
-
-		}
 
 		if ( this.occludedResolveCache ) {
 

@@ -1,9 +1,11 @@
-import { error, warn } from '../../../utils.js';
 import TimestampQueryPool from '../../common/TimestampQueryPool.js';
 
 /**
- * Manages a pool of WebGL timestamp queries for performance measurement.
- * Handles creation, execution, and resolution of timer queries using WebGL extensions.
+ * Manages the WebGL timer queries of GPU timers. Each render and compute call measures its
+ * elapsed time with a `TIME_ELAPSED` query, a timer sums the elapsed time of its calls.
+ *
+ * Only one query can be active at a time, so a call nested in another one is measured by the outer
+ * query and a timer that begins inside a call can't be measured.
  *
  * @augments TimestampQueryPool
  */
@@ -12,355 +14,144 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 	/**
 	 * Creates a new WebGL timestamp query pool.
 	 *
-	 * @param {WebGLRenderingContext|WebGL2RenderingContext} gl - The WebGL context.
+	 * @param {WebGL2RenderingContext} gl - The WebGL context.
 	 * @param {string} type - The type identifier for this query pool.
-	 * @param {number} [maxQueries=2048] - Maximum number of queries this pool can hold.
 	 */
-	constructor( gl, type, maxQueries = 2048 ) {
+	constructor( gl, type ) {
 
-		super( maxQueries );
+		super();
 
 		this.gl = gl;
 		this.type = type;
 
-		// Check for timer query extensions
-		this.ext = gl.getExtension( 'EXT_disjoint_timer_query_webgl2' ) ||
-				  gl.getExtension( 'EXT_disjoint_timer_query' );
+		/**
+		 * A reference to the `EXT_disjoint_timer_query_webgl2` extension.
+		 *
+		 * @type {EXTDisjointTimerQueryWebGL2}
+		 */
+		this.ext = gl.getExtension( 'EXT_disjoint_timer_query_webgl2' );
 
-		if ( ! this.ext ) {
+		/**
+		 * The active query, `null` if there is none.
+		 *
+		 * @type {?Object}
+		 * @default null
+		 */
+		this.activeQuery = null;
 
-			warn( 'EXT_disjoint_timer_query not supported; timestamps will be disabled.' );
-			this.trackTimestamp = false;
-			return;
-
-		}
-
-		// Create query objects
+		/**
+		 * The ended queries that wait for their result.
+		 *
+		 * @type {Array<Object>}
+		 */
 		this.queries = [];
-		for ( let i = 0; i < this.maxQueries; i ++ ) {
 
-			this.queries.push( gl.createQuery() );
+	}
 
-		}
+	/**
+	 * Starts a GPU timer. A timer that begins inside a measured call can't be measured.
+	 *
+	 * @returns {Object} The timer.
+	 */
+	beginTimer() {
+
+		const timer = super.beginTimer();
+
+		if ( this.activeQuery !== null ) timer.lost = true;
+
+		return timer;
+
+	}
+
+	/**
+	 * Begins a query for the active timers.
+	 *
+	 * @returns {?Object} The query, or `null` without active timers or inside another query.
+	 */
+	beginQuery() {
+
+		if ( this.isDisposed || this.activeQuery !== null ) return null;
+
+		const timers = this._retainTimers();
+
+		if ( timers === null ) return null;
+
+		const query = { query: this.gl.createQuery(), timers };
+
+		this.gl.beginQuery( this.ext.TIME_ELAPSED_EXT, query.query );
+
+		this.activeQuery = query;
+
+		return query;
+
+	}
+
+	/**
+	 * Ends the given query.
+	 *
+	 * @param {?Object} query - The query returned by {@link WebGLTimestampQueryPool#beginQuery}.
+	 */
+	endQuery( query ) {
+
+		if ( query === null || query !== this.activeQuery ) return;
+
+		this.gl.endQuery( this.ext.TIME_ELAPSED_EXT );
 
 		this.activeQuery = null;
-		this.queryStates = new Map(); // Track state of each query: 'inactive', 'started', 'ended'
+		this.queries.push( query );
 
 	}
 
 	/**
-	 * Allocates a pair of queries for a given render context.
+	 * Returns the GPU time of the given timers, the sum of the elapsed time of their calls.
 	 *
-	 * @param {string} uid - A unique identifier for the render context.
-	 * @returns {?number} The base offset for the allocated queries, or null if allocation failed.
+	 * @param {Array<Object>} timers - The timers, ended and resolved.
+	 * @returns {?number} The GPU time in milliseconds, or `null` if queries couldn't be measured.
 	 */
-	allocateQueriesForContext( uid ) {
+	getDuration( timers ) {
 
-		if ( ! this.trackTimestamp ) return null;
+		let elapsed = 0;
 
-		if ( this.currentQueryIndex + 2 > this.maxQueries ) {
+		for ( const timer of timers ) {
 
-			this.resolveQueriesAsync();
+			if ( timer.lost ) return null;
 
-			this.currentQueryIndex = 0;
-			this.queryOffsets.clear();
-			this.queryStates.clear();
-			this.activeQuery = null;
+			elapsed += timer.elapsed;
 
 		}
 
-		const baseOffset = this.currentQueryIndex;
-		this.currentQueryIndex += 2;
-
-		// Initialize query states
-		this.queryStates.set( baseOffset, 'inactive' );
-		this.queryOffsets.set( uid, baseOffset );
-
-		return baseOffset;
+		return elapsed;
 
 	}
 
 	/**
-	 * Begins a timestamp query for the specified render context.
-	 *
-	 * @param {string} uid - A unique identifier for the render context.
+	 * Reads back the ended queries whose results are available. The results of all ended
+	 * queries are lost if the GPU timer was disjoint.
 	 */
-	beginQuery( uid ) {
+	resolveQueries() {
 
-		if ( ! this.trackTimestamp || this.isDisposed ) {
+		if ( this.queries.length === 0 || this.isDisposed ) return;
 
-			return;
+		const gl = this.gl;
+		const disjoint = gl.getParameter( this.ext.GPU_DISJOINT_EXT );
 
-		}
+		this.queries = this.queries.filter( ( { query, timers } ) => {
 
-		const baseOffset = this.queryOffsets.get( uid );
-		if ( baseOffset == null ) {
+			if ( disjoint === false && gl.getQueryParameter( query, gl.QUERY_RESULT_AVAILABLE ) === false ) return true;
 
-			return;
+			if ( disjoint === false ) {
 
-		}
+				const elapsed = gl.getQueryParameter( query, gl.QUERY_RESULT ) / 1e6;
 
-		// Don't start a new query if there's an active one
-		if ( this.activeQuery !== null ) {
-
-			return;
-
-		}
-
-		const query = this.queries[ baseOffset ];
-		if ( ! query ) {
-
-			return;
-
-		}
-
-		try {
-
-			// Only begin if query is inactive
-			if ( this.queryStates.get( baseOffset ) === 'inactive' ) {
-
-				this.gl.beginQuery( this.ext.TIME_ELAPSED_EXT, query );
-				this.activeQuery = baseOffset;
-				this.queryStates.set( baseOffset, 'started' );
+				for ( const timer of timers ) timer.elapsed += elapsed;
 
 			}
 
-		} catch ( e ) {
+			this._releaseTimers( timers, disjoint );
 
-			error( 'Error in beginQuery:', e );
-			this.activeQuery = null;
-			this.queryStates.set( baseOffset, 'inactive' );
+			gl.deleteQuery( query );
 
-		}
-
-	}
-
-	/**
-	 * Ends the active timestamp query for the specified render context.
-	 *
-	 * @param {string} uid - A unique identifier for the render context.
-	 */
-	endQuery( uid ) {
-
-		if ( ! this.trackTimestamp || this.isDisposed ) {
-
-			return;
-
-		}
-
-		const baseOffset = this.queryOffsets.get( uid );
-		if ( baseOffset == null ) {
-
-			return;
-
-		}
-
-		// Only end if this is the active query
-		if ( this.activeQuery !== baseOffset ) {
-
-			return;
-
-		}
-
-		try {
-
-			this.gl.endQuery( this.ext.TIME_ELAPSED_EXT );
-			this.queryStates.set( baseOffset, 'ended' );
-			this.activeQuery = null;
-
-		} catch ( e ) {
-
-			error( 'Error in endQuery:', e );
-			// Reset state on error
-			this.queryStates.set( baseOffset, 'inactive' );
-			this.activeQuery = null;
-
-		}
-
-	}
-
-	/**
-	 * Asynchronously resolves all completed queries and returns the total duration.
-	 *
-	 * @async
-	 * @returns {Promise<number>} The total duration in milliseconds, or the last valid value if resolution fails.
-	 */
-	async resolveQueriesAsync() {
-
-		if ( ! this.trackTimestamp || this.pendingResolve ) {
-
-			return this.lastValue;
-
-		}
-
-		this.pendingResolve = true;
-
-		try {
-
-			// Wait for all ended queries to complete
-			const resolvePromises = new Map();
-
-			for ( const [ uid, baseOffset ] of this.queryOffsets ) {
-
-				const state = this.queryStates.get( baseOffset );
-
-				if ( state === 'ended' ) {
-
-					const query = this.queries[ baseOffset ];
-					resolvePromises.set( uid, this.resolveQuery( query ) );
-
-				}
-
-			}
-
-			if ( resolvePromises.size === 0 ) {
-
-				return this.lastValue;
-
-			}
-
-			//
-
-			const framesDuration = {};
-
-			const frames = [];
-
-			this.timestamps.clear();
-
-			for ( const [ uid, promise ] of resolvePromises ) {
-
-				const match = uid.match( /^(.*):f(\d+)$/ );
-				const frame = parseInt( match[ 2 ] );
-
-				if ( frames.includes( frame ) === false ) {
-
-					frames.push( frame );
-
-				}
-
-				if ( framesDuration[ frame ] === undefined ) framesDuration[ frame ] = 0;
-
-				const duration = await promise;
-
-				this.timestamps.set( uid, duration );
-
-				framesDuration[ frame ] += duration;
-
-			}
-
-			// Return the total duration of the last frame
-			const totalDuration = framesDuration[ frames[ frames.length - 1 ] ];
-
-			// Store the last valid result
-			this.lastValue = totalDuration;
-			this.frames = frames;
-
-			// Reset states
-			this.currentQueryIndex = 0;
-			this.queryOffsets.clear();
-			this.queryStates.clear();
-			this.activeQuery = null;
-
-			return totalDuration;
-
-		} catch ( e ) {
-
-			error( 'Error resolving queries:', e );
-			return this.lastValue;
-
-		} finally {
-
-			this.pendingResolve = false;
-
-		}
-
-	}
-
-	/**
-	 * Resolves a single query, checking for completion and disjoint operation.
-	 *
-	 * @async
-	 * @param {WebGLQuery} query - The query object to resolve.
-	 * @returns {Promise<number>} The elapsed time in milliseconds.
-	 */
-	async resolveQuery( query ) {
-
-		return new Promise( ( resolve ) => {
-
-			if ( this.isDisposed ) {
-
-				resolve( this.lastValue );
-				return;
-
-			}
-
-			let timeoutId;
-			let isResolved = false;
-
-			const cleanup = () => {
-
-				if ( timeoutId ) {
-
-					clearTimeout( timeoutId );
-					timeoutId = null;
-
-				}
-
-			};
-
-			const finalizeResolution = ( value ) => {
-
-				if ( ! isResolved ) {
-
-					isResolved = true;
-					cleanup();
-					resolve( value );
-
-				}
-
-			};
-
-			const checkQuery = () => {
-
-				if ( this.isDisposed ) {
-
-					finalizeResolution( this.lastValue );
-					return;
-
-				}
-
-				try {
-
-					// Check if the GPU timer was disjoint (i.e., timing was unreliable)
-					const disjoint = this.gl.getParameter( this.ext.GPU_DISJOINT_EXT );
-					if ( disjoint ) {
-
-						finalizeResolution( this.lastValue );
-						return;
-
-					}
-
-					const available = this.gl.getQueryParameter( query, this.gl.QUERY_RESULT_AVAILABLE );
-					if ( ! available ) {
-
-						timeoutId = setTimeout( checkQuery, 1 );
-						return;
-
-					}
-
-					const elapsed = this.gl.getQueryParameter( query, this.gl.QUERY_RESULT );
-					resolve( Number( elapsed ) / 1e6 ); // Convert nanoseconds to milliseconds
-
-				} catch ( e ) {
-
-					error( 'Error checking query:', e );
-					resolve( this.lastValue );
-
-				}
-
-			};
-
-			checkQuery();
+			return false;
 
 		} );
 
@@ -368,33 +159,21 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 	/**
 	 * Releases all resources held by this query pool.
-	 * This includes deleting all query objects and clearing internal state.
 	 */
 	dispose() {
 
-		if ( this.isDisposed ) {
-
-			return;
-
-		}
+		if ( this.isDisposed ) return;
 
 		this.isDisposed = true;
 
-		if ( ! this.trackTimestamp ) return;
-
-		for ( const query of this.queries ) {
+		for ( const { query, timers } of this.queries ) {
 
 			this.gl.deleteQuery( query );
+			this._releaseTimers( timers, true );
 
 		}
 
 		this.queries = [];
-		this.queryStates.clear();
-		this.queryOffsets.clear();
-		this.timestamps.clear();
-		this.frames = [];
-		this.lastValue = 0;
-		this.activeQuery = null;
 
 	}
 

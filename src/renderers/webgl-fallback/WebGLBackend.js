@@ -158,10 +158,6 @@ class WebGLBackend extends Backend {
 		 */
 		this.disjoint = null;
 
-		// GPU timers. A timer is one TIME_ELAPSED query around everything issued between its begin and end.
-		// The extension allows a single active query, so timers can't overlap here
-		this._timerQuery = null;
-
 		/**
 		* A reference to the `KHR_parallel_shader_compile` extension. `null` if the
 		* device does not support the extension.
@@ -412,130 +408,56 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Inits a time stamp query for the given render context.
+	 * Inits a time stamp query for the given render context. While GPU timers are active, the
+	 * call measures its elapsed time.
 	 *
 	 * @param {string} type - The type of the timestamp query.
-	 * @param {string} uid - A unique identifier for the timestamp query.
+	 * @param {RenderContext|ComputeNode|Array<ComputeNode>} renderContext - The render context or compute group.
 	 */
-	initTimestampQuery( type, uid ) {
+	initTimestampQuery( type, renderContext ) {
 
-		// TODO: only one TIME_ELAPSED query can be active, so passes inside a timer are missing from
-		// trackTimestamp. Remove once trackTimestamp is replaced by timers
-		if ( ! this.disjoint || ! this.trackTimestamp || this._timerQuery !== null ) {
-
-			return;
-
-		}
-
-		if ( ! this.timestampQueryPool[ type ] ) {
-
-			// TODO: Variable maxQueries?
-			this.timestampQueryPool[ type ] = new WebGLTimestampQueryPool( this.gl, type, 2048 );
-
-		}
+		const contextData = this.get( renderContext );
+		const uidTimer = this._beginTimestampUID( type ); // @deprecated r188
 
 		const timestampQueryPool = this.timestampQueryPool[ type ];
 
-		const baseOffset = timestampQueryPool.allocateQueriesForContext( uid );
+		contextData.timestampQuery = timestampQueryPool !== null ? timestampQueryPool.beginQuery() : null;
 
-		if ( baseOffset !== null ) {
-
-			timestampQueryPool.beginQuery( uid );
-
-		}
+		this._endTimestampUID( type, uidTimer, contextData.timestampUID ); // @deprecated r188
 
 	}
 
 	// timestamp utils
 
 	/**
-	 * Prepares the timestamp buffer.
+	 * Ends the time stamp query of the given render context.
 	 *
 	 * @param {string} type - The type of the timestamp query.
-	 * @param {string} uid - A unique identifier for the timestamp query.
+	 * @param {RenderContext|ComputeNode|Array<ComputeNode>} renderContext - The render context or compute group.
 	 */
-	prepareTimestampBuffer( type, uid ) {
-
-		if ( ! this.disjoint || ! this.trackTimestamp || this._timerQuery !== null ) {
-
-			return;
-
-		}
+	prepareTimestampBuffer( type, renderContext ) {
 
 		const timestampQueryPool = this.timestampQueryPool[ type ];
 
-		timestampQueryPool.endQuery( uid );
+		if ( timestampQueryPool === null ) return;
+
+		const contextData = this.get( renderContext );
+
+		timestampQueryPool.endQuery( contextData.timestampQuery );
+
+		contextData.timestampQuery = null;
 
 	}
 
 	/**
-	 * Starts a GPU timer measurement.
+	 * Creates a timestamp query pool of the given type.
 	 *
-	 * @return {?WebGLQuery} The query timing the measurement, or `null` without the
-	 * `EXT_disjoint_timer_query_webgl2` extension or while another timer is running.
+	 * @param {string} type - The type of the timestamp query (e.g. 'render', 'compute').
+	 * @return {WebGLTimestampQueryPool} The timestamp query pool.
 	 */
-	beginTimer() {
+	createTimestampQueryPool( type ) {
 
-		if ( this.disjoint === null ) {
-
-			return null;
-
-		}
-
-		if ( this._timerQuery !== null ) {
-
-			warnOnce( 'WebGLBackend: GPU timers can not overlap in WebGL.' );
-			return null;
-
-		}
-
-		const gl = this.gl;
-		const query = gl.createQuery();
-
-		gl.beginQuery( this.disjoint.TIME_ELAPSED_EXT, query );
-
-		this._timerQuery = query;
-
-		return query;
-
-	}
-
-	/**
-	 * Ends the given measurement and returns its GPU time in milliseconds.
-	 *
-	 * @async
-	 * @param {?WebGLQuery} query - The value returned by {@link WebGLBackend#beginTimer}.
-	 * @return {Promise<?number>} The GPU time in milliseconds, or `null` if the GPU clock was unreliable.
-	 */
-	async endTimer( query ) {
-
-		if ( query === null ) {
-
-			return null;
-
-		}
-
-		const gl = this.gl;
-
-		gl.endQuery( this.disjoint.TIME_ELAPSED_EXT );
-		gl.flush();
-
-		this._timerQuery = null;
-
-		// the result arrives a frame or more later
-
-		while ( gl.getQueryParameter( query, gl.QUERY_RESULT_AVAILABLE ) === false ) {
-
-			await new Promise( resolve => setTimeout( resolve, 1 ) );
-
-		}
-
-		const disjoint = gl.getParameter( this.disjoint.GPU_DISJOINT_EXT );
-		const elapsed = disjoint ? null : gl.getQueryParameter( query, gl.QUERY_RESULT ) / 1e6;
-
-		gl.deleteQuery( query );
-
-		return elapsed;
+		return new WebGLTimestampQueryPool( this.gl, type );
 
 	}
 
@@ -590,7 +512,7 @@ class WebGLBackend extends Backend {
 
 		//
 
-		this.initTimestampQuery( TimestampQuery.RENDER, this.getTimestampUID( renderContext ) );
+		this.initTimestampQuery( TimestampQuery.RENDER, renderContext );
 
 		renderContextData.previousContext = this._currentContext;
 		this._currentContext = renderContext;
@@ -705,7 +627,7 @@ class WebGLBackend extends Backend {
 
 		}
 
-		this.prepareTimestampBuffer( TimestampQuery.RENDER, this.getTimestampUID( renderContext ) );
+		this.prepareTimestampBuffer( TimestampQuery.RENDER, renderContext );
 
 	}
 
@@ -997,7 +919,7 @@ class WebGLBackend extends Backend {
 		//
 
 		state.bindFramebuffer( gl.FRAMEBUFFER, null );
-		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ) );
+		this.initTimestampQuery( TimestampQuery.COMPUTE, computeGroup );
 
 	}
 
@@ -1131,7 +1053,7 @@ class WebGLBackend extends Backend {
 
 		state.disable( gl.RASTERIZER_DISCARD );
 
-		this.prepareTimestampBuffer( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ) );
+		this.prepareTimestampBuffer( TimestampQuery.COMPUTE, computeGroup );
 
 		if ( this._currentContext ) {
 

@@ -1,7 +1,7 @@
-import { warn } from '../../utils.js';
-
 /**
- * Abstract base class of a timestamp query pool.
+ * Abstract base class of a timestamp query pool. While GPU timers are active, the backend
+ * allocates queries for its render and compute calls. Each query keeps the timers that were
+ * active when it was allocated and adds its timestamps to them once it is read back.
  *
  * @abstract
  */
@@ -15,35 +15,12 @@ class TimestampQueryPool {
 	constructor( maxQueries = 256 ) {
 
 		/**
-		 * Whether to track timestamps or not.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.trackTimestamp = true;
-
-		/**
 		 * Maximum number of queries this pool can hold.
 		 *
 		 * @type {number}
 		 * @default 256
 		 */
 		this.maxQueries = maxQueries;
-
-		/**
-		 * How many queries allocated so far.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.currentQueryIndex = 0;
-
-		/**
-		 * Tracks offsets for different contexts.
-		 *
-		 * @type {Map<string, number>}
-		 */
-		this.queryOffsets = new Map();
 
 		/**
 		 * Whether the pool has been disposed or not.
@@ -54,102 +31,103 @@ class TimestampQueryPool {
 		this.isDisposed = false;
 
 		/**
-		 * The total frame duration until the next update.
+		 * The active GPU timers.
 		 *
-		 * @type {number}
-		 * @default 0
+		 * @type {Set<Object>}
 		 */
-		this.lastValue = 0;
-
-		/**
-		 * Stores all timestamp frames.
-		 *
-		 * @type {Array<number>}
-		 */
-		this.frames = [];
-
-		/**
-		 * This property is used to avoid multiple concurrent resolve operations.
-		 * The WebGL backend uses it as a boolean flag. In context of WebGPU, it holds
-		 * the promise of the current resolve operation.
-		 *
-		 * @type {boolean|Promise<number>}
-		 * @default false
-		 */
-		this.pendingResolve = false;
-
-		/**
-		 * Stores the latest timestamp for each render context.
-		 *
-		 * @type {Map<string, number>}
-		 */
-		this.timestamps = new Map();
+		this.timers = new Set();
 
 	}
 
 	/**
-	 * Returns all timestamp frames.
+	 * Starts a GPU timer. It measures the queries allocated until {@link TimestampQueryPool#endTimer}.
 	 *
-	 * @return {Array<number>} The timestamp frames.
+	 * @returns {Object} The timer.
 	 */
-	getTimestampFrames() {
+	beginTimer() {
 
-		return this.frames;
+		const timer = { pending: 0, ended: false, lost: false, begin: null, finish: null, elapsed: 0, resolve: null, promise: null };
+		timer.promise = new Promise( ( resolve ) => timer.resolve = resolve );
+
+		this.timers.add( timer );
+
+		return timer;
 
 	}
 
 	/**
-	 * Returns the timestamp for a given render context.
+	 * Ends the given GPU timer.
 	 *
-	 * @param {string} uid - A unique identifier for the render context.
-	 * @return {?number} The timestamp, or undefined if not available.
+	 * @param {Object} timer - The timer returned by {@link TimestampQueryPool#beginTimer}.
+	 * @returns {Promise<Object>} A Promise that resolves with the timer once all its queries are read back.
 	 */
-	getTimestamp( uid ) {
+	endTimer( timer ) {
 
-		let timestamp = this.timestamps.get( uid );
+		timer.ended = true;
 
-		if ( timestamp === undefined ) {
+		this.timers.delete( timer );
 
-			warn( `TimestampQueryPool: No timestamp available for uid ${ uid }.` );
+		if ( timer.pending === 0 ) timer.resolve( timer );
 
-			timestamp = 0;
+		return timer.promise;
+
+	}
+
+	/**
+	 * Returns the GPU time of the given timers in milliseconds.
+	 *
+	 * @abstract
+	 * @param {Array<Object>} timers - The timers, ended and resolved.
+	 * @returns {?number} The GPU time, or `null` if queries couldn't be read back.
+	 */
+	getDuration( /* timers */ ) {}
+
+	/**
+	 * Returns the active timers for a new query, `null` without active timers.
+	 *
+	 * @protected
+	 * @returns {?Array<Object>} The timers.
+	 */
+	_retainTimers() {
+
+		if ( this.timers.size === 0 ) return null;
+
+		const timers = [ ...this.timers ];
+
+		for ( const timer of timers ) timer.pending ++;
+
+		return timers;
+
+	}
+
+	/**
+	 * Releases the timers of a query once it is read back, and resolves the ended timers
+	 * without pending queries.
+	 *
+	 * @protected
+	 * @param {Array<Object>} timers - The timers returned by {@link TimestampQueryPool#_retainTimers}.
+	 * @param {boolean} lost - Whether the query couldn't be read back.
+	 */
+	_releaseTimers( timers, lost ) {
+
+		for ( const timer of timers ) {
+
+			if ( lost ) timer.lost = true;
+
+			timer.pending --;
+
+			if ( timer.ended && timer.pending === 0 ) timer.resolve( timer );
 
 		}
 
-		return timestamp;
-
 	}
 
 	/**
-	 * Returns whether a timestamp is available for a given render context.
-	 *
-	 * @param {string} uid - A unique identifier for the render context.
-	 * @return {boolean} True if a timestamp is available, false otherwise.
-	 */
-	hasTimestampQuery( uid ) {
-
-		return this.timestamps.has( uid );
-
-	}
-
-	/**
-	 * Allocate queries for a specific uid.
+	 * Reads back the queries that are ready.
 	 *
 	 * @abstract
-	 * @param {string} uid - A unique identifier for the render context.
-	 * @param {number} frameId - The current frame identifier.
-	 * @returns {?number}
 	 */
-	allocateQueriesForContext( /* uid, frameId */ ) {}
-
-	/**
-	 * Resolve all timestamps and return data (or process them).
-	 *
-	 * @abstract
-	 * @async
-	 * @returns {Promise<number>|number} The resolved timestamp value.
-	 */
-	async resolveQueriesAsync() {}
+	resolveQueries() {}
 
 	/**
 	 * Dispose of the query pool.

@@ -3378,7 +3378,18 @@ class Renderer {
 
 	}
 
+	/**
+	 * Waits until the calls of the given type issued so far are read back while `trackTimestamp`
+	 * is enabled. Timestamps are read back once per frame.
+	 *
+	 * @async
+	 * @deprecated since r188. Use {@link GPUTimer} instead.
+	 * @param {string} [type='render'] - The type of the time stamp.
+	 * @return {Promise<number>} A Promise that resolves with the GPU time of the last measured frame.
+	 */
 	async resolveTimestampsAsync( type = 'render' ) {
+
+		warnOnce( 'Renderer: "resolveTimestampsAsync()" has been deprecated. Use "GPUTimer" instead.' ); // @deprecated r188
 
 		if ( this._initialized === false ) await this.init();
 

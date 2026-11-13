@@ -10,8 +10,8 @@ const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
 const _querySetDescriptor = new GPUQuerySetDescriptor();
 
 /**
- * Manages a pool of WebGPU timestamp queries for performance measurement.
- * Extends the base TimestampQueryPool to provide WebGPU-specific implementation.
+ * Manages a pool of WebGPU timestamp queries for GPU timers. Each pass writes a begin and an
+ * end timestamp, a timer measures from the earliest begin to the latest end of its passes.
  *
  * @augments TimestampQueryPool
  */
@@ -29,6 +29,29 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 		super( maxQueries );
 		this.device = device;
 		this.type = type;
+
+		/**
+		 * How many queries allocated so far.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.currentQueryIndex = 0;
+
+		/**
+		 * The timers of each allocated query pair, by the index of its first query.
+		 *
+		 * @type {Map<number, Array<Object>>}
+		 */
+		this.queryTimers = new Map();
+
+		/**
+		 * The readback in flight, `null` if there is none.
+		 *
+		 * @type {?Promise}
+		 * @default null
+		 */
+		this.pendingResolve = null;
 
 		_querySetDescriptor.label = `queryset_global_timestamp_${type}`;
 		_querySetDescriptor.type = 'timestamp';
@@ -59,193 +82,139 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	}
 
 	/**
-	 * Allocates a pair of queries for a given render context.
+	 * Allocates a pair of queries for the active timers.
 	 *
-	 * @param {string} uid - A unique identifier for the render context.
-	 * @returns {?number} The base offset for the allocated queries, or null if allocation failed.
+	 * @returns {?number} The index of the first query, or `null` without active timers.
 	 */
-	allocateQueriesForContext( uid ) {
+	allocateQueries() {
 
-		if ( ! this.trackTimestamp || this.isDisposed ) return null;
+		if ( this.isDisposed || this.timers.size === 0 ) return null;
 
 		if ( this.currentQueryIndex + 2 > this.maxQueries ) {
 
-			this.resolveQueriesAsync();
+			this.resolveQueries();
 
-			this.currentQueryIndex = 0;
-			this.queryOffsets.clear();
+			if ( this.currentQueryIndex > 0 ) {
+
+				// a readback is in flight, so the queries are dropped
+
+				for ( const timers of this.queryTimers.values() ) this._releaseTimers( timers, true );
+
+				this.currentQueryIndex = 0;
+				this.queryTimers.clear();
+
+			}
 
 		}
 
 		const baseOffset = this.currentQueryIndex;
 		this.currentQueryIndex += 2;
 
-		this.queryOffsets.set( uid, baseOffset );
+		this.queryTimers.set( baseOffset, this._retainTimers() );
 
 		return baseOffset;
 
 	}
 
 	/**
-	 * Asynchronously resolves all pending queries and returns the total duration.
-	 * If there's already a pending resolve operation, returns that promise instead.
+	 * Returns the GPU time of the given timers, from the earliest begin to the latest end of their passes.
 	 *
-	 * @async
-	 * @returns {Promise<number>} The total duration in milliseconds, or the last valid value if resolution fails.
+	 * @param {Array<Object>} timers - The timers, ended and resolved.
+	 * @returns {?number} The GPU time in milliseconds, or `null` if queries couldn't be read back.
 	 */
-	async resolveQueriesAsync() {
+	getDuration( timers ) {
 
-		if ( ! this.trackTimestamp || this.currentQueryIndex === 0 || this.isDisposed ) {
+		let begin = null;
+		let finish = null;
 
-			return this.lastValue;
+		for ( const timer of timers ) {
 
-		}
+			if ( timer.lost ) return null;
 
-		if ( this.pendingResolve ) {
+			if ( timer.begin === null ) continue;
 
-			return this.pendingResolve;
-
-		}
-
-		this.pendingResolve = this._resolveQueries();
-
-		try {
-
-			const result = await this.pendingResolve;
-			return result;
-
-		} finally {
-
-			this.pendingResolve = null;
+			if ( begin === null || timer.begin < begin ) begin = timer.begin;
+			if ( finish === null || timer.finish > finish ) finish = timer.finish;
 
 		}
+
+		return begin === null ? 0 : Number( finish - begin ) / 1e6;
 
 	}
 
 	/**
-	 * Internal method to resolve queries and calculate total duration.
+	 * Reads back the allocated queries. Only one readback is in flight, queries allocated meanwhile
+	 * are read back with the next one.
+	 */
+	resolveQueries() {
+
+		if ( this.pendingResolve !== null || this.currentQueryIndex === 0 || this.isDisposed ) return;
+
+		this.pendingResolve = this._resolveQueries().finally( () => this.pendingResolve = null );
+
+	}
+
+	/**
+	 * Reads back the allocated queries and adds their timestamps to their timers.
 	 *
 	 * @async
 	 * @private
-	 * @returns {Promise<number>} The total duration in milliseconds.
+	 * @returns {Promise} A Promise that resolves when the readback has finished.
 	 */
 	async _resolveQueries() {
 
-		if ( this.isDisposed ) {
+		const queryTimers = this.queryTimers;
+		const queryCount = this.currentQueryIndex;
+		const bytesUsed = queryCount * 8;
 
-			return this.lastValue;
+		this.queryTimers = new Map();
+		this.currentQueryIndex = 0;
 
-		}
+		let lost = true;
 
 		try {
 
-			if ( this.resultBuffer.mapState !== 'unmapped' ) {
-
-				return this.lastValue;
-
-			}
-
-			const currentOffsets = new Map( this.queryOffsets );
-			const queryCount = this.currentQueryIndex;
-			const bytesUsed = queryCount * 8;
-
-			// Reset state before GPU work
-			this.currentQueryIndex = 0;
-			this.queryOffsets.clear();
-
 			const commandEncoder = this.device.createCommandEncoder( _commandEncoderDescriptor );
+			commandEncoder.resolveQuerySet( this.querySet, 0, queryCount, this.resolveBuffer, 0 );
+			commandEncoder.copyBufferToBuffer( this.resolveBuffer, 0, this.resultBuffer, 0, bytesUsed );
 
-			commandEncoder.resolveQuerySet(
-				this.querySet,
-				0,
-				queryCount,
-				this.resolveBuffer,
-				0
-			);
+			submit( this.device, commandEncoder.finish() );
 
-			commandEncoder.copyBufferToBuffer(
-				this.resolveBuffer,
-				0,
-				this.resultBuffer,
-				0,
-				bytesUsed
-			);
-
-			const commandBuffer = commandEncoder.finish();
-			submit( this.device, commandBuffer );
-
-			if ( this.resultBuffer.mapState !== 'unmapped' ) {
-
-				return this.lastValue;
-
-			}
-
-			// Create and track the mapping operation
 			await this.resultBuffer.mapAsync( GPUMapMode.READ, 0, bytesUsed );
 
-			if ( this.isDisposed ) {
-
-				if ( this.resultBuffer.mapState === 'mapped' ) {
-
-					this.resultBuffer.unmap();
-
-				}
-
-				return this.lastValue;
-
-			}
-
-			//
+			if ( this.isDisposed ) return;
 
 			const times = new BigUint64Array( this.resultBuffer.getMappedRange( 0, bytesUsed ) );
-			const framesDuration = {};
 
-			const frames = [];
+			// passes don't run in the order they allocated queries, a nested pass (a shadow map) runs before its parent
 
-			this.timestamps.clear();
+			for ( const [ baseOffset, timers ] of queryTimers ) {
 
-			for ( const [ uid, baseOffset ] of currentOffsets ) {
+				const begin = times[ baseOffset ];
+				const finish = times[ baseOffset + 1 ];
 
-				const match = uid.match( /^(.*):f(\d+)$/ );
-				const frame = parseInt( match[ 2 ] );
+				for ( const timer of timers ) {
 
-				if ( frames.includes( frame ) === false ) {
-
-					frames.push( frame );
+					if ( timer.begin === null || begin < timer.begin ) timer.begin = begin;
+					if ( timer.finish === null || finish > timer.finish ) timer.finish = finish;
 
 				}
 
-				if ( framesDuration[ frame ] === undefined ) framesDuration[ frame ] = 0;
-
-				const startTime = times[ baseOffset ];
-				const endTime = times[ baseOffset + 1 ];
-				const duration = Number( endTime - startTime ) / 1e6;
-
-				this.timestamps.set( uid, duration );
-
-				framesDuration[ frame ] += duration;
-
 			}
 
-			// Return the total duration of the last frame
-			const totalDuration = framesDuration[ frames[ frames.length - 1 ] ];
-
 			this.resultBuffer.unmap();
-			this.lastValue = totalDuration;
-			this.frames = frames;
 
-			return totalDuration;
+			lost = false;
 
 		} catch ( e ) {
 
-			error( 'Error resolving queries:', e );
-			if ( this.resultBuffer.mapState === 'mapped' ) {
+			error( 'WebGPUTimestampQueryPool: Error resolving queries:', e );
 
-				this.resultBuffer.unmap();
+			if ( this.resultBuffer !== null && this.resultBuffer.mapState === 'mapped' ) this.resultBuffer.unmap();
 
-			}
+		} finally {
 
-			return this.lastValue;
+			for ( const timers of queryTimers.values() ) this._releaseTimers( timers, lost );
 
 		}
 
@@ -259,70 +228,25 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	 */
 	async dispose() {
 
-		if ( this.isDisposed ) {
-
-			return;
-
-		}
+		if ( this.isDisposed ) return;
 
 		this.isDisposed = true;
 
-		// Wait for pending resolve operation
-		if ( this.pendingResolve ) {
+		if ( this.pendingResolve !== null ) await this.pendingResolve;
 
-			try {
+		for ( const timers of this.queryTimers.values() ) this._releaseTimers( timers, true );
 
-				await this.pendingResolve;
+		this.queryTimers.clear();
 
-			} catch ( e ) {
+		if ( this.resultBuffer.mapState === 'mapped' ) this.resultBuffer.unmap();
 
-				error( 'Error waiting for pending resolve:', e );
+		this.querySet.destroy();
+		this.resolveBuffer.destroy();
+		this.resultBuffer.destroy();
 
-			}
-
-		}
-
-		// Ensure buffer is unmapped before destroying
-		if ( this.resultBuffer && this.resultBuffer.mapState === 'mapped' ) {
-
-			try {
-
-				this.resultBuffer.unmap();
-
-			} catch ( e ) {
-
-				error( 'Error unmapping buffer:', e );
-
-			}
-
-		}
-
-		// Destroy resources
-		if ( this.querySet ) {
-
-			this.querySet.destroy();
-			this.querySet = null;
-
-		}
-
-		if ( this.resolveBuffer ) {
-
-			this.resolveBuffer.destroy();
-			this.resolveBuffer = null;
-
-		}
-
-		if ( this.resultBuffer ) {
-
-			this.resultBuffer.destroy();
-			this.resultBuffer = null;
-
-		}
-
-		this.queryOffsets.clear();
-		this.timestamps.clear();
-		this.frames = [];
-		this.pendingResolve = null;
+		this.querySet = null;
+		this.resolveBuffer = null;
+		this.resultBuffer = null;
 
 	}
 
