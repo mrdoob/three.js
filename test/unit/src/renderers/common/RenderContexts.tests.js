@@ -37,6 +37,25 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
+			QUnit.test( 'get: keeps separate contexts when a secondary MRT output type differs', ( assert ) => {
+
+				const renderer = { getClearDepth: () => 1, getClearStencil: () => 1 };
+				const contexts = new RenderContexts( renderer );
+				const camera = new PerspectiveCamera();
+
+				const rgTarget = new RenderTarget( 256, 256, { count: 2, samples: 1, type: HalfFloatType } );
+				rgTarget.textures[ 1 ].format = RGFormat;
+
+				const rgbaTarget = new RenderTarget( 256, 256, { count: 2, samples: 1, type: HalfFloatType } );
+
+				const rgContext = contexts.get( rgTarget, null, 0, camera );
+				const rgbaContext = contexts.get( rgbaTarget, null, 0, camera );
+
+				assert.notStrictEqual( rgContext, rgbaContext, 'MRT targets with different secondary output types keep separate render contexts' );
+				assert.notStrictEqual( rgContext.stateKey, rgbaContext.stateKey, 'secondary attachment output type affects the node build key' );
+
+			} );
+
 			QUnit.test( 'get: splits the node build key when the build inputs differ', ( assert ) => {
 
 				const renderer = { getClearDepth: () => 1, getClearStencil: () => 1 };
