@@ -26,7 +26,7 @@ class AtomicFunctionNode extends Node {
 	 *
 	 * @param {string} method - The signature of the atomic function to construct.
 	 * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
-	 * @param {Node} valueNode - The value that mutates the atomic variable.
+	 * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
 	 */
 	constructor( method, pointerNode, valueNode ) {
 
@@ -216,7 +216,7 @@ export default AtomicFunctionNode;
  * @function
  * @param {string} method - The signature of the atomic function to construct.
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 const atomicNode = /*@__PURE__*/ nodeProxy( AtomicFunctionNode );
@@ -228,7 +228,7 @@ const atomicNode = /*@__PURE__*/ nodeProxy( AtomicFunctionNode );
  * @function
  * @param {string} method - The signature of the atomic function to construct.
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 export const atomicFunc = ( method, pointerNode, valueNode ) => {
@@ -253,7 +253,7 @@ export const atomicLoad = ( pointerNode ) => atomicFunc( AtomicFunctionNode.ATOM
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 export const atomicStore = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_STORE, pointerNode, valueNode );
@@ -265,7 +265,7 @@ export const atomicStore = ( pointerNode, valueNode ) => atomicFunc( AtomicFunct
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 export const atomicAdd = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_ADD, pointerNode, valueNode );
@@ -277,7 +277,7 @@ export const atomicAdd = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctio
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 export const atomicSub = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_SUB, pointerNode, valueNode );
@@ -289,7 +289,7 @@ export const atomicSub = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctio
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 export const atomicMax = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_MAX, pointerNode, valueNode );
@@ -301,7 +301,7 @@ export const atomicMax = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctio
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 export const atomicMin = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_MIN, pointerNode, valueNode );
@@ -313,7 +313,7 @@ export const atomicMin = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctio
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 export const atomicAnd = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_AND, pointerNode, valueNode );
@@ -325,7 +325,7 @@ export const atomicAnd = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctio
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 export const atomicOr = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_OR, pointerNode, valueNode );
@@ -337,7 +337,7 @@ export const atomicOr = ( pointerNode, valueNode ) => atomicFunc( AtomicFunction
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 export const atomicXor = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_XOR, pointerNode, valueNode );
@@ -349,7 +349,7 @@ export const atomicXor = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctio
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 export const atomicExchange = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_EXCHANGE, pointerNode, valueNode );
