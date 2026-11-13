@@ -12,7 +12,7 @@ import {
 	storage, uniform, instanceIndex, vertexIndex, screenCoordinate, varyingProperty,
 	positionGeometry, cameraViewMatrix, cameraProjectionMatrix, normalize, context, overrideNodes,
 	positionLocal, positionWorld, positionWorldDirection, positionView, positionViewDirection,
-	normalLocal, normalViewGeometry, normalWorldGeometry, tangentViewFrame, bitangentViewFrame, modelWorldMatrix, modelViewMatrix, modelPosition, atomicMax, atomicAdd, atomicStore, atomicLoad
+	normalLocal, normalViewGeometry, normalWorldGeometry, tangentViewFrame, bitangentViewFrame, modelWorldMatrix, modelViewMatrix, modelPosition, atomicMax, atomicAdd, atomicStore, atomicLoad, atomicExchange
 } from 'three/tsl';
 
 import { MeshletDrawingPipeline, MeshletBatch, cacheAttributes, createDebugMaterial, createDrawMaterial, createOcclusion } from './MeshletDrawingPipeline.js';
@@ -274,12 +274,6 @@ class VisibilityBufferBatch extends MeshletBatch {
 		const hwDrawAttribute = createAttribute( new Uint32Array( 4 ), 4, IndirectStorageBufferAttribute );
 		const hwDrawBuffer = storage( hwDrawAttribute, 'uint' );
 
-		const computeHWReset = Fn( () => {
-
-			atomicStore( hwQueueAtomic.element( 0 ), uint( 0 ) );
-
-		} )().compute( 1 ).setName( 'VisibilityBufferDrawingPipeline Reset' );
-
 		// indirect dispatch arguments, split into 2D if exceeding 65535 workgroups
 
 		const computeDispatch = Fn( () => {
@@ -477,7 +471,7 @@ class VisibilityBufferBatch extends MeshletBatch {
 
 		const computeHWArgs = Fn( () => {
 
-			hwDrawBuffer.element( 0 ).assign( min( atomicLoad( hwQueueAtomic.element( 0 ) ), uint( MAX_HW_TRIANGLES ) ).mul( 3 ) );
+			hwDrawBuffer.element( 0 ).assign( min( atomicExchange( hwQueueAtomic.element( 0 ), uint( 0 ) ), uint( MAX_HW_TRIANGLES ) ).mul( 3 ) );
 			hwDrawBuffer.element( 1 ).assign( uint( 1 ) );
 			hwDrawBuffer.element( 2 ).assign( uint( 0 ) );
 			hwDrawBuffer.element( 3 ).assign( uint( 0 ) );
@@ -485,7 +479,7 @@ class VisibilityBufferBatch extends MeshletBatch {
 		} )().compute( 1 ).setName( 'VisibilityBufferDrawingPipeline HW Args' );
 
 
-		this.computeNodes.push( computeHWReset, computeDispatch, computeRasterize, computeHWArgs );
+		this.computeNodes.push( computeDispatch, computeRasterize, computeHWArgs );
 
 		// hardware path — the large triangles queued by the software rasterizer
 

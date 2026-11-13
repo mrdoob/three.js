@@ -1,5 +1,5 @@
 import { StorageBufferAttribute, DynamicDrawUsage } from 'three/webgpu';
-import { Fn, Loop, atomicAdd, atomicLoad, atomicStore, instanceIndex, storage, uint } from 'three/tsl';
+import { Fn, Loop, atomicAdd, atomicExchange, atomicStore, instanceIndex, storage, uint } from 'three/tsl';
 
 /**
  * A reusable GPU counting sort.
@@ -146,13 +146,6 @@ class CountingSort {
 
 		const { binCount, workgroupSize, count } = this;
 
-		this._resetNode = Fn( () => {
-
-			atomicStore( this.histogramAtomic.element( instanceIndex ), uint( 0 ) );
-			atomicStore( this.offsetAtomic.element( instanceIndex ), uint( 0 ) );
-
-		} )().compute( binCount, [ workgroupSize ] ).setName( 'CountingSortReset' );
-
 		this._histogramNode = Fn( () => {
 
 			const bin = binNode().toVar( 'bin' );
@@ -168,7 +161,7 @@ class CountingSort {
 
 			Loop( { start: 0, end: binCount, type: 'uint', name: 'bin', condition: '<' }, ( { bin } ) => {
 
-				const binCountValue = atomicLoad( this.histogramAtomic.element( bin ) ).toVar( 'count' );
+				const binCountValue = atomicExchange( this.histogramAtomic.element( bin ), uint( 0 ) ).toVar( 'count' );
 				atomicStore( this.offsetAtomic.element( bin ), sum );
 				sum.addAssign( binCountValue );
 
@@ -194,7 +187,6 @@ class CountingSort {
 	 */
 	compute( renderer ) {
 
-		renderer.compute( this._resetNode );
 		renderer.compute( this._histogramNode );
 		renderer.compute( this._prefixNode );
 		renderer.compute( this._scatterNode );
