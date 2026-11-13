@@ -1,8 +1,11 @@
 import { HalfFloatType, NodeMaterial, QuadMesh, RendererUtils, RenderTarget, RGBAFormat, StorageTexture, Vector2 } from 'three/webgpu';
-import { Fn, If, Return, float, globalId, ivec2, mix, screenCoordinate, storageTexture, texture, textureStore, uniform, uvec2, vec2, vec4 } from 'three/tsl';
+import { Fn, If, float, globalId, ivec2, mix, screenCoordinate, storageTexture, texture, textureStore, uniform, uvec2, vec2, vec4 } from 'three/tsl';
 
 // the passes run in square workgroups of this many threads per side, one thread per texel
 const WORKGROUP_SIZE = 8;
+
+// keeps the average of texels without coverage from dividing by zero
+const COVERAGE_EPSILON = 1e-8;
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
@@ -354,7 +357,7 @@ function average( texel, above, size, coord ) {
 
 	const covered = sum.a.greaterThan( 0 ).select( float( 1 ), float( 0 ) );
 
-	return vec4( sum.rgb.div( sum.a.max( 1e-8 ) ).mul( covered ), covered );
+	return vec4( sum.rgb.div( sum.a.max( COVERAGE_EPSILON ) ).mul( covered ), covered );
 
 }
 
@@ -377,13 +380,11 @@ function push( texel, above, size, target, dispatchSize ) {
 
 		// skip the threads of the last workgroups past the edge of the level
 
-		If( coord.x.greaterThanEqual( size.x ).or( coord.y.greaterThanEqual( size.y ) ), () => {
+		If( coord.x.lessThan( size.x ).and( coord.y.lessThan( size.y ) ), () => {
 
-			Return();
+			textureStore( target, coord, average( texel, above, size, coord ) );
 
 		} );
-
-		textureStore( target, coord, average( texel, above, size, coord ) );
 
 	} )().compute( dispatchSize, [ WORKGROUP_SIZE, WORKGROUP_SIZE, 1 ] ).setName( 'GutterFill.push' );
 
@@ -411,28 +412,26 @@ function pull( texel, above, size, belowTexel, below, target, dispatchSize ) {
 
 		// skip the threads of the last workgroups past the edge of the level
 
-		If( coord.x.greaterThanEqual( size.x ).or( coord.y.greaterThanEqual( size.y ) ), () => {
+		If( coord.x.lessThan( size.x ).and( coord.y.lessThan( size.y ) ), () => {
 
-			Return();
+			const value = average( texel, above, size, coord ).toVar();
+
+			If( value.a.equal( 0 ), () => {
+
+				// the bilinear sample of the level below at the center of the texel
+
+				const position = vec2( coord ).add( 0.5 ).mul( vec2( below ).div( vec2( size ) ) ).sub( 0.5 ).toVar();
+				const base = ivec2( position.floor() ).toVar();
+				const f = position.fract().toVar();
+				const tap = ( x, y ) => belowTexel( base.add( ivec2( x, y ) ).clamp( ivec2( 0 ), ivec2( below ).sub( 1 ) ) ).rgb;
+
+				value.assign( vec4( mix( mix( tap( 0, 0 ), tap( 1, 0 ), f.x ), mix( tap( 0, 1 ), tap( 1, 1 ), f.x ), f.y ), 0 ) );
+
+			} );
+
+			textureStore( target, coord, value );
 
 		} );
-
-		const value = average( texel, above, size, coord ).toVar();
-
-		If( value.a.equal( 0 ), () => {
-
-			// the bilinear sample of the level below at the center of the texel
-
-			const position = vec2( coord ).add( 0.5 ).mul( vec2( below ).div( vec2( size ) ) ).sub( 0.5 ).toVar();
-			const base = ivec2( position.floor() ).toVar();
-			const f = position.fract().toVar();
-			const tap = ( x, y ) => belowTexel( base.add( ivec2( x, y ) ).clamp( ivec2( 0 ), ivec2( below ).sub( 1 ) ) ).rgb;
-
-			value.assign( vec4( mix( mix( tap( 0, 0 ), tap( 1, 0 ), f.x ), mix( tap( 0, 1 ), tap( 1, 1 ), f.x ), f.y ), 0 ) );
-
-		} );
-
-		textureStore( target, coord, value );
 
 	} )().compute( dispatchSize, [ WORKGROUP_SIZE, WORKGROUP_SIZE, 1 ] ).setName( 'GutterFill.pull' );
 
@@ -444,7 +443,7 @@ function pull( texel, above, size, belowTexel, below, target, dispatchSize ) {
  *
  * @private
  * @param {TextureNode} source - The map.
- * @param {?TextureNode} levels - The filled first level.
+ * @param {TextureNode} levels - The filled first level.
  * @param {Node<vec2>} size - The width and height of the map.
  * @return {NodeMaterial} The material.
  */
@@ -455,17 +454,13 @@ function createFillMaterial( source, levels, size ) {
 		const coord = ivec2( screenCoordinate.xy );
 		const result = source.load( coord ).toVar();
 
-		if ( levels !== null ) {
+		If( result.a.lessThanEqual( 0 ), () => {
 
-			If( result.a.lessThanEqual( 0 ), () => {
+			const uv = vec2( coord ).add( 0.5 ).div( size );
 
-				const uv = vec2( coord ).add( 0.5 ).div( size );
+			result.assign( vec4( levels.sample( uv ).level( 0 ).rgb, 0 ) );
 
-				result.assign( vec4( levels.sample( uv ).level( 0 ).rgb, 0 ) );
-
-			} );
-
-		}
+		} );
 
 		return result;
 
