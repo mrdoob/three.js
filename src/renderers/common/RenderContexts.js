@@ -1,3 +1,4 @@
+import { getTextureType } from '../../nodes/core/NodeUtils.js';
 import RenderContext from './RenderContext.js';
 
 /**
@@ -44,10 +45,12 @@ class RenderContexts {
 		//
 
 		let attachmentState;
+		let buildState;
 
 		if ( renderTarget === null ) {
 
 			attachmentState = 'default';
+			buildState = 'default';
 
 		} else {
 
@@ -55,7 +58,24 @@ class RenderContexts {
 			const type = renderTarget.texture?.type;
 			const count = renderTarget.textures.length;
 
-			attachmentState = `${ count }:${ format }:${ type }:${ renderTarget.samples }:${ renderTarget.depthBuffer }:${ renderTarget.stencilBuffer }`;
+			// Texture names are part of the attachment state as well: two
+			// targets that only differ in a texture name must not share a
+			// render context, since the name can end up in the node build
+			// (see buildState below).
+
+			const names = renderTarget.textures.map( ( texture ) => texture.name ).join( ',' );
+
+			attachmentState = `${ count }:${ format }:${ type }:${ renderTarget.samples }:${ renderTarget.depthBuffer }:${ renderTarget.stencilBuffer }:${ names }`;
+
+			// A node build only reads the output types of the target textures
+			// (`NodeBuilder.getOutputType()`), the texture names used for MRT
+			// outputs (`NodeMaterial.setup()`), and whether the target has a
+			// depth buffer (`NodeMaterial.setupDepth()`). Sample count, exact
+			// format/type and stencil only change pipeline state, which the
+			// backend keys separately (`WebGPUBackend.getRenderCacheKey()`),
+			// so they must not split the node build cache. See #35388.
+
+			buildState = `${ renderTarget.textures.map( ( texture ) => getTextureType( texture ) + ':' + texture.name ).join( ',' ) }:${ renderTarget.depthBuffer }`;
 
 		}
 
@@ -71,8 +91,8 @@ class RenderContexts {
 
 		//
 
-		const stateKey = attachmentState + '-' + mrtState + '-' + cameraState;
-		const renderStateKey = stateKey + '-' + callDepth; // one render context per call depth keeps the bindings of nested renders separate
+		const stateKey = buildState + '-' + mrtState + '-' + cameraState;
+		const renderStateKey = attachmentState + '-' + mrtState + '-' + cameraState + '-' + callDepth; // one render context per call depth keeps the bindings of nested renders separate
 
 		let renderState = this._renderContexts[ renderStateKey ];
 
