@@ -240,6 +240,7 @@ import './src/renderers/webgpu/WebGPUBackend.tests.js';
 //src/renderers/common
 import './src/renderers/common/ClippingContext.tests.js';
 import './src/renderers/common/RenderContexts.tests.js';
+import './src/renderers/common/RenderObject.tests.js';
 
 //src/renderers/shaders
 import './src/renderers/shaders/ShaderChunk.tests.js';
