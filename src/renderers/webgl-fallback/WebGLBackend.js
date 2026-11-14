@@ -159,8 +159,10 @@ class WebGLBackend extends Backend {
 		this.disjoint = null;
 
 		// GPU timers. A timer is one TIME_ELAPSED query around everything issued between its begin and end.
-		// The extension allows a single active query, so timers can't overlap here
+		// The extension allows a single active query, so timers can't overlap here. Measurements that end in
+		// the same task are read back together
 		this._timerQuery = null;
+		this._pendingTimers = [];
 
 		/**
 		* A reference to the `KHR_parallel_shader_compile` extension. `null` if the
@@ -501,7 +503,8 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Ends the given measurement and returns its GPU time in milliseconds.
+	 * Ends the given measurement and returns its GPU time in milliseconds. The queries of all
+	 * measurements that end in the same task are read back together.
 	 *
 	 * @async
 	 * @param {?WebGLQuery} query - The value returned by {@link WebGLBackend#beginTimer}.
@@ -515,27 +518,61 @@ class WebGLBackend extends Backend {
 
 		}
 
-		const gl = this.gl;
-
-		gl.endQuery( this.disjoint.TIME_ELAPSED_EXT );
-		gl.flush();
+		this.gl.endQuery( this.disjoint.TIME_ELAPSED_EXT );
 
 		this._timerQuery = null;
 
-		// the result arrives a frame or more later
+		return new Promise( resolve => {
 
-		while ( gl.getQueryParameter( query, gl.QUERY_RESULT_AVAILABLE ) === false ) {
+			this._pendingTimers.push( { query, resolve } );
 
-			await new Promise( resolve => setTimeout( resolve, 1 ) );
+			if ( this._pendingTimers.length === 1 ) {
+
+				queueMicrotask( () => this._flushTimers() );
+
+			}
+
+		} );
+
+	}
+
+	/**
+	 * Reads back the queries of the pending measurements together and resolves their results.
+	 *
+	 * @private
+	 * @async
+	 */
+	async _flushTimers() {
+
+		const gl = this.gl;
+		const timers = this._pendingTimers;
+		this._pendingTimers = [];
+
+		gl.flush();
+
+		// the results arrive a frame or more later
+
+		for ( let i = 0, l = timers.length; i < l; i ++ ) {
+
+			while ( gl.getQueryParameter( timers[ i ].query, gl.QUERY_RESULT_AVAILABLE ) === false ) {
+
+				await new Promise( resolve => setTimeout( resolve, 1 ) );
+
+			}
 
 		}
 
 		const disjoint = gl.getParameter( this.disjoint.GPU_DISJOINT_EXT );
-		const elapsed = disjoint ? null : gl.getQueryParameter( query, gl.QUERY_RESULT ) / 1e6;
 
-		gl.deleteQuery( query );
+		for ( let i = 0, l = timers.length; i < l; i ++ ) {
 
-		return elapsed;
+			const { query, resolve } = timers[ i ];
+
+			resolve( disjoint ? null : gl.getQueryParameter( query, gl.QUERY_RESULT ) / 1e6 );
+
+			gl.deleteQuery( query );
+
+		}
 
 	}
 
