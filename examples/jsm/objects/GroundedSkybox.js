@@ -1,4 +1,4 @@
-import { Mesh, MeshBasicMaterial, SphereGeometry, Vector3 } from 'three';
+import { Mesh, MeshBasicMaterial, SphereGeometry, Vector3, Float16BufferAttribute } from 'three';
 
 /**
  * A ground-projected skybox.
@@ -36,7 +36,13 @@ class GroundedSkybox extends Mesh {
 
 		}
 
-		const geometry = new SphereGeometry( radius, 2 * resolution, resolution );
+		const geometry = new SphereGeometry(radius, 2 * resolution, resolution, 0, Math.PI * 2, 0, Math.PI,
+			{
+				position: Float16BufferAttribute,
+				uv: Float16BufferAttribute,
+				normal: null
+			}
+		);
 		geometry.scale( 1, 1, - 1 );
 
 		const pos = geometry.getAttribute( 'position' );
@@ -52,7 +58,7 @@ class GroundedSkybox extends Mesh {
 				const f =
 						tmp.y < y1 ? - height / tmp.y : ( 1 - tmp.y * tmp.y / ( 3 * y1 * y1 ) );
 				tmp.multiplyScalar( f );
-				tmp.toArray( pos.array, 3 * i );
+				pos.setXYZ(i, tmp.x, tmp.y, tmp.z);
 
 			}
 
@@ -60,7 +66,7 @@ class GroundedSkybox extends Mesh {
 
 		pos.needsUpdate = true;
 
-		super( geometry, new MeshBasicMaterial( { map, depthWrite: false } ) );
+		super(geometry, new MeshBasicMaterial({ map, depthWrite: false, name: "GroundedSkybox" }));
 
 	}
 
