@@ -44,6 +44,7 @@ class RenderContexts {
 		//
 
 		let attachmentState;
+		let samples = 0;
 
 		if ( renderTarget === null ) {
 
@@ -55,7 +56,8 @@ class RenderContexts {
 			const type = renderTarget.texture?.type;
 			const count = renderTarget.textures.length;
 
-			attachmentState = `${ count }:${ format }:${ type }:${ renderTarget.samples }:${ renderTarget.depthBuffer }:${ renderTarget.stencilBuffer }`;
+			attachmentState = `${ count }:${ format }:${ type }:${ renderTarget.depthBuffer }:${ renderTarget.stencilBuffer }`;
+			samples = renderTarget.samples;
 
 		}
 
@@ -71,27 +73,27 @@ class RenderContexts {
 
 		//
 
-		const stateKey = attachmentState + '-' + mrtState + '-' + cameraState;
-		const renderStateKey = stateKey + '-' + callDepth; // one render context per call depth keeps the bindings of nested renders separate
+		const buildKey = attachmentState + '-' + mrtState + '-' + cameraState;
+		const contextKey = buildKey + '-' + samples + '-' + callDepth; // one render context per call depth keeps the bindings of nested renders separate
 
-		let renderState = this._renderContexts[ renderStateKey ];
+		let renderContext = this._renderContexts[ contextKey ];
 
-		if ( renderState === undefined ) {
+		if ( renderContext === undefined ) {
 
-			renderState = new RenderContext();
-			renderState.mrt = mrt;
-			renderState.stateKey = stateKey;
+			renderContext = new RenderContext();
+			renderContext.mrt = mrt;
+			renderContext.buildKey = buildKey;
 
-			this._renderContexts[ renderStateKey ] = renderState;
+			this._renderContexts[ contextKey ] = renderContext;
 
 		}
 
-		if ( renderTarget !== null ) renderState.sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
+		if ( renderTarget !== null ) renderContext.sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
 
-		renderState.clearDepthValue = this.renderer.getClearDepth();
-		renderState.clearStencilValue = this.renderer.getClearStencil();
+		renderContext.clearDepthValue = this.renderer.getClearDepth();
+		renderContext.clearStencilValue = this.renderer.getClearStencil();
 
-		return renderState;
+		return renderContext;
 
 	}
 

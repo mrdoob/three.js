@@ -634,7 +634,7 @@ class NodeMaterial extends Material {
 
 			const samples = builder.renderer.currentSamples;
 
-			if ( this.alphaToCoverage && samples > 1 ) {
+			if ( this.alphaToCoverage && samples > 0 ) {
 
 				// to be added to flow when the color/alpha value has been determined
 				result = clippingAlpha();
