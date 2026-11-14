@@ -4,7 +4,7 @@ import { float, If, uniform, vec3, vec4 } from '../tsl/TSLBase.js';
 import { positionWorld } from '../accessors/Position.js';
 import { cameraFar, cameraNear, cameraPosition, cameraViewMatrix } from '../accessors/Camera.js';
 import { Loop } from '../utils/LoopNode.js';
-import { linearDepth, viewZToPerspectiveDepth } from '../display/ViewportDepthNode.js';
+import { linearDepth, viewZToOrthographicDepth } from '../display/ViewportDepthNode.js';
 import { modelRadius } from '../accessors/ModelNode.js';
 import { LTC_Evaluate_Volume } from './BSDF/LTC.js';
 
@@ -81,7 +81,7 @@ class VolumetricLightingModel extends LightingModel {
 
 			if ( material.depthNode !== null ) {
 
-				linearDepthRay.assign( linearDepth( viewZToPerspectiveDepth( positionViewRay.z, cameraNear, cameraFar ) ) );
+				linearDepthRay.assign( viewZToOrthographicDepth( positionViewRay.z, cameraNear, cameraFar ) );
 
 				builder.context.sceneDepthNode = linearDepth( material.depthNode ).toVar();
 
