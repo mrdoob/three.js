@@ -267,7 +267,7 @@ class Pipelines extends DataMap {
 		const data = this.get( renderObject );
 		const pipeline = data.pipeline;
 
-		if ( pipeline === undefined ) return false;
+		if ( pipeline === null ) return false;
 
 		const pipelineData = this.backend.get( pipeline );
 
@@ -329,6 +329,15 @@ class Pipelines extends DataMap {
 			vertex: new Map(),
 			fragment: new Map(),
 			compute: new Map()
+		};
+
+	}
+
+	createData() {
+
+		return {
+			pipeline: null,
+			version: - 1
 		};
 
 	}
@@ -490,7 +499,7 @@ class Pipelines extends DataMap {
 
 		const data = this.get( computeNode );
 
-		return data.pipeline === undefined || data.version !== computeNode.version;
+		return data.pipeline === null || data.version !== computeNode.version;
 
 	}
 
@@ -505,7 +514,7 @@ class Pipelines extends DataMap {
 
 		const data = this.get( renderObject );
 
-		return data.pipeline === undefined || this.backend.needsRenderUpdate( renderObject );
+		return data.pipeline === null || this.backend.needsRenderUpdate( renderObject );
 
 	}
 

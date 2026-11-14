@@ -109,7 +109,7 @@ class NodeManager extends DataMap {
 		_chainKeys[ 1 ] = nodeUniformsGroup;
 
 		let groupData = this.groupsData.get( _chainKeys );
-		if ( groupData === undefined ) this.groupsData.set( _chainKeys, groupData = {} );
+		if ( groupData === undefined ) this.groupsData.set( _chainKeys, groupData = { version: - 1 } );
 
 		_chainKeys[ 0 ] = null;
 		_chainKeys[ 1 ] = null;
@@ -172,6 +172,38 @@ class NodeManager extends DataMap {
 
 	}
 
+	createData( object ) {
+
+		if ( object.isRenderObject === true || object.isNode === true ) {
+
+			return {
+				nodeBuilderState: null,
+				version: - 1
+			};
+
+		}
+
+		if ( object.isMaterial === true ) {
+
+			return {
+				cacheKeyVersion: - 1,
+				cacheKey: ''
+			};
+
+		}
+
+		return {
+			backgroundNode: null,
+			background: null,
+			backgroundBlurriness: 0,
+			fogNode: null,
+			fog: null,
+			environmentNode: null,
+			environment: null
+		};
+
+	}
+
 	/**
 	 * Returns a node builder state for the given render object.
 	 *
@@ -184,7 +216,7 @@ class NodeManager extends DataMap {
 
 		let nodeBuilderState = renderObjectData.nodeBuilderState;
 
-		if ( nodeBuilderState === undefined ) {
+		if ( nodeBuilderState === null ) {
 
 			const { nodeBuilderCache } = this;
 
@@ -247,7 +279,7 @@ class NodeManager extends DataMap {
 
 			const nodeBuilderState = this.get( object ).nodeBuilderState;
 
-			if ( nodeBuilderState !== undefined ) {
+			if ( nodeBuilderState !== null ) {
 
 				nodeBuilderState.usedTimes --;
 
@@ -277,7 +309,7 @@ class NodeManager extends DataMap {
 
 		let nodeBuilderState = computeData.nodeBuilderState;
 
-		if ( nodeBuilderState === undefined || computeData.version !== computeNode.version ) {
+		if ( nodeBuilderState === null || computeData.version !== computeNode.version ) {
 
 			const nodeBuilder = this.backend.createNodeBuilder( null, this.renderer );
 			nodeBuilder.compute = computeNode;
@@ -569,10 +601,10 @@ class NodeManager extends DataMap {
 
 			}
 
-		} else if ( sceneData.backgroundNode ) {
+		} else if ( sceneData.backgroundNode !== null ) {
 
-			delete sceneData.backgroundNode;
-			delete sceneData.background;
+			sceneData.backgroundNode = null;
+			sceneData.background = null;
 
 		}
 
@@ -671,10 +703,10 @@ class NodeManager extends DataMap {
 
 			}
 
-		} else {
+		} else if ( sceneData.fogNode !== null ) {
 
-			delete sceneData.fogNode;
-			delete sceneData.fog;
+			sceneData.fogNode = null;
+			sceneData.fog = null;
 
 		}
 
@@ -718,10 +750,10 @@ class NodeManager extends DataMap {
 
 			}
 
-		} else if ( sceneData.environmentNode ) {
+		} else if ( sceneData.environmentNode !== null ) {
 
-			delete sceneData.environmentNode;
-			delete sceneData.environment;
+			sceneData.environmentNode = null;
+			sceneData.environment = null;
 
 		}
 

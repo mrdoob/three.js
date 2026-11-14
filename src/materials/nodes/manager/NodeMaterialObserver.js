@@ -238,63 +238,35 @@ class NodeMaterialObserver {
 		if ( data === undefined ) {
 
 			const { geometry, object } = renderObject;
+			const isInstancedMesh = object.isInstancedMesh === true;
+			const isBatchedMesh = object.isBatchedMesh === true;
+			const outputTarget = this.getOutputTarget( renderObject.renderer );
+			const { environment, environmentIntensity, environmentRotation } = renderObject.scene;
 
 			data = {
 				geometryId: geometry.id,
 				geometryVersion: this.getGeometryData( geometry )._version,
 				materialVersion: this.getMaterialData( renderObject.material )._version,
 				attributesDisposeVersion: renderObject._geometries.attributes.disposeVersion,
-				worldMatrix: object.matrixWorld.clone()
+				worldMatrix: object.matrixWorld.clone(),
+				center: object.center ? object.center.clone() : null,
+				morphTargetInfluences: object.morphTargetInfluences ? object.morphTargetInfluences.slice() : null,
+				instanceMatrix: isInstancedMesh ? object.instanceMatrix : null,
+				instanceMatrixVersion: isInstancedMesh ? object.instanceMatrix.version : - 1,
+				instanceColor: isInstancedMesh ? object.instanceColor : null,
+				instanceColorVersion: ( isInstancedMesh && object.instanceColor !== null ) ? object.instanceColor.version : - 1,
+				morphTextureVersion: ( isInstancedMesh && object.morphTexture !== null ) ? object.morphTexture.version : - 1,
+				matricesTextureVersion: isBatchedMesh ? object._matricesTexture.version : - 1,
+				colorsTextureVersion: ( isBatchedMesh && object._colorsTexture !== null ) ? object._colorsTexture.version : - 1,
+				indirectTextureVersion: isBatchedMesh ? object._indirectTexture.version : - 1,
+				version: renderObject.bundle !== null ? renderObject.bundle.version : - 1,
+				outputTarget: outputTarget,
+				outputTargetVersion: this.getOutputTargetData( outputTarget, renderObject.context )._version,
+				environmentIntensity: environmentIntensity,
+				environmentRotation: environmentRotation.clone(),
+				environmentVersion: environment !== null ? this.getTextureData( environment )._version : - 1,
+				lights: this.getLightsData( renderObject.lightsNode.getBuiltinLights(), [] )
 			};
-
-			if ( object.center ) {
-
-				data.center = object.center.clone();
-
-			}
-
-			if ( object.morphTargetInfluences ) {
-
-				data.morphTargetInfluences = object.morphTargetInfluences.slice();
-
-			}
-
-			if ( object.isInstancedMesh === true ) {
-
-				data.instanceMatrix = object.instanceMatrix;
-				data.instanceMatrixVersion = object.instanceMatrix.version;
-				data.instanceColor = object.instanceColor;
-				data.instanceColorVersion = object.instanceColor !== null ? object.instanceColor.version : null;
-				data.morphTextureVersion = object.morphTexture !== null ? object.morphTexture.version : null;
-
-			}
-
-			if ( object.isBatchedMesh === true ) {
-
-				data.matricesTextureVersion = object._matricesTexture.version;
-				data.colorsTextureVersion = object._colorsTexture !== null ? object._colorsTexture.version : null;
-				data.indirectTextureVersion = object._indirectTexture.version;
-
-			}
-
-			if ( renderObject.bundle !== null ) {
-
-				data.version = renderObject.bundle.version;
-
-			}
-
-			// global data
-
-			data.outputTarget = this.getOutputTarget( renderObject.renderer );
-			data.outputTargetVersion = this.getOutputTargetData( data.outputTarget, renderObject.context )._version;
-
-			const { environment, environmentIntensity, environmentRotation } = renderObject.scene;
-
-			data.environmentIntensity = environmentIntensity;
-			data.environmentRotation = environmentRotation.clone();
-			data.environmentVersion = environment !== null ? this.getTextureData( environment )._version : null;
-
-			data.lights = this.getLightsData( renderObject.lightsNode.getBuiltinLights(), [] );
 
 			this.renderObjects.set( renderObject, data );
 
@@ -848,8 +820,8 @@ class NodeMaterialObserver {
 
 		if ( object.isInstancedMesh === true ) {
 
-			const instanceColorVersion = object.instanceColor !== null ? object.instanceColor.version : null;
-			const morphTextureVersion = object.morphTexture !== null ? object.morphTexture.version : null;
+			const instanceColorVersion = object.instanceColor !== null ? object.instanceColor.version : - 1;
+			const morphTextureVersion = object.morphTexture !== null ? object.morphTexture.version : - 1;
 
 			if ( renderObjectData.instanceMatrix !== object.instanceMatrix ||
 				renderObjectData.instanceMatrixVersion !== object.instanceMatrix.version ||
@@ -873,7 +845,7 @@ class NodeMaterialObserver {
 
 		if ( object.isBatchedMesh === true ) {
 
-			const colorsTextureVersion = object._colorsTexture !== null ? object._colorsTexture.version : null;
+			const colorsTextureVersion = object._colorsTexture !== null ? object._colorsTexture.version : - 1;
 
 			if ( renderObjectData.matricesTextureVersion !== object._matricesTexture.version ||
 				renderObjectData.colorsTextureVersion !== colorsTextureVersion ||
