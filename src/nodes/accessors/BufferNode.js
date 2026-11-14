@@ -1,4 +1,5 @@
 import UniformNode from '../core/UniformNode.js';
+import { warn } from '../../utils.js';
 
 /**
  * A special type of uniform node which represents array-like data
@@ -6,7 +7,7 @@ import UniformNode from '../core/UniformNode.js';
  * which returns an instance of {@link ArrayElementNode}. For example:
  *
  * ```js
- * const bufferNode = buffer( array, 'mat4', count );
+ * const bufferNode = uniformTypedArray( array, 'mat4', count );
  * const matrixNode = bufferNode.element( index ); // access a matrix from the buffer
  * ```
  * In general, it is recommended to use the more managed {@link UniformArrayNode}
@@ -125,4 +126,23 @@ export default BufferNode;
  * @param {number} count - The count of buffer elements.
  * @returns {BufferNode}
  */
-export const buffer = ( value, type, count ) => new BufferNode( value, type, count );
+export const uniformTypedArray = ( value, type, count ) => new BufferNode( value, type, count );
+
+/**
+ * TSL function for creating a buffer node.
+ *
+ * @tsl
+ * @function
+ * @deprecated
+ * @param {Array<number>} value - Array-like buffer data.
+ * @param {string} type - The data type of a buffer element.
+ * @param {number} count - The count of buffer elements.
+ * @returns {BufferNode}
+ */
+export function buffer( value, type, count ) {
+
+	warn( 'TSL: "buffer()" has been deprecated and will be removed in r198. Use "uniformTypedArray()" instead.' ); // @deprecated r188
+
+	return uniformTypedArray( value, type, count );
+
+}
