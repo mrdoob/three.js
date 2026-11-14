@@ -1171,10 +1171,13 @@ class WebGPUBackend extends Backend {
 	 */
 	_resetRenderContextData( renderContextData ) {
 
-		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+		const currentSets = renderContextData._defaultSets;
+		currentSets.attributes.length = 0;
+		currentSets.bindingGroups.length = 0;
+		currentSets.pipeline = null;
+		currentSets.index = null;
 
-		if ( renderContextData.currentBlendColor === undefined ) renderContextData.currentBlendColor = new Color();
-
+		renderContextData.currentSets = currentSets;
 		renderContextData.currentBlendColor.setRGB( 0, 0, 0 );
 		renderContextData.currentBlendAlpha = 0;
 		renderContextData.currentStencilRef = 0;
@@ -1203,7 +1206,7 @@ class WebGPUBackend extends Backend {
 			);
 
 			const bundleSets = {
-				attributes: {},
+				attributes: [],
 				bindingGroups: [],
 				pipeline: null,
 				index: null
@@ -2961,10 +2964,16 @@ class WebGPUBackend extends Backend {
 
 		const renderContextData = this.get( renderContext );
 
+		const bundleSets = renderContextData._bundleSets;
+		bundleSets.attributes.length = 0;
+		bundleSets.bindingGroups.length = 0;
+		bundleSets.pipeline = null;
+		bundleSets.index = null;
+
 		renderContextData._currentPass = renderContextData.currentPass;
 		renderContextData._currentSets = renderContextData.currentSets;
 
-		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+		renderContextData.currentSets = bundleSets;
 		renderContextData.currentPass = this.pipelineUtils.createBundleEncoder( renderContext );
 
 	}
@@ -3111,6 +3120,140 @@ class WebGPUBackend extends Backend {
 	updateBinding( binding ) {
 
 		this.bindingUtils.updateBinding( binding );
+
+	}
+
+	createData( object ) {
+
+		if ( object.isBindGroup === true ) {
+
+			return {
+				layout: undefined,
+				layoutKey: undefined,
+				group: null,
+				groups: undefined,
+				versions: undefined
+			};
+
+		}
+
+		if ( object.isPipeline === true ) {
+
+			return {
+				pipeline: null,
+				error: false
+			};
+
+		}
+
+		if ( object.isBufferAttribute === true || object.isInterleavedBuffer === true || object.isBuffer === true ) {
+
+			return {
+				buffer: undefined,
+				_itemSize: undefined,
+				_paddedItemSize: undefined
+			};
+
+		}
+
+		if ( object.isTexture === true ) {
+
+			return {
+				initialized: false,
+				texture: undefined,
+				format: null,
+				textureDescriptorGPU: null,
+				externalTexture: undefined,
+				xrViewDescriptors: null,
+				msaaTexture: undefined,
+				msaaTextures: undefined,
+				msaaWidth: 0,
+				msaaHeight: 0,
+				msaaSamples: 0,
+				msaaFormat: null,
+				views: null,
+				layers: null,
+				hasPaintCallback: false,
+				version: - 1,
+				dimensionsSnippet: undefined,
+				arrayLayerCount: null,
+				cubeFaceCount: null
+			};
+
+		}
+
+		if ( object.isRenderContext === true ) {
+
+			const currentSets = { attributes: [], bindingGroups: [], pipeline: null, index: null };
+
+			return {
+				descriptor: null,
+				encoder: null,
+				currentPass: null,
+				currentSets: currentSets,
+				_defaultSets: currentSets,
+				_bundleSets: { attributes: [], bindingGroups: [], pipeline: null, index: null },
+				_currentPass: null,
+				_currentSets: null,
+				renderBundles: [],
+				bundleEncoders: undefined,
+				bundleSets: undefined,
+				layerDepthTexture: null,
+				layerDescriptors: null,
+				arrayCameraRenderStages: undefined,
+				currentBlendColor: new Color(),
+				currentBlendAlpha: 0,
+				currentStencilRef: 0,
+				occlusionData: undefined,
+				timestampUID: undefined
+			};
+
+		}
+
+		if ( object.isRenderObject === true ) {
+
+			return {
+				material: null,
+				materialVersion: - 1,
+				transparent: false,
+				blending: 0,
+				premultipliedAlpha: false,
+				blendSrc: 0,
+				blendDst: 0,
+				blendEquation: 0,
+				blendSrcAlpha: null,
+				blendDstAlpha: null,
+				blendEquationAlpha: null,
+				colorWrite: true,
+				depthWrite: true,
+				depthTest: true,
+				depthFunc: 0,
+				stencilWrite: false,
+				stencilFunc: 0,
+				stencilFail: 0,
+				stencilZFail: 0,
+				stencilZPass: 0,
+				stencilFuncMask: 0,
+				stencilWriteMask: 0,
+				polygonOffset: false,
+				polygonOffsetFactor: 0,
+				polygonOffsetUnits: 0,
+				side: 0,
+				alphaToCoverage: false,
+				sampleCount: 0,
+				colorSpace: '',
+				colorFormat: null,
+				depthStencilFormat: null,
+				primitiveTopology: null,
+				stripIndexFormat: undefined,
+				frontFaceCW: false,
+				geometryVersion: - 1,
+				clippingContextCacheKey: ''
+			};
+
+		}
+
+		return {};
 
 	}
 

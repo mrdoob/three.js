@@ -877,12 +877,25 @@ class Backend {
 
 		if ( map === undefined ) {
 
-			map = {};
+			map = this.createData( object );
 			this.data.set( object, map );
 
 		}
 
 		return map;
+
+	}
+
+	/**
+	 * Creates a new dictionary for the given object. Concrete backends can override
+	 * this method to declare all properties up front with a stable object shape.
+	 *
+	 * @param {Object} object - The object.
+	 * @return {Object} The created dictionary.
+	 */
+	createData( /*object*/ ) {
+
+		return {};
 
 	}
 
