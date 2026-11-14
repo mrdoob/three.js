@@ -1,4 +1,8 @@
-import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, context, determinant, float, grayscale, hue, int, inverse, ivec3, mat2, mat3, mat4, mix, mul, overloadingFn, overrideNode, saturation, select, time, transpose, uint, uniform, uv, vec2, vec3, vec4, vibrance } from '../../../src/Three.TSL.js';
+import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, context, cubeTexture, determinant, float, grayscale, hue, int, inverse, ivec3, mat2, mat3, mat4, mix, mul, overloadingFn, overrideNode, saturation, select, texture, texture3D, time, transpose, uint, uniform, uv, vec2, vec3, vec4, vibrance } from '../../../src/Three.TSL.js';
+import { Texture } from '../../../src/textures/Texture.js';
+import { CubeTexture } from '../../../src/textures/CubeTexture.js';
+import { Data3DTexture } from '../../../src/textures/Data3DTexture.js';
+import { LinearFilter, NearestFilter } from '../../../src/constants.js';
 
 // Create a fresh graph for every test and backend.
 export const cases = {
@@ -1529,6 +1533,89 @@ export const cases = {
 		] );
 
 		return brightness( color( 0xff8800 ) );
+
+	},
+
+	// Textures are inputs of the function, each call passes its own texture.
+
+	'layout texture input': () => {
+
+		const sampleMap = Fn( ( [ map, coord ] ) => {
+
+			return map.sample( coord ).rgb;
+
+		}, { map: 'texture', coord: 'vec2', return: 'vec3' } );
+
+		const colorA = sampleMap( texture( new Texture() ), uv() );
+		const colorB = sampleMap( texture( new Texture() ), uv().yx );
+
+		return colorA.add( colorB );
+
+	},
+
+	'layout nested texture input': () => {
+
+		const sampleMap = Fn( ( [ map, coord ] ) => {
+
+			return map.sample( coord ).rgb;
+
+		}, { map: 'texture', coord: 'vec2', return: 'vec3' } );
+
+		const blurMap = Fn( ( [ map, coord ] ) => {
+
+			const colorA = sampleMap( map, coord );
+			const colorB = sampleMap( map, coord.add( 0.01 ) );
+
+			return colorA.add( colorB ).mul( 0.5 );
+
+		}, { map: 'texture', coord: 'vec2', return: 'vec3' } );
+
+		return blurMap( texture( new Texture() ), uv() );
+
+	},
+
+	'layout cube and volume texture inputs': () => {
+
+		const sampleCube = Fn( ( [ map, direction ] ) => {
+
+			return map.sample( direction ).rgb;
+
+		}, { map: 'cubeTexture', direction: 'vec3', return: 'vec3' } );
+
+		const sample3D = Fn( ( [ map, coord ] ) => {
+
+			return map.sample( coord ).rgb;
+
+		}, { map: 'texture3D', coord: 'vec3', return: 'vec3' } );
+
+		const volume = new Data3DTexture();
+		volume.minFilter = LinearFilter;
+		volume.magFilter = LinearFilter;
+
+		const envMap = cubeTexture( new CubeTexture(), vec3( 0, 0, 1 ) ); // the default reflect vector needs a camera
+
+		const envColor = sampleCube( envMap, vec3( uv(), 1 ) );
+		const volumeColor = sample3D( texture3D( volume ), vec3( uv(), 0.5 ) );
+
+		return envColor.add( volumeColor );
+
+	},
+
+	// A texture with NearestFilter is also passed with a sampler, the code of the function is the same.
+
+	'layout nearest texture input': () => {
+
+		const sampleMap = Fn( ( [ map, coord ] ) => {
+
+			return map.sample( coord ).rgb;
+
+		}, { map: 'texture', coord: 'vec2', return: 'vec3' } );
+
+		const map = new Texture();
+		map.minFilter = NearestFilter;
+		map.magFilter = NearestFilter;
+
+		return sampleMap( texture( map ), uv() );
 
 	}
 

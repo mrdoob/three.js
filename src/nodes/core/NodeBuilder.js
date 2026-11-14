@@ -30,12 +30,37 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { warn, error } from '../../utils.js';
+import { Texture } from '../../textures/Texture.js';
+import { CubeTexture } from '../../textures/CubeTexture.js';
+import { Data3DTexture } from '../../textures/Data3DTexture.js';
+import { texture } from '../accessors/TextureNode.js';
+import { cubeTexture } from '../accessors/CubeTextureNode.js';
+import { texture3D } from '../accessors/Texture3DNode.js';
+import { uv } from '../accessors/UV.js';
+import { vec3 } from '../tsl/TSLCore.js';
 
 let _id = 0;
 
 const _functionNodeCache = new WeakMap();
 const _functionShaderNodes = new WeakMap();
 const _layoutDefaultsCache = new WeakMap();
+
+// The texture nodes of the texture inputs of a function layout. Their textures only define the code
+// of the function, each call passes its own texture.
+const _layoutTextureNodes = {
+	texture: () => texture( new Texture(), uv() ), // with a uv node, so the samples don't use the texture matrix
+	cubeTexture: () => cubeTexture( new CubeTexture(), vec3( 0, 0, 1 ) ), // with a direction, so the setup doesn't build the default reflect vector
+	texture3D: () => texture3D( Object.assign( new Data3DTexture(), { minFilter: LinearFilter, magFilter: LinearFilter } ) ) // filterable, so the samples use a sampler
+};
+
+// The node of an input in the code of a function with layout.
+const _createLayoutParameter = ( input ) => {
+
+	const createTextureNode = _layoutTextureNodes[ input.type ];
+
+	return createTextureNode !== undefined ? createTextureNode() : new ParameterNode( input.type, input.name );
+
+};
 
 // Inputs of a layout function call. They can be destructured as an array or as an object.
 const _createLayoutInputs = ( layout, values ) => {
@@ -2365,9 +2390,11 @@ class NodeBuilder {
 	 * @param {string} type - The uniform type.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
 	 * @param {?string} name - The name of the uniform.
-	 * @return {NodeUniform} The node uniform.
+	 * @return {NodeUniform|ParameterNode} The node uniform, or the parameter that replaces it in the code of a function.
 	 */
 	getUniformFromNode( node, type, shaderStage = this.shaderStage, name = null ) {
+
+		if ( node.isParameterNode === true ) return node;
 
 		const nodeData = this.getDataFromNode( node, shaderStage, this.globalCache );
 
@@ -2814,7 +2841,9 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Generates a code flow based on a TSL function: Fn().
+	 * Generates a code flow based on a TSL function: Fn(). The flow also has the parameters of the
+	 * function code: the inputs of the layout, each texture input with the parameters of
+	 * {@link NodeBuilder#getTextureParameters}.
 	 *
 	 * @param {ShaderNodeInternal} shaderNode - A function code will be generated based on the input.
 	 * @return {Object}
@@ -2823,7 +2852,41 @@ class NodeBuilder {
 
 		const layout = shaderNode.layout;
 
-		const inputs = _createLayoutInputs( layout, layout.inputs.map( input => new ParameterNode( input.type, input.name ) ) );
+		const parameters = [];
+
+		const nodes = layout.inputs.map( ( input ) => {
+
+			const node = _createLayoutParameter( input );
+
+			if ( node.isTextureNode === true ) {
+
+				for ( const [ name, parameterNode ] of Object.entries( this.getTextureParameters( input.name, node ) ) ) {
+
+					const type = parameterNode.getNodeType( this );
+
+					if ( parameterNode.isUniformNode === true ) {
+
+						// the clones of the uniform resolve to the parameter, see UniformNode#getSharedNode()
+
+						this.setHashNode( new ParameterNode( type, name ), parameterNode.getUniformHash( this ) );
+
+					}
+
+					parameters.push( { name, type: parameterNode === node ? input.type : type } ); // the texture has the type of the input, e.g. 'texture'
+
+				}
+
+			} else {
+
+				parameters.push( input );
+
+			}
+
+			return node;
+
+		} );
+
+		const inputs = _createLayoutInputs( layout, nodes );
 
 		//
 
@@ -2834,7 +2897,63 @@ class NodeBuilder {
 
 		shaderNode.layout = layout;
 
+		flowData.parameters = parameters;
+
 		return flowData;
+
+	}
+
+	/**
+	 * Returns the parameters that pass a texture to a function: the texture node, and the nodes
+	 * the backend needs to sample it, e.g. its sampler. The parameters are passed in this order,
+	 * with the given names in the code of the function.
+	 *
+	 * @param {string} name - The name of the texture parameter.
+	 * @param {TextureNode} textureNode - The texture node.
+	 * @return {Object<string,Node>} The nodes of the parameters, by name.
+	 */
+	getTextureParameters( name, textureNode ) {
+
+		return { [ name ]: textureNode };
+
+	}
+
+	/**
+	 * Returns the parameters of a call to a TSL function with layout. Each texture input is passed
+	 * with the parameters of {@link NodeBuilder#getTextureParameters}.
+	 *
+	 * @private
+	 * @param {Object} layout - The layout of the function.
+	 * @param {Array<Node>|Object<string,Node>} inputs - The inputs of the call.
+	 * @return {Array<Node>} The parameters of the call.
+	 */
+	_getLayoutCallParameters( layout, inputs ) {
+
+		const parameters = [];
+
+		layout.inputs.forEach( ( input, i ) => {
+
+			const node = Array.isArray( inputs ) ? inputs[ i ] : inputs[ input.name ];
+
+			if ( _layoutTextureNodes[ input.type ] === undefined ) {
+
+				parameters.push( node );
+
+			} else if ( node && node.isTextureNode === true && node.getInputType( this ) === input.type ) {
+
+				parameters.push( ...Object.values( this.getTextureParameters( input.name, node ) ) );
+
+			} else {
+
+				error( `TSL: Input '${ input.name }' of '${ layout.name }()' expects a ${ input.type } node.` );
+
+				parameters.push( node );
+
+			}
+
+		} );
+
+		return parameters;
 
 	}
 
@@ -2913,7 +3032,7 @@ class NodeBuilder {
 	_resolveLayoutDefaults( shaderNode, provided ) {
 
 		const layout = shaderNode.layout;
-		const parameters = layout.inputs.map( input => new ParameterNode( input.type, input.name ) );
+		const parameters = layout.inputs.map( _createLayoutParameter );
 
 		const fullGraph = this._getLayoutCallGraph( shaderNode, _createLayoutInputs( layout, parameters ) );
 		const partialGraph = this._getLayoutCallGraph( shaderNode, _createLayoutInputs( layout, parameters.map( ( parameter, i ) => provided[ i ] ? parameter : undefined ) ) );

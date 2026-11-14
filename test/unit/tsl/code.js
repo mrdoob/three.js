@@ -13,7 +13,7 @@ export function generateCode( createNode, language ) {
 
 	// These cases exercise node code generation without a GPU or renderer init.
 	const coordinateSystem = language === 'glsl' ? WebGLCoordinateSystem : WebGPUCoordinateSystem;
-	const renderer = { backend: {}, coordinateSystem, debug: { diagnostics: { keywords: false } } };
+	const renderer = { backend: { utils: { getTextureSampleData: () => ( { primarySamples: 1 } ) } }, coordinateSystem, debug: { diagnostics: { keywords: false } } };
 	const geometry = new BufferGeometry();
 	geometry.setAttribute( 'uv', new BufferAttribute( new Float32Array( 2 ), 2 ) );
 	const builder = new builders[ language ]( { geometry }, renderer );

@@ -6,6 +6,13 @@ const propertiesRegexp = /[a-z_0-9]+/ig;
 
 const pragmaMain = '#pragma main';
 
+// The TSL types of the GLSL samplers, e.g. of the texture inputs of a function layout.
+const samplerTypes = {
+	sampler2D: 'texture',
+	samplerCube: 'cubeTexture',
+	sampler3D: 'texture3D'
+};
+
 const parse = ( source ) => {
 
 	source = source.trim();
@@ -68,7 +75,7 @@ const parse = ( source ) => {
 
 			const name = propsMatches[ i ++ ][ 0 ];
 
-			inputs.push( new NodeFunctionInput( type, name, count, qualifier, isConst ) );
+			inputs.push( new NodeFunctionInput( samplerTypes[ type ] || type, name, count, qualifier, isConst ) );
 
 		}
 
