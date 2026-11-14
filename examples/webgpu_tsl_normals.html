@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - tsl - normals</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - tsl - normals">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_tsl_normals.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_tsl_normals.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			.slider {
+				position: absolute;
+				cursor: ew-resize;
+				width: 40px;
+				height: 40px;
+				background-color: #F32196;
+				opacity: 0.7;
+				border-radius: 50%;
+				top: calc(50% - 20px);
+				left: calc(50% - 20px);
+				touch-action: none;
+			}
+
+			.lbl {
+				position: absolute;
+				bottom: 16px;
+				padding: 4px 8px;
+				background: rgba(0, 0, 0, 0.6);
+				color: #fff;
+				font: 13px monospace;
+				pointer-events: none;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Normal Packing</span>
+			</div>
+
+			<small>
+				Deferred mirror reflections reconstructed from depth + a 32-bit normal G-buffer by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br />
+				Left: RGB8 (packNormalToRGB). Right: <a href="https://jcgt.org/published/0003/02/01/" target="_blank" rel="noopener">octahedral</a> RG16F. Drag the handle to compare.
+			</small>
+		</div>
+
+		<div class="slider"></div>
+		<div class="lbl" style="left: 16px">RGB8 · packNormalToRGB · 32 bpp</div>
+		<div class="lbl" style="right: 16px">Octahedral · packNormalToOctahedral · RG16F · 32 bpp</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { Fn, mrt, normalView, pass, packNormalToRGB, unpackRGBToNormal, uniform, screenUV, screenSize, getViewPosition, isBackgroundDepth, reflect, vec2, vec3, vec4, texture, equirectUV, select, abs, floor, fract, mix, packNormalToOctahedral, unpackOctahedralToNormal } from 'three/tsl';
+
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			let camera, scene, renderer, renderPipeline, controls, timer;
+			let stage, elapsed = 0;
+
+			const tiltAxis = new THREE.Vector3();
+			const tilt = new THREE.Quaternion();
+			const spin = new THREE.Quaternion();
+			const up = new THREE.Vector3( 0, 1, 0 );
+
+			const params = {
+				view: 'Reflection',
+				environment: 'HDRI',
+				errorScale: 0.25, // degrees mapped to full heatmap intensity
+				animate: true
+			};
+
+			const split = uniform( 0.5 );
+			const errorScale = uniform( params.errorScale );
+			const useChecker = uniform( 0 );
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 1.6, 1.1, 2.2 );
+
+				scene = new THREE.Scene();
+
+				stage = new THREE.Group(); // model, floor and bumper move together
+				scene.add( stage );
+
+				timer = new THREE.Timer();
+				timer.connect( document );
+
+				renderer = new THREE.WebGPURenderer( { outputBufferType: THREE.FloatType } ); // float32 reference normals
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 0.6, 0 );
+				controls.enableDamping = true;
+				controls.minDistance = 0.5;
+				controls.maxDistance = 12;
+				controls.update();
+
+				// environment
+
+				const envMap = new HDRLoader().load( 'textures/equirectangular/san_giuseppe_bridge_2k.hdr' );
+				envMap.minFilter = THREE.LinearFilter;
+				envMap.magFilter = THREE.LinearFilter;
+
+				// models ( only rasterized into the G-buffer, so materials only contribute their normals )
+
+				new GLTFLoader().load( 'models/gltf/ShaderBall.glb', function ( gltf ) {
+
+					const model = gltf.scene;
+					const box = new THREE.Box3().setFromObject( model );
+					model.scale.setScalar( 2 / box.getSize( new THREE.Vector3() ).length() );
+					box.setFromObject( model );
+					model.position.sub( box.getCenter( new THREE.Vector3() ) ).setY( - box.min.y );
+					stage.add( model );
+
+				} );
+
+				const ground = new THREE.Mesh( new THREE.CircleGeometry( 3, 64 ), new THREE.MeshBasicMaterial() );
+				ground.rotation.x = - Math.PI / 2;
+				stage.add( ground );
+
+				// black bumper marking the floor's extent, flagged with alpha 0 in the reference normal attachment
+
+				const bumperMaterial = new THREE.MeshBasicMaterial();
+				bumperMaterial.mrtNode = mrt( { output: vec4( normalView, 0 ) } );
+
+				const bumper = new THREE.Mesh( new THREE.TorusGeometry( 3, 0.03, 16, 128 ), bumperMaterial );
+				bumper.rotation.x = - Math.PI / 2;
+				stage.add( bumper );
+
+				// G-buffer: full precision reference normal, RGB8 normal and octahedral normal ( + depth )
+
+				const scenePass = pass( scene, camera );
+				scenePass.setMRT( mrt( {
+					output: vec4( normalView, 1 ),
+					normalRGB: vec4( packNormalToRGB( normalView ), 0 ),
+					normalOct: packNormalToOctahedral( normalView )
+				} ) );
+
+				// WebGPU has no RGB8 render attachment, alpha is padding
+
+				scenePass.getTexture( 'normalRGB' ).type = THREE.UnsignedByteType;
+
+				const normalOctTexture = scenePass.getTexture( 'normalOct' );
+				normalOctTexture.format = THREE.RGFormat;
+				normalOctTexture.type = THREE.HalfFloatType;
+
+				for ( const gBufferTexture of scenePass.renderTarget.textures ) {
+
+					gBufferTexture.minFilter = THREE.NearestFilter;
+					gBufferTexture.magFilter = THREE.NearestFilter;
+
+				}
+
+				// deferred shading: reconstruct position + normal, reflect the view ray and look up the environment
+
+				const depth = scenePass.getTextureNode( 'depth' ).r;
+
+				const referenceTexel = scenePass.getTextureNode( 'output' );
+				const reference = referenceTexel.xyz;
+				const normalRGB = unpackRGBToNormal( scenePass.getTextureNode( 'normalRGB' ).rgb ).normalize();
+				const normalOct = unpackOctahedralToNormal( scenePass.getTextureNode( 'normalOct' ).rg );
+
+				const projectionMatrixInverse = uniform( camera.projectionMatrixInverse );
+				const cameraWorldMatrix = uniform( camera.matrixWorld );
+
+				const environment = Fn( ( [ direction ] ) => {
+
+					const uv = equirectUV( direction );
+					const cell = floor( uv.mul( vec2( 16, 8 ) ) );
+					const checker = mix( 0.1, 1, fract( cell.x.add( cell.y ).mul( 0.5 ) ).mul( 2 ) );
+					const hdri = texture( envMap, uv ).level( 0 ).rgb;
+					return mix( hdri, vec3( checker ), useChecker );
+
+				} );
+
+				const viewPosition = getViewPosition( screenUV, depth, projectionMatrixInverse );
+				const viewDirection = viewPosition.normalize();
+				const toWorld = ( v ) => cameraWorldMatrix.mul( vec4( v, 0 ) ).xyz;
+
+				const shade = ( normal ) => environment( toWorld( reflect( viewDirection, normal ) ) );
+
+				const background = environment( toWorld( viewDirection ) );
+				const isLeft = screenUV.x.lessThan( split );
+
+				const isBumper = referenceTexel.a.lessThan( 0.5 );
+				const bumperColor = vec3( toWorld( reference ).y.mul( 0.04 ).add( 0.05 ) ); // near-black with a hint of shape
+
+				// angular error in degrees; 2 * asin( |a - b| / 2 ) stays accurate for tiny angles where acos( dot ) does not
+
+				const heatmap = ( normal ) => {
+
+					const degrees = normal.sub( reference.normalize() ).length().mul( 0.5 ).asin().mul( 2 * 180 / Math.PI );
+					const t = degrees.div( errorScale ).saturate().mul( 3 );
+					return vec3( t, t.sub( 1 ), t.sub( 2 ) ).saturate();
+
+				};
+
+				const composite = ( left, right, bg ) => {
+
+					const surface = select( isBumper, bumperColor, select( isLeft, left, right ) );
+					const color = select( isBackgroundDepth( depth ), bg, surface );
+					const divider = abs( screenUV.x.sub( split ) ).mul( screenSize.x ).lessThan( 1 );
+					return vec4( select( divider, vec3( 1 ), color ), 1 );
+
+				};
+
+				const views = {
+					'Reflection': composite( shade( normalRGB ), shade( normalOct ), background ),
+					'Angular error': composite( heatmap( normalRGB ), heatmap( normalOct ), vec3( 0 ) ),
+					'Decoded normals': composite( normalRGB.mul( 0.5 ).add( 0.5 ), normalOct.mul( 0.5 ).add( 0.5 ), vec3( 0 ) )
+				};
+
+				// post-processing
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				function updateOutput() {
+
+					renderPipeline.outputNode = views[ params.view ];
+					renderPipeline.outputColorTransform = params.view === 'Reflection';
+					renderPipeline.needsUpdate = true;
+
+				}
+
+				updateOutput();
+
+				// events
+
+				initSlider();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// gui
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+
+				gui.add( params, 'view', Object.keys( views ) ).onChange( updateOutput );
+
+				gui.add( params, 'environment', [ 'HDRI', 'Checker' ] ).onChange( ( value ) => {
+
+					useChecker.value = value === 'Checker' ? 1 : 0;
+
+				} );
+
+				gui.add( params, 'errorScale', 0.01, 2 ).name( 'error scale (°)' ).onChange( ( value ) => {
+
+					errorScale.value = value;
+
+				} );
+
+				gui.add( params, 'animate' );
+
+			}
+
+			function initSlider() {
+
+				const slider = document.querySelector( '.slider' );
+
+				function onPointerMove( e ) {
+
+					const x = Math.max( 0, Math.min( window.innerWidth, e.pageX ) );
+					split.value = x / window.innerWidth;
+					slider.style.left = x - ( slider.offsetWidth / 2 ) + 'px';
+
+				}
+
+				slider.addEventListener( 'pointerdown', ( e ) => {
+
+					if ( e.isPrimary === false ) return;
+
+					controls.enabled = false;
+					window.addEventListener( 'pointermove', onPointerMove );
+					window.addEventListener( 'pointerup', () => {
+
+						controls.enabled = true;
+						window.removeEventListener( 'pointermove', onPointerMove );
+
+					}, { once: true } );
+
+				} );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				document.querySelector( '.slider' ).style.left = split.value * window.innerWidth - 20 + 'px';
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				if ( params.animate ) {
+
+					// spin plus a 5 second tilt toward / away from the camera, around the camera's horizontal right axis
+
+					elapsed += timer.getDelta();
+
+					tiltAxis.setFromMatrixColumn( camera.matrixWorld, 0 ).setY( 0 ).normalize();
+					tilt.setFromAxisAngle( tiltAxis, Math.sin( elapsed * Math.PI * 2 / 5 ) * 0.05 );
+					spin.setFromAxisAngle( up, elapsed * 0.3 );
+					stage.quaternion.multiplyQuaternions( tilt, spin );
+
+				}
+
+				controls.update();
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+	</body>
+</html>
