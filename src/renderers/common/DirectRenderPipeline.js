@@ -101,7 +101,7 @@ class DirectRenderPipeline extends RenderPipeline {
 			samples = outputRenderTarget.samples;
 			depthBuffer = outputRenderTarget.depthBuffer;
 
-			outputRenderTarget.samples = renderer.samples;
+			outputRenderTarget.samples = outputRenderTarget._autoAllocateDepthBuffer === false ? 0 : renderer.samples;
 			outputRenderTarget.depthBuffer = true;
 
 		}

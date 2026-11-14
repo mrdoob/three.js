@@ -71,12 +71,22 @@ class ARButton {
 
 				renderer.xr.setReferenceSpaceType( 'local' );
 
-				await renderer.xr.setSession( session );
-
-				button.textContent = 'STOP AR';
-				sessionInit.domOverlay.root.style.display = '';
-
 				currentSession = session;
+
+				try {
+
+					await renderer.xr.setSession( session );
+
+					button.textContent = 'STOP AR';
+					sessionInit.domOverlay.root.style.display = '';
+
+				} catch ( error ) {
+
+					console.error( 'ARButton: Unable to set the XR session.', error );
+
+					session.end();
+
+				}
 
 			}
 
@@ -117,7 +127,13 @@ class ARButton {
 
 				if ( currentSession === null ) {
 
-					navigator.xr.requestSession( 'immersive-ar', sessionInit ).then( onSessionStarted );
+					navigator.xr.requestSession( 'immersive-ar', sessionInit )
+						.then( onSessionStarted )
+						.catch( ( error ) => {
+
+							console.error( 'ARButton: Unable to start the XR session.', error );
+
+						} );
 
 				} else {
 
