@@ -461,6 +461,11 @@ class WebGLTextureUtils {
 
 				gl.texStorage3D( gl.TEXTURE_3D, levels, glInternalFormat, width, height, depth );
 
+			} else if ( texture.isHTMLTexture && typeof gl.texElementSubImage2D === 'function' ) {
+
+				// Storage is allocated in updateTexture() once the size of the element
+				// snapshot is known. It must stay mutable since that size can change.
+
 			} else if ( ! texture.isVideoTexture ) {
 
 				gl.texStorage2D( glTextureType, levels, glInternalFormat, width, height );
@@ -696,21 +701,57 @@ class WebGLTextureUtils {
 
 		} else if ( texture.isHTMLTexture ) {
 
-			if ( typeof gl.texElementImage2D === 'function' ) {
+			if ( typeof gl.texElementSubImage2D === 'function' ) {
 
-				if ( gl.texElementImage2D.length === 3 ) {
+				// The snapshot is copied into an existing texture, so the texture has to be
+				// allocated first with the default size of the element snapshot.
 
-					// Chrome 150+
+				const canvas = gl.canvas;
+				const element = options.image;
 
-					gl.texElementImage2D( gl.TEXTURE_2D, gl.RGBA8, options.image );
+				let size;
 
-				} else {
+				try {
 
-					// Chrome 138 - 149
+					size = canvas.getElementImageDefaultSize( element );
 
-					gl.texElementImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, options.image );
+				} catch ( e ) {
+
+					// No paint record for the element yet. Retry once the canvas has painted it.
+					canvas.addEventListener( 'paint', () => {
+
+						texture.needsUpdate = true;
+
+					}, { once: true } );
+
+					canvas.requestPaint();
+					return;
 
 				}
+
+				// Default sizes are fractional, whereas the copy is rounded up.
+				const elementWidth = Math.ceil( size.width );
+				const elementHeight = Math.ceil( size.height );
+
+				const textureData = this.backend.get( texture );
+
+				// Re-allocate only when the size changes since it resets the contents.
+				if ( textureData.htmlWidth !== elementWidth || textureData.htmlHeight !== elementHeight ) {
+
+					gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA8, elementWidth, elementHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null );
+
+					// Only level 0 is defined. Unlike immutable storage, mutable storage needs an
+					// explicit max level to stay complete with mipmap minification filters.
+					gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, 0 );
+
+					textureData.htmlWidth = elementWidth;
+					textureData.htmlHeight = elementHeight;
+
+				}
+
+				// Always pass the destination size. It forces the copy to exactly fill the
+				// allocated texture, independently of how the canvas is sized.
+				gl.texElementSubImage2D( gl.TEXTURE_2D, 0, 0, 0, element, { width: elementWidth, height: elementHeight } );
 
 			}
 

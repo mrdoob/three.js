@@ -725,7 +725,7 @@ class WebGPUTextureUtils {
 			const canvas = this.backend.renderer.domElement;
 			const image = texture.image;
 
-			if ( typeof device.queue.copyElementImageToTexture !== 'function' ) return;
+			if ( typeof device.queue.drawElementImageToTexture !== 'function' ) return;
 
 			// Skip the first frame — the element needs a paint record first.
 			if ( ! textureData.hasPaintCallback ) {
@@ -739,27 +739,21 @@ class WebGPUTextureUtils {
 			const width = textureDescriptorGPU.size.width;
 			const height = textureDescriptorGPU.size.height;
 
-			if ( device.queue.copyElementImageToTexture.length === 2 ) {
+			try {
 
-				// Chrome 150+
+				device.queue.drawElementImageToTexture( { source: image }, { texture: textureData.texture, size: { width, height } } );
 
-				device.queue.copyElementImageToTexture(
-					{ source: image },
-					{
-						destination: { texture: textureData.texture },
-						width: width,
-						height: height
-					}
-				);
+			} catch ( e ) {
 
-			} else {
+				// No paint record for the element yet. Retry once the canvas has painted it.
+				canvas.addEventListener( 'paint', () => {
 
-				// Chrome 138 - 149
+					texture.needsUpdate = true;
 
-				device.queue.copyElementImageToTexture(
-					image, width, height,
-					{ texture: textureData.texture }
-				);
+				}, { once: true } );
+
+				canvas.requestPaint();
+				return;
 
 			}
 
