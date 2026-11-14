@@ -159,6 +159,14 @@ class ViewportTextureNode extends TextureNode {
 	updateBefore( frame ) {
 
 		const renderer = frame.renderer;
+
+		// do not copy the framebuffer during precompilation since `compileAsync()` does not render,
+		// a render nested in the precompilation has its own render context and still copies
+
+		const precompilationState = renderer._precompilationState;
+
+		if ( precompilationState !== null && precompilationState.renderContext === renderer._currentRenderContext ) return false;
+
 		const renderTarget = renderer.getRenderTarget();
 		const canvasTarget = renderer.getCanvasTarget();
 

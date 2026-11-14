@@ -1,6 +1,10 @@
 import { viewportTexture } from '../../../../../src/nodes/display/ViewportTextureNode.js';
 import { FramebufferTexture } from '../../../../../src/textures/FramebufferTexture.js';
 import { RenderTarget } from '../../../../../src/core/RenderTarget.js';
+import { Mesh, OrthographicCamera, PlaneGeometry, Scene } from '../../../../../src/Three.Core.js';
+import { MeshBasicNodeMaterial } from 'three/webgpu';
+import { pass } from 'three/tsl';
+import { getSharedRenderer } from '../tsl/gpu-test-utils.js';
 
 export default QUnit.module( 'Nodes', () => {
 
@@ -226,6 +230,97 @@ export default QUnit.module( 'Nodes', () => {
 					);
 
 				} );
+
+			} );
+
+			QUnit.module( 'Precompilation', () => {
+
+				for ( const backend of [ 'webgpu', 'webgl' ] ) {
+
+					QUnit.test( `compileAsync() only copies the framebuffer in nested renders (${ backend })`, async ( assert ) => {
+
+						const renderer = await getSharedRenderer( backend );
+
+						if ( renderer === null ) {
+
+							assert.ok( true, `SKIPPED: "${ backend }" backend is not available in this environment.` );
+							return;
+
+						}
+
+						const camera = new OrthographicCamera( - 1, 1, 1, - 1, 0.1, 10 );
+						camera.position.z = 5;
+
+						const geometry = new PlaneGeometry( 2, 2 );
+
+						// a scene whose material reads the viewport texture
+
+						const material = new MeshBasicNodeMaterial( { transparent: true } );
+						material.colorNode = viewportTexture();
+
+						const scene = new Scene();
+						scene.add( new Mesh( geometry, material ) );
+
+						// a scene whose material renders the scene above with a pass
+
+						const scenePass = pass( scene, camera );
+
+						const passMaterial = new MeshBasicNodeMaterial();
+						passMaterial.colorNode = scenePass;
+
+						const passScene = new Scene();
+						passScene.add( new Mesh( geometry, passMaterial ) );
+
+						const target = new RenderTarget( 4, 4 );
+						const previousTarget = renderer.getRenderTarget();
+
+						let copies = 0;
+
+						const copyFramebufferToTexture = renderer.copyFramebufferToTexture;
+
+						renderer.copyFramebufferToTexture = function ( ...args ) {
+
+							copies ++;
+
+							return copyFramebufferToTexture.apply( this, args );
+
+						};
+
+						try {
+
+							renderer.setRenderTarget( target );
+
+							renderer.render( scene, camera );
+							assert.strictEqual( copies, 1, 'A render copies the framebuffer' );
+
+							await renderer.compileAsync( scene, camera );
+							assert.strictEqual( copies, 1, 'A compile does not copy the framebuffer' );
+
+							renderer.render( scene, camera );
+							assert.strictEqual( copies, 2, 'The render after a compile copies the framebuffer' );
+
+							renderer.render( passScene, camera );
+							assert.strictEqual( copies, 3, 'The render of a pass copies the framebuffer' );
+
+							await renderer.compileAsync( passScene, camera );
+							assert.strictEqual( copies, 4, 'The render of a pass during a compile copies the framebuffer' );
+
+						} finally {
+
+							delete renderer.copyFramebufferToTexture;
+
+							renderer.setRenderTarget( previousTarget );
+							material.dispose();
+							passMaterial.dispose();
+							scenePass.dispose();
+							geometry.dispose();
+							target.dispose();
+
+						}
+
+					} );
+
+				}
 
 			} );
 
