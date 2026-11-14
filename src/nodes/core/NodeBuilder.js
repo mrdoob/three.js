@@ -120,9 +120,16 @@ class NodeData {
 		this.forceDeclaration = undefined;
 		this.variable = undefined;
 		this.cacheVariable = undefined;
+		this.varying = undefined;
+		this.bufferAttribute = undefined;
+		this.code = undefined;
 		this.uniform = undefined;
+		this.uniformGPU = undefined;
+		this.nodeFunction = undefined;
+		this.functionPropertyName = undefined;
 		this.subBuilds = undefined;
 		this.subBuildsCache = undefined;
+		this.subBuildVariables = undefined;
 
 	}
 
@@ -453,7 +460,7 @@ class NodeBuilder {
 		 *
 		 * @type {Object<string,Array<NodeCode>>}
 		 */
-		this.codes = {};
+		this.codes = { vertex: undefined, fragment: undefined, compute: undefined, any: undefined };
 
 		/**
 		 * This dictionary holds the node variables of this builder.
@@ -463,7 +470,7 @@ class NodeBuilder {
 		 *
 		 * @type {Object<string,Array<NodeVar>|number>}
 		 */
-		this.vars = {};
+		this.vars = { vertex: undefined, fragment: undefined, compute: undefined, any: undefined, _var: 0, _const: 0 };
 
 		/**
 		 * This dictionary holds the declarations for each shader stage.
@@ -476,9 +483,9 @@ class NodeBuilder {
 		 * Current code flow.
 		 * All code generated in this stack will be stored in `.flow`.
 		 *
-		 * @type {{code: string}}
+		 * @type {{code: string, result: string, vars: string}}
 		 */
-		this.flow = { code: '' };
+		this.flow = { code: '', result: '', vars: '' };
 
 		/**
 		 * A chain of nodes.
@@ -1140,17 +1147,27 @@ class NodeBuilder {
 	 */
 	getSharedContext() {
 
-		const context = { ...this.context };
+		const context = {};
 
-		delete context.material;
-		delete context.getUV;
-		delete context.getOutput;
-		delete context.getTextureLevel;
-		delete context.getAO;
-		delete context.getGI;
-		delete context.getShadow;
-		delete context.nodeLoop;
-		delete context.nodeBlock;
+		for ( const key in this.context ) {
+
+			if (
+				key !== 'material' &&
+				key !== 'getUV' &&
+				key !== 'getOutput' &&
+				key !== 'getTextureLevel' &&
+				key !== 'getAO' &&
+				key !== 'getGI' &&
+				key !== 'getShadow' &&
+				key !== 'nodeLoop' &&
+				key !== 'nodeBlock'
+			) {
+
+				context[ key ] = this.context[ key ];
+
+			}
+
+		}
 
 		return context;
 
@@ -2208,7 +2225,7 @@ class NodeBuilder {
 
 		if ( nodeData === undefined ) {
 
-			nodeData = { vertex: undefined, fragment: undefined, compute: undefined, any: undefined };
+			nodeData = { vertex: undefined, fragment: undefined, compute: undefined, any: undefined, null: undefined };
 
 			cache.setData( node, nodeData );
 
@@ -2408,27 +2425,42 @@ class NodeBuilder {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 		const subBuildVariable = this.getSubBuildProperty( property, nodeData.subBuilds );
+		const isSubBuild = subBuildVariable !== property;
 
-		let nodeVar = nodeData[ subBuildVariable ];
+		let nodeVar;
+
+		if ( isSubBuild ) {
+
+			nodeVar = nodeData.subBuildVariables !== undefined ? nodeData.subBuildVariables.get( subBuildVariable ) : undefined;
+
+		} else if ( property === 'variable' ) {
+
+			nodeVar = nodeData.variable;
+
+		} else {
+
+			nodeVar = nodeData[ property ];
+
+		}
 
 		if ( nodeVar === undefined ) {
 
 			const idNS = readOnly ? '_const' : '_var';
 
 			const vars = this.vars[ shaderStage ] || ( this.vars[ shaderStage ] = [] );
-			const id = this.vars[ idNS ] || ( this.vars[ idNS ] = 0 );
+			const id = this.vars[ idNS ];
 
 			if ( name === null ) {
 
 				name = ( readOnly ? 'nodeConst' : 'nodeVar' ) + id;
 
-				this.vars[ idNS ] ++;
+				this.vars[ idNS ] = id + 1;
 
 			}
 
 			//
 
-			if ( subBuildVariable !== property ) {
+			if ( isSubBuild ) {
 
 				name = this.getSubBuildProperty( name, nodeData.subBuilds );
 
@@ -2448,7 +2480,21 @@ class NodeBuilder {
 
 			this.registerDeclaration( nodeVar );
 
-			nodeData[ subBuildVariable ] = nodeVar;
+			if ( isSubBuild ) {
+
+				if ( nodeData.subBuildVariables === undefined ) nodeData.subBuildVariables = new Map();
+
+				nodeData.subBuildVariables.set( subBuildVariable, nodeVar );
+
+			} else if ( property === 'variable' ) {
+
+				nodeData.variable = nodeVar;
+
+			} else {
+
+				nodeData[ property ] = nodeVar;
+
+			}
 
 		}
 
@@ -2523,8 +2569,11 @@ class NodeBuilder {
 
 		const nodeData = this.getDataFromNode( node, 'any' );
 		const subBuildVarying = this.getSubBuildProperty( 'varying', nodeData.subBuilds );
+		const isSubBuild = subBuildVarying !== 'varying';
 
-		let nodeVarying = nodeData[ subBuildVarying ];
+		let nodeVarying = isSubBuild
+			? ( nodeData.subBuildVariables !== undefined ? nodeData.subBuildVariables.get( subBuildVarying ) : undefined )
+			: nodeData.varying;
 
 		if ( nodeVarying === undefined ) {
 
@@ -2535,7 +2584,7 @@ class NodeBuilder {
 
 			//
 
-			if ( subBuildVarying !== 'varying' ) {
+			if ( isSubBuild ) {
 
 				name = this.getSubBuildProperty( name, nodeData.subBuilds );
 
@@ -2549,7 +2598,17 @@ class NodeBuilder {
 
 			this.registerDeclaration( nodeVarying );
 
-			nodeData[ subBuildVarying ] = nodeVarying;
+			if ( isSubBuild ) {
+
+				if ( nodeData.subBuildVariables === undefined ) nodeData.subBuildVariables = new Map();
+
+				nodeData.subBuildVariables.set( subBuildVarying, nodeVarying );
+
+			} else {
+
+				nodeData.varying = nodeVarying;
+
+			}
 
 		}
 
@@ -3095,11 +3154,13 @@ class NodeBuilder {
 		const previousFlowBlock = this.flowBlock;
 
 		const flow = {
-			code: ''
+			code: '',
+			result: '',
+			vars: ''
 		};
 
 		this.flow = flow;
-		this.vars = {};
+		this.vars = { vertex: undefined, fragment: undefined, compute: undefined, any: undefined, _var: 0, _const: 0 };
 		this.declarations = {};
 		this.cache = new NodeCache();
 		this.stack = stack();
@@ -3167,7 +3228,9 @@ class NodeBuilder {
 		const previousFlow = this.flow;
 
 		const flow = {
-			code: ''
+			code: '',
+			result: '',
+			vars: ''
 		};
 
 		this.flow = flow;
@@ -3202,8 +3265,23 @@ class NodeBuilder {
 
 		this.setShaderStage( shaderStage );
 
-		const context = { ...this.context };
-		delete context.nodeBlock;
+		let context;
+
+		if ( this.context.nodeBlock === undefined ) {
+
+			context = { ...this.context };
+
+		} else {
+
+			context = {};
+
+			for ( const key in this.context ) {
+
+				if ( key !== 'nodeBlock' ) context[ key ] = this.context[ key ];
+
+			}
+
+		}
 
 		this.flowBlock = null;
 		this.cache = this.globalCache;

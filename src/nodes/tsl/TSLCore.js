@@ -95,29 +95,11 @@ Node.prototype.get = function ( value ) {
 
 const proto = {};
 
-// Cache of the swizzle and element nodes, a proxy of a node has its own cache
-
-const _swizzleCache = new WeakMap();
-
-function getSwizzleCache( node ) {
-
-	let cache = _swizzleCache.get( node );
-
-	if ( cache === undefined ) {
-
-		cache = {};
-
-		_swizzleCache.set( node, cache );
-
-	}
-
-	return cache;
-
-}
-
 // Set swizzle properties for xyzw, rgba, and stpq.
 
 function setProtoSwizzle( property, altA, altB ) {
+
+	const swizzleCache = new WeakMap();
 
 	// swizzle properties
 
@@ -125,17 +107,13 @@ function setProtoSwizzle( property, altA, altB ) {
 
 		get() {
 
-			const cache = getSwizzleCache( this );
-
-			//
-
-			let split = cache[ property ];
+			let split = swizzleCache.get( this );
 
 			if ( split === undefined ) {
 
 				split = new SplitNode( this, property );
 
-				cache[ property ] = split;
+				swizzleCache.set( this, split );
 
 			}
 
@@ -227,21 +205,19 @@ for ( let a = 0; a < 4; a ++ ) {
 
 for ( let i = 0; i < 32; i ++ ) {
 
+	const elementCache = new WeakMap();
+
 	proto[ i ] = {
 
 		get() {
 
-			const cache = getSwizzleCache( this );
-
-			//
-
-			let element = cache[ i ];
+			let element = elementCache.get( this );
 
 			if ( element === undefined ) {
 
 				element = new ArrayElementNode( this, new ConstNode( i, 'uint' ) );
 
-				cache[ i ] = element;
+				elementCache.set( this, element );
 
 			}
 
@@ -328,6 +304,8 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 };
 
 const ShaderNodeObjects = function ( objects, altType = null ) {
+
+	if ( Array.isArray( objects ) ) return ShaderNodeArray( objects, altType );
 
 	for ( const name in objects ) {
 
@@ -772,7 +750,7 @@ function getLayoutParameters( params ) {
 
 	let output;
 
-	nodeObjects( params );
+	params = nodeObjects( params );
 
 	if ( isArrayAsParameter( params ) ) {
 
@@ -792,7 +770,7 @@ function getProxyParameters( params ) {
 
 	let index = 0;
 
-	nodeObjects( params );
+	params = nodeObjects( params );
 
 	return new Proxy( params, {
 
@@ -878,6 +856,7 @@ class ShaderNodeInternal extends Node {
 
 		this.jsFunc = jsFunc;
 		this.layout = null;
+		this.subBuilds = null;
 
 		this.global = true;
 
@@ -1082,10 +1061,10 @@ export const nodeObjectAssignable = ( val, altType = null ) => {
 
 };
 
-export const nodeObjects = ( val, altType = null ) => new ShaderNodeObjects( val, altType );
-export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, altType );
+export const nodeObjects = ( val, altType = null ) => ShaderNodeObjects( val, altType );
+export const nodeArray = ( val, altType = null ) => ShaderNodeArray( val, altType );
 export const nodeProxy = ( NodeClass, scope = null, factor = null, settings = null ) => new ShaderNodeProxy( NodeClass, scope, factor, settings );
-export const nodeImmutable = ( NodeClass, ...params ) => new ShaderNodeImmutable( NodeClass, ...params );
+export const nodeImmutable = ( NodeClass, ...params ) => ShaderNodeImmutable( NodeClass, ...params );
 export const nodeProxyAssignable = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { ...settings, assignable: true } );
 
 export const nodeProxyConstructor = ( constructorFunction, nodeInstance ) => {
