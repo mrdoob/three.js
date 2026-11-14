@@ -466,13 +466,16 @@ class ShaderCallNodeInternal extends Node {
 		this.rawInputs = rawInputs;
 
 		this.isShaderCallNodeInternal = true;
+		this._hasAutoStatements = false;
 
 	}
 
 	isCacheable( builder ) {
 
 		// A call is an expression unless its body has statements.
-		return this.getOutputNode( builder ).nodes.length === 0;
+		const outputNode = this.getOutputNode( builder );
+
+		return this._hasAutoStatements === false && outputNode.nodes.length === 0;
 
 	}
 
@@ -521,14 +524,16 @@ class ShaderCallNodeInternal extends Node {
 
 		// A layout call needs every input. Missing inputs are completed with the default values
 		// of the function parameters; if they can't be resolved, the function is expanded inline.
+		// A function without layout gets a layout inferred from its inputs, passed in parameter order.
 
-		const layoutInputs = shaderNode.layout ? builder._getLayoutInputs( shaderNode, rawInputs ) : null;
+		const layout = shaderNode.layout || builder._getAutoLayout( shaderNode, rawInputs );
+		const layoutInputs = layout !== null ? builder._getLayoutInputs( shaderNode, rawInputs, layout ) : null;
 
 		if ( layoutInputs !== null ) {
 
 			// build inputs first, use layout inputs to ensure that no extra parameters are built
 
-			const layoutParameters = shaderNode.layout.inputs;
+			const layoutParameters = layout.inputs;
 
 			if ( isArrayAsParameter( layoutInputs ) ) {
 
@@ -564,9 +569,11 @@ class ShaderCallNodeInternal extends Node {
 
 			}
 
-			const functionNode = builder.buildFunctionNode( shaderNode );
+			const functionNode = builder.buildFunctionNode( shaderNode, layout );
 
 			builder.addInclude( functionNode );
+
+			if ( shaderNode.layout === null ) this._hasAutoStatements = layout.hasStatements;
 
 			//
 
@@ -595,6 +602,8 @@ class ShaderCallNodeInternal extends Node {
 							};
 
 						} else {
+
+							if ( target._probingAutoFn !== null ) target._abortAutoProbe();
 
 							value = Reflect.get( target, property, receiver );
 
@@ -665,6 +674,8 @@ class ShaderCallNodeInternal extends Node {
 	}
 
 	build( builder, output = null ) {
+
+		if ( builder._probingAutoFn !== null ) builder._validateAutoProbeNode( this );
 
 		// The call does not use Node.build(), so it handles the inspector node, shared and overridden nodes and assignable state here.
 		this._setupInspector( builder );
@@ -902,6 +913,12 @@ class ShaderNodeInternal extends Node {
 	getLayout() {
 
 		return this.layout;
+
+	}
+
+	_createLayoutName() {
+
+		return 'fn' + fnId ++;
 
 	}
 

@@ -101,6 +101,9 @@ class FunctionCallNode extends Node {
 
 		const functionNode = builder.getFunctionNode( this.functionNode );
 
+		// A function called from a TSL function is an include of it, so it is declared wherever the cached code is reused.
+		builder.addInclude( functionNode );
+
 		const inputs = functionNode.getInputs( builder );
 		const parameters = this.parameters;
 

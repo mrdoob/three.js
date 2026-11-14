@@ -1,3 +1,4 @@
+import Node from './Node.js';
 import NodeUniform from './NodeUniform.js';
 import NodeAttribute from './NodeAttribute.js';
 import NodeVarying from './NodeVarying.js';
@@ -17,7 +18,7 @@ import {
 } from '../../renderers/common/nodes/NodeUniform.js';
 
 import { stack } from './StackNode.js';
-import { getCurrentStack, setCurrentStack } from '../tsl/TSLBase.js';
+import { getCurrentStack, setCurrentStack, nodeObject } from '../tsl/TSLBase.js';
 
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 
@@ -36,28 +37,82 @@ let _id = 0;
 const _functionNodeCache = new WeakMap();
 const _functionShaderNodes = new WeakMap();
 const _layoutDefaultsCache = new WeakMap();
+const _autoLayoutCache = new WeakMap();
+const _autoInputKeys = new WeakMap();
+const _autoProbeAbort = {};
+
+const _abortProbe = () => {
+
+	throw _autoProbeAbort;
+
+};
+
+class ProbeParameterNode extends ParameterNode {
+
+	get isConstNode() {
+
+		return _abortProbe();
+
+	}
+
+	get value() {
+
+		return _abortProbe();
+
+	}
+
+	traverse() {
+
+		return _abortProbe();
+
+	}
+
+}
+
+const _autoValueTypes = new Set( [
+	'float', 'int', 'uint', 'bool',
+	'vec2', 'ivec2', 'uvec2', 'bvec2',
+	'vec3', 'ivec3', 'uvec3', 'bvec3',
+	'vec4', 'ivec4', 'uvec4', 'bvec4',
+	'mat2', 'mat3', 'mat4'
+] );
+
+// Leaf nodes with their own generate() that only depend on their inputs.
+const _purePrimitiveNodes = new Set( [
+	'ConstNode', 'ArrayNode', 'OperatorNode', 'MathNode', 'ConditionalNode', 'FunctionCallNode',
+	'BitcastNode', 'PackFloatNode', 'UnpackFloatNode', 'Packed4x8IntegerNode',
+	'ConvertNode', 'JoinNode', 'SplitNode', 'MemberNode', 'SetNode', 'FlipNode', 'ArrayElementNode'
+] );
+
+const _isPureInclude = node => node.type === 'CodeNode' || ( node.type === 'FunctionNode' && node.includes.every( _isPureInclude ) );
+
+const _positionalProbeProto = Object.defineProperty( {}, 'length', { get: _abortProbe } );
 
 // Inputs of a layout function call. They can be destructured as an array or as an object.
-const _createLayoutInputs = ( layout, values ) => {
+const _createLayoutInputs = ( layout, values, abortOnLength = false ) => {
 
-	const inputs = {
-		[ Symbol.iterator ]() {
+	const inputs = Object.create( abortOnLength ? _positionalProbeProto : Object.prototype );
 
-			let index = 0;
-			const values = Object.values( this );
-			return {
-				next: () => ( {
-					value: values[ index ],
-					done: index ++ >= values.length
-				} )
-			};
+	inputs[ Symbol.iterator ] = () => {
 
-		}
+		let index = 0;
+
+		return {
+			next: () => ( {
+				value: values[ index ],
+				done: index ++ >= values.length
+			} )
+		};
+
 	};
+
+	const keys = _autoInputKeys.get( layout );
 
 	layout.inputs.forEach( ( input, i ) => {
 
-		inputs[ input.name ] = values[ i ];
+		// an auto layout maps the keys of an object call to generated parameter names
+
+		inputs[ keys !== undefined ? keys[ i ] : input.name ] = values[ i ];
 
 	} );
 
@@ -520,6 +575,8 @@ class NodeBuilder {
 		 * @default null
 		 */
 		this.currentFunctionNode = null;
+		this._probingAutoFn = null;
+		this._typingAutoArg = false;
 
 		/**
 		 * The builder's context.
@@ -866,6 +923,8 @@ class NodeBuilder {
 	 * @param {Node} node - The node to add.
 	 */
 	addNode( node ) {
+
+		if ( this._probingAutoFn !== null ) this._validateAutoProbeNode( node );
 
 		if ( this.nodes.has( node ) === false ) {
 
@@ -2756,9 +2815,10 @@ class NodeBuilder {
 	 * It is a similar type of method like {@link NodeBuilder#getMethod}.
 	 *
 	 * @param {ShaderNodeInternal} shaderNode - The shader node to build the function node with.
+	 * @param {?Object} [layout=shaderNode.layout] - The explicit or inferred function layout.
 	 * @return {FunctionNode} The build function node.
 	 */
-	buildFunctionNode( shaderNode ) {
+	buildFunctionNode( shaderNode, layout = shaderNode.layout ) {
 
 		// the code is shared by all builders of a backend, per shader stage since it can differ between stages
 
@@ -2774,23 +2834,32 @@ class NodeBuilder {
 		}
 
 		const cache = stages[ this.shaderStage ] || ( stages[ this.shaderStage ] = new WeakMap() );
+		const cacheKey = layout === shaderNode.layout ? shaderNode : layout; // auto layouts are cached per signature
 
-		let fn = cache.get( shaderNode );
+		let fn = cache.get( cacheKey );
 
 		if ( fn === undefined ) {
 
 			fn = new FunctionNode();
 
 			const previous = this.currentFunctionNode;
+			const previousLayout = shaderNode.layout;
+			const previousProbe = this._probingAutoFn;
+
+			// the function body is built in its own flow, even while probing an auto layout
 
 			this.currentFunctionNode = fn;
+			this._probingAutoFn = null;
+			shaderNode.layout = layout;
 
 			fn.code = this.buildFunctionCode( shaderNode );
 
+			shaderNode.layout = previousLayout;
+			this._probingAutoFn = previousProbe;
 			this.currentFunctionNode = previous;
 
-			cache.set( shaderNode, fn );
-			_functionShaderNodes.set( fn, shaderNode );
+			cache.set( cacheKey, fn );
+			_functionShaderNodes.set( fn, { shaderNode, layout } );
 
 		}
 
@@ -2807,9 +2876,9 @@ class NodeBuilder {
 	 */
 	getFunctionNode( functionNode ) {
 
-		const shaderNode = _functionShaderNodes.get( functionNode );
+		const entry = _functionShaderNodes.get( functionNode );
 
-		return shaderNode !== undefined ? this.buildFunctionNode( shaderNode ) : functionNode;
+		return entry !== undefined ? this.buildFunctionNode( entry.shaderNode, entry.layout ) : functionNode;
 
 	}
 
@@ -2839,6 +2908,355 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Aborts the probe of an auto layout, see {@link NodeBuilder#_getAutoLayout}.
+	 *
+	 * @private
+	 */
+	_abortAutoProbe() {
+
+		_abortProbe();
+
+	}
+
+	/**
+	 * Aborts the probe of an auto layout if the given node is not pure: it may only depend
+	 * on the function parameters, constants and nodes created by the function itself.
+	 *
+	 * @private
+	 * @param {Node} node - The node to validate.
+	 */
+	_validateAutoProbeNode( node ) {
+
+		const probe = this._probingAutoFn;
+
+		if ( node._inspectorNode !== null || node.updateType !== NodeUpdateType.NONE || node.updateBeforeType !== NodeUpdateType.NONE || node.updateAfterType !== NodeUpdateType.NONE ) _abortProbe();
+
+		if ( node.type === 'FunctionNode' ) {
+
+			if ( _isPureInclude( node ) === false ) _abortProbe();
+			return;
+
+		}
+
+		if ( node.id < probe.startId ) {
+
+			if ( node.isConstNode === true && node.assignable === false ) return;
+
+			_abortProbe();
+
+		}
+
+		if ( probe.parameterSet.has( node ) ) return;
+
+		if ( node.type === 'AssignNode' ) {
+
+			const scope = node.targetNode.getScope();
+
+			if ( ! scope || scope.id < probe.startId || probe.parameterSet.has( scope ) || ( scope.isVarNode ? scope.readOnly === true : scope.assignable !== true ) ) _abortProbe();
+
+		} else if ( node.type === 'VarNode' ) {
+
+			if ( probe.parameterNames.has( node.name ) ) _abortProbe();
+
+		} else if ( node.type === 'LoopNode' ) {
+
+			const properties = node.getProperties( this );
+
+			probe.loopStacks.add( properties.stackNode );
+			if ( properties.updateNode ) probe.pendingNodes.push( properties.updateNode );
+
+			// the loop bounds are only built in the 'generate' stage, so they are validated after the setup
+
+			const params = node._getInternalParams();
+
+			for ( let i = 0, l = params.length - 1; i < l; i ++ ) {
+
+				const param = params[ i ];
+				const name = ( param.isNode !== true && param.name ) || node.getVarName( i );
+
+				if ( probe.parameterNames.has( name ) ) _abortProbe();
+
+				probe.loopVars.add( name );
+
+				for ( const value of param.isNode === true ? [ param ] : [ param.start, param.end, param.update ] ) {
+
+					if ( value && value.isNode === true ) probe.pendingNodes.push( value );
+
+				}
+
+			}
+
+		} else if ( node.type === 'ContextNode' ) {
+
+			for ( const key in node.value ) {
+
+				if ( key === 'uniformFlow' ? typeof node.value.uniformFlow !== 'boolean' : ( key !== 'nodeLoop' && key !== 'nodeBlock' && key !== 'assign' ) ) _abortProbe();
+
+			}
+
+		} else if ( node.type === 'ExpressionNode' ) {
+
+			const inLoop = this.context.nodeLoop !== undefined || this.activeStacks.some( s => probe.loopStacks.has( s ) );
+			const isLoopControl = node.nodeType === 'void' && ( node.snippet === 'break' || node.snippet === 'continue' );
+			const isLoopVar = node.nodeType !== 'void' && probe.loopVars.has( node.snippet );
+
+			if ( ! inLoop || ( ! isLoopControl && ! isLoopVar ) ) _abortProbe();
+
+		} else if ( node.isShaderCallNodeInternal === true ) {
+
+			// once() and subBuild() calls store their result in the builder
+
+			if ( node.shaderNode.once === true || node.shaderNode.subBuilds ) _abortProbe();
+
+		} else if ( node.type === 'ColorSpaceNode' || node.type === 'RenderOutputNode' || node.type === 'ToneMappingNode' || node.type === 'InspectorNode' ) {
+
+			// color space and tone mapping depend on renderer or pass context, not only on the backend
+
+			_abortProbe();
+
+		} else if ( node.generate !== Node.prototype.generate && _purePrimitiveNodes.has( node.type ) === false ) {
+
+			_abortProbe();
+
+		}
+
+	}
+
+	/**
+	 * Sets up the body of a TSL function with typed parameters in isolation and returns its layout,
+	 * or `null` if the body is not pure.
+	 *
+	 * @private
+	 * @param {ShaderNodeInternal} shaderNode - The shader node of the function.
+	 * @param {Array<Object>} inputs - The names and types of the parameters.
+	 * @param {?Array<string>} objectKeys - Sorted keys when called with an object, or `null` when positional.
+	 * @return {?Object} The layout of the function.
+	 */
+	_probeAutoLayout( shaderNode, inputs, objectKeys ) {
+
+		const probeStack = stack();
+		const probeNodes = new Set();
+		const parameters = inputs.map( input => new ProbeParameterNode( input.type, input.name ) );
+
+		const probe = {
+			startId: probeStack.id,
+			parameterSet: new Set( parameters ),
+			parameterNames: new Set( inputs.map( input => input.name ) ),
+			loopStacks: new Set(),
+			loopVars: new Set(),
+			pendingNodes: []
+		};
+
+		// the body is set up in an isolated state, so an aborted probe leaves no trace in the builder
+
+		const currentStack = getCurrentStack();
+
+		const saved = {
+			nodes: this.nodes, hashNodes: this.hashNodes, cache: this.cache, stack: this.stack, activeStacks: this.activeStacks,
+			context: this.context, buildStage: this.buildStage, chaining: this.chaining, fnCall: this.fnCall, subBuildFn: this.subBuildFn,
+			currentFunctionNode: this.currentFunctionNode, _probingAutoFn: this._probingAutoFn
+		};
+
+		Object.assign( this, {
+			nodes: probeNodes, hashNodes: new Map(), cache: new NodeCache(), stack: probeStack, activeStacks: [ probeStack ],
+			context: { uniformFlow: false }, buildStage: 'setup', chaining: [], fnCall: null,
+			currentFunctionNode: null, _probingAutoFn: probe
+		} );
+
+		setCurrentStack( probeStack );
+
+		// unlike the array of an inline call, positional inputs have no length, so a variadic body is expanded inline
+
+		const probeLayout = { inputs };
+		if ( objectKeys !== null ) _autoInputKeys.set( probeLayout, objectKeys );
+
+		const callInputs = _createLayoutInputs( probeLayout, parameters, objectKeys === null );
+
+		try {
+
+			const outputNode = shaderNode.call( callInputs ).call( this );
+
+			if ( ! outputNode || outputNode.isNode !== true ) return null;
+
+			// like an inline call, the call is a statement if the body added nodes to the stack
+
+			const hasStatements = probeStack.nodes.length > 0;
+
+			probeStack.outputNode = outputNode;
+			probeStack.build( this );
+
+			while ( probe.pendingNodes.length > 0 ) probe.pendingNodes.pop().build( this );
+
+			const rawReturnType = shaderNode.nodeType || outputNode.getNodeType( this );
+			const returnType = rawReturnType === 'color' ? 'vec3' : rawReturnType;
+
+			if ( _autoValueTypes.has( returnType ) === false || outputNode.getArrayCount( this ) !== null ) return null;
+
+			// a weak number argument mixed with an integer is an integer when inlined, but a float as a parameter
+
+			const hasIntegerFloatPromotion = [ ...probeNodes ].some( n => ( n.isOperatorNode || n.isMathNode ) &&
+				[ n.aNode, n.bNode, n.cNode ].some( o => probe.parameterSet.has( o ) && o.nodeType === 'float' ) &&
+				[ n.aNode, n.bNode, n.cNode ].some( o => o && ! o.isWeak && this.isInteger( o.getNodeType( this ) ) ) );
+
+			const layout = {
+				name: shaderNode._createLayoutName(),
+				type: returnType,
+				inputs,
+				hasStatements,
+				hasIntegerFloatPromotion
+			};
+
+			if ( objectKeys !== null ) _autoInputKeys.set( layout, objectKeys );
+
+			return layout;
+
+		} catch {
+
+			return null;
+
+		} finally {
+
+			Object.assign( this, saved );
+			setCurrentStack( currentStack );
+
+		}
+
+	}
+
+	/**
+	 * Returns a layout for a call to a TSL function without layout, so it can be emitted as a shader
+	 * function instead of being expanded inline. The layout is inferred from the types of the inputs
+	 * and shared by all calls with the same types. Returns `null` if the function must be expanded inline.
+	 *
+	 * @private
+	 * @param {ShaderNodeInternal} shaderNode - The shader node of the function.
+	 * @param {?Array} rawInputs - The inputs of the call.
+	 * @return {?Object} The layout of the function.
+	 */
+	_getAutoLayout( shaderNode, rawInputs ) {
+
+		if (
+			this._probingAutoFn !== null ||
+			this.context.uniformFlow === true ||
+			shaderNode.once === true ||
+			Boolean( shaderNode.subBuilds ) ||
+			shaderNode.nodeType === 'void' ||
+			shaderNode.jsFunc.length > 1 ||
+			! Array.isArray( rawInputs ) ||
+			rawInputs.length === 0
+		) {
+
+			return null;
+
+		}
+
+		const inputs = [];
+		let objectKeys = null;
+		let hasWeakFloat = false;
+		let signatureKey;
+
+		// parameters always get generated names, so they can't shadow built-in functions or local variables
+
+		const addInput = ( rawArg ) => {
+
+			if ( typeof rawArg === 'function' ) return false;
+
+			const arg = nodeObject( rawArg );
+
+			if ( ! arg || arg.isNode !== true || arg.isTextureNode || arg.isBufferNode || arg.isWorkgroupInfoNode || arg.isFn || arg.getArrayCount( this ) !== null ) return false;
+
+			const rawType = arg.getNodeType( this );
+			const type = rawType === 'color' ? 'vec3' : rawType;
+
+			if ( _autoValueTypes.has( type ) === false ) return false;
+
+			if ( arg.isWeak === true ) hasWeakFloat = true;
+			inputs.push( { name: 'p' + inputs.length, type } );
+
+			return true;
+
+		};
+
+		const isOuterTypeCheck = this._typingAutoArg === false;
+		const previousCache = this.cache;
+
+		if ( isOuterTypeCheck ) {
+
+			// infer argument types in a child cache so nodes later wrapped in isolate() keep their own cache
+
+			this._typingAutoArg = true;
+			this.cache = new NodeCache( previousCache );
+
+		}
+
+		try {
+
+			if ( isArrayAsParameter( rawInputs ) ) {
+
+				for ( const rawArg of rawInputs ) {
+
+					if ( addInput( rawArg ) === false ) return null;
+
+				}
+
+				signatureKey = inputs.map( input => input.type ).join( ',' );
+
+			} else if ( rawInputs.length === 1 && rawInputs[ 0 ] !== null && Object.getPrototypeOf( rawInputs[ 0 ] ) === Object.prototype ) {
+
+				const object = rawInputs[ 0 ];
+				const keys = Object.keys( object ).sort();
+
+				if ( keys.length === 0 ) return null;
+
+				for ( const key of keys ) {
+
+					if ( addInput( object[ key ] ) === false ) return null;
+
+				}
+
+				objectKeys = keys;
+				signatureKey = '{' + keys.map( ( key, i ) => key + ':' + inputs[ i ].type ).join( ',' ) + '}';
+
+			} else {
+
+				return null;
+
+			}
+
+		} finally {
+
+			if ( isOuterTypeCheck ) {
+
+				this._typingAutoArg = false;
+				this.cache = previousCache;
+
+			}
+
+		}
+
+		let sigCache = _autoLayoutCache.get( shaderNode );
+
+		if ( sigCache === undefined ) {
+
+			sigCache = new Map();
+			_autoLayoutCache.set( shaderNode, sigCache );
+
+		}
+
+		let layout = sigCache.get( signatureKey );
+
+		if ( layout === undefined ) {
+
+			layout = this._probeAutoLayout( shaderNode, inputs, objectKeys );
+			sigCache.set( signatureKey, layout );
+
+		}
+
+		return ( layout === null || ( hasWeakFloat && layout.hasIntegerFloatPromotion ) ) ? null : layout;
+
+	}
+
+	/**
 	 * Returns the inputs of a call to a TSL function with layout. Missing inputs are completed
 	 * with the default values of the function parameters, found by running the function once
 	 * with all inputs and once without the missing ones, and comparing both node graphs.
@@ -2846,9 +3264,18 @@ class NodeBuilder {
 	 * @private
 	 * @param {ShaderNodeInternal} shaderNode - The shader node of the function.
 	 * @param {?Array} rawInputs - The inputs of the call.
+	 * @param {?Object} [layout=shaderNode.layout] - The explicit or inferred function layout.
 	 * @return {?Array} The inputs of the call, or `null` if the defaults can't be resolved and the function must be expanded inline.
 	 */
-	_getLayoutInputs( shaderNode, rawInputs ) {
+	_getLayoutInputs( shaderNode, rawInputs, layout = shaderNode.layout ) {
+
+		if ( layout !== shaderNode.layout ) {
+
+			const keys = _autoInputKeys.get( layout );
+
+			return keys !== undefined ? keys.map( key => rawInputs[ 0 ][ key ] ) : rawInputs;
+
+		}
 
 		const inputs = shaderNode.layout.inputs;
 
@@ -3486,6 +3913,8 @@ class NodeBuilder {
 	 * @param {SubBuildNode} subBuild - The sub-build layer to add.
 	 */
 	addSubBuild( subBuild ) {
+
+		if ( this._probingAutoFn !== null ) _abortProbe();
 
 		this.subBuildLayers.push( subBuild );
 
