@@ -1546,6 +1546,8 @@ class USDComposer {
 
 			case 'DistantLight':
 				light = new DirectionalLight( color, intensity );
+				light.target.position.set( 0, 0, - 1 );
+				light.add( light.target );
 				break;
 
 			case 'SphereLight': {
@@ -1557,6 +1559,8 @@ class USDComposer {
 					const angle = coneAngle * Math.PI / 180;
 					const softness = this._parseNumber( attrs[ 'shaping:cone:softness' ], 0 );
 					light = new SpotLight( color, intensity, 0, angle, softness );
+					light.target.position.set( 0, 0, - 1 );
+					light.add( light.target );
 
 				} else {
 
