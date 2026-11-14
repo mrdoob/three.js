@@ -98,42 +98,42 @@
 				const map11 = loader.load( 'textures/wave_normals_24bit_uncompressed.dds' );
 				map11.anisotropy = 4;
 
-				const cubemap1 = loader.load( 'textures/compressed/Mountains.dds', function ( texture ) {
+				loader.loadAsync( 'textures/compressed/Mountains.dds' ).then( function ( texture ) {
 
 					texture.magFilter = THREE.LinearFilter;
 					texture.minFilter = THREE.LinearFilter;
-					texture.mapping = THREE.CubeReflectionMapping;
 					texture.colorSpace = THREE.SRGBColorSpace;
+					material1.envMap = texture;
 					material1.needsUpdate = true;
 
 				} );
 
-				const cubemap2 = loader.load( 'textures/compressed/Mountains_argb_mip.dds', function ( texture ) {
+				loader.loadAsync( 'textures/compressed/Mountains_argb_mip.dds' ).then( function ( texture ) {
 
 					texture.magFilter = THREE.LinearFilter;
 					texture.minFilter = THREE.LinearFilter;
-					texture.mapping = THREE.CubeReflectionMapping;
 					texture.colorSpace = THREE.SRGBColorSpace;
+					material5.envMap = texture;
 					material5.needsUpdate = true;
 
 				} );
 
-				const cubemap3 = loader.load( 'textures/compressed/Mountains_argb_nomip.dds', function ( texture ) {
+				loader.loadAsync( 'textures/compressed/Mountains_argb_nomip.dds' ).then( function ( texture ) {
 
 					texture.magFilter = THREE.LinearFilter;
 					texture.minFilter = THREE.LinearFilter;
-					texture.mapping = THREE.CubeReflectionMapping;
 					texture.colorSpace = THREE.SRGBColorSpace;
+					material6.envMap = texture;
 					material6.needsUpdate = true;
 
 				} );
 
-				const material1 = new THREE.MeshBasicMaterial( { map: map1, envMap: cubemap1 } );
+				const material1 = new THREE.MeshBasicMaterial( { map: map1 } );
 				const material2 = new THREE.MeshBasicMaterial( { map: map2 } );
 				const material3 = new THREE.MeshBasicMaterial( { map: map3, alphaTest: 0.5, side: THREE.DoubleSide } );
 				const material4 = new THREE.MeshBasicMaterial( { map: map4, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
-				const material5 = new THREE.MeshBasicMaterial( { envMap: cubemap2 } );
-				const material6 = new THREE.MeshBasicMaterial( { envMap: cubemap3 } );
+				const material5 = new THREE.MeshBasicMaterial();
+				const material6 = new THREE.MeshBasicMaterial();
 				const material7 = new THREE.MeshBasicMaterial( { map: map5 } );
 				const material8 = new THREE.MeshBasicMaterial( { map: map6 } );
 				const material9 = new THREE.MeshBasicMaterial( { map: map7 } );
