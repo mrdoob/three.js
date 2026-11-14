@@ -190,6 +190,48 @@ class Node extends EventDispatcher {
 	}
 
 	/**
+	 * Whether this node passes through to its inner expression every time it is generated,
+	 * without owning a shader variable, e.g. a swizzle or an element access. Such a node is not
+	 * cacheable itself, so its reuse must reach the inner expression, which can then be cached.
+	 *
+	 * By default, a node is a pass-through node if its setup returned an output node with a value.
+	 * Nodes that store or consume their value, like variables or assignments, have no output node.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether this node is a pass-through node.
+	 */
+	_isPassThrough( builder ) {
+
+		const { outputNode } = builder.getNodeProperties( this );
+
+		if ( ! outputNode || outputNode.isNode !== true || outputNode.isStackNode === true ) return false;
+
+		return this.getNodeType( builder ) !== 'void';
+
+	}
+
+	/**
+	 * Whether `analyze()` must analyze the children of this pass-through node again, because
+	 * the node is read once more. Every read reaches the inner expression, so its usage count
+	 * matches the number of reads and it can be cached when it is read more than once.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether the reuse of this node is propagated to its children.
+	 */
+	_propagatesUsage( builder ) {
+
+		if ( builder.isContextAssign() === true || this.isCacheable( builder ) === true || this._isPassThrough( builder ) !== true ) return false;
+
+		// An assignable node declared as a variable owns its value.
+		if ( this.assignable === true && this._declaresAssignable() && this._isVariable( builder, builder.getDataFromNode( this ) ) ) return false;
+
+		return true;
+
+	}
+
+	/**
 	 * Makes this node assignable and adds it to the current stack,
 	 * so it can be declared where it was created if it is assigned later.
 	 * Only use it with nodes that are not shared, see {@link Node#assignable}.
@@ -1017,7 +1059,7 @@ class Node extends EventDispatcher {
 
 		}
 
-		if ( usageCount === 1 ) {
+		if ( usageCount === 1 || this._propagatesUsage( builder ) ) {
 
 			// node flow children
 

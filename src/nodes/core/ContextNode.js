@@ -69,6 +69,12 @@ class ContextNode extends Node {
 
 	}
 
+	_isPassThrough( builder ) {
+
+		return this.getNodeType( builder ) !== 'void';
+
+	}
+
 	/**
 	 * This method is overwritten to ensure it returns the reference to {@link ContextNode#node}.
 	 *
@@ -132,7 +138,7 @@ class ContextNode extends Node {
 
 		const usageCount = builder.increaseUsage( this );
 
-		if ( usageCount === 1 ) {
+		if ( usageCount === 1 || this._propagatesUsage( builder ) ) {
 
 			const previousContext = builder.addContext( this.value );
 

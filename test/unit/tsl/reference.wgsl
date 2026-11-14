@@ -1682,3 +1682,68 @@ fn fn0 ( value : vec3<f32> ) -> f32 {
 }
 
 fn0( vec3<f32>( 1.0, 0.24620132669705552, 0.0 ) )
+
+// swizzle reuse
+
+let nodeConst0 = ( fragCoord.xy / render.nodeUniform0 );
+
+( ( nodeConst0.x * nodeConst0.x ) + nodeConst0.x )
+
+// nested swizzle reuse
+
+let nodeConst0 = ( nodeVarying0 * vec2<f32>( 2.0 ) );
+
+( ( nodeConst0.x * nodeConst0.x ) + nodeConst0.x )
+
+// context reuse
+
+let nodeConst0 = ( ( nodeVarying0 * vec2<f32>( 2.0 ) ) - vec2<f32>( 1.0 ) );
+
+( ( nodeConst0 * nodeConst0 ) + nodeConst0 )
+
+// storage element reuse
+
+let nodeConst0 = ( i32( object.nodeUniform1 ) + 1 );
+
+( ( nodeUniform0.value[ nodeConst0 ] * nodeUniform0.value[ nodeConst0 ] ) + nodeUniform0.value[ nodeConst0 ] )
+
+// linearDepth reuse
+
+let nodeConst0 = ( ( ( ( render.cameraNear * render.cameraFar ) / ( ( ( render.cameraFar - render.cameraNear ) * nodeVarying0.x ) - render.cameraFar ) ) + render.cameraNear ) / ( render.cameraNear - render.cameraFar ) );
+
+( ( nodeConst0 * nodeConst0 ) + nodeConst0 )
+
+// sample reuse
+
+let nodeConst0 = ( ( nodeVarying0 * vec2<f32>( 2.0 ) ) + vec2<f32>( 1.0 ) );
+
+( ( nodeConst0 * nodeConst0 ) + nodeConst0 )
+
+// swizzle reuse across blocks
+
+var nodeVar0 : f32;
+
+nodeVar0 = 0.0;
+
+if ( ( object.nodeUniform0 > 0.0 ) ) {
+
+	let nodeConst0 = ( nodeVarying0 * vec2<f32>( 2.0 ) );
+	nodeVar0 = nodeConst0.x;
+
+}
+
+let nodeConst0 = ( nodeVarying0 * vec2<f32>( 2.0 ) );
+
+( ( nodeVar0 + nodeConst0.x ) + nodeConst0.x )
+
+// element reuse around assignment
+
+var nodeVar0 : array< f32, 3 >;
+var nodeVar1 : f32;
+
+nodeVar0 = array< f32, 3 >( 1.0, 2.0, 3.0 );
+let nodeConst0 = ( i32( object.nodeUniform0 ) + 1 );
+nodeVar1 = nodeVar0[ nodeConst0 ];
+nodeVar0[ nodeConst0 ] = 5.0;
+
+( nodeVar1 + nodeVar0[ nodeConst0 ] )
