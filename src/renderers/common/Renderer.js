@@ -766,6 +766,15 @@ class Renderer {
 		this._precompilationState = null;
 
 		/**
+		 * The compute nodes being compiled by `compileComputeAsync()`, mapped to their
+		 * compilation so later calls can wait on it.
+		 *
+		 * @private
+		 * @type {WeakMap<Node,Promise>}
+		 */
+		this._compilingComputeNodes = new WeakMap();
+
+		/**
 		 * When an override material is in use, this property points to the current
 		 * source material during the rendering of a render object.
 		 *
@@ -1379,6 +1388,38 @@ class Renderer {
 			throw new Error( 'THREE.Renderer: .compileComputeAsync() expects a ComputeNode.' );
 
 		}
+
+		// nodes already compiling in another call are waited on rather than compiled again
+
+		const compiling = this._compilingComputeNodes;
+		const pending = computeList.map( ( computeNode ) => compiling.get( computeNode ) ).filter( ( promise ) => promise );
+		const newNodes = computeList.filter( ( computeNode ) => compiling.has( computeNode ) === false );
+
+		const promise = newNodes.length > 0 ? this._compileComputeAsync( newNodes, onProgress ) : Promise.resolve();
+		newNodes.forEach( ( computeNode ) => compiling.set( computeNode, promise ) );
+
+		try {
+
+			await Promise.all( [ promise, ...pending ] );
+
+		} finally {
+
+			newNodes.forEach( ( computeNode ) => compiling.delete( computeNode ) );
+
+		}
+
+	}
+
+	/**
+	 * Compiles the given compute nodes, see `compileComputeAsync()`.
+	 *
+	 * @private
+	 * @async
+	 * @param {Array<Node>} computeList - The compute nodes.
+	 * @param {?onProgressCallback} onProgress - Executed while the compilation is in progress.
+	 * @return {Promise} A Promise that resolves when the compile has been finished.
+	 */
+	async _compileComputeAsync( computeList, onProgress ) {
 
 		const total = computeList.length;
 		let loaded = 0;
