@@ -862,6 +862,12 @@ class RenderObject {
 
 						}
 
+					} else if ( value.isNode === true && material.isNodeMaterial !== true ) {
+
+						// honor monkey-patched nodes of non-node materials
+
+						valueKey += value.getCacheKey( true );
+
 					}
 
 					valueKey += '}';
