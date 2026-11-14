@@ -3378,11 +3378,16 @@ class Renderer {
 
 	}
 
-	async resolveTimestampsAsync( type = 'render' ) {
+	/**
+	 * @async
+	 * @deprecated since r188. Use {@link GPUTimer} instead.
+	 * @return {Promise<null>} A Promise that resolves with `null`.
+	 */
+	async resolveTimestampsAsync() {
 
-		if ( this._initialized === false ) await this.init();
+		warnOnce( 'Renderer: "resolveTimestampsAsync()" has been removed. Use "GPUTimer" instead.' ); // @deprecated r188
 
-		return this.backend.resolveTimestampsAsync( type );
+		return null;
 
 	}
 

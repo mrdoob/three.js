@@ -74,6 +74,8 @@ class Animation {
 
 			this._requestId = this._context.requestAnimationFrame( update );
 
+			this.renderer.backend.resolveTimestamps();
+
 			if ( this.renderer._inspector.isRunning ) {
 
 				this.renderer._inspector.finish();
