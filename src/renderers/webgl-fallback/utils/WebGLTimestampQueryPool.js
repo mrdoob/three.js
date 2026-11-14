@@ -1,11 +1,9 @@
 import TimestampQueryPool from '../../common/TimestampQueryPool.js';
 
 /**
- * Manages the WebGL timer queries of GPU timers. Each render and compute call measures its
- * elapsed time with a `TIME_ELAPSED` query, a timer sums the elapsed time of its calls.
- *
- * Only one query can be active at a time, so a call nested in another one is measured by the outer
- * query and a timer that begins inside a call can't be measured.
+ * Manages the WebGL timer queries of GPU timers. While timers are active, a `TIME_ELAPSED` query
+ * measures the render and compute calls. The query restarts when a timer begins or ends, so each
+ * query adds its elapsed time to the timers that were active during it.
  *
  * @augments TimestampQueryPool
  */
@@ -15,21 +13,14 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 	 * Creates a new WebGL timestamp query pool.
 	 *
 	 * @param {WebGL2RenderingContext} gl - The WebGL context.
-	 * @param {string} type - The type identifier for this query pool.
+	 * @param {EXTDisjointTimerQueryWebGL2} ext - The `EXT_disjoint_timer_query_webgl2` extension.
 	 */
-	constructor( gl, type ) {
+	constructor( gl, ext ) {
 
 		super();
 
 		this.gl = gl;
-		this.type = type;
-
-		/**
-		 * A reference to the `EXT_disjoint_timer_query_webgl2` extension.
-		 *
-		 * @type {EXTDisjointTimerQueryWebGL2}
-		 */
-		this.ext = gl.getExtension( 'EXT_disjoint_timer_query_webgl2' );
+		this.ext = ext;
 
 		/**
 		 * The active query, `null` if there is none.
@@ -40,7 +31,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 		this.activeQuery = null;
 
 		/**
-		 * The ended queries that wait for their result.
+		 * The ended queries waiting for their results.
 		 *
 		 * @type {Array<Object>}
 		 */
@@ -49,64 +40,45 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 	}
 
 	/**
-	 * Starts a GPU timer. A timer that begins inside a measured call can't be measured.
+	 * Starts a GPU timer.
 	 *
 	 * @returns {Object} The timer.
 	 */
 	beginTimer() {
 
+		this._endQuery();
+
 		const timer = super.beginTimer();
 
-		if ( this.activeQuery !== null ) timer.lost = true;
+		this._beginQuery();
 
 		return timer;
 
 	}
 
 	/**
-	 * Begins a query for the active timers.
+	 * Ends the given GPU timer.
 	 *
-	 * @returns {?Object} The query, or `null` without active timers or inside another query.
+	 * @param {Object} timer - The timer returned by {@link WebGLTimestampQueryPool#beginTimer}.
+	 * @returns {Promise<Object>} A Promise that resolves with the timer once all its queries are read back.
 	 */
-	beginQuery() {
+	endTimer( timer ) {
 
-		if ( this.isDisposed || this.activeQuery !== null ) return null;
+		this._endQuery();
 
-		const timers = this._retainTimers();
+		const promise = super.endTimer( timer );
 
-		if ( timers === null ) return null;
+		this._beginQuery();
 
-		const query = { query: this.gl.createQuery(), timers };
-
-		this.gl.beginQuery( this.ext.TIME_ELAPSED_EXT, query.query );
-
-		this.activeQuery = query;
-
-		return query;
+		return promise;
 
 	}
 
 	/**
-	 * Ends the given query.
-	 *
-	 * @param {?Object} query - The query returned by {@link WebGLTimestampQueryPool#beginQuery}.
-	 */
-	endQuery( query ) {
-
-		if ( query === null || query !== this.activeQuery ) return;
-
-		this.gl.endQuery( this.ext.TIME_ELAPSED_EXT );
-
-		this.activeQuery = null;
-		this.queries.push( query );
-
-	}
-
-	/**
-	 * Returns the GPU time of the given timers, the sum of the elapsed time of their calls.
+	 * Returns the GPU time of the given timers, the sum of their elapsed times.
 	 *
 	 * @param {Array<Object>} timers - The timers, ended and resolved.
-	 * @returns {?number} The GPU time in milliseconds, or `null` if queries couldn't be measured.
+	 * @returns {?number} The GPU time in milliseconds, or `null` if a query was disjoint.
 	 */
 	getDuration( timers ) {
 
@@ -125,8 +97,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 	}
 
 	/**
-	 * Reads back the ended queries whose results are available. The results of all ended
-	 * queries are lost if the GPU timer was disjoint.
+	 * Reads back the ended queries whose results are available.
 	 */
 	resolveQueries() {
 
@@ -158,11 +129,50 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 	}
 
 	/**
-	 * Releases all resources held by this query pool.
+	 * Starts a query for the active timers.
+	 *
+	 * @private
+	 */
+	_beginQuery() {
+
+		if ( this.isDisposed ) return;
+
+		const timers = this._retainTimers();
+
+		if ( timers === null ) return;
+
+		const query = this.gl.createQuery();
+
+		this.gl.beginQuery( this.ext.TIME_ELAPSED_EXT, query );
+
+		this.activeQuery = { query, timers };
+
+	}
+
+	/**
+	 * Ends the active query.
+	 *
+	 * @private
+	 */
+	_endQuery() {
+
+		if ( this.activeQuery === null ) return;
+
+		this.gl.endQuery( this.ext.TIME_ELAPSED_EXT );
+
+		this.queries.push( this.activeQuery );
+		this.activeQuery = null;
+
+	}
+
+	/**
+	 * Dispose of the query pool.
 	 */
 	dispose() {
 
 		if ( this.isDisposed ) return;
+
+		this._endQuery();
 
 		this.isDisposed = true;
 

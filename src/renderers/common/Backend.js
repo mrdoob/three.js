@@ -601,16 +601,20 @@ class Backend {
 	 * Starts a GPU timer measurement. While a timer is active, the render and compute calls
 	 * allocate timestamp queries.
 	 *
-	 * @return {?Array<Object>} The render and compute pool timers, or `null` without timestamp queries.
+	 * @return {?Array<Object>} The timers of the render and compute pools, or `null` without timestamp queries.
 	 */
 	beginTimer() {
 
 		if ( this.hasTimestamp === false ) return null;
 
-		return [
-			this.getTimestampQueryPool( TimestampQuery.RENDER ).beginTimer(),
-			this.getTimestampQueryPool( TimestampQuery.COMPUTE ).beginTimer()
-		];
+		const renderPool = this.getTimestampQueryPool( TimestampQuery.RENDER );
+		const computePool = this.getTimestampQueryPool( TimestampQuery.COMPUTE );
+
+		const timers = [ renderPool.beginTimer() ];
+
+		if ( computePool !== renderPool ) timers.push( computePool.beginTimer() );
+
+		return timers;
 
 	}
 
@@ -626,12 +630,9 @@ class Backend {
 
 		if ( timers === null ) return null;
 
-		const renderPool = this.timestampQueryPool[ TimestampQuery.RENDER ];
-		const computePool = this.timestampQueryPool[ TimestampQuery.COMPUTE ];
+		await Promise.all( timers.map( ( timer ) => timer.pool.endTimer( timer ) ) );
 
-		await Promise.all( [ renderPool.endTimer( timers[ 0 ] ), computePool.endTimer( timers[ 1 ] ) ] );
-
-		return renderPool.getDuration( timers );
+		return timers[ 0 ].pool.getDuration( timers );
 
 	}
 

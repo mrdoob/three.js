@@ -46,7 +46,7 @@ class TimestampQueryPool {
 	 */
 	beginTimer() {
 
-		const timer = { pending: 0, ended: false, lost: false, begin: null, finish: null, elapsed: 0, resolve: null, promise: null };
+		const timer = { pool: this, pending: 0, ended: false, lost: false, begin: null, finish: null, elapsed: 0, resolve: null, promise: null };
 		timer.promise = new Promise( ( resolve ) => timer.resolve = resolve );
 
 		this.timers.add( timer );

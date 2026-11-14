@@ -408,54 +408,16 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Inits a time stamp query for the given render context. While GPU timers are active, the
-	 * call measures its elapsed time.
+	 * Creates a timestamp query pool. WebGL allows one active `TIME_ELAPSED` query, so the render
+	 * and compute types share the same pool.
 	 *
-	 * @param {string} type - The type of the timestamp query.
-	 * @param {RenderContext|ComputeNode|Array<ComputeNode>} renderContext - The render context or compute group.
-	 */
-	initTimestampQuery( type, renderContext ) {
-
-		const timestampQueryPool = this.timestampQueryPool[ type ];
-
-		this.get( renderContext ).timestampQuery = timestampQueryPool !== null ? timestampQueryPool.beginQuery() : null;
-
-	}
-
-	// timestamp utils
-
-	/**
-	 * Ends the time stamp query of the given render context.
-	 *
-	 * @param {string} type - The type of the timestamp query.
-	 * @param {RenderContext|ComputeNode|Array<ComputeNode>} renderContext - The render context or compute group.
-	 */
-	prepareTimestampBuffer( type, renderContext ) {
-
-		const timestampQueryPool = this.timestampQueryPool[ type ];
-
-		if ( timestampQueryPool === null ) return;
-
-		const contextData = this.get( renderContext );
-
-		timestampQueryPool.endQuery( contextData.timestampQuery );
-
-		contextData.timestampQuery = null;
-
-	}
-
-	/**
-	 * Creates a timestamp query pool of the given type.
-	 *
-	 * @param {string} type - The type of the timestamp query (e.g. 'render', 'compute').
 	 * @return {WebGLTimestampQueryPool} The timestamp query pool.
 	 */
-	createTimestampQueryPool( type ) {
+	createTimestampQueryPool() {
 
-		return new WebGLTimestampQueryPool( this.gl, type );
+		return this.timestampQueryPool[ TimestampQuery.RENDER ] || this.timestampQueryPool[ TimestampQuery.COMPUTE ] || new WebGLTimestampQueryPool( this.gl, this.disjoint );
 
 	}
-
 
 	/**
 	 * Returns the backend's rendering context.
@@ -506,8 +468,6 @@ class WebGLBackend extends Backend {
 		state.setScissorTest( renderContext.scissor );
 
 		//
-
-		this.initTimestampQuery( TimestampQuery.RENDER, renderContext );
 
 		renderContextData.previousContext = this._currentContext;
 		this._currentContext = renderContext;
@@ -621,8 +581,6 @@ class WebGLBackend extends Backend {
 			state.setScissorTest( previousContext.scissor );
 
 		}
-
-		this.prepareTimestampBuffer( TimestampQuery.RENDER, renderContext );
 
 	}
 
@@ -907,14 +865,13 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
 	 */
-	beginCompute( computeGroup ) {
+	beginCompute( /*computeGroup*/ ) {
 
 		const { state, gl } = this;
 
 		//
 
 		state.bindFramebuffer( gl.FRAMEBUFFER, null );
-		this.initTimestampQuery( TimestampQuery.COMPUTE, computeGroup );
 
 	}
 
@@ -1040,15 +997,13 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
 	 */
-	finishCompute( computeGroup ) {
+	finishCompute( /*computeGroup*/ ) {
 
 		const { state, gl } = this;
 
 		this.discard = false;
 
 		state.disable( gl.RASTERIZER_DISCARD );
-
-		this.prepareTimestampBuffer( TimestampQuery.COMPUTE, computeGroup );
 
 		if ( this._currentContext ) {
 
