@@ -16,6 +16,7 @@
 	"physics_rapier_instancing": [ "community" ],
 	"physics_rapier_joints": [ "community" ],
 	"physics_rapier_vehicle_controller": [ "community" ],
+  "webgl_animation_foot_ik": [ "community", "animation", "ik", "three-mesh-bvh" ],
 	"webgl_batch_lod_bvh": [ "community", "three.ez" ],
 	"webgl_decals": [ "normals" ],
 	"webgl_depth_texture": [ "renderTarget" ],
