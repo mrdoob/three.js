@@ -224,6 +224,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			envMapPMREM: HAS_PMREM,
 			envMapMaxLod: HAS_PMREM ? envMapMipmaps.length - 1 : null,
 			envMapSize: HAS_PMREM ? envMapMipmaps[ 0 ].width : null,
+			envMapDiffuseEnabled: material.envMapDiffuseEnabled !== false,
 			aoMap: HAS_AOMAP,
 			lightMap: HAS_LIGHTMAP,
 			bumpMap: HAS_BUMPMAP,
@@ -554,6 +555,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			_programLayers.enable( 24 );
 		if ( parameters.diffuseRoughness )
 			_programLayers.enable( 25 );
+		if ( parameters.envMapDiffuseEnabled )
+			_programLayers.enable( 26 );
 		if ( parameters.batchingColor )
 			_programLayers.enable( 20 );
 		if ( parameters.gradientMap )
