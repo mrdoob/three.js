@@ -4,6 +4,10 @@ import { normalView } from '../accessors/Normal.js';
 import { positionView } from '../accessors/Position.js';
 import { faceDirection } from './FrontFacingNode.js';
 import { Fn, nodeProxy, float, vec2 } from '../tsl/TSLBase.js';
+import { mix, smoothstep } from '../math/MathNode.js';
+
+// determinant below which the bump fades out, as the normal nears the surface plane
+const BUMP_DEGENERATE_EPSILON = 1e-3;
 
 // Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
 // https://mmikk.github.io/papers3d/mm_sfgrad_bump.pdf
@@ -40,7 +44,9 @@ const perturbNormalArb = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const vGrad = fDet.sign().mul( dHdxy.x.mul( R1 ).add( dHdxy.y.mul( R2 ) ) );
 
-	return fDet.abs().mul( surf_norm ).sub( vGrad ).normalize();
+	// a normal lying in the surface plane, such as on terrain skirts, has no valid perturbation
+	const fade = smoothstep( 0, BUMP_DEGENERATE_EPSILON, fDet.abs() );
+	return mix( surf_norm, fDet.abs().mul( surf_norm ).sub( vGrad ), fade ).normalize();
 
 } );
 
