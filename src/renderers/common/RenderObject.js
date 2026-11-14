@@ -928,7 +928,9 @@ class RenderObject {
 
 		}
 
-		cacheKey += this.context.stateKey + ',';
+		cacheKey += this.context.buildKey + ',';
+
+		cacheKey += ( material.alphaToCoverage === true && renderer.currentSamples > 0 ) ? '1,' : '0,';
 
 		cacheKey += object.receiveShadow + ',';
 
