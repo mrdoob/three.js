@@ -3,7 +3,7 @@ let _color4 = null;
 
 import Color4 from './Color4.js';
 import { Vector2 } from '../../math/Vector2.js';
-import { createCanvasElement, warn, warnOnce } from '../../utils.js';
+import { createCanvasElement, warnOnce } from '../../utils.js';
 import { REVISION, TimestampQuery } from '../../constants.js';
 
 /**
@@ -67,53 +67,11 @@ class Backend {
 			[ TimestampQuery.COMPUTE ]: null
 		};
 
-		/**
-		 * Whether to track timestamps with a Timestamp Query API or not.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 * @deprecated since r188. Use {@link GPUTimer} instead.
-		 */
-		this.trackTimestamp = ( parameters.trackTimestamp === true );
+		if ( parameters.trackTimestamp === true ) {
 
-		if ( this.trackTimestamp === true ) {
-
-			warnOnce( 'WebGPURenderer: "trackTimestamp" has been deprecated. Use "GPUTimer" instead.' ); // @deprecated r188
+			warnOnce( 'WebGPURenderer: "trackTimestamp" has been removed. Use "GPUTimer" instead.' ); // @deprecated r188
 
 		}
-
-		/**
-		 * The timers of the current frame while `trackTimestamp` is enabled.
-		 *
-		 * @private
-		 * @deprecated since r188.
-		 * @type {{render: ?Object, compute: ?Object}}
-		 */
-		this._frameTimers = {
-			[ TimestampQuery.RENDER ]: null,
-			[ TimestampQuery.COMPUTE ]: null
-		};
-
-		/**
-		 * The GPU time of each render and compute call by its unique identifier while `trackTimestamp` is enabled.
-		 *
-		 * @private
-		 * @deprecated since r188.
-		 * @type {Map<string, number>}
-		 */
-		this._timestamps = new Map();
-
-		/**
-		 * The pending call timers of each type while `trackTimestamp` is enabled.
-		 *
-		 * @private
-		 * @deprecated since r188.
-		 * @type {{render: Set<Promise>, compute: Set<Promise>}}
-		 */
-		this._pendingTimestamps = {
-			[ TimestampQuery.RENDER ]: new Set(),
-			[ TimestampQuery.COMPUTE ]: new Set()
-		};
 
 	}
 
@@ -682,8 +640,6 @@ class Backend {
 	 */
 	resolveTimestamps() {
 
-		this._updateFrameTimers(); // @deprecated r188
-
 		for ( const type in this.timestampQueryPool ) {
 
 			const timestampQueryPool = this.timestampQueryPool[ type ];
@@ -691,155 +647,6 @@ class Backend {
 			if ( timestampQueryPool !== null ) timestampQueryPool.resolveQueries();
 
 		}
-
-	}
-
-	/**
-	 * Measures each frame while `trackTimestamp` is enabled and writes the GPU time
-	 * to `renderer.info.render.timestamp` and `renderer.info.compute.timestamp`.
-	 *
-	 * @private
-	 * @deprecated since r188.
-	 */
-	_updateFrameTimers() {
-
-		for ( const type in this._frameTimers ) {
-
-			const timer = this._frameTimers[ type ];
-
-			if ( timer !== null ) {
-
-				const timestampQueryPool = this.timestampQueryPool[ type ];
-
-				timestampQueryPool.endTimer( timer ).then( () => {
-
-					const duration = timestampQueryPool.getDuration( [ timer ] );
-
-					if ( duration !== null ) this.renderer.info[ type ].timestamp = duration;
-
-				} );
-
-				this._frameTimers[ type ] = null;
-
-			}
-
-			if ( this.trackTimestamp === true && this.hasTimestamp === true ) {
-
-				this._frameTimers[ type ] = this.getTimestampQueryPool( type ).beginTimer();
-
-			}
-
-		}
-
-	}
-
-	/**
-	 * Starts a timer measuring only the next query of the given type while `trackTimestamp` is enabled.
-	 *
-	 * @private
-	 * @deprecated since r188.
-	 * @param {string} type - The type of the timestamp query.
-	 * @return {?Object} The timer, or `null` if `trackTimestamp` is disabled.
-	 */
-	_beginTimestampUID( type ) {
-
-		if ( this.trackTimestamp !== true || this.hasTimestamp !== true ) return null;
-
-		return this.getTimestampQueryPool( type ).beginTimer();
-
-	}
-
-	/**
-	 * Ends the timer returned by {@link Backend#_beginTimestampUID} and stores its GPU time
-	 * for the given unique identifier once it is read back.
-	 *
-	 * @private
-	 * @deprecated since r188.
-	 * @param {string} type - The type of the timestamp query.
-	 * @param {?Object} timer - The timer.
-	 * @param {string} uid - The unique identifier of the render or compute call.
-	 */
-	_endTimestampUID( type, timer, uid ) {
-
-		if ( timer === null ) return;
-
-		const timestampQueryPool = this.timestampQueryPool[ type ];
-		const pending = this._pendingTimestamps[ type ];
-
-		const promise = timestampQueryPool.endTimer( timer ).then( () => {
-
-			pending.delete( promise );
-
-			const duration = timestampQueryPool.getDuration( [ timer ] );
-
-			if ( duration === null ) return;
-
-			this._timestamps.set( uid, duration );
-
-			if ( this._timestamps.size > 4096 ) this._timestamps.delete( this._timestamps.keys().next().value );
-
-		} );
-
-		pending.add( promise );
-
-	}
-
-	/**
-	 * Returns `true` if a timestamp for the given uid is available.
-	 *
-	 * @deprecated since r188. Use {@link GPUTimer} instead.
-	 * @param {string} uid - The unique identifier.
-	 * @return {boolean} Whether the timestamp is available or not.
-	 */
-	hasTimestampQuery( uid ) {
-
-		return this._timestamps.has( uid );
-
-	}
-
-	/**
-	 * Returns the timestamp for the given uid.
-	 *
-	 * @deprecated since r188. Use {@link GPUTimer} instead.
-	 * @param {string} uid - The unique identifier.
-	 * @return {number} The timestamp.
-	 */
-	getTimestamp( uid ) {
-
-		const timestamp = this._timestamps.get( uid );
-
-		if ( timestamp === undefined ) {
-
-			warn( `Backend: No timestamp available for uid ${ uid }.` );
-
-			return 0;
-
-		}
-
-		return timestamp;
-
-	}
-
-	/**
-	 * Waits until the calls of the given type issued so far are read back.
-	 *
-	 * @async
-	 * @deprecated since r188. Use {@link GPUTimer} instead.
-	 * @param {string} [type='render'] - The type of the time stamp.
-	 * @return {Promise<number>} A Promise that resolves with the GPU time of the last measured frame.
-	 */
-	async resolveTimestampsAsync( type = 'render' ) {
-
-		if ( this.trackTimestamp !== true ) {
-
-			warnOnce( 'WebGPURenderer: Timestamp tracking is disabled.' );
-			return;
-
-		}
-
-		await Promise.all( this._pendingTimestamps[ type ] );
-
-		return this.renderer.info[ type ].timestamp;
 
 	}
 

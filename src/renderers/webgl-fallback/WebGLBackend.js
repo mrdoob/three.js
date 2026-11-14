@@ -416,14 +416,9 @@ class WebGLBackend extends Backend {
 	 */
 	initTimestampQuery( type, renderContext ) {
 
-		const contextData = this.get( renderContext );
-		const uidTimer = this._beginTimestampUID( type ); // @deprecated r188
-
 		const timestampQueryPool = this.timestampQueryPool[ type ];
 
-		contextData.timestampQuery = timestampQueryPool !== null ? timestampQueryPool.beginQuery() : null;
-
-		this._endTimestampUID( type, uidTimer, contextData.timestampUID ); // @deprecated r188
+		this.get( renderContext ).timestampQuery = timestampQueryPool !== null ? timestampQueryPool.beginQuery() : null;
 
 	}
 

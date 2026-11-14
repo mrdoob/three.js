@@ -65,7 +65,6 @@ class WebGPUBackend extends Backend {
 	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
 	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
 	 * @property {boolean} [forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
-	 * @property {boolean} [trackTimestamp=false] - Whether to track timestamps with a Timestamp Query API or not. Deprecated since r188, use {@link GPUTimer} instead.
 	 * @property {string} [powerPreference=undefined] - The power preference.
 	 * @property {Object} [requiredLimits=undefined] - Specifies the limits that are required by the device request. The request will fail if the adapter cannot provide these limits.
 	 * @property {GPUDevice} [device=undefined] - If there is an existing GPU device on app level, it can be passed to the renderer as a parameter.
@@ -293,8 +292,6 @@ class WebGPUBackend extends Backend {
 		};
 
 		this.device = device;
-
-		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
 
 		this.updateSize();
 
@@ -2629,13 +2626,8 @@ class WebGPUBackend extends Backend {
 	 */
 	initTimestampQuery( type, renderContext, descriptor ) {
 
-		const contextData = this.get( renderContext );
-		const uidTimer = this._beginTimestampUID( type ); // @deprecated r188
-
 		const timestampQueryPool = this.timestampQueryPool[ type ];
 		const baseOffset = timestampQueryPool !== null ? timestampQueryPool.allocateQueries() : null;
-
-		this._endTimestampUID( type, uidTimer, contextData.timestampUID ); // @deprecated r188
 
 		if ( baseOffset === null ) {
 
@@ -2643,6 +2635,8 @@ class WebGPUBackend extends Backend {
 			return;
 
 		}
+
+		const contextData = this.get( renderContext );
 
 		if ( contextData.timestampWrites === undefined ) {
 
