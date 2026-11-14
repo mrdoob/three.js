@@ -21,14 +21,12 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	 * Creates a new WebGPU timestamp query pool.
 	 *
 	 * @param {GPUDevice} device - The WebGPU device to create queries on.
-	 * @param {string} type - The type identifier for this query pool.
 	 * @param {number} [maxQueries=2048] - Maximum number of queries this pool can hold.
 	 */
-	constructor( device, type, maxQueries = 2048 ) {
+	constructor( device, maxQueries = 2048 ) {
 
 		super( maxQueries );
 		this.device = device;
-		this.type = type;
 
 		/**
 		 * How many queries allocated so far.
@@ -53,7 +51,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 		 */
 		this.pendingResolve = null;
 
-		_querySetDescriptor.label = `queryset_global_timestamp_${type}`;
+		_querySetDescriptor.label = 'queryset_gpu_timer';
 		_querySetDescriptor.type = 'timestamp';
 		_querySetDescriptor.count = this.maxQueries;
 
@@ -63,7 +61,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 		const bufferSize = this.maxQueries * 8;
 
-		_bufferDescriptor.label = `buffer_timestamp_resolve_${type}`;
+		_bufferDescriptor.label = 'buffer_gpu_timer_resolve';
 		_bufferDescriptor.size = bufferSize;
 		_bufferDescriptor.usage = GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC;
 
@@ -71,7 +69,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 		_bufferDescriptor.reset();
 
-		_bufferDescriptor.label = `buffer_timestamp_result_${type}`;
+		_bufferDescriptor.label = 'buffer_gpu_timer_result';
 		_bufferDescriptor.size = bufferSize;
 		_bufferDescriptor.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
 
@@ -117,28 +115,16 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	}
 
 	/**
-	 * Returns the GPU time of the given timers, from the earliest begin to the latest end of their passes.
+	 * Returns the GPU time of the given timer, from the earliest begin to the latest end of its passes.
 	 *
-	 * @param {Array<Object>} timers - The timers, ended and resolved.
+	 * @param {Object} timer - The timer, ended and resolved.
 	 * @returns {?number} The GPU time in milliseconds, or `null` if queries couldn't be read back.
 	 */
-	getDuration( timers ) {
+	getDuration( timer ) {
 
-		let begin = null;
-		let finish = null;
+		if ( timer.lost ) return null;
 
-		for ( const timer of timers ) {
-
-			if ( timer.lost ) return null;
-
-			if ( timer.begin === null ) continue;
-
-			if ( begin === null || timer.begin < begin ) begin = timer.begin;
-			if ( finish === null || timer.finish > finish ) finish = timer.finish;
-
-		}
-
-		return begin === null ? 0 : Number( finish - begin ) / 1e6;
+		return timer.begin === null ? 0 : Number( timer.finish - timer.begin ) / 1e6;
 
 	}
 

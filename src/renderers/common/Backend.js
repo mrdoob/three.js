@@ -4,7 +4,7 @@ let _color4 = null;
 import Color4 from './Color4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { createCanvasElement, warnOnce } from '../../utils.js';
-import { REVISION, TimestampQuery } from '../../constants.js';
+import { REVISION } from '../../constants.js';
 
 /**
  * Most of the rendering related logic is implemented in the
@@ -58,14 +58,12 @@ class Backend {
 		this.domElement = null;
 
 		/**
-		 * A reference to the timestamp query pool.
-   		 *
-   		 * @type {{render: ?TimestampQueryPool, compute: ?TimestampQueryPool}}
+		 * The timestamp query pool of the GPU timers, created on first use.
+		 *
+		 * @type {?TimestampQueryPool}
+		 * @default null
 		 */
-		this.timestampQueryPool = {
-			[ TimestampQuery.RENDER ]: null,
-			[ TimestampQuery.COMPUTE ]: null
-		};
+		this.timestampQueryPool = null;
 
 		if ( parameters.trackTimestamp === true ) {
 
@@ -571,50 +569,26 @@ class Backend {
 	}
 
 	/**
-	 * Creates a timestamp query pool of the given type.
+	 * Creates the timestamp query pool of the GPU timers.
 	 *
 	 * @abstract
-	 * @param {string} type - The type of the timestamp query (e.g. 'render', 'compute').
 	 * @return {TimestampQueryPool} The timestamp query pool.
 	 */
-	createTimestampQueryPool( /* type */ ) {}
-
-	/**
-	 * Returns the timestamp query pool of the given type, created on first use.
-	 *
-	 * @param {string} type - The type of the timestamp query (e.g. 'render', 'compute').
-	 * @return {TimestampQueryPool} The timestamp query pool.
-	 */
-	getTimestampQueryPool( type ) {
-
-		if ( this.timestampQueryPool[ type ] === null ) {
-
-			this.timestampQueryPool[ type ] = this.createTimestampQueryPool( type );
-
-		}
-
-		return this.timestampQueryPool[ type ];
-
-	}
+	createTimestampQueryPool() {}
 
 	/**
 	 * Starts a GPU timer measurement. While a timer is active, the render and compute calls
 	 * allocate timestamp queries.
 	 *
-	 * @return {?Array<Object>} The timers of the render and compute pools, or `null` without timestamp queries.
+	 * @return {?Object} The timer, or `null` without timestamp queries.
 	 */
 	beginTimer() {
 
 		if ( this.hasTimestamp === false ) return null;
 
-		const renderPool = this.getTimestampQueryPool( TimestampQuery.RENDER );
-		const computePool = this.getTimestampQueryPool( TimestampQuery.COMPUTE );
+		if ( this.timestampQueryPool === null ) this.timestampQueryPool = this.createTimestampQueryPool();
 
-		const timers = [ renderPool.beginTimer() ];
-
-		if ( computePool !== renderPool ) timers.push( computePool.beginTimer() );
-
-		return timers;
+		return this.timestampQueryPool.beginTimer();
 
 	}
 
@@ -623,16 +597,16 @@ class Backend {
 	 * are read back, or `null` when the backend doesn't support timing.
 	 *
 	 * @async
-	 * @param {?Array<Object>} timers - The value returned by {@link Backend#beginTimer}.
+	 * @param {?Object} timer - The value returned by {@link Backend#beginTimer}.
 	 * @return {Promise<?number>} The GPU time in milliseconds.
 	 */
-	async endTimer( timers ) {
+	async endTimer( timer ) {
 
-		if ( timers === null ) return null;
+		if ( timer === null ) return null;
 
-		await Promise.all( timers.map( ( timer ) => timer.pool.endTimer( timer ) ) );
+		await this.timestampQueryPool.endTimer( timer );
 
-		return timers[ 0 ].pool.getDuration( timers );
+		return this.timestampQueryPool.getDuration( timer );
 
 	}
 
@@ -641,13 +615,7 @@ class Backend {
 	 */
 	resolveTimestamps() {
 
-		for ( const type in this.timestampQueryPool ) {
-
-			const timestampQueryPool = this.timestampQueryPool[ type ];
-
-			if ( timestampQueryPool !== null ) timestampQueryPool.resolveQueries();
-
-		}
+		if ( this.timestampQueryPool !== null ) this.timestampQueryPool.resolveQueries();
 
 	}
 
@@ -887,15 +855,7 @@ class Backend {
 	 */
 	async dispose() {
 
-		for ( const queryPool of Object.values( this.timestampQueryPool ) ) {
-
-			if ( queryPool !== null ) {
-
-				await queryPool.dispose();
-
-			}
-
-		}
+		if ( this.timestampQueryPool !== null ) await this.timestampQueryPool.dispose();
 
 	}
 

@@ -13,7 +13,7 @@ import WebGPUCapabilities from './utils/WebGPUCapabilities.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
-import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compatibility, CustomBlending } from '../../constants.js';
+import { WebGPUCoordinateSystem, REVISION, HalfFloatType, Compatibility, CustomBlending } from '../../constants.js';
 import { Color } from '../../math/Color.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { error, warnOnce } from '../../utils.js';
@@ -937,7 +937,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		this.initTimestampQuery( TimestampQuery.RENDER, renderContext, descriptor );
+		this.initTimestampQuery( renderContext, descriptor );
 
 		descriptor.occlusionQuerySet = occlusionQuerySet;
 
@@ -1884,7 +1884,7 @@ class WebGPUBackend extends Backend {
 		_computePassDescriptor.label = label;
 		_commandEncoderDescriptor.label = label;
 
-		this.initTimestampQuery( TimestampQuery.COMPUTE, computeGroup, _computePassDescriptor );
+		this.initTimestampQuery( computeGroup, _computePassDescriptor );
 
 		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( _commandEncoderDescriptor );
 		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( _computePassDescriptor );
@@ -2620,13 +2620,12 @@ class WebGPUBackend extends Backend {
 	 * Inits a time stamp query for the given render context. While GPU timers are active, the
 	 * pass writes its begin and end timestamps to the timestamp query pool.
 	 *
-	 * @param {string} type - The type of the timestamp query (e.g. 'render', 'compute').
 	 * @param {RenderContext|ComputeNode|Array<ComputeNode>} renderContext - The render context or compute group.
 	 * @param {Object} descriptor - The query descriptor.
 	 */
-	initTimestampQuery( type, renderContext, descriptor ) {
+	initTimestampQuery( renderContext, descriptor ) {
 
-		const timestampQueryPool = this.timestampQueryPool[ type ];
+		const timestampQueryPool = this.timestampQueryPool;
 		const baseOffset = timestampQueryPool !== null ? timestampQueryPool.allocateQueries() : null;
 
 		if ( baseOffset === null ) {
@@ -2671,14 +2670,13 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Creates a timestamp query pool of the given type.
+	 * Creates the timestamp query pool of the GPU timers.
 	 *
-	 * @param {string} type - The type of the timestamp query (e.g. 'render', 'compute').
 	 * @return {WebGPUTimestampQueryPool} The timestamp query pool.
 	 */
-	createTimestampQueryPool( type ) {
+	createTimestampQueryPool() {
 
-		return new WebGPUTimestampQueryPool( this.device, type, 2048 );
+		return new WebGPUTimestampQueryPool( this.device, 2048 );
 
 	}
 

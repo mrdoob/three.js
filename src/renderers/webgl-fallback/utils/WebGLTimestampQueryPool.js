@@ -75,24 +75,14 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 	}
 
 	/**
-	 * Returns the GPU time of the given timers, the sum of their elapsed times.
+	 * Returns the GPU time of the given timer, the sum of its elapsed times.
 	 *
-	 * @param {Array<Object>} timers - The timers, ended and resolved.
+	 * @param {Object} timer - The timer, ended and resolved.
 	 * @returns {?number} The GPU time in milliseconds, or `null` if a query was disjoint.
 	 */
-	getDuration( timers ) {
+	getDuration( timer ) {
 
-		let elapsed = 0;
-
-		for ( const timer of timers ) {
-
-			if ( timer.lost ) return null;
-
-			elapsed += timer.elapsed;
-
-		}
-
-		return elapsed;
+		return timer.lost ? null : timer.elapsed;
 
 	}
 
@@ -159,6 +149,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 		if ( this.activeQuery === null ) return;
 
 		this.gl.endQuery( this.ext.TIME_ELAPSED_EXT );
+		this.gl.flush();
 
 		this.queries.push( this.activeQuery );
 		this.activeQuery = null;

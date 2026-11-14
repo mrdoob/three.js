@@ -14,7 +14,7 @@ import { GLFeatureName } from './utils/WebGLConstants.js';
 import { WebGLBufferRenderer } from './WebGLBufferRenderer.js';
 
 import { isTypedArray, warnOnce, warn, error } from '../../utils.js';
-import { WebGLCoordinateSystem, TimestampQuery, Compatibility } from '../../constants.js';
+import { WebGLCoordinateSystem, Compatibility } from '../../constants.js';
 import WebGLTimestampQueryPool from './utils/WebGLTimestampQueryPool.js';
 
 const _invalidationArray = [];
@@ -408,14 +408,13 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Creates a timestamp query pool. WebGL allows one active `TIME_ELAPSED` query, so the render
-	 * and compute types share the same pool.
+	 * Creates the timestamp query pool of the GPU timers.
 	 *
 	 * @return {WebGLTimestampQueryPool} The timestamp query pool.
 	 */
 	createTimestampQueryPool() {
 
-		return this.timestampQueryPool[ TimestampQuery.RENDER ] || this.timestampQueryPool[ TimestampQuery.COMPUTE ] || new WebGLTimestampQueryPool( this.gl, this.disjoint );
+		return new WebGLTimestampQueryPool( this.gl, this.disjoint );
 
 	}
 

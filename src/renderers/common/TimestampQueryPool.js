@@ -46,7 +46,7 @@ class TimestampQueryPool {
 	 */
 	beginTimer() {
 
-		const timer = { pool: this, pending: 0, ended: false, lost: false, begin: null, finish: null, elapsed: 0, resolve: null, promise: null };
+		const timer = { pending: 0, ended: false, lost: false, begin: null, finish: null, elapsed: 0, resolve: null, promise: null };
 		timer.promise = new Promise( ( resolve ) => timer.resolve = resolve );
 
 		this.timers.add( timer );
@@ -74,13 +74,13 @@ class TimestampQueryPool {
 	}
 
 	/**
-	 * Returns the GPU time of the given timers in milliseconds.
+	 * Returns the GPU time of the given timer in milliseconds.
 	 *
 	 * @abstract
-	 * @param {Array<Object>} timers - The timers, ended and resolved.
+	 * @param {Object} timer - The timer, ended and resolved.
 	 * @returns {?number} The GPU time, or `null` if queries couldn't be read back.
 	 */
-	getDuration( /* timers */ ) {}
+	getDuration( /* timer */ ) {}
 
 	/**
 	 * Returns the active timers for a new query, `null` without active timers.
