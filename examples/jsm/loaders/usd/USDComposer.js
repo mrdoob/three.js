@@ -1552,12 +1552,12 @@ class USDComposer {
 
 			case 'SphereLight': {
 
-				const coneAngle = this._parseNumber( attrs[ 'shaping:cone:angle' ], 0 );
+				const coneAngle = this._parseNumber( attrs[ 'inputs:shaping:cone:angle' ], 0 );
 
 				if ( coneAngle > 0 ) {
 
 					const angle = coneAngle * Math.PI / 180;
-					const softness = this._parseNumber( attrs[ 'shaping:cone:softness' ], 0 );
+					const softness = this._parseNumber( attrs[ 'inputs:shaping:cone:softness' ], 0 );
 					light = new SpotLight( color, intensity, 0, angle, softness );
 					light.target.position.set( 0, 0, - 1 );
 					light.add( light.target );
@@ -1591,6 +1591,8 @@ class USDComposer {
 			}
 
 		}
+
+		light.position.set( 0, 0, 0 );
 
 		return light;
 
