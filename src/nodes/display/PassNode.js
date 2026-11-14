@@ -826,7 +826,7 @@ class PassNode extends Node {
 
 		// the render target is configured like in setup() and updateBefore(), so the pipelines match the ones of the render
 
-		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
+		this.renderTarget.samples = this.options.samples !== undefined ? this.options.samples : renderer.samples;
 
 		renderer.getDrawingBufferSize( _size );
 		this.setSize( _size.width, _size.height );
@@ -848,8 +848,7 @@ class PassNode extends Node {
 
 	setup( { renderer } ) {
 
-		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
-
+		this.renderTarget.samples = this.options.samples !== undefined ? this.options.samples : renderer.samples;
 		this.renderTarget.texture.type = this.options.type !== undefined ? this.options.type : renderer.getOutputBufferType();
 
 		if ( renderer.reversedDepthBuffer === true && this.renderTarget.depthTexture !== null ) {
