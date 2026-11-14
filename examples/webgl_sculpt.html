@@ -188,7 +188,7 @@
 					strength: sculptor.getStrength(),
 					detail: sculptor.getDetail(),
 					negative: sculptor.getNegative(),
-					mirror: sculptor.mirror,
+					mirrorAxis: sculptor.mirrorAxis,
 					wireframe: false,
 					export: exportGLTF
 				};
@@ -232,9 +232,9 @@
 
 				} );
 
-				gui.add( params, 'mirror' ).onChange( function ( value ) {
+				gui.add( params, 'mirrorAxis', [ 'none', 'x', 'y', 'z' ] ).onChange( function ( value ) {
 
-					sculptor.mirror = value;
+					sculptor.mirrorAxis = value;
 
 				} );
 
