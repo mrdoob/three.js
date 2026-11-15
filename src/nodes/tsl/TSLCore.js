@@ -570,7 +570,7 @@ class ShaderCallNodeInternal extends Node {
 
 			//
 
-			const inputs = getLayoutParameters( layoutInputs );
+			const inputs = builder._getLayoutCallParameters( shaderNode.layout, getLayoutParameters( layoutInputs ) );
 
 			result = functionNode.call( inputs );
 

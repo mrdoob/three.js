@@ -2460,7 +2460,7 @@ class WebGPUBackend extends Backend {
 
 		const sampleCount = utils.getSampleCountRenderContext( renderObject.context );
 		const colorSpace = utils.getCurrentColorSpace( renderObject.context );
-		const colorFormat = utils.getCurrentColorFormat( renderObject.context );
+		const colorFormat = utils.getCurrentColorFormats( renderObject.context ).join();
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderObject.context );
 		const primitiveTopology = utils.getPrimitiveTopology( object, material );
 		const stripIndexFormat = utils.getStripIndexFormat( object, geometry );
@@ -2546,7 +2546,7 @@ class WebGPUBackend extends Backend {
 			material.side, material.alphaToCoverage,
 			frontFaceCW,
 			utils.getSampleCountRenderContext( renderContext ),
-			utils.getCurrentColorSpace( renderContext ), utils.getCurrentColorFormat( renderContext ), utils.getCurrentDepthStencilFormat( renderContext ),
+			utils.getCurrentColorSpace( renderContext ), utils.getCurrentColorFormats( renderContext ).join(), utils.getCurrentDepthStencilFormat( renderContext ),
 			utils.getPrimitiveTopology( object, material ), utils.getStripIndexFormat( object, geometry ),
 			this.attributeUtils.getVertexBufferLayoutCacheKey( renderObject ),
 			renderObject.clippingContextCacheKey

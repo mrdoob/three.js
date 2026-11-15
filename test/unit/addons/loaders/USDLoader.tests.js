@@ -379,6 +379,36 @@ def Xform "Root"
 
 			} );
 
+			QUnit.test( 'applies displayColor and displayOpacity to geometric primitives', ( assert ) => {
+
+				const usda = `#usda 1.0
+
+def Xform "Root"
+{
+	def Cube "Box"
+	{
+		double size = 1
+		color3f[] primvars:displayColor = [(0.25, 0.5, 0.75)]
+		float[] primvars:displayOpacity = [0.5]
+	}
+
+	def Cylinder "Can"
+	{
+		color3f[] primvars:displayColor = [(1, 0, 0)]
+	}
+}`;
+
+				const group = new USDLoader().parse( usda );
+				const box = group.getObjectByName( 'Box' );
+				const can = group.getObjectByName( 'Can' );
+
+				assert.deepEqual( box.material.color.toArray(), [ 0.25, 0.5, 0.75 ], 'A Cube takes its displayColor.' );
+				assert.strictEqual( box.material.opacity, 0.5, 'A Cube takes its displayOpacity.' );
+				assert.ok( box.material.transparent, 'A Cube with displayOpacity below 1 is transparent.' );
+				assert.deepEqual( can.material.color.toArray(), [ 1, 0, 0 ], 'A Cylinder takes its displayColor.' );
+
+			} );
+
 		} );
 
 	} );
