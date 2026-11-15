@@ -3,7 +3,7 @@ import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { texture } from './TextureNode.js';
 import { cubeTexture } from './CubeTextureNode.js';
-import { buffer } from './BufferNode.js';
+import { uniformTypedArray } from './BufferNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 import { uniformArray } from './UniformArrayNode.js';
 import ReferenceElementNode from './ReferenceElementNode.js';
@@ -194,7 +194,7 @@ class ReferenceNode extends Node {
 
 		if ( this.count !== null ) {
 
-			node = buffer( null, uniformType, this.count );
+			node = uniformTypedArray( null, uniformType, this.count );
 
 		} else if ( Array.isArray( this.getValueFromReference() ) ) {
 

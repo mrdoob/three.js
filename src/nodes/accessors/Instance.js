@@ -6,7 +6,7 @@ import { positionLocal, positionPrevious } from './Position.js';
 import { varyingProperty } from '../core/PropertyNode.js';
 import { instancedBufferAttribute, instancedDynamicBufferAttribute } from './BufferAttributeNode.js';
 import ReferenceAttributeNode, { referenceAttribute } from './ReferenceAttributeNode.js';
-import { buffer } from './BufferNode.js';
+import { uniformTypedArray } from './BufferNode.js';
 import { storage } from './StorageBufferNode.js';
 import { instanceIndex } from '../core/IndexNode.js';
 
@@ -44,7 +44,7 @@ function createInstanceMatrixNode( builder, instanceMatrix ) {
 
 		if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
 
-			instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', matrixCount ).element( instanceIndex );
+			instanceMatrixNode = uniformTypedArray( instanceMatrix.array, 'mat4', matrixCount ).element( instanceIndex );
 
 		} else {
 
