@@ -131,7 +131,7 @@ class Camera extends Object3D {
 
 	updateWorldMatrix( updateParents, updateChildren, force = false ) {
 
-		super.updateWorldMatrix( updateParents, updateChildren, force );
+		const updated = super.updateWorldMatrix( updateParents, updateChildren, force );
 
 		// exclude scale from view matrix to be glTF conform
 
@@ -146,6 +146,8 @@ class Camera extends Object3D {
 			this.matrixWorldInverse.compose( _position, _quaternion, _scale.set( 1, 1, 1 ) ).invert();
 
 		}
+
+		return updated;
 
 	}
 
