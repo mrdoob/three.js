@@ -237,9 +237,8 @@
 
 				// denoise
 
-				const temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
+				const temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, sceneNormal, scenePassVelocity, camera, {
 					mode: 'specular',
-					normalDecode,
 					accumulate: false
 				} );
 				temporalReprojectNode.maxFrames.value = 16;
@@ -247,8 +246,7 @@
 
 				const denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
 					depth: scenePassDepth,
-					normal: scenePassNormal,
-					normalDecode,
+					normal: sceneNormal,
 					raw: ssrNode,
 					metalRoughness: sceneMetalRough,
 					mode: 'specular',

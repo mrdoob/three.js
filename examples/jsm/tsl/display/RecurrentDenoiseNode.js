@@ -1,4 +1,4 @@
-import { abs, atan, bool, convertToTexture, cos, cross, Discard, dot, EPSILON, exp, float, Fn, getScreenPosition, getViewPosition, If, int, log, Loop, luminance, mat2, max, mix, nodeObject, NodeUpdateType, normalize, passTexture, PI, property, reflect, sin, smoothstep, sqrt, tan, texture, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4, context, isBackgroundDepth } from 'three/tsl';
+import { abs, atan, bool, convertToTexture, cos, cross, Discard, dot, EPSILON, exp, float, Fn, getScreenPosition, getViewPosition, If, int, log, Loop, luminance, mat2, max, mix, nodeObject, NodeUpdateType, normalize, passTexture, PI, property, reflect, sin, smoothstep, sqrt, tan, texture, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth } from 'three/tsl';
 import { HalfFloatType, MathUtils, Matrix4, NodeMaterial, QuadMesh, RendererUtils, RenderTarget, Node, Vector2 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
@@ -226,8 +226,7 @@ const toTextureNode = ( value ) => {
 /**
  * @typedef {Object} RecurrentDenoiseNodeOptions
  * @property {?Node<float>} [depth=null] - Scene depth buffer for view-space edge stopping.
- * @property {?Node<vec3>} [normal=null] - Encoded view-space normals for geometric edge stopping.
- * @property {Function} [normalDecode] - Decodes a normal sample to a view-space `vec3`. Defaults to RGB decoding. Fixed at construction time.
+ * @property {?Node<vec3>} [normal=null] - A sampleable node that returns view-space normals for geometric edge stopping.
  * @property {?Node<vec4>} [metalRoughness=null] - Roughness/metalness G-buffer for specular edge stopping.
  * @property {?Node<vec4>} [diffuse=null] - Scene base color (albedo) G-buffer for chromatic edge stopping.
  * @property {?Node<vec4>} [raw=null] - Unfiltered input (e.g. raw SSR/SSGI) for secondary sampling and temporal blend.
@@ -266,7 +265,6 @@ class RecurrentDenoiseNode extends Node {
 		const {
 			depth = null,
 			normal = null,
-			normalDecode = ( value ) => unpackRGBToNormal( value.rgb ),
 			metalRoughness = null,
 			diffuse = null,
 			raw = null,
@@ -295,13 +293,6 @@ class RecurrentDenoiseNode extends Node {
 		this.textureNode = inputTexture;
 		this.depthNode = depth !== null ? nodeObject( depth ) : null;
 		this.normalNode = normal !== null ? nodeObject( normal ) : null;
-
-		/**
-		 * Decodes normal samples to view-space normals.
-		 *
-		 * @type {Function}
-		 */
-		this.normalDecode = normalDecode;
 		this.rawNode = toTextureNode( raw );
 		this.roughnessMetalnessNode = metalRoughness !== null ? nodeObject( metalRoughness ) : null;
 		this.diffuseNode = diffuse !== null ? nodeObject( diffuse ) : null;
@@ -440,7 +431,7 @@ class RecurrentDenoiseNode extends Node {
 		const sampleTexture = ( uvCoord ) => texture( this.textureNode, uvCoord ).max( 0 );
 		const sampleRaw = ( uvCoord ) => this.rawNode?.sample( uvCoord )?.max( 0 ) ?? vec3( 0 ).max( 0 );
 		const sampleDepth = ( uvCoord ) => this.depthNode?.sample( uvCoord )?.x ?? float( 0.5 );
-		const sampleNormal = ( uvCoord ) => this.normalDecode( this.normalNode?.sample( uvCoord ) ?? vec3( 0, 0, 1 ) );
+		const sampleNormal = ( uvCoord ) => this.normalNode?.sample( uvCoord )?.normalize() ?? vec3( 0, 0, 1 );
 		const sampleRoughnessMetalness = ( uvCoord ) => this.roughnessMetalnessNode?.sample( uvCoord )?.rg ?? vec2( 0, 1 );
 		const sampleDiffuse = ( uvCoord ) => this.diffuseNode?.sample( uvCoord )?.rgb ?? vec3( 0 );
 

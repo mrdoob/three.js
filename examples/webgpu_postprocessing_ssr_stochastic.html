@@ -294,17 +294,15 @@
 				binaryRefine: params.ssr.binaryRefine
 			} ).toInspector( 'SSR' );
 
-			temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
+			temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, sceneNormal, scenePassVelocity, camera, {
 				mode: 'specular',
-				normalDecode,
 				accumulate: false
 			} );
 			temporalReprojectNode.toInspector( 'Temporal Reproject' );
 
 			denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
 				depth: scenePassDepth,
-				normal: scenePassNormal,
-				normalDecode,
+				normal: sceneNormal,
 				raw: ssrNode,
 				metalRoughness: scenePassMetalRough,
 				mode: 'specular',
