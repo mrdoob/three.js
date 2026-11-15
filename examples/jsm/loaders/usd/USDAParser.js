@@ -1,7 +1,7 @@
 // Pre-compiled regex patterns for performance
 const DEF_MATCH_REGEX = /^def\s+(?:(\w+)\s+)?"?([^"]+)"?$/;
 const VARIANT_STRING_REGEX = /^string\s+(\w+)$/;
-const ATTR_MATCH_REGEX = /^(?:uniform\s+)?(\w+(?:\[\])?)\s+(.+)$/;
+const ATTR_MATCH_REGEX = /^(?:(?:custom|uniform)\s+)*(\w+(?:\[\])?)\s+(.+)$/;
 // Preserve metadata blocks without changing the legacy parseText value shape.
 const VALUE_METADATA = Symbol( 'valueMetadata' );
 
@@ -73,7 +73,7 @@ class USDAParser {
 
 				}
 
-			} else if ( line.includes( ':' ) && ! line.includes( '=' ) ) {
+			} else if ( line.includes( ':' ) && ! line.includes( '=' ) && ! line.endsWith( '(' ) ) {
 
 				// Handle dictionary entries like "0: [(...)...]" for timeSamples
 				const colonIdx = line.indexOf( ':' );

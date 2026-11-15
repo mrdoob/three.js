@@ -379,6 +379,46 @@ def Xform "Root"
 
 			} );
 
+			QUnit.test( 'reads namespaced attributes whose metadata block spans lines', ( assert ) => {
+
+				const usda = `#usda 1.0
+
+def Xform "Root"
+{
+	def Xform "First"
+	{
+		custom double sensor:temperature (
+			customData = {
+				string units = "degrees-celsius"
+			}
+		)
+		custom double sensor:humidity (
+			customData = {
+				string units = "percent"
+			}
+		)
+		custom token sensor:quality (
+			doc = "Quality of the last reading"
+		)
+	}
+
+	def Xform "Second"
+	{
+		double3 xformOp:translate = (1, 2, 3)
+		uniform token[] xformOpOrder = ["xformOp:translate"]
+	}
+}`;
+
+				const { specsByPath } = new USDAParser().parseData( usda );
+
+				assert.ok( specsByPath[ '/Root/Second' ], 'The prim after the attributes keeps its parent.' );
+				assert.notOk( specsByPath[ '/Second' ], 'No prim moves to the root.' );
+				assert.ok( specsByPath[ '/Root/Second.xformOp:translate' ], 'Later attributes stay on their prim.' );
+				assert.ok( specsByPath[ '/Root/First.sensor:temperature' ], 'A custom attribute is named without "custom" and its type.' );
+				assert.ok( specsByPath[ '/Root/First.sensor:quality' ], 'Each attribute with a metadata block is read.' );
+
+			} );
+
 		} );
 
 	} );
