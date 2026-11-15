@@ -159,6 +159,11 @@ class ViewportTextureNode extends TextureNode {
 	updateBefore( frame ) {
 
 		const renderer = frame.renderer;
+
+		// do not copy during precompilation
+
+		if ( renderer._precompilationState !== null ) return false;
+
 		const renderTarget = renderer.getRenderTarget();
 		const canvasTarget = renderer.getCanvasTarget();
 
