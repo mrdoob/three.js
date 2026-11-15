@@ -57,7 +57,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
+		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, packNormalToOctahedral, unpackOctahedralToNormal, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 		import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
@@ -112,6 +112,7 @@
 
 		const params = {
 			output: 0,
+			normalFormat: new URLSearchParams( window.location.search ).get( 'normalFormat' ) === 'rgb' ? 'rgb' : 'octahedral',
 			roughness: 0.3,
 
 			ssr: {
@@ -233,6 +234,11 @@
 
 			renderPipeline = new THREE.RenderPipeline( renderer );
 
+			const octahedralNormals = params.normalFormat === 'octahedral';
+			const normalDecode = octahedralNormals
+				? ( value ) => unpackOctahedralToNormal( value.rg )
+				: ( value ) => unpackRGBToNormal( value.rgb );
+
 			const scenePass = pass( scene, camera );
 			scenePass.setMRT( mrt( {
 				output: output,
@@ -240,13 +246,14 @@
 				// metal Fresnel f0; do NOT bake in the (1-metalness) diffuse attenuation here, as
 				// that zeroes metals and destroys their specular tint (f0 would become 0 → black).
 				diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
-				// Pack roughness into normal alpha channel to save MRT bandwidth
-				normal: vec4( packNormalToRGB( normalView ).rgb, materialRoughness ),
-				velocity: velocity
+				// Keep the octahedral normal attachment at four bytes per pixel (RG16F).
+				// Roughness uses the otherwise unused velocity Z channel in both modes.
+				normal: octahedralNormals ? packNormalToOctahedral( normalView ) : packNormalToRGB( normalView ),
+				velocity: vec4( velocity.xy, materialRoughness, 0 )
 			} ) );
 
 			scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
-			const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal' );
+			const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', ( value ) => packNormalToRGB( normalDecode( value ) ) );
 			scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
 
 				return scenePass.getLinearDepthNode();
@@ -256,24 +263,29 @@
 			const scenePassDiffuseColor = scenePass.getTextureNode( 'diffuseColor' ).toInspector( 'Diffuse Color' );
 
 			const normalTexture = scenePass.getTexture( 'normal' );
-			normalTexture.type = THREE.UnsignedByteType;
+			normalTexture.type = octahedralNormals ? THREE.HalfFloatType : THREE.UnsignedByteType;
+			normalTexture.format = octahedralNormals ? THREE.RGFormat : THREE.RGBAFormat;
+			// Octahedral coordinates must be decoded before interpolating across their folds.
+			normalTexture.minFilter = normalTexture.magFilter = THREE.NearestFilter;
 
 			const diffuseTexture = scenePass.getTexture( 'diffuseColor' );
 			diffuseTexture.type = THREE.UnsignedByteType;
 
-			const sceneNormal = sample( ( uv ) => unpackRGBToNormal( scenePassNormal.sample( uv ).rgb ) );
+			// SSR consumes decoded normals through SampleNode, independent of the MRT encoding.
+			const sceneNormal = sample( ( uv ) => normalDecode( scenePassNormal.sample( uv ) ) );
+			const sceneRoughness = scenePassVelocity.z;
 
-			// metalness in diffuseColor.a, roughness in normal.a (no separate metalrough MRT)
+			// Metalness in diffuseColor.a, roughness in velocity.z (no separate metalrough MRT).
 			const scenePassMetalRough = sample( ( uv ) => vec2(
 				scenePassDiffuseColor.sample( uv ).a,
-				scenePassNormal.sample( uv ).a
+				scenePassVelocity.sample( uv ).z
 			) ).toInspector( 'Metalness/Roughness' );
 
 			ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
 				stochastic: true,
 				diffuseNode: scenePassDiffuseColor,
 				metalnessNode: scenePassDiffuseColor.a,
-				roughnessNode: scenePassNormal.a,
+				roughnessNode: sceneRoughness,
 				environmentNode: hdrTexture,
 				envImportanceSampling: params.ssr.envImportanceSampling,
 				binaryRefine: params.ssr.binaryRefine
@@ -281,6 +293,7 @@
 
 			temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
 				mode: 'specular',
+				normalDecode,
 				accumulate: false
 			} );
 			temporalReprojectNode.toInspector( 'Temporal Reproject' );
@@ -288,6 +301,7 @@
 			denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
 				depth: scenePassDepth,
 				normal: scenePassNormal,
+				normalDecode,
 				raw: ssrNode,
 				metalRoughness: scenePassMetalRough,
 				mode: 'specular',
@@ -348,6 +362,14 @@
 
 			const displayGui = renderer.inspector.createParameters( 'Display' );
 			displayGui.add( params, 'output', outputTypes ).name( 'Output' ).onChange( updateOutputNode );
+			displayGui.add( params, 'normalFormat', { 'RGB8': 'rgb', 'Octahedral RG16F': 'octahedral' } ).name( 'Normals' ).onChange( value => {
+
+				// Recreate attachments and clear temporal history when their layout changes.
+				const url = new URL( window.location.href );
+				url.searchParams.set( 'normalFormat', value );
+				window.location.href = url.href;
+
+			} );
 			displayGui.add( params.post, 'traa' ).name( 'TRAA' ).onChange( updateOutputNode );
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );

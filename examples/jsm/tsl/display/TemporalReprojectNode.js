@@ -226,13 +226,13 @@ const sampleBilinearTap = Fn( ( [
 	bilinearWeight,
 	worldPosition,
 	worldNormal
-] ) => {
+], builder ) => {
 
 	const color = textureLoad( historyTexture, tapCoord ).max( 0 );
 	const reprojDepth = textureLoad( previousDepthNode, tapCoord ).r;
 	const reprojViewPos = getViewPosition( vec2( tapCoord ).add( 0.5 ).div( resolution ), reprojDepth, previousProjectionMatrixInverse );
 	const reprojWorldPos = previousCameraWorldMatrix.mul( vec4( reprojViewPos, 1.0 ) ).xyz;
-	const reprojWorldNorm = unpackRGBToNormal( textureLoad( previousNormalNode, tapCoord ).rgb ).transformNormalByInverseViewMatrix( previousCameraViewMatrix );
+	const reprojWorldNorm = builder.context.normalDecode( textureLoad( previousNormalNode, tapCoord ) ).transformNormalByInverseViewMatrix( previousCameraViewMatrix );
 
 	const planeDiff = abs( dot( reprojWorldPos.sub( worldPosition ), worldNormal ) ).toVar();
 	planeDiff.divAssign( abs( reprojViewPos.z ) );
@@ -472,6 +472,7 @@ const VARIANCE_GAMMA_MAX = 1;
 /**
  * @typedef {Object} TemporalReprojectNodeOptions
  * @property {TemporalReprojectMode} [mode='diffuse'] - `diffuse` for SSGI/scene colour; `specular` for SSR reflections.
+ * @property {Function} [normalDecode] - Decodes a normal texture sample to a view-space `vec3`. Defaults to RGB decoding. Fixed at construction time.
  * @property {boolean} [hitPointReprojection] - Parallax hit-point reprojection (specular mode only). Defaults to `true` in specular mode.
  * @property {boolean} [accumulate=false] - When `true`, history is stored in this pass (classic temporal resolve). When `false`,
  * use {@link TemporalReprojectNode#setHistoryTexture} to read history from another pass (e.g. denoise output).
@@ -517,6 +518,7 @@ class TemporalReprojectNode extends Node {
 
 		const {
 			mode = 'diffuse',
+			normalDecode = ( value ) => unpackRGBToNormal( value.rgb ),
 			hitPointReprojection = mode === 'specular',
 			accumulate = false
 		} = options;
@@ -533,6 +535,13 @@ class TemporalReprojectNode extends Node {
 		this.beautyNode = beautyNode;
 		this.depthNode = depthNode;
 		this.normalNode = normalNode;
+
+		/**
+		 * Decodes current and previous normal samples to view-space normals.
+		 *
+		 * @type {Function}
+		 */
+		this.normalDecode = normalDecode;
 		this.velocityNode = velocityNode;
 		this.camera = camera;
 
@@ -788,7 +797,7 @@ class TemporalReprojectNode extends Node {
 			const beautyTexel = beautyTexelFromScreen( screenTexel, beautySize, this._resolution );
 
 			const inputColor = textureLoad( this.beautyNode, beautyTexel ).max( 0 ).toVar();
-			const viewNormal = unpackRGBToNormal( textureLoad( this.normalNode, screenTexel ).rgb ).toVar();
+			const viewNormal = this.normalDecode( textureLoad( this.normalNode, screenTexel ) ).toVar();
 
 			// Shared 3×3 beauty fetch: feeds both the variance-clip box and the SSR ray-length stats.
 			const neighborhood = collectNeighborhood( this.beautyNode, beautyTexel, inputColor, this.flickerSuppression );
@@ -942,7 +951,7 @@ class TemporalReprojectNode extends Node {
 
 		} );
 
-		return resolve();
+		return resolve().context( { normalDecode: this.normalDecode } );
 
 	}
 
