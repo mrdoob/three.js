@@ -48,7 +48,7 @@ class SSRNode extends Node {
 	 *
 	 * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
 	 * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
-	 * @param {Node<vec3>} normalNode - A sampleable node that returns decoded view-space normals, independent of the normal texture's encoding.
+	 * @param {Node<vec3>} normalNode - A node that represents the beauty pass's normals.
 	 * @param {SSRNodeOptions} [options] - Optional inputs for material and environment data.
 	 */
 	constructor( colorNode, depthNode, normalNode, options = {} ) {
@@ -110,7 +110,7 @@ class SSRNode extends Node {
 		this.depthNode = depthNode;
 
 		/**
-		 * A sampleable node that returns decoded view-space normals, independent of the normal texture's encoding.
+		 * A node that represents the beauty pass's normals.
 		 *
 		 * @type {Node<vec3>}
 		 */
@@ -1401,7 +1401,7 @@ export default SSRNode;
  * @function
  * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
  * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
- * @param {Node<vec3>} normalNode - A sampleable node that returns decoded view-space normals, independent of the normal texture's encoding.
+ * @param {Node<vec3>} normalNode - A node that represents the beauty pass's normals.
  * @param {SSRNodeOptions} [options] - Optional inputs for material and environment data.
  * @returns {SSRNode}
  */
