@@ -187,6 +187,15 @@ class TextureNode extends UniformNode {
 		 */
 		this._samplerComparison = false;
 
+		/**
+		 * Whether a node sharing this node's binding gathers from the texture.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._gather = false;
+
 		this.setUpdateMatrix( uvNode === null );
 
 	}
@@ -660,6 +669,15 @@ class TextureNode extends UniformNode {
 		const texture = this.value;
 
 		const properties = builder.getNodeProperties( this );
+
+		if ( this.gatherNode !== null ) {
+
+			// make sure the shared texture node creates a binding with a sampler
+
+			this.getSharedNode( builder )._gather = true;
+
+		}
+
 		const textureProperty = super.generate( builder, 'property' );
 
 		if ( output === 'samplerComparison' || properties.compareNode !== null ) {
@@ -949,6 +967,18 @@ class TextureNode extends UniformNode {
 		textureNode.referenceNode = this.getBase();
 
 		return textureNode;
+
+	}
+
+	/**
+	 * Returns `true` if four texels are gathered from the texture,
+	 * meaning the node must be bound with a sampler.
+	 *
+	 * @return {boolean} Whether gathering is used or not.
+	 */
+	isGather() {
+
+		return this.gatherNode !== null || this._gather === true;
 
 	}
 

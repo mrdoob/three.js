@@ -1432,7 +1432,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
 				// Also textureGather always need sampler.
-				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false ) || node.gatherNode !== null;
+				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false ) || node.isGather();
 
 				if ( needsSampler ) {
 
@@ -1497,6 +1497,20 @@ class WGSLNodeBuilder extends NodeBuilder {
 			}
 
 			nodeData.uniformGPU = uniformGPU;
+
+		} else if ( textureTypes.has( type ) && nodeData.uniformGPU.length === 1 && node.isGather() ) {
+
+			// the texture was bound without a sampler before a node gathered from it
+
+			const [ texture ] = nodeData.uniformGPU;
+			const bindings = this.getBindGroupArray( node.groupNode.name, shaderStage );
+
+			const sampler = new NodeSampler( `${ uniformNode.name }_sampler`, uniformNode.node, node.groupNode );
+			sampler.setVisibility( gpuShaderStageLib[ shaderStage ] );
+
+			bindings.splice( bindings.indexOf( texture ), 0, sampler );
+
+			nodeData.uniformGPU = [ sampler, texture ];
 
 		}
 
@@ -2335,9 +2349,8 @@ ${ flowData.code }
 		const backend = this.renderer.backend;
 		const texture = textureNode.value;
 
-		// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-		// Also textureGather always need sampler.
-		const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && textureNode.isStorageTextureNode !== true ) || textureNode.gatherNode !== null;
+		// the sampler is declared if the texture was bound with one
+		const needsSampler = this.getDataFromNode( textureNode, shaderStage, this.globalCache ).uniformGPU.length === 2;
 
 		let samplerType = null;
 
