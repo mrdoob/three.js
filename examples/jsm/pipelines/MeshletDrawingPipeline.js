@@ -3558,6 +3558,8 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 		// the buffers of the pool are disposed and the geometries moved before an outer render only: the parent of
 		// a nested render can still hold draw commands referring to them
+		// TODO: consider a finish() method in the drawing pipeline, called once the draw commands of a render are
+		// submitted, to release the buffers there
 
 		if ( isNestedRender( this.renderer ) === false ) this._geometryPool.update();
 
