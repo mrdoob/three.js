@@ -152,9 +152,6 @@
 				metalrough: vec2( metalness, roughness ) // pack metalness and roughness into a single attachment
 			} ) );
 
-			// Clear to the encoded view-space normal (0, 0, 1).
-			scenePass.getMRT().setClearColor( 'normal', octahedralNormals ? new THREE.Color( 0, 0, 0 ) : new THREE.Color( 0.5, 0.5, 1 ) );
-
 			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
 			const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', ( node ) => {
 
