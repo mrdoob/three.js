@@ -39,7 +39,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec4, uniform, mix, velocity } from 'three/tsl';
+			import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToRGB, unpackRGBToNormal, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, velocity } from 'three/tsl';
 			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 			import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 			import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
@@ -51,6 +51,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const params = {
+				normalFormat: new URLSearchParams( window.location.search ).get( 'normalFormat' ) === 'rgb' ? 'rgb' : 'octahedral',
 				output: 'Beauty', traa: true,
 				quality: 0.5, binaryRefine: false, maxDistance: 20, thickness: 0.12,
 				denoise: true, lumaPhi: 0.75,
@@ -182,31 +183,44 @@
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
 
+				const octahedralNormals = params.normalFormat === 'octahedral';
+				const normalDecode = octahedralNormals
+					? ( value ) => unpackOctahedralToNormal( value.rg )
+					: ( value ) => unpackRGBToNormal( value.rgb );
+
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
 					output: output,
 					diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
-					normal: vec4( packNormalToRGB( normalView ), materialRoughness ),
-					velocity: velocity
+					normal: octahedralNormals ? packNormalToOctahedral( normalView ) : packNormalToRGB( normalView ),
+					// Roughness uses the spare velocity Z channel, keeping normals at four bytes per pixel.
+					velocity: vec4( velocity.xy, materialRoughness, 0 )
 				} ) );
 
-				scenePass.getTexture( 'normal' ).type = THREE.UnsignedByteType;
+				// Clear to the encoded view-space normal (0, 0, 1).
+				scenePass.getMRT().setClearColor( 'normal', octahedralNormals ? new THREE.Color( 0, 0, 0 ) : new THREE.Color( 0.5, 0.5, 1 ) );
+
+				const normalTexture = scenePass.getTexture( 'normal' );
+				normalTexture.type = octahedralNormals ? THREE.HalfFloatType : THREE.UnsignedByteType;
+				normalTexture.format = octahedralNormals ? THREE.RGFormat : THREE.RGBAFormat;
+				// Decode octahedral coordinates before interpolating across their folds.
+				normalTexture.minFilter = normalTexture.magFilter = THREE.NearestFilter;
 				scenePass.getTexture( 'diffuseColor' ).type = THREE.UnsignedByteType;
 
 				const scenePassColor = scenePass.getTextureNode( 'output' );
 				const scenePassDepth = scenePass.getTextureNode( 'depth' );
-				const scenePassNormal = scenePass.getTextureNode( 'normal' );
+				const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', ( value ) => packNormalToRGB( normalDecode( value ) ) );
 				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
 				const scenePassDiffuseColor = scenePass.getTextureNode( 'diffuseColor' );
 
-				const sceneNormal = sample( ( uv ) => unpackRGBToNormal( scenePassNormal.sample( uv ).rgb ) );
-				const sceneRoughness = sample( ( uv ) => scenePassNormal.sample( uv ).a );
+				const sceneNormal = sample( ( uv ) => normalDecode( scenePassNormal.sample( uv ) ) );
+				const sceneRoughness = sample( ( uv ) => scenePassVelocity.sample( uv ).z );
 
-				// metalness in diffuseColor.a, roughness in normal.a
+				// Metalness in diffuseColor.a, roughness in velocity.z.
 
 				const sceneMetalRough = sample( ( uv ) => vec2(
 					scenePassDiffuseColor.sample( uv ).a,
-					scenePassNormal.sample( uv ).a
+					scenePassVelocity.sample( uv ).z
 				) );
 
 				// ssr
@@ -225,6 +239,7 @@
 
 				const temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
 					mode: 'specular',
+					normalDecode,
 					accumulate: false
 				} );
 				temporalReprojectNode.maxFrames.value = 16;
@@ -233,6 +248,7 @@
 				const denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
 					depth: scenePassDepth,
 					normal: scenePassNormal,
+					normalDecode,
 					raw: ssrNode,
 					metalRoughness: sceneMetalRough,
 					mode: 'specular',
@@ -291,6 +307,14 @@
 				// GUI
 
 				const displayGui = renderer.inspector.createParameters( 'Display' );
+				displayGui.add( params, 'normalFormat', { 'RGB8': 'rgb', 'Octahedral RG16F': 'octahedral' } ).name( 'Normals' ).onChange( value => {
+
+					// Recreate attachments and clear temporal history when their layout changes.
+					const url = new URL( window.location.href );
+					url.searchParams.set( 'normalFormat', value );
+					window.location.href = url.href;
+
+				} );
 				displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN' ] ).name( 'Output' ).onChange( updateOutput );
 				displayGui.add( params, 'traa' ).name( 'TRAA' ).onChange( updateOutput );
 

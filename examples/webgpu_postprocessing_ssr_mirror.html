@@ -44,7 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -55,6 +55,7 @@
 		import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 		const params = {
+			normalFormat: new URLSearchParams( window.location.search ).get( 'normalFormat' ) === 'rgb' ? 'rgb' : 'octahedral',
 			output: 'Beauty', enabled: true, quality: 0.5, intensity: 1,
 			maxDistance: 1, thickness: 0.03, binaryRefine: false,
 			roughness: 1, blur: true, blurQuality: 1
@@ -139,17 +140,25 @@
 
 			renderPipeline = new THREE.RenderPipeline( renderer );
 
+			const octahedralNormals = params.normalFormat === 'octahedral';
+			const normalDecode = octahedralNormals
+				? ( value ) => unpackOctahedralToNormal( value.rg )
+				: ( value ) => unpackRGBToNormal( value.rgb );
+
 			const scenePass = pass( scene, camera );
 			scenePass.setMRT( mrt( {
 				output: output,
-				normal: packNormalToRGB( normalView ),
+				normal: octahedralNormals ? packNormalToOctahedral( normalView ) : packNormalToRGB( normalView ),
 				metalrough: vec2( metalness, roughness ) // pack metalness and roughness into a single attachment
 			} ) );
+
+			// Clear to the encoded view-space normal (0, 0, 1).
+			scenePass.getMRT().setClearColor( 'normal', octahedralNormals ? new THREE.Color( 0, 0, 0 ) : new THREE.Color( 0.5, 0.5, 1 ) );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
 			const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', ( node ) => {
 
-				return colorSpaceToWorking( node, THREE.SRGBColorSpace );
+				return colorSpaceToWorking( packNormalToRGB( normalDecode( node ) ), THREE.SRGBColorSpace );
 
 			} );
 			const scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
@@ -159,17 +168,20 @@
 			} );
 			const scenePassMetalRough = scenePass.getTextureNode( 'metalrough' ).toInspector( 'Metalness-Roughness' );
 
-			// optional: optimize bandwidth by reducing the texture precision for normals and metal/roughness
+			// Both normal encodings use four bytes per pixel; metal/roughness uses RGBA8.
 
 			const normalTexture = scenePass.getTexture( 'normal' );
-			normalTexture.type = THREE.UnsignedByteType;
+			normalTexture.type = octahedralNormals ? THREE.HalfFloatType : THREE.UnsignedByteType;
+			normalTexture.format = octahedralNormals ? THREE.RGFormat : THREE.RGBAFormat;
+			// Decode octahedral coordinates before interpolating across their folds.
+			normalTexture.minFilter = normalTexture.magFilter = THREE.NearestFilter;
 
 			const metalRoughTexture = scenePass.getTexture( 'metalrough' );
 			metalRoughTexture.type = THREE.UnsignedByteType;
 
 			const sceneNormal = sample( ( uv ) => {
 
-				return unpackRGBToNormal( scenePassNormal.sample( uv ) );
+				return normalDecode( scenePassNormal.sample( uv ) );
 
 			} );
 
@@ -214,6 +226,14 @@
 			// GUI
 
 			const displayGui = renderer.inspector.createParameters( 'Display' );
+			displayGui.add( params, 'normalFormat', { 'RGB8': 'rgb', 'Octahedral RG16F': 'octahedral' } ).name( 'Normals' ).onChange( value => {
+
+				// Recreate attachments and clear temporal history when their layout changes.
+				const url = new URL( window.location.href );
+				url.searchParams.set( 'normalFormat', value );
+				window.location.href = url.href;
+
+			} );
 			displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN' ] ).name( 'Output' ).info( 'DN means denoise; this mirror example uses spatial blur rather than stochastic denoising.' ).onChange( updateOutput );
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
