@@ -2676,7 +2676,7 @@ class WebGPUBackend extends Backend {
 	 */
 	createTimestampQueryPool() {
 
-		return new WebGPUTimestampQueryPool( this.device, 2048 );
+		return new WebGPUTimestampQueryPool( this.device );
 
 	}
 

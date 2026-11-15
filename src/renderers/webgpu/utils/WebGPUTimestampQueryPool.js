@@ -21,9 +21,9 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	 * Creates a new WebGPU timestamp query pool.
 	 *
 	 * @param {GPUDevice} device - The WebGPU device to create queries on.
-	 * @param {number} [maxQueries=2048] - Maximum number of queries this pool can hold.
+	 * @param {number} [maxQueries=4096] - Maximum number of queries this pool can hold.
 	 */
-	constructor( device, maxQueries = 2048 ) {
+	constructor( device, maxQueries = 4096 ) {
 
 		super( maxQueries );
 		this.device = device;
