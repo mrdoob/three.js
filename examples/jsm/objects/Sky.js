@@ -2,6 +2,7 @@ import {
 	BackSide,
 	BoxGeometry,
 	BufferGeometry,
+	Color,
 	Float32BufferAttribute,
 	HalfFloatType,
 	LinearFilter,
@@ -249,8 +250,12 @@ Sky.SkyShader = {
 	uniforms: {
 		'turbidity': { value: 2 },
 		'rayleigh': { value: 1 },
+		'rayleighColor': { value: new Color( 0.191785, 0.448125, 1.0 ) },
 		'mieCoefficient': { value: 0.005 },
 		'mieDirectionalG': { value: 0.8 },
+		'mieColor': { value: new Color( 0.451084, 0.681483, 1.0 ) },
+		'absorptionScale': { value: 1 },
+		'absorptionColor': { value: new Color( 0.3125, 1.0, 0.04375 ) },
 		'sunPosition': { value: new Vector3() },
 		'cloudScale': { value: 0.0002 },
 		'cloudSpeed': { value: 0.00002 },
@@ -267,8 +272,12 @@ Sky.SkyShader = {
 	vertexShader: /* glsl */`
 		uniform vec3 sunPosition;
 		uniform float rayleigh;
+		uniform vec3 rayleighColor;
 		uniform float turbidity;
 		uniform float mieCoefficient;
+		uniform vec3 mieColor;
+		uniform float absorptionScale;
+		uniform vec3 absorptionColor;
 
 		varying vec3 vWorldPosition;
 		varying vec3 vSunDirection;
@@ -284,20 +293,21 @@ Sky.SkyShader = {
 		const vec3 lambda = vec3( 680E-9, 550E-9, 450E-9 );
 		// this pre-calculation replaces older TotalRayleigh(vec3 lambda) function:
 		// (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn))
-		const vec3 totalRayleigh = vec3( 5.804542996261093E-6, 1.3562911419845635E-5, 3.0265902468824876E-5 );
+		const float totalRayleigh = 3.0265902468824876E-5;
 
 		// mie stuff
 		// K coefficient for the primaries
 		const float v = 4.0;
 		const vec3 K = vec3( 0.686, 0.678, 0.666 );
 		// MieConst = pi * pow( ( 2.0 * pi ) / lambda, vec3( v - 2.0 ) ) * K
-		const vec3 MieConst = vec3( 1.8399918514433978E14, 2.7798023919660528E14, 4.0790479543861094E14 );
+		const float MieConst = 4.0790479543861094E14;
 
 		// earth shadow hack
 		// cutoffAngle = pi / 1.95;
 		const float cutoffAngle = 1.6110731556870734;
 		const float steepness = 1.5;
 		const float EE = 1000.0;
+		const float ozoneExtinction = 0.016;
 
 		float sunIntensity( float zenithAngleCos ) {
 			zenithAngleCos = clamp( zenithAngleCos, -1.0, 1.0 );
@@ -306,7 +316,7 @@ Sky.SkyShader = {
 
 		vec3 totalMie( float T ) {
 			float c = ( 0.2 * T ) * 10E-18;
-			return 0.434 * c * MieConst;
+			return 0.434 * c * MieConst * mieColor;
 		}
 
 		void main() {
@@ -331,7 +341,7 @@ Sky.SkyShader = {
 			// stratospheric ozone (Chappuis band) absorption along incoming sun path
 			float sunCos = max( 0.0, vSunDirection.y );
 			float sunOzoneAirMass = 1.0 / sqrt( sunCos * sunCos + 0.004 );
-			vSunE = sunIntensity( vSunDirection.y ) * exp( -vec3( 0.005, 0.016, 0.0007 ) * sunOzoneAirMass );
+			vSunE = sunIntensity( vSunDirection.y ) * exp( -( absorptionScale * ozoneExtinction ) * absorptionColor * sunOzoneAirMass );
 
 			float sunfade = 1.0 - clamp( 1.0 - exp( vSunDirection.y ), 0.0, 1.0 );
 
@@ -339,7 +349,7 @@ Sky.SkyShader = {
 
 			// extinction (absorption + out scattering)
 			// rayleigh coefficients
-			vBetaR = totalRayleigh * rayleighCoefficient;
+			vBetaR = rayleighColor * totalRayleigh * rayleighCoefficient;
 
 			// mie coefficients
 			vBetaM = totalMie( turbidity ) * mieCoefficient;

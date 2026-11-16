@@ -1,6 +1,7 @@
 import {
 	BackSide,
 	BoxGeometry,
+	Color,
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	Mesh,
@@ -106,6 +107,15 @@ class SkyMesh extends Mesh {
 		this.rayleigh = uniform( 1 );
 
 		/**
+		 * The color of Rayleigh scattering which defines the spectrum
+		 * of the molecular sky. The default value represents the
+		 * atmosphere of Earth.
+		 *
+		 * @type {UniformNode<vec3>}
+		 */
+		this.rayleighColor = uniform( new Color( 0.191785, 0.448125, 1.0 ) );
+
+		/**
 		 * The strength of Mie scattering by aerosol particles
 		 * which controls the intensity of the glow around the sun.
 		 * Higher values produce a brighter glow.
@@ -122,6 +132,33 @@ class SkyMesh extends Mesh {
 		 * @type {UniformNode<float>}
 		 */
 		this.mieDirectionalG = uniform( 0.8 );
+
+		/**
+		 * The color of Mie scattering which defines the spectrum of
+		 * the haze around the sun and along the horizon. The default
+		 * value represents the atmosphere of Earth.
+		 *
+		 * @type {UniformNode<vec3>}
+		 */
+		this.mieColor = uniform( new Color( 0.451084, 0.681483, 1.0 ) );
+
+		/**
+		 * The strength of atmospheric absorption. Higher values remove
+		 * more of {@link SkyMesh#absorptionColor} from the sunlight and
+		 * tint the sky in the complementary color.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.absorptionScale = uniform( 1 );
+
+		/**
+		 * The wavelengths absorbed by the atmosphere along the path of
+		 * the sunlight. The default value represents the ozone layer
+		 * of Earth.
+		 *
+		 * @type {UniformNode<vec3>}
+		 */
+		this.absorptionColor = uniform( new Color( 0.3125, 1.0, 0.04375 ) );
 
 		/**
 		 * The sun position uniform.
@@ -205,14 +242,14 @@ class SkyMesh extends Mesh {
 			// const lambda = vec3( 680E-9, 550E-9, 450E-9 );
 			// this pre-calculation replaces older TotalRayleigh(vec3 lambda) function:
 			// (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn))
-			const totalRayleigh = vec3( 5.804542996261093E-6, 1.3562911419845635E-5, 3.0265902468824876E-5 );
+			const totalRayleigh = this.rayleighColor.mul( 3.0265902468824876E-5 );
 
 			// mie stuff
 			// K coefficient for the primaries
 			// const v = float( 4.0 );
 			// const K = vec3( 0.686, 0.678, 0.666 );
 			// MieConst = pi * pow( ( 2.0 * pi ) / lambda, vec3( v - 2.0 ) ) * K
-			const MieConst = vec3( 1.8399918514433978E14, 2.7798023919660528E14, 4.0790479543861094E14 );
+			const MieConst = this.mieColor.mul( 4.0790479543861094E14 );
 
 			// earth shadow hack
 			// cutoffAngle = pi / 1.95;
@@ -234,7 +271,8 @@ class SkyMesh extends Mesh {
 			// stratospheric ozone (Chappuis band) absorption along incoming sun path
 			const sunCos = max( 0.0, angle );
 			const sunOzoneAirMass = float( 1.0 ).div( sqrt( sunCos.mul( sunCos ).add( 0.004 ) ) );
-			vSunE.assign( exp( vec3( 0.005, 0.016, 0.0007 ).mul( sunOzoneAirMass ).negate() ).mul( sunIntensity ) );
+			const ozoneExtinction = this.absorptionColor.mul( this.absorptionScale.mul( 0.016 ) );
+			vSunE.assign( exp( ozoneExtinction.mul( sunOzoneAirMass ).negate() ).mul( sunIntensity ) );
 
 			// sun fade
 

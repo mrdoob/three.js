@@ -66,8 +66,12 @@
 				const effectController = {
 					turbidity: 10,
 					rayleigh: 3,
+					rayleighColor: new THREE.Color( 0.191785, 0.448125, 1.0 ),
 					mieCoefficient: 0.005,
 					mieDirectionalG: 0.7,
+					mieColor: new THREE.Color( 0.451084, 0.681483, 1.0 ),
+					absorptionScale: 1,
+					absorptionColor: new THREE.Color( 0.3125, 1.0, 0.04375 ),
 					elevation: 65,
 					azimuth: 0,
 					exposure: 0.05,
@@ -81,8 +85,12 @@
 
 					sky.turbidity.value = effectController.turbidity;
 					sky.rayleigh.value = effectController.rayleigh;
+					sky.rayleighColor.value.copy( effectController.rayleighColor );
 					sky.mieCoefficient.value = effectController.mieCoefficient;
 					sky.mieDirectionalG.value = effectController.mieDirectionalG;
+					sky.mieColor.value.copy( effectController.mieColor );
+					sky.absorptionScale.value = effectController.absorptionScale;
+					sky.absorptionColor.value.copy( effectController.absorptionColor );
 					sky.cloudCoverage.value = effectController.cloudCoverage;
 					sky.cloudDensity.value = effectController.cloudDensity;
 					sky.cloudElevation.value = effectController.cloudElevation;
@@ -103,8 +111,12 @@
 
 				gui.add( effectController, 'turbidity', 0.0, 20.0, 0.1 ).onChange( guiChanged );
 				gui.add( effectController, 'rayleigh', 0.0, 4, 0.001 ).onChange( guiChanged );
+				gui.addColor( effectController, 'rayleighColor' ).onChange( guiChanged );
 				gui.add( effectController, 'mieCoefficient', 0.0, 0.1, 0.001 ).onChange( guiChanged );
 				gui.add( effectController, 'mieDirectionalG', 0.0, 1, 0.001 ).onChange( guiChanged );
+				gui.addColor( effectController, 'mieColor' ).onChange( guiChanged );
+				gui.add( effectController, 'absorptionScale', 0.0, 50, 0.1 ).onChange( guiChanged );
+				gui.addColor( effectController, 'absorptionColor' ).onChange( guiChanged );
 				gui.add( effectController, 'elevation', 0, 90, 0.1 ).onChange( guiChanged );
 				gui.add( effectController, 'azimuth', - 180, 180, 0.1 ).onChange( guiChanged );
 				gui.add( effectController, 'exposure', 0, 1, 0.0001 ).onChange( guiChanged );
