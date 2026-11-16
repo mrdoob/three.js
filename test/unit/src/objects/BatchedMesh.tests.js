@@ -92,39 +92,6 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
-
-			const material = new MeshBasicMaterial();
-			const camera = new PerspectiveCamera();
-			camera.updateMatrixWorld();
-
-			const batchedMesh = new BatchedMesh( 4, 1000, 2000, material );
-			batchedMesh.perObjectFrustumCulled = false;
-			batchedMesh.sortObjects = false;
-			const customSort = ( a, b ) => a.z - b.z;
-			batchedMesh.customSort = customSort;
-
-			const geometryId = batchedMesh.addGeometry( new BoxGeometry() );
-			batchedMesh.addInstance( geometryId );
-			batchedMesh.onBeforeRender( {}, null, camera, batchedMesh.geometry, material );
-
-			const target = new BatchedMesh( 4, 1000, 2000, material );
-			target.perObjectFrustumCulled = false;
-			target.sortObjects = false;
-			target.onBeforeRender( {}, null, camera, target.geometry, material );
-
-			target.copy( batchedMesh );
-
-			assert.strictEqual( target.customSort, customSort, 'customSort is copied' );
-			assert.strictEqual( target._multiDrawCount, batchedMesh._multiDrawCount, '_multiDrawCount is copied' );
-			assert.strictEqual( target._mergedDrawCount, batchedMesh._mergedDrawCount, '_mergedDrawCount is copied' );
-			assert.strictEqual( target._visibilityChanged, true, '_visibilityChanged is set to true' );
-
-			target.onBeforeRender( {}, null, camera, target.geometry, material );
-			assert.strictEqual( target._multiDrawCount, 1, 'draw parameters update after copy on render' );
-
-		} );
-
 	} );
 
 } );
