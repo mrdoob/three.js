@@ -2,8 +2,8 @@ import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 import { denormalize, normalize, getNormalizationScale } from '../math/MathUtils.js';
 import { StaticDrawUsage, FloatType } from '../constants.js';
-import { fromHalfFloat, toHalfFloat } from '../extras/DataUtils.js';
 import { EventDispatcher } from './EventDispatcher.js';
+import { warnOnce } from '../utils.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
 const _vector2 = /*@__PURE__*/ new Vector2();
@@ -890,8 +890,8 @@ class Uint32BufferAttribute extends BufferAttribute {
  * Convenient class that can be used when creating a `Float16` buffer attribute with
  * a plain `Array` instance.
  *
- * This class automatically converts to and from FP16 via `Uint16Array` since `Float16Array`
- * browser support is still problematic.
+ * The attribute data are stored in a `Float16Array`. If `Float16Array` is not supported,
+ * the class falls back to `Float32Array`.
  *
  * @augments BufferAttribute
  */
@@ -900,155 +900,25 @@ class Float16BufferAttribute extends BufferAttribute {
 	/**
 	 * Constructs a new buffer attribute.
 	 *
-	 * @param {(Array<number>|Uint16Array)} array - The array holding the attribute data.
+	 * @param {(Array<number>|Float16Array)} array - The array holding the attribute data.
 	 * @param {number} itemSize - The item size.
 	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
 	 */
 	constructor( array, itemSize, normalized ) {
 
-		super( new Uint16Array( array ), itemSize, normalized );
+		if ( typeof Float16Array !== 'undefined' ) {
+
+			super( new Float16Array( array ), itemSize, normalized );
+
+		} else {
+
+			warnOnce( 'Float16BufferAttribute: Float16Array is not supported. Falling back to Float32Array.' );
+
+			super( new Float32Array( array ), itemSize, normalized );
+
+		}
 
 		this.isFloat16BufferAttribute = true;
-
-	}
-
-	getX( index ) {
-
-		let x = fromHalfFloat( this.array[ index * this.itemSize ] );
-
-		if ( this.normalized ) x = denormalize( x, this.array );
-
-		return x;
-
-	}
-
-	setX( index, x ) {
-
-		if ( this.normalized ) x = normalize( x, this.array );
-
-		this.array[ index * this.itemSize ] = toHalfFloat( x );
-
-		return this;
-
-	}
-
-	getY( index ) {
-
-		let y = fromHalfFloat( this.array[ index * this.itemSize + 1 ] );
-
-		if ( this.normalized ) y = denormalize( y, this.array );
-
-		return y;
-
-	}
-
-	setY( index, y ) {
-
-		if ( this.normalized ) y = normalize( y, this.array );
-
-		this.array[ index * this.itemSize + 1 ] = toHalfFloat( y );
-
-		return this;
-
-	}
-
-	getZ( index ) {
-
-		let z = fromHalfFloat( this.array[ index * this.itemSize + 2 ] );
-
-		if ( this.normalized ) z = denormalize( z, this.array );
-
-		return z;
-
-	}
-
-	setZ( index, z ) {
-
-		if ( this.normalized ) z = normalize( z, this.array );
-
-		this.array[ index * this.itemSize + 2 ] = toHalfFloat( z );
-
-		return this;
-
-	}
-
-	getW( index ) {
-
-		let w = fromHalfFloat( this.array[ index * this.itemSize + 3 ] );
-
-		if ( this.normalized ) w = denormalize( w, this.array );
-
-		return w;
-
-	}
-
-	setW( index, w ) {
-
-		if ( this.normalized ) w = normalize( w, this.array );
-
-		this.array[ index * this.itemSize + 3 ] = toHalfFloat( w );
-
-		return this;
-
-	}
-
-	setXY( index, x, y ) {
-
-		index *= this.itemSize;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-
-		}
-
-		this.array[ index + 0 ] = toHalfFloat( x );
-		this.array[ index + 1 ] = toHalfFloat( y );
-
-		return this;
-
-	}
-
-	setXYZ( index, x, y, z ) {
-
-		index *= this.itemSize;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-			z = normalize( z, this.array );
-
-		}
-
-		this.array[ index + 0 ] = toHalfFloat( x );
-		this.array[ index + 1 ] = toHalfFloat( y );
-		this.array[ index + 2 ] = toHalfFloat( z );
-
-		return this;
-
-	}
-
-	setXYZW( index, x, y, z, w ) {
-
-		index *= this.itemSize;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-			z = normalize( z, this.array );
-			w = normalize( w, this.array );
-
-		}
-
-		this.array[ index + 0 ] = toHalfFloat( x );
-		this.array[ index + 1 ] = toHalfFloat( y );
-		this.array[ index + 2 ] = toHalfFloat( z );
-		this.array[ index + 3 ] = toHalfFloat( w );
-
-		return this;
 
 	}
 

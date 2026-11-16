@@ -152,6 +152,8 @@ const TYPED_ARRAYS = {
 	Float64Array: Float64Array
 };
 
+if ( typeof Float16Array !== 'undefined' ) TYPED_ARRAYS.Float16Array = Float16Array;
+
 /**
  * Creates a typed array of the specified type from the given buffer.
  *

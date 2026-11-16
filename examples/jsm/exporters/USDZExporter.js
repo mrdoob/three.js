@@ -591,7 +591,7 @@ function buildNode( object, parentNode, materials, usedNames, files, options ) {
 
 		const resolvedMaterials = meshMaterials.map( ( m ) => materials[ m.uuid ] );
 
-		if ( isMultiMaterial === false ) {
+		if ( meshMaterials.length === 1 ) {
 
 			const geometryFileName = `geometries/Geometry_${geometry.id}.usda`;
 
@@ -1441,7 +1441,7 @@ function buildCamera( camera, usedNames, options ) {
 		const verticalAperture = camera.getFilmHeight().toPrecision( PRECISION );
 		node.addProperty( `float verticalAperture = ${verticalAperture}` );
 
-		const focalLength = camera.getFocalLength().toPrecision( PRECISION );
+		const focalLength = ( camera.getFocalLength() * camera.zoom ).toPrecision( PRECISION );
 		node.addProperty( `float focalLength = ${focalLength}` );
 
 		const focusDistance = camera.focus.toPrecision( PRECISION );

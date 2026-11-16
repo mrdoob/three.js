@@ -49,10 +49,10 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( result.name, attribute.name );
 				assert.strictEqual( result.usage, DynamicDrawUsage );
 				assert.strictEqual( result.gpuType, IntType );
-				const half = new Float16BufferAttribute( [ 0x8000, 0x3c00, 0x0001 ], 1 );
+				const half = new Float16BufferAttribute( [ - 1, 1, 0.5 ], 1 );
 				const remappedHalf = BufferGeometryUtils.remapAttribute( half, [ 2, 0, 1 ] );
 				assert.true( remappedHalf.isFloat16BufferAttribute );
-				assert.deepEqual( Array.from( remappedHalf.array ), [ 0x0001, 0x8000, 0x3c00 ] );
+				assert.deepEqual( Array.from( remappedHalf.array ), [ 0.5, - 1, 1 ] );
 				assert.notStrictEqual( result.array, attribute.array );
 
 			} );
@@ -79,7 +79,7 @@ export default QUnit.module( 'Addons', () => {
 
 				const geometry = new BufferGeometry();
 				geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 0, 0, 2, 0, 0, 1, 0, 0 ] ), 3 ) );
-				const morph = new Float16BufferAttribute( [ 0x8000, 0x0001, 0x3c00, 0x4000, 0x4200, 0x4400, 0, 0, 0 ], 3 );
+				const morph = new Float16BufferAttribute( [ - 1, 0.5, 1, 2, 3, 4, 0, 0, 0 ], 3 );
 				morph.name = 'pose';
 				morph.setUsage( DynamicDrawUsage );
 				geometry.morphAttributes.position = [ morph ];
@@ -88,7 +88,7 @@ export default QUnit.module( 'Addons', () => {
 				assert.deepEqual( Array.from( result.index.array ), [ 0, 1, 1 ] );
 				const output = result.morphAttributes.position[ 0 ];
 				assert.true( output.isFloat16BufferAttribute );
-				assert.deepEqual( Array.from( output.array ), [ 0x4000, 0x4200, 0x4400, 0x8000, 0x0001, 0x3c00 ] );
+				assert.deepEqual( Array.from( output.array ), [ 2, 3, 4, - 1, 0.5, 1 ] );
 				assert.strictEqual( output.name, 'pose' );
 				assert.strictEqual( output.usage, DynamicDrawUsage );
 				assert.strictEqual( morph.count, 3 );
