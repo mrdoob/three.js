@@ -198,9 +198,9 @@
 					scenePass.setMRT( mrt( {
 						output: output,
 						diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
-						normal: octahedralNormals ? packNormalToOctahedral( normalView ) : packNormalToRGB( normalView ),
-						// Roughness uses the spare velocity Z channel, keeping normals at four bytes per pixel.
-						velocity: vec4( velocity.xy, materialRoughness, 0 )
+						// RGB8 keeps roughness in the spare normal alpha. Octahedral RG16F has no spare channel, so roughness moves to velocity Z.
+						normal: octahedralNormals ? packNormalToOctahedral( normalView ) : vec4( packNormalToRGB( normalView ), materialRoughness ),
+						velocity: octahedralNormals ? vec4( velocity.xy, materialRoughness, 0 ) : velocity
 					} ) );
 
 					const normalTexture = scenePass.getTexture( 'normal' );
@@ -230,13 +230,13 @@
 						return mix( mix( tap( 0, 0 ), tap( 1, 0 ), weight.x ), mix( tap( 0, 1 ), tap( 1, 1 ), weight.x ), weight.y ).normalize();
 
 					} );
-					const sceneRoughness = sample( ( uv ) => scenePassVelocity.sample( uv ).z );
+					const sceneRoughness = sample( ( uv ) => octahedralNormals ? scenePassVelocity.sample( uv ).z : scenePassNormal.sample( uv ).a );
 
-					// Metalness in diffuseColor.a, roughness in velocity.z.
+					// Metalness in diffuseColor.a.
 
 					const sceneMetalRough = sample( ( uv ) => vec2(
 						scenePassDiffuseColor.sample( uv ).a,
-						scenePassVelocity.sample( uv ).z
+						sceneRoughness.sample( uv )
 					) );
 
 					// ssr

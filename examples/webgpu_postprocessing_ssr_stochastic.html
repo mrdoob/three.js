@@ -252,10 +252,9 @@
 					// metal Fresnel f0; do NOT bake in the (1-metalness) diffuse attenuation here, as
 					// that zeroes metals and destroys their specular tint (f0 would become 0 → black).
 					diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
-					// Keep the octahedral normal attachment at four bytes per pixel (RG16F).
-					// Roughness uses the otherwise unused velocity Z channel in both modes.
-					normal: octahedralNormals ? packNormalToOctahedral( normalView ) : packNormalToRGB( normalView ),
-					velocity: vec4( velocity.xy, materialRoughness, 0 )
+					// RGB8 keeps roughness in the spare normal alpha. Octahedral RG16F has no spare channel, so roughness moves to velocity Z.
+					normal: octahedralNormals ? packNormalToOctahedral( normalView ) : vec4( packNormalToRGB( normalView ), materialRoughness ),
+					velocity: octahedralNormals ? vec4( velocity.xy, materialRoughness, 0 ) : velocity
 				} ) );
 
 				scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
@@ -291,12 +290,12 @@
 					return mix( mix( tap( 0, 0 ), tap( 1, 0 ), weight.x ), mix( tap( 0, 1 ), tap( 1, 1 ), weight.x ), weight.y ).normalize();
 
 				} );
-				const sceneRoughness = scenePassVelocity.z;
+				const sceneRoughness = sample( ( uv ) => octahedralNormals ? scenePassVelocity.sample( uv ).z : scenePassNormal.sample( uv ).a );
 
-				// Metalness in diffuseColor.a, roughness in velocity.z (no separate metalrough MRT).
+				// Metalness in diffuseColor.a (no separate metalrough MRT).
 				const scenePassMetalRough = sample( ( uv ) => vec2(
 					scenePassDiffuseColor.sample( uv ).a,
-					scenePassVelocity.sample( uv ).z
+					sceneRoughness.sample( uv )
 				) ).toInspector( 'Metalness/Roughness' );
 
 				ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
