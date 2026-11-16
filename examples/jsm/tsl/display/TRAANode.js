@@ -1,4 +1,4 @@
-import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
+import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture, warnOnce } from 'three/webgpu';
 import { float, Fn, max, texture, uniform, uv, vec2, vec4, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
 import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
 
@@ -458,6 +458,26 @@ class TRAANode extends Node {
 		this.depthNode.build( builder );
 		this.velocityNode.build( builder );
 		this.beautyNode.build( builder );
+
+		for ( const node of [ this.depthNode, this.velocityNode, this.beautyNode ] ) {
+
+			const renderTarget = node.value.renderTarget;
+
+			if ( renderTarget !== null && renderTarget.samples > 0 ) {
+
+				warnOnce( 'TRAANode: MSAA is incompatible with TRAA and has been disabled on the input pass.' );
+
+				if ( node.isPassTextureNode === true ) {
+
+					node.passNode.options.samples = 0;
+
+				}
+
+				renderTarget.samples = 0;
+
+			}
+
+		}
 
 		if ( builder.renderPipeline && ! builder.context.renderPipelineState.viewOffsetOwner ) {
 

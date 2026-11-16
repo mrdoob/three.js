@@ -1,4 +1,4 @@
-import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
+import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture, warnOnce } from 'three/webgpu';
 import { exp, float, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, ivec2, mix, outputStruct, struct, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
 import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
 
@@ -489,6 +489,26 @@ class TAAUNode extends Node {
 		this.depthNode.build( builder );
 		this.velocityNode.build( builder );
 		this.beautyNode.build( builder );
+
+		for ( const node of [ this.depthNode, this.velocityNode, this.beautyNode ] ) {
+
+			const renderTarget = node.value.renderTarget;
+
+			if ( renderTarget !== null && renderTarget.samples > 0 ) {
+
+				warnOnce( 'TAAUNode: MSAA is incompatible with TAAU and has been disabled on the input pass.' );
+
+				if ( node.isPassTextureNode === true ) {
+
+					node.passNode.options.samples = 0;
+
+				}
+
+				renderTarget.samples = 0;
+
+			}
+
+		}
 
 		if ( builder.renderPipeline && ! builder.context.renderPipelineState.viewOffsetOwner ) {
 
