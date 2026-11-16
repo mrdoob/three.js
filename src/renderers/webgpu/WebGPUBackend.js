@@ -1962,7 +1962,12 @@ class WebGPUBackend extends Backend {
 
 		// pipeline
 
-		const pipelineGPU = this.get( pipeline ).pipeline;
+		const pipelineData = this.get( pipeline );
+
+		// Skip if pipeline has error
+		if ( pipelineData.error === true ) return;
+
+		const pipelineGPU = pipelineData.pipeline;
 
 		if ( groupGPU.currentPipeline !== pipelineGPU ) {
 
