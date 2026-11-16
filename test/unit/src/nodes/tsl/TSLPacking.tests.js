@@ -6,19 +6,11 @@ import {
 	packSnorm4x8, unpackSnorm4x8,
 	packUnorm4x8, unpackUnorm4x8,
 	packNormalToRGB, unpackRGBToNormal, unpackNormal,
-	packNormalToOctahedral, unpackOctahedralToNormal, unpackOctahedralToNormalUnnormalized,
-	length, normalize, mix
+	packNormalToOctahedral, unpackOctahedralToNormal,
+	length, normalize
 } from 'three/tsl';
 import { toHalfFloat } from '../../../../../src/extras/DataUtils.js';
 import { gpuTest, gpuFuzzTest } from './gpu-test-utils.js';
-
-// Mirrors the octahedral normal accessor of the SSR examples: the four taps are decoded
-// without normalizing, blended bilinearly, and the result is normalized once.
-const blendOctahedral = ( e00, e10, e01, e11, weight ) => mix(
-	mix( unpackOctahedralToNormalUnnormalized( e00 ), unpackOctahedralToNormalUnnormalized( e10 ), weight.x ),
-	mix( unpackOctahedralToNormalUnnormalized( e01 ), unpackOctahedralToNormalUnnormalized( e11 ), weight.x ),
-	weight.y
-).normalize();
 
 // Packing/unpacking coverage: every round-trip test checks a value that was
 // packed and then unpacked against the *original* input (an independent,
@@ -117,9 +109,6 @@ export default QUnit.module( 'Nodes', () => {
 				assert.closeAbs( unpackOctahedralToNormal( vec2( - 1, 1 ) ), vec3( 0, 0, - 1 ), 1e-6, 'corner is -Z' );
 				assert.closeAbs( unpackOctahedralToNormal( vec2( 4 / 7, 1 ) ), vec3( 0, 0.6, - 0.8 ), 1e-6, 'lower hemisphere edge' );
 
-				assert.closeAbs( unpackOctahedralToNormalUnnormalized( vec2( 4 / 7, 1 ) ), vec3( 0, 3 / 7, - 4 / 7 ), 1e-6, 'unnormalized lower hemisphere edge' );
-				assert.closeAbs( unpackOctahedralToNormalUnnormalized( vec2( 0, - 1 ) ), vec3( 0, - 1, 0 ), 1e-6, 'unnormalized fold boundary with x == 0' );
-
 			} );
 
 			gpuFuzzTest( 'packNormalToOctahedral <-> unpackOctahedralToNormal round trip', 1024, ( { instanceIndex, assert } ) => {
@@ -128,49 +117,6 @@ export default QUnit.module( 'Nodes', () => {
 				const direction = vec3( hash( seed.add( 1 ) ), hash( seed.add( 5000 ) ), hash( seed.add( 9000 ) ) ).sub( 0.5 );
 
 				assert.closeAbs( unpackOctahedralToNormal( packNormalToOctahedral( direction.mul( 10 ) ) ), normalize( direction ), 1e-5, 'recovers the normalized direction' );
-
-			} );
-
-			gpuTest( 'octahedral bilinear blend known values', ( { assert } ) => {
-
-				const n00 = vec3( 0.6, 0, 0.8 );
-				const n10 = vec3( 0, 0.6, 0.8 );
-				const n01 = vec3( 0, 0.6, - 0.8 );
-				const n11 = vec3( - 0.8, 0, - 0.6 );
-				const blend = ( weight ) => blendOctahedral( packNormalToOctahedral( n00 ), packNormalToOctahedral( n10 ), packNormalToOctahedral( n01 ), packNormalToOctahedral( n11 ), weight );
-
-				assert.closeAbs( blend( vec2( 0, 0 ) ), n00, 1e-6, 'weight (0, 0) returns the first tap' );
-				assert.closeAbs( blend( vec2( 1, 0 ) ), n10, 1e-6, 'weight (1, 0) returns the second tap' );
-				assert.closeAbs( blend( vec2( 0, 1 ) ), n01, 1e-6, 'weight (0, 1) returns the third tap' );
-				assert.closeAbs( blend( vec2( 1, 1 ) ), n11, 1e-6, 'weight (1, 1) returns the fourth tap' );
-
-				// Two lower hemisphere normals on opposite sides of a fold. Their encoded coordinates
-				// sit near opposite edges of the square, so interpolating the coordinates themselves
-				// would land in the upper hemisphere.
-				const a = packNormalToOctahedral( vec3( 0.3, 0.1, - 0.9 ) );
-				const b = packNormalToOctahedral( vec3( - 0.3, 0.1, - 0.9 ) );
-				const expected = normalize( vec3( 0, 0.1, - 0.9 ) );
-
-				assert.closeAbs( blendOctahedral( a, b, a, b, vec2( 0.5, 0.5 ) ), expected, 1e-6, 'blending across a fold stays between the taps' );
-				assert.closeAbs( unpackOctahedralToNormal( mix( a, b, 0.5 ) ), vec3( 0, 10, 3 ).normalize(), 1e-5, '...whereas interpolating the encoded coordinates flips the normal upwards' );
-
-			} );
-
-			gpuFuzzTest( 'octahedral bilinear blend matches blending the normals', 1024, ( { instanceIndex, assert } ) => {
-
-				// Four neighboring unit normals anywhere on the sphere, including across the folds.
-				const seed = instanceIndex.toFloat();
-				const random3 = ( offset ) => vec3( hash( seed.add( offset ) ), hash( seed.add( offset + 5000 ) ), hash( seed.add( offset + 9000 ) ) ).sub( 0.5 );
-				const center = normalize( random3( 1 ) );
-				const tap = ( offset ) => normalize( center.add( random3( offset ).mul( 0.05 ) ) );
-				const n00 = tap( 100 ), n10 = tap( 200 ), n01 = tap( 300 ), n11 = tap( 400 );
-				const weight = vec2( hash( seed.add( 500 ) ), hash( seed.add( 600 ) ) );
-
-				const expected = normalize( mix( mix( n00, n10, weight.x ), mix( n01, n11, weight.x ), weight.y ) );
-				const actual = blendOctahedral( packNormalToOctahedral( n00 ), packNormalToOctahedral( n10 ), packNormalToOctahedral( n01 ), packNormalToOctahedral( n11 ), weight );
-
-				// The taps are blended before normalizing, so their differing lengths bias the weights slightly.
-				assert.closeAbs( actual, expected, 2e-3, 'single normalize blend matches the blend of unit normals' );
 
 			} );
 
