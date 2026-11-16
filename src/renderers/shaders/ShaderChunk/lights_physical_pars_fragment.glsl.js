@@ -448,7 +448,7 @@ float IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float 
 vec3 EnvironmentBRDF( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness ) {
 
 	float dotNV = saturate( dot( normal, viewDir ) );
-	vec2 fab = texture2D( dfgLUT, vec2( roughness, dotNV ) ).rg;
+	vec2 fab = textureLod( dfgLUT, vec2( roughness, dotNV ), 0.0 ).rg;
 
 	return specularColor * fab.x + specularF90 * fab.y;
 
