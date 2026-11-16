@@ -821,8 +821,8 @@ class Color {
 		this.getHSL( _hslA );
 		color.getHSL( _hslB );
 
-		// a gray has no hue (getHSL() reports 0, which is red), so it takes the hue of the
-		// other color. Otherwise white to blue would pass through green.
+		// grays have no hue, so use the hue of the other color
+
 		if ( _hslA.s === 0 ) _hslA.h = _hslB.h;
 		if ( _hslB.s === 0 ) _hslB.h = _hslA.h;
 
