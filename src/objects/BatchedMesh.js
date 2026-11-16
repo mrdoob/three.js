@@ -1483,6 +1483,7 @@ class BatchedMesh extends Mesh {
 		this.sortObjects = source.sortObjects;
 		this.boundingBox = source.boundingBox !== null ? source.boundingBox.clone() : null;
 		this.boundingSphere = source.boundingSphere !== null ? source.boundingSphere.clone() : null;
+		this.customSort = source.customSort;
 
 		this._geometryInfo = source._geometryInfo.map( info => ( {
 			...info,
@@ -1499,6 +1500,8 @@ class BatchedMesh extends Mesh {
 		this._nextVertexStart = source._nextVertexStart;
 		this._geometryCount = source._geometryCount;
 
+		this._visibilityChanged = true;
+
 		this._maxInstanceCount = source._maxInstanceCount;
 		this._maxVertexCount = source._maxVertexCount;
 		this._maxIndexCount = source._maxIndexCount;
@@ -1510,6 +1513,8 @@ class BatchedMesh extends Mesh {
 		this._mergedDrawCounts = source._mergedDrawCounts.slice();
 		this._mergedDrawStarts = source._mergedDrawStarts.slice();
 		this._mergedDrawInstanceCounts = source._mergedDrawInstanceCounts.slice();
+		this._multiDrawCount = source._multiDrawCount;
+		this._mergedDrawCount = source._mergedDrawCount;
 
 		this._indirectTexture = source._indirectTexture.clone();
 		this._indirectTexture.image.data = this._indirectTexture.image.data.slice();
