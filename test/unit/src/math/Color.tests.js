@@ -451,6 +451,28 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'lerpHSL', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
+			const c = new Color( 1, 0, 0 );
+			c.lerpHSL( new Color( 0, 1, 0 ), 0.5 );
+			assert.ok( c.getHex() === 0xffff00, 'Red to green passes through yellow: ' + c.getHexString() );
+
+			const white = new Color( 1, 1, 1 );
+			white.lerpHSL( new Color( 0, 0, 1 ), 0.5 );
+			assert.ok( white.getHex() === 0x9f9fdf, 'White to blue keeps the hue of blue: ' + white.getHexString() );
+
+			const blue = new Color( 0, 0, 1 );
+			blue.lerpHSL( new Color( 0.5, 0.5, 0.5 ), 0.5 );
+			assert.ok( blue.getHex() === 0x4040bf, 'Blue to gray keeps the hue of blue: ' + blue.getHexString() );
+
+			const gray = new Color( 0.2, 0.2, 0.2 );
+			gray.lerpHSL( new Color( 0.6, 0.6, 0.6 ), 0.5 );
+			assert.ok( gray.r === gray.g && gray.g === gray.b, 'Gray to gray stays gray: ' + gray.getHexString() );
+
+		} );
+
 		QUnit.test( 'equals', ( assert ) => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
