@@ -57,7 +57,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, packNormalToOctahedral, unpackOctahedralToNormal, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
+		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, packNormalToOctahedral, unpackOctahedralToNormal, textureSize, ivec2, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 		import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
@@ -271,14 +271,26 @@
 				const normalTexture = scenePass.getTexture( 'normal' );
 				normalTexture.type = octahedralNormals ? THREE.HalfFloatType : THREE.UnsignedByteType;
 				normalTexture.format = octahedralNormals ? THREE.RGFormat : THREE.RGBAFormat;
-				// Octahedral coordinates must be decoded before interpolating across their folds.
-				normalTexture.minFilter = normalTexture.magFilter = THREE.NearestFilter;
+				// RGB8 normals filter in hardware. Octahedral coordinates cannot be interpolated across their folds.
+				normalTexture.minFilter = normalTexture.magFilter = octahedralNormals ? THREE.NearestFilter : THREE.LinearFilter;
 
 				const diffuseTexture = scenePass.getTexture( 'diffuseColor' );
 				diffuseTexture.type = THREE.UnsignedByteType;
 
-				// SSR consumes decoded normals through SampleNode, independent of the MRT encoding.
-				const sceneNormal = sample( ( uv ) => normalDecode( scenePassNormal.sample( uv ) ) );
+				// The accessor hides the filtering: a filtered read for RGB8, or a decode of the four nearest texels before blending for octahedral.
+				const sceneNormal = sample( ( uv ) => {
+
+					if ( octahedralNormals === false ) return normalDecode( scenePassNormal.sample( uv ) );
+
+					const size = textureSize( scenePassNormal );
+					const coord = uv.mul( vec2( size ) ).sub( 0.5 );
+					const base = ivec2( coord.floor() );
+					const weight = coord.fract();
+					const tap = ( x, y ) => normalDecode( scenePassNormal.load( base.add( ivec2( x, y ) ).clamp( ivec2( 0 ), ivec2( size ).sub( 1 ) ) ) );
+
+					return mix( mix( tap( 0, 0 ), tap( 1, 0 ), weight.x ), mix( tap( 0, 1 ), tap( 1, 1 ), weight.x ), weight.y ).normalize();
+
+				} );
 				const sceneRoughness = scenePassVelocity.z;
 
 				// Metalness in diffuseColor.a, roughness in velocity.z (no separate metalrough MRT).
