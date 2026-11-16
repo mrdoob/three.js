@@ -4,7 +4,7 @@ let _color4 = null;
 import Color4 from './Color4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { createCanvasElement, warnOnce } from '../../utils.js';
-import { REVISION, TimestampQuery } from '../../constants.js';
+import { REVISION } from '../../constants.js';
 
 /**
  * Most of the rendering related logic is implemented in the
@@ -58,22 +58,18 @@ class Backend {
 		this.domElement = null;
 
 		/**
-		 * A reference to the timestamp query pool.
-   		 *
-   		 * @type {{render: ?TimestampQueryPool, compute: ?TimestampQueryPool}}
-		 */
-		this.timestampQueryPool = {
-			[ TimestampQuery.RENDER ]: null,
-			[ TimestampQuery.COMPUTE ]: null
-		};
-
-		/**
-		 * Whether to track timestamps with a Timestamp Query API or not.
+		 * The timestamp query pool of the GPU timers, created on first use.
 		 *
-		 * @type {boolean}
-		 * @default false
+		 * @type {?TimestampQueryPool}
+		 * @default null
 		 */
-		this.trackTimestamp = ( parameters.trackTimestamp === true );
+		this.timestampQueryPool = null;
+
+		if ( parameters.trackTimestamp === true ) {
+
+			warnOnce( 'WebGPURenderer: "trackTimestamp" has been removed. Use "GPUTimer" instead.' ); // @deprecated r188
+
+		}
 
 	}
 
@@ -514,8 +510,8 @@ class Backend {
 	// utils
 
 	/**
-	 * Updates a unique identifier for the given render context that can be used
-	 * to allocate resources like occlusion queries or timestamp queries.
+	 * Updates a unique identifier for the given render or compute call. The inspector
+	 * uses it to identify the call across frames.
 	 *
 	 * @param {RenderContext|ComputeNode|Array<ComputeNode>} abstractRenderContext - The render context.
 	 */
@@ -549,8 +545,7 @@ class Backend {
 	}
 
 	/**
-	 * Returns a unique identifier for the given render context that can be used
-	 * to allocate resources like occlusion queries or timestamp queries.
+	 * Returns the unique identifier of the given render or compute call.
 	 *
 	 * @param {RenderContext|ComputeNode} abstractRenderContext - The render context.
 	 * @return {string} The unique identifier.
@@ -558,49 +553,6 @@ class Backend {
 	getTimestampUID( abstractRenderContext ) {
 
 		return this.get( abstractRenderContext ).timestampUID;
-
-	}
-
-	/**
-	 * Returns all timestamp frames for the given type.
-	 *
-	 * @param {string} type - The type of the time stamp.
-	 * @return {Array<number>} The timestamp frames.
-	 */
-	getTimestampFrames( type ) {
-
-		const queryPool = this.timestampQueryPool[ type ];
-
-		return queryPool ? queryPool.getTimestampFrames() : [];
-
-	}
-
-	/**
-	 * Returns the query pool for the given uid.
-	 *
-	 * @param {string} uid - The unique identifier.
-	 * @return {TimestampQueryPool} The query pool.
-	 */
-	_getQueryPool( uid ) {
-
-		const type = uid.startsWith( 'c:' ) ? TimestampQuery.COMPUTE : TimestampQuery.RENDER;
-		const queryPool = this.timestampQueryPool[ type ];
-
-		return queryPool;
-
-	}
-
-	/**
-	 * Returns the timestamp for the given uid.
-	 *
-	 * @param {string} uid - The unique identifier.
-	 * @return {number} The timestamp.
-	 */
-	getTimestamp( uid ) {
-
-		const queryPool = this._getQueryPool( uid );
-
-		return queryPool.getTimestamp( uid );
 
 	}
 
@@ -617,42 +569,53 @@ class Backend {
 	}
 
 	/**
-	 * Returns `true` if a timestamp for the given uid is available.
+	 * Creates the timestamp query pool of the GPU timers.
 	 *
-	 * @param {string} uid - The unique identifier.
-	 * @return {boolean} Whether the timestamp is available or not.
+	 * @abstract
+	 * @return {TimestampQueryPool} The timestamp query pool.
 	 */
-	hasTimestampQuery( uid ) {
-
-		const queryPool = this._getQueryPool( uid );
-
-		return queryPool.hasTimestampQuery( uid );
-
-	}
+	createTimestampQueryPool() {}
 
 	/**
-	 * Starts a GPU timer measurement. Backends that support timing return the measurement,
-	 * others return `null`.
+	 * Starts a GPU timer measurement. While a timer is active, the render and compute calls
+	 * allocate timestamp queries.
 	 *
-	 * @return {?(number|Object)} The measurement, specific to the backend.
+	 * @return {?Object} The timer, or `null` without timestamp queries.
 	 */
 	beginTimer() {
 
-		return null;
+		if ( this.hasTimestamp === false ) return null;
+
+		if ( this.timestampQueryPool === null ) this.timestampQueryPool = this.createTimestampQueryPool();
+
+		return this.timestampQueryPool.beginTimer();
 
 	}
 
 	/**
-	 * Ends the given measurement and returns its GPU time in milliseconds, or `null` when the
-	 * backend doesn't support timing.
+	 * Ends the given measurement and returns its GPU time in milliseconds once its queries
+	 * are read back, or `null` when the backend doesn't support timing.
 	 *
 	 * @async
-	 * @param {?(number|Object)} measurement - The measurement returned by {@link Backend#beginTimer}.
+	 * @param {?Object} timer - The value returned by {@link Backend#beginTimer}.
 	 * @return {Promise<?number>} The GPU time in milliseconds.
 	 */
-	async endTimer( /* measurement */ ) {
+	async endTimer( timer ) {
 
-		return null;
+		if ( timer === null ) return null;
+
+		await this.timestampQueryPool.endTimer( timer );
+
+		return this.timestampQueryPool.getDuration( timer );
+
+	}
+
+	/**
+	 * Reads back the timestamp queries. The renderer calls this method once per frame.
+	 */
+	resolveTimestamps() {
+
+		if ( this.timestampQueryPool !== null ) this.timestampQueryPool.resolveQueries();
 
 	}
 
@@ -690,39 +653,6 @@ class Backend {
 		}
 
 		return occlusionData;
-
-	}
-
-	/**
-	 * Resolves the time stamp for the given render context and type.
-	 *
-	 * @async
-	 * @abstract
-	 * @param {string} [type='render'] - The type of the time stamp.
-	 * @return {Promise<number>} A Promise that resolves with the time stamp.
-	 */
-	async resolveTimestampsAsync( type = 'render' ) {
-
-		if ( ! this.trackTimestamp ) {
-
-			warnOnce( 'WebGPURenderer: Timestamp tracking is disabled.' );
-			return;
-
-		}
-
-		const queryPool = this.timestampQueryPool[ type ];
-
-		if ( ! queryPool ) {
-
-			return;
-
-		}
-
-		const duration = await queryPool.resolveQueriesAsync();
-
-		this.renderer.info[ type ].timestamp = duration;
-
-		return duration;
 
 	}
 
@@ -925,15 +855,7 @@ class Backend {
 	 */
 	async dispose() {
 
-		for ( const queryPool of Object.values( this.timestampQueryPool ) ) {
-
-			if ( queryPool !== null ) {
-
-				await queryPool.dispose();
-
-			}
-
-		}
+		if ( this.timestampQueryPool !== null ) await this.timestampQueryPool.dispose();
 
 	}
 

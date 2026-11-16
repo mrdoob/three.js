@@ -111,7 +111,7 @@
 				timer = new THREE.Timer();
 				timer.connect( document );
 
-				renderer = new THREE.WebGPURenderer( { antialias: true, alpha: true, trackTimestamp: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( 0x000000 );
