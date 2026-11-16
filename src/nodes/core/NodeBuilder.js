@@ -200,7 +200,7 @@ const _hasContextOverrides = ( context, baseContext ) => {
 
 };
 
-const _nonSharedContextProperties = new Set( [
+const _localContextProperties = new Set( [
 	'material',
 	'getUV',
 	'getOutput',
@@ -1188,7 +1188,7 @@ class NodeBuilder {
 
 		for ( const key in this.context ) {
 
-			if ( _nonSharedContextProperties.has( key ) === false ) {
+			if ( _localContextProperties.has( key ) === false ) {
 
 				context[ key ] = this.context[ key ];
 
