@@ -3866,7 +3866,7 @@ class ShaderCallNodeInternal extends Node {
 
 			//
 
-			const inputs = getLayoutParameters( layoutInputs );
+			const inputs = builder._getLayoutCallParameters( shaderNode.layout, getLayoutParameters( layoutInputs ) );
 
 			result = functionNode.call( inputs );
 
@@ -9241,6 +9241,7 @@ class VaryingNode extends Node {
 
 			properties.varying = varying = builder.getVaryingFromNode( this, name, type, interpolationType, interpolationSampling );
 			properties.node = subBuild( this.node, 'VERTEX' );
+			properties.vertexAnalyzed = false;
 
 		}
 
@@ -9277,11 +9278,20 @@ class VaryingNode extends Node {
 
 		// TODO: Node.build() could pass through the output node of setup() directly, so overrides of analyze() and generate() don't need to handle it twice
 
-		if ( builder.getNodeProperties( this ).outputNode ) return super.analyze( builder );
+		const properties = builder.getNodeProperties( this );
+
+		if ( properties.outputNode ) return super.analyze( builder );
 
 		this.setupVarying( builder );
 
-		builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
+		// The vertex value is generated once, so it is analyzed once, however many times the varying is read.
+		if ( properties.vertexAnalyzed === false ) {
+
+			properties.vertexAnalyzed = true;
+
+			builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
+
+		}
 
 	}
 
@@ -12456,6 +12466,12 @@ class ParameterNode extends PropertyNode {
 	getHash() {
 
 		return String( this.id );
+
+	}
+
+	getInputType( builder ) {
+
+		return this.getNodeType( builder );
 
 	}
 
@@ -18782,35 +18798,50 @@ class TextureNode extends UniformNode {
 
 		if ( builder.isFlipY() ) {
 
-			const baseNode = this.getBase();
-
-			if ( baseNode._flipYUniform === null ) {
-
-				baseNode._flipYUniform = uniform( false ).onObjectUpdate( () => {
-
-					const texture = baseNode.value;
-
-					return ( texture.image instanceof ImageBitmap && texture.flipY === true ) || texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true || texture.isDepthTexture === true;
-
-				} );
-
-			}
+			const flipYUniform = this._getFlipYUniform();
 
 			uvNode = uvNode.toVar();
 
 			if ( this.sampler ) {
 
-				uvNode = baseNode._flipYUniform.select( uvNode.flipY(), uvNode );
+				uvNode = flipYUniform.select( uvNode.flipY(), uvNode );
 
 			} else {
 
-				uvNode = baseNode._flipYUniform.select( uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( int( uvNode.y ) ).sub( 1 ) ), uvNode );
+				uvNode = flipYUniform.select( uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( int( uvNode.y ) ).sub( 1 ) ), uvNode );
 
 			}
 
 		}
 
 		return uvNode;
+
+	}
+
+	/**
+	 * Returns the uniform that defines whether the texture is flipped on the y-axis.
+	 * Only required for WebGL, see {@link NodeBuilder#isFlipY}.
+	 *
+	 * @private
+	 * @return {UniformNode<bool>} The y-flip uniform.
+	 */
+	_getFlipYUniform() {
+
+		const baseNode = this.getBase();
+
+		if ( baseNode._flipYUniform === null ) {
+
+			baseNode._flipYUniform = uniform( false ).onObjectUpdate( () => {
+
+				const texture = baseNode.value;
+
+				return ( texture.image instanceof ImageBitmap && texture.flipY === true ) || texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true || texture.isDepthTexture === true;
+
+			} );
+
+		}
+
+		return baseNode._flipYUniform;
 
 	}
 
@@ -19662,6 +19693,11 @@ class ViewportTextureNode extends TextureNode {
 	updateBefore( frame ) {
 
 		const renderer = frame.renderer;
+
+		// do not copy during precompilation
+
+		if ( renderer._precompilationState !== null ) return false;
+
 		const renderTarget = renderer.getRenderTarget();
 		const canvasTarget = renderer.getCanvasTarget();
 
@@ -19920,17 +19956,9 @@ class ViewportDepthNode extends Node {
 
 			if ( value !== null ) {
 
-				if ( camera.isOrthographicCamera !== true ) {
+				const viewZ = depthToViewZ( value, cameraNear, cameraFar, camera );
 
-					const viewZ = perspectiveDepthToViewZ( value, cameraNear, cameraFar );
-
-					node = viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
-
-				} else {
-
-					node = value;
-
-				}
+				node = viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
 
 			} else {
 
@@ -20323,6 +20351,233 @@ const triplanarTextures = /*@__PURE__*/ Fn( ( [ textureXNode, textureYNode = nul
  */
 const triplanarTexture = ( ...params ) => triplanarTextures( ...params );
 
+/**
+ * Saves the state of the given renderer and stores it into the given state object.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @private
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
+function saveRendererState( renderer, state = {} ) {
+
+	state.toneMapping = renderer.toneMapping;
+	state.toneMappingExposure = renderer.toneMappingExposure;
+	state.outputColorSpace = renderer.outputColorSpace;
+	state.renderTarget = renderer.getRenderTarget();
+	state.activeCubeFace = renderer.getActiveCubeFace();
+	state.activeMipmapLevel = renderer.getActiveMipmapLevel();
+	state.renderObjectFunction = renderer.getRenderObjectFunction();
+	state.pixelRatio = renderer.getPixelRatio();
+	state.mrt = renderer.getMRT();
+	state.clearColor = renderer.getClearColor( state.clearColor || new Color() );
+	state.clearAlpha = renderer.getClearAlpha();
+	state.autoClear = renderer.autoClear;
+	state.autoClearColor = renderer.autoClearColor;
+	state.autoClearDepth = renderer.autoClearDepth;
+	state.autoClearStencil = renderer.autoClearStencil;
+	state.opaque = renderer.opaque;
+	state.transparent = renderer.transparent;
+	state.scissorTest = renderer.getScissorTest();
+
+	return state;
+
+}
+
+/**
+ * Saves the state of the given renderer and stores it into the given state object.
+ * Besides, the function also resets the state of the renderer to its default values.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @private
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
+function resetRendererState( renderer, state ) {
+
+	state = saveRendererState( renderer, state );
+
+	renderer.setMRT( null );
+	renderer.setRenderObjectFunction( null );
+	renderer.setClearColor( 0x000000, 1 );
+	renderer.autoClear = true;
+	renderer.autoClearColor = true;
+	renderer.autoClearDepth = true;
+	renderer.autoClearStencil = true;
+	renderer.opaque = true;
+	renderer.transparent = true;
+
+	return state;
+
+}
+
+/**
+ * Restores the state of the given renderer from the given state object.
+ *
+ * @private
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Object} state - The state to restore.
+ */
+function restoreRendererState( renderer, state ) {
+
+	renderer.toneMapping = state.toneMapping;
+	renderer.toneMappingExposure = state.toneMappingExposure;
+	renderer.outputColorSpace = state.outputColorSpace;
+	renderer.setRenderTarget( state.renderTarget, state.activeCubeFace, state.activeMipmapLevel );
+	renderer.setRenderObjectFunction( state.renderObjectFunction );
+	renderer.setPixelRatio( state.pixelRatio );
+	renderer.setMRT( state.mrt );
+	renderer.setClearColor( state.clearColor, state.clearAlpha );
+	renderer.autoClear = state.autoClear;
+	renderer.autoClearColor = state.autoClearColor;
+	renderer.autoClearDepth = state.autoClearDepth;
+	renderer.autoClearStencil = state.autoClearStencil;
+	renderer.opaque = state.opaque;
+	renderer.transparent = state.transparent;
+	renderer.setScissorTest( state.scissorTest );
+
+}
+
+/**
+ * Saves the state of the given scene and stores it into the given state object.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @private
+ * @function
+ * @param {Scene} scene - The scene.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
+function saveSceneState( scene, state = {} ) {
+
+	state.background = scene.background;
+	state.backgroundNode = scene.backgroundNode;
+	state.overrideMaterial = scene.overrideMaterial;
+
+	return state;
+
+}
+
+/**
+ * Saves the state of the given scene and stores it into the given state object.
+ * Besides, the function also resets the state of the scene to its default values.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @private
+ * @function
+ * @param {Scene} scene - The scene.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
+function resetSceneState( scene, state ) {
+
+	state = saveSceneState( scene, state );
+
+	scene.background = null;
+	scene.backgroundNode = null;
+	scene.overrideMaterial = null;
+
+	return state;
+
+}
+
+/**
+ * Restores the state of the given scene from the given state object.
+ *
+ * @private
+ * @function
+ * @param {Scene} scene - The scene.
+ * @param {Object} state - The state to restore.
+ */
+function restoreSceneState( scene, state ) {
+
+	scene.background = state.background;
+	scene.backgroundNode = state.backgroundNode;
+	scene.overrideMaterial = state.overrideMaterial;
+
+}
+
+/**
+ * Saves the state of the given renderer and scene and stores it into the given state object.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @private
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Scene} scene - The scene.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
+function saveRendererAndSceneState( renderer, scene, state = {} ) {
+
+	state = saveRendererState( renderer, state );
+	state = saveSceneState( scene, state );
+
+	return state;
+
+}
+
+/**
+ * Saves the state of the given renderer and scene and stores it into the given state object.
+ * Besides, the function also resets the state of the renderer and scene to its default values.
+ *
+ * If not state object is provided, the function creates one.
+ *
+ * @private
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Scene} scene - The scene.
+ * @param {Object} [state={}] - The state.
+ * @return {Object} The state.
+ */
+function resetRendererAndSceneState( renderer, scene, state ) {
+
+	state = resetRendererState( renderer, state );
+	state = resetSceneState( scene, state );
+
+	return state;
+
+}
+
+/**
+ * Restores the state of the given renderer and scene from the given state object.
+ *
+ * @private
+ * @function
+ * @param {Renderer} renderer - The renderer.
+ * @param {Scene} scene - The scene.
+ * @param {Object} state - The state to restore.
+ */
+function restoreRendererAndSceneState( renderer, scene, state ) {
+
+	restoreRendererState( renderer, state );
+	restoreSceneState( scene, state );
+
+}
+
+var RendererUtils = /*#__PURE__*/Object.freeze({
+	__proto__: null,
+	resetRendererAndSceneState: resetRendererAndSceneState,
+	resetRendererState: resetRendererState,
+	resetSceneState: resetSceneState,
+	restoreRendererAndSceneState: restoreRendererAndSceneState,
+	restoreRendererState: restoreRendererState,
+	restoreSceneState: restoreSceneState,
+	saveRendererAndSceneState: saveRendererAndSceneState,
+	saveRendererState: saveRendererState,
+	saveSceneState: saveSceneState
+});
+
 const _reflectorPlane = new Plane();
 const _normal = new Vector3();
 const _reflectorWorldPosition = new Vector3();
@@ -20643,6 +20898,14 @@ class ReflectorBaseNode extends Node {
 		 */
 		this.hasOutput = false;
 
+		/**
+		 * The renderer state saved and restored around the reflector render.
+		 *
+		 * @private
+		 * @type {Object}
+		 */
+		this._rendererState = {};
+
 	}
 
 	isCacheable( /*builder*/ ) {
@@ -20880,13 +21143,11 @@ class ReflectorBaseNode extends Node {
 
 		material.visible = false;
 
-		const currentRenderTarget = renderer.getRenderTarget();
-		const currentMRT = renderer.getMRT();
-		const currentAutoClear = renderer.autoClear;
+		resetRendererState( renderer, this._rendererState );
 
-		renderer.setMRT( null );
+		renderer.setClearColor( this._rendererState.clearColor, this._rendererState.clearAlpha );
+
 		renderer.setRenderTarget( renderTarget );
-		renderer.autoClear = true;
 
 		const previousName = scene.name;
 
@@ -20908,9 +21169,7 @@ class ReflectorBaseNode extends Node {
 
 		scene.name = previousName;
 
-		renderer.setMRT( currentMRT );
-		renderer.setRenderTarget( currentRenderTarget );
-		renderer.autoClear = currentAutoClear;
+		restoreRendererState( renderer, this._rendererState );
 
 		material.visible = true;
 
@@ -27608,7 +27867,7 @@ class NodeMaterial extends Material {
 
 			const samples = builder.renderer.currentSamples;
 
-			if ( this.alphaToCoverage && samples > 1 ) {
+			if ( this.alphaToCoverage && samples > 0 ) {
 
 				// to be added to flow when the color/alpha value has been determined
 				result = clippingAlpha();
@@ -28500,233 +28759,6 @@ class QuadMesh extends Mesh {
 	}
 
 }
-
-/**
- * Saves the state of the given renderer and stores it into the given state object.
- *
- * If not state object is provided, the function creates one.
- *
- * @private
- * @function
- * @param {Renderer} renderer - The renderer.
- * @param {Object} [state={}] - The state.
- * @return {Object} The state.
- */
-function saveRendererState( renderer, state = {} ) {
-
-	state.toneMapping = renderer.toneMapping;
-	state.toneMappingExposure = renderer.toneMappingExposure;
-	state.outputColorSpace = renderer.outputColorSpace;
-	state.renderTarget = renderer.getRenderTarget();
-	state.activeCubeFace = renderer.getActiveCubeFace();
-	state.activeMipmapLevel = renderer.getActiveMipmapLevel();
-	state.renderObjectFunction = renderer.getRenderObjectFunction();
-	state.pixelRatio = renderer.getPixelRatio();
-	state.mrt = renderer.getMRT();
-	state.clearColor = renderer.getClearColor( state.clearColor || new Color() );
-	state.clearAlpha = renderer.getClearAlpha();
-	state.autoClear = renderer.autoClear;
-	state.autoClearColor = renderer.autoClearColor;
-	state.autoClearDepth = renderer.autoClearDepth;
-	state.autoClearStencil = renderer.autoClearStencil;
-	state.opaque = renderer.opaque;
-	state.transparent = renderer.transparent;
-	state.scissorTest = renderer.getScissorTest();
-
-	return state;
-
-}
-
-/**
- * Saves the state of the given renderer and stores it into the given state object.
- * Besides, the function also resets the state of the renderer to its default values.
- *
- * If not state object is provided, the function creates one.
- *
- * @private
- * @function
- * @param {Renderer} renderer - The renderer.
- * @param {Object} [state={}] - The state.
- * @return {Object} The state.
- */
-function resetRendererState( renderer, state ) {
-
-	state = saveRendererState( renderer, state );
-
-	renderer.setMRT( null );
-	renderer.setRenderObjectFunction( null );
-	renderer.setClearColor( 0x000000, 1 );
-	renderer.autoClear = true;
-	renderer.autoClearColor = true;
-	renderer.autoClearDepth = true;
-	renderer.autoClearStencil = true;
-	renderer.opaque = true;
-	renderer.transparent = true;
-
-	return state;
-
-}
-
-/**
- * Restores the state of the given renderer from the given state object.
- *
- * @private
- * @function
- * @param {Renderer} renderer - The renderer.
- * @param {Object} state - The state to restore.
- */
-function restoreRendererState( renderer, state ) {
-
-	renderer.toneMapping = state.toneMapping;
-	renderer.toneMappingExposure = state.toneMappingExposure;
-	renderer.outputColorSpace = state.outputColorSpace;
-	renderer.setRenderTarget( state.renderTarget, state.activeCubeFace, state.activeMipmapLevel );
-	renderer.setRenderObjectFunction( state.renderObjectFunction );
-	renderer.setPixelRatio( state.pixelRatio );
-	renderer.setMRT( state.mrt );
-	renderer.setClearColor( state.clearColor, state.clearAlpha );
-	renderer.autoClear = state.autoClear;
-	renderer.autoClearColor = state.autoClearColor;
-	renderer.autoClearDepth = state.autoClearDepth;
-	renderer.autoClearStencil = state.autoClearStencil;
-	renderer.opaque = state.opaque;
-	renderer.transparent = state.transparent;
-	renderer.setScissorTest( state.scissorTest );
-
-}
-
-/**
- * Saves the state of the given scene and stores it into the given state object.
- *
- * If not state object is provided, the function creates one.
- *
- * @private
- * @function
- * @param {Scene} scene - The scene.
- * @param {Object} [state={}] - The state.
- * @return {Object} The state.
- */
-function saveSceneState( scene, state = {} ) {
-
-	state.background = scene.background;
-	state.backgroundNode = scene.backgroundNode;
-	state.overrideMaterial = scene.overrideMaterial;
-
-	return state;
-
-}
-
-/**
- * Saves the state of the given scene and stores it into the given state object.
- * Besides, the function also resets the state of the scene to its default values.
- *
- * If not state object is provided, the function creates one.
- *
- * @private
- * @function
- * @param {Scene} scene - The scene.
- * @param {Object} [state={}] - The state.
- * @return {Object} The state.
- */
-function resetSceneState( scene, state ) {
-
-	state = saveSceneState( scene, state );
-
-	scene.background = null;
-	scene.backgroundNode = null;
-	scene.overrideMaterial = null;
-
-	return state;
-
-}
-
-/**
- * Restores the state of the given scene from the given state object.
- *
- * @private
- * @function
- * @param {Scene} scene - The scene.
- * @param {Object} state - The state to restore.
- */
-function restoreSceneState( scene, state ) {
-
-	scene.background = state.background;
-	scene.backgroundNode = state.backgroundNode;
-	scene.overrideMaterial = state.overrideMaterial;
-
-}
-
-/**
- * Saves the state of the given renderer and scene and stores it into the given state object.
- *
- * If not state object is provided, the function creates one.
- *
- * @private
- * @function
- * @param {Renderer} renderer - The renderer.
- * @param {Scene} scene - The scene.
- * @param {Object} [state={}] - The state.
- * @return {Object} The state.
- */
-function saveRendererAndSceneState( renderer, scene, state = {} ) {
-
-	state = saveRendererState( renderer, state );
-	state = saveSceneState( scene, state );
-
-	return state;
-
-}
-
-/**
- * Saves the state of the given renderer and scene and stores it into the given state object.
- * Besides, the function also resets the state of the renderer and scene to its default values.
- *
- * If not state object is provided, the function creates one.
- *
- * @private
- * @function
- * @param {Renderer} renderer - The renderer.
- * @param {Scene} scene - The scene.
- * @param {Object} [state={}] - The state.
- * @return {Object} The state.
- */
-function resetRendererAndSceneState( renderer, scene, state ) {
-
-	state = resetRendererState( renderer, state );
-	state = resetSceneState( scene, state );
-
-	return state;
-
-}
-
-/**
- * Restores the state of the given renderer and scene from the given state object.
- *
- * @private
- * @function
- * @param {Renderer} renderer - The renderer.
- * @param {Scene} scene - The scene.
- * @param {Object} state - The state to restore.
- */
-function restoreRendererAndSceneState( renderer, scene, state ) {
-
-	restoreRendererState( renderer, state );
-	restoreSceneState( scene, state );
-
-}
-
-var RendererUtils = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	resetRendererAndSceneState: resetRendererAndSceneState,
-	resetRendererState: resetRendererState,
-	resetSceneState: resetSceneState,
-	restoreRendererAndSceneState: restoreRendererAndSceneState,
-	restoreRendererState: restoreRendererState,
-	restoreSceneState: restoreSceneState,
-	saveRendererAndSceneState: saveRendererAndSceneState,
-	saveRendererState: saveRendererState,
-	saveSceneState: saveSceneState
-});
 
 const _size$1 = /*@__PURE__*/ new Vector2();
 
@@ -30199,9 +30231,9 @@ const normal = /*@__PURE__*/ Fn( ( { texture, uv } ) => {
 
 		const step = 0.01;
 
-		const x = texture.sample( uv.add( vec3( - step, 0.0, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( step, 0.0, 0.0 ) ) ).r );
-		const y = texture.sample( uv.add( vec3( 0.0, - step, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, step, 0.0 ) ) ).r );
-		const z = texture.sample( uv.add( vec3( 0.0, 0.0, - step ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, 0.0, step ) ) ).r );
+		const x = texture.sample( uv.add( vec3( - step, 0.0, 0.0 ) ) ).level( 0 ).r.sub( texture.sample( uv.add( vec3( step, 0.0, 0.0 ) ) ).level( 0 ).r );
+		const y = texture.sample( uv.add( vec3( 0.0, - step, 0.0 ) ) ).level( 0 ).r.sub( texture.sample( uv.add( vec3( 0.0, step, 0.0 ) ) ).level( 0 ).r );
+		const z = texture.sample( uv.add( vec3( 0.0, 0.0, - step ) ) ).level( 0 ).r.sub( texture.sample( uv.add( vec3( 0.0, 0.0, step ) ) ).level( 0 ).r );
 
 		ret.assign( vec3( x, y, z ) );
 
@@ -31770,7 +31802,7 @@ class PassNode extends Node {
 
 		// the render target is configured like in setup() and updateBefore(), so the pipelines match the ones of the render
 
-		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
+		this.renderTarget.samples = this.options.samples !== undefined ? this.options.samples : renderer.samples;
 
 		renderer.getDrawingBufferSize( _size );
 		this.setSize( _size.width, _size.height );
@@ -31792,9 +31824,8 @@ class PassNode extends Node {
 
 	setup( { renderer } ) {
 
-		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
-
-		this.renderTarget.texture.type = renderer.getOutputBufferType();
+		this.renderTarget.samples = this.options.samples !== undefined ? this.options.samples : renderer.samples;
+		this.renderTarget.texture.type = this.options.type !== undefined ? this.options.type : renderer.getOutputBufferType();
 
 		if ( renderer.reversedDepthBuffer === true && this.renderTarget.depthTexture !== null ) {
 
@@ -35800,7 +35831,7 @@ const PCFShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, shadow,
  */
 const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, depthLayer }, builder ) => {
 
-	let distribution = texture( depthTexture ).sample( shadowCoord.xy );
+	let distribution = texture( depthTexture ).sample( shadowCoord.xy ).level( 0 );
 
 	if ( depthTexture.isArrayTexture ) {
 
@@ -35859,7 +35890,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		let depth = shadowPass.sample( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) );
+		let depth = shadowPass.sample( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) ).level( 0 );
 
 		if ( shadowPass.value.isArrayTexture ) {
 
@@ -35906,7 +35937,7 @@ const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPas
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		let distribution = shadowPass.sample( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) );
+		let distribution = shadowPass.sample( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) ).level( 0 );
 
 		if ( shadowPass.value.isArrayTexture ) {
 
@@ -36625,7 +36656,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		// do not render shadow maps during precompilation
 
-		if ( frame.renderer._precompilationState !== null ) return;
+		if ( frame.renderer._precompilationState !== null ) return false;
 
 		const { shadow } = this;
 
@@ -38366,7 +38397,7 @@ function _getCubemapMaterial() {
 		envMap: cubeTexture()
 	};
 
-	return _getMaterial( 'cubemap', uniforms, uniforms.envMap.sample( positionWorldDirection ) );
+	return _getMaterial( 'cubemap', uniforms, uniforms.envMap.sample( positionWorldDirection ).level( 0 ) );
 
 }
 
@@ -40871,7 +40902,7 @@ const DFGLUT = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
 
 	const uv = vec2( roughness, dotNV );
 
-	return texture( lut, uv ).rg;
+	return texture( lut, uv ).level( 0 ).rg;
 
 } );
 
