@@ -44,6 +44,27 @@ export const packNormalToOctahedral = /*@__PURE__*/ Fn( ( [ normal ] ) => {
 }, { normal: 'vec3', return: 'vec2' } );
 
 /**
+ * Decodes signed octahedral coordinates into a direction without normalizing it.
+ * Use this when several decoded directions are blended and the result is normalized once.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec2>} encoded - The signed octahedral coordinates in `[-1, 1]`.
+ * @return {Node<vec3>} The unnormalized direction.
+ */
+export const unpackOctahedralToNormalUnnormalized = /*@__PURE__*/ Fn( ( [ encoded ] ) => {
+
+	// Rune Stubbe's decoder, see https://x.com/Stubbesaurus/status/937994790553227264
+
+	const normal = vec3( encoded, float( 1 ).sub( encoded.x.abs() ).sub( encoded.y.abs() ) ).toVar();
+	const t = normal.z.negate().max( 0 ).toVar();
+	normal.x.addAssign( normal.x.greaterThanEqual( 0 ).select( t.negate(), t ) );
+	normal.y.addAssign( normal.y.greaterThanEqual( 0 ).select( t.negate(), t ) );
+	return normal;
+
+}, { encoded: 'vec2', return: 'vec3' } );
+
+/**
  * Decodes signed octahedral coordinates into a unit direction.
  *
  * @tsl
@@ -53,13 +74,7 @@ export const packNormalToOctahedral = /*@__PURE__*/ Fn( ( [ normal ] ) => {
  */
 export const unpackOctahedralToNormal = /*@__PURE__*/ Fn( ( [ encoded ] ) => {
 
-	// Rune Stubbe's decoder, see https://x.com/Stubbesaurus/status/937994790553227264
-
-	const normal = vec3( encoded, float( 1 ).sub( encoded.x.abs() ).sub( encoded.y.abs() ) ).toVar();
-	const t = normal.z.negate().max( 0 ).toVar();
-	normal.x.addAssign( normal.x.greaterThanEqual( 0 ).select( t.negate(), t ) );
-	normal.y.addAssign( normal.y.greaterThanEqual( 0 ).select( t.negate(), t ) );
-	return normal.normalize();
+	return unpackOctahedralToNormalUnnormalized( encoded ).normalize();
 
 }, { encoded: 'vec2', return: 'vec3' } );
 

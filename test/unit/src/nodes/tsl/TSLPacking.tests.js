@@ -6,7 +6,7 @@ import {
 	packSnorm4x8, unpackSnorm4x8,
 	packUnorm4x8, unpackUnorm4x8,
 	packNormalToRGB, unpackRGBToNormal, unpackNormal,
-	packNormalToOctahedral, unpackOctahedralToNormal,
+	packNormalToOctahedral, unpackOctahedralToNormal, unpackOctahedralToNormalUnnormalized,
 	length, normalize
 } from 'three/tsl';
 import { toHalfFloat } from '../../../../../src/extras/DataUtils.js';
@@ -108,6 +108,9 @@ export default QUnit.module( 'Nodes', () => {
 				assert.closeAbs( unpackOctahedralToNormal( vec2( 3 / 7, - 4 / 7 ) ), vec3( 0.6, - 0.8, 0 ), 1e-6, 'equator' );
 				assert.closeAbs( unpackOctahedralToNormal( vec2( - 1, 1 ) ), vec3( 0, 0, - 1 ), 1e-6, 'corner is -Z' );
 				assert.closeAbs( unpackOctahedralToNormal( vec2( 4 / 7, 1 ) ), vec3( 0, 0.6, - 0.8 ), 1e-6, 'lower hemisphere edge' );
+
+				assert.closeAbs( unpackOctahedralToNormalUnnormalized( vec2( 4 / 7, 1 ) ), vec3( 0, 3 / 7, - 4 / 7 ), 1e-6, 'unnormalized lower hemisphere edge' );
+				assert.closeAbs( unpackOctahedralToNormalUnnormalized( vec2( 0, - 1 ) ), vec3( 0, - 1, 0 ), 1e-6, 'unnormalized fold boundary with x == 0' );
 
 			} );
 

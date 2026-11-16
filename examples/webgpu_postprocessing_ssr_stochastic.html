@@ -57,7 +57,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, packNormalToOctahedral, unpackOctahedralToNormal, textureSize, ivec2, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
+		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, packNormalToOctahedral, unpackOctahedralToNormal, unpackOctahedralToNormalUnnormalized, textureSize, ivec2, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 		import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
@@ -286,14 +286,7 @@
 					const base = ivec2( coord.floor() );
 					const weight = coord.fract();
 					// Taps are decoded without normalizing; the blended result is normalized once.
-					const tap = ( x, y ) => {
-
-						const encoded = scenePassNormal.load( base.add( ivec2( x, y ) ).clamp( ivec2( 0 ), ivec2( size ).sub( 1 ) ) ).rg;
-						const z = encoded.x.abs().add( encoded.y.abs() ).oneMinus();
-
-						return vec3( encoded.sub( encoded.sign().mul( z.negate().max( 0 ) ) ), z );
-
-					};
+					const tap = ( x, y ) => unpackOctahedralToNormalUnnormalized( scenePassNormal.load( base.add( ivec2( x, y ) ).clamp( ivec2( 0 ), ivec2( size ).sub( 1 ) ) ).rg );
 
 					return mix( mix( tap( 0, 0 ), tap( 1, 0 ), weight.x ), mix( tap( 0, 1 ), tap( 1, 1 ), weight.x ), weight.y ).normalize();
 
