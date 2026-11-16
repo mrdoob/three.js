@@ -46,7 +46,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		let depth = shadowPass.sample( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) );
+		let depth = shadowPass.sample( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) ).level( 0 );
 
 		if ( shadowPass.value.isArrayTexture ) {
 
@@ -93,7 +93,7 @@ const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPas
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		let distribution = shadowPass.sample( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) );
+		let distribution = shadowPass.sample( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) ).level( 0 );
 
 		if ( shadowPass.value.isArrayTexture ) {
 
