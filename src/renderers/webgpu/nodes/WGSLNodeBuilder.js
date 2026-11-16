@@ -580,9 +580,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( textureData.dimensionsSnippet === undefined ) textureData.dimensionsSnippet = {};
 
-		let textureDimensionNode = textureData.dimensionsSnippet[ levelSnippet ];
+		const dimensionsKey = textureProperty + ':' + levelSnippet;
 
-		if ( textureData.dimensionsSnippet[ levelSnippet ] === undefined ) {
+		let textureDimensionNode = textureData.dimensionsSnippet[ dimensionsKey ];
+
+		if ( textureDimensionNode === undefined ) {
 
 			let textureDimensionsParams;
 			let dimensionType;
@@ -614,7 +616,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			textureDimensionNode = new VarNode( new ExpressionNode( `textureDimensions( ${ textureDimensionsParams } )`, dimensionType ) );
 
-			textureData.dimensionsSnippet[ levelSnippet ] = textureDimensionNode;
+			textureData.dimensionsSnippet[ dimensionsKey ] = textureDimensionNode;
 
 			if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.is3DTexture || texture.isData3DTexture ) {
 
