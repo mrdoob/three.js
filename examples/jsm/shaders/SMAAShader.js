@@ -186,7 +186,7 @@ const SMAAWeightsShader = {
 
 	fragmentShader: /* glsl */`
 
-		#define SMAASampleLevelZeroOffset( tex, coord, offset ) texture2D( tex, coord + float( offset ) * resolution, 0.0 )
+		#define SMAASampleLevelZeroOffset( tex, coord, offset ) textureLod( tex, coord + float( offset ) * resolution, 0.0 )
 
 		uniform sampler2D tDiffuse;
 		uniform sampler2D tArea;
@@ -209,7 +209,7 @@ const SMAAWeightsShader = {
 			// e = float2(bias, 0.0) + 0.5 * SEARCH_TEX_PIXEL_SIZE +
 			//     e * float2(scale, 1.0) * float2(64.0, 32.0) * SEARCH_TEX_PIXEL_SIZE;
 			e.r = bias + e.r * scale;
-			return 255.0 * texture2D( searchTex, e, 0.0 ).r;
+			return 255.0 * textureLod( searchTex, e, 0.0 ).r;
 		}
 
 		float SMAASearchXLeft( sampler2D edgesTex, sampler2D searchTex, vec2 texcoord, float end ) {
@@ -223,7 +223,7 @@ const SMAAWeightsShader = {
 			vec2 e = vec2( 0.0, 1.0 );
 
 			for ( int i = 0; i < SMAA_MAX_SEARCH_STEPS; i ++ ) { // WebGL port note: Changed while to for
-				e = texture2D( edgesTex, texcoord, 0.0 ).rg;
+				e = textureLod( edgesTex, texcoord, 0.0 ).rg;
 				texcoord -= vec2( 2.0, 0.0 ) * resolution;
 				if ( ! ( texcoord.x > end && e.g > 0.8281 && e.r == 0.0 ) ) break;
 			}
@@ -245,7 +245,7 @@ const SMAAWeightsShader = {
 			vec2 e = vec2( 0.0, 1.0 );
 
 			for ( int i = 0; i < SMAA_MAX_SEARCH_STEPS; i ++ ) { // WebGL port note: Changed while to for
-				e = texture2D( edgesTex, texcoord, 0.0 ).rg;
+				e = textureLod( edgesTex, texcoord, 0.0 ).rg;
 				texcoord += vec2( 2.0, 0.0 ) * resolution;
 				if ( ! ( texcoord.x < end && e.g > 0.8281 && e.r == 0.0 ) ) break;
 			}
@@ -262,7 +262,7 @@ const SMAAWeightsShader = {
 			vec2 e = vec2( 1.0, 0.0 );
 
 			for ( int i = 0; i < SMAA_MAX_SEARCH_STEPS; i ++ ) { // WebGL port note: Changed while to for
-				e = texture2D( edgesTex, texcoord, 0.0 ).rg;
+				e = textureLod( edgesTex, texcoord, 0.0 ).rg;
 				texcoord += vec2( 0.0, 2.0 ) * resolution; // WebGL port note: Changed sign
 				if ( ! ( texcoord.y > end && e.r > 0.8281 && e.g == 0.0 ) ) break;
 			}
@@ -279,7 +279,7 @@ const SMAAWeightsShader = {
 			vec2 e = vec2( 1.0, 0.0 );
 
 			for ( int i = 0; i < SMAA_MAX_SEARCH_STEPS; i ++ ) { // WebGL port note: Changed while to for
-				e = texture2D( edgesTex, texcoord, 0.0 ).rg;
+				e = textureLod( edgesTex, texcoord, 0.0 ).rg;
 				texcoord -= vec2( 0.0, 2.0 ) * resolution; // WebGL port note: Changed sign
 				if ( ! ( texcoord.y < end && e.r > 0.8281 && e.g == 0.0 ) ) break;
 			}
@@ -302,7 +302,7 @@ const SMAAWeightsShader = {
 			// Move to proper place, according to the subpixel offset:
 			texcoord.y += SMAA_AREATEX_SUBTEX_SIZE * offset;
 
-			return texture2D( areaTex, texcoord, 0.0 ).rg;
+			return textureLod( areaTex, texcoord, 0.0 ).rg;
 		}
 
 		vec4 SMAABlendingWeightCalculationPS( vec2 texcoord, vec2 pixcoord, vec4 offset[ 3 ], sampler2D edgesTex, sampler2D areaTex, sampler2D searchTex, ivec4 subsampleIndices ) {
@@ -322,7 +322,7 @@ const SMAAWeightsShader = {
 				// Now fetch the left crossing edges, two at a time using bilinear
 				// filtering. Sampling at -0.25 (see @CROSSING_OFFSET) enables to
 				// discern what value each edge has:
-				float e1 = texture2D( edgesTex, coords, 0.0 ).r;
+				float e1 = textureLod( edgesTex, coords, 0.0 ).r;
 
 				// Find the distance to the right:
 				coords.x = SMAASearchXRight( edgesTex, searchTex, offset[ 0 ].zw, offset[ 2 ].y );
@@ -356,7 +356,7 @@ const SMAAWeightsShader = {
 				d.x = coords.y;
 
 				// Fetch the top crossing edges:
-				float e1 = texture2D( edgesTex, coords, 0.0 ).g;
+				float e1 = textureLod( edgesTex, coords, 0.0 ).g;
 
 				// Find the distance to the bottom:
 				coords.y = SMAASearchYDown( edgesTex, searchTex, offset[ 1 ].zw, offset[ 2 ].w );
@@ -446,7 +446,7 @@ const SMAABlendShader = {
 
 			// Is there any blending weight with a value greater than 0.0?
 			if ( dot(a, vec4( 1.0, 1.0, 1.0, 1.0 )) < 1e-5 ) {
-				return texture2D( colorTex, texcoord, 0.0 );
+				return textureLod( colorTex, texcoord, 0.0 );
 			} else {
 				// Up to 4 lines can be crossing a pixel (one through each edge). We
 				// favor blending by choosing the line with the maximum weight for each
@@ -463,9 +463,9 @@ const SMAABlendShader = {
 				}
 
 				// Fetch the opposite color and lerp by hand:
-				vec4 C = texture2D( colorTex, texcoord, 0.0 );
+				vec4 C = textureLod( colorTex, texcoord, 0.0 );
 				texcoord += sign( offset ) * resolution;
-				vec4 Cop = texture2D( colorTex, texcoord, 0.0 );
+				vec4 Cop = textureLod( colorTex, texcoord, 0.0 );
 				float s = abs( offset.x ) > abs( offset.y ) ? abs( offset.x ) : abs( offset.y );
 
 				// WebGL port note: Added gamma correction

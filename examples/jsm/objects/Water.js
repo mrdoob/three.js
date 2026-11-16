@@ -111,7 +111,6 @@ class Water extends Mesh {
 
 			vertexShader: /* glsl */`
 				uniform mat4 textureMatrix;
-				uniform float time;
 
 				varying vec4 mirrorCoord;
 				varying vec4 worldPosition;
@@ -151,10 +150,10 @@ class Water extends Mesh {
 				varying vec4 worldPosition;
 
 				vec4 getNoise( vec2 uv ) {
-					vec2 uv0 = ( uv / 103.0 ) + vec2(time / 17.0, time / 29.0);
-					vec2 uv1 = uv / 107.0-vec2( time / -19.0, time / 31.0 );
-					vec2 uv2 = uv / vec2( 8907.0, 9803.0 ) + vec2( time / 101.0, time / 97.0 );
-					vec2 uv3 = uv / vec2( 1091.0, 1027.0 ) - vec2( time / 109.0, time / -113.0 );
+					vec2 uv0 = uv * ( 1.0 / 103.0 ) + time * vec2( 1.0 / 17.0, 1.0 / 29.0 );
+					vec2 uv1 = uv * ( 1.0 / 107.0 ) - time * vec2( - 1.0 / 19.0, 1.0 / 31.0 );
+					vec2 uv2 = uv * vec2( 1.0 / 8907.0, 1.0 / 9803.0 ) + time * vec2( 1.0 / 101.0, 1.0 / 97.0 );
+					vec2 uv3 = uv * vec2( 1.0 / 1091.0, 1.0 / 1027.0 ) - time * vec2( 1.0 / 109.0, - 1.0 / 113.0 );
 					vec4 noise = texture2D( normalSampler, uv0 ) +
 						texture2D( normalSampler, uv1 ) +
 						texture2D( normalSampler, uv2 ) +
@@ -163,7 +162,7 @@ class Water extends Mesh {
 				}
 
 				void sunLight( const vec3 surfaceNormal, const vec3 eyeDirection, float shiny, float spec, float diffuse, inout vec3 diffuseColor, inout vec3 specularColor ) {
-					vec3 reflection = normalize( reflect( -sunDirection, surfaceNormal ) );
+					vec3 reflection = reflect( - sunDirection, surfaceNormal );
 					float direction = max( 0.0, dot( eyeDirection, reflection ) );
 					specularColor += pow( direction, shiny ) * sunColor * spec;
 					diffuseColor += max( dot( sunDirection, surfaceNormal ), 0.0 ) * sunColor * diffuse;
@@ -187,20 +186,26 @@ class Water extends Mesh {
 					vec3 diffuseLight = vec3(0.0);
 					vec3 specularLight = vec3(0.0);
 
-					vec3 worldToEye = eye-worldPosition.xyz;
-					vec3 eyeDirection = normalize( worldToEye );
+					vec3 worldToEye = eye - worldPosition.xyz;
+					float invDistance = inversesqrt( dot( worldToEye, worldToEye ) );
+					vec3 eyeDirection = worldToEye * invDistance;
 					sunLight( surfaceNormal, eyeDirection, 100.0, 2.0, 0.5, diffuseLight, specularLight );
 
-					float distance = length(worldToEye);
-
-					vec2 distortion = surfaceNormal.xz * ( 0.001 + 1.0 / distance ) * distortionScale;
+					vec2 viewRight = vec2( viewMatrix[ 0 ][ 0 ], viewMatrix[ 2 ][ 0 ] );
+					vec2 normalTilt = vec2(
+						surfaceNormal.x * viewRight.x + surfaceNormal.z * viewRight.y,
+						surfaceNormal.z * viewRight.x - surfaceNormal.x * viewRight.y
+					);
+					vec2 distortion = - normalTilt * ( 0.001 + invDistance ) * distortionScale;
 					vec3 reflectionSample = vec3( texture2D( mirrorSampler, mirrorCoord.xy / mirrorCoord.w + distortion ) );
 
 					float theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );
-					float rf0 = 0.02;
-					float reflectance = rf0 + ( 1.0 - rf0 ) * pow( ( 1.0 - theta ), 5.0 );
-					vec3 scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ) * waterColor;
-					vec3 albedo = mix( ( sunColor * diffuseLight * 0.3 + scatter ) * getShadowMask(), reflectionSample + specularLight, reflectance );
+					float oneMinusTheta = 1.0 - theta;
+					float oneMinusTheta2 = oneMinusTheta * oneMinusTheta;
+					float reflectance = 0.02 + 0.98 * ( oneMinusTheta2 * oneMinusTheta2 * oneMinusTheta );
+					vec3 scatter = theta * waterColor;
+					float shadowMask = getShadowMask();
+					vec3 albedo = mix( ( diffuseLight * 0.3 + scatter ) * shadowMask, reflectionSample + specularLight * shadowMask, reflectance );
 					vec3 outgoingLight = albedo;
 					gl_FragColor = vec4( outgoingLight, alpha );
 
@@ -216,6 +221,7 @@ class Water extends Mesh {
 			uniforms: UniformsUtils.clone( mirrorShader.uniforms ),
 			vertexShader: mirrorShader.vertexShader,
 			fragmentShader: mirrorShader.fragmentShader,
+			transparent: alpha < 1.0,
 			lights: true,
 			side: side,
 			fog: fog

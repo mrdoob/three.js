@@ -2006,7 +2006,7 @@ class VRMLLoader extends Loader {
 
 				if ( colorPerVertex === true ) {
 
-					if ( colorIndex.length > 0 ) {
+					if ( colorIndex && colorIndex.length > 0 ) {
 
 						// if the colorIndex field is not empty, then one color is used for each polyline of the IndexedLineSet.
 
@@ -2023,7 +2023,7 @@ class VRMLLoader extends Loader {
 
 				} else {
 
-					if ( colorIndex.length > 0 ) {
+					if ( colorIndex && colorIndex.length > 0 ) {
 
 						// if the colorIndex field is not empty, then colors are applied to each vertex of the IndexedLineSet
 
@@ -2409,9 +2409,9 @@ class VRMLLoader extends Loader {
 
 					// vertices
 
-					const x = xSpacing * i;
+					const x = xSpacing * j;
 					const y = height[ index ];
-					const z = zSpacing * j;
+					const z = zSpacing * i;
 
 					vertices.push( x, y, z );
 
@@ -2451,7 +2451,7 @@ class VRMLLoader extends Loader {
 
 					} else {
 
-						uvs.push( i / ( xDimension - 1 ), j / ( zDimension - 1 ) );
+						uvs.push( j / ( xDimension - 1 ), i / ( zDimension - 1 ) );
 
 					}
 
@@ -2478,13 +2478,13 @@ class VRMLLoader extends Loader {
 
 					if ( ccw === true ) {
 
-						indices.push( a, c, b );
-						indices.push( c, a, d );
+						indices.push( a, b, c );
+						indices.push( c, d, a );
 
 					} else {
 
-						indices.push( a, b, c );
-						indices.push( c, d, a );
+						indices.push( a, c, b );
+						indices.push( c, a, d );
 
 					}
 

@@ -521,8 +521,7 @@ class OBB {
 		this.halfSize.y *= sy;
 		this.halfSize.z *= sz;
 
-		v1.setFromMatrixPosition( matrix );
-		this.center.add( v1 );
+		this.center.applyMatrix4( matrix );
 
 		return this;
 

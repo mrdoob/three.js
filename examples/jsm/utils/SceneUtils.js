@@ -283,6 +283,26 @@ function sortInstancedMesh( mesh, compareFn ) {
 
 	}
 
+	mesh.instanceMatrix.needsUpdate = true;
+
+	if ( mesh.instanceColor ) {
+
+		mesh.instanceColor.needsUpdate = true;
+
+	}
+
+	for ( const name in mesh.geometry.attributes ) {
+
+		const attribute = mesh.geometry.attributes[ name ];
+
+		if ( attribute.isInstancedBufferAttribute ) {
+
+			attribute.needsUpdate = true;
+
+		}
+
+	}
+
 }
 
 /**

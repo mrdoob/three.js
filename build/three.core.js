@@ -1805,6 +1805,66 @@ function arrayNeedsUint32( array ) {
 }
 
 /**
+ * Adds a value to an array that is used as a binary min-heap.
+ *
+ * @private
+ * @param {Array<number>} heap - The min-heap.
+ * @param {number} value - The value to add.
+ */
+function minHeapPush( heap, value ) {
+
+	let i = heap.length;
+	heap.push( value );
+
+	while ( i > 0 ) {
+
+		const parent = ( i - 1 ) >> 1;
+		if ( heap[ parent ] <= value ) break;
+
+		heap[ i ] = heap[ parent ];
+		i = parent;
+
+	}
+
+	heap[ i ] = value;
+
+}
+
+/**
+ * Removes and returns the smallest value of an array that is used as a binary min-heap.
+ *
+ * @private
+ * @param {Array<number>} heap - The min-heap.
+ * @return {number|undefined} The smallest value, or `undefined` if the heap is empty.
+ */
+function minHeapPop( heap ) {
+
+	const smallest = heap[ 0 ];
+	const last = heap.pop();
+	const length = heap.length;
+
+	if ( length === 0 ) return smallest;
+
+	let i = 0;
+	let child;
+
+	while ( ( child = 2 * i + 1 ) < length ) {
+
+		if ( child + 1 < length && heap[ child + 1 ] < heap[ child ] ) child ++;
+		if ( heap[ child ] >= last ) break;
+
+		heap[ i ] = heap[ child ];
+		i = child;
+
+	}
+
+	heap[ i ] = last;
+
+	return smallest;
+
+}
+
+/**
  * Map of typed array constructor names to their constructors.
  * This mapping enables dynamic creation of typed arrays based on string type names.
  *
@@ -9491,17 +9551,20 @@ class RenderTarget extends EventDispatcher {
 
 			for ( let i = 0, il = this.textures.length; i < il; i ++ ) {
 
-				this.textures[ i ].image.width = width;
-				this.textures[ i ].image.height = height;
-				this.textures[ i ].image.depth = depth;
+				const texture = this.textures[ i ];
+				const image = texture.images ? texture.images[ 0 ] : texture.image;
 
-				if ( this.textures[ i ].isData3DTexture !== true ) { // Fix for #31693
+				image.width = width;
+				image.height = height;
+				image.depth = depth;
+
+				if ( texture.isData3DTexture !== true ) { // Fix for #31693
 
 					// TODO: Reconsider setting isArrayTexture flag here and in the ctor of Texture.
 					// Maybe a method `isArrayTexture()` or just a getter could replace a flag since
 					// both are evaluated on each call?
 
-					this.textures[ i ].isArrayTexture = this.textures[ i ].image.depth > 1;
+					texture.isArrayTexture = image.depth > 1;
 
 				}
 
@@ -18432,6 +18495,8 @@ const _offset = /*@__PURE__*/ new Vector3();
 const _box$2 = /*@__PURE__*/ new Box3();
 const _boxMorphTargets = /*@__PURE__*/ new Box3();
 const _vector$9 = /*@__PURE__*/ new Vector3();
+const _min = /*@__PURE__*/ new Vector3();
+const _max = /*@__PURE__*/ new Vector3();
 
 /**
  * A representation of mesh, line, or point geometry. Includes vertex
@@ -19093,11 +19158,11 @@ class BufferGeometry extends EventDispatcher {
 
 					if ( this.morphTargetsRelative ) {
 
-						_vector$9.addVectors( this.boundingBox.min, _box$2.min );
-						this.boundingBox.expandByPoint( _vector$9 );
+						_min.addVectors( this.boundingBox.min, _box$2.min );
+						_max.addVectors( this.boundingBox.max, _box$2.max );
 
-						_vector$9.addVectors( this.boundingBox.max, _box$2.max );
-						this.boundingBox.expandByPoint( _vector$9 );
+						this.boundingBox.expandByPoint( _min );
+						this.boundingBox.expandByPoint( _max );
 
 					} else {
 
@@ -19169,11 +19234,11 @@ class BufferGeometry extends EventDispatcher {
 
 					if ( this.morphTargetsRelative ) {
 
-						_vector$9.addVectors( _box$2.min, _boxMorphTargets.min );
-						_box$2.expandByPoint( _vector$9 );
+						_min.addVectors( _box$2.min, _boxMorphTargets.min );
+						_max.addVectors( _box$2.max, _boxMorphTargets.max );
 
-						_vector$9.addVectors( _box$2.max, _boxMorphTargets.max );
-						_box$2.expandByPoint( _vector$9 );
+						_box$2.expandByPoint( _min );
+						_box$2.expandByPoint( _max );
 
 					} else {
 
@@ -26729,7 +26794,7 @@ class BatchedMesh extends Mesh {
 		this._instanceInfo = [];
 		this._geometryInfo = [];
 
-		// instance, geometry ids that have been set as inactive, and are available to be overwritten
+		// instance, geometry ids that have been set as inactive, and are available to be overwritten (stored as min-heaps)
 		this._availableInstanceIds = [];
 		this._availableGeometryIds = [];
 
@@ -27068,9 +27133,7 @@ class BatchedMesh extends Mesh {
 		// Prioritize using previously freed instance ids
 		if ( this._availableInstanceIds.length > 0 ) {
 
-			this._availableInstanceIds.sort( ascIdSort );
-
-			drawId = this._availableInstanceIds.shift();
+			drawId = minHeapPop( this._availableInstanceIds );
 			this._instanceInfo[ drawId ] = instanceInfo;
 
 		} else {
@@ -27165,9 +27228,7 @@ class BatchedMesh extends Mesh {
 		let geometryId;
 		if ( this._availableGeometryIds.length > 0 ) {
 
-			this._availableGeometryIds.sort( ascIdSort );
-
-			geometryId = this._availableGeometryIds.shift();
+			geometryId = minHeapPop( this._availableGeometryIds );
 			geometryInfoList[ geometryId ] = geometryInfo;
 
 
@@ -27333,7 +27394,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		geometryInfoList[ geometryId ].active = false;
-		this._availableGeometryIds.push( geometryId );
+		minHeapPush( this._availableGeometryIds, geometryId );
 		this._visibilityChanged = true;
 
 		return this;
@@ -27351,7 +27412,7 @@ class BatchedMesh extends Mesh {
 		this.validateInstanceId( instanceId );
 
 		this._instanceInfo[ instanceId ].active = false;
-		this._availableInstanceIds.push( instanceId );
+		minHeapPush( this._availableInstanceIds, instanceId );
 		this._visibilityChanged = true;
 
 		return this;
@@ -27753,7 +27814,7 @@ class BatchedMesh extends Mesh {
 	*/
 	setInstanceCount( maxInstanceCount ) {
 
-		// shrink the available instances as much as possible
+		// shrink the available instances as much as possible. a sorted array is still a valid min-heap
 		const availableInstanceIds = this._availableInstanceIds;
 		const instanceInfo = this._instanceInfo;
 		availableInstanceIds.sort( ascIdSort );
@@ -28623,7 +28684,7 @@ class Line extends Object3D {
 		_inverseMatrix$1.copy( matrixWorld ).invert();
 		_ray$1.copy( raycaster.ray ).applyMatrix4( _inverseMatrix$1 );
 
-		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+		const localThreshold = threshold / matrixWorld.getMaxScaleOnAxis();
 		const localThresholdSq = localThreshold * localThreshold;
 
 		const step = this.isLineSegments ? 2 : 1;
@@ -29157,7 +29218,7 @@ class Points extends Object3D {
 		_inverseMatrix.copy( matrixWorld ).invert();
 		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
-		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+		const localThreshold = threshold / matrixWorld.getMaxScaleOnAxis();
 		const localThresholdSq = localThreshold * localThreshold;
 
 		const index = geometry.index;
@@ -39234,6 +39295,7 @@ class MeshStandardMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -40346,6 +40408,7 @@ class MeshPhongMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -40788,6 +40851,7 @@ class MeshToonMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -41025,6 +41089,7 @@ class MeshNormalMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -41310,6 +41375,7 @@ class MeshLambertMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -41961,6 +42027,7 @@ class MeshMatcapMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -50506,6 +50573,8 @@ class ObjectLoader extends Loader {
 				if ( data.filmOffset !== undefined ) object.filmOffset = data.filmOffset;
 				if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
 
+				object.updateProjectionMatrix();
+
 				break;
 
 			case 'OrthographicCamera':
@@ -50514,6 +50583,8 @@ class ObjectLoader extends Loader {
 
 				if ( data.zoom !== undefined ) object.zoom = data.zoom;
 				if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
+
+				object.updateProjectionMatrix();
 
 				break;
 
@@ -50638,8 +50709,9 @@ class ObjectLoader extends Loader {
 				} );
 				object._instanceInfo = data.instanceInfo;
 
-				object._availableInstanceIds = data.availableInstanceIds;
-				object._availableGeometryIds = data.availableGeometryIds;
+				// sorted so the lists are valid min-heaps
+				object._availableInstanceIds = data.availableInstanceIds.slice().sort( ( a, b ) => a - b );
+				object._availableGeometryIds = data.availableGeometryIds.slice().sort( ( a, b ) => a - b );
 
 				object._nextIndexStart = data.nextIndexStart;
 				object._nextVertexStart = data.nextVertexStart;

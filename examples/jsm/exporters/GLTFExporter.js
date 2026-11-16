@@ -2265,8 +2265,8 @@ class GLTFWriter {
 		if ( isOrtho ) {
 
 			cameraDef.orthographic = {
-				xmag: camera.right,
-				ymag: camera.top,
+				xmag: ( camera.right - camera.left ) / ( 2 * camera.zoom ),
+				ymag: ( camera.top - camera.bottom ) / ( 2 * camera.zoom ),
 				zfar: camera.far <= 0 ? 0.001 : camera.far,
 				znear: camera.near < 0 ? 0 : camera.near
 			};
@@ -2275,7 +2275,7 @@ class GLTFWriter {
 
 			cameraDef.perspective = {
 				aspectRatio: camera.aspect,
-				yfov: MathUtils.degToRad( camera.fov ),
+				yfov: MathUtils.degToRad( camera.getEffectiveFOV() ),
 				zfar: camera.far <= 0 ? 0.001 : camera.far,
 				znear: camera.near < 0 ? 0 : camera.near
 			};

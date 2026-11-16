@@ -1,5 +1,5 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
-import { float, Fn, max, texture, uniform, uv, vec2, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
+import { float, Fn, max, texture, uniform, uv, vec2, vec4, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
 import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -597,14 +597,14 @@ class TRAANode extends Node {
 
 			const output = flickerReduction( currentColor, clippedHistoryColor, currentWeight );
 
-			return output;
+			return vec4( output.rgb, 1 );
 
 		} );
 
 		// materials
 
 		this._resolveMaterial.contextNode = context( builder.getSharedContext() );
-		this._resolveMaterial.colorNode = resolve();
+		this._resolveMaterial.fragmentNode = resolve();
 
 		return this._textureNode;
 

@@ -270,7 +270,7 @@ class EdgeSplitModifier {
 				const changedNormals = new Array( oldNormals.length / 3 ).fill( false );
 
 				for ( const splitData of splitIndexes )
-					changedNormals[ splitData.original ] = true;
+					changedNormals[ indexes[ splitData.original ] ] = true;
 
 				for ( let i = 0; i < changedNormals.length; i ++ ) {
 

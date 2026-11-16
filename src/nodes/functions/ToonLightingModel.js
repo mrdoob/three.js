@@ -14,7 +14,7 @@ const getGradientIrradiance = /*@__PURE__*/ Fn( ( { normal, lightDirection, buil
 
 	if ( builder.material.gradientMap ) {
 
-		const gradientMap = materialReference( 'gradientMap', 'texture' ).context( { getUV: () => coord } );
+		const gradientMap = materialReference( 'gradientMap', 'texture' ).context( { getUV: () => coord, getTextureLevel: () => float( 0 ) } );
 
 		return vec3( gradientMap.r );
 

@@ -359,7 +359,7 @@ class SMAANode extends Node {
 			// e = float2(bias, 0.0) + 0.5 * SEARCH_TEX_PIXEL_SIZE + e * float2(scale, 1.0) * float2(64.0, 32.0) * SEARCH_TEX_PIXEL_SIZE;
 			const coord = vec2( e ).toVar();
 			coord.r = bias.add( coord.r.mul( scale ) );
-			return float( 255 ).mul( searchTex.sample( coord ) ).r;
+			return float( 255 ).mul( searchTex.sample( coord ).level( 0 ) ).r;
 
 		} );
 
@@ -374,7 +374,7 @@ class SMAANode extends Node {
 			// Move to proper place, according to the subpixel offset:
 			texcoord.y.addAssign( float( SMAA_AREATEX_SUBTEX_SIZE ).mul( offset ) );
 
-			return areaTex.sample( texcoord ).rg;
+			return areaTex.sample( texcoord ).level( 0 ).rg;
 
 		} );
 
@@ -393,7 +393,7 @@ class SMAANode extends Node {
 
 			Loop( { start: int( 0 ), end: int( SMAA_MAX_SEARCH_STEPS ), type: 'int', condition: '<' }, () => { // port note: Changed while to for
 
-				e.assign( edgesTex.sample( coord ).rg );
+				e.assign( edgesTex.sample( coord ).level( 0 ).rg );
 				coord.subAssign( vec2( 2, 0 ).mul( this._invSize ) );
 
 				If( coord.x.lessThanEqual( end ).or( e.g.lessThanEqual( float( 0.8281 ) ).or( e.r.notEqual( float( 0 ) ) ) ), () => {
@@ -425,7 +425,7 @@ class SMAANode extends Node {
 
 			Loop( { start: int( 0 ), end: int( SMAA_MAX_SEARCH_STEPS ), type: 'int', condition: '<' }, () => { // port note: Changed while to for
 
-				e.assign( edgesTex.sample( coord ).rg );
+				e.assign( edgesTex.sample( coord ).level( 0 ).rg );
 				coord.addAssign( vec2( 2, 0 ).mul( this._invSize ) );
 
 				If( coord.x.greaterThanEqual( end ).or( e.g.lessThanEqual( float( 0.8281 ) ).or( e.r.notEqual( float( 0 ) ) ) ), () => {
@@ -452,7 +452,7 @@ class SMAANode extends Node {
 
 			Loop( { start: int( 0 ), end: int( SMAA_MAX_SEARCH_STEPS ), type: 'int', condition: '<' }, () => { // port note: Changed while to for
 
-				e.assign( edgesTex.sample( coord ).rg );
+				e.assign( edgesTex.sample( coord ).level( 0 ).rg );
 				coord.addAssign( vec2( 0, - 2 ).mul( this._invSize ) );
 
 				If( coord.y.lessThanEqual( end ).or( e.r.lessThanEqual( float( 0.8281 ) ).or( e.g.notEqual( float( 0 ) ) ) ), () => {
@@ -479,7 +479,7 @@ class SMAANode extends Node {
 
 			Loop( { start: int( 0 ), end: int( SMAA_MAX_SEARCH_STEPS ), type: 'int', condition: '<' }, () => { // port note: Changed while to for
 
-				e.assign( edgesTex.sample( coord ).rg );
+				e.assign( edgesTex.sample( coord ).level( 0 ).rg );
 				coord.subAssign( vec2( 0, - 2 ).mul( this._invSize ) );
 
 				If( coord.y.greaterThanEqual( end ).or( e.r.lessThanEqual( float( 0.8281 ) ).or( e.g.notEqual( float( 0 ) ) ) ), () => {
@@ -529,7 +529,7 @@ class SMAANode extends Node {
 				// Now fetch the left crossing edges, two at a time using bilinear
 				// filtering. Sampling at -0.25 (see @CROSSING_OFFSET) enables to
 				// discern what value each edge has:
-				const e1 = this._edgesTextureUniform.sample( coordsLeft ).r.toVar();
+				const e1 = this._edgesTextureUniform.sample( coordsLeft ).level( 0 ).r.toVar();
 
 				// Find the distance to the right:
 				const coordsRight = vec2().toVar();
@@ -545,7 +545,7 @@ class SMAANode extends Node {
 				const sqrt_d = sqrt( abs( d ) );
 
 				// Fetch the right crossing edges:
-				const e2 = this._edgesTextureUniform.sample( coordsRight.add( vec2( 1, 0 ).mul( this._invSize ) ) ).r.toVar();
+				const e2 = this._edgesTextureUniform.sample( coordsRight.add( vec2( 1, 0 ).mul( this._invSize ) ) ).level( 0 ).r.toVar();
 				weights.r = e2;
 
 				// Get the area for this direction:
@@ -565,7 +565,7 @@ class SMAANode extends Node {
 				d.x = coordsUp.y;
 
 				// Fetch the top crossing edges:
-				const e1 = this._edgesTextureUniform.sample( coordsUp ).g.toVar();
+				const e1 = this._edgesTextureUniform.sample( coordsUp ).level( 0 ).g.toVar();
 
 				// Find the distance to the bottom:
 				const coordsDown = vec2().toVar();
@@ -580,7 +580,7 @@ class SMAANode extends Node {
 				const sqrt_d = sqrt( abs( d ) );
 
 				// Fetch the bottom crossing edges:
-				const e2 = this._edgesTextureUniform.sample( coordsDown.add( vec2( 0, 1 ).mul( this._invSize ) ) ).g.toVar();
+				const e2 = this._edgesTextureUniform.sample( coordsDown.add( vec2( 0, 1 ).mul( this._invSize ) ) ).level( 0 ).g.toVar();
 
 				// Get the area for this direction:
 				weights.ba = SMAAArea( this._areaTextureUniform, sqrt_d, e1, e2, float( subsampleIndices.x ) );
@@ -609,7 +609,7 @@ class SMAANode extends Node {
 
 			If( dot( a, vec4( 1.0 ) ).lessThan( 1e-5 ), () => { // Edge at north
 
-				result.assign( this.textureNode.sample( uvNode ) );
+				result.assign( this.textureNode.sample( uvNode ).level( 0 ) );
 
 			} ).Else( () => {
 
@@ -636,10 +636,10 @@ class SMAANode extends Node {
 
 				// Fetch the opposite color and lerp by hand:
 
-				const C = this.textureNode.sample( uvNode ).toVar();
+				const C = this.textureNode.sample( uvNode ).level( 0 ).toVar();
 				const texcoord = vec2( uvNode ).toVar();
 				texcoord.addAssign( sign( offset ).mul( this._invSize ) );
-				const Cop = this.textureNode.sample( texcoord ).toVar();
+				const Cop = this.textureNode.sample( texcoord ).level( 0 ).toVar();
 				const s = abs( offset.x ).greaterThan( abs( offset.y ) ).select( abs( offset.x ), abs( offset.y ) ).toVar();
 
 				const mixed = mix( C, Cop, s );

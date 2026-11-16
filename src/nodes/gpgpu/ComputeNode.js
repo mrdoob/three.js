@@ -65,7 +65,7 @@ class ComputeNode extends Node {
 		 * The dispatch size for workgroups on X, Y, and Z axes.
 		 * Used directly if `count` is not provided.
 		 *
-		 * @type {number|Array<number>}
+		 * @type {number|Array<number>|IndirectStorageBufferAttribute}
 		 */
 		this.dispatchSize = null;
 
@@ -293,7 +293,7 @@ export const computeKernel = ( node, workgroupSize = [ 64 ] ) => {
  * @tsl
  * @function
  * @param {Node} node - The TSL logic for the compute shader.
- * @param {number|Array<number>} count - The compute count or dispatch size.
+ * @param {number|Array<number>|IndirectStorageBufferAttribute} count - The compute count or dispatch size.
  * @param {Array<number>} [workgroupSize=[64]] - The workgroup size.
  * @returns {ComputeNode}
 ,  */

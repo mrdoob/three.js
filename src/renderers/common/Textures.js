@@ -180,7 +180,7 @@ class Textures extends DataMap {
 
 		if ( depthTexture && depthTexture.renderTarget === renderTarget ) {
 
-			const image = depthTexture.image;
+			const image = depthTexture.images ? depthTexture.images[ 0 ] : depthTexture.image;
 
 			if ( textureNeedsUpdate === true || image.width !== mipWidth || image.height !== mipHeight ) {
 

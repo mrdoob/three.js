@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - SSR animation</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - SSR animation">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_postprocessing_ssr_animation.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_postprocessing_ssr_animation.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>SSR Animation</span>
+			</div>
+
+			<small>
+				Animated Screen Space Reflections by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br />
+				Rotating metallic spheres and a moving emissive object above a reflective floor.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec4, uniform, mix, velocity } from 'three/tsl';
+			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+			import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
+			import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+			import { smaa } from 'three/addons/tsl/display/SMAANode.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			const params = {
+				output: 'Beauty', traa: true,
+				quality: 0.5, binaryRefine: false, maxDistance: 20, thickness: 0.12,
+				denoise: true, lumaPhi: 0.75,
+				roughness: 0.18, animate: true, orbit: false
+			};
+
+			let camera, scene, renderer, renderPipeline;
+			let controls, timer, floor, torusKnot;
+
+			const spheres = [];
+			let time = 0;
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 60 );
+				camera.position.set( 7, 4.8, 9 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x18212c );
+
+				timer = new THREE.Timer();
+
+				// lights
+
+				const hemiLight = new THREE.HemisphereLight( 0xddeeff, 0x3b2620, 1.5 );
+				scene.add( hemiLight );
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 4 );
+				dirLight.position.set( 4, 8, 4 );
+				scene.add( dirLight );
+
+				// floor
+
+				const floorGeometry = new THREE.PlaneGeometry( 18, 18 );
+				const floorMaterial = new THREE.MeshStandardNodeMaterial( {
+					color: 0xb8c4d5,
+					metalness: 0.85,
+					roughness: params.roughness
+				} );
+
+				floor = new THREE.Mesh( floorGeometry, floorMaterial );
+				floor.rotation.x = - Math.PI / 2;
+				scene.add( floor );
+
+				// walls
+
+				const wallGeometry = new THREE.BoxGeometry( 1, 5, 0.25 );
+
+				for ( let i = 0; i < 11; i ++ ) {
+
+					const wallMaterial = new THREE.MeshStandardNodeMaterial( {
+						color: i % 2 ? 0xdacbbb : 0x183444,
+						roughness: 0.8
+					} );
+
+					const wall = new THREE.Mesh( wallGeometry, wallMaterial );
+					wall.position.set( i - 5, 2.5, - 4 );
+					scene.add( wall );
+
+				}
+
+				// spheres
+
+				const sphereGeometry = new THREE.SphereGeometry( 0.9, 64, 32 );
+				const tints = [ 0xff4030, 0x30e0a0, 0x4080ff ];
+
+				for ( let i = 0; i < tints.length; i ++ ) {
+
+					const stripe = positionLocal.y.mul( 12 ).add( positionLocal.x.mul( 8 ) ).sin().smoothstep( - 0.1, 0.1 );
+
+					const sphereMaterial = new THREE.MeshStandardNodeMaterial( {
+						metalness: 0.9,
+						roughness: params.roughness
+					} );
+					sphereMaterial.colorNode = mix( color( tints[ i ] ), color( 0xffffff ), stripe.mul( 0.35 ) );
+
+					const sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+					sphere.position.set( ( i - 1 ) * 2.5, 1.1, 0 );
+					scene.add( sphere );
+
+					spheres.push( sphere );
+
+				}
+
+				// torus knot
+
+				const torusKnotGeometry = new THREE.TorusKnotGeometry( 0.45, 0.16, 96, 16 );
+				const torusKnotMaterial = new THREE.MeshStandardNodeMaterial( {
+					color: 0xffb020,
+					emissive: 0xff5000,
+					emissiveIntensity: 1.5,
+					roughness: 0.35
+				} );
+
+				torusKnot = new THREE.Mesh( torusKnotGeometry, torusKnotMaterial );
+				scene.add( torusKnot );
+
+				//
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.AgXToneMapping;
+				renderer.toneMappingExposure = 1.2;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				const environment = new RoomEnvironment();
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene.environment = pmremGenerator.fromScene( environment ).texture;
+				scene.environmentIntensity = 0.6;
+
+				environment.dispose();
+				pmremGenerator.dispose();
+
+				//
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 1, 0 );
+				controls.enableDamping = true;
+				controls.autoRotateSpeed = 0.8;
+				controls.update();
+
+				// post processing
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				const scenePass = pass( scene, camera );
+				scenePass.setMRT( mrt( {
+					output: output,
+					diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
+					normal: vec4( packNormalToRGB( normalView ), materialRoughness ),
+					velocity: velocity
+				} ) );
+
+				scenePass.getTexture( 'normal' ).type = THREE.UnsignedByteType;
+				scenePass.getTexture( 'diffuseColor' ).type = THREE.UnsignedByteType;
+
+				const scenePassColor = scenePass.getTextureNode( 'output' );
+				const scenePassDepth = scenePass.getTextureNode( 'depth' );
+				const scenePassNormal = scenePass.getTextureNode( 'normal' );
+				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
+				const scenePassDiffuseColor = scenePass.getTextureNode( 'diffuseColor' );
+
+				const sceneNormal = sample( ( uv ) => unpackRGBToNormal( scenePassNormal.sample( uv ).rgb ) );
+				const sceneRoughness = sample( ( uv ) => scenePassNormal.sample( uv ).a );
+
+				// metalness in diffuseColor.a, roughness in normal.a
+
+				const sceneMetalRough = sample( ( uv ) => vec2(
+					scenePassDiffuseColor.sample( uv ).a,
+					scenePassNormal.sample( uv ).a
+				) );
+
+				// ssr
+
+				const ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+					stochastic: true,
+					diffuseNode: scenePassDiffuseColor,
+					metalnessNode: scenePassDiffuseColor.a,
+					roughnessNode: sceneRoughness,
+					binaryRefine: params.binaryRefine
+				} ).toInspector( 'SSR' );
+
+				const ssrTexture = ssrNode.getTextureNode();
+
+				// denoise
+
+				const temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
+					mode: 'specular',
+					accumulate: false
+				} );
+				temporalReprojectNode.maxFrames.value = 16;
+				temporalReprojectNode.clampIntensity.value = 0.25;
+
+				const denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
+					depth: scenePassDepth,
+					normal: scenePassNormal,
+					raw: ssrNode,
+					metalRoughness: sceneMetalRough,
+					mode: 'specular',
+					accumulate: true
+				} );
+				denoiseNode.depthPhi.value = 20;
+				denoiseNode.normalPhi.value = 0.3;
+				denoiseNode.radius.value = 1.5;
+				denoiseNode.alphaPhi.value = 5;
+				denoiseNode.strength.value = 0.725;
+				denoiseNode.adaptiveTrust.value = 1;
+
+				// feed the denoised result + velocity back into SSR for multi-bounce reflections
+
+				ssrNode.setHistory( denoiseNode, scenePassVelocity );
+				temporalReprojectNode.setHistoryTexture( denoiseNode );
+
+				// composite
+
+				const denoiseEnabled = uniform( 1 );
+
+				const combined = scenePassColor.rgb.add( mix( ssrTexture.rgb, denoiseNode.rgb, denoiseEnabled ) );
+
+				const temporalAA = traa( vec4( combined, 1 ), scenePassDepth, scenePassVelocity, camera );
+				const spatialAA = smaa( vec4( combined, 1 ) );
+
+				function updateOutput() {
+
+					let outputNode;
+
+					switch ( params.output ) {
+
+						case 'Beauty': outputNode = params.traa ? temporalAA : spatialAA; break;
+						case 'SSR': outputNode = vec4( ssrTexture.rgb, 1 ); break;
+						case 'SSR DN': outputNode = vec4( denoiseNode.rgb, 1 ); break;
+
+					}
+
+					renderPipeline.outputNode = outputNode;
+					renderPipeline.outputColorTransform = true;
+					renderPipeline.needsUpdate = true;
+
+				}
+
+				function updateParameters() {
+
+					ssrNode.quality.value = params.quality;
+					ssrNode.binaryRefine = params.binaryRefine;
+					ssrNode.maxDistance.value = params.maxDistance;
+					ssrNode.thickness.value = params.thickness;
+
+					denoiseNode.lumaPhi.value = params.lumaPhi;
+
+				}
+
+				// GUI
+
+				const displayGui = renderer.inspector.createParameters( 'Display' );
+				displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN' ] ).name( 'Output' ).onChange( updateOutput );
+				displayGui.add( params, 'traa' ).name( 'TRAA' ).onChange( updateOutput );
+
+				const ssrGui = renderer.inspector.createParameters( 'SSR' );
+				ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( updateParameters );
+				ssrGui.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( updateParameters );
+				ssrGui.add( params, 'maxDistance', 0.01, 50, 0.01 ).name( 'Max distance' ).onChange( updateParameters );
+				ssrGui.add( params, 'thickness', 0, 0.5, 0.001 ).name( 'Thickness' ).onChange( updateParameters );
+
+				const denoiseGui = renderer.inspector.createParameters( 'Denoising' );
+				denoiseGui.add( params, 'denoise' ).name( 'Enabled' ).onChange( ( value ) => denoiseEnabled.value = Number( value ) );
+				denoiseGui.add( params, 'lumaPhi', 0, 3 ).name( 'Luma phi' ).onChange( updateParameters );
+
+				const sceneGui = renderer.inspector.createParameters( 'Scene' );
+				sceneGui.add( params, 'roughness', 0, 1 ).name( 'Roughness' ).onChange( ( value ) => {
+
+					floor.material.roughness = value;
+
+					for ( const sphere of spheres ) {
+
+						sphere.material.roughness = value;
+
+					}
+
+				} );
+				sceneGui.add( params, 'animate' ).name( 'Animation' );
+				sceneGui.add( params, 'orbit' ).name( 'Orbit camera' );
+
+				updateParameters();
+				updateOutput();
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				renderer.setAnimationLoop( animate );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				const delta = Math.min( timer.getDelta(), 0.05 );
+
+				if ( params.animate ) time += delta;
+
+				for ( let i = 0; i < spheres.length; i ++ ) {
+
+					const sphere = spheres[ i ];
+					sphere.rotation.set( time * 0.35, time * ( 0.7 + i * 0.2 ), 0.25 );
+					sphere.position.y = 1.1 + Math.sin( time * 1.4 + i ) * 0.18;
+
+				}
+
+				torusKnot.position.set( Math.sin( time ) * 3.5, 1.3, - 1.5 );
+				torusKnot.rotation.set( time * 0.5, time, 0 );
+
+				controls.autoRotate = params.orbit;
+				controls.update( delta );
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+
+	</body>
+</html>

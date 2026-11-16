@@ -686,11 +686,9 @@ class SSRNode extends Node {
 	/**
 	 * Wires the feedback inputs for multi-bounce reflections: the previous frame's
 	 * denoised result (`history`) and the velocity buffer used to reproject it
-	 * (`velocity`). `history` accepts a texture, e.g. the output of a {@link DenoiseNode}
-	 * (`getTexture()`), or a node with a render target, whose texture is used. Pass `null`
-	 * for both to disable multi-bounce. The alpha of the history is the weight of its
-	 * newest frame, like the output of a temporal `DenoiseNode` without `alpha` or `coverage`:
-	 * the feedback is scaled by `1 - alpha`, so it fades in as the history converges.
+	 * (`velocity`). `history` accepts the producing node (e.g. a
+	 * {@link RecurrentDenoiseNode}) — its output render target is used — or a raw
+	 * texture. Pass `null` for both to disable multi-bounce.
 	 *
 	 * @param {Texture} history
 	 * @param {Node<vec2>} velocity
