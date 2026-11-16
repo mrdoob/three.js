@@ -243,7 +243,7 @@
 				const octahedralNormals = params.normalFormat === 'octahedral';
 				const normalDecode = octahedralNormals
 					? ( value ) => unpackOctahedralToNormal( value.rg )
-					: ( value ) => unpackRGBToNormal( value.rgb );
+					: ( value ) => unpackRGBToNormal( value.rgb ).normalize();
 
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
@@ -299,7 +299,8 @@
 
 				temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, sceneNormal, scenePassVelocity, camera, {
 					mode: 'specular',
-					accumulate: false
+					accumulate: false,
+					normalHistory: { texture: scenePassNormal, decode: normalDecode }
 				} );
 				temporalReprojectNode.toInspector( 'Temporal Reproject' );
 

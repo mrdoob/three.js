@@ -226,7 +226,7 @@ const toTextureNode = ( value ) => {
 /**
  * @typedef {Object} RecurrentDenoiseNodeOptions
  * @property {?Node<float>} [depth=null] - Scene depth buffer for view-space edge stopping.
- * @property {?Node<vec3>} [normal=null] - A sampleable node that returns view-space normals for geometric edge stopping.
+ * @property {?Node<vec3>} [normal=null] - A sampleable node that returns unit view-space normals for geometric edge stopping.
  * @property {?Node<vec4>} [metalRoughness=null] - Roughness/metalness G-buffer for specular edge stopping.
  * @property {?Node<vec4>} [diffuse=null] - Scene base color (albedo) G-buffer for chromatic edge stopping.
  * @property {?Node<vec4>} [raw=null] - Unfiltered input (e.g. raw SSR/SSGI) for secondary sampling and temporal blend.
@@ -431,7 +431,7 @@ class RecurrentDenoiseNode extends Node {
 		const sampleTexture = ( uvCoord ) => texture( this.textureNode, uvCoord ).max( 0 );
 		const sampleRaw = ( uvCoord ) => this.rawNode?.sample( uvCoord )?.max( 0 ) ?? vec3( 0 ).max( 0 );
 		const sampleDepth = ( uvCoord ) => this.depthNode?.sample( uvCoord )?.x ?? float( 0.5 );
-		const sampleNormal = ( uvCoord ) => this.normalNode?.sample( uvCoord )?.normalize() ?? vec3( 0, 0, 1 );
+		const sampleNormal = ( uvCoord ) => this.normalNode?.sample( uvCoord ) ?? vec3( 0, 0, 1 );
 		const sampleRoughnessMetalness = ( uvCoord ) => this.roughnessMetalnessNode?.sample( uvCoord )?.rg ?? vec2( 0, 1 );
 		const sampleDiffuse = ( uvCoord ) => this.diffuseNode?.sample( uvCoord )?.rgb ?? vec3( 0 );
 

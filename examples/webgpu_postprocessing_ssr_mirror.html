@@ -149,7 +149,7 @@
 				const octahedralNormals = params.normalFormat === 'octahedral';
 				const normalDecode = octahedralNormals
 					? ( value ) => unpackOctahedralToNormal( value.rg )
-					: ( value ) => unpackRGBToNormal( value.rgb );
+					: ( value ) => unpackRGBToNormal( value.rgb ).normalize();
 
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
