@@ -129,7 +129,6 @@ class CountingSort {
 		this._cpuCounts = new Uint32Array( binCount );
 		this._cpuOffsets = new Uint32Array( binCount );
 
-		this._resetNode = null;
 		this._histogramNode = null;
 		this._prefixNode = null;
 		this._scatterNode = null;

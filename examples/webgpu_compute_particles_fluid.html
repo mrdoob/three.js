@@ -186,8 +186,8 @@
 
 				// the MLS-MPM system uses four compute shaders:
 				// 1. p2g1Kernel & 2. p2g2Kernel: These particle2grid kernels transfer the particles' energy to the grid
-				// 3. updateGridKernel: updates the grid
-				// 4. g2pKernel: grid2particle kernel, transfers the grid energy back to the particles and clears the grid in place for the next pass.
+				// 3. updateGridKernel: updates the grid and clears the atomic cell buffer in place for the next pass
+				// 4. g2pKernel: grid2particle kernel, transfers the grid energy back to the particles
 				// the implementation closely follows https://github.com/matsuoka-601/WebGPU-Ocean
 
 				// because webgpu only supports int atomics, we use fixed point floats by multiplying/dividing the float values with a high integer constant
@@ -318,19 +318,19 @@
 
 					const cell = cellBuffer.element( instanceIndex );
 					const mass = decodeFixedPoint( atomicExchange( cell.get( 'mass' ), 0 ) ).toConst();
-					If( mass.lessThanEqual( 0 ), () => {
+					const cellX = atomicExchange( cell.get( 'x' ), 0 );
+					const cellY = atomicExchange( cell.get( 'y' ), 0 );
+					const cellZ = atomicExchange( cell.get( 'z' ), 0 );
 
-						atomicExchange( cell.get( 'x' ), 0 );
-						atomicExchange( cell.get( 'y' ), 0 );
-						atomicExchange( cell.get( 'z' ), 0 );
+					If( mass.lessThanEqual( 0 ), () => {
 
 						Return();
 
 					} );
 
-					const vx = decodeFixedPoint( atomicExchange( cell.get( 'x' ), 0 ) ).div( mass ).toVar();
-					const vy = decodeFixedPoint( atomicExchange( cell.get( 'y' ), 0 ) ).div( mass ).toVar();
-					const vz = decodeFixedPoint( atomicExchange( cell.get( 'z' ), 0 ) ).div( mass ).toVar();
+					const vx = decodeFixedPoint( cellX ).div( mass ).toVar();
+					const vy = decodeFixedPoint( cellY ).div( mass ).toVar();
+					const vz = decodeFixedPoint( cellZ ).div( mass ).toVar();
 
 					const x = int( instanceIndex ).div( int( gridSize.z * gridSize.y ) );
 					const y = int( instanceIndex ).div( int( gridSize.z ) ).mod( int( gridSize.y ) );

@@ -319,7 +319,7 @@ export const atomicMin = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctio
 export const atomicAnd = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_AND, pointerNode, valueNode );
 
 /**
- * Stores, in an atomic variable, the bitwise OR of its value with a parameter.
+ * Stores, in an atomic variable, the bitwise OR of its value with a parameter
  * and returns the value stored in the atomic variable before the operation.
  *
  * @tsl
@@ -331,7 +331,7 @@ export const atomicAnd = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctio
 export const atomicOr = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_OR, pointerNode, valueNode );
 
 /**
- * Stores in an atomic variable the bitwise XOR of its value with a parameter.
+ * Stores, in an atomic variable, the bitwise XOR of its value with a parameter
  * and returns the value stored in the atomic variable before the operation.
  *
  * @tsl
