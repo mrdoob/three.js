@@ -3,7 +3,7 @@
  * Copyright 2010-2026 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '187';
+const REVISION = '188dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -1805,6 +1805,66 @@ function arrayNeedsUint32( array ) {
 }
 
 /**
+ * Adds a value to an array that is used as a binary min-heap.
+ *
+ * @private
+ * @param {Array<number>} heap - The min-heap.
+ * @param {number} value - The value to add.
+ */
+function minHeapPush( heap, value ) {
+
+	let i = heap.length;
+	heap.push( value );
+
+	while ( i > 0 ) {
+
+		const parent = ( i - 1 ) >> 1;
+		if ( heap[ parent ] <= value ) break;
+
+		heap[ i ] = heap[ parent ];
+		i = parent;
+
+	}
+
+	heap[ i ] = value;
+
+}
+
+/**
+ * Removes and returns the smallest value of an array that is used as a binary min-heap.
+ *
+ * @private
+ * @param {Array<number>} heap - The min-heap.
+ * @return {number|undefined} The smallest value, or `undefined` if the heap is empty.
+ */
+function minHeapPop( heap ) {
+
+	const smallest = heap[ 0 ];
+	const last = heap.pop();
+	const length = heap.length;
+
+	if ( length === 0 ) return smallest;
+
+	let i = 0;
+	let child;
+
+	while ( ( child = 2 * i + 1 ) < length ) {
+
+		if ( child + 1 < length && heap[ child + 1 ] < heap[ child ] ) child ++;
+		if ( heap[ child ] >= last ) break;
+
+		heap[ i ] = heap[ child ];
+		i = child;
+
+	}
+
+	heap[ i ] = last;
+
+	return smallest;
+
+}
+
+/**
  * Map of typed array constructor names to their constructors.
  * This mapping enables dynamic creation of typed arrays based on string type names.
  *
@@ -1823,6 +1883,8 @@ const TYPED_ARRAYS = {
 	Float32Array: Float32Array,
 	Float64Array: Float64Array
 };
+
+if ( typeof Float16Array !== 'undefined' ) TYPED_ARRAYS.Float16Array = Float16Array;
 
 /**
  * Creates a typed array of the specified type from the given buffer.
@@ -7541,8 +7603,8 @@ class Texture extends EventDispatcher {
 		this.userData = {};
 
 		/**
-		 * This can be used to only update a subregion or specific rows of the texture (for example, just the
-		 * first 3 rows). Use the `addUpdateRange()` function to add ranges to this array.
+		 * This can be used to only update parts of a data texture (for example, just a few rows).
+		 * Use the `addUpdateRange()` function to add ranges to this array.
 		 *
 		 * @type {Array<Object>}
 		 */
@@ -7680,8 +7742,12 @@ class Texture extends EventDispatcher {
 	/**
 	 * Adds a range of data in the data texture to be updated on the GPU.
 	 *
-	 * @param {number} start - Position at which to start update.
-	 * @param {number} count - The number of components to update.
+	 * Update ranges assume four components per texel, so they currently only work with `RGBAFormat`.
+	 * Each range must stay within a single row of the texture. To update several rows, add one
+	 * range per row. Update ranges are only supported in `WebGLRenderer`.
+	 *
+	 * @param {number} start - Index of the first array element to update.
+	 * @param {number} count - The number of array elements to update.
 	 */
 	addUpdateRange( start, count ) {
 
@@ -9487,17 +9553,20 @@ class RenderTarget extends EventDispatcher {
 
 			for ( let i = 0, il = this.textures.length; i < il; i ++ ) {
 
-				this.textures[ i ].image.width = width;
-				this.textures[ i ].image.height = height;
-				this.textures[ i ].image.depth = depth;
+				const texture = this.textures[ i ];
+				const image = texture.images ? texture.images[ 0 ] : texture.image;
 
-				if ( this.textures[ i ].isData3DTexture !== true ) { // Fix for #31693
+				image.width = width;
+				image.height = height;
+				image.depth = depth;
+
+				if ( texture.isData3DTexture !== true ) { // Fix for #31693
 
 					// TODO: Reconsider setting isArrayTexture flag here and in the ctor of Texture.
 					// Maybe a method `isArrayTexture()` or just a getter could replace a flag since
 					// both are evaluated on each call?
 
-					this.textures[ i ].isArrayTexture = this.textures[ i ].image.depth > 1;
+					texture.isArrayTexture = image.depth > 1;
 
 				}
 
@@ -11911,6 +11980,8 @@ const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 /**
  * Fires when the object has been added to its parent object.
  *
+ * Adding 3D objects inside a listener of this event is not supported.
+ *
  * @event Object3D#added
  * @type {Object}
  */
@@ -11918,6 +11989,8 @@ const _addedEvent = { type: 'added' };
 
 /**
  * Fires when the object has been removed from its parent object.
+ *
+ * Removing 3D objects inside a listener of this event is not supported.
  *
  * @event Object3D#removed
  * @type {Object}
@@ -11927,6 +12000,8 @@ const _removedEvent = { type: 'removed' };
 /**
  * Fires when a new child object has been added.
  *
+ * Adding 3D objects inside a listener of this event is not supported.
+ *
  * @event Object3D#childadded
  * @type {Object}
  */
@@ -11934,6 +12009,8 @@ const _childaddedEvent = { type: 'childadded', child: null };
 
 /**
  * Fires when a child object has been removed.
+ *
+ * Removing 3D objects inside a listener of this event is not supported.
  *
  * @event Object3D#childremoved
  * @type {Object}
@@ -14892,6 +14969,11 @@ class Color {
 		this.getHSL( _hslA );
 		color.getHSL( _hslB );
 
+		// grays have no hue, so use the hue of the other color
+
+		if ( _hslA.s === 0 ) _hslA.h = _hslB.h;
+		if ( _hslB.s === 0 ) _hslB.h = _hslA.h;
+
 		const h = lerp( _hslA.h, _hslB.h, alpha );
 		const s = lerp( _hslA.s, _hslB.s, alpha );
 		const l = lerp( _hslA.l, _hslB.l, alpha );
@@ -16715,215 +16797,6 @@ function satForAxes( axes, v0, v1, v2, extents ) {
 
 }
 
-// Fast Half Float Conversions, http://www.fox-toolkit.org/ftp/fasthalffloatconversion.pdf
-
-const _tables = /*@__PURE__*/ _generateTables();
-
-function _generateTables() {
-
-	// float32 to float16 helpers
-
-	const buffer = new ArrayBuffer( 4 );
-	const floatView = new Float32Array( buffer );
-	const uint32View = new Uint32Array( buffer );
-
-	const baseTable = new Uint32Array( 512 );
-	const shiftTable = new Uint32Array( 512 );
-
-	for ( let i = 0; i < 256; ++ i ) {
-
-		const e = i - 127;
-
-		// very small number (0, -0)
-
-		if ( e < -27 ) {
-
-			baseTable[ i ] = 0x0000;
-			baseTable[ i | 0x100 ] = 0x8000;
-			shiftTable[ i ] = 24;
-			shiftTable[ i | 0x100 ] = 24;
-
-			// small number (denorm)
-
-		} else if ( e < -14 ) {
-
-			baseTable[ i ] = 0x0400 >> ( - e - 14 );
-			baseTable[ i | 0x100 ] = ( 0x0400 >> ( - e - 14 ) ) | 0x8000;
-			shiftTable[ i ] = - e - 1;
-			shiftTable[ i | 0x100 ] = - e - 1;
-
-			// normal number
-
-		} else if ( e <= 15 ) {
-
-			baseTable[ i ] = ( e + 15 ) << 10;
-			baseTable[ i | 0x100 ] = ( ( e + 15 ) << 10 ) | 0x8000;
-			shiftTable[ i ] = 13;
-			shiftTable[ i | 0x100 ] = 13;
-
-			// large number (Infinity, -Infinity)
-
-		} else if ( e < 128 ) {
-
-			baseTable[ i ] = 0x7c00;
-			baseTable[ i | 0x100 ] = 0xfc00;
-			shiftTable[ i ] = 24;
-			shiftTable[ i | 0x100 ] = 24;
-
-			// stay (NaN, Infinity, -Infinity)
-
-		} else {
-
-			baseTable[ i ] = 0x7c00;
-			baseTable[ i | 0x100 ] = 0xfc00;
-			shiftTable[ i ] = 13;
-			shiftTable[ i | 0x100 ] = 13;
-
-		}
-
-	}
-
-	// float16 to float32 helpers
-
-	const mantissaTable = new Uint32Array( 2048 );
-	const exponentTable = new Uint32Array( 64 );
-	const offsetTable = new Uint32Array( 64 );
-
-	for ( let i = 1; i < 1024; ++ i ) {
-
-		let m = i << 13; // zero pad mantissa bits
-		let e = 0; // zero exponent
-
-		// normalized
-		while ( ( m & 0x00800000 ) === 0 ) {
-
-			m <<= 1;
-			e -= 0x00800000; // decrement exponent
-
-		}
-
-		m &= -8388609; // clear leading 1 bit
-		e += 0x38800000; // adjust bias
-
-		mantissaTable[ i ] = m | e;
-
-	}
-
-	for ( let i = 1024; i < 2048; ++ i ) {
-
-		mantissaTable[ i ] = 0x38000000 + ( ( i - 1024 ) << 13 );
-
-	}
-
-	for ( let i = 1; i < 31; ++ i ) {
-
-		exponentTable[ i ] = i << 23;
-
-	}
-
-	exponentTable[ 31 ] = 0x47800000;
-	exponentTable[ 32 ] = 0x80000000;
-
-	for ( let i = 33; i < 63; ++ i ) {
-
-		exponentTable[ i ] = 0x80000000 + ( ( i - 32 ) << 23 );
-
-	}
-
-	exponentTable[ 63 ] = 0xc7800000;
-
-	for ( let i = 1; i < 64; ++ i ) {
-
-		if ( i !== 32 ) {
-
-			offsetTable[ i ] = 1024;
-
-		}
-
-	}
-
-	return {
-		floatView: floatView,
-		uint32View: uint32View,
-		baseTable: baseTable,
-		shiftTable: shiftTable,
-		mantissaTable: mantissaTable,
-		exponentTable: exponentTable,
-		offsetTable: offsetTable
-	};
-
-}
-
-/**
- * Returns a half precision floating point value (FP16) from the given single
- * precision floating point value (FP32).
- *
- * @param {number} val - A single precision floating point value.
- * @return {number} The FP16 value.
- */
-function toHalfFloat( val ) {
-
-	if ( Math.abs( val ) > 65504 ) warn( 'DataUtils.toHalfFloat(): Value out of range.' );
-
-	val = clamp( val, -65504, 65504 );
-
-	_tables.floatView[ 0 ] = val;
-	const f = _tables.uint32View[ 0 ];
-	const e = ( f >> 23 ) & 0x1ff;
-	return _tables.baseTable[ e ] + ( ( f & 0x007fffff ) >> _tables.shiftTable[ e ] );
-
-}
-
-/**
- * Returns a single precision floating point value (FP32) from the given half
- * precision floating point value (FP16).
- *
- * @param {number} val - A half precision floating point value.
- * @return {number} The FP32 value.
- */
-function fromHalfFloat( val ) {
-
-	const m = val >> 10;
-	_tables.uint32View[ 0 ] = _tables.mantissaTable[ _tables.offsetTable[ m ] + ( val & 0x3ff ) ] + _tables.exponentTable[ m ];
-	return _tables.floatView[ 0 ];
-
-}
-
-/**
- * A class containing utility functions for data.
- *
- * @hideconstructor
- */
-class DataUtils {
-
-	/**
-	 * Returns a half precision floating point value (FP16) from the given single
-	 * precision floating point value (FP32).
-	 *
-	 * @param {number} val - A single precision floating point value.
-	 * @return {number} The FP16 value.
-	 */
-	static toHalfFloat( val ) {
-
-		return toHalfFloat( val );
-
-	}
-
-	/**
-	 * Returns a single precision floating point value (FP32) from the given half
-	 * precision floating point value (FP16).
-	 *
-	 * @param {number} val - A half precision floating point value.
-	 * @return {number} The FP32 value.
-	 */
-	static fromHalfFloat( val ) {
-
-		return fromHalfFloat( val );
-
-	}
-
-}
-
 const _vector$a = /*@__PURE__*/ new Vector3();
 const _vector2$1 = /*@__PURE__*/ new Vector2();
 
@@ -17809,8 +17682,8 @@ class Uint32BufferAttribute extends BufferAttribute {
  * Convenient class that can be used when creating a `Float16` buffer attribute with
  * a plain `Array` instance.
  *
- * This class automatically converts to and from FP16 via `Uint16Array` since `Float16Array`
- * browser support is still problematic.
+ * The attribute data are stored in a `Float16Array`. If `Float16Array` is not supported,
+ * the class falls back to `Float32Array`.
  *
  * @augments BufferAttribute
  */
@@ -17819,155 +17692,25 @@ class Float16BufferAttribute extends BufferAttribute {
 	/**
 	 * Constructs a new buffer attribute.
 	 *
-	 * @param {(Array<number>|Uint16Array)} array - The array holding the attribute data.
+	 * @param {(Array<number>|Float16Array)} array - The array holding the attribute data.
 	 * @param {number} itemSize - The item size.
 	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
 	 */
 	constructor( array, itemSize, normalized ) {
 
-		super( new Uint16Array( array ), itemSize, normalized );
+		if ( typeof Float16Array !== 'undefined' ) {
+
+			super( new Float16Array( array ), itemSize, normalized );
+
+		} else {
+
+			warnOnce( 'Float16BufferAttribute: Float16Array is not supported. Falling back to Float32Array.' );
+
+			super( new Float32Array( array ), itemSize, normalized );
+
+		}
 
 		this.isFloat16BufferAttribute = true;
-
-	}
-
-	getX( index ) {
-
-		let x = fromHalfFloat( this.array[ index * this.itemSize ] );
-
-		if ( this.normalized ) x = denormalize( x, this.array );
-
-		return x;
-
-	}
-
-	setX( index, x ) {
-
-		if ( this.normalized ) x = normalize( x, this.array );
-
-		this.array[ index * this.itemSize ] = toHalfFloat( x );
-
-		return this;
-
-	}
-
-	getY( index ) {
-
-		let y = fromHalfFloat( this.array[ index * this.itemSize + 1 ] );
-
-		if ( this.normalized ) y = denormalize( y, this.array );
-
-		return y;
-
-	}
-
-	setY( index, y ) {
-
-		if ( this.normalized ) y = normalize( y, this.array );
-
-		this.array[ index * this.itemSize + 1 ] = toHalfFloat( y );
-
-		return this;
-
-	}
-
-	getZ( index ) {
-
-		let z = fromHalfFloat( this.array[ index * this.itemSize + 2 ] );
-
-		if ( this.normalized ) z = denormalize( z, this.array );
-
-		return z;
-
-	}
-
-	setZ( index, z ) {
-
-		if ( this.normalized ) z = normalize( z, this.array );
-
-		this.array[ index * this.itemSize + 2 ] = toHalfFloat( z );
-
-		return this;
-
-	}
-
-	getW( index ) {
-
-		let w = fromHalfFloat( this.array[ index * this.itemSize + 3 ] );
-
-		if ( this.normalized ) w = denormalize( w, this.array );
-
-		return w;
-
-	}
-
-	setW( index, w ) {
-
-		if ( this.normalized ) w = normalize( w, this.array );
-
-		this.array[ index * this.itemSize + 3 ] = toHalfFloat( w );
-
-		return this;
-
-	}
-
-	setXY( index, x, y ) {
-
-		index *= this.itemSize;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-
-		}
-
-		this.array[ index + 0 ] = toHalfFloat( x );
-		this.array[ index + 1 ] = toHalfFloat( y );
-
-		return this;
-
-	}
-
-	setXYZ( index, x, y, z ) {
-
-		index *= this.itemSize;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-			z = normalize( z, this.array );
-
-		}
-
-		this.array[ index + 0 ] = toHalfFloat( x );
-		this.array[ index + 1 ] = toHalfFloat( y );
-		this.array[ index + 2 ] = toHalfFloat( z );
-
-		return this;
-
-	}
-
-	setXYZW( index, x, y, z, w ) {
-
-		index *= this.itemSize;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-			z = normalize( z, this.array );
-			w = normalize( w, this.array );
-
-		}
-
-		this.array[ index + 0 ] = toHalfFloat( x );
-		this.array[ index + 1 ] = toHalfFloat( y );
-		this.array[ index + 2 ] = toHalfFloat( z );
-		this.array[ index + 3 ] = toHalfFloat( w );
-
-		return this;
 
 	}
 
@@ -18420,6 +18163,8 @@ const _offset = /*@__PURE__*/ new Vector3();
 const _box$2 = /*@__PURE__*/ new Box3();
 const _boxMorphTargets = /*@__PURE__*/ new Box3();
 const _vector$9 = /*@__PURE__*/ new Vector3();
+const _min = /*@__PURE__*/ new Vector3();
+const _max = /*@__PURE__*/ new Vector3();
 
 /**
  * A representation of mesh, line, or point geometry. Includes vertex
@@ -19081,11 +18826,11 @@ class BufferGeometry extends EventDispatcher {
 
 					if ( this.morphTargetsRelative ) {
 
-						_vector$9.addVectors( this.boundingBox.min, _box$2.min );
-						this.boundingBox.expandByPoint( _vector$9 );
+						_min.addVectors( this.boundingBox.min, _box$2.min );
+						_max.addVectors( this.boundingBox.max, _box$2.max );
 
-						_vector$9.addVectors( this.boundingBox.max, _box$2.max );
-						this.boundingBox.expandByPoint( _vector$9 );
+						this.boundingBox.expandByPoint( _min );
+						this.boundingBox.expandByPoint( _max );
 
 					} else {
 
@@ -19157,11 +18902,11 @@ class BufferGeometry extends EventDispatcher {
 
 					if ( this.morphTargetsRelative ) {
 
-						_vector$9.addVectors( _box$2.min, _boxMorphTargets.min );
-						_box$2.expandByPoint( _vector$9 );
+						_min.addVectors( _box$2.min, _boxMorphTargets.min );
+						_max.addVectors( _box$2.max, _boxMorphTargets.max );
 
-						_vector$9.addVectors( _box$2.max, _boxMorphTargets.max );
-						_box$2.expandByPoint( _vector$9 );
+						_box$2.expandByPoint( _min );
+						_box$2.expandByPoint( _max );
 
 					} else {
 
@@ -19369,6 +19114,24 @@ class BufferGeometry extends EventDispatcher {
 
 			tmp.copy( t );
 			tmp.sub( n.multiplyScalar( n.dot( t ) ) ).normalize();
+
+			// Degenerate uvs give no tangent direction, so use any direction perpendicular to the normal
+
+			if ( tmp.lengthSq() === 0 ) {
+
+				if ( Math.abs( n2.x ) < 0.9 ) {
+
+					tmp.set( 1, 0, 0 );
+
+				} else {
+
+					tmp.set( 0, 1, 0 );
+
+				}
+
+				tmp.crossVectors( n2, tmp ).normalize();
+
+			}
 
 			// Calculate handedness
 
@@ -22737,6 +22500,8 @@ class Sprite extends Object3D {
 
 		this.material = source.material;
 
+		this.count = source.count;
+
 		return this;
 
 	}
@@ -24198,6 +23963,8 @@ class Mesh extends Object3D {
 
 		this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 		this.geometry = source.geometry;
+
+		this.count = source.count;
 
 		return this;
 
@@ -26695,7 +26462,7 @@ class BatchedMesh extends Mesh {
 		this._instanceInfo = [];
 		this._geometryInfo = [];
 
-		// instance, geometry ids that have been set as inactive, and are available to be overwritten
+		// instance, geometry ids that have been set as inactive, and are available to be overwritten (stored as min-heaps)
 		this._availableInstanceIds = [];
 		this._availableGeometryIds = [];
 
@@ -27034,9 +26801,7 @@ class BatchedMesh extends Mesh {
 		// Prioritize using previously freed instance ids
 		if ( this._availableInstanceIds.length > 0 ) {
 
-			this._availableInstanceIds.sort( ascIdSort );
-
-			drawId = this._availableInstanceIds.shift();
+			drawId = minHeapPop( this._availableInstanceIds );
 			this._instanceInfo[ drawId ] = instanceInfo;
 
 		} else {
@@ -27131,9 +26896,7 @@ class BatchedMesh extends Mesh {
 		let geometryId;
 		if ( this._availableGeometryIds.length > 0 ) {
 
-			this._availableGeometryIds.sort( ascIdSort );
-
-			geometryId = this._availableGeometryIds.shift();
+			geometryId = minHeapPop( this._availableGeometryIds );
 			geometryInfoList[ geometryId ] = geometryInfo;
 
 
@@ -27299,7 +27062,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		geometryInfoList[ geometryId ].active = false;
-		this._availableGeometryIds.push( geometryId );
+		minHeapPush( this._availableGeometryIds, geometryId );
 		this._visibilityChanged = true;
 
 		return this;
@@ -27317,7 +27080,7 @@ class BatchedMesh extends Mesh {
 		this.validateInstanceId( instanceId );
 
 		this._instanceInfo[ instanceId ].active = false;
-		this._availableInstanceIds.push( instanceId );
+		minHeapPush( this._availableInstanceIds, instanceId );
 		this._visibilityChanged = true;
 
 		return this;
@@ -27719,7 +27482,7 @@ class BatchedMesh extends Mesh {
 	*/
 	setInstanceCount( maxInstanceCount ) {
 
-		// shrink the available instances as much as possible
+		// shrink the available instances as much as possible. a sorted array is still a valid min-heap
 		const availableInstanceIds = this._availableInstanceIds;
 		const instanceInfo = this._instanceInfo;
 		availableInstanceIds.sort( ascIdSort );
@@ -27917,15 +27680,16 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.geometry = source.geometry.clone();
 		this.perObjectFrustumCulled = source.perObjectFrustumCulled;
 		this.sortObjects = source.sortObjects;
 		this.boundingBox = source.boundingBox !== null ? source.boundingBox.clone() : null;
 		this.boundingSphere = source.boundingSphere !== null ? source.boundingSphere.clone() : null;
+		this.customSort = source.customSort;
 
 		this._geometryInfo = source._geometryInfo.map( info => ( {
 			...info,
@@ -27942,6 +27706,8 @@ class BatchedMesh extends Mesh {
 		this._nextVertexStart = source._nextVertexStart;
 		this._geometryCount = source._geometryCount;
 
+		this._visibilityChanged = true;
+
 		this._maxInstanceCount = source._maxInstanceCount;
 		this._maxVertexCount = source._maxVertexCount;
 		this._maxIndexCount = source._maxIndexCount;
@@ -27953,6 +27719,8 @@ class BatchedMesh extends Mesh {
 		this._mergedDrawCounts = source._mergedDrawCounts.slice();
 		this._mergedDrawStarts = source._mergedDrawStarts.slice();
 		this._mergedDrawInstanceCounts = source._mergedDrawInstanceCounts.slice();
+		this._multiDrawCount = source._multiDrawCount;
+		this._mergedDrawCount = source._mergedDrawCount;
 
 		this._indirectTexture = source._indirectTexture.clone();
 		this._indirectTexture.image.data = this._indirectTexture.image.data.slice();
@@ -28589,7 +28357,7 @@ class Line extends Object3D {
 		_inverseMatrix$1.copy( matrixWorld ).invert();
 		_ray$1.copy( raycaster.ray ).applyMatrix4( _inverseMatrix$1 );
 
-		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+		const localThreshold = threshold / matrixWorld.getMaxScaleOnAxis();
 		const localThresholdSq = localThreshold * localThreshold;
 
 		const step = this.isLineSegments ? 2 : 1;
@@ -28932,7 +28700,7 @@ class PointsMaterial extends Material {
 		/**
 		 * Defines the size of the points in pixels.
 		 *
-		 * Might be capped if the value exceeds hardware dependent parameters like [gl.ALIASED_POINT_SIZE_RANGE](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParamete).
+		 * Might be capped if the value exceeds hardware dependent parameters like [gl.ALIASED_POINT_SIZE_RANGE](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParameter).
 		 *
 		 * @type {number}
 		 * @default 1
@@ -29123,7 +28891,7 @@ class Points extends Object3D {
 		_inverseMatrix.copy( matrixWorld ).invert();
 		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
-		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+		const localThreshold = threshold / matrixWorld.getMaxScaleOnAxis();
 		const localThresholdSq = localThreshold * localThreshold;
 
 		const index = geometry.index;
@@ -38734,6 +38502,8 @@ class ShaderMaterial extends Material {
 
 		this.defines = Object.assign( {}, source.defines );
 
+		this.linewidth = source.linewidth;
+
 		this.wireframe = source.wireframe;
 		this.wireframeLinewidth = source.wireframeLinewidth;
 
@@ -39198,6 +38968,7 @@ class MeshStandardMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -40310,6 +40081,7 @@ class MeshPhongMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -40752,6 +40524,7 @@ class MeshToonMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -40989,6 +40762,7 @@ class MeshNormalMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -41274,6 +41048,7 @@ class MeshLambertMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -41925,6 +41700,7 @@ class MeshMatcapMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -42445,6 +42221,10 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 
 		if ( targetTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
 
+			// Cubic spline tracks store an in-tangent, the value and an out-tangent per keyframe.
+			// Subtracting a constant does not change the tangents of numeric tracks, but removing
+			// a rotation from quaternion tracks has to rotate the tangents as well.
+
 			targetOffset = targetValueSize / 3;
 
 		}
@@ -42489,25 +42269,28 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 		const numTimes = targetTrack.times.length;
 		for ( let j = 0; j < numTimes; ++ j ) {
 
-			const valueStart = j * targetValueSize + targetOffset;
-
 			if ( referenceTrackType === 'quaternion' ) {
 
-				// Multiply the conjugate for quaternion track types
-				Quaternion.multiplyQuaternionsFlat(
-					targetTrack.values,
-					valueStart,
-					referenceValue,
-					0,
-					targetTrack.values,
-					valueStart
-				);
+				for ( let k = 0; k < targetValueSize; k += 4 ) {
+
+					const offset = j * targetValueSize + k;
+
+					Quaternion.multiplyQuaternionsFlat(
+						targetTrack.values,
+						offset,
+						referenceValue,
+						0,
+						targetTrack.values,
+						offset
+					);
+
+				}
 
 			} else {
 
+				const valueStart = j * targetValueSize + targetOffset;
 				const valueEnd = targetValueSize - targetOffset * 2;
 
-				// Subtract each value for all other numeric track types
 				for ( let k = 0; k < valueEnd; ++ k ) {
 
 					targetTrack.values[ valueStart + k ] -= referenceValue[ k ];
@@ -46811,6 +46594,28 @@ class LightShadow {
 		this.biasNode = null;
 
 		/**
+		 * A custom shadow filter function. Only supported with `WebGPURenderer`.
+		 *
+		 * If a filter node is defined, it replaces the filter selected by the
+		 * renderer's shadow map type.
+		 *
+		 * @type {?Function}
+		 * @default null
+		 */
+		this.filterNode = null;
+
+		/**
+		 * A custom shadow node that replaces the default shadow node of the light.
+		 * Only supported with `WebGPURenderer`.
+		 *
+		 * The node is bound to its light, so `copy()` and `clone()` do not transfer it.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.shadowNode = null;
+
+		/**
 		 * Defines how much the position used to query the shadow map is offset along
 		 * the object normal. The default is `0`. Increasing this value can be used to
 		 * reduce shadow acne especially in large scenes where light shines onto
@@ -47082,6 +46887,7 @@ class LightShadow {
 		this.mapType = source.mapType;
 
 		this.biasNode = source.biasNode;
+		this.filterNode = source.filterNode;
 
 		return this;
 
@@ -48468,9 +48274,9 @@ class DirectionalLight extends Light {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.target = source.target.clone();
 		this.shadow = source.shadow.clone();
@@ -48619,9 +48425,9 @@ class RectAreaLight extends Light {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.width = source.width;
 		this.height = source.height;
@@ -49032,9 +48838,9 @@ class LightProbe extends Light {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.sh.copy( source.sh );
 
@@ -49356,6 +49162,77 @@ class InstancedBufferGeometry extends BufferGeometry {
 }
 
 /**
+ * An instanced version of an interleaved buffer.
+ *
+ * @augments InterleavedBuffer
+ */
+class InstancedInterleavedBuffer extends InterleavedBuffer {
+
+	/**
+	 * Constructs a new instanced interleaved buffer.
+	 *
+	 * @param {TypedArray} array - A typed array with a shared buffer storing attribute data.
+	 * @param {number} stride - The number of typed-array elements per vertex.
+	 * @param {number} [meshPerAttribute=1] - Defines how often a value of this interleaved buffer should be repeated.
+	 */
+	constructor( array, stride, meshPerAttribute = 1 ) {
+
+		super( array, stride );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isInstancedInterleavedBuffer = true;
+
+		/**
+		 * Defines how often a value of this buffer attribute should be repeated,
+		 * see {@link InstancedBufferAttribute#meshPerAttribute}.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.meshPerAttribute = meshPerAttribute;
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.meshPerAttribute = source.meshPerAttribute;
+
+		return this;
+
+	}
+
+	clone( data ) {
+
+		const ib = super.clone( data );
+
+		ib.meshPerAttribute = this.meshPerAttribute;
+
+		return ib;
+
+	}
+
+	toJSON( data ) {
+
+		const json = super.toJSON( data );
+
+		json.isInstancedInterleavedBuffer = true;
+		json.meshPerAttribute = this.meshPerAttribute;
+
+		return json;
+
+	}
+
+}
+
+/**
  * Class for loading geometries. The files are internally
  * loaded via {@link FileLoader}.
  *
@@ -49448,7 +49325,19 @@ class BufferGeometryLoader extends Loader {
 			const buffer = getArrayBuffer( json, interleavedBuffer.buffer );
 
 			const array = getTypedArray( interleavedBuffer.type, buffer );
-			const ib = new InterleavedBuffer( array, interleavedBuffer.stride );
+
+			let ib;
+
+			if ( interleavedBuffer.isInstancedInterleavedBuffer ) {
+
+				ib = new InstancedInterleavedBuffer( array, interleavedBuffer.stride, interleavedBuffer.meshPerAttribute );
+
+			} else {
+
+				ib = new InterleavedBuffer( array, interleavedBuffer.stride );
+
+			}
+
 			ib.uuid = interleavedBuffer.uuid;
 
 			if ( interleavedBuffer.usage !== undefined ) ib.setUsage( interleavedBuffer.usage );
@@ -49476,6 +49365,14 @@ class BufferGeometryLoader extends Loader {
 
 		const geometry = json.isInstancedBufferGeometry ? new InstancedBufferGeometry() : new BufferGeometry();
 
+		// the default instance count is Infinity which is serialized as null
+
+		if ( json.isInstancedBufferGeometry && typeof json.instanceCount === 'number' ) {
+
+			geometry.instanceCount = json.instanceCount;
+
+		}
+
 		const index = json.data.index;
 
 		if ( index !== undefined ) {
@@ -49500,8 +49397,16 @@ class BufferGeometryLoader extends Loader {
 			} else {
 
 				const typedArray = getTypedArray( attribute.type, attribute.array );
-				const bufferAttributeConstr = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
-				bufferAttribute = new bufferAttributeConstr( typedArray, attribute.itemSize, attribute.normalized );
+
+				if ( attribute.isInstancedBufferAttribute ) {
+
+					bufferAttribute = new InstancedBufferAttribute( typedArray, attribute.itemSize, attribute.normalized, attribute.meshPerAttribute );
+
+				} else {
+
+					bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+
+				}
 
 			}
 
@@ -50440,6 +50345,8 @@ class ObjectLoader extends Loader {
 				if ( data.filmOffset !== undefined ) object.filmOffset = data.filmOffset;
 				if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
 
+				object.updateProjectionMatrix();
+
 				break;
 
 			case 'OrthographicCamera':
@@ -50448,6 +50355,8 @@ class ObjectLoader extends Loader {
 
 				if ( data.zoom !== undefined ) object.zoom = data.zoom;
 				if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
+
+				object.updateProjectionMatrix();
 
 				break;
 
@@ -50572,8 +50481,9 @@ class ObjectLoader extends Loader {
 				} );
 				object._instanceInfo = data.instanceInfo;
 
-				object._availableInstanceIds = data.availableInstanceIds;
-				object._availableGeometryIds = data.availableGeometryIds;
+				// sorted so the lists are valid min-heaps
+				object._availableInstanceIds = data.availableInstanceIds.slice().sort( ( a, b ) => a - b );
+				object._availableGeometryIds = data.availableGeometryIds.slice().sort( ( a, b ) => a - b );
 
 				object._nextIndexStart = data.nextIndexStart;
 				object._nextVertexStart = data.nextVertexStart;
@@ -56847,77 +56757,6 @@ class UniformsGroup extends EventDispatcher {
 }
 
 /**
- * An instanced version of an interleaved buffer.
- *
- * @augments InterleavedBuffer
- */
-class InstancedInterleavedBuffer extends InterleavedBuffer {
-
-	/**
-	 * Constructs a new instanced interleaved buffer.
-	 *
-	 * @param {TypedArray} array - A typed array with a shared buffer storing attribute data.
-	 * @param {number} stride - The number of typed-array elements per vertex.
-	 * @param {number} [meshPerAttribute=1] - Defines how often a value of this interleaved buffer should be repeated.
-	 */
-	constructor( array, stride, meshPerAttribute = 1 ) {
-
-		super( array, stride );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isInstancedInterleavedBuffer = true;
-
-		/**
-		 * Defines how often a value of this buffer attribute should be repeated,
-		 * see {@link InstancedBufferAttribute#meshPerAttribute}.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.meshPerAttribute = meshPerAttribute;
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.meshPerAttribute = source.meshPerAttribute;
-
-		return this;
-
-	}
-
-	clone( data ) {
-
-		const ib = super.clone( data );
-
-		ib.meshPerAttribute = this.meshPerAttribute;
-
-		return ib;
-
-	}
-
-	toJSON( data ) {
-
-		const json = super.toJSON( data );
-
-		json.isInstancedInterleavedBuffer = true;
-		json.meshPerAttribute = this.meshPerAttribute;
-
-		return json;
-
-	}
-
-}
-
-/**
  * An alternative version of a buffer attribute with more control over the VBO.
  *
  * The renderer does not construct a VBO for this kind of attribute. Instead, it uses
@@ -60840,6 +60679,215 @@ class Controls extends EventDispatcher {
 	 * @param {number} [delta] - The time delta in seconds.
 	 */
 	update( /* delta */ ) {}
+
+}
+
+// Fast Half Float Conversions, http://www.fox-toolkit.org/ftp/fasthalffloatconversion.pdf
+
+const _tables = /*@__PURE__*/ _generateTables();
+
+function _generateTables() {
+
+	// float32 to float16 helpers
+
+	const buffer = new ArrayBuffer( 4 );
+	const floatView = new Float32Array( buffer );
+	const uint32View = new Uint32Array( buffer );
+
+	const baseTable = new Uint32Array( 512 );
+	const shiftTable = new Uint32Array( 512 );
+
+	for ( let i = 0; i < 256; ++ i ) {
+
+		const e = i - 127;
+
+		// very small number (0, -0)
+
+		if ( e < -27 ) {
+
+			baseTable[ i ] = 0x0000;
+			baseTable[ i | 0x100 ] = 0x8000;
+			shiftTable[ i ] = 24;
+			shiftTable[ i | 0x100 ] = 24;
+
+			// small number (denorm)
+
+		} else if ( e < -14 ) {
+
+			baseTable[ i ] = 0x0400 >> ( - e - 14 );
+			baseTable[ i | 0x100 ] = ( 0x0400 >> ( - e - 14 ) ) | 0x8000;
+			shiftTable[ i ] = - e - 1;
+			shiftTable[ i | 0x100 ] = - e - 1;
+
+			// normal number
+
+		} else if ( e <= 15 ) {
+
+			baseTable[ i ] = ( e + 15 ) << 10;
+			baseTable[ i | 0x100 ] = ( ( e + 15 ) << 10 ) | 0x8000;
+			shiftTable[ i ] = 13;
+			shiftTable[ i | 0x100 ] = 13;
+
+			// large number (Infinity, -Infinity)
+
+		} else if ( e < 128 ) {
+
+			baseTable[ i ] = 0x7c00;
+			baseTable[ i | 0x100 ] = 0xfc00;
+			shiftTable[ i ] = 24;
+			shiftTable[ i | 0x100 ] = 24;
+
+			// stay (NaN, Infinity, -Infinity)
+
+		} else {
+
+			baseTable[ i ] = 0x7c00;
+			baseTable[ i | 0x100 ] = 0xfc00;
+			shiftTable[ i ] = 13;
+			shiftTable[ i | 0x100 ] = 13;
+
+		}
+
+	}
+
+	// float16 to float32 helpers
+
+	const mantissaTable = new Uint32Array( 2048 );
+	const exponentTable = new Uint32Array( 64 );
+	const offsetTable = new Uint32Array( 64 );
+
+	for ( let i = 1; i < 1024; ++ i ) {
+
+		let m = i << 13; // zero pad mantissa bits
+		let e = 0; // zero exponent
+
+		// normalized
+		while ( ( m & 0x00800000 ) === 0 ) {
+
+			m <<= 1;
+			e -= 0x00800000; // decrement exponent
+
+		}
+
+		m &= -8388609; // clear leading 1 bit
+		e += 0x38800000; // adjust bias
+
+		mantissaTable[ i ] = m | e;
+
+	}
+
+	for ( let i = 1024; i < 2048; ++ i ) {
+
+		mantissaTable[ i ] = 0x38000000 + ( ( i - 1024 ) << 13 );
+
+	}
+
+	for ( let i = 1; i < 31; ++ i ) {
+
+		exponentTable[ i ] = i << 23;
+
+	}
+
+	exponentTable[ 31 ] = 0x47800000;
+	exponentTable[ 32 ] = 0x80000000;
+
+	for ( let i = 33; i < 63; ++ i ) {
+
+		exponentTable[ i ] = 0x80000000 + ( ( i - 32 ) << 23 );
+
+	}
+
+	exponentTable[ 63 ] = 0xc7800000;
+
+	for ( let i = 1; i < 64; ++ i ) {
+
+		if ( i !== 32 ) {
+
+			offsetTable[ i ] = 1024;
+
+		}
+
+	}
+
+	return {
+		floatView: floatView,
+		uint32View: uint32View,
+		baseTable: baseTable,
+		shiftTable: shiftTable,
+		mantissaTable: mantissaTable,
+		exponentTable: exponentTable,
+		offsetTable: offsetTable
+	};
+
+}
+
+/**
+ * Returns a half precision floating point value (FP16) from the given single
+ * precision floating point value (FP32).
+ *
+ * @param {number} val - A single precision floating point value.
+ * @return {number} The FP16 value.
+ */
+function toHalfFloat( val ) {
+
+	if ( Math.abs( val ) > 65504 ) warn( 'DataUtils.toHalfFloat(): Value out of range.' );
+
+	val = clamp( val, -65504, 65504 );
+
+	_tables.floatView[ 0 ] = val;
+	const f = _tables.uint32View[ 0 ];
+	const e = ( f >> 23 ) & 0x1ff;
+	return _tables.baseTable[ e ] + ( ( f & 0x007fffff ) >> _tables.shiftTable[ e ] );
+
+}
+
+/**
+ * Returns a single precision floating point value (FP32) from the given half
+ * precision floating point value (FP16).
+ *
+ * @param {number} val - A half precision floating point value.
+ * @return {number} The FP32 value.
+ */
+function fromHalfFloat( val ) {
+
+	const m = val >> 10;
+	_tables.uint32View[ 0 ] = _tables.mantissaTable[ _tables.offsetTable[ m ] + ( val & 0x3ff ) ] + _tables.exponentTable[ m ];
+	return _tables.floatView[ 0 ];
+
+}
+
+/**
+ * A class containing utility functions for data.
+ *
+ * @hideconstructor
+ */
+class DataUtils {
+
+	/**
+	 * Returns a half precision floating point value (FP16) from the given single
+	 * precision floating point value (FP32).
+	 *
+	 * @param {number} val - A single precision floating point value.
+	 * @return {number} The FP16 value.
+	 */
+	static toHalfFloat( val ) {
+
+		return toHalfFloat( val );
+
+	}
+
+	/**
+	 * Returns a single precision floating point value (FP32) from the given half
+	 * precision floating point value (FP16).
+	 *
+	 * @param {number} val - A half precision floating point value.
+	 * @return {number} The FP32 value.
+	 */
+	static fromHalfFloat( val ) {
+
+		return fromHalfFloat( val );
+
+	}
 
 }
 

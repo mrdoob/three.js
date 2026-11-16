@@ -20,11 +20,13 @@ class SSSLightingModel extends PhysicalLightingModel {
 	 * @param {boolean} [anisotropy=false] - Whether anisotropy is supported or not.
 	 * @param {boolean} [transmission=false] - Whether transmission is supported or not.
 	 * @param {boolean} [dispersion=false] - Whether dispersion is supported or not.
+	 * @param {boolean} [retroreflection=false] - Whether retroreflection is supported or not.
+	 * @param {boolean} [diffuseRoughness=false] - Whether diffuse roughness is supported or not.
 	 * @param {boolean} [sss=false] - Whether SSS is supported or not.
 	 */
-	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false, dispersion = false, sss = false ) {
+	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false, dispersion = false, retroreflection = false, diffuseRoughness = false, sss = false ) {
 
-		super( clearcoat, sheen, iridescence, anisotropy, transmission, dispersion );
+		super( clearcoat, sheen, iridescence, anisotropy, transmission, dispersion, retroreflection, diffuseRoughness );
 
 		/**
 		 * Whether the lighting model should use SSS or not.
@@ -153,7 +155,7 @@ class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 	 */
 	setupLightingModel( /*builder*/ ) {
 
-		return new SSSLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useAnisotropy, this.useTransmission, this.useDispersion, this.useSSS );
+		return new SSSLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useAnisotropy, this.useTransmission, this.useDispersion, this.useRetroreflection, this.useDiffuseRoughness, this.useSSS );
 
 	}
 

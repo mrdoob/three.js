@@ -316,6 +316,7 @@ export class WebGLNodesHandler {
 
 			// update node frame references for update nodes
 			const { nodeFrame } = self;
+			nodeFrame.camera = camera;
 			nodeFrame.material = this;
 			nodeFrame.object = object;
 

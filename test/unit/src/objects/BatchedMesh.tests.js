@@ -36,6 +36,36 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
+		QUnit.test( 'addInstance reuses the smallest deleted id', ( assert ) => {
+
+			const material = new MeshBasicMaterial();
+			const batchedMesh = new BatchedMesh( 8, 1000, 2000, material );
+			const geometryId = batchedMesh.addGeometry( new BoxGeometry() );
+
+			for ( let i = 0; i < 8; i ++ ) batchedMesh.addInstance( geometryId );
+
+			const deleted = [ 6, 2, 5, 0, 7, 3 ];
+			for ( const id of deleted ) batchedMesh.deleteInstance( id );
+
+			const reused = deleted.map( () => batchedMesh.addInstance( geometryId ) );
+			assert.deepEqual( reused, [ 0, 2, 3, 5, 6, 7 ], 'ids are reused in ascending order' );
+
+		} );
+
+		QUnit.test( 'addGeometry reuses the smallest deleted id', ( assert ) => {
+
+			const material = new MeshBasicMaterial();
+			const batchedMesh = new BatchedMesh( 1, 5000, 10000, material );
+
+			for ( let i = 0; i < 4; i ++ ) batchedMesh.addGeometry( new BoxGeometry() );
+
+			batchedMesh.deleteGeometry( 2 );
+			batchedMesh.deleteGeometry( 1 );
+
+			assert.strictEqual( batchedMesh.addGeometry( new BoxGeometry() ), 1, 'reuses id 1 first' );
+
+		} );
+
 		QUnit.test( 'setGeometrySize', ( assert ) => {
 
 			const material = new MeshBasicMaterial();

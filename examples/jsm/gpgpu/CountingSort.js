@@ -1,5 +1,5 @@
 import { StorageBufferAttribute, DynamicDrawUsage } from 'three/webgpu';
-import { Fn, atomicAdd, atomicStore, instanceIndex, storage, uint } from 'three/tsl';
+import { Fn, atomicAdd, atomicExchange, atomicStore, instanceIndex, storage, uint } from 'three/tsl';
 import { PrefixSum } from './PrefixSum.js';
 
 /**
@@ -146,7 +146,6 @@ class CountingSort {
 		this._cpuCounts = new Uint32Array( binCount );
 		this._cpuOffsets = new Uint32Array( binCount );
 
-		this._resetNode = null;
 		this._histogramNode = null;
 		this._scatterNode = null;
 
@@ -161,13 +160,6 @@ class CountingSort {
 	setBinNode( binNode ) {
 
 		const { binCount, workgroupSize, count } = this;
-
-		this._resetNode = Fn( () => {
-
-			atomicStore( this.histogramAtomic.element( instanceIndex ), uint( 0 ) );
-			atomicStore( this.offsetAtomic.element( instanceIndex ), uint( 0 ) );
-
-		} )().compute( binCount, [ workgroupSize ] ).setName( 'CountingSortReset' );
 
 		this._histogramNode = Fn( () => {
 
@@ -196,7 +188,6 @@ class CountingSort {
 	 */
 	compute( renderer ) {
 
-		renderer.compute( this._resetNode );
 		renderer.compute( this._histogramNode );
 		this._prefixSum.compute( renderer );
 		renderer.compute( this._scatterNode );

@@ -10,6 +10,7 @@ import {
 	TriangleStripDrawMode,
 	TrianglesDrawMode,
 	Vector3,
+	Vector4,
 } from 'three';
 
 /**
@@ -895,6 +896,7 @@ function toTrianglesDrawMode( geometry, drawMode ) {
  * Helpful for Raytracing or Decals (i.e. a `DecalGeometry` applied to a morphed Object with a `BufferGeometry`
  * will use the original `BufferGeometry`, not the morphed/skinned one, generating an incorrect result.
  * Using this function to create a shadow `Object3`D the `DecalGeometry` can be correctly generated).
+ * If the geometry has no normal attribute, both returned normal attributes are `undefined`.
  *
  * @param {Mesh|Line|Points} object - The 3D object to compute morph attributes for.
  * @return {Object} An object with original position/normal attributes and morphed ones.
@@ -912,6 +914,8 @@ function computeMorphedAttributes( object ) {
 	const _morphA = new Vector3();
 	const _morphB = new Vector3();
 	const _morphC = new Vector3();
+
+	const _direction = new Vector4();
 
 	function _calculateMorphedAttributeData(
 		object,
@@ -971,9 +975,21 @@ function computeMorphedAttributes( object ) {
 
 		if ( object.isSkinnedMesh ) {
 
-			object.applyBoneTransform( a, _vA );
-			object.applyBoneTransform( b, _vB );
-			object.applyBoneTransform( c, _vC );
+			if ( attribute === object.geometry.getAttribute( 'normal' ) ) {
+
+				// normals are directions so they must be transformed with w = 0
+
+				_vA.copy( object.applyBoneTransform( a, _direction.set( _vA.x, _vA.y, _vA.z, 0 ) ) );
+				_vB.copy( object.applyBoneTransform( b, _direction.set( _vB.x, _vB.y, _vB.z, 0 ) ) );
+				_vC.copy( object.applyBoneTransform( c, _direction.set( _vC.x, _vC.y, _vC.z, 0 ) ) );
+
+			} else {
+
+				object.applyBoneTransform( a, _vA );
+				object.applyBoneTransform( b, _vB );
+				object.applyBoneTransform( c, _vC );
+
+			}
 
 		}
 
@@ -1007,7 +1023,7 @@ function computeMorphedAttributes( object ) {
 	let start, end;
 
 	const modifiedPosition = new Float32Array( positionAttribute.count * positionAttribute.itemSize );
-	const modifiedNormal = new Float32Array( normalAttribute.count * normalAttribute.itemSize );
+	const modifiedNormal = ( normalAttribute !== undefined ) ? new Float32Array( normalAttribute.count * normalAttribute.itemSize ) : undefined;
 
 	if ( index !== null ) {
 
@@ -1037,14 +1053,18 @@ function computeMorphedAttributes( object ) {
 						modifiedPosition
 					);
 
-					_calculateMorphedAttributeData(
-						object,
-						normalAttribute,
-						morphNormal,
-						morphTargetsRelative,
-						a, b, c,
-						modifiedNormal
-					);
+					if ( normalAttribute !== undefined ) {
+
+						_calculateMorphedAttributeData(
+							object,
+							normalAttribute,
+							morphNormal,
+							morphTargetsRelative,
+							a, b, c,
+							modifiedNormal
+						);
+
+					}
 
 				}
 
@@ -1070,14 +1090,18 @@ function computeMorphedAttributes( object ) {
 					modifiedPosition
 				);
 
-				_calculateMorphedAttributeData(
-					object,
-					normalAttribute,
-					morphNormal,
-					morphTargetsRelative,
-					a, b, c,
-					modifiedNormal
-				);
+				if ( normalAttribute !== undefined ) {
+
+					_calculateMorphedAttributeData(
+						object,
+						normalAttribute,
+						morphNormal,
+						morphTargetsRelative,
+						a, b, c,
+						modifiedNormal
+					);
+
+				}
 
 			}
 
@@ -1111,14 +1135,18 @@ function computeMorphedAttributes( object ) {
 						modifiedPosition
 					);
 
-					_calculateMorphedAttributeData(
-						object,
-						normalAttribute,
-						morphNormal,
-						morphTargetsRelative,
-						a, b, c,
-						modifiedNormal
-					);
+					if ( normalAttribute !== undefined ) {
+
+						_calculateMorphedAttributeData(
+							object,
+							normalAttribute,
+							morphNormal,
+							morphTargetsRelative,
+							a, b, c,
+							modifiedNormal
+						);
+
+					}
 
 				}
 
@@ -1144,14 +1172,18 @@ function computeMorphedAttributes( object ) {
 					modifiedPosition
 				);
 
-				_calculateMorphedAttributeData(
-					object,
-					normalAttribute,
-					morphNormal,
-					morphTargetsRelative,
-					a, b, c,
-					modifiedNormal
-				);
+				if ( normalAttribute !== undefined ) {
+
+					_calculateMorphedAttributeData(
+						object,
+						normalAttribute,
+						morphNormal,
+						morphTargetsRelative,
+						a, b, c,
+						modifiedNormal
+					);
+
+				}
 
 			}
 
@@ -1160,7 +1192,7 @@ function computeMorphedAttributes( object ) {
 	}
 
 	const morphedPositionAttribute = new Float32BufferAttribute( modifiedPosition, 3 );
-	const morphedNormalAttribute = new Float32BufferAttribute( modifiedNormal, 3 );
+	const morphedNormalAttribute = ( normalAttribute !== undefined ) ? new Float32BufferAttribute( modifiedNormal, 3 ) : undefined;
 
 	return {
 

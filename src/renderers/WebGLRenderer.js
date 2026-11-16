@@ -3345,6 +3345,8 @@ class WebGLRenderer {
 
 			textures.setTexture2D( texture, 0 );
 
+			state.activeTexture( _gl.TEXTURE0 ); // see #33153
+
 			_gl.copyTexSubImage2D( _gl.TEXTURE_2D, level, 0, 0, x, y, width, height );
 
 			state.unbindTexture();

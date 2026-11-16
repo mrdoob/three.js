@@ -12,7 +12,6 @@ import {
 	NearestFilter,
 	PCFShadowMap,
 	Vector2,
-	RedFormat,
 	ArrayCamera,
 	VSMShadowMap,
 	RendererUtils,
@@ -170,9 +169,9 @@ class TileShadowNode extends ShadowBaseNode {
 		const depthTexture = new DepthTexture( shadowWidth, shadowHeight, this.config.depthType, undefined, undefined, undefined, undefined, undefined, undefined, undefined, tileCount );
 		depthTexture.compareFunction = builder.renderer.reversedDepthBuffer ? GreaterEqualCompare : LessCompare;
 		depthTexture.name = 'ShadowDepthArrayTexture';
-		// The color attachment is only sampled for transmitted shadows.
+		// The color attachment is only sampled for transmitted shadows, which read its color and alpha.
 		const count = builder.renderer.shadowMap.transmitted === true ? 1 : 0;
-		const shadowMap = builder.createRenderTarget( shadowWidth, shadowHeight, { count, format: RedFormat, depth: tileCount, useArrayDepthTexture: true } );
+		const shadowMap = builder.createRenderTarget( shadowWidth, shadowHeight, { count, depth: tileCount, useArrayDepthTexture: true } );
 		shadowMap.depthTexture = depthTexture;
 		if ( count > 0 ) shadowMap.texture.name = 'ShadowTexture';
 		this.shadowMap = shadowMap;
@@ -414,7 +413,9 @@ class TileShadowNode extends ShadowBaseNode {
 	 */
 	setup( builder ) {
 
-		if ( this.lights.length === 0 ) {
+		// The shadow map has a color attachment only for transmitted shadows (see init()).
+
+		if ( this.lights.length === 0 || ( this.shadowMap.textures.length > 0 ) !== ( builder.renderer.shadowMap.transmitted === true ) ) {
 
 			this.init( builder );
 

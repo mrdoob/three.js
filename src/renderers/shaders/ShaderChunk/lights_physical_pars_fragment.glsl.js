@@ -448,7 +448,7 @@ float IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float 
 vec3 EnvironmentBRDF( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness ) {
 
 	float dotNV = saturate( dot( normal, viewDir ) );
-	vec2 fab = texture2D( dfgLUT, vec2( roughness, dotNV ) ).rg;
+	vec2 fab = textureLod( dfgLUT, vec2( roughness, dotNV ), 0.0 ).rg;
 
 	return specularColor * fab.x + specularF90 * fab.y;
 
@@ -507,8 +507,8 @@ void computeMultiscattering( const in vec2 fab, const in vec3 specularColor, con
 
 		vec2 uv = LTC_Uv( normal, viewDir, roughness );
 
-		vec4 t1 = texture2D( ltc_1, uv );
-		vec4 t2 = texture2D( ltc_2, uv );
+		vec4 t1 = textureLod( ltc_1, uv, 0.0 );
+		vec4 t2 = textureLod( ltc_2, uv, 0.0 );
 
 		mat3 mInv = mat3(
 			vec3( t1.x, 0, t1.y ),
@@ -530,8 +530,8 @@ void computeMultiscattering( const in vec2 fab, const in vec3 specularColor, con
 
 			vec2 uvClearcoat = LTC_Uv( Ncc, viewDir, material.clearcoatRoughness );
 
-			vec4 t1Clearcoat = texture2D( ltc_1, uvClearcoat );
-			vec4 t2Clearcoat = texture2D( ltc_2, uvClearcoat );
+			vec4 t1Clearcoat = textureLod( ltc_1, uvClearcoat, 0.0 );
+			vec4 t2Clearcoat = textureLod( ltc_2, uvClearcoat, 0.0 );
 
 			mat3 mInvClearcoat = mat3(
 				vec3( t1Clearcoat.x, 0, t1Clearcoat.y ),

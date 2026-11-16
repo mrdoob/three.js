@@ -46,7 +46,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		let depth = shadowPass.sample( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) );
+		let depth = shadowPass.sample( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) ).level( 0 );
 
 		if ( shadowPass.value.isArrayTexture ) {
 
@@ -93,7 +93,7 @@ const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPas
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		let distribution = shadowPass.sample( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) );
+		let distribution = shadowPass.sample( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) ).level( 0 );
 
 		if ( shadowPass.value.isArrayTexture ) {
 
@@ -215,6 +215,16 @@ class ShadowNode extends ShadowBaseNode {
 		 * @default null
 		 */
 		this._currentShadowType = null;
+
+		/**
+		 * Whether the output node of this shadow node was set up
+		 * with transmitted shadows or not.
+		 *
+		 * @type {?boolean}
+		 * @private
+		 * @default null
+		 */
+		this._currentTransmitted = null;
 
 		/**
 		 * A Weak Map holding the current frame ID per camera. Used
@@ -601,8 +611,9 @@ class ShadowNode extends ShadowBaseNode {
 		return Fn( () => {
 
 			const currentShadowType = builder.renderer.shadowMap.type;
+			const currentTransmitted = builder.renderer.shadowMap.transmitted;
 
-			if ( this._currentShadowType !== currentShadowType ) {
+			if ( this._currentShadowType !== currentShadowType || this._currentTransmitted !== currentTransmitted ) {
 
 				this._reset();
 				this._node = null;
@@ -617,6 +628,7 @@ class ShadowNode extends ShadowBaseNode {
 
 				this._node = node = this.setupShadow( builder );
 				this._currentShadowType = currentShadowType;
+				this._currentTransmitted = currentTransmitted;
 
 			}
 
@@ -758,6 +770,7 @@ class ShadowNode extends ShadowBaseNode {
 	_reset() {
 
 		this._currentShadowType = null;
+		this._currentTransmitted = null;
 
 		this.disposeShadowMaterial();
 
@@ -799,7 +812,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		// do not render shadow maps during precompilation
 
-		if ( frame.renderer._precompilationState !== null ) return;
+		if ( frame.renderer._precompilationState !== null ) return false;
 
 		const { shadow } = this;
 

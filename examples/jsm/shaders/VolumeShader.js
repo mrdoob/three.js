@@ -128,7 +128,7 @@ const VolumeRenderShader1 = {
 
 				float sample1(vec3 texcoords) {
 						/* Sample float value from a 3D texture. Assumes intensity data. */
-						return texture(u_data, texcoords.xyz).r;
+						return textureLod(u_data, texcoords.xyz, 0.0).r;
 				}
 
 
@@ -136,7 +136,7 @@ const VolumeRenderShader1 = {
 						val = (val - u_clim[0]) / (u_clim[1] - u_clim[0]);
 						float n = float(textureSize(u_cmdata, 0).x); // see #33842
 						val = (val * (n - 1.0) + 0.5) / n;
-						return texture2D(u_cmdata, vec2(val, 0.5));
+						return textureLod(u_cmdata, vec2(val, 0.5), 0.0);
 				}
 
 

@@ -30,7 +30,7 @@ class NormalMapNode extends Node {
 	 * Constructs a new normal map node.
 	 *
 	 * @param {Node<vec3>} node - Represents the normal map data.
-	 * @param {?Node<vec2>} [scaleNode=null] - Controls the intensity of the effect.
+	 * @param {?Node<vec2>} [scaleNode=null] - Controls the intensity of the effect. Only affects tangent space normal maps.
 	 */
 	constructor( node, scaleNode = null ) {
 
@@ -44,7 +44,7 @@ class NormalMapNode extends Node {
 		this.node = node;
 
 		/**
-		 * Controls the intensity of the effect.
+		 * Controls the intensity of the effect. Only affects tangent space normal maps.
 		 *
 		 * @type {?Node<vec2>}
 		 * @default null
@@ -91,6 +91,20 @@ class NormalMapNode extends Node {
 
 			}
 
+			if ( scaleNode !== null ) {
+
+				let scale = scaleNode;
+
+				if ( builder.isFlatShading() === true ) {
+
+					scale = negateOnBackSide( scale );
+
+				}
+
+				normalMap = vec3( normalMap.xy.mul( scale ), normalMap.z );
+
+			}
+
 		} else {
 
 			if ( unpackNormalMode !== NoNormalPacking ) {
@@ -101,25 +115,11 @@ class NormalMapNode extends Node {
 
 		}
 
-		if ( scaleNode !== null ) {
-
-			let scale = scaleNode;
-
-			if ( builder.isFlatShading() === true ) {
-
-				scale = negateOnBackSide( scale );
-
-			}
-
-			normalMap = vec3( normalMap.xy.mul( scale ), normalMap.z );
-
-		}
-
 		let output = null;
 
 		if ( normalMapType === ObjectSpaceNormalMap ) {
 
-			output = transformNormalToView( normalMap );
+			output = transformNormalToView( negateOnBackSide( normalMap ) );
 
 		} else if ( normalMapType === TangentSpaceNormalMap ) {
 
@@ -147,7 +147,7 @@ export default NormalMapNode;
  * @tsl
  * @function
  * @param {Node<vec3>} node - Represents the normal map data.
- * @param {?Node<vec2>} [scaleNode=null] - Controls the intensity of the effect.
+ * @param {?Node<vec2>} [scaleNode=null] - Controls the intensity of the effect. Only affects tangent space normal maps.
  * @returns {NormalMapNode}
  */
 export const normalMap = /*@__PURE__*/ nodeProxy( NormalMapNode ).setParameterLength( 1, 2 );

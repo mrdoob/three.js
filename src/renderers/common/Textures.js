@@ -180,7 +180,7 @@ class Textures extends DataMap {
 
 		if ( depthTexture && depthTexture.renderTarget === renderTarget ) {
 
-			const image = depthTexture.image;
+			const image = depthTexture.images ? depthTexture.images[ 0 ] : depthTexture.image;
 
 			if ( textureNeedsUpdate === true || image.width !== mipWidth || image.height !== mipHeight ) {
 
@@ -591,7 +591,8 @@ class Textures extends DataMap {
 
 		} else {
 
-			target.width = target.height = target.depth = 1;
+			target.width = target.height = 1;
+			target.depth = texture.isCubeTexture ? 6 : 1;
 
 		}
 

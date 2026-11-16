@@ -978,9 +978,18 @@ class VRMLLoader extends Loader {
 				if ( groundColor.length > 0 ) {
 
 					const groundGeometry = new SphereGeometry( radius, 32, 16, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
-					const groundMaterial = new MeshBasicMaterial( { fog: false, side: BackSide, vertexColors: true, depthWrite: false, depthTest: false } );
+					const groundMaterial = new MeshBasicMaterial( { fog: false, side: BackSide, depthWrite: false, depthTest: false } );
 
-					paintFaces( groundGeometry, radius, groundAngle, toColorArray( groundColor ), false );
+					if ( groundColor.length > 3 ) {
+
+						paintFaces( groundGeometry, radius, groundAngle, toColorArray( groundColor ), false );
+						groundMaterial.vertexColors = true;
+
+					} else {
+
+						groundMaterial.color.setRGB( groundColor[ 0 ], groundColor[ 1 ], groundColor[ 2 ], SRGBColorSpace );
+
+					}
 
 					const ground = new Mesh( groundGeometry, groundMaterial );
 					group.add( ground );
@@ -1618,7 +1627,7 @@ class VRMLLoader extends Loader {
 				switch ( fieldName ) {
 
 					case 'position':
-						camera.position.set( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 0 ] );
+						camera.position.set( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
 						break;
 
 					case 'orientation':
@@ -1997,7 +2006,7 @@ class VRMLLoader extends Loader {
 
 				if ( colorPerVertex === true ) {
 
-					if ( colorIndex.length > 0 ) {
+					if ( colorIndex && colorIndex.length > 0 ) {
 
 						// if the colorIndex field is not empty, then one color is used for each polyline of the IndexedLineSet.
 
@@ -2014,7 +2023,7 @@ class VRMLLoader extends Loader {
 
 				} else {
 
-					if ( colorIndex.length > 0 ) {
+					if ( colorIndex && colorIndex.length > 0 ) {
 
 						// if the colorIndex field is not empty, then colors are applied to each vertex of the IndexedLineSet
 
@@ -2400,9 +2409,9 @@ class VRMLLoader extends Loader {
 
 					// vertices
 
-					const x = xSpacing * i;
+					const x = xSpacing * j;
 					const y = height[ index ];
-					const z = zSpacing * j;
+					const z = zSpacing * i;
 
 					vertices.push( x, y, z );
 
@@ -2442,7 +2451,7 @@ class VRMLLoader extends Loader {
 
 					} else {
 
-						uvs.push( i / ( xDimension - 1 ), j / ( zDimension - 1 ) );
+						uvs.push( j / ( xDimension - 1 ), i / ( zDimension - 1 ) );
 
 					}
 
@@ -2469,13 +2478,13 @@ class VRMLLoader extends Loader {
 
 					if ( ccw === true ) {
 
-						indices.push( a, c, b );
-						indices.push( c, a, d );
+						indices.push( a, b, c );
+						indices.push( c, d, a );
 
 					} else {
 
-						indices.push( a, b, c );
-						indices.push( c, d, a );
+						indices.push( a, c, b );
+						indices.push( c, a, d );
 
 					}
 

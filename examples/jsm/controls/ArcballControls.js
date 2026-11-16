@@ -1823,6 +1823,7 @@ class ArcballControls extends Controls {
 		if ( this._grid != null && this.scene != null ) {
 
 			this.scene.remove( this._grid );
+			this._grid.dispose();
 			this._grid = null;
 
 		}

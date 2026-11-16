@@ -7,6 +7,7 @@ import { InstancedBufferGeometry } from '../core/InstancedBufferGeometry.js';
 import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
 import { InterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.js';
 import { InterleavedBuffer } from '../core/InterleavedBuffer.js';
+import { InstancedInterleavedBuffer } from '../core/InstancedInterleavedBuffer.js';
 import { getTypedArray, error } from '../utils.js';
 
 /**
@@ -102,7 +103,19 @@ class BufferGeometryLoader extends Loader {
 			const buffer = getArrayBuffer( json, interleavedBuffer.buffer );
 
 			const array = getTypedArray( interleavedBuffer.type, buffer );
-			const ib = new InterleavedBuffer( array, interleavedBuffer.stride );
+
+			let ib;
+
+			if ( interleavedBuffer.isInstancedInterleavedBuffer ) {
+
+				ib = new InstancedInterleavedBuffer( array, interleavedBuffer.stride, interleavedBuffer.meshPerAttribute );
+
+			} else {
+
+				ib = new InterleavedBuffer( array, interleavedBuffer.stride );
+
+			}
+
 			ib.uuid = interleavedBuffer.uuid;
 
 			if ( interleavedBuffer.usage !== undefined ) ib.setUsage( interleavedBuffer.usage );
@@ -130,6 +143,14 @@ class BufferGeometryLoader extends Loader {
 
 		const geometry = json.isInstancedBufferGeometry ? new InstancedBufferGeometry() : new BufferGeometry();
 
+		// the default instance count is Infinity which is serialized as null
+
+		if ( json.isInstancedBufferGeometry && typeof json.instanceCount === 'number' ) {
+
+			geometry.instanceCount = json.instanceCount;
+
+		}
+
 		const index = json.data.index;
 
 		if ( index !== undefined ) {
@@ -154,8 +175,16 @@ class BufferGeometryLoader extends Loader {
 			} else {
 
 				const typedArray = getTypedArray( attribute.type, attribute.array );
-				const bufferAttributeConstr = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
-				bufferAttribute = new bufferAttributeConstr( typedArray, attribute.itemSize, attribute.normalized );
+
+				if ( attribute.isInstancedBufferAttribute ) {
+
+					bufferAttribute = new InstancedBufferAttribute( typedArray, attribute.itemSize, attribute.normalized, attribute.meshPerAttribute );
+
+				} else {
+
+					bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+
+				}
 
 			}
 

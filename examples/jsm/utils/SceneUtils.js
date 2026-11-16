@@ -195,11 +195,7 @@ function reduceVertices( object, func, initialValue ) {
 
 					}
 
-					if ( ! child.isSkinnedMesh ) {
-
-						vertex.applyMatrix4( child.matrixWorld );
-
-					}
+					vertex.applyMatrix4( child.matrixWorld );
 
 					value = func( value, vertex );
 
@@ -282,6 +278,26 @@ function sortInstancedMesh( mesh, compareFn ) {
 				if ( attribute.itemSize > 3 ) attribute.setW( i, attributeRef.getW( refIndex ) );
 
 			}
+
+		}
+
+	}
+
+	mesh.instanceMatrix.needsUpdate = true;
+
+	if ( mesh.instanceColor ) {
+
+		mesh.instanceColor.needsUpdate = true;
+
+	}
+
+	for ( const name in mesh.geometry.attributes ) {
+
+		const attribute = mesh.geometry.attributes[ name ];
+
+		if ( attribute.isInstancedBufferAttribute ) {
+
+			attribute.needsUpdate = true;
 
 		}
 

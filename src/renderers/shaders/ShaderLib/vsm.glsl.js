@@ -26,13 +26,13 @@ void main() {
 
 		#ifdef HORIZONTAL_PASS
 
-			vec2 distribution = texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( uvOffset, 0.0 ) * radius ) / resolution ).rg;
+			vec2 distribution = textureLod( shadow_pass, ( gl_FragCoord.xy + vec2( uvOffset, 0.0 ) * radius ) / resolution, 0.0 ).rg;
 			mean += distribution.x;
 			squared_mean += distribution.y * distribution.y + distribution.x * distribution.x;
 
 		#else
 
-			float depth = texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( 0.0, uvOffset ) * radius ) / resolution ).r;
+			float depth = textureLod( shadow_pass, ( gl_FragCoord.xy + vec2( 0.0, uvOffset ) * radius ) / resolution, 0.0 ).r;
 			mean += depth;
 			squared_mean += depth * depth;
 

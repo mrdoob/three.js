@@ -69,6 +69,24 @@ class TAARenderPass extends SSAARenderPass {
 	}
 
 	/**
+	 * Sets the size of the pass.
+	 *
+	 * @param {number} width - The width to set.
+	 * @param {number} height - The height to set.
+	 */
+	setSize( width, height ) {
+
+		super.setSize( width, height );
+
+		if ( this._holdRenderTarget ) this._holdRenderTarget.setSize( width, height );
+
+		// resizing clears the render targets so the accumulation must start over
+
+		this.accumulateIndex = - 1;
+
+	}
+
+	/**
 	 * Performs the TAA render pass.
 	 *
 	 * @param {WebGLRenderer} renderer - The renderer.

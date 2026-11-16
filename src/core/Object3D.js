@@ -26,6 +26,8 @@ const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 /**
  * Fires when the object has been added to its parent object.
  *
+ * Adding 3D objects inside a listener of this event is not supported.
+ *
  * @event Object3D#added
  * @type {Object}
  */
@@ -33,6 +35,8 @@ const _addedEvent = { type: 'added' };
 
 /**
  * Fires when the object has been removed from its parent object.
+ *
+ * Removing 3D objects inside a listener of this event is not supported.
  *
  * @event Object3D#removed
  * @type {Object}
@@ -42,6 +46,8 @@ const _removedEvent = { type: 'removed' };
 /**
  * Fires when a new child object has been added.
  *
+ * Adding 3D objects inside a listener of this event is not supported.
+ *
  * @event Object3D#childadded
  * @type {Object}
  */
@@ -49,6 +55,8 @@ const _childaddedEvent = { type: 'childadded', child: null };
 
 /**
  * Fires when a child object has been removed.
+ *
+ * Removing 3D objects inside a listener of this event is not supported.
  *
  * @event Object3D#childremoved
  * @type {Object}
@@ -1231,6 +1239,7 @@ class Object3D extends EventDispatcher {
 	 * @param {boolean} [updateChildren=false] Whether descendant nodes should be updated or not.
 	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
 	 * when {@link Object3D#matrixWorldNeedsUpdate} is `false`.
+	 * @return {boolean} Whether the world matrix has changed or not.
 	 */
 	updateWorldMatrix( updateParents, updateChildren, force = false ) {
 
@@ -1238,7 +1247,7 @@ class Object3D extends EventDispatcher {
 
 		if ( updateParents === true && parent !== null ) {
 
-			parent.updateWorldMatrix( true, false );
+			if ( parent.updateWorldMatrix( true, false ) === true ) force = true;
 
 		}
 
@@ -1281,6 +1290,8 @@ class Object3D extends EventDispatcher {
 			}
 
 		}
+
+		return force;
 
 	}
 

@@ -1410,9 +1410,19 @@ class ColladaComposer {
 		switch ( data.optics.technique ) {
 
 			case 'perspective':
+				let yfov = data.optics.parameters.yfov;
+				const xfov = data.optics.parameters.xfov;
+				const aspect = data.optics.parameters.aspect_ratio;
+
+				if ( yfov === undefined && xfov !== undefined && aspect !== undefined ) {
+
+					yfov = MathUtils.radToDeg( 2 * Math.atan( Math.tan( MathUtils.degToRad( xfov ) / 2 ) / aspect ) );
+
+				}
+
 				camera = new PerspectiveCamera(
-					data.optics.parameters.yfov,
-					data.optics.parameters.aspect_ratio,
+					yfov,
+					aspect,
 					data.optics.parameters.znear,
 					data.optics.parameters.zfar
 				);

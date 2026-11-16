@@ -64,7 +64,7 @@
 					int numBlockers = 0;
 
 					for( int i = 0; i < BLOCKER_SEARCH_NUM_SAMPLES; i++ ) {
-						float shadowMapDepth = texture2D(shadowMap, uv + poissonDisk[i] * searchRadius).r;
+						float shadowMapDepth = textureLod(shadowMap, uv + poissonDisk[i] * searchRadius, 0.0).r;
 						if ( shadowMapDepth < zReceiver ) {
 							blockerDepthSum += shadowMapDepth;
 							numBlockers ++;
@@ -81,13 +81,13 @@
 					float depth;
 					#pragma unroll_loop_start
 					for( int i = 0; i < 17; i ++ ) {
-						depth = texture2D( shadowMap, uv + poissonDisk[ i ] * filterRadius ).r;
+						depth = textureLod( shadowMap, uv + poissonDisk[ i ] * filterRadius, 0.0 ).r;
 						if( zReceiver <= depth ) sum += 1.0;
 					}
 					#pragma unroll_loop_end
 					#pragma unroll_loop_start
 					for( int i = 0; i < 17; i ++ ) {
-						depth = texture2D( shadowMap, uv + -poissonDisk[ i ].yx * filterRadius ).r;
+						depth = textureLod( shadowMap, uv + -poissonDisk[ i ].yx * filterRadius, 0.0 ).r;
 						if( zReceiver <= depth ) sum += 1.0;
 					}
 					#pragma unroll_loop_end
@@ -238,10 +238,10 @@
 				);
 
 				shader = shader.replace(
-					'\t\t\tif ( frustumTest ) {\n\t\t\t\tfloat depth = texture2D( shadowMap, shadowCoord.xy ).r;',
+					'\t\t\tif ( frustumTest ) {\n\t\t\t\tfloat depth = textureLod( shadowMap, shadowCoord.xy, 0.0 ).r;',
 					'\t\t\tif ( frustumTest ) {\n' +
 					document.getElementById( 'PCSSGetShadow' ).textContent + '\n' +
-					'\t\t\t\tfloat depth = texture2D( shadowMap, shadowCoord.xy ).r;'
+					'\t\t\t\tfloat depth = textureLod( shadowMap, shadowCoord.xy, 0.0 ).r;'
 				);
 
 				THREE.ShaderChunk.shadowmap_pars_fragment = shader;

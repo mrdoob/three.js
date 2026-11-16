@@ -1,4 +1,4 @@
-import { add, float, Fn, If, luminance, max, struct, vec2, vec4, getViewPosition, logarithmicDepthToViewZ, viewZToOrthographicDepth, viewZToPerspectiveDepth } from 'three/tsl';
+import { add, float, Fn, If, luminance, max, struct, vec2, vec4, getViewPosition, projectionDepth, viewZToOrthographicDepth, viewZToPerspectiveDepth } from 'three/tsl';
 
 /**
  * Optimized version of AABB clipping.
@@ -84,11 +84,10 @@ export const sampleCurrentDepth = Fn( ( [ depthNode, positionTexel, cameraNearFa
 
 		for ( let y = - 1; y <= 1; ++ y ) {
 
-			const neighbor = positionTexel.add( vec2( x, y ) ).toVar();
+			const neighbor = positionTexel.add( vec2( x, y ) ).toConst();
 			let depth = depthNode.load( neighbor ).r;
 			if ( builder.renderer.reversedDepthBuffer ) depth = depth.oneMinus();
-			if ( builder.renderer.logarithmicDepthBuffer ) depth = logarithmicToPerspectiveDepth( depth, cameraNearFar );
-			depth = depth.toVar();
+			depth = projectionDepth( depth, cameraNearFar.x, cameraNearFar.y ).toConst();
 
 			If( depth.lessThan( closestDepth ), () => {
 
@@ -126,10 +125,9 @@ export const sampleCurrentDepth = Fn( ( [ depthNode, positionTexel, cameraNearFa
  * @param {Camera} camera - The camera.
  * @return {Node<float>} The reprojected depth.
  */
-export const samplePreviousDepth = Fn( ( [ previousDepthNode, uv, previousCameraProjectionMatrixInverse, previousCameraWorldMatrix, cameraWorldMatrixInverse, cameraNearFar, camera ], builder ) => {
+export const samplePreviousDepth = Fn( ( [ previousDepthNode, uv, previousCameraProjectionMatrixInverse, previousCameraWorldMatrix, cameraWorldMatrixInverse, cameraNearFar, camera ] ) => {
 
-	let depth = previousDepthNode.sample( uv ).r;
-	if ( builder.renderer.logarithmicDepthBuffer ) depth = logarithmicToPerspectiveDepth( depth, cameraNearFar );
+	const depth = projectionDepth( previousDepthNode.sample( uv ).r, cameraNearFar.x, cameraNearFar.y );
 	const positionView = getViewPosition( uv, depth, previousCameraProjectionMatrixInverse );
 	const positionWorld = previousCameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz;
 	const viewZ = cameraWorldMatrixInverse.mul( vec4( positionWorld, 1 ) ).z;
@@ -158,14 +156,6 @@ const currentDepthStruct = struct( {
 	closestPositionTexel: 'vec2',
 	farthestDepth: 'float'
 } );
-
-const logarithmicToPerspectiveDepth = ( depth, cameraNearFar ) => {
-
-	const { x: near, y: far } = cameraNearFar;
-	const viewZ = logarithmicDepthToViewZ( depth, near, far );
-	return viewZToPerspectiveDepth( viewZ, near, far );
-
-};
 
 function halton( index, base ) {
 
