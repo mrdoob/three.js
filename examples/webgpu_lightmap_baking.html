@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
 			</div>
 
-			<small>Progressively bake and denoise ray traced radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>) diffuse irradiance into a UV atlas by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/><span id="status"></span></small>
+			<small>Progressively bake and denoise ray traced radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>) diffuse irradiance into a UV atlas by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>, with stitched seams and filled gutters.<br/><span id="status"></span></small>
 		</div>
 
 		<script type="importmap">
@@ -37,6 +37,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
+			import { texture } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -45,6 +46,8 @@
 			import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
 			import { RayTracedRadiosity, rayTracedRadiosityIrradiance } from 'three/addons/lighting/RayTracedRadiosity.js';
 			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
+			import { SeamStitchGenerator } from 'three/addons/utils/SeamStitchGenerator.js';
+			import { GutterFillGenerator } from 'three/addons/utils/GutterFillGenerator.js';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -58,13 +61,15 @@
 
 			let camera, scene, renderer, controls, status;
 			let world, meshes, materials;
-			let radiosity, lightMapper, denoiseNode = null;
-			let needsBake = false, denoised = false;
+			let radiosity, lightMapper, denoiseNode = null, seamStitch, gutterFill, stitchedTarget, filledTarget, stitchedAtlas = null;
+			let needsBake = false, denoised = false, finished = false;
 
 			const params = {
 				scene: 'Cornell Box',
 				resolution: 1024,
-				denoise: false
+				denoise: false,
+				stitchSeams: true,
+				fillGutters: true
 			};
 
 			const scenes = { 'Cornell Box': createCornellBox, 'Courtyard': loadCourtyard };
@@ -113,7 +118,18 @@
 				gui.add( params, 'scene', Object.keys( scenes ) ).name( 'Scene' ).onChange( setScene );
 				gui.add( params, 'resolution', phone ? [ 256, 1024, 2048 ] : [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
 				gui.add( params, 'denoise' ).name( 'Denoise' ).onChange( requestBake );
+				gui.add( params, 'stitchSeams' ).name( 'Stitch Seams' ).onChange( finishLightMap );
+				gui.add( params, 'fillGutters' ).name( 'Fill Gutters' ).onChange( finishLightMap );
 				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
+
+				// the stitched and the filled light map, resized to the light map. The filled one has mipmaps: without
+				// empty texels around the charts, they show no dark outlines
+
+				seamStitch = new SeamStitchGenerator( renderer );
+				gutterFill = new GutterFillGenerator( renderer );
+
+				stitchedTarget = new THREE.RenderTarget( 1, 1, { type: THREE.HalfFloatType, depthBuffer: false } );
+				filledTarget = new THREE.RenderTarget( 1, 1, { type: THREE.HalfFloatType, depthBuffer: false, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -354,20 +370,58 @@
 				lightMapper = new LightMapper( renderer, world.atlas.resolution, rayTracedRadiosityIrradiance( radiosity ), { variance: params.denoise, guides: params.denoise } );
 				lightMapper.addObjects( meshes );
 
-				// the denoiser filters once, when the bake is done
+				// the denoiser filters once, when the bake is done. It keeps the coverage of the light map in alpha,
+				// which the seams are stitched and the gutters are filled around
 
 				denoiseNode = params.denoise ? denoise( lightMapper.getTextureNode( 'color' ), {
 					position: lightMapper.getTextureNode( 'position' ),
 					normal: lightMapper.getTextureNode( 'normal' ),
 					variance: lightMapper.getTextureNode( 'variance' ),
-					quality: 'quality'
+					quality: 'quality',
+					coverage: true
 				} ) : null;
 				if ( denoiseNode !== null ) denoiseNode.autoUpdate = false;
 				denoised = false;
+				finished = false;
 				bakedRays = 0;
 				raysPerFrame = 8;
 
 				setLightMap( lightMapper.getTextureNode() );
+
+			}
+
+			// once the bake is done, the seams of the light map are stitched and its gutters are filled
+
+			function finishLightMap() {
+
+				if ( bakedRays < rays || ( denoiseNode !== null && ! denoised ) ) return;
+
+				// the light map has its coverage in alpha, the stitched light map also the stitched texels
+
+				let map = denoiseNode !== null ? denoiseNode.getTexture() : lightMapper.texture;
+
+				if ( params.stitchSeams ) {
+
+					// finding the seams takes a moment, once per atlas
+
+					if ( stitchedAtlas !== world.atlas ) {
+
+						seamStitch.setGeometry( world.lightMapped );
+						stitchedAtlas = world.atlas;
+
+					}
+
+					map = seamStitch.generate( map, stitchedTarget ).texture;
+
+				}
+
+				if ( params.fillGutters ) map = gutterFill.generate( map, filledTarget ).texture;
+
+				if ( map === lightMapper.texture ) setLightMap( lightMapper.getTextureNode() );
+				else if ( denoiseNode !== null && map === denoiseNode.getTexture() ) setLightMap( denoiseNode );
+				else setLightMap( texture( map ) );
+
+				finished = true;
 
 			}
 
@@ -443,13 +497,21 @@
 
 				}
 
-				// denoise once the bake is done
+				// denoise once the bake is done, then stitch and fill the denoised light map in the next frame
 
-				if ( denoiseNode !== null && ! denoised && bakedRays >= rays ) {
+				if ( bakedRays >= rays && ! finished ) {
 
-					denoiseNode.textureNeedsUpdate = true;
-					denoised = true;
-					setLightMap( denoiseNode );
+					if ( denoiseNode !== null && ! denoised ) {
+
+						denoiseNode.textureNeedsUpdate = true;
+						denoised = true;
+						setLightMap( denoiseNode );
+
+					} else {
+
+						finishLightMap();
+
+					}
 
 				}
 
