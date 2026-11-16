@@ -2006,7 +2006,7 @@ class VRMLLoader extends Loader {
 
 				if ( colorPerVertex === true ) {
 
-					if ( colorIndex.length > 0 ) {
+					if ( colorIndex && colorIndex.length > 0 ) {
 
 						// if the colorIndex field is not empty, then one color is used for each polyline of the IndexedLineSet.
 
@@ -2023,7 +2023,7 @@ class VRMLLoader extends Loader {
 
 				} else {
 
-					if ( colorIndex.length > 0 ) {
+					if ( colorIndex && colorIndex.length > 0 ) {
 
 						// if the colorIndex field is not empty, then colors are applied to each vertex of the IndexedLineSet
 
