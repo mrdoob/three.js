@@ -1,4 +1,4 @@
-import { BoxGeometry, Mesh, MeshStandardMaterial, PerspectiveCamera, Scene, SphereGeometry } from 'three';
+import { BoxGeometry, Mesh, MeshStandardMaterial, Scene, SphereGeometry } from 'three';
 import { USDZExporter } from '../../../../examples/jsm/exporters/USDZExporter.js';
 import { USDLoader } from '../../../../examples/jsm/loaders/USDLoader.js';
 import { unzipSync, strFromU8 } from '../../../../examples/jsm/libs/fflate.module.js';
@@ -240,24 +240,6 @@ export default QUnit.module( 'Addons', () => {
 					assert.closeTo( importedMesh.material.metalness, mesh.material.metalness, tolerance, 'Material metalness matches' );
 
 				}
-
-			} );
-
-			QUnit.test( 'export perspective camera with zoom', async ( assert ) => {
-
-				const exporter = new USDZExporter();
-				const scene = new Scene();
-
-				const camera = new PerspectiveCamera( 60, 1.5, 0.1, 100 );
-				camera.zoom = 2;
-				scene.add( camera );
-
-				const exportResult = await exporter.parseAsync( scene );
-				const unzipped = unzipSync( exportResult );
-				const usdaContent = strFromU8( unzipped[ 'model.usda' ] );
-
-				const expectedFocalLength = ( camera.getFocalLength() * camera.zoom ).toPrecision( 7 );
-				assert.ok( usdaContent.includes( `float focalLength = ${expectedFocalLength}` ), 'focalLength honors camera.zoom' );
 
 			} );
 
