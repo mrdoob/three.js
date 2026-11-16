@@ -285,7 +285,15 @@
 					const coord = uv.mul( vec2( size ) ).sub( 0.5 );
 					const base = ivec2( coord.floor() );
 					const weight = coord.fract();
-					const tap = ( x, y ) => normalDecode( scenePassNormal.load( base.add( ivec2( x, y ) ).clamp( ivec2( 0 ), ivec2( size ).sub( 1 ) ) ) );
+					// Taps are decoded without normalizing; the blended result is normalized once.
+					const tap = ( x, y ) => {
+
+						const encoded = scenePassNormal.load( base.add( ivec2( x, y ) ).clamp( ivec2( 0 ), ivec2( size ).sub( 1 ) ) ).rg;
+						const z = encoded.x.abs().add( encoded.y.abs() ).oneMinus();
+
+						return vec3( encoded.sub( encoded.sign().mul( z.negate().max( 0 ) ) ), z );
+
+					};
 
 					return mix( mix( tap( 0, 0 ), tap( 1, 0 ), weight.x ), mix( tap( 0, 1 ), tap( 1, 1 ), weight.x ), weight.y ).normalize();
 
