@@ -26,7 +26,7 @@ function evaluateGridIrradiance( atlas, uvw, res, normal ) {
 	const atlasDepth = paddedSlices.mul( 7.0 );
 	const uvZBase = uvw.z.mul( nz ).add( ATLAS_PADDING );
 
-	const slice = ( t ) => atlas.sample( vec3( uvw.xy, uvZBase.add( paddedSlices.mul( t ) ).div( atlasDepth ) ) );
+	const slice = ( t ) => atlas.sample( vec3( uvw.xy, uvZBase.add( paddedSlices.mul( t ) ).div( atlasDepth ) ) ).level( 0 );
 
 	const s0 = slice( 0 ), s1 = slice( 1 ), s2 = slice( 2 ), s3 = slice( 3 );
 	const s4 = slice( 4 ), s5 = slice( 5 ), s6 = slice( 6 );

@@ -115,7 +115,7 @@ export const PCFShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, 
  */
 export const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, depthLayer }, builder ) => {
 
-	let distribution = texture( depthTexture ).sample( shadowCoord.xy );
+	let distribution = texture( depthTexture ).sample( shadowCoord.xy ).level( 0 );
 
 	if ( depthTexture.isArrayTexture ) {
 

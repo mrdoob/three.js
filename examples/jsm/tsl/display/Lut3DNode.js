@@ -67,7 +67,7 @@ class Lut3DNode extends Node {
 
 		const { inputNode, lutNode } = this;
 
-		const sampleLut = ( uv ) => lutNode.sample( uv );
+		const sampleLut = ( uv ) => lutNode.sample( uv ).level( 0 );
 
 		const lut3D = Fn( () => {
 

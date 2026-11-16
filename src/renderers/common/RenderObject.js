@@ -218,7 +218,7 @@ class RenderObject {
 		 * A reference to a render pipeline the render
 		 * object is processed with.
 		 *
-		 * @type {RenderPipeline}
+		 * @type {?RenderObjectPipeline}
 		 * @default null
 		 */
 		this.pipeline = null;

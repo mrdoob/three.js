@@ -724,8 +724,8 @@ class PhysicalLightingModel extends LightingModel {
 
 		const uv = LTC_Uv( { N, V, roughness } );
 
-		const t1 = ltc_1.sample( uv ).toVar();
-		const t2 = ltc_2.sample( uv ).toVar();
+		const t1 = ltc_1.sample( uv ).level( 0 ).toVar();
+		const t2 = ltc_2.sample( uv ).level( 0 ).toVar();
 
 		const mInv = mat3(
 			vec3( t1.x, 0, t1.y ),
@@ -747,8 +747,8 @@ class PhysicalLightingModel extends LightingModel {
 
 			const uvClearcoat = LTC_Uv( { N: Ncc, V, roughness: clearcoatRoughness } );
 
-			const t1Clearcoat = ltc_1.sample( uvClearcoat );
-			const t2Clearcoat = ltc_2.sample( uvClearcoat );
+			const t1Clearcoat = ltc_1.sample( uvClearcoat ).level( 0 );
+			const t2Clearcoat = ltc_2.sample( uvClearcoat ).level( 0 );
 
 			const mInvClearcoat = mat3(
 				vec3( t1Clearcoat.x, 0, t1Clearcoat.y ),

@@ -43,12 +43,13 @@ const HIT_DISTANCE_PHI = 8;
  * // SSR with coverage in alpha: texels without coverage do not darken the radiance
  * const denoised = temporalDenoise( reflections, { depth, normal, camera, velocity, coverage: true } );
  *
- * // a light map, filtered once when the bake is done
+ * // a light map, filtered once when the bake is done, with its coverage in alpha
  * const denoiseNode = denoise( lightMapper.getTextureNode( 'color' ), {
  * 	position: lightMapper.getTextureNode( 'position' ),
  * 	normal: lightMapper.getTextureNode( 'normal' ),
  * 	variance: lightMapper.getTextureNode( 'variance' ),
- * 	quality: 'quality'
+ * 	quality: 'quality',
+ * 	coverage: true
  * } );
  * denoiseNode.autoUpdate = false;
  * material.lightMapNode = denoiseNode;
@@ -83,7 +84,7 @@ class DenoiseNode extends Node {
 	 * @param {?Node<float>} [options.roughness=null] - Screen space, reflections: the roughness of the scene, a node with `sample( uv )`.
 	 * @param {?Node<float>} [options.hitDistance=null] - Screen space, reflections: the hit distance of each pixel of the input, a node with `sample( uv )`, with `roughness`.
 	 * @param {boolean} [options.alpha=false] - Screen space: whether alpha is a second signal to filter, e.g. AO next to GI.
-	 * @param {boolean} [options.coverage=false] - Screen space: whether the input is radiance with its coverage in alpha.
+	 * @param {boolean} [options.coverage=false] - Whether the input has its coverage in alpha: radiance in screen space, a map in texture space, e.g. a light map of `LightMapper`.
 	 * @param {boolean} [options.temporal=false] - Screen space: whether to accumulate the input in time, see `temporalDenoise()`.
 	 * @param {('fast'|'quality')} [options.quality='fast'] - The preset of the filter.
 	 */
@@ -99,7 +100,7 @@ class DenoiseNode extends Node {
 		const screenSpace = position === null;
 
 		if ( screenSpace && ( depth === null || camera === null || variance !== null ) ) throw new Error( 'THREE.DenoiseNode: Screen space needs depth and camera, and supports no variance.' );
-		if ( ! screenSpace && ( normal === null || alpha || coverage || temporal ) ) throw new Error( 'THREE.DenoiseNode: Texture space needs normals, and supports neither alpha, coverage nor temporal.' );
+		if ( ! screenSpace && ( normal === null || alpha || temporal ) ) throw new Error( 'THREE.DenoiseNode: Texture space needs normals, and supports neither alpha nor temporal.' );
 		if ( temporal && velocity === null ) throw new Error( 'THREE.DenoiseNode: Temporal needs velocity.' );
 
 		/**
@@ -182,12 +183,14 @@ class DenoiseNode extends Node {
 		 * @type {boolean}
 		 * @readonly
 		 */
-		this.alpha = alpha || coverage;
+		this.alpha = alpha || ( coverage && screenSpace );
 
 		/**
-		 * Whether the input is radiance with its coverage in alpha: the node filters the radiance weighted by
-		 * coverage, so that texels without coverage do not darken it, and returns the radiance with the filtered
-		 * coverage in alpha.
+		 * Whether the input has its coverage in alpha. In screen space, the input is radiance: the node filters the
+		 * radiance weighted by coverage, so that texels without coverage do not darken it, and returns the radiance
+		 * with the filtered coverage in alpha. In texture space, texels with an alpha of 0 have no data, like texels
+		 * without a variance, and the output keeps the coverage in alpha, 1 or 0, e.g. for `SeamStitchGenerator`
+		 * and `GutterFillGenerator`.
 		 *
 		 * @type {boolean}
 		 * @readonly
@@ -1170,17 +1173,27 @@ class DenoiseNode extends Node {
 
 		} else {
 
-			// texture space: the color with the standard deviation of its noise, -1 for texels without data
+			// texture space: the color with the standard deviation of its noise, -1 for texels without data, i.e.
+			// without a variance or, with coverage, without coverage
 
 			const input = this.inputNode;
 			const variance = this.varianceNode;
+			const coverage = this.coverage;
 
 			prepare = () => {
 
 				const coord = ivec2( screenCoordinate.xy );
-				const value = input.load( coord ).rgb.toVar();
+				const texel = input.load( coord ).toVar();
+				const value = texel.rgb.toVar();
+				const uncovered = coverage ? texel.a.lessThanEqual( 0 ) : false;
 
-				if ( variance === null ) return vec4( value, luminance( value ).mul( this.relativeNoise ) );
+				if ( variance === null ) {
+
+					const deviation = luminance( value ).mul( this.relativeNoise );
+
+					return vec4( value, coverage ? uncovered.select( - 1, deviation ) : deviation );
+
+				}
 
 				// the variance blurred over the 3x3 texels of the same surface like in SVGF, so that a single lucky sample
 				// does not stop the filter
@@ -1202,7 +1215,9 @@ class DenoiseNode extends Node {
 
 				} );
 
-				return vec4( value, variance.load( coord ).r.lessThan( 0 ).select( - 1, sqrt( sum.x.div( sum.y.max( 1e-6 ) ) ) ) );
+				const noData = coverage ? variance.load( coord ).r.lessThan( 0 ).or( uncovered ) : variance.load( coord ).r.lessThan( 0 );
+
+				return vec4( value, noData.select( - 1, sqrt( sum.x.div( sum.y.max( 1e-6 ) ) ) ) );
 
 			};
 
@@ -1465,7 +1480,8 @@ class DenoiseNode extends Node {
 
 	/**
 	 * Texture space: creates the material that writes the output and fills the texels without data with the mean of
-	 * the denoised texels within two texels, like `LightMapper` fills the padding of the charts.
+	 * the denoised texels within two texels, like `LightMapper` fills the padding of the charts. With coverage, the
+	 * alpha of the output is 1 at the texels with data and 0 elsewhere.
 	 *
 	 * @private
 	 * @return {NodeMaterial} The material.
@@ -1474,12 +1490,13 @@ class DenoiseNode extends Node {
 
 		const input = this._input;
 		const size = ivec2( this._size );
+		const coverage = this.coverage;
 
 		const resolve = () => {
 
 			const coord = ivec2( screenCoordinate.xy );
 			const center = input.load( coord ).toVar();
-			const result = vec4( center.rgb, 1 ).toVar();
+			const result = vec4( center.rgb, coverage ? center.a.greaterThanEqual( 0 ).select( float( 1 ), float( 0 ) ) : 1 ).toVar();
 
 			If( center.a.lessThan( 0 ), () => {
 
@@ -1499,7 +1516,7 @@ class DenoiseNode extends Node {
 
 				If( sum.a.greaterThan( 0 ), () => {
 
-					result.assign( vec4( sum.rgb.div( sum.a ), 1 ) );
+					result.assign( vec4( sum.rgb.div( sum.a ), coverage ? 0 : 1 ) );
 
 				} );
 
