@@ -48,7 +48,7 @@ class SSRNode extends Node {
 	 *
 	 * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
 	 * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
-	 * @param {Node<vec3>} normalNode - A node that represents the beauty pass's normals.
+	 * @param {Node<vec3>} normalNode - A node that represents the beauty pass's unit view-space normals.
 	 * @param {SSRNodeOptions} [options] - Optional inputs for material and environment data.
 	 */
 	constructor( colorNode, depthNode, normalNode, options = {} ) {
@@ -887,7 +887,7 @@ class SSRNode extends Node {
 
 			const viewPosition = getViewPosition( uvPos, depth, this._cameraProjectionMatrixInverse ).toVar();
 			const worldPosition = this._cameraWorldMatrix.mul( vec4( viewPosition, 1.0 ) ).xyz.toVar();
-			const viewNormal = this.normalNode.rgb.normalize().toVar();
+			const viewNormal = this.normalNode.rgb.toVar();
 
 			const viewIncidentDir = ( ( this.camera.isPerspectiveCamera ) ? normalize( viewPosition ) : vec3( 0, 0, - 1 ) ).toVar();
 
@@ -1171,7 +1171,7 @@ class SSRNode extends Node {
 
 					If( away.lessThanEqual( tk ), () => {
 
-						const vN = this.normalNode.sample( uvS ).rgb.normalize().toVar();
+						const vN = this.normalNode.sample( uvS ).rgb.toVar();
 
 						// the reflected ray is pointing towards the same side as the fragment's normal (current ray position),
 						// which means it wouldn't reflect off the surface. The loop continues to the next step for the next ray sample.
@@ -1232,7 +1232,7 @@ class SSRNode extends Node {
 							const sMid = hitSLo.add( hitSHi ).mul( 0.5 ).toVar();
 							const uvMid = screenPosAt( sMid ).mul( invResolution ).toConst();
 							const sceneZMid = depthToViewZ( this.depthNode.sample( uvMid ).r, this._cameraNear, this._cameraFar, this.camera );
-							const frontFacing = dot( viewReflectDir, this.normalNode.sample( uvMid ).rgb.normalize() ).lessThan( 0 );
+							const frontFacing = dot( viewReflectDir, this.normalNode.sample( uvMid ).rgb ).lessThan( 0 );
 
 							If( reflectRayZAt( sMid ).lessThanEqual( sceneZMid ).and( frontFacing ), () => {
 
@@ -1273,7 +1273,7 @@ class SSRNode extends Node {
 					withinRange.assign( withinRange.and( isBackgroundDepth( hitD ).not() )
 						.and( pointToLineDistance( vP, viewPosition, d1viewPosition ).lessThanEqual( tk ) ) );
 
-					withinRange.assign( withinRange.and( dot( viewReflectDir, this.normalNode.sample( uvS ).rgb.normalize() ).lessThan( 0 ) ) );
+					withinRange.assign( withinRange.and( dot( viewReflectDir, this.normalNode.sample( uvS ).rgb ).lessThan( 0 ) ) );
 
 				}
 
@@ -1401,7 +1401,7 @@ export default SSRNode;
  * @function
  * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
  * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
- * @param {Node<vec3>} normalNode - A node that represents the beauty pass's normals.
+ * @param {Node<vec3>} normalNode - A node that represents the beauty pass's unit view-space normals.
  * @param {SSRNodeOptions} [options] - Optional inputs for material and environment data.
  * @returns {SSRNode}
  */
