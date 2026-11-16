@@ -1239,15 +1239,13 @@ class Object3D extends EventDispatcher {
 	 * @param {boolean} [updateChildren=false] Whether descendant nodes should be updated or not.
 	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
 	 * when {@link Object3D#matrixWorldNeedsUpdate} is `false`.
-	 * @return {boolean} Whether the world matrix has been updated or not.
+	 * @return {boolean} Whether the world matrix has changed or not.
 	 */
 	updateWorldMatrix( updateParents, updateChildren, force = false ) {
 
 		const parent = this.parent;
 
 		if ( updateParents === true && parent !== null ) {
-
-			// a changed parent world matrix requires an update of this world matrix as well
 
 			if ( parent.updateWorldMatrix( true, false ) === true ) force = true;
 
