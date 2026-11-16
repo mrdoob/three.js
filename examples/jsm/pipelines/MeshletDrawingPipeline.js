@@ -300,6 +300,21 @@ function isSupportedMaterial( material, renderer ) {
 }
 
 /**
+ * Returns `true` if the current render call is nested in another one, like a render to a render target in
+ * `onBeforeRender()`. The draw commands of the parent render are not submitted yet and can still refer to the
+ * buffers of the pipeline.
+ *
+ * @private
+ * @param {Renderer} renderer - The renderer.
+ * @return {boolean} Whether the render call is nested or not.
+ */
+function isNestedRender( renderer ) {
+
+	return renderer._callDepth > 0;
+
+}
+
+/**
  * Returns the accessors of matrices stored as four vec4 columns in a storage buffer of vec4 elements.
  *
  * @private
@@ -1942,6 +1957,10 @@ class MeshletGeometryPool {
 
 		this.version = 0;
 
+		// the buffers replaced by reserve(), disposed by update() since a render can still refer to them
+
+		this.retired = [];
+
 	}
 
 	/**
@@ -1999,10 +2018,15 @@ class MeshletGeometryPool {
 	}
 
 	/**
-	 * Reclaims the elements of the removed geometries once they exceed half of the elements of the pool, so
-	 * removing many geometries moves the geometries once.
+	 * Disposes the replaced buffers and reclaims the elements of the removed geometries once they exceed half of
+	 * the elements of the pool, so removing many geometries moves the geometries once. Called before an outer
+	 * render only, when no draw commands refer to the buffers of the pool.
 	 */
 	update() {
+
+		for ( const attribute of this.retired ) attribute.dispose();
+
+		this.retired.length = 0;
 
 		if ( this.wasted > 0 && this.wasted > ( this.vertexEnd * 4 + this.indexEnd ) / 2 ) this.compact();
 
@@ -2052,7 +2076,7 @@ class MeshletGeometryPool {
 			const array = new Float32Array( Math.max( vertices * 4, Math.ceil( this.vertexArray.length * 1.5 / 4 ) * 4 ) );
 			array.set( this.vertexArray.subarray( 0, this.vertexEnd * 4 ) );
 
-			this.vertexAttribute.dispose();
+			this.retired.push( this.vertexAttribute );
 			this.vertexArray = array;
 			this.vertexAttribute = new StorageBufferAttribute( array, 4 );
 			this.vertexNode.value = this.vertexAttribute;
@@ -2065,7 +2089,7 @@ class MeshletGeometryPool {
 			const array = new Uint32Array( Math.max( indices, Math.ceil( this.indexArray.length * 1.5 ) ) );
 			array.set( this.indexArray.subarray( 0, this.indexEnd ) );
 
-			this.indexAttribute.dispose();
+			this.retired.push( this.indexAttribute );
 			this.indexArray = array;
 			this.indexAttribute = new StorageBufferAttribute( array, 1 );
 			this.indexNode.value = this.indexAttribute;
@@ -2082,6 +2106,10 @@ class MeshletGeometryPool {
 
 		this.vertexAttribute.dispose();
 		this.indexAttribute.dispose();
+
+		for ( const attribute of this.retired ) attribute.dispose();
+
+		this.retired.length = 0;
 
 	}
 
@@ -3528,9 +3556,12 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		super.begin( camera, renderContext );
 		this._checkedGeometries = new WeakSet();
 
-		// the vertices of disposed geometries are reclaimed before the render call
+		// the buffers of the pool are disposed and the geometries moved before an outer render only: the parent of
+		// a nested render can still hold draw commands referring to them
+		// TODO: consider a finish() method in the drawing pipeline, called once the draw commands of a render are
+		// submitted, to release the buffers there
 
-		this._geometryPool.update();
+		if ( isNestedRender( this.renderer ) === false ) this._geometryPool.update();
 
 		const renderer = this.renderer;
 		const renderTarget = renderer.getRenderTarget();
