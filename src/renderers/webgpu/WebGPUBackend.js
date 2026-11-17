@@ -2294,7 +2294,6 @@ class WebGPUBackend extends Backend {
 		const pipelineData = this.get( pipeline );
 		const pipelineGPU = pipelineData.pipeline;
 
-		// Skip if pipeline has error
 		if ( pipelineData.error === true ) return;
 
 		const drawParams = renderObject.getDrawParameters();
