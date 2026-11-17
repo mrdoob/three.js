@@ -1525,8 +1525,8 @@ class VRMLLoader extends Loader {
 
 			const transformData = {
 				center: new Vector2(),
-				rotation: new Vector2(),
-				scale: new Vector2(),
+				rotation: 0,
+				scale: new Vector2( 1, 1 ),
 				translation: new Vector2()
 			};
 
