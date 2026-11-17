@@ -181,6 +181,9 @@ class AssignNode extends Node {
 		// The value of an assignment is its target.
 		nodeData.propertyName = target;
 
+		// the target was assigned in the generated code
+		builder.getDataFromNode( this.targetNode.getScope() ).assigned = true;
+
 		return builder.format( snippet, targetType, output );
 
 	}
