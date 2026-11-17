@@ -2,9 +2,6 @@
  * Measures the GPU time of the render and compute passes issued between {@link GPUTimer#begin} and
  * {@link GPUTimer#end}, from the start of the first pass to the end of the last one.
  *
- * Timers can overlap and end in any order: a pass counts toward every active timer. In WebGL only one
- * timer can run at a time and an overlapping one returns `null`.
- *
  * Requires the `timestamp-query` feature in WebGPU or the `EXT_disjoint_timer_query_webgl2` extension
  * in WebGL. Otherwise the results are `null`.
  *
