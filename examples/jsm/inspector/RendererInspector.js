@@ -310,7 +310,7 @@ export class RendererInspector extends InspectorBase {
 
 			} else {
 
-				stats.gpu = gpu;
+				stats.gpu = gpu.delta;
 
 			}
 
