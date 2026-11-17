@@ -190,6 +190,7 @@ function Loader( editor ) {
 					loader.parse( contents, function ( object ) {
 
 						object.name = filename;
+						object.rotation.x = - Math.PI / 2; // Rhino is Z-up
 
 						editor.execute( new AddObjectCommand( editor, object ) );
 
