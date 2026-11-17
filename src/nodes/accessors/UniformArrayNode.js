@@ -115,7 +115,7 @@ class UniformArrayNode extends BufferNode {
 
 		super( null );
 
-		if ( value.some( element => element && element.isNode === true ) ) {
+		if ( value !== null && value.some( element => element && element.isNode === true ) ) {
 
 			value = value.map( getArrayElementValue );
 
