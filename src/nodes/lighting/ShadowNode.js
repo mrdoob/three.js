@@ -813,6 +813,33 @@ class ShadowNode extends ShadowBaseNode {
 	}
 
 	/**
+	 * Returns `true` if the shadow map must be rendered for the given frame. The shadow
+	 * map is rendered once per camera and frame. Renders nested in the one that has
+	 * updated the shadow map in the current frame share it.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 * @return {boolean} Whether the shadow map must be rendered.
+	 */
+	needsRefresh( frame ) {
+
+		const { frameId, camera, scene } = frame;
+
+		if ( this._cameraFrameId.get( camera ) === frameId ) return false;
+
+		const lastUpdate = this._lastUpdate;
+
+		const matchingShadows =
+			lastUpdate.frameId === frameId &&
+			lastUpdate.sceneId === scene.id &&
+			lastUpdate.layersMask === camera.layers.mask;
+
+		const isNestedRender = frame.renderer._callDepth > lastUpdate.callDepth;
+
+		return ( matchingShadows && isNestedRender ) === false;
+
+	}
+
+	/**
 	 * The implementation performs the update of the shadow map if necessary.
 	 *
 	 * @param {NodeFrame} frame - A reference to the current node frame.
@@ -825,53 +852,24 @@ class ShadowNode extends ShadowBaseNode {
 
 		const { shadow } = this;
 
-		let needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
+		if ( shadow.needsUpdate === false && shadow.autoUpdate === false ) return;
 
-		if ( needsUpdate ) {
+		if ( this.needsRefresh( frame ) ) {
 
-			const { frameId, camera, scene } = frame;
-
-			const callDepth = frame.renderer._callDepth;
 			const lastUpdate = this._lastUpdate;
 
-			const cameraAlreadyUpdated = this._cameraFrameId.get( camera ) === frameId;
-
-			const sameShadowContent =
-				lastUpdate.frameId === frameId &&
-				lastUpdate.sceneId === scene.id &&
-				lastUpdate.layersMask === camera.layers.mask;
-
-			// A render nested in the one that has updated the shadow map in this frame,
-			// like the render of a reflector, shares the shadow map instead of updating it again.
-
-			const isNestedRender = callDepth > lastUpdate.callDepth;
-
-			if ( cameraAlreadyUpdated || ( sameShadowContent && isNestedRender ) ) {
-
-				needsUpdate = false;
-
-			}
-
-			this._cameraFrameId.set( camera, frameId );
-
-			if ( needsUpdate ) {
-
-				lastUpdate.frameId = frameId;
-				lastUpdate.callDepth = callDepth;
-				lastUpdate.sceneId = scene.id;
-				lastUpdate.layersMask = camera.layers.mask;
-
-			}
-
-		}
-
-		if ( needsUpdate ) {
+			lastUpdate.frameId = frame.frameId;
+			lastUpdate.callDepth = frame.renderer._callDepth;
+			lastUpdate.sceneId = frame.scene.id;
+			lastUpdate.layersMask = frame.camera.layers.mask;
 
 			this.updateShadow( frame );
 
 			shadow.needsUpdate = false;
 
 		}
+
+		this._cameraFrameId.set( frame.camera, frame.frameId );
 
 	}
 
