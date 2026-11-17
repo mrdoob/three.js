@@ -2282,8 +2282,7 @@ class GLTFWriter {
 
 		}
 
-		// Question: Is saving "type" as name intentional?
-		if ( camera.name !== '' ) cameraDef.name = camera.type;
+		if ( camera.name !== '' ) cameraDef.name = camera.name;
 
 		return json.cameras.push( cameraDef ) - 1;
 
