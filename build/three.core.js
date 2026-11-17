@@ -13193,6 +13193,7 @@ class Object3D extends EventDispatcher {
 	 * @param {boolean} [updateChildren=false] Whether descendant nodes should be updated or not.
 	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
 	 * when {@link Object3D#matrixWorldNeedsUpdate} is `false`.
+	 * @return {boolean} Whether the world matrix has changed or not.
 	 */
 	updateWorldMatrix( updateParents, updateChildren, force = false ) {
 
@@ -13200,7 +13201,7 @@ class Object3D extends EventDispatcher {
 
 		if ( updateParents === true && parent !== null ) {
 
-			parent.updateWorldMatrix( true, false );
+			if ( parent.updateWorldMatrix( true, false ) === true ) force = true;
 
 		}
 
@@ -13243,6 +13244,8 @@ class Object3D extends EventDispatcher {
 			}
 
 		}
+
+		return force;
 
 	}
 
@@ -47058,7 +47061,7 @@ class Camera extends Object3D {
 
 	updateWorldMatrix( updateParents, updateChildren, force = false ) {
 
-		super.updateWorldMatrix( updateParents, updateChildren, force );
+		const updated = super.updateWorldMatrix( updateParents, updateChildren, force );
 
 		// exclude scale from view matrix to be glTF conform
 
@@ -47073,6 +47076,8 @@ class Camera extends Object3D {
 			this.matrixWorldInverse.compose( _position$2, _quaternion$2, _scale$2.set( 1, 1, 1 ) ).invert();
 
 		}
+
+		return updated;
 
 	}
 
