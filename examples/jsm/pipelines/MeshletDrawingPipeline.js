@@ -951,7 +951,7 @@ class MeshletCulling {
 				const bounds = instanceBounds.element( data );
 				const center = matrixWorld.mul( vec4( geometryBounds.xyz, 1.0 ) ).xyz.toVar();
 				const scale = bounds.w.abs();
-				const radius = scale.mul( geometryBounds.w ).add( bounds.x );
+				const radius = scale.mul( geometryBounds.w ).add( bounds.x ).toVar();
 				const cullBounds = deformBounds( center, radius );
 
 				const visible = bool( true ).toVar();
@@ -979,15 +979,18 @@ class MeshletCulling {
 
 				} );
 
-				// screen-space projected error: pixelError = errorWorld / dist * cotHalfFov * screenHeight / 2,
+				// screen-space projected error at the closest point of the bounding sphere:
+				// pixelError = errorWorld / dist * cotHalfFov * screenHeight / 2,
 				// orthographic views: pixelError = errorWorld * 2 / frustumHeight * screenHeight / 2
 
-				const lodDistance = select( lodPerspective.greaterThan( 0.5 ), max( 0.01, distance( lodPosition, center ) ), float( 1.0 ) );
+				const centerDistance = distance( lodPosition, center ).toVar();
+				const lodDistance = select( lodPerspective.greaterThan( 0.5 ), max( 0.01, centerDistance.sub( radius ) ), float( 1.0 ) );
 				const pixelFactor = lodScale.div( lodDistance ).toVar();
 
 				// the radius of the object on the screen in pixels, the objects smaller than the minimum are not drawn
 
-				const screenRadius = scale.mul( geometryBounds.w ).mul( pixelFactor ).toVar();
+				const screenDistance = select( lodPerspective.greaterThan( 0.5 ), max( 0.01, centerDistance ), float( 1.0 ) );
+				const screenRadius = scale.mul( geometryBounds.w ).mul( lodScale.div( screenDistance ) ).toVar();
 
 				If( screenRadius.lessThan( minScreenRadius ), () => {
 
