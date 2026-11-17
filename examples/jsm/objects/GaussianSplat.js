@@ -102,8 +102,9 @@ class GaussianSplat extends Mesh {
 	 * @param {BufferGeometry} splatGeometry - The splat geometry to render. Higher-order spherical harmonics attributes must use packed `Uint32Array` words from {@link createGaussianSplatGeometry} (`SH_BAND_WORDS[ degree ]` words per splat, four clamped-byte coefficients per word).
 	 * @param {Object} [options] - Options.
 	 * @param {boolean} [options.autoSort=true] - Whether to sort automatically in `onBeforeRender`.
+	 * @param {number} [options.minPixelSize=0] - Splats drawn smaller than this many pixels are skipped. See {@link GaussianSplat#minPixelSize}.
 	 */
-	constructor( splatGeometry, { autoSort = true } = {} ) {
+	constructor( splatGeometry, { autoSort = true, minPixelSize = 0 } = {} ) {
 
 		const positionAttribute = splatGeometry.getAttribute( 'position' );
 		const covarianceAttribute = splatGeometry.getAttribute( 'covariance' );
@@ -124,7 +125,8 @@ class GaussianSplat extends Mesh {
 		const localCameraPosition = uniform( new Vector3() );
 		const sphericalHarmonicsComputeNode = createSphericalHarmonicsComputeNode( buffers, localCameraPosition );
 		const sort = new CountingSort( count, { binCount: BIN_COUNT, workgroupSize: WORKGROUP_SIZE } );
-		const materialNodes = createMaterialNodes( buffers, sort, localCameraPosition );
+		const minPixelSizeNode = uniform( minPixelSize );
+		const materialNodes = createMaterialNodes( buffers, sort, localCameraPosition, minPixelSizeNode );
 		const material = createMaterial( materialNodes.vertexNode, materialNodes.fragmentNode );
 
 		super( geometry, material );
@@ -170,6 +172,7 @@ class GaussianSplat extends Mesh {
 		 */
 		this.autoSort = autoSort;
 
+		this._minPixelSize = minPixelSizeNode;
 		this._buffers = buffers;
 		this._sort = sort;
 		this._sortMatrix = uniform( new Matrix4() );
@@ -224,6 +227,28 @@ class GaussianSplat extends Mesh {
 			}
 
 		};
+
+	}
+
+	/**
+	 * A parameter determining the size at which a splat is skipped when the splat's drawn size along its longest axis is smaller than this many pixels. 
+	 * A value of `0` will draw every splat.
+	 *
+	 * Sizes are measured by the pixels of the drawing buffer, as influenced by the current
+	 * device pixel ratio.
+	 *
+	 * @type {number}
+	 * @default 0
+	 */
+	get minPixelSize() {
+
+		return this._minPixelSize.value;
+
+	}
+
+	set minPixelSize( value ) {
+
+		this._minPixelSize.value = value;
 
 	}
 
@@ -897,7 +922,7 @@ function createSphericalHarmonicsComputeNode( buffers, localCameraPosition ) {
 
 }
 
-function createMaterialNodes( buffers, sort, localCameraPosition ) {
+function createMaterialNodes( buffers, sort, localCameraPosition, minPixelSize ) {
 
 	const splatUv = varyingProperty( 'vec2', 'vSplatUv' );
 	const splatColor = varyingProperty( 'vec4', 'vSplatColor' );
@@ -1012,7 +1037,10 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 
 		const clipLimit = centerClip.w.mul( CLIP_XY ).toVar( 'clipLimit' );
 
+		const drawnSize = scale1.mul( 2 * SPLAT_KERNEL_CUTOFF ).toVar( 'drawnSize' );
+
 		If( viewCenter.z.greaterThanEqual( - 0.01 )
+			.or( drawnSize.lessThan( minPixelSize ) )
 			.or( centerClip.z.lessThan( centerClip.w.negate() ) )
 			.or( centerClip.z.greaterThan( centerClip.w ) )
 			.or( centerClip.x.lessThan( clipLimit.negate() ) )
