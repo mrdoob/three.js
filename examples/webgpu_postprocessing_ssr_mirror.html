@@ -44,7 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -142,14 +142,14 @@
 			const scenePass = pass( scene, camera );
 			scenePass.setMRT( mrt( {
 				output: output,
-				normal: packNormalToRGB( normalView ),
+				normal: packNormalToOctahedral( normalView ),
 				metalrough: vec2( metalness, roughness ) // pack metalness and roughness into a single attachment
 			} ) );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
 			const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', ( node ) => {
 
-				return colorSpaceToWorking( node, THREE.SRGBColorSpace );
+				return colorSpaceToWorking( packNormalToRGB( unpackOctahedralToNormal( node.rg ) ), THREE.SRGBColorSpace );
 
 			} );
 			const scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
@@ -159,17 +159,20 @@
 			} );
 			const scenePassMetalRough = scenePass.getTextureNode( 'metalrough' ).toInspector( 'Metalness-Roughness' );
 
-			// optional: optimize bandwidth by reducing the texture precision for normals and metal/roughness
+			// octahedral normals can't be filtered across their folds
 
 			const normalTexture = scenePass.getTexture( 'normal' );
-			normalTexture.type = THREE.UnsignedByteType;
+			normalTexture.format = THREE.RGFormat;
+			normalTexture.minFilter = normalTexture.magFilter = THREE.NearestFilter;
+
+			// optional: optimize bandwidth by reducing the texture precision for metal/roughness
 
 			const metalRoughTexture = scenePass.getTexture( 'metalrough' );
 			metalRoughTexture.type = THREE.UnsignedByteType;
 
 			const sceneNormal = sample( ( uv ) => {
 
-				return unpackRGBToNormal( scenePassNormal.sample( uv ) );
+				return unpackOctahedralToNormal( scenePassNormal.sample( uv ).rg );
 
 			} );
 
