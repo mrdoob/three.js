@@ -39,7 +39,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToRGB, unpackRGBToNormal, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, velocity } from 'three/tsl';
+			import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, velocity } from 'three/tsl';
 			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 			import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 			import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
@@ -51,7 +51,6 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const params = {
-				normalFormat: 'octahedral',
 				output: 'Beauty', traa: true,
 				quality: 0.5, binaryRefine: false, maxDistance: 20, thickness: 0.12,
 				denoise: true, lumaPhi: 0.75,
@@ -181,172 +180,136 @@
 
 				// post processing
 
-				let updateOutput, updateParameters, denoiseEnabled, disposePostProcessing;
+				renderPipeline = new THREE.RenderPipeline( renderer );
 
-				function updateNormalFormat() {
+				const scenePass = pass( scene, camera );
+				scenePass.setMRT( mrt( {
+					output: output,
+					diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
+					normal: packNormalToOctahedral( normalView ),
+					velocity: vec4( velocity, materialRoughness, 0 )
+				} ) );
 
-					if ( disposePostProcessing ) disposePostProcessing();
+				// octahedral normals can't be filtered across their folds
 
-					renderPipeline = new THREE.RenderPipeline( renderer );
+				const normalTexture = scenePass.getTexture( 'normal' );
+				normalTexture.format = THREE.RGFormat;
+				normalTexture.minFilter = normalTexture.magFilter = THREE.NearestFilter;
 
-					const octahedralNormals = params.normalFormat === 'octahedral';
-					const normalDecode = octahedralNormals
-						? ( value ) => unpackOctahedralToNormal( value.rg )
-						: ( value ) => unpackRGBToNormal( value.rgb ).normalize();
+				scenePass.getTexture( 'diffuseColor' ).type = THREE.UnsignedByteType;
 
-					const scenePass = pass( scene, camera );
-					scenePass.setMRT( mrt( {
-						output: output,
-						diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
-						// RGB8 keeps roughness in the spare normal alpha. Octahedral RG16F has no spare channel, so roughness moves to velocity Z.
-						normal: octahedralNormals ? packNormalToOctahedral( normalView ) : vec4( packNormalToRGB( normalView ), materialRoughness ),
-						velocity: octahedralNormals ? vec4( velocity.xy, materialRoughness, 0 ) : velocity
-					} ) );
+				const scenePassColor = scenePass.getTextureNode( 'output' );
+				const scenePassDepth = scenePass.getTextureNode( 'depth' );
+				const scenePassNormal = scenePass.getTextureNode( 'normal' );
+				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
+				const scenePassDiffuseColor = scenePass.getTextureNode( 'diffuseColor' );
 
-					const normalTexture = scenePass.getTexture( 'normal' );
-					normalTexture.type = octahedralNormals ? THREE.HalfFloatType : THREE.UnsignedByteType;
-					normalTexture.format = octahedralNormals ? THREE.RGFormat : THREE.RGBAFormat;
-					// RGB8 normals filter in hardware. Octahedral coordinates cannot be interpolated across their folds.
-					normalTexture.minFilter = normalTexture.magFilter = octahedralNormals ? THREE.NearestFilter : THREE.LinearFilter;
-					scenePass.getTexture( 'diffuseColor' ).type = THREE.UnsignedByteType;
+				const normalDecode = ( value ) => unpackOctahedralToNormal( value.rg );
+				const sceneNormal = sample( ( uv ) => normalDecode( scenePassNormal.sample( uv ) ) );
+				const sceneRoughness = sample( ( uv ) => scenePassVelocity.sample( uv ).z );
 
-					const scenePassColor = scenePass.getTextureNode( 'output' );
-					const scenePassDepth = scenePass.getTextureNode( 'depth' );
-					const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', ( value ) => packNormalToRGB( normalDecode( value ) ) );
-					const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
-					const scenePassDiffuseColor = scenePass.getTextureNode( 'diffuseColor' );
+				// metalness in diffuseColor.a, roughness in velocity.z
 
-					const sceneNormal = sample( ( uv ) => normalDecode( scenePassNormal.sample( uv ) ) );
-					const sceneRoughness = sample( ( uv ) => octahedralNormals ? scenePassVelocity.sample( uv ).z : scenePassNormal.sample( uv ).a );
+				const sceneMetalRough = sample( ( uv ) => vec2(
+					scenePassDiffuseColor.sample( uv ).a,
+					scenePassVelocity.sample( uv ).z
+				) );
 
-					// Metalness in diffuseColor.a.
+				// ssr
 
-					const sceneMetalRough = sample( ( uv ) => vec2(
-						scenePassDiffuseColor.sample( uv ).a,
-						sceneRoughness.sample( uv )
-					) );
+				const ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+					stochastic: true,
+					diffuseNode: scenePassDiffuseColor,
+					metalnessNode: scenePassDiffuseColor.a,
+					roughnessNode: sceneRoughness,
+					binaryRefine: params.binaryRefine
+				} ).toInspector( 'SSR' );
 
-					// ssr
+				const ssrTexture = ssrNode.getTextureNode();
 
-					const ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
-						stochastic: true,
-						diffuseNode: scenePassDiffuseColor,
-						metalnessNode: scenePassDiffuseColor.a,
-						roughnessNode: sceneRoughness,
-						binaryRefine: params.binaryRefine
-					} ).toInspector( 'SSR' );
+				// denoise
 
-					const ssrTexture = ssrNode.getTextureNode();
+				const temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, sceneNormal, scenePassVelocity, camera, {
+					mode: 'specular',
+					accumulate: false,
+					normalHistory: { texture: scenePassNormal, decode: normalDecode }
+				} );
+				temporalReprojectNode.maxFrames.value = 16;
+				temporalReprojectNode.clampIntensity.value = 0.25;
 
-					// denoise
+				const denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
+					depth: scenePassDepth,
+					normal: sceneNormal,
+					raw: ssrNode,
+					metalRoughness: sceneMetalRough,
+					mode: 'specular',
+					accumulate: true
+				} );
+				denoiseNode.depthPhi.value = 20;
+				denoiseNode.normalPhi.value = 0.3;
+				denoiseNode.radius.value = 1.5;
+				denoiseNode.alphaPhi.value = 5;
+				denoiseNode.strength.value = 0.725;
+				denoiseNode.adaptiveTrust.value = 1;
 
-					const temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, sceneNormal, scenePassVelocity, camera, {
-						mode: 'specular',
-						accumulate: false,
-						normalHistory: { texture: scenePassNormal, decode: normalDecode }
-					} );
-					temporalReprojectNode.maxFrames.value = 16;
-					temporalReprojectNode.clampIntensity.value = 0.25;
+				// feed the denoised result + velocity back into SSR for multi-bounce reflections
 
-					const denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
-						depth: scenePassDepth,
-						normal: sceneNormal,
-						raw: ssrNode,
-						metalRoughness: sceneMetalRough,
-						mode: 'specular',
-						accumulate: true
-					} );
-					denoiseNode.depthPhi.value = 20;
-					denoiseNode.normalPhi.value = 0.3;
-					denoiseNode.radius.value = 1.5;
-					denoiseNode.alphaPhi.value = 5;
-					denoiseNode.strength.value = 0.725;
-					denoiseNode.adaptiveTrust.value = 1;
+				ssrNode.setHistory( denoiseNode, scenePassVelocity );
+				temporalReprojectNode.setHistoryTexture( denoiseNode );
 
-					// feed the denoised result + velocity back into SSR for multi-bounce reflections
+				// composite
 
-					ssrNode.setHistory( denoiseNode, scenePassVelocity );
-					temporalReprojectNode.setHistoryTexture( denoiseNode );
+				const denoiseEnabled = uniform( 1 );
 
-					// composite
+				const combined = scenePassColor.rgb.add( mix( ssrTexture.rgb, denoiseNode.rgb, denoiseEnabled ) );
 
-					denoiseEnabled = uniform( Number( params.denoise ) );
+				const temporalAA = traa( vec4( combined, 1 ), scenePassDepth, scenePassVelocity, camera );
+				const spatialAA = smaa( vec4( combined, 1 ) );
 
-					const combined = scenePassColor.rgb.add( mix( ssrTexture.rgb, denoiseNode.rgb, denoiseEnabled ) );
+				function updateOutput() {
 
-					const temporalAA = traa( vec4( combined, 1 ), scenePassDepth, scenePassVelocity, camera );
-					const spatialAA = smaa( vec4( combined, 1 ) );
+					let outputNode;
 
-					updateOutput = function () {
+					switch ( params.output ) {
 
-						let outputNode;
+						case 'Beauty': outputNode = params.traa ? temporalAA : spatialAA; break;
+						case 'SSR': outputNode = vec4( ssrTexture.rgb, 1 ); break;
+						case 'SSR DN': outputNode = vec4( denoiseNode.rgb, 1 ); break;
 
-						switch ( params.output ) {
+					}
 
-							case 'Beauty': outputNode = params.traa ? temporalAA : spatialAA; break;
-							case 'SSR': outputNode = vec4( ssrTexture.rgb, 1 ); break;
-							case 'SSR DN': outputNode = vec4( denoiseNode.rgb, 1 ); break;
-
-						}
-
-						renderPipeline.outputNode = outputNode;
-						renderPipeline.outputColorTransform = true;
-						renderPipeline.needsUpdate = true;
-
-					};
-
-					updateParameters = function () {
-
-						ssrNode.quality.value = params.quality;
-						ssrNode.binaryRefine = params.binaryRefine;
-						ssrNode.maxDistance.value = params.maxDistance;
-						ssrNode.thickness.value = params.thickness;
-
-						denoiseNode.lumaPhi.value = params.lumaPhi;
-
-					};
-
-					const nodes = new Set( [ scenePass, ssrNode, temporalReprojectNode, denoiseNode, temporalAA, spatialAA, renderPipeline ] );
-
-					disposePostProcessing = () => {
-
-						for ( const node of nodes ) {
-
-							node.traverse?.( child => {
-
-								if ( child.isRTTNode ) nodes.add( child );
-
-							} );
-
-						}
-
-						for ( const node of nodes ) node.dispose();
-
-					};
-
-					updateParameters();
-					updateOutput();
+					renderPipeline.outputNode = outputNode;
+					renderPipeline.outputColorTransform = true;
+					renderPipeline.needsUpdate = true;
 
 				}
 
-				updateNormalFormat();
+				function updateParameters() {
+
+					ssrNode.quality.value = params.quality;
+					ssrNode.binaryRefine = params.binaryRefine;
+					ssrNode.maxDistance.value = params.maxDistance;
+					ssrNode.thickness.value = params.thickness;
+
+					denoiseNode.lumaPhi.value = params.lumaPhi;
+
+				}
 
 				// GUI
 
 				const displayGui = renderer.inspector.createParameters( 'Display' );
-				displayGui.add( params, 'normalFormat', { 'RGB8': 'rgb', 'Octahedral RG16F': 'octahedral' } ).name( 'Normals' ).onChange( updateNormalFormat );
-				displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN' ] ).name( 'Output' ).onChange( () => updateOutput() );
-				displayGui.add( params, 'traa' ).name( 'TRAA' ).onChange( () => updateOutput() );
+				displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN' ] ).name( 'Output' ).onChange( updateOutput );
+				displayGui.add( params, 'traa' ).name( 'TRAA' ).onChange( updateOutput );
 
 				const ssrGui = renderer.inspector.createParameters( 'SSR' );
-				ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( () => updateParameters() );
-				ssrGui.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( () => updateParameters() );
-				ssrGui.add( params, 'maxDistance', 0.01, 50, 0.01 ).name( 'Max distance' ).onChange( () => updateParameters() );
-				ssrGui.add( params, 'thickness', 0, 0.5, 0.001 ).name( 'Thickness' ).onChange( () => updateParameters() );
+				ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( updateParameters );
+				ssrGui.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( updateParameters );
+				ssrGui.add( params, 'maxDistance', 0.01, 50, 0.01 ).name( 'Max distance' ).onChange( updateParameters );
+				ssrGui.add( params, 'thickness', 0, 0.5, 0.001 ).name( 'Thickness' ).onChange( updateParameters );
 
 				const denoiseGui = renderer.inspector.createParameters( 'Denoising' );
 				denoiseGui.add( params, 'denoise' ).name( 'Enabled' ).onChange( ( value ) => denoiseEnabled.value = Number( value ) );
-				denoiseGui.add( params, 'lumaPhi', 0, 3 ).name( 'Luma phi' ).onChange( () => updateParameters() );
+				denoiseGui.add( params, 'lumaPhi', 0, 3 ).name( 'Luma phi' ).onChange( updateParameters );
 
 				const sceneGui = renderer.inspector.createParameters( 'Scene' );
 				sceneGui.add( params, 'roughness', 0, 1 ).name( 'Roughness' ).onChange( ( value ) => {
