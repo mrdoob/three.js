@@ -87,8 +87,6 @@ class TileShadowNode extends ShadowBaseNode {
 		this.initialLightDirection = new Vector3();
 		this.updateLightDirection();
 
-		this._cameraFrameId = new WeakMap();
-
 		this.shadowSize = {
 			top: light.shadow.camera.top,
 			bottom: light.shadow.camera.bottom,
@@ -284,6 +282,8 @@ class TileShadowNode extends ShadowBaseNode {
      */
 	updateShadow( frame ) {
 
+		this.update();
+
 		const { shadowMap, light } = this;
 		const { renderer, scene, camera } = frame;
 		const shadowType = renderer.shadowMap.type;
@@ -344,40 +344,6 @@ class TileShadowNode extends ShadowBaseNode {
 		}
 
 		_cameraLayers.length = 0;
-
-	}
-
-	/**
-	 * The implementation performs the update of the shadow map if necessary.
-	 *
-	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 */
-	updateBefore( frame ) {
-
-		const shadow = this.originalLight.shadow;
-
-		let needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
-
-		if ( needsUpdate ) {
-
-			if ( this._cameraFrameId[ frame.camera ] === frame.frameId ) {
-
-				needsUpdate = false;
-
-			}
-
-			this._cameraFrameId[ frame.camera ] = frame.frameId;
-
-		}
-
-		if ( needsUpdate ) {
-
-			this.update();
-			this.updateShadow( frame );
-
-			shadow.needsUpdate = false;
-
-		}
 
 	}
 
