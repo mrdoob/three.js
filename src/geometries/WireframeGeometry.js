@@ -81,7 +81,7 @@ class WireframeGeometry extends BufferGeometry {
 					const groupStart = group.start;
 					const groupCount = group.count;
 
-					for ( let i = groupStart, l = ( groupStart + groupCount ); i < l; i += 3 ) {
+					for ( let i = groupStart, l = Math.min( indices.count, ( groupStart + groupCount ) ); i < l; i += 3 ) {
 
 						for ( let j = 0; j < 3; j ++ ) {
 
