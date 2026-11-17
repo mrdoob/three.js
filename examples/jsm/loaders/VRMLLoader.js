@@ -1191,8 +1191,10 @@ class VRMLLoader extends Loader {
 						break;
 
 					case 'texture':
-						const textureNode = fieldValues[ 0 ];
+						let textureNode = fieldValues[ 0 ];
 						if ( textureNode !== null ) {
+
+							if ( textureNode.USE ) textureNode = nodeMap[ textureNode.USE ];
 
 							if ( textureNode.name === 'ImageTexture' || textureNode.name === 'PixelTexture' ) {
 
