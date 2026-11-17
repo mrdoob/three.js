@@ -834,14 +834,19 @@ class ShadowNode extends ShadowBaseNode {
 			const callDepth = frame.renderer._callDepth;
 			const lastUpdate = this._lastUpdate;
 
-			if ( this._cameraFrameId.get( camera ) === frameId ) {
+			const cameraAlreadyUpdated = this._cameraFrameId.get( camera ) === frameId;
 
-				needsUpdate = false;
+			const sameShadowContent =
+				lastUpdate.frameId === frameId &&
+				lastUpdate.sceneId === scene.id &&
+				lastUpdate.layersMask === camera.layers.mask;
 
-			} else if ( lastUpdate.frameId === frameId && callDepth > lastUpdate.callDepth && lastUpdate.sceneId === scene.id && lastUpdate.layersMask === camera.layers.mask ) {
+			// A render nested in the one that has updated the shadow map in this frame,
+			// like the render of a reflector, shares the shadow map instead of updating it again.
 
-				// A render nested in the one that has updated the shadow map in this frame,
-				// like the render of a reflector, shares the shadow map instead of updating it again.
+			const isNestedRender = callDepth > lastUpdate.callDepth;
+
+			if ( cameraAlreadyUpdated || ( sameShadowContent && isNestedRender ) ) {
 
 				needsUpdate = false;
 
