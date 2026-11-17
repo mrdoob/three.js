@@ -604,15 +604,25 @@ class Backend {
 
 		if ( timer === null ) return null;
 
-		await this.timestampQueryPool.endTimer( timer );
+		const timestampQueryPool = this.timestampQueryPool;
 
-		const delta = this.timestampQueryPool.getDuration( timer );
+		await timestampQueryPool.endTimer( timer );
+
+		const delta = timestampQueryPool.getDuration( timer );
 
 		if ( delta === null ) return null;
 
-		// WebGL only measures the duration, so the timer has no start and end
-		const start = timer.begin === null ? null : Number( timer.begin ) / 1e6;
-		const end = timer.finish === null ? null : Number( timer.finish ) / 1e6;
+		// WebGL only measures the duration
+
+		let start = null;
+		let end = null;
+
+		if ( timer.begin !== null ) {
+
+			start = Number( timer.begin ) / 1e6;
+			end = Number( timer.finish ) / 1e6;
+
+		}
 
 		return { start, end, delta };
 
