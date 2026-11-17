@@ -57,7 +57,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, packNormalToOctahedral, unpackOctahedralToNormal, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
+		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 		import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
@@ -112,7 +112,6 @@
 
 		const params = {
 			output: 0,
-			normalFormat: 'octahedral',
 			roughness: 0.3,
 
 			ssr: {
@@ -232,135 +231,93 @@
 
 			scene.environmentIntensity = 1;
 
-			let disposePostProcessing;
+			renderPipeline = new THREE.RenderPipeline( renderer );
 
-			function updateNormalFormat() {
+			const scenePass = pass( scene, camera );
+			scenePass.setMRT( mrt( {
+				output: output,
+				// Store base color (albedo) in RGB + metalness in alpha. The albedo is needed for
+				// metal Fresnel f0; do NOT bake in the (1-metalness) diffuse attenuation here, as
+				// that zeroes metals and destroys their specular tint (f0 would become 0 → black).
+				diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
+				normal: packNormalToOctahedral( normalView ),
+				// Pack roughness into the spare velocity channel to save MRT bandwidth
+				velocity: vec4( velocity, materialRoughness, 0 )
+			} ) );
 
-				if ( disposePostProcessing ) disposePostProcessing();
+			scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
+			const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', ( node ) => packNormalToRGB( unpackOctahedralToNormal( node.rg ) ) );
+			scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
 
-				renderPipeline = new THREE.RenderPipeline( renderer );
+				return scenePass.getLinearDepthNode();
 
-				const octahedralNormals = params.normalFormat === 'octahedral';
-				const normalDecode = octahedralNormals
-					? ( value ) => unpackOctahedralToNormal( value.rg )
-					: ( value ) => unpackRGBToNormal( value.rgb ).normalize();
+			} );
+			scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
+			const scenePassDiffuseColor = scenePass.getTextureNode( 'diffuseColor' ).toInspector( 'Diffuse Color' );
 
-				const scenePass = pass( scene, camera );
-				scenePass.setMRT( mrt( {
-					output: output,
-					// Store base color (albedo) in RGB + metalness in alpha. The albedo is needed for
-					// metal Fresnel f0; do NOT bake in the (1-metalness) diffuse attenuation here, as
-					// that zeroes metals and destroys their specular tint (f0 would become 0 → black).
-					diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
-					// RGB8 keeps roughness in the spare normal alpha. Octahedral RG16F has no spare channel, so roughness moves to velocity Z.
-					normal: octahedralNormals ? packNormalToOctahedral( normalView ) : vec4( packNormalToRGB( normalView ), materialRoughness ),
-					velocity: octahedralNormals ? vec4( velocity.xy, materialRoughness, 0 ) : velocity
-				} ) );
+			// octahedral normals can't be filtered across their folds
 
-				scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
-				const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', ( value ) => packNormalToRGB( normalDecode( value ) ) );
-				scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
+			const normalTexture = scenePass.getTexture( 'normal' );
+			normalTexture.format = THREE.RGFormat;
+			normalTexture.minFilter = normalTexture.magFilter = THREE.NearestFilter;
 
-					return scenePass.getLinearDepthNode();
+			const diffuseTexture = scenePass.getTexture( 'diffuseColor' );
+			diffuseTexture.type = THREE.UnsignedByteType;
 
-				} );
-				scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
-				const scenePassDiffuseColor = scenePass.getTextureNode( 'diffuseColor' ).toInspector( 'Diffuse Color' );
+			const normalDecode = ( value ) => unpackOctahedralToNormal( value.rg );
+			const sceneNormal = sample( ( uv ) => normalDecode( scenePassNormal.sample( uv ) ) );
 
-				const normalTexture = scenePass.getTexture( 'normal' );
-				normalTexture.type = octahedralNormals ? THREE.HalfFloatType : THREE.UnsignedByteType;
-				normalTexture.format = octahedralNormals ? THREE.RGFormat : THREE.RGBAFormat;
-				// RGB8 normals filter in hardware. Octahedral coordinates cannot be interpolated across their folds.
-				normalTexture.minFilter = normalTexture.magFilter = octahedralNormals ? THREE.NearestFilter : THREE.LinearFilter;
+			// metalness in diffuseColor.a, roughness in velocity.z (no separate metalrough MRT)
+			const scenePassMetalRough = sample( ( uv ) => vec2(
+				scenePassDiffuseColor.sample( uv ).a,
+				scenePassVelocity.sample( uv ).z
+			) ).toInspector( 'Metalness/Roughness' );
 
-				const diffuseTexture = scenePass.getTexture( 'diffuseColor' );
-				diffuseTexture.type = THREE.UnsignedByteType;
+			ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+				stochastic: true,
+				diffuseNode: scenePassDiffuseColor,
+				metalnessNode: scenePassDiffuseColor.a,
+				roughnessNode: scenePassVelocity.z,
+				environmentNode: hdrTexture,
+				envImportanceSampling: params.ssr.envImportanceSampling,
+				binaryRefine: params.ssr.binaryRefine
+			} ).toInspector( 'SSR' );
 
-				const sceneNormal = sample( ( uv ) => normalDecode( scenePassNormal.sample( uv ) ) );
-				const sceneRoughness = sample( ( uv ) => octahedralNormals ? scenePassVelocity.sample( uv ).z : scenePassNormal.sample( uv ).a );
+			temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, sceneNormal, scenePassVelocity, camera, {
+				mode: 'specular',
+				accumulate: false,
+				normalHistory: { texture: scenePassNormal, decode: normalDecode }
+			} );
+			temporalReprojectNode.toInspector( 'Temporal Reproject' );
 
-				// Metalness in diffuseColor.a (no separate metalrough MRT).
-				const scenePassMetalRough = sample( ( uv ) => vec2(
-					scenePassDiffuseColor.sample( uv ).a,
-					sceneRoughness.sample( uv )
-				) ).toInspector( 'Metalness/Roughness' );
+			denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
+				depth: scenePassDepth,
+				normal: sceneNormal,
+				raw: ssrNode,
+				metalRoughness: scenePassMetalRough,
+				mode: 'specular',
+				accumulate: true,
+			} );
+			denoiseNode.alphaSource = 'raylength'; // SSR alpha channel contains ray length
+			denoiseNode.toInspector( 'Denoise' );
+			// feed the denoised result + velocity back into SSR for multi-bounce reflections
+			ssrNode.setHistory( denoiseNode, scenePassVelocity );
+			temporalReprojectNode.setHistoryTexture( denoiseNode );
 
-				ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
-					stochastic: true,
-					diffuseNode: scenePassDiffuseColor,
-					metalnessNode: scenePassDiffuseColor.a,
-					roughnessNode: sceneRoughness,
-					environmentNode: hdrTexture,
-					envImportanceSampling: params.ssr.envImportanceSampling,
-					binaryRefine: params.ssr.binaryRefine
-				} ).toInspector( 'SSR' );
+			const denoisePassBlend = vec4( denoiseNode.rgb, ssrNode.a.greaterThan( 0 ).toVar() );
 
-				temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, sceneNormal, scenePassVelocity, camera, {
-					mode: 'specular',
-					accumulate: false,
-					normalHistory: { texture: scenePassNormal, decode: normalDecode }
-				} );
-				temporalReprojectNode.toInspector( 'Temporal Reproject' );
+			gammaUniform = uniform( params.post.grading.gamma );
+			contrastUniform = uniform( params.post.grading.contrast );
+			saturationUniform = uniform( params.post.grading.saturation );
 
-				denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
-					depth: scenePassDepth,
-					normal: sceneNormal,
-					raw: ssrNode,
-					metalRoughness: scenePassMetalRough,
-					mode: 'specular',
-					accumulate: true,
-				} );
-				denoiseNode.alphaSource = 'raylength'; // SSR alpha channel contains ray length
-				denoiseNode.toInspector( 'Denoise' );
-				// feed the denoised result + velocity back into SSR for multi-bounce reflections
-				ssrNode.setHistory( denoiseNode, scenePassVelocity );
-				temporalReprojectNode.setHistoryTexture( denoiseNode );
+			const litColor = scenePassColor.rgb.add( denoisePassBlend.rgb );
 
-				const denoisePassBlend = vec4( denoiseNode.rgb, ssrNode.a.greaterThan( 0 ).toVar() );
+			const outputNode = vec4( litColor, 1 );
+			outputNode.toInspector( 'Combined SSR' );
+			combinedOutputNode = outputNode;
 
-				gammaUniform = uniform( params.post.grading.gamma );
-				contrastUniform = uniform( params.post.grading.contrast );
-				saturationUniform = uniform( params.post.grading.saturation );
-
-				const litColor = scenePassColor.rgb.add( denoisePassBlend.rgb );
-
-				const outputNode = vec4( litColor, 1 );
-				outputNode.toInspector( 'Combined SSR' );
-				combinedOutputNode = outputNode;
-
-				renderPipeline.outputNode = applyPostProcessing( combinedOutputNode );
-				renderPipeline.outputColorTransform = false;
-
-				const nodes = new Set( [ scenePass, ssrNode, temporalReprojectNode, denoiseNode, renderPipeline ] );
-
-				disposePostProcessing = () => {
-
-					for ( const temporal of temporalOutputs.values() ) nodes.add( temporal );
-
-					for ( const node of nodes ) {
-
-						node.traverse?.( child => {
-
-							if ( child.isRTTNode ) nodes.add( child );
-
-						} );
-
-					}
-
-					for ( const node of nodes ) node.dispose();
-
-					temporalOutputs.clear();
-
-				};
-
-				applyParams();
-				applyPost();
-
-				if ( controls ) updateOutputNode();
-
-			}
-
-			updateNormalFormat();
+			renderPipeline.outputNode = applyPostProcessing( combinedOutputNode );
+			renderPipeline.outputColorTransform = false;
 
 			controls = new OrbitControls( camera, renderer.domElement );
 			controls.enableDamping = true;
@@ -395,7 +352,6 @@
 			};
 
 			const displayGui = renderer.inspector.createParameters( 'Display' );
-			displayGui.add( params, 'normalFormat', { 'RGB8': 'rgb', 'Octahedral RG16F': 'octahedral' } ).name( 'Normals' ).onChange( updateNormalFormat );
 			displayGui.add( params, 'output', outputTypes ).name( 'Output' ).onChange( updateOutputNode );
 			displayGui.add( params.post, 'traa' ).name( 'TRAA' ).onChange( updateOutputNode );
 
