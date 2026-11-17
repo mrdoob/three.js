@@ -4448,7 +4448,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 		return new MeshletBatch( entry.clusters, entry.material, entry.receiveShadow, capacity, this.renderer, culling, {
 			debug: this.debug,
-			dither: entry.farMaterial === null && entry.objectClusters.some( ( clusters ) => clusters.lodCount > 1 ),
+			dither: this._shadowPass === false && entry.farMaterial === null && entry.objectClusters.some( ( clusters ) => clusters.lodCount > 1 ),
 			depthPrepass: this._usesDepthPrepass(),
 			instanced: entry.instanced,
 			instanceColor: entry.instanceColor,
@@ -4505,7 +4505,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		lodView.scale = camera.projectionMatrix.elements[ 5 ] * height / 2;
 		lodView.perspective = camera.isPerspectiveCamera === true ? 1 : 0;
 		lodView.threshold = this._shadowPass === true ? this.shadowLodThreshold : this.lodThreshold;
-		lodView.transition = this.lodTransition;
+		lodView.transition = this._shadowPass === true ? 0 : this.lodTransition;
 		lodView.minScreenRadius = this.minScreenRadius;
 		lodView.coarseScreenRadius = this.coarseScreenRadius;
 
@@ -4664,7 +4664,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		// batches. batches sharing the objects of another batch are created after it, with its capacity
 
 		const getSource = ( entry ) => entry.source !== null ? entry.source.batch : null;
-		const usesDither = ( entry ) => entry.farMaterial === null && entry.objectClusters.some( ( clusters ) => clusters.lodCount > 1 );
+		const usesDither = ( entry ) => this._shadowPass === false && entry.farMaterial === null && entry.objectClusters.some( ( clusters ) => clusters.lodCount > 1 );
 
 		const needsBatch = ( entry ) => {
 
@@ -4682,7 +4682,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		// the clusters per object of a batch: the most detailed level of the geometries of its objects, or the largest
 		// adjacent pair when levels crossfade
 
-		const useTransitions = this.lodTransition > 0;
+		const useTransitions = this.lodTransition > 0 && this._shadowPass === false;
 
 		for ( const entry of active ) {
 
@@ -5150,7 +5150,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 			capacity.objects += objects;
 			capacity.data += source !== null ? 0 : objects;
 			capacity.queue += getQueueCapacity( objects, maxPairChunks, entries[ i ].queueBudget ) * queueCount;
-			capacity.clusters += objects * maxPairChunks;
+			capacity.clusters += entries[ i ].queueMeasured === false ? objects * maxPairChunks : objects * maxChunks;
 			capacity.visibility += occlusion === true ? objects * maxChunks : 0;
 
 			for ( const clusters of entries[ i ].objectClusters ) {
