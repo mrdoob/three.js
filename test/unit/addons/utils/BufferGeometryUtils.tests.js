@@ -1,4 +1,4 @@
-import { Bone, BufferAttribute, BufferGeometry, DynamicDrawUsage, Float16BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Skeleton, SkinnedMesh, Vector3 } from 'three';
+import { Bone, BufferAttribute, BufferGeometry, DynamicDrawUsage, Float16BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Skeleton, SkinnedMesh, Uint16BufferAttribute, Uint32BufferAttribute, Vector3 } from 'three';
 import * as BufferGeometryUtils from '../../../../examples/jsm/utils/BufferGeometryUtils.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
@@ -287,6 +287,52 @@ export default QUnit.module( 'Addons', () => {
 					assert.deepEqual( getComponents( position ), [ 0, 0, 0, 1, 0, 0 ], 'has merged positions' );
 					assert.deepEqual( getComponents( normal ), [ 0, 0, 1, 0, 0, 1 ], 'has merged normals' );
 					assert.deepEqual( getComponents( morphPosition ), [ 0, 1, 0, 1, 1, 0 ], 'has merged morph positions' );
+
+				} );
+
+				QUnit.test( 'merges vertices across zero bin boundary and omits unreferenced indexed vertices', ( assert ) => {
+
+					const geometry = new BufferGeometry();
+					geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [
+						99, 99, 99, // unreferenced
+						- 0.00006, 0, 0, // trunc( -0.6 + 0.5 ) = -0
+						0.00001, 0, 0, // trunc( +0.1 + 0.5 ) = +0
+						1, 0, 0
+					] ), 3 ) );
+					geometry.setAttribute( 'color', new BufferAttribute( new Uint8Array( [
+						0, 0, 0,
+						255, 128, 0,
+						255, 128, 0,
+						0, 255, 0
+					] ), 3, true ) );
+					geometry.setIndex( [ 1, 2, 3, 1 ] );
+
+					const merged = BufferGeometryUtils.mergeVertices( geometry, 1e-4 );
+
+					assert.strictEqual( merged.getAttribute( 'position' ).count, 2, 'merges -0/+0 bucket and drops unreferenced vertex' );
+					assert.deepEqual( Array.from( merged.index.array ), [ 0, 0, 1, 0 ] );
+					assert.true( merged.index instanceof Uint16BufferAttribute, 'uses Uint16BufferAttribute below 65536 vertices' );
+
+				} );
+
+				QUnit.test( 'selects Uint32BufferAttribute when merged vertex count exceeds 65535', ( assert ) => {
+
+					const count = 65536;
+					const positions = new Float32Array( count * 3 );
+
+					for ( let i = 0; i < count; i ++ ) {
+
+						positions[ i * 3 ] = i;
+
+					}
+
+					const geometry = new BufferGeometry();
+					geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
+
+					const merged = BufferGeometryUtils.mergeVertices( geometry );
+
+					assert.strictEqual( merged.getAttribute( 'position' ).count, count );
+					assert.true( merged.index instanceof Uint32BufferAttribute, 'uses Uint32BufferAttribute at 65536 vertices' );
 
 				} );
 

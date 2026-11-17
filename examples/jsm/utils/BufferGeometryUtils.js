@@ -9,6 +9,8 @@ import {
 	TriangleFanDrawMode,
 	TriangleStripDrawMode,
 	TrianglesDrawMode,
+	Uint16BufferAttribute,
+	Uint32BufferAttribute,
 	Vector3,
 	Vector4,
 } from 'three';
@@ -683,6 +685,9 @@ function estimateBytesUsed( geometry ) {
 
 }
 
+const _hashFloat64 = new Float64Array( 1 );
+const _hashInt32 = new Int32Array( _hashFloat64.buffer );
+
 /**
  * Returns a new geometry with vertices for which all similar vertex attributes (within tolerance) are merged.
  *
@@ -694,68 +699,121 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 	tolerance = Math.max( tolerance, Number.EPSILON );
 
-	// Generate an index buffer if the geometry doesn't have one, or optimize it
-	// if it's already available.
-	const hashToIndex = {};
 	const indices = geometry.getIndex();
-	const positions = geometry.getAttribute( 'position' );
-	const vertexCount = indices ? indices.count : positions.count;
+	const attributes = Object.values( geometry.attributes );
 
-	// next value for triangle indices
-	let nextIndex = 0;
+	let stride = 0;
+	for ( const attr of attributes ) stride += attr.itemSize;
 
-	// attributes and new attribute arrays
-	const attributeNames = Object.keys( geometry.attributes );
-	const sourceIndices = [];
-	const buffers = new Map();
-	const newIndices = [];
-	const getters = [ 'getX', 'getY', 'getZ', 'getW' ];
+	const sourceCount = attributes.length > 0 ? attributes[ 0 ].count : 0;
+	const vertexCount = indices ? indices.count : sourceCount;
 
-	// convert the error tolerance to an amount of decimal places to truncate to
+	// quantize source attributes to the tolerance grid
 	const halfTolerance = tolerance * 0.5;
-	const exponent = Math.log10( 1 / tolerance );
-	const hashMultiplier = Math.pow( 10, exponent );
+	const hashMultiplier = Math.pow( 10, Math.log10( 1 / tolerance ) );
 	const hashAdditive = halfTolerance * hashMultiplier;
-	for ( let i = 0; i < vertexCount; i ++ ) {
 
-		const index = indices ? indices.getX( i ) : i;
+	const quantized = new Float64Array( sourceCount * stride );
+	let offset = 0;
 
-		// Generate a hash for the vertex attributes at the current index 'i'
-		let hash = '';
-		for ( let j = 0, l = attributeNames.length; j < l; j ++ ) {
+	for ( const attr of attributes ) {
 
-			const name = attributeNames[ j ];
-			const attribute = geometry.getAttribute( name );
-			const itemSize = attribute.itemSize;
+		const itemSize = attr.itemSize;
+
+		for ( let i = 0; i < sourceCount; i ++ ) {
 
 			for ( let k = 0; k < itemSize; k ++ ) {
 
-				// Math.trunc() preserves the full Number range, ~~ would wrap to int32
-				hash += `${ Math.trunc( attribute[ getters[ k ] ]( index ) * hashMultiplier + hashAdditive ) },`;
+				const v = Math.trunc( attr.getComponent( i, k ) * hashMultiplier + hashAdditive ) + 0;
+				quantized[ i * stride + offset + k ] = v === v ? v : 0.5;
 
 			}
 
 		}
 
-		// Add another reference to the vertex if it's already
-		// used by another index
-		if ( hash in hashToIndex ) {
+		offset += itemSize;
 
-			newIndices.push( hashToIndex[ hash ] );
+	}
 
-		} else {
+	// deduplicate via open-addressed hash table (slots hold source index + 1, 0 means empty)
+	let tableSize = 1;
+	while ( tableSize < sourceCount * 2 ) tableSize <<= 1;
+	const tableMask = tableSize - 1;
+	const table = new Int32Array( tableSize );
 
-			sourceIndices.push( index );
+	const remap = new Int32Array( sourceCount );
+	const sourceIndicesAll = new Uint32Array( sourceCount );
+	const newIndices = new Uint32Array( vertexCount );
+	let nextIndex = 0;
 
-			hashToIndex[ hash ] = nextIndex;
-			newIndices.push( nextIndex );
-			nextIndex ++;
+	for ( let i = 0; i < vertexCount; i ++ ) {
+
+		const index = indices ? indices.getX( i ) : i;
+		let merged = remap[ index ];
+
+		if ( merged === 0 ) {
+
+			const base = index * stride;
+			let hash = 0x811c9dc5 | 0;
+
+			for ( let k = 0; k < stride; k ++ ) {
+
+				_hashFloat64[ 0 ] = quantized[ base + k ];
+				hash = ( Math.imul( hash, 0x9e3779b1 ) + ( _hashInt32[ 0 ] ^ _hashInt32[ 1 ] ) ) | 0;
+
+			}
+
+			let slot = ( Math.imul( hash ^ ( hash >>> 16 ), 0x85ebca6b ) >>> 13 ) & tableMask;
+
+			while ( true ) {
+
+				const entry = table[ slot ];
+
+				if ( entry === 0 ) {
+
+					sourceIndicesAll[ nextIndex ] = index;
+					merged = ++ nextIndex;
+					table[ slot ] = index + 1;
+					break;
+
+				}
+
+				const otherBase = ( entry - 1 ) * stride;
+				let match = true;
+
+				for ( let k = 0; k < stride; k ++ ) {
+
+					if ( quantized[ otherBase + k ] !== quantized[ base + k ] ) {
+
+						match = false;
+						break;
+
+					}
+
+				}
+
+				if ( match ) {
+
+					merged = remap[ entry - 1 ];
+					break;
+
+				}
+
+				slot = ( slot + 1 ) & tableMask;
+
+			}
+
+			remap[ index ] = merged;
 
 		}
+
+		newIndices[ i ] = merged - 1;
 
 	}
 
 	// generate result BufferGeometry
+	const sourceIndices = sourceIndicesAll.subarray( 0, nextIndex );
+	const buffers = new Map();
 	const result = geometry.clone();
 	for ( const name in geometry.attributes ) {
 
@@ -771,7 +829,7 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 	// indices
 
-	result.setIndex( newIndices );
+	result.setIndex( nextIndex > 65535 ? new Uint32BufferAttribute( newIndices.buffer, 1 ) : new Uint16BufferAttribute( newIndices, 1 ) );
 
 	return result;
 
