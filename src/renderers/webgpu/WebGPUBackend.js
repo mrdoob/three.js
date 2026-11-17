@@ -293,8 +293,6 @@ class WebGPUBackend extends Backend {
 
 		this.device = device;
 
-		this.updateSize();
-
 	}
 
 	/**
@@ -3016,7 +3014,12 @@ class WebGPUBackend extends Backend {
 	 */
 	updateSize() {
 
-		this.delete( this.renderer.getCanvasTarget() );
+		// the context configuration does not depend on the canvas size, so only the descriptor is reset
+
+		const canvasData = this.get( this.renderer.getCanvasTarget() );
+
+		delete canvasData.descriptor;
+		delete canvasData.samples;
 
 	}
 
