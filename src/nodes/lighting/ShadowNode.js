@@ -236,6 +236,15 @@ class ShadowNode extends ShadowBaseNode {
 		this._cameraFrameId = new WeakMap();
 
 		/**
+		 * Describes the render call that last updated the shadow map. Used
+		 * to share the shadow map with render calls nested in that one.
+		 *
+		 * @type {{frameId: number, callDepth: number, sceneId: number, layersMask: number}}
+		 * @private
+		 */
+		this._lastUpdate = { frameId: - 1, callDepth: 0, sceneId: - 1, layersMask: 0 };
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -820,13 +829,34 @@ class ShadowNode extends ShadowBaseNode {
 
 		if ( needsUpdate ) {
 
-			if ( this._cameraFrameId.get( frame.camera ) === frame.frameId ) {
+			const { frameId, camera, scene } = frame;
+
+			const callDepth = frame.renderer._callDepth;
+			const lastUpdate = this._lastUpdate;
+
+			if ( this._cameraFrameId.get( camera ) === frameId ) {
+
+				needsUpdate = false;
+
+			} else if ( lastUpdate.frameId === frameId && callDepth > lastUpdate.callDepth && lastUpdate.sceneId === scene.id && lastUpdate.layersMask === camera.layers.mask ) {
+
+				// A render nested in the one that has updated the shadow map in this frame,
+				// like the render of a reflector, shares the shadow map instead of updating it again.
 
 				needsUpdate = false;
 
 			}
 
-			this._cameraFrameId.set( frame.camera, frame.frameId );
+			this._cameraFrameId.set( camera, frameId );
+
+			if ( needsUpdate ) {
+
+				lastUpdate.frameId = frameId;
+				lastUpdate.callDepth = callDepth;
+				lastUpdate.sceneId = scene.id;
+				lastUpdate.layersMask = camera.layers.mask;
+
+			}
 
 		}
 
