@@ -79,7 +79,7 @@
 				scene.add( directionalLight );
 
 				const loader = new Rhino3dmLoader();
-				loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.32.1/' );
+				loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@9.2.0-beta.1/' );
 				loader.load( 'models/3dm/Rhino_Logo.3dm', function ( object ) {
 
 					scene.add( object );
@@ -130,6 +130,8 @@
 				for ( let i = 0; i < layers.length; i ++ ) {
 
 					const layer = layers[ i ];
+					if ( layer === undefined ) continue; // layers are indexed by layer index: a deleted layer leaves a gap
+
 					gui.add( layer, 'visible' ).name( layer.name ).onChange( function ( val ) {
 
 						const name = this.object.name;
