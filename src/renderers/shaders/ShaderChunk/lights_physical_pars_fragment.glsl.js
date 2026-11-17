@@ -668,7 +668,7 @@ void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geomet
 
 }
 
-void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradiance, const in vec3 clearcoatRadiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight) {
+void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 clearcoatRadiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight) {
 
 	#ifdef USE_CLEARCOAT
 
@@ -676,13 +676,6 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	#endif
 
-	#ifdef USE_SHEEN
-
-		sheenSpecularIndirect += irradiance * material.sheenColor * IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness ) * RECIPROCAL_PI;
-
- 	#endif
-
-	// Both indirect specular and indirect diffuse light accumulate here
 	// Compute multiscattering separately for dielectric and metallic, then mix
 
 	vec3 singleScatteringDielectric = vec3( 0.0 );
@@ -707,25 +700,9 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 	vec3 singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, material.metalness );
 	vec3 multiScattering = mix( multiScatteringDielectric, multiScatteringMetallic, material.metalness );
 
-	// Diffuse energy conservation uses dielectric path
-	vec3 totalScatteringDielectric = singleScatteringDielectric + multiScatteringDielectric;
-	#ifdef USE_DIFFUSE_ROUGHNESS
-
-		float dotNV = saturate( dot( geometryNormal, geometryViewDir ) );
-		vec3 diffuse = EON_DirectionalAlbedo( material.diffuseColor, material.diffuseRoughness, dotNV ) * ( 1.0 - material.metalness ) * ( 1.0 - totalScatteringDielectric );
-
-	#else
-
-		vec3 diffuse = material.diffuseContribution * ( 1.0 - totalScatteringDielectric );
-
-	#endif
-
-	vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
-
-	vec3 indirectSpecular = radiance * singleScattering;
-	indirectSpecular += multiScattering * cosineWeightedIrradiance;
-
-	vec3 indirectDiffuse = diffuse * cosineWeightedIrradiance;
+	// The multiple scattering lobe has the shape of the single scattering lobe, so it scales the radiance, see
+	// Turquin, "Practical multiple scattering compensation for microfacet models"
+	vec3 indirectSpecular = radiance * ( singleScattering + multiScattering );
 
 	#ifdef USE_SHEEN
 
@@ -734,12 +711,10 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 		float sheenEnergyComp = 1.0 - max3( material.sheenColor ) * sheenAlbedo;
 
 		indirectSpecular *= sheenEnergyComp;
-		indirectDiffuse *= sheenEnergyComp;
 
 	#endif
 
 	reflectedLight.indirectSpecular += indirectSpecular;
-	reflectedLight.indirectDiffuse += indirectDiffuse;
 
 }
 

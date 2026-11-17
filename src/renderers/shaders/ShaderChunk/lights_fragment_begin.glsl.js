@@ -221,8 +221,6 @@ IncidentLight directLight;
 
 #if defined( RE_IndirectDiffuse )
 
-	vec3 iblIrradiance = vec3( 0.0 );
-
 	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
 
 	#if defined( USE_LIGHT_PROBES )
