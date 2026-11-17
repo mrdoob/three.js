@@ -3,6 +3,7 @@ import { NodeUpdateType } from '../core/constants.js';
 import { getValueType } from '../core/NodeUtils.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import BufferNode from './BufferNode.js';
+import { error } from '../../utils.js';
 
 /**
  * Represents the element access on uniform array nodes.
@@ -51,6 +52,35 @@ class UniformArrayElementNode extends ArrayElementNode {
 }
 
 /**
+ * Returns the JavaScript value of the given array element. Constant and uniform
+ * nodes like `color( 0xff0000 )` or `uniform( new Color() )` are resolved to
+ * their values since uniform arrays can only hold raw data.
+ *
+ * @private
+ * @param {any} element - The array element.
+ * @return {any} The element value.
+ */
+function getArrayElementValue( element ) {
+
+	if ( element && element.isNode === true ) {
+
+		if ( element.isConstNode === true || element.isUniformNode === true ) {
+
+			return element.value;
+
+		}
+
+		error( 'UniformArrayNode: Only constant or uniform nodes are supported as array elements.' );
+
+		return null;
+
+	}
+
+	return element;
+
+}
+
+/**
  * Similar to {@link BufferNode} this module represents array-like data as
  * uniform buffers. Unlike {@link BufferNode}, it can handle more common
  * data types in the array (e.g `three.js` primitives) and automatically
@@ -84,6 +114,12 @@ class UniformArrayNode extends BufferNode {
 	constructor( value, elementType = null ) {
 
 		super( null );
+
+		if ( value.some( element => element && element.isNode === true ) ) {
+
+			value = value.map( getArrayElementValue );
+
+		}
 
 		/**
 		 * Array holding the buffer data. Unlike {@link BufferNode}, the array can
