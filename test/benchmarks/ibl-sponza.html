@@ -1,0 +1,83 @@
+<!doctype html>
+<html><body style="margin:0"><script>
+const variant = new URLSearchParams( location.search ).get( 'variant' ) || 'before';
+document.write( `<script type="importmap">${JSON.stringify( { imports: { three: `/${variant}/src/Three.js`, 'three/addons/': `/${variant}/examples/jsm/` } } )}<\/script>` );
+</script><script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+const renderer = new THREE.WebGLRenderer( { antialias: false } );
+renderer.setPixelRatio( 1 );
+document.body.appendChild( renderer.domElement );
+const gl = renderer.getContext();
+const debug = gl.getExtension( 'WEBGL_debug_renderer_info' );
+if ( ! debug ) throw new Error( 'Cannot verify hardware renderer' );
+const gpu = gl.getParameter( debug.UNMASKED_RENDERER_WEBGL );
+if ( /swiftshader|llvmpipe|lavapipe|software|warp|basic render/i.test( gpu ) ) throw new Error( `Unsupported GPU: ${gpu}` );
+const timer = gl.getExtension( 'EXT_disjoint_timer_query_webgl2' );
+const scene = new THREE.Scene();
+const room = new RoomEnvironment();
+const pmrem = new THREE.PMREMGenerator( renderer );
+const env = pmrem.fromScene( room );
+scene.environment = env.texture;
+scene.background = new THREE.Color( 0x777777 );
+room.dispose();
+const model = await new GLTFLoader().loadAsync( '/asset/Sponza.gltf' );
+scene.add( model.scene );
+const camera = new THREE.PerspectiveCamera( 75, 16 / 9, 0.1, 100 );
+let materials = 0;
+model.scene.traverse( o=>{
+
+	if ( o.isMesh && o.material.isMeshStandardMaterial ) materials ++;
+
+} );
+function draw( frame ) {
+
+	const angle = frame % 240 / 240 * Math.PI * 2;
+	camera.position.set( 0, 2, 0 );
+	camera.lookAt( Math.cos( angle ) * 10, 2.5, Math.sin( angle ) * 10 );
+	renderer.render( scene, camera );
+
+}
+
+window.benchmark = async ( width, height, seconds = 8 ) => {
+
+	renderer.setSize( width, height );
+	camera.aspect = width / height; camera.updateProjectionMatrix();
+	// Warm all camera orientations, pipelines and textures for at least 3 seconds.
+	const warm = performance.now(); let frame = 0;
+	do {
+
+		for ( let i = 0; i < 24; i ++ )draw( frame ++ ); gl.finish(); await new Promise( r=>setTimeout( r, 0 ) );
+
+	} while ( performance.now() - warm < 3000 || frame < 240 );
+
+	gl.finish(); frame = 0; const batches = []; const start = performance.now();
+	do {
+
+		const query = timer && gl.createQuery();
+		if ( query )gl.beginQuery( timer.TIME_ELAPSED_EXT, query );
+		for ( let i = 0; i < 24; i ++ )draw( frame ++ );
+		if ( query )gl.endQuery( timer.TIME_ELAPSED_EXT );
+		gl.finish();
+		batches.push( query );
+		await new Promise( r=>setTimeout( r, 0 ) );
+
+	} while ( performance.now() - start < seconds * 1000 || frame % 240 !== 0 );
+
+	gl.finish(); const elapsedMs = performance.now() - start;
+	await new Promise( r=>setTimeout( r, 50 ) );
+	const disjoint = timer && gl.getParameter( timer.GPU_DISJOINT_EXT );
+	let gpuNs = 0, available = !! timer;
+	for ( const q of batches ) {
+
+		if ( ! q ) continue; if ( ! gl.getQueryParameter( q, gl.QUERY_RESULT_AVAILABLE ) )available = false; else gpuNs += gl.getQueryParameter( q, gl.QUERY_RESULT ); gl.deleteQuery( q );
+
+	}
+
+	return { gpu, width, height, materials, frames: frame, elapsedMs, msPerFrame: elapsedMs / frame, gpuMsPerFrame: available && ! disjoint ? gpuNs / 1e6 / frame : null, disjoint, calls: renderer.info.render.calls, triangles: renderer.info.render.triangles };
+
+};
+
+window.ready = true;
+</script></body></html>
