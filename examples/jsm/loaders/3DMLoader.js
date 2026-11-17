@@ -1,7 +1,6 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
-	BufferGeometryLoader,
 	CanvasTexture,
 	ClampToEdgeWrapping,
 	Color,
@@ -30,9 +29,9 @@ import {
 } from 'three';
 
 import { EXRLoader } from '../loaders/EXRLoader.js';
+import { HDRLoader } from '../loaders/HDRLoader.js';
 
 const _taskCache = new WeakMap();
-const _bufferGeometryLoader = new BufferGeometryLoader();
 
 /**
  * A loader for Rhinoceros 3D files and objects.
@@ -41,11 +40,11 @@ const _bufferGeometryLoader = new BufferGeometryLoader();
  * animate, and translate NURBS curves, surfaces, breps, extrusions, point clouds,
  * as well as polygon meshes and SubD objects. `rhino3dm.js` is compiled to WebAssembly
  * from the open source geometry library `openNURBS`. The loader currently uses
- * `rhino3dm.js 8.32.1`.
+ * `rhino3dm.js 9.2.0-beta.1`; it needs 9.2 or later, whose API is generated from RhinoCommon.
  *
  * ```js
  * const loader = new Rhino3dmLoader();
- * loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.32.1/' );
+ * loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@9.2.0-beta.1/' );
  *
  * const object = await loader.loadAsync( 'models/3dm/Rhino_Logo.3dm' );
  * scene.add( object );
@@ -324,7 +323,7 @@ class Rhino3dmLoader extends Loader {
 
 	}
 
-	_createMaterial( material, renderEnvironment ) {
+	_createMaterial( material, renderEnvironment, files ) {
 
 		if ( material === undefined ) {
 
@@ -361,7 +360,7 @@ class Rhino3dmLoader extends Loader {
 
 			mat.anisotropy = pbr.anisotropic;
 			mat.anisotropyRotation = pbr.anisotropicRotation;
-			mat.color = new Color( pbr.baseColor.r, pbr.baseColor.g, pbr.baseColor.b );
+			mat.color = new Color( pbr.baseColor.R, pbr.baseColor.G, pbr.baseColor.B );
 			mat.clearcoat = pbr.clearcoat;
 			mat.clearcoatRoughness = pbr.clearcoatRoughness;
 			mat.metalness = pbr.metallic;
@@ -388,9 +387,9 @@ class Rhino3dmLoader extends Loader {
 
 			const texture = material.textures[ i ];
 
-			if ( texture.image !== null ) {
+			if ( texture.file !== null ) {
 
-				const map = textureLoader.load( texture.image );
+				const map = textureLoader.load( this._fileURL( files, texture.file ) );
 
 
 				switch ( texture.type ) {
@@ -522,14 +521,11 @@ class Rhino3dmLoader extends Loader {
 
 				}
 
-				map.wrapS = texture.wrapU === 0 ? RepeatWrapping : ClampToEdgeWrapping;
-				map.wrapT = texture.wrapV === 0 ? RepeatWrapping : ClampToEdgeWrapping;
-
-				if ( texture.repeat ) {
-
-					map.repeat.set( texture.repeat[ 0 ], texture.repeat[ 1 ] );
-
-				}
+				map.wrapS = texture.wrapU === 'Repeat' ? RepeatWrapping : ClampToEdgeWrapping;
+				map.wrapT = texture.wrapV === 'Repeat' ? RepeatWrapping : ClampToEdgeWrapping;
+				map.repeat.set( texture.repeat[ 0 ], texture.repeat[ 1 ] );
+				map.offset.set( texture.offset[ 0 ], texture.offset[ 1 ] );
+				map.rotation = texture.rotation;
 
 			}
 
@@ -537,7 +533,10 @@ class Rhino3dmLoader extends Loader {
 
 		if ( renderEnvironment ) {
 
-			new EXRLoader().setPriority( this.priority ).setCache( this.cache ).load( renderEnvironment.image, function ( texture ) {
+			const extension = files[ renderEnvironment.file ].extension;
+			const EnvironmentLoader = extension === 'exr' ? EXRLoader : extension === 'hdr' ? HDRLoader : TextureLoader;
+
+			new EnvironmentLoader().setPriority( this.priority ).setCache( this.cache ).load( this._fileURL( files, renderEnvironment.file ), function ( texture ) {
 
 				texture.mapping = EquirectangularReflectionMapping;
 				mat.envMap = texture;
@@ -547,6 +546,14 @@ class Rhino3dmLoader extends Loader {
 		}
 
 		return mat;
+
+	}
+
+	_fileURL( files, name ) {
+
+		const file = files[ name ];
+		if ( file.url === undefined ) file.url = URL.createObjectURL( new Blob( [ file.bytes ], { type: file.mimeType } ) );
+		return file.url;
 
 	}
 
@@ -623,7 +630,7 @@ class Rhino3dmLoader extends Loader {
 					if ( matId >= 0 ) {
 
 						const rMaterial = materials[ matId ];
-						material = this._createMaterial( rMaterial, data.renderEnvironment );
+						material = this._createMaterial( rMaterial, data.renderEnvironment, data.files );
 
 
 					}
@@ -716,28 +723,20 @@ class Rhino3dmLoader extends Loader {
 	}
 
 	/**
-	 * Builds a BufferGeometry from a worker payload. Meshes decoded via the fast path
-	 * arrive as transferable typed arrays (`format: 'buffers'`) and are assembled directly;
-	 * everything else falls back to the three.js BufferGeometry JSON produced by
-	 * `toThreejsJSON()` (older rhino3dm, point clouds, curves, …).
+	 * Builds a BufferGeometry from a worker payload: meshes, point clouds, curves and points
+	 * arrive as transferable typed arrays (`format: 'buffers'`).
 	 */
 	_geometryFromData( data ) {
 
-		if ( data && data.format === 'buffers' ) {
+		const geometry = new BufferGeometry();
 
-			const geometry = new BufferGeometry();
+		if ( data.position && data.position.length ) geometry.setAttribute( 'position', new BufferAttribute( data.position, 3 ) );
+		if ( data.normal && data.normal.length ) geometry.setAttribute( 'normal', new BufferAttribute( data.normal, 3 ) );
+		if ( data.uv && data.uv.length ) geometry.setAttribute( 'uv', new BufferAttribute( data.uv, 2 ) );
+		if ( data.color && data.color.length ) geometry.setAttribute( 'color', new BufferAttribute( data.color, 3 ) );
+		if ( data.index && data.index.length ) geometry.setIndex( new BufferAttribute( data.index, 1 ) );
 
-			if ( data.position && data.position.length ) geometry.setAttribute( 'position', new BufferAttribute( data.position, 3 ) );
-			if ( data.normal && data.normal.length ) geometry.setAttribute( 'normal', new BufferAttribute( data.normal, 3 ) );
-			if ( data.uv && data.uv.length ) geometry.setAttribute( 'uv', new BufferAttribute( data.uv, 2 ) );
-			if ( data.color && data.color.length ) geometry.setAttribute( 'color', new BufferAttribute( data.color, 3 ) );
-			if ( data.index && data.index.length ) geometry.setIndex( new BufferAttribute( data.index, 1 ) );
-
-			return geometry;
-
-		}
-
-		return _bufferGeometryLoader.parse( data );
+		return geometry;
 
 	}
 
@@ -1114,7 +1113,6 @@ class Rhino3dmLoader extends Loader {
 function Rhino3dmWorker() {
 
 	let libraryPending;
-	let libraryConfig;
 	let rhino;
 	let taskID;
 
@@ -1126,42 +1124,30 @@ function Rhino3dmWorker() {
 
 			case 'init':
 
-				libraryConfig = message.libraryConfig;
-				const wasmBinary = libraryConfig.wasmBinary;
-				let RhinoModule;
-				libraryPending = new Promise( function ( resolve ) {
+				// rhino3dm >= 9.2: the factory resolves with the module.
+				libraryPending = rhino3dm( { wasmBinary: message.libraryConfig.wasmBinary } ) // eslint-disable-line no-undef
+					.then( ( module ) => {
 
-					/* Like Basis Loader */
-					RhinoModule = { wasmBinary, onRuntimeInitialized: resolve };
+						rhino = module;
 
-					rhino3dm( RhinoModule ); // eslint-disable-line no-undef
-
-				 } ).then( () => {
-
-					rhino = RhinoModule;
-
-				 } );
+					} );
 
 				break;
 
 			case 'decode':
 
-				taskID = message.id;
-				const buffer = message.buffer;
-				const subdivisionLevel = message.subdivisionLevel;
 				libraryPending.then( () => {
+
+					taskID = message.id;
 
 					try {
 
-						const data = decodeObjects( rhino, buffer, subdivisionLevel );
-						// Transfer the mesh typed arrays (fast path) instead of structure-cloning
-						// them across the worker boundary.
+						const data = decodeObjects( new Uint8Array( message.buffer ), message.subdivisionLevel );
 						self.postMessage( { type: 'decode', id: message.id, data }, collectTransferables( data ) );
 
 					} catch ( error ) {
 
-						// Error objects don't always survive structured clone with their stack intact.
-						self.postMessage( { type: 'error', id: message.id, error: { message: error.message, stack: error.stack } } );
+						self.postMessage( { type: 'error', id: message.id, error: errorToObject( error ) } );
 
 					}
 
@@ -1173,47 +1159,65 @@ function Rhino3dmWorker() {
 
 	};
 
-	// Converts a rhino3dm mesh or point cloud to a Three.js payload. When the wasm build
-	// supports toThreejsBuffers (rhino3dm >= 8.32.1 for point clouds, >= 8.32 for meshes),
-	// returns transferable typed arrays tagged `format: 'buffers'`; otherwise falls back to
-	// the element-by-element BufferGeometry JSON.
-	function meshToThreejs( geom ) {
+	// rhino3dm 9.2 throws WebAssembly.Exception; its text is read (and the exception freed) through the module.
+	function errorToObject( error ) {
 
-		if ( typeof geom.toThreejsBuffers === 'function' ) {
+		if ( typeof WebAssembly.Exception === 'function' && error instanceof WebAssembly.Exception ) {
 
-			const b = geom.toThreejsBuffers( false );
-			const g = { format: 'buffers', position: b.position };
-			if ( b.normal ) g.normal = b.normal; // meshes always have normals; point clouds may not
-			if ( b.index ) g.index = b.index; // meshes only (point clouds are non-indexed)
-			if ( b.uv ) g.uv = b.uv;
-			if ( b.color ) g.color = b.color;
-			return g;
+			const message = rhino.getExceptionMessage( error );
+			rhino.decrementExceptionRefcount( error );
+			return { message: String( message ) };
 
 		}
 
-		return geom.toThreejsJSON();
+		return { message: error.message, stack: error.stack };
 
 	}
 
-	// Gathers the ArrayBuffers backing every fast-path mesh so postMessage can transfer
-	// (move) them to the main thread instead of copying.
+	function warn( message, type, guid ) {
+
+		self.postMessage( { type: 'warning', id: taskID, data: { message: `THREE.3DMLoader: ${message}`, type, guid } } );
+
+	}
+
+	// 'ObjectType_Brep' -> 'Brep'
+	function enumName( value ) {
+
+		const name = value.constructor.name;
+		return name.substring( name.indexOf( '_' ) + 1 );
+
+	}
+
+	function color( c ) {
+
+		return { r: c.r, g: c.g, b: c.b, a: c.a };
+
+	}
+
+	function meshToBuffers( mesh ) {
+
+		const b = mesh.toThreejsBuffers( false );
+		const g = { format: 'buffers', position: b.position };
+		if ( b.normal ) g.normal = b.normal;
+		if ( b.index ) g.index = b.index;
+		if ( b.uv ) g.uv = b.uv;
+		if ( b.color ) g.color = b.color;
+		return g;
+
+	}
+
 	function collectTransferables( data ) {
 
 		const transfer = new Set();
 
-		if ( data && data.objects ) {
+		for ( const obj of data.objects ) {
 
-			for ( const obj of data.objects ) {
+			const g = obj.geometry;
+			if ( g && g.format === 'buffers' ) {
 
-				const g = obj.geometry;
+				for ( const key of [ 'position', 'normal', 'uv', 'color', 'index' ] ) {
 
-				if ( g && g.format === 'buffers' ) {
-
-					for ( const key of [ 'position', 'normal', 'uv', 'color', 'index' ] ) {
-
-						if ( g[ key ] && g[ key ].buffer ) transfer.add( g[ key ].buffer );
-
-					}
+					if ( g[ key ] ) transfer.add( g[ key ].buffer );
 
 				}
 
@@ -1221,292 +1225,267 @@ function Rhino3dmWorker() {
 
 		}
 
+		for ( const file of Object.values( data.files ) ) transfer.add( file.bytes.buffer );
+
 		return Array.from( transfer );
 
 	}
 
-	function decodeObjects( rhino, buffer, subdivisionLevel ) {
+	// Embedded files keyed as getEmbeddedFileAsBase64( path ) matched them: the full path, then the file name
+	// alone, ignoring case. Embedded paths are normalized for the platform (C:\a\b.png reads /a/b.png) while
+	// texture paths are not, so a Windows file only ever matches by name.
+	function embeddedFileLookup( doc ) {
 
-		const arr = new Uint8Array( buffer );
-		const doc = rhino.File3dm.fromByteArray( arr );
+		const byPath = new Map();
+		const byName = new Map();
 
-		const objects = [];
+		for ( const file of doc.embeddedFiles ) {
+
+			const path = file.filename;
+			byPath.set( path.toLowerCase(), file );
+			const name = baseName( path );
+			if ( ! byName.has( name ) ) byName.set( name, file );
+
+		}
+
+		return ( path ) => path ? ( byPath.get( path.toLowerCase() ) || byName.get( baseName( path ) ) ) : undefined;
+
+	}
+
+	function baseName( path ) {
+
+		return path.split( /[\\/]/ ).pop().toLowerCase();
+
+	}
+
+	const mimeTypes = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif', bmp: 'image/bmp', tif: 'image/tiff', tiff: 'image/tiff', exr: 'image/x-exr', hdr: 'image/vnd.radiance' };
+
+	// Embedded images are sent once per file as transferable bytes; textures refer to them by name.
+	function addFile( files, findFile, path ) {
+
+		const file = findFile( path );
+		if ( ! file ) return null;
+
+		const name = file.filename;
+
+		if ( ! files[ name ] ) {
+
+			const extension = baseName( name ).split( '.' ).pop();
+			files[ name ] = { bytes: file.toByteArray(), mimeType: mimeTypes[ extension ] || 'application/octet-stream', extension };
+
+		}
+
+		return name;
+
+	}
+
+	function decodeObjects( bytes, subdivisionLevel ) {
+
+		const doc = rhino.File3dm.fromByteArray( bytes );
+
+		if ( ! doc ) throw new Error( 'THREE.3DMLoader: Not a 3dm file, or the file could not be read.' );
+
+		const findFile = embeddedFileLookup( doc );
+		const files = {};
+
+		// Tables are indexed by component index: iteration skips deleted components, so array position and
+		// attributes.layerIndex / materialIndex can disagree.
+
 		const materials = [];
-		const layers = [];
-		const views = [];
-		const namedViews = [];
-		const groups = [];
-		const strings = [];
 
-		//Handle objects
+		for ( const _material of doc.materials ) {
 
-		const objs = doc.objects();
-		const cnt = objs.count;
-
-		for ( let i = 0; i < cnt; i ++ ) {
-
-			const _object = objs.get( i );
-
-			const object = extractObjectData( _object, doc, subdivisionLevel );
-
-			_object.delete();
-
-			if ( object ) {
-
-				objects.push( object );
-
-			}
-
-		}
-
-		// Handle instance definitions
-
-		for ( let i = 0; i < doc.instanceDefinitions().count; i ++ ) {
-
-			const idef = doc.instanceDefinitions().get( i );
-			const idefAttributes = extractProperties( idef );
-			idefAttributes.objectIds = idef.getObjectIds();
-
-			objects.push( { geometry: null, attributes: idefAttributes, objectType: 'InstanceDefinition' } );
-
-		}
-
-		// Handle materials
-
-		const textureTypes = [
-			// rhino.TextureType.Bitmap,
-			rhino.TextureType.Diffuse,
-			rhino.TextureType.Bump,
-			rhino.TextureType.Transparency,
-			rhino.TextureType.Opacity,
-			rhino.TextureType.Emap
-		];
-
-		const pbrTextureTypes = [
-			rhino.TextureType.PBR_BaseColor,
-			rhino.TextureType.PBR_Subsurface,
-			rhino.TextureType.PBR_SubsurfaceScattering,
-			rhino.TextureType.PBR_SubsurfaceScatteringRadius,
-			rhino.TextureType.PBR_Metallic,
-			rhino.TextureType.PBR_Specular,
-			rhino.TextureType.PBR_SpecularTint,
-			rhino.TextureType.PBR_Roughness,
-			rhino.TextureType.PBR_Anisotropic,
-			rhino.TextureType.PBR_Anisotropic_Rotation,
-			rhino.TextureType.PBR_Sheen,
-			rhino.TextureType.PBR_SheenTint,
-			rhino.TextureType.PBR_Clearcoat,
-			rhino.TextureType.PBR_ClearcoatBump,
-			rhino.TextureType.PBR_ClearcoatRoughness,
-			rhino.TextureType.PBR_OpacityIor,
-			rhino.TextureType.PBR_OpacityRoughness,
-			rhino.TextureType.PBR_Emission,
-			rhino.TextureType.PBR_AmbientOcclusion,
-			rhino.TextureType.PBR_Displacement
-		];
-
-		for ( let i = 0; i < doc.materials().count; i ++ ) {
-
-			const _material = doc.materials().get( i );
-
-			const material = extractProperties( _material );
-
-			const textures = [];
-
-			textures.push( ...extractTextures( _material, textureTypes, doc ) );
-
-			material.pbrSupported = _material.physicallyBased().supported;
-
-			if ( material.pbrSupported ) {
-
-				textures.push( ...extractTextures( _material, pbrTextureTypes, doc ) );
-				material.pbr = extractProperties( _material.physicallyBased() );
-
-			}
-
-			material.textures = textures;
-
-			materials.push( material );
-
+			materials[ _material.index ] = extractMaterial( _material, files, findFile );
 			_material.delete();
 
 		}
 
-		// Handle layers
+		const layers = [];
 
-		for ( let i = 0; i < doc.layers().count; i ++ ) {
+		for ( const _layer of doc.layers ) {
 
-			const _layer = doc.layers().get( i );
 			const layer = extractProperties( _layer );
-
-			layers.push( layer );
-
+			layer.visible = _layer.isVisible; // 8.x name, read by userData consumers
+			layers[ _layer.index ] = layer;
 			_layer.delete();
 
 		}
 
-		// Handle views
+		// Whether the material the object renders with (resolved as Rhino3dmLoader does) shows an image.
+		const hasTexture = ( attributes ) => {
 
-		for ( let i = 0; i < doc.views().count; i ++ ) {
+			let index = - 1;
+			const source = attributes.materialSource;
 
-			const _view = doc.views().get( i );
-			const view = extractProperties( _view );
+			if ( source === rhino.ObjectMaterialSource.MaterialFromLayer ) {
 
-			views.push( view );
+				const layer = layers[ attributes.layerIndex ];
+				if ( layer ) index = layer.renderMaterialIndex;
 
-			_view.delete();
+			} else if ( source === rhino.ObjectMaterialSource.MaterialFromObject ) {
 
-		}
-
-		// Handle named views
-
-		for ( let i = 0; i < doc.namedViews().count; i ++ ) {
-
-			const _namedView = doc.namedViews().get( i );
-			const namedView = extractProperties( _namedView );
-
-			namedViews.push( namedView );
-
-			_namedView.delete();
-
-		}
-
-		// Handle groups
-
-		for ( let i = 0; i < doc.groups().count; i ++ ) {
-
-			const _group = doc.groups().get( i );
-			const group = extractProperties( _group );
-
-			groups.push( group );
-
-			_group.delete();
-
-		}
-
-		// Handle settings
-
-		const settings = extractProperties( doc.settings() );
-
-		//TODO: Handle other document stuff like dimstyles, instance definitions, bitmaps etc.
-
-		// Handle dimstyles
-
-		// Handle bitmaps
-
-		// Handle strings
-		// Note: doc.strings().documentUserTextCount() counts any doc.strings defined in a section
-
-		const strings_count = doc.strings().count;
-
-		for ( let i = 0; i < strings_count; i ++ ) {
-
-			strings.push( doc.strings().get( i ) );
-
-		}
-
-		// Handle Render Environments for Material Environment
-
-		// get the id of the active render environment skylight, which we'll use for environment texture
-		const reflectionId = doc.settings().renderSettings().renderEnvironments.reflectionId;
-
-		const rc = doc.renderContent();
-
-		let renderEnvironment = null;
-
-		for ( let i = 0; i < rc.count; i ++ ) {
-
-			const content = rc.get( i );
-
-			switch ( content.kind ) {
-
-				case 'environment':
-
-					const id = content.id;
-
-					// there could be multiple render environments in a 3dm file
-					if ( id !== reflectionId ) break;
-
-					const renderTexture = content.findChild( 'texture' );
-					const fileName = renderTexture.fileName;
-
-					for ( let j = 0; j < doc.embeddedFiles().count; j ++ ) {
-
-						const _fileName = doc.embeddedFiles().get( j ).fileName;
-
-						if ( fileName === _fileName ) {
-
-							const background = doc.getEmbeddedFileAsBase64( fileName );
-							const backgroundImage = 'data:image/png;base64,' + background;
-							renderEnvironment = { type: 'renderEnvironment', image: backgroundImage, name: fileName };
-
-						}
-
-					}
-
-					break;
+				index = attributes.materialIndex;
 
 			}
 
+			const material = materials[ index ];
+			return material !== undefined && material.textures.some( ( t ) => t.file !== null );
+
+		};
+
+		const objects = [];
+
+		for ( const _object of doc.objects ) {
+
+			const object = extractObjectData( _object, doc, subdivisionLevel, hasTexture );
+			_object.delete();
+			if ( object ) objects.push( object );
+
 		}
 
-		// Handle Render Settings
+		for ( const idef of doc.instanceDefinitions ) {
+
+			objects.push( { geometry: null, attributes: { id: idef.id, name: idef.name, description: idef.description, objectIds: idef.getObjectIds() }, objectType: 'InstanceDefinition' } );
+			idef.delete();
+
+		}
+
+		const views = [];
+		for ( let i = 0; i < doc.views.count; i ++ ) views.push( extractProperties( doc.views.get( i ) ) );
+
+		const namedViews = [];
+		for ( let i = 0; i < doc.namedViews.count; i ++ ) namedViews.push( extractProperties( doc.namedViews.get( i ) ) );
+
+		const groups = [];
+		for ( const group of doc.allGroups ) groups.push( extractProperties( group ) );
+
+		const settings = extractProperties( doc.settings );
+
+		const strings = [];
+		for ( let i = 0; i < doc.strings.count; i ++ ) strings.push( [ doc.strings.getKey( i ), doc.strings.getValue( i ) ] );
+
+		const rs = doc.settings.renderSettings;
+		const Usage = rhino.RenderSettingsEnvironmentUsage;
+		const Purpose = rhino.RenderSettingsEnvironmentPurpose;
+		const environmentId = ( usage ) => rs.renderEnvironmentId( usage, Purpose.ForRendering );
+
+		let renderEnvironment = null;
+		const environment = doc.renderEnvironments.find( environmentId( Usage.Reflection ) );
+
+		if ( environment ) {
+
+			const texture = environment.findChild( 'texture' );
+			const file = texture ? addFile( files, findFile, texture.filename ) : null;
+			if ( file ) renderEnvironment = { file };
+
+		}
+
+		const postEffects = [];
+		for ( const effect of rs.postEffects ) postEffects.push( { id: effect.id, localName: effect.localName, on: effect.on, shown: effect.shown, type: enumName( effect.type ) } );
 
 		const renderSettings = {
-			ambientLight: doc.settings().renderSettings().ambientLight,
-			backgroundColorTop: doc.settings().renderSettings().backgroundColorTop,
-			backgroundColorBottom: doc.settings().renderSettings().backgroundColorBottom,
-			useHiddenLights: doc.settings().renderSettings().useHiddenLights,
-			depthCue: doc.settings().renderSettings().depthCue,
-			flatShade: doc.settings().renderSettings().flatShade,
-			renderBackFaces: doc.settings().renderSettings().renderBackFaces,
-			renderPoints: doc.settings().renderSettings().renderPoints,
-			renderCurves: doc.settings().renderSettings().renderCurves,
-			renderIsoParams: doc.settings().renderSettings().renderIsoParams,
-			renderMeshEdges: doc.settings().renderSettings().renderMeshEdges,
-			renderAnnotations: doc.settings().renderSettings().renderAnnotations,
-			useViewportSize: doc.settings().renderSettings().useViewportSize,
-			scaleBackgroundToFit: doc.settings().renderSettings().scaleBackgroundToFit,
-			transparentBackground: doc.settings().renderSettings().transparentBackground,
-			imageDpi: doc.settings().renderSettings().imageDpi,
-			shadowMapLevel: doc.settings().renderSettings().shadowMapLevel,
-			namedView: doc.settings().renderSettings().namedView,
-			snapShot: doc.settings().renderSettings().snapShot,
-			specificViewport: doc.settings().renderSettings().specificViewport,
-			groundPlane: extractProperties( doc.settings().renderSettings().groundPlane ),
-			safeFrame: extractProperties( doc.settings().renderSettings().safeFrame ),
-			dithering: extractProperties( doc.settings().renderSettings().dithering ),
-			skylight: extractProperties( doc.settings().renderSettings().skylight ),
-			linearWorkflow: extractProperties( doc.settings().renderSettings().linearWorkflow ),
-			renderChannels: extractProperties( doc.settings().renderSettings().renderChannels ),
-			sun: extractProperties( doc.settings().renderSettings().sun ),
-			renderEnvironments: extractProperties( doc.settings().renderSettings().renderEnvironments ),
-			postEffects: extractProperties( doc.settings().renderSettings().postEffects ),
-
+			ambientLight: color( rs.ambientLight ),
+			backgroundColorTop: color( rs.backgroundColorTop ),
+			backgroundColorBottom: color( rs.backgroundColorBottom ),
+			useHiddenLights: rs.useHiddenLights,
+			depthCue: rs.depthCue,
+			flatShade: rs.flatShade,
+			renderBackfaces: rs.renderBackfaces,
+			renderPoints: rs.renderPoints,
+			renderCurves: rs.renderCurves,
+			renderIsoparams: rs.renderIsoparams,
+			renderMeshEdges: rs.renderMeshEdges,
+			renderAnnotations: rs.renderAnnotations,
+			useViewportSize: rs.useViewportSize,
+			scaleBackgroundToFit: rs.scaleBackgroundToFit,
+			transparentBackground: rs.transparentBackground,
+			imageDpi: rs.imageDpi,
+			shadowmapLevel: rs.shadowmapLevel,
+			namedView: rs.namedView,
+			snapshot: rs.snapshot,
+			specificViewport: rs.specificViewport,
+			groundPlane: extractProperties( rs.groundPlane ),
+			safeFrame: extractProperties( rs.safeFrame ),
+			dithering: extractProperties( rs.dithering ),
+			skylight: extractProperties( rs.skylight ),
+			linearWorkflow: extractProperties( rs.linearWorkflow ),
+			renderChannels: extractProperties( rs.renderChannels ),
+			sun: extractProperties( rs.sun ),
+			renderEnvironments: {
+				backgroundId: environmentId( Usage.Background ),
+				reflectionId: environmentId( Usage.Reflection ),
+				skylightingId: environmentId( Usage.Skylighting )
+			},
+			postEffects
 		};
 
 		doc.delete();
 
-		return { objects, materials, layers, views, namedViews, groups, strings, settings, renderSettings, renderEnvironment };
+		return { objects, materials, layers, views, namedViews, groups, strings, settings, renderSettings, renderEnvironment, files };
 
 	}
 
-	function extractTextures( m, tTypes, d ) {
+	const textureTypes = [ 'Diffuse', 'Bump', 'Transparency', 'Opacity', 'Emap' ];
+
+	const pbrTextureTypes = [
+		'PBR_BaseColor', 'PBR_Subsurface', 'PBR_SubsurfaceScattering', 'PBR_SubsurfaceScatteringRadius', 'PBR_Metallic',
+		'PBR_Specular', 'PBR_SpecularTint', 'PBR_Roughness', 'PBR_Anisotropic', 'PBR_Anisotropic_Rotation', 'PBR_Sheen',
+		'PBR_SheenTint', 'PBR_Clearcoat', 'PBR_ClearcoatBump', 'PBR_ClearcoatRoughness', 'PBR_OpacityIor',
+		'PBR_OpacityRoughness', 'PBR_Emission', 'PBR_AmbientOcclusion', 'PBR_Displacement', 'PBR_Alpha'
+	];
+
+	function extractMaterial( m, files, findFile ) {
+
+		const material = {
+			id: m.id,
+			index: m.index,
+			name: m.name,
+			diffuseColor: color( m.diffuseColor ),
+			emissionColor: color( m.emissionColor ),
+			specularColor: color( m.specularColor ),
+			transparency: m.transparency,
+			indexOfRefraction: m.indexOfRefraction,
+			reflectivity: m.reflectivity,
+			disableLighting: m.disableLighting,
+			pbrSupported: m.isPhysicallyBased,
+			textures: extractTextures( m, textureTypes, files, findFile )
+		};
+
+		if ( material.pbrSupported ) {
+
+			material.pbr = extractProperties( m.physicallyBased ); // baseColor, emission are Color4f: { R, G, B, A } in 0..1
+			material.textures.push( ...extractTextures( m, pbrTextureTypes, files, findFile ) );
+
+		}
+
+		return material;
+
+	}
+
+	function extractTextures( m, types, files, findFile ) {
 
 		const textures = [];
 
-		for ( let i = 0; i < tTypes.length; i ++ ) {
+		for ( const type of types ) {
 
-			const _texture = m.getTexture( tTypes[ i ] );
-			if ( _texture ) {
+			const t = m.getTexture( rhino.TextureType[ type ] );
+			if ( ! t ) continue;
 
-				let textureType = tTypes[ i ].constructor.name;
-				textureType = textureType.substring( 12, textureType.length );
-				const texture = extractTextureData( _texture, textureType, d );
-				textures.push( texture );
-				_texture.delete();
+			const file = addFile( files, findFile, t.fileName );
 
-			}
+			if ( ! file ) warn( `Image for ${type} texture not embedded in file.`, 'missing resource' );
+
+			textures.push( {
+				type,
+				file,
+				wrapU: enumName( t.wrapU ),
+				wrapV: enumName( t.wrapV ),
+				repeat: [ t.repeat.X, t.repeat.Y ],
+				offset: [ t.offset.X, t.offset.Y ],
+				rotation: t.rotation
+			} );
+
+			t.delete();
 
 		}
 
@@ -1514,128 +1493,47 @@ function Rhino3dmWorker() {
 
 	}
 
-	function extractTextureData( t, tType, d ) {
+	function extractObjectData( object, doc, subdivisionLevel, hasTexture ) {
 
-		const texture = { type: tType };
+		const _geometry = object.geometry;
+		const _attributes = object.attributes;
+		const objectType = enumName( _geometry.objectType );
+		let geometry, mesh;
 
-		const image = d.getEmbeddedFileAsBase64( t.fileName );
-
-		texture.wrapU = t.wrapU;
-		texture.wrapV = t.wrapV;
-		texture.wrapW = t.wrapW;
-		const uvw = t.uvwTransform.toFloatArray( true );
-
-		texture.repeat = [ uvw[ 0 ], uvw[ 5 ] ];
-
-		if ( image ) {
-
-			texture.image = 'data:image/png;base64,' + image;
-
-		} else {
-
-			self.postMessage( { type: 'warning', id: taskID, data: {
-				message: `THREE.3DMLoader: Image for ${tType} texture not embedded in file.`,
-				type: 'missing resource'
-			}
-
-			} );
-
-			texture.image = null;
-
-		}
-
-		return texture;
-
-	}
-
-	function extractObjectData( object, doc, subdivisionLevel ) {
-
-		const _geometry = object.geometry();
-		const _attributes = object.attributes();
-		let objectType = _geometry.objectType;
-		let geometry, attributes, position, data, mesh;
-
-		// skip instance definition objects
-		//if( _attributes.isInstanceDefinitionObject ) { continue; }
-
-		// TODO: handle other geometry types
 		switch ( objectType ) {
 
-			case rhino.ObjectType.Curve:
+			case 'Curve':
 
-				const pts = curveToPoints( _geometry, 100 );
-
-				position = {};
-				attributes = {};
-				data = {};
-
-				position.itemSize = 3;
-				position.type = 'Float32Array';
-				position.array = [];
-
-				for ( let j = 0; j < pts.length; j ++ ) {
-
-					position.array.push( pts[ j ][ 0 ] );
-					position.array.push( pts[ j ][ 1 ] );
-					position.array.push( pts[ j ][ 2 ] );
-
-				}
-
-				attributes.position = position;
-				data.attributes = attributes;
-
-				geometry = { data };
-
+				geometry = { format: 'buffers', position: curveToPositions( _geometry ) };
 				break;
 
-			case rhino.ObjectType.Point:
+			case 'Point': {
 
-				const pt = _geometry.location;
-
-				position = {};
-				const color = {};
-				attributes = {};
-				data = {};
-
-				position.itemSize = 3;
-				position.type = 'Float32Array';
-				position.array = [ pt[ 0 ], pt[ 1 ], pt[ 2 ] ];
-
-				const _color = _attributes.drawColor( doc );
-
-				color.itemSize = 3;
-				color.type = 'Float32Array';
-				color.array = [ _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 ];
-
-				attributes.position = position;
-				attributes.color = color;
-				data.attributes = attributes;
-
-				geometry = { data };
-
+				const p = _geometry.location;
+				const c = _attributes.drawColor( doc );
+				geometry = { format: 'buffers', position: new Float32Array( [ p.X, p.Y, p.Z ] ), color: new Float32Array( [ c.r / 255, c.g / 255, c.b / 255 ] ) };
 				break;
 
-			case rhino.ObjectType.PointSet:
-			case rhino.ObjectType.Mesh:
+			}
 
-				geometry = meshToThreejs( _geometry );
+			case 'PointSet':
+			case 'Mesh':
 
+				geometry = meshToBuffers( _geometry );
 				break;
 
-			case rhino.ObjectType.Brep:
+			case 'Brep':
 
-				const faces = _geometry.faces();
 				mesh = new rhino.Mesh();
 
-				for ( let faceIndex = 0; faceIndex < faces.count; faceIndex ++ ) {
+				for ( const face of _geometry.faces ) {
 
-					const face = faces.get( faceIndex );
-					const _mesh = face.getMesh( rhino.MeshType.Any );
+					const faceMesh = face.getMesh( rhino.MeshType.Any );
 
-					if ( _mesh ) {
+					if ( faceMesh ) {
 
-						mesh.append( _mesh );
-						_mesh.delete();
+						mesh.append( faceMesh );
+						faceMesh.delete();
 
 					}
 
@@ -1643,182 +1541,134 @@ function Rhino3dmWorker() {
 
 				}
 
-				if ( mesh.faces().count > 0 ) {
+				if ( mesh.faces.count > 0 ) {
 
 					mesh.compact();
-					geometry = meshToThreejs( mesh );
-					faces.delete();
+					geometry = meshToBuffers( mesh );
 
 				}
 
 				mesh.delete();
-
 				break;
 
-			case rhino.ObjectType.Extrusion:
+			case 'Extrusion':
 
 				mesh = _geometry.getMesh( rhino.MeshType.Any );
 
 				if ( mesh ) {
 
-					geometry = meshToThreejs( mesh );
+					geometry = meshToBuffers( mesh );
 					mesh.delete();
 
 				}
 
 				break;
 
-			case rhino.ObjectType.TextDot:
+			case 'SubD':
 
-				geometry = extractProperties( _geometry );
-
-				break;
-
-			case rhino.ObjectType.Light:
-
-				geometry = extractProperties( _geometry );
-
-				if ( geometry.lightStyle.name === 'LightStyle_WorldLinear' ) {
-
-					self.postMessage( { type: 'warning', id: taskID, data: {
-						message: `THREE.3DMLoader: No conversion exists for ${objectType.constructor.name} ${geometry.lightStyle.name}`,
-						type: 'no conversion',
-						guid: _attributes.id
-					}
-
-					} );
-
-				}
-
-				break;
-
-			case rhino.ObjectType.InstanceReference:
-
-				geometry = extractProperties( _geometry );
-				geometry.xform = extractProperties( _geometry.xform );
-				geometry.xform.array = _geometry.xform.toFloatArray( true );
-
-				break;
-
-			case rhino.ObjectType.SubD:
-
-				// TODO: precalculate resulting vertices and faces and warn on excessive results
+				// obj.geometry is copy-on-write: subdividing it leaves the file's SubD as it was.
 				_geometry.subdivide( subdivisionLevel );
-				mesh = rhino.Mesh.createFromSubDControlNet( _geometry, false );
+
+				// The texture-coordinate control net gives every SubD face its own vertices with the face's normal,
+				// so it shades flat: use it only when the object shows a texture, the smooth control net otherwise.
+				mesh = hasTexture( _attributes )
+					? rhino.Mesh.createFromSubDControlNetWithTextureCoordinates( _geometry )
+					: rhino.Mesh.createFromSubDControlNet( _geometry );
+
 				if ( mesh ) {
 
-					geometry = meshToThreejs( mesh );
+					geometry = meshToBuffers( mesh );
 					mesh.delete();
 
 				}
 
 				break;
 
-				/*
-				case rhino.ObjectType.Annotation:
-				case rhino.ObjectType.Hatch:
-				case rhino.ObjectType.ClipPlane:
-				*/
+			case 'TextDot':
+
+				geometry = { text: _geometry.text, fontFace: _geometry.fontFace, fontHeight: _geometry.fontHeight, point: xyz( _geometry.point ) };
+				break;
+
+			case 'Light':
+
+				geometry = {
+					lightStyle: { name: _geometry.lightStyle.constructor.name },
+					location: xyz( _geometry.location ),
+					direction: xyz( _geometry.direction ),
+					width: xyz( _geometry.width ),
+					length: xyz( _geometry.length ),
+					diffuse: color( _geometry.diffuse ),
+					intensity: _geometry.intensity,
+					spotAngleRadians: _geometry.spotAngleRadians
+				};
+
+				if ( geometry.lightStyle.name === 'LightStyle_WorldLinear' ) warn( `No conversion exists for ${objectType} ${geometry.lightStyle.name}`, 'no conversion', _attributes.objectId );
+
+				break;
+
+			case 'InstanceReference':
+
+				geometry = { parentIdefId: _geometry.parentIdefId, xform: { array: Array.from( rhino.Transform.toFloatArray( _geometry.xform, true ) ) } };
+				break;
 
 			default:
 
-				self.postMessage( { type: 'warning', id: taskID, data: {
-					message: `THREE.3DMLoader: Conversion not implemented for ${objectType.constructor.name}`,
-					type: 'not implemented',
-					guid: _attributes.id
-				}
-
-				} );
-
+				warn( `Conversion not implemented for ${objectType}`, 'not implemented', _attributes.objectId );
 				break;
 
 		}
 
-		if ( geometry ) {
+		if ( ! geometry ) {
 
-			attributes = extractProperties( _attributes );
-			attributes.geometry = extractProperties( _geometry );
-
-			if ( _attributes.groupCount > 0 ) {
-
-				attributes.groupIds = _attributes.getGroupList();
-
-			}
-
-			if ( _attributes.userStringCount > 0 ) {
-
-				attributes.userStrings = _attributes.getUserStrings();
-
-			}
-
-			if ( _geometry.userStringCount > 0 ) {
-
-				attributes.geometry.userStrings = _geometry.getUserStrings();
-
-			}
-
-			if ( _attributes.decals().count > 0 ) {
-
-				self.postMessage( { type: 'warning', id: taskID, data: {
-					message: 'THREE.3DMLoader: No conversion exists for the decals associated with this object.',
-					type: 'no conversion',
-					guid: _attributes.id
-				}
-
-				} );
-
-			}
-
-			attributes.drawColor = _attributes.drawColor( doc );
-
-			objectType = objectType.constructor.name;
-			objectType = objectType.substring( 11, objectType.length );
-
-			return { geometry, attributes, objectType };
-
-		} else {
-
-			self.postMessage( { type: 'warning', id: taskID, data: {
-				message: `THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.`,
-				type: 'missing mesh',
-				guid: _attributes.id
-			}
-
-			} );
+			if ( objectType === 'Brep' || objectType === 'Extrusion' || objectType === 'SubD' ) warn( `${objectType} has no associated mesh geometry.`, 'missing mesh', _attributes.objectId );
+			return;
 
 		}
 
+		const attributes = extractProperties( _attributes );
+		attributes.id = _attributes.objectId; // 8.x name
+		attributes.geometry = extractProperties( _geometry );
+		attributes.drawColor = color( _attributes.drawColor( doc ) );
+
+		if ( _attributes.groupCount > 0 ) attributes.groupIds = _attributes.getGroupList();
+		if ( _attributes.userStringCount > 0 ) attributes.userStrings = _attributes.getUserStrings();
+		if ( _geometry.userStringCount > 0 ) attributes.geometry.userStrings = _geometry.getUserStrings();
+
+		if ( _attributes.decals.count > 0 ) warn( 'No conversion exists for the decals associated with this object.', 'no conversion', _attributes.objectId );
+
+		return { geometry, attributes, objectType };
+
 	}
 
+	function xyz( p ) {
+
+		return [ p.X, p.Y, p.Z ];
+
+	}
+
+	// Copies an object's own data: primitives, enums (as { name, value }) and plain objects (rhino3dm 9.2 value
+	// types such as Point3d and Transform). Wrapped C++ objects (lists, sub-objects, SubD components, ...) are
+	// skipped: following them walks linked structures without end (SubD vertex.next / previous).
 	function extractProperties( object ) {
 
 		const result = {};
 
 		for ( const property in object ) {
 
-			const value = object[ property ];
+			let value;
 
-			if ( typeof value !== 'function' ) {
+			try {
 
-				if ( typeof value === 'object' && value !== null && value.hasOwnProperty( 'constructor' ) ) {
+				value = object[ property ];
 
-					result[ property ] = { name: value.constructor.name, value: value.value };
+			} catch ( error ) {
 
-				} else if ( typeof value === 'object' && value !== null ) {
-
-					result[ property ] = extractProperties( value );
-
-				} else {
-
-					result[ property ] = value;
-
-				}
-
-			} else {
-
-				// these are functions that could be called to extract more data.
+				errorToObject( error );
+				continue;
 
 			}
+
+			result[ property ] = plainValue( value );
 
 		}
 
@@ -1826,80 +1676,103 @@ function Rhino3dmWorker() {
 
 	}
 
-	function curveToPoints( curve, pointLimit ) {
+	function plainValue( value ) {
+
+		if ( value === null || typeof value !== 'object' ) return typeof value === 'function' ? undefined : value;
+		if ( Object.prototype.hasOwnProperty.call( value, 'constructor' ) ) return { name: value.constructor.name, value: value.value }; // enum
+		if ( value.$$ ) return undefined; // wrapped C++ object
+		if ( ArrayBuffer.isView( value ) ) return Array.from( value );
+		if ( Array.isArray( value ) ) return value.map( plainValue );
+
+		const result = {};
+		for ( const key in value ) result[ key ] = plainValue( value[ key ] );
+		return result;
+
+	}
+
+	// A curve as a polyline: exact for lines and polylines, otherwise sampled with points added where the
+	// tangent turns by more than ~5.7 degrees.
+	function curveToPositions( curve ) {
+
+		const points = [];
+		curveToPoints( curve, 100, points );
+
+		const position = new Float32Array( points.length * 3 );
+
+		for ( let i = 0; i < points.length; i ++ ) {
+
+			position[ i * 3 ] = points[ i ].X;
+			position[ i * 3 + 1 ] = points[ i ].Y;
+			position[ i * 3 + 2 ] = points[ i ].Z;
+
+		}
+
+		return position;
+
+	}
+
+	function curveToPoints( curve, pointLimit, out ) {
 
 		let pointCount = pointLimit;
-		let rc = [];
-		const ts = [];
 
 		if ( curve instanceof rhino.LineCurve ) {
 
-			return [ curve.pointAtStart, curve.pointAtEnd ];
+			out.push( curve.pointAtStart, curve.pointAtEnd );
+			return;
 
 		}
 
 		if ( curve instanceof rhino.PolylineCurve ) {
 
-			pointCount = curve.pointCount;
-			for ( let i = 0; i < pointCount; i ++ ) {
-
-				rc.push( curve.point( i ) );
-
-			}
-
-			return rc;
+			for ( let i = 0; i < curve.pointCount; i ++ ) out.push( curve.point( i ) );
+			return;
 
 		}
 
 		if ( curve instanceof rhino.PolyCurve ) {
 
-			const segmentCount = curve.segmentCount;
-
-			for ( let i = 0; i < segmentCount; i ++ ) {
+			for ( let i = 0; i < curve.segmentCount; i ++ ) {
 
 				const segment = curve.segmentCurve( i );
-				const segmentArray = curveToPoints( segment, pointCount );
-				rc = rc.concat( segmentArray );
+				curveToPoints( segment, pointCount, out );
 				segment.delete();
 
 			}
 
-			return rc;
+			return;
 
 		}
 
 		if ( curve instanceof rhino.ArcCurve ) {
 
-			pointCount = Math.floor( curve.angleDegrees / 5 );
-			pointCount = pointCount < 2 ? 2 : pointCount;
-			// alternative to this hardcoded version: https://stackoverflow.com/a/18499923/2179399
+			pointCount = Math.max( 2, Math.floor( curve.angleDegrees / 5 ) );
 
 		}
 
 		if ( curve instanceof rhino.NurbsCurve && curve.degree === 1 ) {
 
-			const pLine = curve.tryGetPolyline();
+			const [ ok, polyline ] = curve.tryGetPolyline();
 
-			for ( let i = 0; i < pLine.count; i ++ ) {
+			if ( ok ) {
 
-				rc.push( pLine.get( i ) );
+				for ( let i = 0; i < polyline.count; i ++ ) out.push( polyline.get( i ) );
+				polyline.delete();
+				return;
 
 			}
-
-			pLine.delete();
-
-			return rc;
 
 		}
 
 		const domain = curve.domain;
 		const divisions = pointCount - 1.0;
+		const ts = [];
 
 		for ( let j = 0; j < pointCount; j ++ ) {
 
-			const t = domain[ 0 ] + ( j / divisions ) * ( domain[ 1 ] - domain[ 0 ] );
+			// The ends by index: T0 + ( T1 - T0 ) is not always T1 in floating point.
+			const t = j === pointCount - 1 ? domain.T1 : domain.T0 + ( j / divisions ) * ( domain.T1 - domain.T0 );
 
-			if ( t === domain[ 0 ] || t === domain[ 1 ] ) {
+			if ( j === 0 || j === pointCount - 1 ) {
 
 				ts.push( t );
 				continue;
@@ -1907,14 +1780,10 @@ function Rhino3dmWorker() {
 			}
 
 			const tan = curve.tangentAt( t );
-			const prevTan = curve.tangentAt( ts.slice( - 1 )[ 0 ] );
+			const prevTan = curve.tangentAt( ts[ ts.length - 1 ] );
 
-			// Duplicated from THREE.Vector3
-			// How to pass imports to worker?
-
-			const tS = tan[ 0 ] * tan[ 0 ] + tan[ 1 ] * tan[ 1 ] + tan[ 2 ] * tan[ 2 ];
-			const ptS = prevTan[ 0 ] * prevTan[ 0 ] + prevTan[ 1 ] * prevTan[ 1 ] + prevTan[ 2 ] * prevTan[ 2 ];
-
+			const tS = tan.X * tan.X + tan.Y * tan.Y + tan.Z * tan.Z;
+			const ptS = prevTan.X * prevTan.X + prevTan.Y * prevTan.Y + prevTan.Z * prevTan.Z;
 			const denominator = Math.sqrt( tS * ptS );
 
 			let angle;
@@ -1925,7 +1794,7 @@ function Rhino3dmWorker() {
 
 			} else {
 
-				const theta = ( tan.x * prevTan.x + tan.y * prevTan.y + tan.z * prevTan.z ) / denominator;
+				const theta = ( tan.X * prevTan.X + tan.Y * prevTan.Y + tan.Z * prevTan.Z ) / denominator;
 				angle = Math.acos( Math.max( - 1, Math.min( 1, theta ) ) );
 
 			}
@@ -1936,8 +1805,7 @@ function Rhino3dmWorker() {
 
 		}
 
-		rc = ts.map( t => curve.pointAt( t ) );
-		return rc;
+		for ( const t of ts ) out.push( curve.pointAt( t ) );
 
 	}
 
