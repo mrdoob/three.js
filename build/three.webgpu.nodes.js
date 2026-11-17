@@ -3,8 +3,8 @@
  * Copyright 2010-2026 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-import { DynamicDrawUsage, RenderObjectRefreshType, Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, error, UnsignedIntType, IntType, RedFormat, RedIntegerFormat, DepthFormat, DepthStencilFormat, AlphaFormat, RGFormat, RGIntegerFormat, RGBFormat, RGBIntegerFormat, EventDispatcher, generateUUID, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBufferAttribute, InterleavedBuffer, NoColorSpace, log as log$1, warnOnce, Texture, Compatibility, LessCompare, LessEqualCompare, GreaterCompare, GreaterEqualCompare, NearestFilter, Sphere, BackSide, DoubleSide, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking, ObjectSpaceNormalMap, RED_GREEN_RGTC2_Format, RG11_EAC_Format, DataTexture, RGBAFormat, FloatType, InstancedBufferAttribute, DataArrayTexture, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, NormalBlending, SrcAlphaFactor, OneMinusSrcAlphaFactor, AddEquation, MaterialBlending, NoBlending, Material, LineBasicMaterial, LineDashedMaterial, MeshNormalMaterial, SRGBColorSpace, RenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, HalfFloatType, ClampToEdgeWrapping, floorPowerOfTwo, LinearSRGBColorSpace, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, ByteType, UnsignedByteType, ShortType, UnsignedShortType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedInt101111Type, getByteLength, Object3D, LinearMipMapLinearFilter, Plane, OrthographicCamera, BufferGeometry, Float32BufferAttribute, BufferAttribute, UVMapping, VSMShadowMap, PCFShadowMap, BasicShadowMap, CubeDepthTexture, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, REVISION, Data3DTexture, PerspectiveCamera, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, Frustum, FrustumArray, PCFSoftShadowMap, yieldToMain, RGBAIntegerFormat, TimestampQuery, createCanvasElement, MaxEquation, MinEquation, ReverseSubtractEquation, SubtractEquation, OneMinusConstantAlphaFactor, ConstantAlphaFactor, OneMinusConstantColorFactor, ConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, ReversedDepthFuncs, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, R11_EAC_Format, SIGNED_R11_EAC_Format, SIGNED_RG11_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, EqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, isTypedArray, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
-export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, BezierInterpolant, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, Cylindrical, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, Euler, ExternalTexture, ExtrudeGeometry, Float16BufferAttribute, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HTMLTexture, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateBezier, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, KeyframeTrack, LOD, LatheGeometry, Layers, Light, LightShadow, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MathUtils, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, Path, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureSource, TextureUtils, Timer, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, getConsoleFunction, setConsoleFunction } from './three.core.js';
+import { DynamicDrawUsage, RenderObjectRefreshType, Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, error, UnsignedIntType, IntType, RedFormat, RedIntegerFormat, DepthFormat, DepthStencilFormat, AlphaFormat, RGFormat, RGIntegerFormat, RGBFormat, RGBIntegerFormat, EventDispatcher, generateUUID, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBufferAttribute, InterleavedBuffer, NoColorSpace, log as log$1, warnOnce, Texture, Compatibility, LessCompare, LessEqualCompare, GreaterCompare, GreaterEqualCompare, NearestFilter, Sphere, BackSide, DoubleSide, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking, ObjectSpaceNormalMap, RED_GREEN_RGTC2_Format, RG11_EAC_Format, DataTexture, RGBAFormat, FloatType, InstancedBufferAttribute, DataArrayTexture, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, NormalBlending, SrcAlphaFactor, OneMinusSrcAlphaFactor, AddEquation, MaterialBlending, NoBlending, Material, LineBasicMaterial, LineDashedMaterial, MeshNormalMaterial, SRGBColorSpace, RenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, HalfFloatType, ClampToEdgeWrapping, floorPowerOfTwo, LinearSRGBColorSpace, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, ByteType, UnsignedByteType, ShortType, UnsignedShortType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedInt101111Type, getByteLength, Object3D, LinearMipMapLinearFilter, Plane, OrthographicCamera, BufferGeometry, Float32BufferAttribute, BufferAttribute, UVMapping, VSMShadowMap, PCFShadowMap, BasicShadowMap, CubeDepthTexture, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, REVISION, Data3DTexture, PerspectiveCamera, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, Frustum, FrustumArray, PCFSoftShadowMap, yieldToMain, RGBAIntegerFormat, createCanvasElement, MaxEquation, MinEquation, ReverseSubtractEquation, SubtractEquation, OneMinusConstantAlphaFactor, ConstantAlphaFactor, OneMinusConstantColorFactor, ConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, ReversedDepthFuncs, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, R11_EAC_Format, SIGNED_R11_EAC_Format, SIGNED_RG11_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, EqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, isTypedArray, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
+export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, BezierInterpolant, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, Cylindrical, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, Euler, ExternalTexture, ExtrudeGeometry, Float16BufferAttribute, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HTMLTexture, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateBezier, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, KeyframeTrack, LOD, LatheGeometry, Layers, Light, LightShadow, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MathUtils, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, Path, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureSource, TextureUtils, Timer, TimestampQuery, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, getConsoleFunction, setConsoleFunction } from './three.core.js';
 
 const refreshUniforms = [
 	'alphaMap',
@@ -17209,11 +17209,11 @@ class ReferenceNode extends Node {
 
 		} else if ( uniformType === 'texture' ) {
 
-			node = texture( null );
+			node = uniformTexture( null );
 
 		} else if ( uniformType === 'cubeTexture' ) {
 
-			node = cubeTexture( null );
+			node = uniformCubeTexture( null );
 
 		} else {
 
@@ -31936,6 +31936,8 @@ class Animation {
 
 			this._requestId = this._context.requestAnimationFrame( update );
 
+			this.renderer.backend.resolveTimestamps();
+
 			if ( this.renderer._inspector.isRunning ) {
 
 				this.renderer._inspector.finish();
@@ -34270,7 +34272,6 @@ class Info {
 		 * @property {number} triangles - The number of rendered triangle primitives of the current frame.
 		 * @property {number} points - The number of rendered point primitives of the current frame.
 		 * @property {number} lines - The number of rendered line primitives of the current frame.
-		 * @property {number} timestamp - The timestamp of the frame.
 		 */
 		this.render = {
 			calls: 0,
@@ -34278,8 +34279,7 @@ class Info {
 			drawCalls: 0,
 			triangles: 0,
 			points: 0,
-			lines: 0,
-			timestamp: 0,
+			lines: 0
 		};
 
 		/**
@@ -34289,12 +34289,10 @@ class Info {
 		 * @readonly
 		 * @property {number} calls - The number of compute calls since the app has been started.
 		 * @property {number} frameCalls - The number of compute calls of the current frame.
-		 * @property {number} timestamp - The timestamp of the frame when using `renderer.computeAsync()`.
 		 */
 		this.compute = {
 			calls: 0,
-			frameCalls: 0,
-			timestamp: 0
+			frameCalls: 0
 		};
 
 		/**
@@ -34416,9 +34414,6 @@ class Info {
 
 		this.render.calls = 0;
 		this.compute.calls = 0;
-
-		this.render.timestamp = 0;
-		this.compute.timestamp = 0;
 
 		for ( const prop in this.memory ) {
 
@@ -46648,7 +46643,7 @@ class AtomicFunctionNode extends Node {
 	 *
 	 * @param {string} method - The signature of the atomic function to construct.
 	 * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
-	 * @param {Node} valueNode - The value that mutates the atomic variable.
+	 * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
 	 */
 	constructor( method, pointerNode, valueNode ) {
 
@@ -46821,6 +46816,12 @@ class AtomicFunctionNode extends Node {
 
 	}
 
+	static get ATOMIC_EXCHANGE() {
+
+		return 'atomicExchange';
+
+	}
+
 }
 
 /**
@@ -46830,7 +46831,7 @@ class AtomicFunctionNode extends Node {
  * @function
  * @param {string} method - The signature of the atomic function to construct.
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 const atomicNode = /*@__PURE__*/ nodeProxy( AtomicFunctionNode );
@@ -46842,7 +46843,7 @@ const atomicNode = /*@__PURE__*/ nodeProxy( AtomicFunctionNode );
  * @function
  * @param {string} method - The signature of the atomic function to construct.
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 const atomicFunc = ( method, pointerNode, valueNode ) => {
@@ -46867,87 +46868,106 @@ const atomicLoad = ( pointerNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_LOAD
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 const atomicStore = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_STORE, pointerNode, valueNode );
 
 /**
- * Increments the value stored in the atomic variable.
+ * Increments the value stored in the atomic variable
+ * and returns the value stored in the atomic variable before the operation.
  *
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 const atomicAdd = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_ADD, pointerNode, valueNode );
 
 /**
- * Decrements the value stored in the atomic variable.
+ * Decrements the value stored in the atomic variable
+ * and returns the value stored in the atomic variable before the operation.
  *
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 const atomicSub = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_SUB, pointerNode, valueNode );
 
 /**
- * Stores in an atomic variable the maximum between its current value and a parameter.
+ * Stores, in an atomic variable, the maximum between its current value and a parameter
+ * and returns the value stored in the atomic variable before the operation.
  *
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 const atomicMax = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_MAX, pointerNode, valueNode );
 
 /**
- * Stores in an atomic variable the minimum between its current value and a parameter.
+ * Stores, in an atomic variable, the minimum between its current value and a parameter
+ * and returns the value stored in the atomic variable before the operation.
  *
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 const atomicMin = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_MIN, pointerNode, valueNode );
 
 /**
- * Stores in an atomic variable the bitwise AND of its value with a parameter.
+ * Stores, in an atomic variable, the bitwise AND of its value with a parameter
+ * and returns the value stored in the atomic variable before the operation.
  *
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 const atomicAnd = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_AND, pointerNode, valueNode );
 
 /**
- * Stores in an atomic variable the bitwise OR of its value with a parameter.
+ * Stores, in an atomic variable, the bitwise OR of its value with a parameter
+ * and returns the value stored in the atomic variable before the operation.
  *
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 const atomicOr = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_OR, pointerNode, valueNode );
 
 /**
- * Stores in an atomic variable the bitwise XOR of its value with a parameter.
+ * Stores, in an atomic variable, the bitwise XOR of its value with a parameter
+ * and returns the value stored in the atomic variable before the operation.
  *
  * @tsl
  * @function
  * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
- * @param {Node} valueNode - The value that mutates the atomic variable.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
 const atomicXor = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_XOR, pointerNode, valueNode );
+
+/**
+ * Stores a value in the atomic variable and returns the original
+ * value stored in the atomic variable before the operation.
+ *
+ * @tsl
+ * @function
+ * @param {Node} pointerNode - An atomic variable or element of an atomic buffer.
+ * @param {Node<uint|int>} valueNode - The value that mutates the atomic variable.
+ * @returns {AtomicFunctionNode}
+ */
+const atomicExchange = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_EXCHANGE, pointerNode, valueNode );
 
 /**
  * This class represents a set of built in WGSL shader functions that sync
@@ -66635,11 +66655,16 @@ class Renderer {
 
 	}
 
-	async resolveTimestampsAsync( type = 'render' ) {
+	/**
+	 * @async
+	 * @deprecated since r188. Use {@link GPUTimer} instead.
+	 * @return {Promise<null>} A Promise that resolves with `null`.
+	 */
+	async resolveTimestampsAsync() {
 
-		if ( this._initialized === false ) await this.init();
+		warnOnce( 'Renderer: "resolveTimestampsAsync()" has been removed. Use "GPUTimer" instead.' ); // @deprecated r188
 
-		return this.backend.resolveTimestampsAsync( type );
+		return null;
 
 	}
 
@@ -70864,22 +70889,18 @@ class Backend {
 		this.domElement = null;
 
 		/**
-		 * A reference to the timestamp query pool.
-   		 *
-   		 * @type {{render: ?TimestampQueryPool, compute: ?TimestampQueryPool}}
-		 */
-		this.timestampQueryPool = {
-			[ TimestampQuery.RENDER ]: null,
-			[ TimestampQuery.COMPUTE ]: null
-		};
-
-		/**
-		 * Whether to track timestamps with a Timestamp Query API or not.
+		 * The timestamp query pool of the GPU timers, created on first use.
 		 *
-		 * @type {boolean}
-		 * @default false
+		 * @type {?TimestampQueryPool}
+		 * @default null
 		 */
-		this.trackTimestamp = ( parameters.trackTimestamp === true );
+		this.timestampQueryPool = null;
+
+		if ( parameters.trackTimestamp === true ) {
+
+			warnOnce( 'WebGPURenderer: "trackTimestamp" has been removed. Use "GPUTimer" instead.' ); // @deprecated r188
+
+		}
 
 	}
 
@@ -71320,8 +71341,8 @@ class Backend {
 	// utils
 
 	/**
-	 * Updates a unique identifier for the given render context that can be used
-	 * to allocate resources like occlusion queries or timestamp queries.
+	 * Updates a unique identifier for the given render or compute call. The inspector
+	 * uses it to identify the call across frames.
 	 *
 	 * @param {RenderContext|ComputeNode|Array<ComputeNode>} abstractRenderContext - The render context.
 	 */
@@ -71355,8 +71376,7 @@ class Backend {
 	}
 
 	/**
-	 * Returns a unique identifier for the given render context that can be used
-	 * to allocate resources like occlusion queries or timestamp queries.
+	 * Returns the unique identifier of the given render or compute call.
 	 *
 	 * @param {RenderContext|ComputeNode} abstractRenderContext - The render context.
 	 * @return {string} The unique identifier.
@@ -71364,49 +71384,6 @@ class Backend {
 	getTimestampUID( abstractRenderContext ) {
 
 		return this.get( abstractRenderContext ).timestampUID;
-
-	}
-
-	/**
-	 * Returns all timestamp frames for the given type.
-	 *
-	 * @param {string} type - The type of the time stamp.
-	 * @return {Array<number>} The timestamp frames.
-	 */
-	getTimestampFrames( type ) {
-
-		const queryPool = this.timestampQueryPool[ type ];
-
-		return queryPool ? queryPool.getTimestampFrames() : [];
-
-	}
-
-	/**
-	 * Returns the query pool for the given uid.
-	 *
-	 * @param {string} uid - The unique identifier.
-	 * @return {TimestampQueryPool} The query pool.
-	 */
-	_getQueryPool( uid ) {
-
-		const type = uid.startsWith( 'c:' ) ? TimestampQuery.COMPUTE : TimestampQuery.RENDER;
-		const queryPool = this.timestampQueryPool[ type ];
-
-		return queryPool;
-
-	}
-
-	/**
-	 * Returns the timestamp for the given uid.
-	 *
-	 * @param {string} uid - The unique identifier.
-	 * @return {number} The timestamp.
-	 */
-	getTimestamp( uid ) {
-
-		const queryPool = this._getQueryPool( uid );
-
-		return queryPool.getTimestamp( uid );
 
 	}
 
@@ -71423,42 +71400,53 @@ class Backend {
 	}
 
 	/**
-	 * Returns `true` if a timestamp for the given uid is available.
+	 * Creates the timestamp query pool of the GPU timers.
 	 *
-	 * @param {string} uid - The unique identifier.
-	 * @return {boolean} Whether the timestamp is available or not.
+	 * @abstract
+	 * @return {TimestampQueryPool} The timestamp query pool.
 	 */
-	hasTimestampQuery( uid ) {
-
-		const queryPool = this._getQueryPool( uid );
-
-		return queryPool.hasTimestampQuery( uid );
-
-	}
+	createTimestampQueryPool() {}
 
 	/**
-	 * Starts a GPU timer measurement. Backends that support timing return the measurement,
-	 * others return `null`.
+	 * Starts a GPU timer measurement. While a timer is active, the render and compute calls
+	 * allocate timestamp queries.
 	 *
-	 * @return {?(number|Object)} The measurement, specific to the backend.
+	 * @return {?Object} The timer, or `null` without timestamp queries.
 	 */
 	beginTimer() {
 
-		return null;
+		if ( this.hasTimestamp === false ) return null;
+
+		if ( this.timestampQueryPool === null ) this.timestampQueryPool = this.createTimestampQueryPool();
+
+		return this.timestampQueryPool.beginTimer();
 
 	}
 
 	/**
-	 * Ends the given measurement and returns its GPU time in milliseconds, or `null` when the
-	 * backend doesn't support timing.
+	 * Ends the given measurement and returns its GPU time in milliseconds once its queries
+	 * are read back, or `null` when the backend doesn't support timing.
 	 *
 	 * @async
-	 * @param {?(number|Object)} measurement - The measurement returned by {@link Backend#beginTimer}.
+	 * @param {?Object} timer - The value returned by {@link Backend#beginTimer}.
 	 * @return {Promise<?number>} The GPU time in milliseconds.
 	 */
-	async endTimer( /* measurement */ ) {
+	async endTimer( timer ) {
 
-		return null;
+		if ( timer === null ) return null;
+
+		await this.timestampQueryPool.endTimer( timer );
+
+		return this.timestampQueryPool.getDuration( timer );
+
+	}
+
+	/**
+	 * Reads back the timestamp queries. The renderer calls this method once per frame.
+	 */
+	resolveTimestamps() {
+
+		if ( this.timestampQueryPool !== null ) this.timestampQueryPool.resolveQueries();
 
 	}
 
@@ -71496,39 +71484,6 @@ class Backend {
 		}
 
 		return occlusionData;
-
-	}
-
-	/**
-	 * Resolves the time stamp for the given render context and type.
-	 *
-	 * @async
-	 * @abstract
-	 * @param {string} [type='render'] - The type of the time stamp.
-	 * @return {Promise<number>} A Promise that resolves with the time stamp.
-	 */
-	async resolveTimestampsAsync( type = 'render' ) {
-
-		if ( ! this.trackTimestamp ) {
-
-			warnOnce( 'WebGPURenderer: Timestamp tracking is disabled.' );
-			return;
-
-		}
-
-		const queryPool = this.timestampQueryPool[ type ];
-
-		if ( ! queryPool ) {
-
-			return;
-
-		}
-
-		const duration = await queryPool.resolveQueriesAsync();
-
-		this.renderer.info[ type ].timestamp = duration;
-
-		return duration;
 
 	}
 
@@ -71731,15 +71686,7 @@ class Backend {
 	 */
 	async dispose() {
 
-		for ( const queryPool of Object.values( this.timestampQueryPool ) ) {
-
-			if ( queryPool !== null ) {
-
-				await queryPool.dispose();
-
-			}
-
-		}
+		if ( this.timestampQueryPool !== null ) await this.timestampQueryPool.dispose();
 
 	}
 
@@ -76009,7 +75956,9 @@ class WebGLBufferRenderer {
 }
 
 /**
- * Abstract base class of a timestamp query pool.
+ * Abstract base class of a timestamp query pool. While GPU timers are active, the backend
+ * allocates queries for its render and compute calls. Each query keeps the timers that were
+ * active when it was allocated and adds its timestamps to them once it is read back.
  *
  * @abstract
  */
@@ -76023,35 +75972,12 @@ class TimestampQueryPool {
 	constructor( maxQueries = 256 ) {
 
 		/**
-		 * Whether to track timestamps or not.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.trackTimestamp = true;
-
-		/**
 		 * Maximum number of queries this pool can hold.
 		 *
 		 * @type {number}
 		 * @default 256
 		 */
 		this.maxQueries = maxQueries;
-
-		/**
-		 * How many queries allocated so far.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.currentQueryIndex = 0;
-
-		/**
-		 * Tracks offsets for different contexts.
-		 *
-		 * @type {Map<string, number>}
-		 */
-		this.queryOffsets = new Map();
 
 		/**
 		 * Whether the pool has been disposed or not.
@@ -76062,102 +75988,103 @@ class TimestampQueryPool {
 		this.isDisposed = false;
 
 		/**
-		 * The total frame duration until the next update.
+		 * The active GPU timers.
 		 *
-		 * @type {number}
-		 * @default 0
+		 * @type {Set<Object>}
 		 */
-		this.lastValue = 0;
-
-		/**
-		 * Stores all timestamp frames.
-		 *
-		 * @type {Array<number>}
-		 */
-		this.frames = [];
-
-		/**
-		 * This property is used to avoid multiple concurrent resolve operations.
-		 * The WebGL backend uses it as a boolean flag. In context of WebGPU, it holds
-		 * the promise of the current resolve operation.
-		 *
-		 * @type {boolean|Promise<number>}
-		 * @default false
-		 */
-		this.pendingResolve = false;
-
-		/**
-		 * Stores the latest timestamp for each render context.
-		 *
-		 * @type {Map<string, number>}
-		 */
-		this.timestamps = new Map();
+		this.timers = new Set();
 
 	}
 
 	/**
-	 * Returns all timestamp frames.
+	 * Starts a GPU timer. It measures the queries allocated until {@link TimestampQueryPool#endTimer}.
 	 *
-	 * @return {Array<number>} The timestamp frames.
+	 * @returns {Object} The timer.
 	 */
-	getTimestampFrames() {
+	beginTimer() {
 
-		return this.frames;
+		const timer = { pending: 0, ended: false, lost: false, begin: null, finish: null, elapsed: 0, resolve: null, promise: null };
+		timer.promise = new Promise( ( resolve ) => timer.resolve = resolve );
+
+		this.timers.add( timer );
+
+		return timer;
 
 	}
 
 	/**
-	 * Returns the timestamp for a given render context.
+	 * Ends the given GPU timer.
 	 *
-	 * @param {string} uid - A unique identifier for the render context.
-	 * @return {?number} The timestamp, or undefined if not available.
+	 * @param {Object} timer - The timer returned by {@link TimestampQueryPool#beginTimer}.
+	 * @returns {Promise<Object>} A Promise that resolves with the timer once all its queries are read back.
 	 */
-	getTimestamp( uid ) {
+	endTimer( timer ) {
 
-		let timestamp = this.timestamps.get( uid );
+		timer.ended = true;
 
-		if ( timestamp === undefined ) {
+		this.timers.delete( timer );
 
-			warn( `TimestampQueryPool: No timestamp available for uid ${ uid }.` );
+		if ( timer.pending === 0 ) timer.resolve( timer );
 
-			timestamp = 0;
+		return timer.promise;
+
+	}
+
+	/**
+	 * Returns the GPU time of the given timer in milliseconds.
+	 *
+	 * @abstract
+	 * @param {Object} timer - The timer, ended and resolved.
+	 * @returns {?number} The GPU time, or `null` if queries couldn't be read back.
+	 */
+	getDuration( /* timer */ ) {}
+
+	/**
+	 * Returns the active timers for a new query, `null` without active timers.
+	 *
+	 * @protected
+	 * @returns {?Array<Object>} The timers.
+	 */
+	_retainTimers() {
+
+		if ( this.timers.size === 0 ) return null;
+
+		const timers = [ ...this.timers ];
+
+		for ( const timer of timers ) timer.pending ++;
+
+		return timers;
+
+	}
+
+	/**
+	 * Releases the timers of a query once it is read back, and resolves the ended timers
+	 * without pending queries.
+	 *
+	 * @protected
+	 * @param {Array<Object>} timers - The timers returned by {@link TimestampQueryPool#_retainTimers}.
+	 * @param {boolean} lost - Whether the query couldn't be read back.
+	 */
+	_releaseTimers( timers, lost ) {
+
+		for ( const timer of timers ) {
+
+			if ( lost ) timer.lost = true;
+
+			timer.pending --;
+
+			if ( timer.ended && timer.pending === 0 ) timer.resolve( timer );
 
 		}
 
-		return timestamp;
-
 	}
 
 	/**
-	 * Returns whether a timestamp is available for a given render context.
-	 *
-	 * @param {string} uid - A unique identifier for the render context.
-	 * @return {boolean} True if a timestamp is available, false otherwise.
-	 */
-	hasTimestampQuery( uid ) {
-
-		return this.timestamps.has( uid );
-
-	}
-
-	/**
-	 * Allocate queries for a specific uid.
+	 * Reads back the queries that are ready.
 	 *
 	 * @abstract
-	 * @param {string} uid - A unique identifier for the render context.
-	 * @param {number} frameId - The current frame identifier.
-	 * @returns {?number}
 	 */
-	allocateQueriesForContext( /* uid, frameId */ ) {}
-
-	/**
-	 * Resolve all timestamps and return data (or process them).
-	 *
-	 * @abstract
-	 * @async
-	 * @returns {Promise<number>|number} The resolved timestamp value.
-	 */
-	async resolveQueriesAsync() {}
+	resolveQueries() {}
 
 	/**
 	 * Dispose of the query pool.
@@ -76169,8 +76096,9 @@ class TimestampQueryPool {
 }
 
 /**
- * Manages a pool of WebGL timestamp queries for performance measurement.
- * Handles creation, execution, and resolution of timer queries using WebGL extensions.
+ * Manages the WebGL timer queries of GPU timers. While timers are active, a `TIME_ELAPSED` query
+ * measures the render and compute calls. The query restarts when a timer begins or ends, so each
+ * query adds its elapsed time to the timers that were active during it.
  *
  * @augments TimestampQueryPool
  */
@@ -76179,389 +76107,169 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 	/**
 	 * Creates a new WebGL timestamp query pool.
 	 *
-	 * @param {WebGLRenderingContext|WebGL2RenderingContext} gl - The WebGL context.
-	 * @param {string} type - The type identifier for this query pool.
-	 * @param {number} [maxQueries=2048] - Maximum number of queries this pool can hold.
+	 * @param {WebGL2RenderingContext} gl - The WebGL context.
+	 * @param {EXTDisjointTimerQueryWebGL2} ext - The `EXT_disjoint_timer_query_webgl2` extension.
 	 */
-	constructor( gl, type, maxQueries = 2048 ) {
+	constructor( gl, ext ) {
 
-		super( maxQueries );
+		super();
 
 		this.gl = gl;
-		this.type = type;
+		this.ext = ext;
 
-		// Check for timer query extensions
-		this.ext = gl.getExtension( 'EXT_disjoint_timer_query_webgl2' ) ||
-				  gl.getExtension( 'EXT_disjoint_timer_query' );
-
-		if ( ! this.ext ) {
-
-			warn( 'EXT_disjoint_timer_query not supported; timestamps will be disabled.' );
-			this.trackTimestamp = false;
-			return;
-
-		}
-
-		// Create query objects
-		this.queries = [];
-		for ( let i = 0; i < this.maxQueries; i ++ ) {
-
-			this.queries.push( gl.createQuery() );
-
-		}
-
+		/**
+		 * The active query, `null` if there is none.
+		 *
+		 * @type {?Object}
+		 * @default null
+		 */
 		this.activeQuery = null;
-		this.queryStates = new Map(); // Track state of each query: 'inactive', 'started', 'ended'
+
+		/**
+		 * The ended queries waiting for their results.
+		 *
+		 * @type {Array<Object>}
+		 */
+		this.queries = [];
 
 	}
 
 	/**
-	 * Allocates a pair of queries for a given render context.
+	 * Starts a GPU timer.
 	 *
-	 * @param {string} uid - A unique identifier for the render context.
-	 * @returns {?number} The base offset for the allocated queries, or null if allocation failed.
+	 * @returns {Object} The timer.
 	 */
-	allocateQueriesForContext( uid ) {
+	beginTimer() {
 
-		if ( ! this.trackTimestamp ) return null;
+		this._endQuery();
 
-		if ( this.currentQueryIndex + 2 > this.maxQueries ) {
+		const timer = super.beginTimer();
 
-			this.resolveQueriesAsync();
+		this._beginQuery();
 
-			this.currentQueryIndex = 0;
-			this.queryOffsets.clear();
-			this.queryStates.clear();
-			this.activeQuery = null;
-
-		}
-
-		const baseOffset = this.currentQueryIndex;
-		this.currentQueryIndex += 2;
-
-		// Initialize query states
-		this.queryStates.set( baseOffset, 'inactive' );
-		this.queryOffsets.set( uid, baseOffset );
-
-		return baseOffset;
+		return timer;
 
 	}
 
 	/**
-	 * Begins a timestamp query for the specified render context.
+	 * Ends the given GPU timer.
 	 *
-	 * @param {string} uid - A unique identifier for the render context.
+	 * @param {Object} timer - The timer returned by {@link WebGLTimestampQueryPool#beginTimer}.
+	 * @returns {Promise<Object>} A Promise that resolves with the timer once all its queries are read back.
 	 */
-	beginQuery( uid ) {
+	endTimer( timer ) {
 
-		if ( ! this.trackTimestamp || this.isDisposed ) {
+		this._endQuery();
 
-			return;
+		const promise = super.endTimer( timer );
 
-		}
+		this._beginQuery();
 
-		const baseOffset = this.queryOffsets.get( uid );
-		if ( baseOffset == null ) {
-
-			return;
-
-		}
-
-		// Don't start a new query if there's an active one
-		if ( this.activeQuery !== null ) {
-
-			return;
-
-		}
-
-		const query = this.queries[ baseOffset ];
-		if ( ! query ) {
-
-			return;
-
-		}
-
-		try {
-
-			// Only begin if query is inactive
-			if ( this.queryStates.get( baseOffset ) === 'inactive' ) {
-
-				this.gl.beginQuery( this.ext.TIME_ELAPSED_EXT, query );
-				this.activeQuery = baseOffset;
-				this.queryStates.set( baseOffset, 'started' );
-
-			}
-
-		} catch ( e ) {
-
-			error( 'Error in beginQuery:', e );
-			this.activeQuery = null;
-			this.queryStates.set( baseOffset, 'inactive' );
-
-		}
+		return promise;
 
 	}
 
 	/**
-	 * Ends the active timestamp query for the specified render context.
+	 * Returns the GPU time of the given timer, the sum of its elapsed times.
 	 *
-	 * @param {string} uid - A unique identifier for the render context.
+	 * @param {Object} timer - The timer, ended and resolved.
+	 * @returns {?number} The GPU time in milliseconds, or `null` if a query was disjoint.
 	 */
-	endQuery( uid ) {
+	getDuration( timer ) {
 
-		if ( ! this.trackTimestamp || this.isDisposed ) {
-
-			return;
-
-		}
-
-		const baseOffset = this.queryOffsets.get( uid );
-		if ( baseOffset == null ) {
-
-			return;
-
-		}
-
-		// Only end if this is the active query
-		if ( this.activeQuery !== baseOffset ) {
-
-			return;
-
-		}
-
-		try {
-
-			this.gl.endQuery( this.ext.TIME_ELAPSED_EXT );
-			this.queryStates.set( baseOffset, 'ended' );
-			this.activeQuery = null;
-
-		} catch ( e ) {
-
-			error( 'Error in endQuery:', e );
-			// Reset state on error
-			this.queryStates.set( baseOffset, 'inactive' );
-			this.activeQuery = null;
-
-		}
+		return timer.lost ? null : timer.elapsed;
 
 	}
 
 	/**
-	 * Asynchronously resolves all completed queries and returns the total duration.
-	 *
-	 * @async
-	 * @returns {Promise<number>} The total duration in milliseconds, or the last valid value if resolution fails.
+	 * Reads back the ended queries whose results are available.
 	 */
-	async resolveQueriesAsync() {
+	resolveQueries() {
 
-		if ( ! this.trackTimestamp || this.pendingResolve ) {
+		if ( this.queries.length === 0 || this.isDisposed ) return;
 
-			return this.lastValue;
+		const gl = this.gl;
+		const disjoint = gl.getParameter( this.ext.GPU_DISJOINT_EXT );
 
-		}
+		this.queries = this.queries.filter( ( { query, timers } ) => {
 
-		this.pendingResolve = true;
+			if ( disjoint === false && gl.getQueryParameter( query, gl.QUERY_RESULT_AVAILABLE ) === false ) return true;
 
-		try {
+			if ( disjoint === false ) {
 
-			// Wait for all ended queries to complete
-			const resolvePromises = new Map();
+				const elapsed = gl.getQueryParameter( query, gl.QUERY_RESULT ) / 1e6;
 
-			for ( const [ uid, baseOffset ] of this.queryOffsets ) {
-
-				const state = this.queryStates.get( baseOffset );
-
-				if ( state === 'ended' ) {
-
-					const query = this.queries[ baseOffset ];
-					resolvePromises.set( uid, this.resolveQuery( query ) );
-
-				}
+				for ( const timer of timers ) timer.elapsed += elapsed;
 
 			}
 
-			if ( resolvePromises.size === 0 ) {
+			this._releaseTimers( timers, disjoint );
 
-				return this.lastValue;
+			gl.deleteQuery( query );
 
-			}
-
-			//
-
-			const framesDuration = {};
-
-			const frames = [];
-
-			this.timestamps.clear();
-
-			for ( const [ uid, promise ] of resolvePromises ) {
-
-				const match = uid.match( /^(.*):f(\d+)$/ );
-				const frame = parseInt( match[ 2 ] );
-
-				if ( frames.includes( frame ) === false ) {
-
-					frames.push( frame );
-
-				}
-
-				if ( framesDuration[ frame ] === undefined ) framesDuration[ frame ] = 0;
-
-				const duration = await promise;
-
-				this.timestamps.set( uid, duration );
-
-				framesDuration[ frame ] += duration;
-
-			}
-
-			// Return the total duration of the last frame
-			const totalDuration = framesDuration[ frames[ frames.length - 1 ] ];
-
-			// Store the last valid result
-			this.lastValue = totalDuration;
-			this.frames = frames;
-
-			// Reset states
-			this.currentQueryIndex = 0;
-			this.queryOffsets.clear();
-			this.queryStates.clear();
-			this.activeQuery = null;
-
-			return totalDuration;
-
-		} catch ( e ) {
-
-			error( 'Error resolving queries:', e );
-			return this.lastValue;
-
-		} finally {
-
-			this.pendingResolve = false;
-
-		}
-
-	}
-
-	/**
-	 * Resolves a single query, checking for completion and disjoint operation.
-	 *
-	 * @async
-	 * @param {WebGLQuery} query - The query object to resolve.
-	 * @returns {Promise<number>} The elapsed time in milliseconds.
-	 */
-	async resolveQuery( query ) {
-
-		return new Promise( ( resolve ) => {
-
-			if ( this.isDisposed ) {
-
-				resolve( this.lastValue );
-				return;
-
-			}
-
-			let timeoutId;
-			let isResolved = false;
-
-			const cleanup = () => {
-
-				if ( timeoutId ) {
-
-					clearTimeout( timeoutId );
-					timeoutId = null;
-
-				}
-
-			};
-
-			const finalizeResolution = ( value ) => {
-
-				if ( ! isResolved ) {
-
-					isResolved = true;
-					cleanup();
-					resolve( value );
-
-				}
-
-			};
-
-			const checkQuery = () => {
-
-				if ( this.isDisposed ) {
-
-					finalizeResolution( this.lastValue );
-					return;
-
-				}
-
-				try {
-
-					// Check if the GPU timer was disjoint (i.e., timing was unreliable)
-					const disjoint = this.gl.getParameter( this.ext.GPU_DISJOINT_EXT );
-					if ( disjoint ) {
-
-						finalizeResolution( this.lastValue );
-						return;
-
-					}
-
-					const available = this.gl.getQueryParameter( query, this.gl.QUERY_RESULT_AVAILABLE );
-					if ( ! available ) {
-
-						timeoutId = setTimeout( checkQuery, 1 );
-						return;
-
-					}
-
-					const elapsed = this.gl.getQueryParameter( query, this.gl.QUERY_RESULT );
-					resolve( Number( elapsed ) / 1e6 ); // Convert nanoseconds to milliseconds
-
-				} catch ( e ) {
-
-					error( 'Error checking query:', e );
-					resolve( this.lastValue );
-
-				}
-
-			};
-
-			checkQuery();
+			return false;
 
 		} );
 
 	}
 
 	/**
-	 * Releases all resources held by this query pool.
-	 * This includes deleting all query objects and clearing internal state.
+	 * Starts a query for the active timers.
+	 *
+	 * @private
+	 */
+	_beginQuery() {
+
+		if ( this.isDisposed ) return;
+
+		const timers = this._retainTimers();
+
+		if ( timers === null ) return;
+
+		const query = this.gl.createQuery();
+
+		this.gl.beginQuery( this.ext.TIME_ELAPSED_EXT, query );
+
+		this.activeQuery = { query, timers };
+
+	}
+
+	/**
+	 * Ends the active query.
+	 *
+	 * @private
+	 */
+	_endQuery() {
+
+		if ( this.activeQuery === null ) return;
+
+		this.gl.endQuery( this.ext.TIME_ELAPSED_EXT );
+		this.gl.flush();
+
+		this.queries.push( this.activeQuery );
+		this.activeQuery = null;
+
+	}
+
+	/**
+	 * Dispose of the query pool.
 	 */
 	dispose() {
 
-		if ( this.isDisposed ) {
+		if ( this.isDisposed ) return;
 
-			return;
-
-		}
+		this._endQuery();
 
 		this.isDisposed = true;
 
-		if ( ! this.trackTimestamp ) return;
-
-		for ( const query of this.queries ) {
+		for ( const { query, timers } of this.queries ) {
 
 			this.gl.deleteQuery( query );
+			this._releaseTimers( timers, true );
 
 		}
 
 		this.queries = [];
-		this.queryStates.clear();
-		this.queryOffsets.clear();
-		this.timestamps.clear();
-		this.frames = [];
-		this.lastValue = 0;
-		this.activeQuery = null;
 
 	}
 
@@ -76707,10 +76415,6 @@ class WebGLBackend extends Backend {
 		 * @default null
 		 */
 		this.disjoint = null;
-
-		// GPU timers. A timer is one TIME_ELAPSED query around everything issued between its begin and end.
-		// The extension allows a single active query, so timers can't overlap here
-		this._timerQuery = null;
 
 		/**
 		* A reference to the `KHR_parallel_shader_compile` extension. `null` if the
@@ -76962,133 +76666,15 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Inits a time stamp query for the given render context.
+	 * Creates the timestamp query pool of the GPU timers.
 	 *
-	 * @param {string} type - The type of the timestamp query.
-	 * @param {string} uid - A unique identifier for the timestamp query.
+	 * @return {WebGLTimestampQueryPool} The timestamp query pool.
 	 */
-	initTimestampQuery( type, uid ) {
+	createTimestampQueryPool() {
 
-		// TODO: only one TIME_ELAPSED query can be active, so passes inside a timer are missing from
-		// trackTimestamp. Remove once trackTimestamp is replaced by timers
-		if ( ! this.disjoint || ! this.trackTimestamp || this._timerQuery !== null ) {
-
-			return;
-
-		}
-
-		if ( ! this.timestampQueryPool[ type ] ) {
-
-			// TODO: Variable maxQueries?
-			this.timestampQueryPool[ type ] = new WebGLTimestampQueryPool( this.gl, type, 2048 );
-
-		}
-
-		const timestampQueryPool = this.timestampQueryPool[ type ];
-
-		const baseOffset = timestampQueryPool.allocateQueriesForContext( uid );
-
-		if ( baseOffset !== null ) {
-
-			timestampQueryPool.beginQuery( uid );
-
-		}
+		return new WebGLTimestampQueryPool( this.gl, this.disjoint );
 
 	}
-
-	// timestamp utils
-
-	/**
-	 * Prepares the timestamp buffer.
-	 *
-	 * @param {string} type - The type of the timestamp query.
-	 * @param {string} uid - A unique identifier for the timestamp query.
-	 */
-	prepareTimestampBuffer( type, uid ) {
-
-		if ( ! this.disjoint || ! this.trackTimestamp || this._timerQuery !== null ) {
-
-			return;
-
-		}
-
-		const timestampQueryPool = this.timestampQueryPool[ type ];
-
-		timestampQueryPool.endQuery( uid );
-
-	}
-
-	/**
-	 * Starts a GPU timer measurement.
-	 *
-	 * @return {?WebGLQuery} The query timing the measurement, or `null` without the
-	 * `EXT_disjoint_timer_query_webgl2` extension or while another timer is running.
-	 */
-	beginTimer() {
-
-		if ( this.disjoint === null ) {
-
-			return null;
-
-		}
-
-		if ( this._timerQuery !== null ) {
-
-			warnOnce( 'WebGLBackend: GPU timers can not overlap in WebGL.' );
-			return null;
-
-		}
-
-		const gl = this.gl;
-		const query = gl.createQuery();
-
-		gl.beginQuery( this.disjoint.TIME_ELAPSED_EXT, query );
-
-		this._timerQuery = query;
-
-		return query;
-
-	}
-
-	/**
-	 * Ends the given measurement and returns its GPU time in milliseconds.
-	 *
-	 * @async
-	 * @param {?WebGLQuery} query - The value returned by {@link WebGLBackend#beginTimer}.
-	 * @return {Promise<?number>} The GPU time in milliseconds, or `null` if the GPU clock was unreliable.
-	 */
-	async endTimer( query ) {
-
-		if ( query === null ) {
-
-			return null;
-
-		}
-
-		const gl = this.gl;
-
-		gl.endQuery( this.disjoint.TIME_ELAPSED_EXT );
-		gl.flush();
-
-		this._timerQuery = null;
-
-		// the result arrives a frame or more later
-
-		while ( gl.getQueryParameter( query, gl.QUERY_RESULT_AVAILABLE ) === false ) {
-
-			await new Promise( resolve => setTimeout( resolve, 1 ) );
-
-		}
-
-		const disjoint = gl.getParameter( this.disjoint.GPU_DISJOINT_EXT );
-		const elapsed = disjoint ? null : gl.getQueryParameter( query, gl.QUERY_RESULT ) / 1e6;
-
-		gl.deleteQuery( query );
-
-		return elapsed;
-
-	}
-
 
 	/**
 	 * Returns the backend's rendering context.
@@ -77139,8 +76725,6 @@ class WebGLBackend extends Backend {
 		state.setScissorTest( renderContext.scissor );
 
 		//
-
-		this.initTimestampQuery( TimestampQuery.RENDER, this.getTimestampUID( renderContext ) );
 
 		renderContextData.previousContext = this._currentContext;
 		this._currentContext = renderContext;
@@ -77254,8 +76838,6 @@ class WebGLBackend extends Backend {
 			state.setScissorTest( previousContext.scissor );
 
 		}
-
-		this.prepareTimestampBuffer( TimestampQuery.RENDER, this.getTimestampUID( renderContext ) );
 
 	}
 
@@ -77540,14 +77122,13 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
 	 */
-	beginCompute( computeGroup ) {
+	beginCompute( /*computeGroup*/ ) {
 
 		const { state, gl } = this;
 
 		//
 
 		state.bindFramebuffer( gl.FRAMEBUFFER, null );
-		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ) );
 
 	}
 
@@ -77673,15 +77254,13 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
 	 */
-	finishCompute( computeGroup ) {
+	finishCompute( /*computeGroup*/ ) {
 
 		const { state, gl } = this;
 
 		this.discard = false;
 
 		state.disable( gl.RASTERIZER_DISCARD );
-
-		this.prepareTimestampBuffer( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ) );
 
 		if ( this._currentContext ) {
 
@@ -81085,27 +80664,18 @@ class WebGPUTexturePassUtils extends DataMap {
 	/**
 	 * Constructs a new utility object.
 	 *
-	 * @param {WebGPUBackend} backend - The WebGPU backend.
+	 * @param {GPUDevice} device - The WebGPU device.
 	 */
-	constructor( backend ) {
+	constructor( device ) {
 
 		super();
-
-		/**
-		 * A reference to the WebGPU backend.
-		 *
-		 * @type {WebGPUBackend}
-		 */
-		this.backend = backend;
 
 		/**
 		 * The WebGPU device.
 		 *
 		 * @type {GPUDevice}
 		 */
-		this.device = backend.device;
-
-		const device = this.device;
+		this.device = device;
 
 		const mipmapSource = `
 struct VarysStruct {
@@ -81348,12 +80918,6 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 
 			_renderPassDescriptor.colorAttachments.push( _colorAttachment );
 
-			if ( this.backend._activeTimers > 0 ) {
-
-				this.backend._setTimerQueries( _renderPassDescriptor );
-
-			}
-
 			const passEncoder = commandEncoder.beginRenderPass( _renderPassDescriptor );
 
 			_renderPassDescriptor.reset();
@@ -81498,23 +81062,13 @@ fn main_cube( Varys: VarysStruct ) -> @location( 0 ) vec4<f32> {
 	 */
 	_mipmapRunBundles( commandEncoder, passes ) {
 
-		const backend = this.backend;
 		const levels = passes.length;
 
 		for ( let i = 0; i < levels; i ++ ) {
 
 			const pass = passes[ i ];
-			const descriptor = pass.passDescriptor;
 
-			if ( backend._activeTimers > 0 ) {
-
-				backend._setTimerQueries( descriptor );
-
-			}
-
-			const passEncoder = commandEncoder.beginRenderPass( descriptor );
-
-			descriptor.timestampWrites = undefined;
+			const passEncoder = commandEncoder.beginRenderPass( pass.passDescriptor );
 
 			passEncoder.executeBundles( pass.renderBundles );
 
@@ -82970,7 +82524,7 @@ class WebGPUTextureUtils {
 
 		if ( passUtils === null ) {
 
-			this._passUtils = passUtils = new WebGPUTexturePassUtils( this.backend );
+			this._passUtils = passUtils = new WebGPUTexturePassUtils( this.backend.device );
 
 		}
 
@@ -84598,9 +84152,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( textureData.dimensionsSnippet === undefined ) textureData.dimensionsSnippet = {};
 
-		let textureDimensionNode = textureData.dimensionsSnippet[ levelSnippet ];
+		const dimensionsKey = textureProperty + ':' + levelSnippet;
 
-		if ( textureData.dimensionsSnippet[ levelSnippet ] === undefined ) {
+		let textureDimensionNode = textureData.dimensionsSnippet[ dimensionsKey ];
+
+		if ( textureDimensionNode === undefined ) {
 
 			let textureDimensionsParams;
 			let dimensionType;
@@ -84632,7 +84188,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			textureDimensionNode = new VarNode( new ExpressionNode( `textureDimensions( ${ textureDimensionsParams } )`, dimensionType ) );
 
-			textureData.dimensionsSnippet[ levelSnippet ] = textureDimensionNode;
+			textureData.dimensionsSnippet[ dimensionsKey ] = textureDimensionNode;
 
 			if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.is3DTexture || texture.isData3DTexture ) {
 
@@ -89454,8 +89010,11 @@ const _commandEncoderDescriptor$1 = new GPUCommandEncoderDescriptor();
 const _querySetDescriptor$1 = new GPUQuerySetDescriptor();
 
 /**
- * Manages a pool of WebGPU timestamp queries for performance measurement.
- * Extends the base TimestampQueryPool to provide WebGPU-specific implementation.
+ * Manages a pool of WebGPU timestamp queries for GPU timers. Each pass writes a begin and an
+ * end timestamp, a timer measures from the earliest begin to the latest end of its passes.
+ *
+ * Only one readback is in flight. When the query set is full meanwhile, it waits for its own
+ * readback and the following passes continue in another query set, so no query is dropped.
  *
  * @augments TimestampQueryPool
  */
@@ -89465,26 +89024,60 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	 * Creates a new WebGPU timestamp query pool.
 	 *
 	 * @param {GPUDevice} device - The WebGPU device to create queries on.
-	 * @param {string} type - The type identifier for this query pool.
-	 * @param {number} [maxQueries=2048] - Maximum number of queries this pool can hold.
+	 * @param {number} [maxQueries=4096] - Maximum number of queries of a query set.
 	 */
-	constructor( device, type, maxQueries = 2048 ) {
+	constructor( device, maxQueries = 4096 ) {
 
 		super( maxQueries );
 		this.device = device;
-		this.type = type;
 
-		_querySetDescriptor$1.label = `queryset_global_timestamp_${type}`;
-		_querySetDescriptor$1.type = 'timestamp';
-		_querySetDescriptor$1.count = this.maxQueries;
+		/**
+		 * The query set the passes write to.
+		 *
+		 * @type {GPUQuerySet}
+		 */
+		this.querySet = this._createQuerySet();
 
-		this.querySet = this.device.createQuerySet( _querySetDescriptor$1 );
+		/**
+		 * How many queries of the current query set are allocated.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.currentQueryIndex = 0;
 
-		_querySetDescriptor$1.reset();
+		/**
+		 * The timers of each allocated query pair of the current query set, by the index of its first query.
+		 *
+		 * @type {Map<number, Array<Object>>}
+		 */
+		this.queryTimers = new Map();
+
+		/**
+		 * The full query sets waiting for their readback.
+		 *
+		 * @type {Array<{querySet: GPUQuerySet, queryTimers: Map<number, Array<Object>>, queryCount: number}>}
+		 */
+		this.fullQuerySets = [];
+
+		/**
+		 * The query sets that were read back and can be reused.
+		 *
+		 * @type {Array<GPUQuerySet>}
+		 */
+		this.freeQuerySets = [];
+
+		/**
+		 * The readback in flight, `null` if there is none.
+		 *
+		 * @type {?Promise}
+		 * @default null
+		 */
+		this.pendingResolve = null;
 
 		const bufferSize = this.maxQueries * 8;
 
-		_bufferDescriptor$1.label = `buffer_timestamp_resolve_${type}`;
+		_bufferDescriptor$1.label = 'buffer_gpu_timer_resolve';
 		_bufferDescriptor$1.size = bufferSize;
 		_bufferDescriptor$1.usage = GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC;
 
@@ -89492,7 +89085,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 		_bufferDescriptor$1.reset();
 
-		_bufferDescriptor$1.label = `buffer_timestamp_result_${type}`;
+		_bufferDescriptor$1.label = 'buffer_gpu_timer_result';
 		_bufferDescriptor$1.size = bufferSize;
 		_bufferDescriptor$1.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
 
@@ -89503,195 +89096,171 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	}
 
 	/**
-	 * Allocates a pair of queries for a given render context.
+	 * Allocates a pair of queries for the active timers.
 	 *
-	 * @param {string} uid - A unique identifier for the render context.
-	 * @returns {?number} The base offset for the allocated queries, or null if allocation failed.
+	 * @returns {?number} The index of the first query in {@link WebGPUTimestampQueryPool#querySet}, or `null` without active timers.
 	 */
-	allocateQueriesForContext( uid ) {
+	allocateQueries() {
 
-		if ( ! this.trackTimestamp || this.isDisposed ) return null;
+		if ( this.isDisposed || this.timers.size === 0 ) return null;
 
 		if ( this.currentQueryIndex + 2 > this.maxQueries ) {
 
-			this.resolveQueriesAsync();
+			// the query set is full, it waits for its readback and the passes continue in another one
 
-			this.currentQueryIndex = 0;
-			this.queryOffsets.clear();
+			this.fullQuerySets.push( this._takeQueries() );
+
+			this.querySet = this.freeQuerySets.length > 0 ? this.freeQuerySets.pop() : this._createQuerySet();
 
 		}
 
 		const baseOffset = this.currentQueryIndex;
 		this.currentQueryIndex += 2;
 
-		this.queryOffsets.set( uid, baseOffset );
+		this.queryTimers.set( baseOffset, this._retainTimers() );
 
 		return baseOffset;
 
 	}
 
 	/**
-	 * Asynchronously resolves all pending queries and returns the total duration.
-	 * If there's already a pending resolve operation, returns that promise instead.
+	 * Returns the GPU time of the given timer, from the earliest begin to the latest end of its passes.
+	 *
+	 * @param {Object} timer - The timer, ended and resolved.
+	 * @returns {?number} The GPU time in milliseconds, or `null` if queries couldn't be read back.
+	 */
+	getDuration( timer ) {
+
+		if ( timer.lost ) return null;
+
+		return timer.begin === null ? 0 : Number( timer.finish - timer.begin ) / 1e6;
+
+	}
+
+	/**
+	 * Reads back the oldest full query set, or the current one. Only one readback is in flight,
+	 * queries allocated meanwhile are read back with the next ones.
+	 */
+	resolveQueries() {
+
+		if ( this.pendingResolve !== null || this.isDisposed ) return;
+
+		let queries = this.fullQuerySets.shift();
+
+		if ( queries === undefined ) {
+
+			if ( this.currentQueryIndex === 0 ) return;
+
+			// the current query set is read in place, the following passes write after the readback is submitted
+
+			queries = this._takeQueries();
+
+		}
+
+		this.pendingResolve = this._resolveQueries( queries ).finally( () => this.pendingResolve = null );
+
+	}
+
+	/**
+	 * Reads back the given queries and adds their timestamps to their timers.
 	 *
 	 * @async
-	 * @returns {Promise<number>} The total duration in milliseconds, or the last valid value if resolution fails.
+	 * @private
+	 * @param {{querySet: GPUQuerySet, queryTimers: Map<number, Array<Object>>, queryCount: number}} queries - The queries to read back.
+	 * @returns {Promise} A Promise that resolves when the readback has finished.
 	 */
-	async resolveQueriesAsync() {
+	async _resolveQueries( { querySet, queryTimers, queryCount } ) {
 
-		if ( ! this.trackTimestamp || this.currentQueryIndex === 0 || this.isDisposed ) {
+		const bytesUsed = queryCount * 8;
 
-			return this.lastValue;
-
-		}
-
-		if ( this.pendingResolve ) {
-
-			return this.pendingResolve;
-
-		}
-
-		this.pendingResolve = this._resolveQueries();
+		let lost = true;
 
 		try {
 
-			const result = await this.pendingResolve;
-			return result;
+			const commandEncoder = this.device.createCommandEncoder( _commandEncoderDescriptor$1 );
+			commandEncoder.resolveQuerySet( querySet, 0, queryCount, this.resolveBuffer, 0 );
+			commandEncoder.copyBufferToBuffer( this.resolveBuffer, 0, this.resultBuffer, 0, bytesUsed );
+
+			submit( this.device, commandEncoder.finish() );
+
+			// the queries are copied, so a full query set can be reused
+
+			if ( querySet !== this.querySet ) this.freeQuerySets.push( querySet );
+
+			await this.resultBuffer.mapAsync( GPUMapMode.READ, 0, bytesUsed );
+
+			if ( this.isDisposed ) return;
+
+			const times = new BigUint64Array( this.resultBuffer.getMappedRange( 0, bytesUsed ) );
+
+			// passes don't run in the order they allocated queries, a nested pass (a shadow map) runs before its parent
+
+			for ( const [ baseOffset, timers ] of queryTimers ) {
+
+				const begin = times[ baseOffset ];
+				const finish = times[ baseOffset + 1 ];
+
+				for ( const timer of timers ) {
+
+					if ( timer.begin === null || begin < timer.begin ) timer.begin = begin;
+					if ( timer.finish === null || finish > timer.finish ) timer.finish = finish;
+
+				}
+
+			}
+
+			this.resultBuffer.unmap();
+
+			lost = false;
+
+		} catch ( e ) {
+
+			error( 'WebGPUTimestampQueryPool: Error resolving queries:', e );
+
+			if ( this.resultBuffer !== null && this.resultBuffer.mapState === 'mapped' ) this.resultBuffer.unmap();
 
 		} finally {
 
-			this.pendingResolve = null;
+			for ( const timers of queryTimers.values() ) this._releaseTimers( timers, lost );
 
 		}
 
 	}
 
 	/**
-	 * Internal method to resolve queries and calculate total duration.
+	 * Takes the allocated queries of the current query set, its following queries start at the first index.
 	 *
-	 * @async
 	 * @private
-	 * @returns {Promise<number>} The total duration in milliseconds.
+	 * @returns {{querySet: GPUQuerySet, queryTimers: Map<number, Array<Object>>, queryCount: number}} The queries.
 	 */
-	async _resolveQueries() {
+	_takeQueries() {
 
-		if ( this.isDisposed ) {
+		const queries = { querySet: this.querySet, queryTimers: this.queryTimers, queryCount: this.currentQueryIndex };
 
-			return this.lastValue;
+		this.queryTimers = new Map();
+		this.currentQueryIndex = 0;
 
-		}
+		return queries;
 
-		try {
+	}
 
-			if ( this.resultBuffer.mapState !== 'unmapped' ) {
+	/**
+	 * Creates a timestamp query set.
+	 *
+	 * @private
+	 * @returns {GPUQuerySet} The query set.
+	 */
+	_createQuerySet() {
 
-				return this.lastValue;
+		_querySetDescriptor$1.label = 'queryset_gpu_timer';
+		_querySetDescriptor$1.type = 'timestamp';
+		_querySetDescriptor$1.count = this.maxQueries;
 
-			}
+		const querySet = this.device.createQuerySet( _querySetDescriptor$1 );
 
-			const currentOffsets = new Map( this.queryOffsets );
-			const queryCount = this.currentQueryIndex;
-			const bytesUsed = queryCount * 8;
+		_querySetDescriptor$1.reset();
 
-			// Reset state before GPU work
-			this.currentQueryIndex = 0;
-			this.queryOffsets.clear();
-
-			const commandEncoder = this.device.createCommandEncoder( _commandEncoderDescriptor$1 );
-
-			commandEncoder.resolveQuerySet(
-				this.querySet,
-				0,
-				queryCount,
-				this.resolveBuffer,
-				0
-			);
-
-			commandEncoder.copyBufferToBuffer(
-				this.resolveBuffer,
-				0,
-				this.resultBuffer,
-				0,
-				bytesUsed
-			);
-
-			const commandBuffer = commandEncoder.finish();
-			submit( this.device, commandBuffer );
-
-			if ( this.resultBuffer.mapState !== 'unmapped' ) {
-
-				return this.lastValue;
-
-			}
-
-			// Create and track the mapping operation
-			await this.resultBuffer.mapAsync( GPUMapMode.READ, 0, bytesUsed );
-
-			if ( this.isDisposed ) {
-
-				if ( this.resultBuffer.mapState === 'mapped' ) {
-
-					this.resultBuffer.unmap();
-
-				}
-
-				return this.lastValue;
-
-			}
-
-			//
-
-			const times = new BigUint64Array( this.resultBuffer.getMappedRange( 0, bytesUsed ) );
-			const framesDuration = {};
-
-			const frames = [];
-
-			this.timestamps.clear();
-
-			for ( const [ uid, baseOffset ] of currentOffsets ) {
-
-				const match = uid.match( /^(.*):f(\d+)$/ );
-				const frame = parseInt( match[ 2 ] );
-
-				if ( frames.includes( frame ) === false ) {
-
-					frames.push( frame );
-
-				}
-
-				if ( framesDuration[ frame ] === undefined ) framesDuration[ frame ] = 0;
-
-				const startTime = times[ baseOffset ];
-				const endTime = times[ baseOffset + 1 ];
-				const duration = Number( endTime - startTime ) / 1e6;
-
-				this.timestamps.set( uid, duration );
-
-				framesDuration[ frame ] += duration;
-
-			}
-
-			// Return the total duration of the last frame
-			const totalDuration = framesDuration[ frames[ frames.length - 1 ] ];
-
-			this.resultBuffer.unmap();
-			this.lastValue = totalDuration;
-			this.frames = frames;
-
-			return totalDuration;
-
-		} catch ( e ) {
-
-			error( 'Error resolving queries:', e );
-			if ( this.resultBuffer.mapState === 'mapped' ) {
-
-				this.resultBuffer.unmap();
-
-			}
-
-			return this.lastValue;
-
-		}
+		return querySet;
 
 	}
 
@@ -89703,70 +89272,34 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	 */
 	async dispose() {
 
-		if ( this.isDisposed ) {
-
-			return;
-
-		}
+		if ( this.isDisposed ) return;
 
 		this.isDisposed = true;
 
-		// Wait for pending resolve operation
-		if ( this.pendingResolve ) {
+		if ( this.pendingResolve !== null ) await this.pendingResolve;
 
-			try {
+		const querySets = [ this.querySet, ...this.freeQuerySets ];
 
-				await this.pendingResolve;
+		for ( const { querySet, queryTimers } of [ ...this.fullQuerySets, this._takeQueries() ] ) {
 
-			} catch ( e ) {
+			for ( const timers of queryTimers.values() ) this._releaseTimers( timers, true );
 
-				error( 'Error waiting for pending resolve:', e );
-
-			}
+			if ( querySets.includes( querySet ) === false ) querySets.push( querySet );
 
 		}
 
-		// Ensure buffer is unmapped before destroying
-		if ( this.resultBuffer && this.resultBuffer.mapState === 'mapped' ) {
+		for ( const querySet of querySets ) querySet.destroy();
 
-			try {
+		if ( this.resultBuffer.mapState === 'mapped' ) this.resultBuffer.unmap();
 
-				this.resultBuffer.unmap();
+		this.resolveBuffer.destroy();
+		this.resultBuffer.destroy();
 
-			} catch ( e ) {
-
-				error( 'Error unmapping buffer:', e );
-
-			}
-
-		}
-
-		// Destroy resources
-		if ( this.querySet ) {
-
-			this.querySet.destroy();
-			this.querySet = null;
-
-		}
-
-		if ( this.resolveBuffer ) {
-
-			this.resolveBuffer.destroy();
-			this.resolveBuffer = null;
-
-		}
-
-		if ( this.resultBuffer ) {
-
-			this.resultBuffer.destroy();
-			this.resultBuffer = null;
-
-		}
-
-		this.queryOffsets.clear();
-		this.timestamps.clear();
-		this.frames = [];
-		this.pendingResolve = null;
+		this.querySet = null;
+		this.fullQuerySets = [];
+		this.freeQuerySets = [];
+		this.resolveBuffer = null;
+		this.resultBuffer = null;
 
 	}
 
@@ -89966,15 +89499,11 @@ const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
 const _computePassDescriptor = new GPUComputePassDescriptor();
 const _querySetDescriptor = new GPUQuerySetDescriptor();
 const _shaderModuleDescriptor = new GPUShaderModuleDescriptor();
-const _timerTimestampWrites = new GPURenderPassTimestampWrites();
 const _texelCopyTextureInfoSrc = new GPUTexelCopyTextureInfo();
 const _texelCopyTextureInfoDst = new GPUTexelCopyTextureInfo();
 const _textureDescriptor = new GPUTextureDescriptor();
 const _viewDescriptor = new GPUTextureViewDescriptor();
 const _extent3D = new GPUExtent3D();
-
-// number of timestamp queries available to GPU timers, two per pass
-const TIMER_QUERY_COUNT = 4096;
 
 /**
  * A backend implementation targeting WebGPU.
@@ -89996,7 +89525,6 @@ class WebGPUBackend extends Backend {
 	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
 	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
 	 * @property {boolean} [forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
-	 * @property {boolean} [trackTimestamp=false] - Whether to track timestamps with a Timestamp Query API or not.
 	 * @property {string} [powerPreference=undefined] - The power preference.
 	 * @property {Object} [requiredLimits=undefined] - Specifies the limits that are required by the device request. The request will fail if the adapter cannot provide these limits.
 	 * @property {GPUDevice} [device=undefined] - If there is an existing GPU device on app level, it can be passed to the renderer as a parameter.
@@ -90105,14 +89633,6 @@ class WebGPUBackend extends Backend {
 		 * @type {Map<number,GPUBuffer>}
 		 */
 		this.occludedResolveCache = new Map();
-
-		// GPU timers. While a timer is active every pass writes its begin and end timestamps to the next
-		// two queries of this set, created on first use and used as a ring
-
-		this._timerQuerySet = null;
-		this._timerResolveBuffer = null;
-		this._timerQueryIndex = 0;
-		this._activeTimers = 0;
 
 		// compatibility checks
 
@@ -90233,8 +89753,6 @@ class WebGPUBackend extends Backend {
 
 		this.device = device;
 
-		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
-
 		this.updateSize();
 
 	}
@@ -90331,7 +89849,7 @@ class WebGPUBackend extends Backend {
 	 */
 	get hasTimestamp() {
 
-		return true;
+		return this.device !== null && this.hasFeature( GPUFeatureName.TimestampQuery );
 
 	}
 
@@ -90879,7 +90397,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		this.initTimestampQuery( TimestampQuery.RENDER, renderContext, descriptor );
+		this.initTimestampQuery( renderContext, descriptor );
 
 		descriptor.occlusionQuerySet = occlusionQuerySet;
 
@@ -91053,12 +90571,6 @@ class WebGPUBackend extends Backend {
 			renderContextData.bundleEncoders = undefined;
 			renderContextData.bundleSets = undefined;
 			renderContextData.arrayCameraRenderStages = undefined;
-
-			if ( this._activeTimers > 0 ) {
-
-				this._setTimerQueries( descriptor );
-
-			}
 
 			const currentPass = encoder.beginRenderPass( descriptor );
 			renderContextData.currentPass = currentPass;
@@ -91421,12 +90933,6 @@ class WebGPUBackend extends Backend {
 
 						layerDescriptor.depthStencilAttachment.stencilLoadOp = stageIndex === 0 ? stencilLoadOp : GPULoadOp.Load;
 						layerDescriptor.depthStencilAttachment.stencilStoreOp = isLastStage ? stencilStoreOp : GPUStoreOp.Store;
-
-					}
-
-					if ( this._activeTimers > 0 ) {
-
-						this._setTimerQueries( layerDescriptor );
 
 					}
 
@@ -91808,18 +91314,10 @@ class WebGPUBackend extends Backend {
 		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
 		_commandEncoderDescriptor.reset();
 
-		const descriptor = {
+		const currentPass = encoder.beginRenderPass( {
 			colorAttachments,
 			depthStencilAttachment
-		};
-
-		if ( this._activeTimers > 0 ) {
-
-			this._setTimerQueries( descriptor );
-
-		}
-
-		const currentPass = encoder.beginRenderPass( descriptor );
+		} );
 
 		currentPass.end();
 
@@ -91846,13 +91344,7 @@ class WebGPUBackend extends Backend {
 		_computePassDescriptor.label = label;
 		_commandEncoderDescriptor.label = label;
 
-		this.initTimestampQuery( TimestampQuery.COMPUTE, computeGroup, _computePassDescriptor );
-
-		if ( this._activeTimers > 0 ) {
-
-			this._setTimerQueries( _computePassDescriptor );
-
-		}
+		this.initTimestampQuery( computeGroup, _computePassDescriptor );
 
 		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( _commandEncoderDescriptor );
 		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( _computePassDescriptor );
@@ -92585,41 +92077,25 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Inits a time stamp query for the given render context.
+	 * Inits a time stamp query for the given render context. While GPU timers are active, the
+	 * pass writes its begin and end timestamps to the timestamp query pool.
 	 *
-	 * @param {string} type - The type of the timestamp query (e.g. 'render', 'compute').
 	 * @param {RenderContext|ComputeNode|Array<ComputeNode>} renderContext - The render context or compute group.
 	 * @param {Object} descriptor - The query descriptor.
 	 */
-	initTimestampQuery( type, renderContext, descriptor ) {
+	initTimestampQuery( renderContext, descriptor ) {
 
-		// TODO: a pass can only write one set of timestamps, so passes inside a timer write to the timer
-		// queries and are missing from trackTimestamp. Remove once trackTimestamp is replaced by timers
-		if ( this._activeTimers > 0 ) {
+		const timestampQueryPool = this.timestampQueryPool;
+		const baseOffset = timestampQueryPool !== null ? timestampQueryPool.allocateQueries() : null;
 
-			return;
-
-		}
-
-		if ( this.trackTimestamp === false ) {
+		if ( baseOffset === null ) {
 
 			descriptor.timestampWrites = undefined;
 			return;
 
 		}
 
-		if ( ! this.timestampQueryPool[ type ] ) {
-
-			// TODO: Variable maxQueries?
-			this.timestampQueryPool[ type ] = new WebGPUTimestampQueryPool( this.device, type, 2048 );
-
-		}
-
-		const timestampQueryPool = this.timestampQueryPool[ type ];
-
 		const contextData = this.get( renderContext );
-
-		const baseOffset = timestampQueryPool.allocateQueriesForContext( contextData.timestampUID );
 
 		if ( contextData.timestampWrites === undefined ) {
 
@@ -92645,7 +92121,7 @@ class WebGPUBackend extends Backend {
 	 */
 	_continueTimestampQuery( descriptor ) {
 
-		if ( this.trackTimestamp === true && this._activeTimers === 0 ) {
+		if ( descriptor.timestampWrites !== undefined ) {
 
 			descriptor.timestampWrites.beginningOfPassWriteIndex = undefined;
 
@@ -92654,151 +92130,13 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Starts a GPU timer measurement.
+	 * Creates the timestamp query pool of the GPU timers.
 	 *
-	 * @return {?number} The query index the measurement starts at, or `null` without timestamp queries.
+	 * @return {WebGPUTimestampQueryPool} The timestamp query pool.
 	 */
-	beginTimer() {
+	createTimestampQueryPool() {
 
-		if ( this.hasFeature( GPUFeatureName.TimestampQuery ) === false ) {
-
-			return null;
-
-		}
-
-		if ( this._timerQuerySet === null ) {
-
-			_querySetDescriptor.label = 'timerQuerySet';
-			_querySetDescriptor.type = 'timestamp';
-			_querySetDescriptor.count = TIMER_QUERY_COUNT;
-
-			this._timerQuerySet = this.device.createQuerySet( _querySetDescriptor );
-
-			_querySetDescriptor.reset();
-
-			_bufferDescriptor.label = 'timerResolveBuffer';
-			_bufferDescriptor.size = TIMER_QUERY_COUNT * 8;
-			_bufferDescriptor.usage = GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC;
-
-			this._timerResolveBuffer = this.device.createBuffer( _bufferDescriptor );
-
-			_bufferDescriptor.reset();
-
-		}
-
-		this._activeTimers ++;
-
-		return this._timerQueryIndex;
-
-	}
-
-	/**
-	 * Ends the given measurement and returns its GPU time in milliseconds.
-	 *
-	 * @async
-	 * @param {?number} startIndex - The value returned by {@link WebGPUBackend#beginTimer}.
-	 * @return {Promise<?number>} The GPU time in milliseconds.
-	 */
-	async endTimer( startIndex ) {
-
-		if ( startIndex === null ) {
-
-			return null;
-
-		}
-
-		this._activeTimers --;
-
-		const endIndex = this._timerQueryIndex;
-		const queryCount = endIndex - startIndex;
-
-		if ( queryCount > TIMER_QUERY_COUNT ) {
-
-			warnOnce( `WebGPUBackend: A GPU timer can measure at most ${ TIMER_QUERY_COUNT / 2 } passes.` );
-			return null;
-
-		}
-
-		// read back the queries of this measurement. The queries are a ring, so a range past the end of
-		// the set continues at the start and is read in two steps
-
-		const device = this.device;
-		const firstQuery = startIndex % TIMER_QUERY_COUNT;
-		const firstCount = Math.min( queryCount, TIMER_QUERY_COUNT - firstQuery );
-		const secondCount = queryCount - firstCount;
-
-		_bufferDescriptor.size = queryCount * 8;
-		_bufferDescriptor.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
-
-		const readBuffer = device.createBuffer( _bufferDescriptor );
-
-		_bufferDescriptor.reset();
-
-		const encoder = device.createCommandEncoder();
-		encoder.resolveQuerySet( this._timerQuerySet, firstQuery, firstCount, this._timerResolveBuffer, 0 );
-		encoder.copyBufferToBuffer( this._timerResolveBuffer, 0, readBuffer, 0, firstCount * 8 );
-
-		if ( secondCount > 0 ) {
-
-			encoder.resolveQuerySet( this._timerQuerySet, 0, secondCount, this._timerResolveBuffer, 0 );
-			encoder.copyBufferToBuffer( this._timerResolveBuffer, 0, readBuffer, firstCount * 8, secondCount * 8 );
-
-		}
-
-		submit( device, encoder.finish() );
-
-		await readBuffer.mapAsync( GPUMapMode.READ );
-
-		const timestamps = new BigUint64Array( readBuffer.getMappedRange() );
-
-		// Passes don't run in the order they took queries. A nested pass (a shadow map) runs before its
-		// parent. So take the earliest begin and latest end.
-
-		let earliestBegin = 0n;
-		let latestEnd = 0n;
-
-		for ( let i = 0; i < queryCount; i += 2 ) {
-
-			const passBegin = timestamps[ i ];
-			const passEnd = timestamps[ i + 1 ];
-
-			if ( i === 0 || passBegin < earliestBegin ) {
-
-				earliestBegin = passBegin;
-
-			}
-
-			if ( passEnd > latestEnd ) {
-
-				latestEnd = passEnd;
-
-			}
-
-		}
-
-		readBuffer.destroy();
-
-		return Number( latestEnd - earliestBegin ) / 1e6;
-
-	}
-
-	/**
-	 * Points the pass descriptor at the next two timer queries.
-	 *
-	 * @private
-	 * @param {Object} descriptor - The render or compute pass descriptor.
-	 */
-	_setTimerQueries( descriptor ) {
-
-		const index = this._timerQueryIndex % TIMER_QUERY_COUNT;
-
-		_timerTimestampWrites.querySet = this._timerQuerySet;
-		_timerTimestampWrites.beginningOfPassWriteIndex = index;
-		_timerTimestampWrites.endOfPassWriteIndex = index + 1;
-
-		descriptor.timestampWrites = _timerTimestampWrites;
-
-		this._timerQueryIndex += 2;
+		return new WebGPUTimestampQueryPool( this.device );
 
 	}
 
@@ -93382,12 +92720,6 @@ class WebGPUBackend extends Backend {
 
 			this._continueTimestampQuery( descriptor );
 
-			if ( this._activeTimers > 0 ) {
-
-				this._setTimerQueries( descriptor );
-
-			}
-
 			renderContextData.currentPass = encoder.beginRenderPass( descriptor );
 
 			this._resetRenderContextData( renderContextData );
@@ -93478,13 +92810,6 @@ class WebGPUBackend extends Backend {
 
 		this.bindingUtils.dispose();
 		this.textureUtils.dispose();
-
-		if ( this._timerQuerySet !== null ) {
-
-			this._timerQuerySet.destroy();
-			this._timerResolveBuffer.destroy();
-
-		}
 
 		if ( this.occludedResolveCache ) {
 
@@ -94932,9 +94257,6 @@ class NodeObjectLoader extends ObjectLoader {
  * Measures the GPU time of the render and compute passes issued between {@link GPUTimer#begin} and
  * {@link GPUTimer#end}, from the start of the first pass to the end of the last one.
  *
- * Timers can overlap and end in any order: a pass counts toward every active timer. In WebGL only one
- * timer can run at a time and an overlapping one returns `null`.
- *
  * Requires the `timestamp-query` feature in WebGPU or the `EXT_disjoint_timer_query_webgl2` extension
  * in WebGL. Otherwise the results are `null`.
  *
@@ -95160,6 +94482,7 @@ var Three_TSL = /*#__PURE__*/Object.freeze({
 	atanh: atanh,
 	atomicAdd: atomicAdd,
 	atomicAnd: atomicAnd,
+	atomicExchange: atomicExchange,
 	atomicFunc: atomicFunc,
 	atomicLoad: atomicLoad,
 	atomicMax: atomicMax,
@@ -95773,4 +95096,4 @@ var Three_TSL = /*#__PURE__*/Object.freeze({
 	xor: xor
 });
 
-export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BackSide, BarrierNode, BasicEnvironmentNode, BasicLightMapNode, BasicShadowMap, BitcastNode, BitcountNode, BlendMode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BuiltinNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, ClippingNode, CodeNode, Color, ColorManagement, ColorSpaceNode, Compatibility, ComputeBuiltinNode, ComputeNode, ConditionalNode, ConstNode, ConstantAlphaFactor, ConstantColorFactor, ContextNode, ConvertNode, CubeCamera, CubeDepthTexture, CubeMapNode, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, Data3DTexture, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectRenderPipeline, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, EventDispatcher, EventNode, ExpressionNode, FileLoader, FlipNode, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GPUTimer, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InputNode, InspectorBase, InspectorNode, InstancedBufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, IsolateNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialBlending, MaterialLoader, MaterialNode, MaterialReferenceNode, MathNode, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeError, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialInstance, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalGAPacking, NormalMapNode, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OperatorNode, OrthographicCamera, OutputStructNode, OverrideContextNode, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PMREMNode, PackFloatNode, Packed4x8IntegerNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointShadowNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, ReadbackBuffer, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceAttributeNode, ReferenceBaseNode, ReferenceElementNode, ReferenceNode, ReflectorNode, ReinhardToneMapping, RenderObjectRefreshType, RenderOutputNode, RenderPipeline, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, SampleNode, Scene, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StackTrace, StandardDrawingPipeline, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageStructNode, StorageTexture, StorageTexture3DNode, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, SubtractEquation, SubtractiveBlending, Three_TSL as TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLBackend, WebGLCoordinateSystem, WebGPUBackend, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, WorkgroupInfoNode, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BackSide, BarrierNode, BasicEnvironmentNode, BasicLightMapNode, BasicShadowMap, BitcastNode, BitcountNode, BlendMode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BuiltinNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, ClippingNode, CodeNode, Color, ColorManagement, ColorSpaceNode, Compatibility, ComputeBuiltinNode, ComputeNode, ConditionalNode, ConstNode, ConstantAlphaFactor, ConstantColorFactor, ContextNode, ConvertNode, CubeCamera, CubeDepthTexture, CubeMapNode, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, Data3DTexture, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectRenderPipeline, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, EventDispatcher, EventNode, ExpressionNode, FileLoader, FlipNode, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GPUTimer, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InputNode, InspectorBase, InspectorNode, InstancedBufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, IsolateNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialBlending, MaterialLoader, MaterialNode, MaterialReferenceNode, MathNode, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeError, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialInstance, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalGAPacking, NormalMapNode, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OperatorNode, OrthographicCamera, OutputStructNode, OverrideContextNode, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PMREMNode, PackFloatNode, Packed4x8IntegerNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointShadowNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, ReadbackBuffer, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceAttributeNode, ReferenceBaseNode, ReferenceElementNode, ReferenceNode, ReflectorNode, ReinhardToneMapping, RenderObjectRefreshType, RenderOutputNode, RenderPipeline, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, SampleNode, Scene, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StackTrace, StandardDrawingPipeline, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageStructNode, StorageTexture, StorageTexture3DNode, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, SubtractEquation, SubtractiveBlending, Three_TSL as TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLBackend, WebGLCoordinateSystem, WebGPUBackend, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, WorkgroupInfoNode, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
