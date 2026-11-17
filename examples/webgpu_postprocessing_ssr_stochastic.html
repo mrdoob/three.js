@@ -283,10 +283,10 @@
 				binaryRefine: params.ssr.binaryRefine
 			} ).toInspector( 'SSR' );
 
-			temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, sceneNormal, scenePassVelocity, camera, {
+			temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
 				mode: 'specular',
 				accumulate: false,
-				normalHistory: { texture: scenePassNormal, decode: normalDecode }
+				normalDecode: normalDecode
 			} );
 			temporalReprojectNode.toInspector( 'Temporal Reproject' );
 
