@@ -916,7 +916,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		};
 
-		const aoNode = computeSpecularOcclusion( normalView, roughness );
+		const soNode = computeSpecularOcclusion( normalView, roughness );
 
 		if ( this.clearcoat === true ) {
 
@@ -931,7 +931,7 @@ class PhysicalLightingModel extends LightingModel {
 		}
 
 		reflectedLight.indirectDiffuse.mulAssign( ambientOcclusion );
-		reflectedLight.indirectSpecular.mulAssign( aoNode );
+		reflectedLight.indirectSpecular.mulAssign( soNode );
 
 	}
 
