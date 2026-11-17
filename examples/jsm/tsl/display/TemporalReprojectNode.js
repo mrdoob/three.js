@@ -1,5 +1,5 @@
-import { EPSILON, Fn, If, abs, convertToTexture, dFdx, dFdy, dot, exp, float, floor, fwidth, getViewPosition, ivec2, luminance, max, min, mix, nodeObject, normalize, passTexture, screenCoordinate, select, smoothstep, sqrt, struct, texture, textureLoad, uniform, packNormalToOctahedral, unpackOctahedralToNormal, outputStruct, uv, vec2, vec3, vec4, velocity, context, OnBeforeRenderPipeline, OnAfterRenderPipeline, isBackgroundDepth } from 'three/tsl';
-import { DepthTexture, HalfFloatType, RGFormat, NearestFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
+import { EPSILON, Fn, If, abs, convertToTexture, dFdx, dFdy, dot, exp, float, floor, fwidth, getViewPosition, ivec2, luminance, max, min, mix, nodeObject, normalize, passTexture, screenCoordinate, select, smoothstep, sqrt, struct, texture, textureLoad, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4, velocity, context, OnBeforeRenderPipeline, OnAfterRenderPipeline, isBackgroundDepth } from 'three/tsl';
+import { DepthTexture, HalfFloatType, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { ENV_RAY_LENGTH, ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
 
 // Reprojection helpers
@@ -208,7 +208,6 @@ const applyVarianceClipping = Fn( ( [ historyColor, mean, stdColor, gamma, flick
 
 const bilinearTapStruct = struct( { color: 'vec4', weight: 'float', confidence: 'float' } );
 const historyResultStruct = struct( { color: 'vec4', tapConfidence: 'float', minConfidence: 'float' } );
-const resolveResultStruct = struct( { color: 'vec4', normal: 'vec2' } );
 
 /**
  * Single bilinear history tap with plane-distance and normal confidence.
@@ -273,11 +272,35 @@ function bilinearHistoryTap( ctx, tapOffset, bilinearWeight ) {
  *
  * @tsl
  */
-const createSampleHistory4Tap = ( normalDecode ) => {
+const createSampleHistory4Tap = ( normalDecode ) => Fn( ( [
+	historyTexture,
+	previousDepthNode,
+	previousNormalNode,
+	resolution,
+	previousProjectionMatrixInverse,
+	previousCameraWorldMatrix,
+	previousCameraViewMatrix,
+	reprojUV,
+	worldPosition,
+	worldNormal,
+	inputColor
+] ) => {
 
 	const sampleBilinearTap = createSampleBilinearTap( normalDecode );
 
-	return Fn( ( [
+	const reprojPixelCoord = reprojUV.mul( resolution ).sub( 0.5 ).toVar();
+	const reprojICoord = ivec2( floor( reprojPixelCoord ) );
+	const fCoord = reprojPixelCoord.fract();
+
+	const fx = fCoord.x;
+	const fy = fCoord.y;
+	const f00 = float( 1 ).sub( fx ).mul( float( 1 ).sub( fy ) );
+	const f10 = fx.mul( float( 1 ).sub( fy ) );
+	const f01 = float( 1 ).sub( fx ).mul( fy );
+	const f11 = fx.mul( fy );
+
+	const tapCtx = {
+		sampleBilinearTap,
 		historyTexture,
 		previousDepthNode,
 		previousNormalNode,
@@ -285,56 +308,28 @@ const createSampleHistory4Tap = ( normalDecode ) => {
 		previousProjectionMatrixInverse,
 		previousCameraWorldMatrix,
 		previousCameraViewMatrix,
-		reprojUV,
+		reprojICoord,
 		worldPosition,
-		worldNormal,
-		inputColor
-	] ) => {
+		worldNormal
+	};
 
-		const reprojPixelCoord = reprojUV.mul( resolution ).sub( 0.5 ).toVar();
-		const reprojICoord = ivec2( floor( reprojPixelCoord ) );
-		const fCoord = reprojPixelCoord.fract();
+	const tap00 = bilinearHistoryTap( tapCtx, ivec2( 0, 0 ), f00 );
+	const tap10 = bilinearHistoryTap( tapCtx, ivec2( 1, 0 ), f10 );
+	const tap01 = bilinearHistoryTap( tapCtx, ivec2( 0, 1 ), f01 );
+	const tap11 = bilinearHistoryTap( tapCtx, ivec2( 1, 1 ), f11 );
 
-		const fx = fCoord.x;
-		const fy = fCoord.y;
-		const f00 = float( 1 ).sub( fx ).mul( float( 1 ).sub( fy ) );
-		const f10 = fx.mul( float( 1 ).sub( fy ) );
-		const f01 = float( 1 ).sub( fx ).mul( fy );
-		const f11 = fx.mul( fy );
+	const colorSum = tap00.get( 'color' ).add( tap10.get( 'color' ) ).add( tap01.get( 'color' ) ).add( tap11.get( 'color' ) );
+	const weightSum = tap00.get( 'weight' ).add( tap10.get( 'weight' ) ).add( tap01.get( 'weight' ) ).add( tap11.get( 'weight' ) );
+	const maxConf = max( max( tap00.get( 'confidence' ), tap10.get( 'confidence' ) ), max( tap01.get( 'confidence' ), tap11.get( 'confidence' ) ) );
+	const minConf = min( min( tap00.get( 'confidence' ), tap10.get( 'confidence' ) ), min( tap01.get( 'confidence' ), tap11.get( 'confidence' ) ) );
 
-		const tapCtx = {
-			sampleBilinearTap,
-			historyTexture,
-			previousDepthNode,
-			previousNormalNode,
-			resolution,
-			previousProjectionMatrixInverse,
-			previousCameraWorldMatrix,
-			previousCameraViewMatrix,
-			reprojICoord,
-			worldPosition,
-			worldNormal
-		};
+	return historyResultStruct(
+		select( weightSum.greaterThan( 0.01 ), colorSum.div( weightSum ), vec4( inputColor.rgb, float( 1 ) ) ),
+		maxConf,
+		minConf
+	);
 
-		const tap00 = bilinearHistoryTap( tapCtx, ivec2( 0, 0 ), f00 );
-		const tap10 = bilinearHistoryTap( tapCtx, ivec2( 1, 0 ), f10 );
-		const tap01 = bilinearHistoryTap( tapCtx, ivec2( 0, 1 ), f01 );
-		const tap11 = bilinearHistoryTap( tapCtx, ivec2( 1, 1 ), f11 );
-
-		const colorSum = tap00.get( 'color' ).add( tap10.get( 'color' ) ).add( tap01.get( 'color' ) ).add( tap11.get( 'color' ) );
-		const weightSum = tap00.get( 'weight' ).add( tap10.get( 'weight' ) ).add( tap01.get( 'weight' ) ).add( tap11.get( 'weight' ) );
-		const maxConf = max( max( tap00.get( 'confidence' ), tap10.get( 'confidence' ) ), max( tap01.get( 'confidence' ), tap11.get( 'confidence' ) ) );
-		const minConf = min( min( tap00.get( 'confidence' ), tap10.get( 'confidence' ) ), min( tap01.get( 'confidence' ), tap11.get( 'confidence' ) ) );
-
-		return historyResultStruct(
-			select( weightSum.greaterThan( 0.01 ), colorSum.div( weightSum ), vec4( inputColor.rgb, float( 1 ) ) ),
-			maxConf,
-			minConf
-		);
-
-	} );
-
-};
+} );
 
 // Diffuse reprojection
 
@@ -483,9 +478,7 @@ const VARIANCE_GAMMA_MAX = 1;
  * @property {boolean} [hitPointReprojection] - Parallax hit-point reprojection (specular mode only). Defaults to `true` in specular mode.
  * @property {boolean} [accumulate=false] - When `true`, history is stored in this pass (classic temporal resolve). When `false`,
  * use {@link TemporalReprojectNode#setHistoryTexture} to read history from another pass (e.g. denoise output).
- * @property {?Object} [normalHistory=null] - Optional full-resolution encoded normal texture and its decoder, avoiding an extra resolve attachment.
- * @property {TextureNode} normalHistory.texture - The current-frame normal texture to copy into history.
- * @property {Function} normalHistory.decode - Decodes a texture sample into a unit view-space normal.
+ * @property {Function} [normalDecode] - Decodes a sample of the normal texture into a unit view-space normal. Defaults to {@link unpackRGBToNormal}.
  */
 
 /**
@@ -517,7 +510,7 @@ class TemporalReprojectNode extends Node {
 	/**
 	 * @param {TextureNode} beautyNode
 	 * @param {TextureNode} depthNode
-	 * @param {Node<vec3>} normalNode - A sampleable node that returns unit view-space normals.
+	 * @param {TextureNode} normalNode
 	 * @param {TextureNode} velocityNode
 	 * @param {Camera} camera
 	 * @param {TemporalReprojectNodeOptions} [options]
@@ -530,7 +523,7 @@ class TemporalReprojectNode extends Node {
 			mode = 'diffuse',
 			hitPointReprojection = mode === 'specular',
 			accumulate = false,
-			normalHistory = null
+			normalDecode = ( value ) => unpackRGBToNormal( value.rgb )
 		} = options;
 
 		if ( mode !== 'specular' && mode !== 'diffuse' ) {
@@ -545,7 +538,7 @@ class TemporalReprojectNode extends Node {
 		this.beautyNode = beautyNode;
 		this.depthNode = depthNode;
 		this.normalNode = normalNode;
-		this.normalHistory = normalHistory;
+		this.normalDecode = normalDecode;
 		this.velocityNode = velocityNode;
 		this.camera = camera;
 
@@ -577,18 +570,8 @@ class TemporalReprojectNode extends Node {
 		this._historyRenderTarget.texture.name = 'TemporalReprojectNode.history';
 		this._historyTextureNode = texture( this._historyRenderTarget.texture );
 
-		this._resolveRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, count: normalHistory === null ? 2 : 1 } );
+		this._resolveRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._resolveRenderTarget.texture.name = 'TemporalReprojectNode.resolve';
-
-		// Procedural samplers need materialized history; texture-backed inputs can be copied directly.
-		if ( normalHistory === null ) {
-
-			const normalTexture = this._resolveRenderTarget.textures[ 1 ];
-			normalTexture.name = 'TemporalReprojectNode.normal';
-			normalTexture.format = RGFormat;
-			normalTexture.minFilter = normalTexture.magFilter = NearestFilter;
-
-		}
 
 		this._resolveMaterial = new NodeMaterial();
 		this._resolveMaterial.name = 'TemporalReproject.resolve';
@@ -602,7 +585,7 @@ class TemporalReprojectNode extends Node {
 
 		this._placeholderPreviousDepthTexture = new DepthTexture( 1, 1 );
 		this._previousDepthNode = texture( this._placeholderPreviousDepthTexture );
-		this._previousNormalTexture = this._getNormalHistoryTexture().clone();
+		this._previousNormalTexture = normalNode.value.clone();
 		this._previousNormalNode = texture( this._previousNormalTexture );
 
 		this._needsPostProcessingSync = false;
@@ -615,12 +598,6 @@ class TemporalReprojectNode extends Node {
 	getTextureNode() {
 
 		return this._textureNode;
-
-	}
-
-	_getNormalHistoryTexture() {
-
-		return this.normalHistory !== null ? this.normalHistory.texture.value : this._resolveRenderTarget.textures[ 1 ];
 
 	}
 
@@ -691,7 +668,7 @@ class TemporalReprojectNode extends Node {
 		if ( needsRestart === true ) {
 
 			this._previousNormalTexture.dispose();
-			this._previousNormalTexture = this._getNormalHistoryTexture().clone();
+			this._previousNormalTexture = this.normalNode.value.clone();
 			this._previousNormalNode.value = this._previousNormalTexture;
 
 			// External history (e.g. denoise feedback) is stale at the old resolution — use
@@ -734,7 +711,7 @@ class TemporalReprojectNode extends Node {
 		if ( srcW > 0 && srcH > 0 ) {
 
 			renderer.copyTextureToTexture( currentDepth, historyDepth );
-			renderer.copyTextureToTexture( this._getNormalHistoryTexture(), this._previousNormalTexture );
+			renderer.copyTextureToTexture( this.normalNode.value, this._previousNormalTexture );
 
 			this._previousDepthNode.value = historyDepth;
 
@@ -804,8 +781,7 @@ class TemporalReprojectNode extends Node {
 
 		const isSpecular = this.mode === 'specular';
 		const cameraUniforms = this._cameraUniforms;
-		const normalDecode = this.normalHistory !== null ? this.normalHistory.decode : ( value ) => unpackOctahedralToNormal( value.rg );
-		const sampleHistory4Tap = createSampleHistory4Tap( normalDecode );
+		const sampleHistory4Tap = createSampleHistory4Tap( this.normalDecode );
 
 		const resolve = Fn( () => {
 
@@ -819,7 +795,7 @@ class TemporalReprojectNode extends Node {
 			const beautyTexel = beautyTexelFromScreen( screenTexel, beautySize, this._resolution );
 
 			const inputColor = textureLoad( this.beautyNode, beautyTexel ).max( 0 ).toVar();
-			const viewNormal = this.normalNode.sample( uvNode ).toVar();
+			const viewNormal = this.normalDecode( textureLoad( this.normalNode, screenTexel ) ).toVar();
 
 			// Shared 3×3 beauty fetch: feeds both the variance-clip box and the SSR ray-length stats.
 			const neighborhood = collectNeighborhood( this.beautyNode, beautyTexel, inputColor, this.flickerSuppression );
@@ -969,15 +945,11 @@ class TemporalReprojectNode extends Node {
 
 			}
 
-			const color = vec4( historyColor.rgb, float( 1 ).div( currentFrameCount ) );
-
-			return this.normalHistory !== null ? color : resolveResultStruct( color, packNormalToOctahedral( viewNormal ) );
+			return vec4( historyColor.rgb, float( 1 ).div( currentFrameCount ) );
 
 		} );
 
-		const result = resolve();
-
-		return this.normalHistory !== null ? result : outputStruct( result.get( 'color' ), result.get( 'normal' ) );
+		return resolve();
 
 	}
 
@@ -1042,7 +1014,7 @@ export default TemporalReprojectNode;
 /**
  * @param {TextureNode} beautyNode
  * @param {TextureNode} depthNode
- * @param {Node<vec3>} normalNode - A sampleable node that returns unit view-space normals.
+ * @param {TextureNode} normalNode
  * @param {TextureNode} velocityNode
  * @param {Camera} camera
  * @param {TemporalReprojectNodeOptions} [options]
