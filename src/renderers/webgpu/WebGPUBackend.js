@@ -293,10 +293,6 @@ class WebGPUBackend extends Backend {
 
 		this.device = device;
 
-		// a new device requires a new context configuration
-
-		this.delete( this.renderer.getCanvasTarget() );
-
 	}
 
 	/**
