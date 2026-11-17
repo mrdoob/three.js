@@ -852,9 +852,17 @@ class ShadowNode extends ShadowBaseNode {
 
 		const { shadow } = this;
 
-		if ( shadow.needsUpdate === false && shadow.autoUpdate === false ) return;
+		let needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
 
-		if ( this.needsRefresh( frame ) ) {
+		if ( needsUpdate ) {
+
+			needsUpdate = this.needsRefresh( frame );
+
+			this._cameraFrameId.set( frame.camera, frame.frameId );
+
+		}
+
+		if ( needsUpdate ) {
 
 			const lastUpdate = this._lastUpdate;
 
@@ -868,8 +876,6 @@ class ShadowNode extends ShadowBaseNode {
 			shadow.needsUpdate = false;
 
 		}
-
-		this._cameraFrameId.set( frame.camera, frame.frameId );
 
 	}
 
