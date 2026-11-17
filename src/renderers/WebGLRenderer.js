@@ -3217,7 +3217,14 @@ class WebGLRenderer {
 
 					// restore framebuffer of current render target if necessary
 
-					const framebuffer = ( _currentRenderTarget !== null ) ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
+					let framebuffer = ( _currentRenderTarget !== null ) ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
+
+					if ( _currentRenderTarget !== null && _currentRenderTarget.isWebGLCubeRenderTarget ) {
+
+						framebuffer = framebuffer[ _currentActiveCubeFace ];
+
+					}
+
 					state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
 				}
@@ -3298,7 +3305,14 @@ class WebGLRenderer {
 					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, null );
 
 					// reset the frame buffer to the currently set buffer before waiting
-					const currFramebuffer = _currentRenderTarget !== null ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
+					let currFramebuffer = ( _currentRenderTarget !== null ) ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
+
+					if ( _currentRenderTarget !== null && _currentRenderTarget.isWebGLCubeRenderTarget ) {
+
+						currFramebuffer = currFramebuffer[ _currentActiveCubeFace ];
+
+					}
+
 					state.bindFramebuffer( _gl.FRAMEBUFFER, currFramebuffer );
 
 					// check if the commands have finished every 8 ms
