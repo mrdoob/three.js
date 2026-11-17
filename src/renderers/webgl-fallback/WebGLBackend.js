@@ -14,7 +14,7 @@ import { GLFeatureName } from './utils/WebGLConstants.js';
 import { WebGLBufferRenderer } from './WebGLBufferRenderer.js';
 
 import { isTypedArray, warnOnce, warn, error } from '../../utils.js';
-import { WebGLCoordinateSystem, TimestampQuery, Compatibility } from '../../constants.js';
+import { WebGLCoordinateSystem, Compatibility } from '../../constants.js';
 import WebGLTimestampQueryPool from './utils/WebGLTimestampQueryPool.js';
 
 const _invalidationArray = [];
@@ -408,52 +408,15 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Inits a time stamp query for the given render context.
+	 * Creates the timestamp query pool of the GPU timers.
 	 *
-	 * @param {string} type - The type of the timestamp query.
-	 * @param {string} uid - A unique identifier for the timestamp query.
+	 * @return {WebGLTimestampQueryPool} The timestamp query pool.
 	 */
-	initTimestampQuery( type, uid ) {
+	createTimestampQueryPool() {
 
-		if ( ! this.disjoint || ! this.trackTimestamp ) return;
-
-		if ( ! this.timestampQueryPool[ type ] ) {
-
-			// TODO: Variable maxQueries?
-			this.timestampQueryPool[ type ] = new WebGLTimestampQueryPool( this.gl, type, 2048 );
-
-		}
-
-		const timestampQueryPool = this.timestampQueryPool[ type ];
-
-		const baseOffset = timestampQueryPool.allocateQueriesForContext( uid );
-
-		if ( baseOffset !== null ) {
-
-			timestampQueryPool.beginQuery( uid );
-
-		}
+		return new WebGLTimestampQueryPool( this.gl, this.disjoint );
 
 	}
-
-	// timestamp utils
-
-	/**
-	 * Prepares the timestamp buffer.
-	 *
-	 * @param {string} type - The type of the timestamp query.
-	 * @param {string} uid - A unique identifier for the timestamp query.
-	 */
-	prepareTimestampBuffer( type, uid ) {
-
-		if ( ! this.disjoint || ! this.trackTimestamp ) return;
-
-		const timestampQueryPool = this.timestampQueryPool[ type ];
-
-		timestampQueryPool.endQuery( uid );
-
-	}
-
 
 	/**
 	 * Returns the backend's rendering context.
@@ -504,8 +467,6 @@ class WebGLBackend extends Backend {
 		state.setScissorTest( renderContext.scissor );
 
 		//
-
-		this.initTimestampQuery( TimestampQuery.RENDER, this.getTimestampUID( renderContext ) );
 
 		renderContextData.previousContext = this._currentContext;
 		this._currentContext = renderContext;
@@ -619,8 +580,6 @@ class WebGLBackend extends Backend {
 			state.setScissorTest( previousContext.scissor );
 
 		}
-
-		this.prepareTimestampBuffer( TimestampQuery.RENDER, this.getTimestampUID( renderContext ) );
 
 	}
 
@@ -905,14 +864,13 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
 	 */
-	beginCompute( computeGroup ) {
+	beginCompute( /*computeGroup*/ ) {
 
 		const { state, gl } = this;
 
 		//
 
 		state.bindFramebuffer( gl.FRAMEBUFFER, null );
-		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ) );
 
 	}
 
@@ -1038,15 +996,13 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
 	 */
-	finishCompute( computeGroup ) {
+	finishCompute( /*computeGroup*/ ) {
 
 		const { state, gl } = this;
 
 		this.discard = false;
 
 		state.disable( gl.RASTERIZER_DISCARD );
-
-		this.prepareTimestampBuffer( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ) );
 
 		if ( this._currentContext ) {
 
@@ -1757,7 +1713,7 @@ class WebGLBackend extends Backend {
 	 *
 	 * @private
 	 * @param {RenderObject} renderObject - The render object.
-	 * @param {RenderPipeline} pipeline - The render pipeline.
+	 * @param {RenderObjectPipeline} pipeline - The render pipeline.
 	 */
 	_completeCompile( renderObject, pipeline ) {
 

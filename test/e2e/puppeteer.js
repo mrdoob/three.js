@@ -14,7 +14,7 @@ const exceptionList = [
  	'webgl_materials_cubemap_dynamic', 	// 1 min
 	'webgl_materials_displacementmap', 	// 1 min
 	'webgl_materials_envmaps_hdr', 		// 1 min
-	'webgpu_water', 					// 1 min
+	'webgpu_loader_vdb',				// streams 31 MB of frames
 
 	// Requires HTML-in-Canvas API
 	'webgl_materials_texture_html',
@@ -45,6 +45,7 @@ const exceptionList = [
 	'webgpu_storage_buffer',
 	'webgpu_tsl_editor',
 	'webgpu_tsl_graph',
+	'webgpu_tsl_noise_smoothing',
 	'webxr_vr_video',
 	'webgpu_tsl_transpiler',
 	'webgpu_rendertarget_2d-array_3d',
@@ -62,7 +63,9 @@ const exceptionList = [
 	'webgpu_morphtargets_face',
 	'webgpu_shadowmap_progressive',
 	'webgpu_lightmap_baking',
-	'webgpu_postprocessing_ssr_denoise',
+	'webgpu_postprocessing_ssr_animation',
+	'webgpu_postprocessing_ssr_mirror',
+	'webgpu_postprocessing_ssr_stochastic',
 	'webgpu_renderer_pathtracer',
 	'webgpu_vxgi',
 	'webgpu_vxgi_sponza',
@@ -243,9 +246,7 @@ async function main() {
 
 	// Workers do not receive evaluateOnNewDocument scripts.
 	const buildInjection = ( code ) => injection + '\n' + code
-		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' )
-		// Disables WebGPU timestamp queries to prevent Inspector/Profiler from crashing in E2E software mode
-		.replace( /this\.trackTimestamp\s*=\s*\(\s*parameters\.trackTimestamp\s*===\s*true\s*\);/g, 'Object.defineProperty(this, \'trackTimestamp\', { get: () => false, set: () => {} });' );
+		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
 
 	const builds = {
 		'three.core.js': buildInjection( await fs.readFile( 'build/three.core.js', 'utf8' ) ),

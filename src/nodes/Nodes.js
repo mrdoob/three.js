@@ -60,6 +60,7 @@ export { default as ReferenceElementNode } from './accessors/ReferenceElementNod
 export { default as ReferenceNode } from './accessors/ReferenceNode.js';
 export { default as RendererReferenceNode } from './accessors/RendererReferenceNode.js';
 export { default as StorageBufferNode } from './accessors/StorageBufferNode.js';
+export { default as StorageStructNode } from './accessors/StorageStructNode.js';
 export { default as StorageTexture3DNode } from './accessors/StorageTexture3DNode.js';
 export { default as StorageTextureNode } from './accessors/StorageTextureNode.js';
 export { default as Texture3DNode } from './accessors/Texture3DNode.js';
@@ -83,7 +84,6 @@ export { default as FrontFacingNode } from './display/FrontFacingNode.js';
 export { default as NormalMapNode } from './display/NormalMapNode.js';
 export { default as PassNode } from './display/PassNode.js';
 export { default as RenderOutputNode } from './display/RenderOutputNode.js';
-export { default as ScreenNode } from './display/ScreenNode.js';
 export { default as ToneMappingNode } from './display/ToneMappingNode.js';
 export { default as ToonOutlinePassNode } from './display/ToonOutlinePassNode.js';
 export { default as ViewportDepthNode } from './display/ViewportDepthNode.js';

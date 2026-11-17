@@ -180,7 +180,7 @@ class Textures extends DataMap {
 
 		if ( depthTexture && depthTexture.renderTarget === renderTarget ) {
 
-			const image = depthTexture.image;
+			const image = depthTexture.images ? depthTexture.images[ 0 ] : depthTexture.image;
 
 			if ( textureNeedsUpdate === true || image.width !== mipWidth || image.height !== mipHeight ) {
 
@@ -435,6 +435,8 @@ class Textures extends DataMap {
 
 						backend.createTexture( texture, options );
 
+						if ( textureData.isDefaultTexture === true ) this.info.updateTexture( texture, options );
+
 						textureData.isDefaultTexture = false;
 						textureData.generation = texture.version;
 
@@ -481,7 +483,7 @@ class Textures extends DataMap {
 
 			//
 
-			this.info.createTexture( texture );
+			this.info.createTexture( texture, options );
 
 			//
 
@@ -589,7 +591,8 @@ class Textures extends DataMap {
 
 		} else {
 
-			target.width = target.height = target.depth = 1;
+			target.width = target.height = 1;
+			target.depth = texture.isCubeTexture ? 6 : 1;
 
 		}
 

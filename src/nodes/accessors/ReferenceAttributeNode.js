@@ -244,7 +244,7 @@ class ReferenceAttributeNode extends Node {
 
 			const index = attribute.isStorageInstancedBufferAttribute === true ? instanceIndex : vertexIndex;
 
-			return storage( attribute, type, Math.max( attribute.count, 1 ) ).onObjectUpdate( ( { object } ) => this.getAttribute( object ) ).element( index );
+			return storage( attribute, type ).onObjectUpdate( ( { object } ) => this.getAttribute( object ) ).element( index );
 
 		}
 

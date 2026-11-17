@@ -46,7 +46,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		let depth = shadowPass.sample( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) );
+		let depth = shadowPass.sample( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) ).level( 0 );
 
 		if ( shadowPass.value.isArrayTexture ) {
 
@@ -93,7 +93,7 @@ const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPas
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		let distribution = shadowPass.sample( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) );
+		let distribution = shadowPass.sample( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) ).level( 0 );
 
 		if ( shadowPass.value.isArrayTexture ) {
 
@@ -217,6 +217,16 @@ class ShadowNode extends ShadowBaseNode {
 		this._currentShadowType = null;
 
 		/**
+		 * Whether the output node of this shadow node was set up
+		 * with transmitted shadows or not.
+		 *
+		 * @type {?boolean}
+		 * @private
+		 * @default null
+		 */
+		this._currentTransmitted = null;
+
+		/**
 		 * A Weak Map holding the current frame ID per camera. Used
 		 * to control the update of shadow maps.
 		 *
@@ -224,6 +234,15 @@ class ShadowNode extends ShadowBaseNode {
 		 * @private
 		 */
 		this._cameraFrameId = new WeakMap();
+
+		/**
+		 * Describes the render call that last updated the shadow map. Used
+		 * to share the shadow map with render calls nested in that one.
+		 *
+		 * @type {{frameId: number, callDepth: number, sceneId: number, layersMask: number}}
+		 * @private
+		 */
+		this._lastUpdate = { frameId: - 1, callDepth: 0, sceneId: - 1, layersMask: 0 };
 
 		/**
 		 * This flag can be used for type testing.
@@ -601,8 +620,9 @@ class ShadowNode extends ShadowBaseNode {
 		return Fn( () => {
 
 			const currentShadowType = builder.renderer.shadowMap.type;
+			const currentTransmitted = builder.renderer.shadowMap.transmitted;
 
-			if ( this._currentShadowType !== currentShadowType ) {
+			if ( this._currentShadowType !== currentShadowType || this._currentTransmitted !== currentTransmitted ) {
 
 				this._reset();
 				this._node = null;
@@ -617,6 +637,7 @@ class ShadowNode extends ShadowBaseNode {
 
 				this._node = node = this.setupShadow( builder );
 				this._currentShadowType = currentShadowType;
+				this._currentTransmitted = currentTransmitted;
 
 			}
 
@@ -758,6 +779,7 @@ class ShadowNode extends ShadowBaseNode {
 	_reset() {
 
 		this._currentShadowType = null;
+		this._currentTransmitted = null;
 
 		this.disposeShadowMaterial();
 
@@ -791,6 +813,33 @@ class ShadowNode extends ShadowBaseNode {
 	}
 
 	/**
+	 * Returns `true` if the shadow map must be rendered for the given frame. The shadow
+	 * map is rendered once per camera and frame. Renders nested in the one that has
+	 * updated the shadow map in the current frame share it.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 * @return {boolean} Whether the shadow map must be rendered.
+	 */
+	needsRefresh( frame ) {
+
+		const { frameId, camera, scene } = frame;
+
+		if ( this._cameraFrameId.get( camera ) === frameId ) return false;
+
+		const lastUpdate = this._lastUpdate;
+
+		const hasMatchingShadows =
+			lastUpdate.frameId === frameId &&
+			lastUpdate.sceneId === scene.id &&
+			lastUpdate.layersMask === camera.layers.mask;
+
+		const isNestedRender = frame.renderer._callDepth > lastUpdate.callDepth;
+
+		return ( hasMatchingShadows && isNestedRender ) === false;
+
+	}
+
+	/**
 	 * The implementation performs the update of the shadow map if necessary.
 	 *
 	 * @param {NodeFrame} frame - A reference to the current node frame.
@@ -799,7 +848,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		// do not render shadow maps during precompilation
 
-		if ( frame.renderer._precompilationState !== null ) return;
+		if ( frame.renderer._precompilationState !== null ) return false;
 
 		const { shadow } = this;
 
@@ -807,17 +856,20 @@ class ShadowNode extends ShadowBaseNode {
 
 		if ( needsUpdate ) {
 
-			if ( this._cameraFrameId.get( frame.camera ) === frame.frameId ) {
-
-				needsUpdate = false;
-
-			}
+			needsUpdate = this.needsRefresh( frame );
 
 			this._cameraFrameId.set( frame.camera, frame.frameId );
 
 		}
 
 		if ( needsUpdate ) {
+
+			const lastUpdate = this._lastUpdate;
+
+			lastUpdate.frameId = frame.frameId;
+			lastUpdate.callDepth = frame.renderer._callDepth;
+			lastUpdate.sceneId = frame.scene.id;
+			lastUpdate.layersMask = frame.camera.layers.mask;
 
 			this.updateShadow( frame );
 

@@ -12,7 +12,7 @@ import {
 	storage, uniform, instanceIndex, vertexIndex, screenCoordinate, varyingProperty,
 	positionGeometry, cameraViewMatrix, cameraProjectionMatrix, normalize, context, overrideNodes,
 	positionLocal, positionWorld, positionWorldDirection, positionView, positionViewDirection,
-	normalLocal, normalViewGeometry, normalWorldGeometry, tangentViewFrame, bitangentViewFrame, modelWorldMatrix, modelViewMatrix, modelPosition, atomicMax, atomicAdd, atomicStore, atomicLoad
+	normalLocal, normalViewGeometry, normalWorldGeometry, tangentViewFrame, bitangentViewFrame, modelWorldMatrix, modelViewMatrix, modelPosition, atomicMax, atomicAdd, atomicStore, atomicLoad, atomicExchange
 } from 'three/tsl';
 
 import { MeshletDrawingPipeline, MeshletBatch, cacheAttributes, createDebugMaterial, createDrawMaterial, createOcclusion } from './MeshletDrawingPipeline.js';
@@ -182,8 +182,8 @@ function createView( width, height ) {
 	const screenTriAttribute = new StorageBufferAttribute( new Uint32Array( pixels ), 1 );
 	const screenInstAttribute = new StorageBufferAttribute( new Uint32Array( pixels ), 1 );
 
-	const screenTriAtomic = storage( screenTriAttribute, 'uint', pixels ).toAtomic();
-	const screenInstAtomic = storage( screenInstAttribute, 'uint', pixels ).toAtomic();
+	const screenTriAtomic = storage( screenTriAttribute, 'uint' ).toAtomic();
+	const screenInstAtomic = storage( screenInstAttribute, 'uint' ).toAtomic();
 
 	const computeClear = Fn( () => {
 
@@ -196,9 +196,9 @@ function createView( width, height ) {
 		width,
 		height,
 		screenTriAtomic,
-		screenTriRead: storage( screenTriAttribute, 'uint', pixels ).toReadOnly(),
+		screenTriRead: storage( screenTriAttribute, 'uint' ).toReadOnly(),
 		screenInstAtomic,
-		screenInstRead: storage( screenInstAttribute, 'uint', pixels ).toReadOnly(),
+		screenInstRead: storage( screenInstAttribute, 'uint' ).toReadOnly(),
 		computeClear,
 		dispose() {
 
@@ -263,22 +263,16 @@ class VisibilityBufferBatch extends MeshletBatch {
 		const { screenTriAtomic, screenTriRead, screenInstAtomic, screenInstRead } = this.view;
 
 		const dispatchAttribute = createAttribute( new Uint32Array( 3 ), 3, IndirectStorageBufferAttribute );
-		const dispatchBuffer = storage( dispatchAttribute, 'uint', 3 );
+		const dispatchBuffer = storage( dispatchAttribute, 'uint' );
 
 		// the software rasterizer sends large triangles to the hardware queue, the counter followed by [ instance, triangle ] pairs
 
 		const hwQueueAttribute = createAttribute( new Uint32Array( 1 + MAX_HW_TRIANGLES * 2 ), 1 );
-		const hwQueueAtomic = storage( hwQueueAttribute, 'uint', 1 + MAX_HW_TRIANGLES * 2 ).toAtomic();
-		const hwQueueRead = storage( hwQueueAttribute, 'uint', 1 + MAX_HW_TRIANGLES * 2 ).toReadOnly();
+		const hwQueueAtomic = storage( hwQueueAttribute, 'uint' ).toAtomic();
+		const hwQueueRead = storage( hwQueueAttribute, 'uint' ).toReadOnly();
 
 		const hwDrawAttribute = createAttribute( new Uint32Array( 4 ), 4, IndirectStorageBufferAttribute );
-		const hwDrawBuffer = storage( hwDrawAttribute, 'uint', 4 );
-
-		const computeHWReset = Fn( () => {
-
-			atomicStore( hwQueueAtomic.element( 0 ), uint( 0 ) );
-
-		} )().compute( 1 ).setName( 'VisibilityBufferDrawingPipeline Reset' );
+		const hwDrawBuffer = storage( hwDrawAttribute, 'uint' );
 
 		// indirect dispatch arguments, split into 2D if exceeding 65535 workgroups
 
@@ -477,7 +471,7 @@ class VisibilityBufferBatch extends MeshletBatch {
 
 		const computeHWArgs = Fn( () => {
 
-			hwDrawBuffer.element( 0 ).assign( min( atomicLoad( hwQueueAtomic.element( 0 ) ), uint( MAX_HW_TRIANGLES ) ).mul( 3 ) );
+			hwDrawBuffer.element( 0 ).assign( min( atomicExchange( hwQueueAtomic.element( 0 ), uint( 0 ) ), uint( MAX_HW_TRIANGLES ) ).mul( 3 ) );
 			hwDrawBuffer.element( 1 ).assign( uint( 1 ) );
 			hwDrawBuffer.element( 2 ).assign( uint( 0 ) );
 			hwDrawBuffer.element( 3 ).assign( uint( 0 ) );
@@ -485,7 +479,7 @@ class VisibilityBufferBatch extends MeshletBatch {
 		} )().compute( 1 ).setName( 'VisibilityBufferDrawingPipeline HW Args' );
 
 
-		this.computeNodes.push( computeHWReset, computeDispatch, computeRasterize, computeHWArgs );
+		this.computeNodes.push( computeDispatch, computeRasterize, computeHWArgs );
 
 		// hardware path — the large triangles queued by the software rasterizer
 

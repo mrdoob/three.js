@@ -86,9 +86,9 @@ class DirectionalLight extends Light {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.target = source.target.clone();
 		this.shadow = source.shadow.clone();

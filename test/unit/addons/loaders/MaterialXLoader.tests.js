@@ -735,6 +735,34 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+			QUnit.test( 'reads geompropvalue from built-in properties and named attributes', ( assert ) => {
+
+				const text = `<?xml version="1.0"?>
+<materialx version="1.39">
+	<nodegraph name="test_graph">
+		<geompropvalue name="named" type="vector2">
+			<input name="geomprop" type="string" value="st" />
+			<input name="default" type="vector2" value="0.25, 0.5" />
+		</geompropvalue>
+		<geompropvalue name="builtin" type="vector3">
+			<input name="geomprop" type="string" value="Pworld" />
+		</geompropvalue>
+		<combine3 name="combined" type="color3">
+			<input name="in1" type="float" nodename="named" output="outx" />
+			<input name="in2" type="float" nodename="named" output="outy" />
+			<input name="in3" type="float" nodename="builtin" output="outz" />
+		</combine3>
+		<output name="out" type="color3" nodename="combined" />
+	</nodegraph>
+</materialx>`;
+
+				const result = new MaterialXLoader().parse( text );
+				assert.strictEqual( result.errors.length, 0, 'The document translates without errors.' );
+				assert.false( result.log.some( ( entry ) => entry.code === 'unsupported-node' ), 'geompropvalue is supported.' );
+				assert.ok( result.materials.test_graph.colorNode, 'The graph output is built.' );
+
+			} );
+
 			QUnit.test( 'supports hsvadjust, facingratio and triplanarprojection', ( assert ) => {
 
 				const nodes = [

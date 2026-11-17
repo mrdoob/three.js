@@ -46,7 +46,7 @@ const LUTShader = {
 			vec3 uvw = vec3( halfPixelWidth ) + val.rgb * ( 1.0 - pixelWidth );
 
 
-			lutVal = vec4( texture( lut, uvw ).rgb, val.a );
+			lutVal = vec4( textureLod( lut, uvw, 0.0 ).rgb, val.a );
 
 			gl_FragColor = vec4( mix( val, lutVal, intensity ) );
 

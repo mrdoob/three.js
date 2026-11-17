@@ -155,8 +155,9 @@ class SplitNode extends Node {
 		} else {
 
 			// ignore .components if .node returns float/integer
+			// but keep the snippet's type equal to the declared node type
 
-			snippet = node.build( builder, output );
+			snippet = node.build( builder, output || this.getNodeType( builder ) );
 
 		}
 

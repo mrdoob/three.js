@@ -36,7 +36,7 @@ function createInstanceMatrixNode( builder, instanceMatrix ) {
 
 	if ( isStorageMatrix ) {
 
-		instanceMatrixNode = storage( instanceMatrix, 'mat4', matrixCount ).element( instanceIndex );
+		instanceMatrixNode = storage( instanceMatrix, 'mat4' ).element( instanceIndex );
 
 	} else {
 
@@ -274,7 +274,7 @@ export const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder
 
 		if ( isStorageColor ) {
 
-			instanceColorNode = storage( colors, 'vec3', Math.max( colors.count, 1 ) ).element( instanceIndex );
+			instanceColorNode = storage( colors, 'vec3' ).element( instanceIndex );
 
 		} else {
 

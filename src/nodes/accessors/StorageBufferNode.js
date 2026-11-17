@@ -49,9 +49,8 @@ class StorageBufferNode extends BufferNode {
 	 *
 	 * @param {StorageBufferAttribute|StorageInstancedBufferAttribute|BufferAttribute} value - The buffer data.
 	 * @param {?(string|Struct)} [bufferType=null] - The buffer type (e.g. `'vec3'`).
-	 * @param {number} [bufferCount=0] - The buffer count.
 	 */
-	constructor( value, bufferType = null, bufferCount = 0 ) {
+	constructor( value, bufferType = null ) {
 
 		let nodeType, structTypeNode = null;
 
@@ -60,16 +59,9 @@ class StorageBufferNode extends BufferNode {
 			nodeType = 'struct';
 			structTypeNode = bufferType;
 
-			if ( value.isStorageBufferAttribute || value.isStorageInstancedBufferAttribute ) {
-
-				bufferCount = value.count;
-
-			}
-
 		} else if ( bufferType === null && ( value.isStorageBufferAttribute || value.isStorageInstancedBufferAttribute ) ) {
 
 			nodeType = getTypeFromLength( value.itemSize );
-			bufferCount = value.count;
 
 		} else {
 
@@ -77,7 +69,7 @@ class StorageBufferNode extends BufferNode {
 
 		}
 
-		super( value, nodeType, bufferCount );
+		super( value, nodeType );
 
 		/**
 		 * This flag can be used for type testing.
@@ -156,43 +148,6 @@ class StorageBufferNode extends BufferNode {
 			else value.isStorageBufferAttribute = true;
 
 		}
-
-	}
-
-	/**
-	 * This method is overwritten since the buffer data might be shared
-	 * and thus the hash should be shared as well.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The hash.
-	 */
-	getHash( builder ) {
-
-		let id;
-
-		if ( this.bufferCount === 0 ) {
-
-			let bufferData = builder.globalCache.getData( this.value );
-
-			if ( bufferData === undefined ) {
-
-				bufferData = {
-					node: this
-				};
-
-				builder.globalCache.setData( this.value, bufferData );
-
-			}
-
-			id = bufferData.node.id;
-
-		} else {
-
-			id = this.id;
-
-		}
-
-		return String( id );
 
 	}
 
@@ -390,7 +345,6 @@ export default StorageBufferNode;
  * @function
  * @param {StorageBufferAttribute|StorageInstancedBufferAttribute|BufferAttribute} value - The buffer data.
  * @param {?(string|Struct)} [type=null] - The buffer type (e.g. `'vec3'`).
- * @param {number} [count=0] - The buffer count.
  * @returns {StorageBufferNode}
  */
-export const storage = ( value, type = null, count = 0 ) => new StorageBufferNode( value, type, count );
+export const storage = ( value, type = null ) => new StorageBufferNode( value, type );

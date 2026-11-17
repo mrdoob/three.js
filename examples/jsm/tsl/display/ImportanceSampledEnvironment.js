@@ -517,8 +517,8 @@ class ImportanceSampledEnvironment {
 		If( alpha.greaterThan( 0.01 ), () => {
 
 			const r_env = vec2( Xi2.z, Xi2.w );
-			const v_cdf = texture( marginalNode, vec2( r_env.x, float( 0 ) ) ).r;
-			const u_cdf = texture( conditionalNode, vec2( r_env.y, v_cdf ) ).r;
+			const v_cdf = texture( marginalNode, vec2( r_env.x, float( 0 ) ) ).level( 0 ).r;
+			const u_cdf = texture( conditionalNode, vec2( r_env.y, v_cdf ) ).level( 0 ).r;
 			const isEnvUV = vec2( u_cdf, v_cdf );
 			const envDirWS = equirectUV( isEnvUV );
 

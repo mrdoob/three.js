@@ -6,7 +6,8 @@ import {
 	Group,
 	Loader,
 	Mesh,
-	MeshPhongMaterial
+	MeshPhongMaterial,
+	SRGBColorSpace
 } from 'three';
 import { unzipSync } from '../libs/fflate.module.js';
 
@@ -209,7 +210,7 @@ class AMFLoader extends Loader {
 
 			loadedMaterial = new MeshPhongMaterial( {
 				flatShading: true,
-				color: new Color( color.r, color.g, color.b ),
+				color: new Color().setRGB( color.r, color.g, color.b, SRGBColorSpace ),
 				name: matName
 			} );
 
@@ -234,19 +235,19 @@ class AMFLoader extends Loader {
 
 				if ( matColor.nodeName === 'r' ) {
 
-					color.r = matColor.textContent;
+					color.r = parseFloat( matColor.textContent );
 
 				} else if ( matColor.nodeName === 'g' ) {
 
-					color.g = matColor.textContent;
+					color.g = parseFloat( matColor.textContent );
 
 				} else if ( matColor.nodeName === 'b' ) {
 
-					color.b = matColor.textContent;
+					color.b = parseFloat( matColor.textContent );
 
 				} else if ( matColor.nodeName === 'a' ) {
 
-					color.a = matColor.textContent;
+					color.a = parseFloat( matColor.textContent );
 
 				}
 
@@ -489,7 +490,7 @@ class AMFLoader extends Loader {
 					const color = mesh.color;
 
 					objDefaultMaterial = defaultMaterial.clone();
-					objDefaultMaterial.color = new Color( color.r, color.g, color.b );
+					objDefaultMaterial.color.setRGB( color.r, color.g, color.b, SRGBColorSpace );
 
 					if ( color.a !== 1.0 ) {
 

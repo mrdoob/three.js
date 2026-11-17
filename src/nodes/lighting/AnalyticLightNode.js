@@ -210,7 +210,7 @@ class AnalyticLightNode extends LightingNode {
 
 			let shadowNode;
 
-			if ( customShadowNode !== undefined ) {
+			if ( customShadowNode !== null ) {
 
 				shadowNode = nodeObject( customShadowNode );
 

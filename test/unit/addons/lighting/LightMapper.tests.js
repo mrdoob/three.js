@@ -30,6 +30,7 @@ export default QUnit.module( 'Addons', () => {
 					getClearColor: value => value.set( 0 ),
 					getClearAlpha: () => 1,
 					getScissorTest: () => false,
+					hasFeature: () => false,
 					setRenderTarget: () => {},
 					setRenderObjectFunction: () => {},
 					setPixelRatio: () => {},

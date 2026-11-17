@@ -257,10 +257,15 @@ class SSAOPass extends Pass {
 
 		// dispose materials
 
+		this.ssaoMaterial.dispose();
 		this.normalMaterial.dispose();
 		this.blurMaterial.dispose();
 		this.copyMaterial.dispose();
 		this.depthRenderMaterial.dispose();
+
+		// dispose textures
+
+		this.noiseTexture.dispose();
 
 		// dispose full screen quad
 

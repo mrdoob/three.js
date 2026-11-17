@@ -52,9 +52,9 @@ class LightProbe extends Light {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.sh.copy( source.sh );
 

@@ -26,7 +26,7 @@ function evaluateGridIrradiance( atlas, uvw, res, normal ) {
 	const atlasDepth = paddedSlices.mul( 7.0 );
 	const uvZBase = uvw.z.mul( nz ).add( ATLAS_PADDING );
 
-	const slice = ( t ) => atlas.sample( vec3( uvw.xy, uvZBase.add( paddedSlices.mul( t ) ).div( atlasDepth ) ) );
+	const slice = ( t ) => atlas.sample( vec3( uvw.xy, uvZBase.add( paddedSlices.mul( t ) ).div( atlasDepth ) ) ).level( 0 );
 
 	const s0 = slice( 0 ), s1 = slice( 1 ), s2 = slice( 2 ), s3 = slice( 3 );
 	const s4 = slice( 4 ), s5 = slice( 5 ), s6 = slice( 6 );
@@ -75,24 +75,6 @@ function getGridIrradiance( light, min, max, res, intensity, position, normal ) 
 	const uvw = samplePos.sub( min ).div( range ).clamp( halfTexel, halfTexel.oneMinus() );
 
 	return evaluateGridIrradiance( texture3D( light.texture ), uvw, res, normal ).mul( intensity );
-
-}
-
-/**
- * Returns the irradiance of a baked {@link LightProbeGrid} at the given world-space
- * position and normal. Use this to evaluate the grid outside of the lighting context,
- * e.g. when baking light maps with {@link LightMapper}.
- *
- * @param {LightProbeGrid} light - The baked light probe grid.
- * @param {Node<vec3>} position - The world-space position.
- * @param {Node<vec3>} normal - The world-space normal.
- * @return {Node<vec3>} The irradiance.
- */
-export function lightProbeGridIrradiance( light, position, normal ) {
-
-	const box = light.boundingBox;
-
-	return getGridIrradiance( light, uniform( box.min ), uniform( box.max ), uniform( light.resolution ), uniform( light.intensity ), position, normal );
 
 }
 

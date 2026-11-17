@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, HalfFloatType, RGBAFormat, RedFormat, UnsignedByteType } from 'three/webgpu';
-import { Fn, NodeUpdateType, uniform, reference, vec2, vec4, float, uv, mix, passTexture, getViewPosition, getNormalFromDepth, screenCoordinate, interleavedGradientNoise, normalize, floor, exp2, pow, PI, Loop, If, Break, property, outputStruct, context, projectionDepth } from 'three/tsl';
+import { Fn, NodeUpdateType, uniform, reference, vec2, vec4, float, uv, mix, passTexture, getViewPosition, getNormalFromDepth, screenCoordinate, interleavedGradientNoise, normalize, floor, exp2, pow, PI, Loop, If, Break, outputStruct, context, projectionDepth } from 'three/tsl';
 
 import { VXGIVolume } from './VXGIVolume.js';
 import { createConeTracer, gather, intersectVolume, sampleDirectional } from './VXGIConeTracer.js';
@@ -11,8 +11,6 @@ const TEMPORAL_SHIFT = 5.588238;
 const TEMPORAL_CYCLE = 64;
 
 let _rendererState;
-
-const _neutralContext = /*@__PURE__*/ context();
 
 /**
  * Post processing node for voxel based global illumination. The scene is voxelized into a
@@ -361,12 +359,6 @@ class VXGINode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		// this node is usually updated while a scene pass renders whose context injects the
-		// AO/GI of this node into the materials; the nested renders below must not inherit it
-
-		const currentContextNode = renderer.contextNode;
-		renderer.contextNode = _neutralContext;
-
 		//
 
 		const size = renderer.getDrawingBufferSize( _size );
@@ -410,8 +402,6 @@ class VXGINode extends Node {
 
 		// restore
 
-		renderer.contextNode = currentContextNode;
-
 		RendererUtils.restoreRendererState( renderer, _rendererState );
 
 	}
@@ -453,11 +443,6 @@ class VXGINode extends Node {
 			radianceNode: volume.radianceNode,
 			directionalNode: directional === true ? volume.directionalNode : null
 		} );
-
-		const aoField = property( 'float' );
-		const giField = property( 'vec4' );
-
-		const outputNode = outputStruct( aoField, giField );
 
 		const gi = Fn( () => {
 
@@ -570,16 +555,14 @@ class VXGINode extends Node {
 
 			} );
 
-			aoField.assign( ao );
-			giField.assign( vec4( color, 1 ) );
-
-			return vec4( 0 );
+			return vec4( color, ao );
 
 		} );
 
+		const result = gi().toConst();
+
 		this._material.contextNode = context( this._sharedContext );
-		this._material.colorNode = gi();
-		this._material.outputNode = outputNode;
+		this._material.fragmentNode = outputStruct( result.w, vec4( result.xyz, 1 ) );
 		this._material.needsUpdate = true;
 
 	}

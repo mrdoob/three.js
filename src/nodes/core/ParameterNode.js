@@ -72,6 +72,12 @@ class ParameterNode extends PropertyNode {
 
 	}
 
+	getInputType( builder ) {
+
+		return this.getNodeType( builder );
+
+	}
+
 	generate() {
 
 		return this.name;

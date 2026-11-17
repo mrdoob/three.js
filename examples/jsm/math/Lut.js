@@ -187,7 +187,7 @@ class Lut {
 	 */
 	copy( lut ) {
 
-		this.lut = lut.lut;
+		this.lut = lut.lut.map( ( color ) => color.clone() );
 		this.map = lut.map;
 		this.n = lut.n;
 		this.minV = lut.minV;
@@ -262,15 +262,15 @@ class Lut {
 
 		const data = imageData.data;
 
-		let k = 0;
-
 		const step = 1.0 / this.n;
 
 		const minColor = new Color();
 		const maxColor = new Color();
 		const finalColor = new Color();
 
-		for ( let i = 1; i >= 0; i -= step ) {
+		for ( let k = 0; k < this.n; k ++ ) {
+
+			const i = ( this.n - 1 - k ) * step;
 
 			for ( let j = this.map.length - 1; j >= 0; j -- ) {
 
@@ -288,8 +288,6 @@ class Lut {
 					data[ k * 4 + 1 ] = Math.round( finalColor.g * 255 );
 					data[ k * 4 + 2 ] = Math.round( finalColor.b * 255 );
 					data[ k * 4 + 3 ] = 255;
-
-					k += 1;
 
 				}
 

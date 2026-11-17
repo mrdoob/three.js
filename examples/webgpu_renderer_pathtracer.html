@@ -34,9 +34,9 @@
 					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/",
 					"three/examples/": "./",
-					"three-gpu-pathtracer/webgpu": "https://cdn.jsdelivr.net/npm/three-gpu-pathtracer@0.0.26/src/webgpu/index.js",
-					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/index.js",
-					"three-mesh-bvh/webgpu": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/webgpu/index.js"
+					"three-gpu-pathtracer/webgpu": "https://cdn.jsdelivr.net/npm/three-gpu-pathtracer@0.0.28/src/webgpu/index.js",
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.17/src/index.js",
+					"three-mesh-bvh/webgpu": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.17/src/webgpu/index.js"
 				}
 			}
 		</script>
@@ -91,11 +91,19 @@
 				await renderer.init();
 
 				pathTracer = new WebGPUPathTracer( renderer );
-				pathTracer.useMegakernel( true ); // TODO: Remove once the wavefront backend supports array-bound struct buffers.
 				pathTracer.filterGlossyFactor = 1;
 				pathTracer.minSamples = 3;
 				pathTracer.maxSamples = 32;
 				pathTracer.renderScale = params.resolutionScale;
+				pathTracer.addEventListener( 'progress', ( { samples } ) => {
+
+					if ( samples ) {
+
+						params.samples = Math.floor( samples.avg );
+
+					}
+
+				} );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xeeeeee );
@@ -225,12 +233,6 @@
 				if ( params.enable ) {
 
 					pathTracer.renderSample();
-
-					pathTracer.getSampleCountsAsync().then( counts => {
-
-						params.samples = Math.floor( counts.avg );
-
-					} );
 
 				} else {
 

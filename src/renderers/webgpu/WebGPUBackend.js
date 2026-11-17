@@ -13,7 +13,7 @@ import WebGPUCapabilities from './utils/WebGPUCapabilities.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
-import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compatibility, CustomBlending } from '../../constants.js';
+import { WebGPUCoordinateSystem, REVISION, HalfFloatType, Compatibility, CustomBlending } from '../../constants.js';
 import { Color } from '../../math/Color.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { error, warnOnce } from '../../utils.js';
@@ -39,7 +39,6 @@ const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
 const _computePassDescriptor = new GPUComputePassDescriptor();
 const _querySetDescriptor = new GPUQuerySetDescriptor();
 const _shaderModuleDescriptor = new GPUShaderModuleDescriptor();
-const _renderPassTimestampWrites = new GPURenderPassTimestampWrites();
 const _texelCopyTextureInfoSrc = new GPUTexelCopyTextureInfo();
 const _texelCopyTextureInfoDst = new GPUTexelCopyTextureInfo();
 const _textureDescriptor = new GPUTextureDescriptor();
@@ -66,7 +65,6 @@ class WebGPUBackend extends Backend {
 	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
 	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
 	 * @property {boolean} [forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
-	 * @property {boolean} [trackTimestamp=false] - Whether to track timestamps with a Timestamp Query API or not.
 	 * @property {string} [powerPreference=undefined] - The power preference.
 	 * @property {Object} [requiredLimits=undefined] - Specifies the limits that are required by the device request. The request will fail if the adapter cannot provide these limits.
 	 * @property {GPUDevice} [device=undefined] - If there is an existing GPU device on app level, it can be passed to the renderer as a parameter.
@@ -295,10 +293,6 @@ class WebGPUBackend extends Backend {
 
 		this.device = device;
 
-		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
-
-		this.updateSize();
-
 	}
 
 	/**
@@ -393,7 +387,7 @@ class WebGPUBackend extends Backend {
 	 */
 	get hasTimestamp() {
 
-		return true;
+		return this.device !== null && this.hasFeature( GPUFeatureName.TimestampQuery );
 
 	}
 
@@ -941,7 +935,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		this.initTimestampQuery( TimestampQuery.RENDER, this.getTimestampUID( renderContext ), descriptor );
+		this.initTimestampQuery( renderContext, descriptor );
 
 		descriptor.occlusionQuerySet = occlusionQuerySet;
 
@@ -1482,6 +1476,8 @@ class WebGPUBackend extends Backend {
 
 					const renderPass = encoder.beginRenderPass( layerDescriptor );
 
+					this._continueTimestampQuery( layerDescriptor );
+
 					if ( renderContext.viewport ) {
 
 						const { x, y, width, height, minDepth, maxDepth } = renderContext.viewportValue;
@@ -1886,7 +1882,7 @@ class WebGPUBackend extends Backend {
 		_computePassDescriptor.label = label;
 		_commandEncoderDescriptor.label = label;
 
-		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ), _computePassDescriptor );
+		this.initTimestampQuery( computeGroup, _computePassDescriptor );
 
 		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( _commandEncoderDescriptor );
 		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( _computePassDescriptor );
@@ -1905,9 +1901,15 @@ class WebGPUBackend extends Backend {
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
 	 * @param {number|Array<number>|IndirectStorageBufferAttribute} [dispatchSize=null]
-	 * - A single number representing count, or
-	 * - An array [x, y, z] representing dispatch size, or
-	 * - A IndirectStorageBufferAttribute for indirect dispatch size.
+	 * An argument that defines the number of compute invocations executed in a compute call
+	 * and the size of the dispatched workgroup grid in which they are executed.
+	 * Depending on the type of the argument, the dispatch size of a compute call will be determined in different ways.
+	 * - A number will dispatch a workgroup grid sized to fit `dispatchSize` invocations.
+	 * - An array [x, y, z] will directly define the size of the workgroup grid.
+	 *   The compute call will execute x * y * z * workgroupSize invocations.
+	 * - A IndirectStorageBufferAttribute will run an indirect compute dispatch.
+	 *   In an indirect dispatch, the [x, y, z] dimensions of the workgroup grid are defined by the first three values
+	 *   stored in the IndirectStorageBufferAttribute.
 	 */
 	compute( computeGroup, computeNode, bindings, pipeline, dispatchSize = null ) {
 
@@ -1917,7 +1919,11 @@ class WebGPUBackend extends Backend {
 
 		// pipeline
 
-		const pipelineGPU = this.get( pipeline ).pipeline;
+		const pipelineData = this.get( pipeline );
+
+		if ( pipelineData.error === true ) return;
+
+		const pipelineGPU = pipelineData.pipeline;
 
 		if ( groupGPU.currentPipeline !== pipelineGPU ) {
 
@@ -2245,7 +2251,6 @@ class WebGPUBackend extends Backend {
 		const pipelineData = this.get( pipeline );
 		const pipelineGPU = pipelineData.pipeline;
 
-		// Skip if pipeline has error
 		if ( pipelineData.error === true ) return;
 
 		const drawParams = renderObject.getDrawParameters();
@@ -2415,7 +2420,7 @@ class WebGPUBackend extends Backend {
 
 		const sampleCount = utils.getSampleCountRenderContext( renderObject.context );
 		const colorSpace = utils.getCurrentColorSpace( renderObject.context );
-		const colorFormat = utils.getCurrentColorFormat( renderObject.context );
+		const colorFormat = utils.getCurrentColorFormats( renderObject.context ).join();
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderObject.context );
 		const primitiveTopology = utils.getPrimitiveTopology( object, material );
 		const stripIndexFormat = utils.getStripIndexFormat( object, geometry );
@@ -2501,7 +2506,7 @@ class WebGPUBackend extends Backend {
 			material.side, material.alphaToCoverage,
 			frontFaceCW,
 			utils.getSampleCountRenderContext( renderContext ),
-			utils.getCurrentColorSpace( renderContext ), utils.getCurrentColorFormat( renderContext ), utils.getCurrentDepthStencilFormat( renderContext ),
+			utils.getCurrentColorSpace( renderContext ), utils.getCurrentColorFormats( renderContext ).join(), utils.getCurrentDepthStencilFormat( renderContext ),
 			utils.getPrimitiveTopology( object, material ), utils.getStripIndexFormat( object, geometry ),
 			this.attributeUtils.getVertexBufferLayoutCacheKey( renderObject ),
 			renderObject.clippingContextCacheKey
@@ -2613,37 +2618,66 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Inits a time stamp query for the given render context.
+	 * Inits a time stamp query for the given render context. While GPU timers are active, the
+	 * pass writes its begin and end timestamps to the timestamp query pool.
 	 *
-	 * @param {string} type - The type of the timestamp query (e.g. 'render', 'compute').
-	 * @param {number} uid - Unique id for the context (e.g. render context id).
+	 * @param {RenderContext|ComputeNode|Array<ComputeNode>} renderContext - The render context or compute group.
 	 * @param {Object} descriptor - The query descriptor.
 	 */
-	initTimestampQuery( type, uid, descriptor ) {
+	initTimestampQuery( renderContext, descriptor ) {
 
-		if ( ! this.trackTimestamp ) {
+		const timestampQueryPool = this.timestampQueryPool;
+		const baseOffset = timestampQueryPool !== null ? timestampQueryPool.allocateQueries() : null;
+
+		if ( baseOffset === null ) {
 
 			descriptor.timestampWrites = undefined;
 			return;
 
 		}
 
-		if ( ! this.timestampQueryPool[ type ] ) {
+		const contextData = this.get( renderContext );
 
-			// TODO: Variable maxQueries?
-			this.timestampQueryPool[ type ] = new WebGPUTimestampQueryPool( this.device, type, 2048 );
+		if ( contextData.timestampWrites === undefined ) {
+
+			contextData.timestampWrites = new GPURenderPassTimestampWrites();
 
 		}
 
-		const timestampQueryPool = this.timestampQueryPool[ type ];
+		const timestampWrites = contextData.timestampWrites;
+		timestampWrites.querySet = timestampQueryPool.querySet;
+		timestampWrites.beginningOfPassWriteIndex = baseOffset;
+		timestampWrites.endOfPassWriteIndex = baseOffset + 1;
 
-		const baseOffset = timestampQueryPool.allocateQueriesForContext( uid );
+		descriptor.timestampWrites = timestampWrites;
 
-		_renderPassTimestampWrites.querySet = timestampQueryPool.querySet;
-		_renderPassTimestampWrites.beginningOfPassWriteIndex = baseOffset;
-		_renderPassTimestampWrites.endOfPassWriteIndex = baseOffset + 1;
+	}
 
-		descriptor.timestampWrites = _renderPassTimestampWrites;
+	/**
+	 * Makes following passes of a split render pass only write the end timestamp so the
+	 * query measures from the first pass to the last one.
+	 *
+	 * @private
+	 * @param {Object} descriptor - The render pass descriptor.
+	 */
+	_continueTimestampQuery( descriptor ) {
+
+		if ( descriptor.timestampWrites !== undefined ) {
+
+			descriptor.timestampWrites.beginningOfPassWriteIndex = undefined;
+
+		}
+
+	}
+
+	/**
+	 * Creates the timestamp query pool of the GPU timers.
+	 *
+	 * @return {WebGPUTimestampQueryPool} The timestamp query pool.
+	 */
+	createTimestampQueryPool() {
+
+		return new WebGPUTimestampQueryPool( this.device );
 
 	}
 
@@ -2980,7 +3014,12 @@ class WebGPUBackend extends Backend {
 	 */
 	updateSize() {
 
-		this.delete( this.renderer.getCanvasTarget() );
+		// the context configuration does not depend on the canvas size, so only the descriptor is reset
+
+		const canvasData = this.get( this.renderer.getCanvasTarget() );
+
+		delete canvasData.descriptor;
+		delete canvasData.samples;
 
 	}
 
@@ -3034,8 +3073,10 @@ class WebGPUBackend extends Backend {
 		let srcY = 0;
 		let srcZ = 0;
 
-		let srcWidth = srcTexture.image.width;
-		let srcHeight = srcTexture.image.height;
+		const levelScale = Math.pow( 2, - srcLevel );
+
+		let srcWidth = Math.floor( srcTexture.width * levelScale );
+		let srcHeight = Math.floor( srcTexture.height * levelScale );
 		let srcDepth = 1;
 
 
@@ -3222,6 +3263,8 @@ class WebGPUBackend extends Backend {
 
 			if ( renderContext.depth ) descriptor.depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
 			if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+
+			this._continueTimestampQuery( descriptor );
 
 			renderContextData.currentPass = encoder.beginRenderPass( descriptor );
 

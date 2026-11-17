@@ -517,7 +517,7 @@
 				teapotGeometry.computeBoundingBox();
 				const teapotMinY = teapotGeometry.boundingBox.min.y;
 				vertexCount = teapotGeometry.attributes.position.count;
-				teapotVerticesBuffer = storage( teapotGeometry.attributes.position, 'vec3', vertexCount ).toReadOnly();
+				teapotVerticesBuffer = storage( teapotGeometry.attributes.position, 'vec3' ).toReadOnly();
 
 				createComputePasses();
 
@@ -732,7 +732,7 @@
 
 				teapot = new THREE.Mesh(
 					teapotGeometry,
-					new THREE.MeshStandardMaterial( { color: 0x000000, roughness: 1.0, metalness: 1.0 } )
+					new THREE.MeshStandardNodeMaterial( { color: 0x000000, roughness: 1.0, metalness: 1.0 } )
 				);
 				//teapot.castShadow = true;
 				teapot.receiveShadow = true;

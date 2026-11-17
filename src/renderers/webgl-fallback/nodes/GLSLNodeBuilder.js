@@ -94,6 +94,15 @@ const glslMethods = {
 	floatunpack_unorm_4x8: 'tsl_unpackUnorm4x8'
 };
 
+const samplerTypes = new Set( [ 'texture', 'texture3D', 'cubeTexture', 'cubeDepthTexture' ] );
+
+// The GLSL types of the texture inputs of a function layout.
+const layoutTextureTypes = {
+	texture: 'sampler2D',
+	cubeTexture: 'samplerCube',
+	texture3D: 'sampler3D'
+};
+
 const precisionLib = {
 	low: 'lowp',
 	medium: 'mediump',
@@ -382,6 +391,22 @@ class GLSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Returns the parameters that pass a texture to a function: the texture and its y-flip.
+	 * Cube textures are not flipped, see {@link CubeTextureNode#setupUV}.
+	 *
+	 * @param {string} name - The name of the texture parameter.
+	 * @param {TextureNode} textureNode - The texture node.
+	 * @return {Object<string,Node>} The nodes of the parameters, by name.
+	 */
+	getTextureParameters( name, textureNode ) {
+
+		if ( textureNode.isCubeTextureNode === true ) return { [ name ]: textureNode };
+
+		return { [ name ]: textureNode, [ name + '_flipY' ]: textureNode._getFlipYUniform() };
+
+	}
+
+	/**
 	 * Builds the given shader node.
 	 *
 	 * @param {ShaderNodeInternal} shaderNode - The shader node.
@@ -394,9 +419,9 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 		const parameters = [];
 
-		for ( const input of layout.inputs ) {
+		for ( const { name, type } of flowData.parameters ) {
 
-			parameters.push( this.getType( input.type ) + ' ' + input.name );
+			parameters.push( ( layoutTextureTypes[ type ] || this.getType( type ) ) + ' ' + name );
 
 		}
 
@@ -967,57 +992,9 @@ ${ flowData.code }
 			let snippet = null;
 			let group = false;
 
-			if ( uniform.type === 'texture' || uniform.type === 'texture3D' ) {
+			if ( samplerTypes.has( uniform.type ) ) {
 
-				const textureNode = uniform.node;
-				const texture = textureNode.value;
-
-				const componentType = this.getComponentTypeFromTexture( texture );
-				const typePrefix = componentType === 'float' ? '' : componentType.charAt( 0 );
-
-				if ( uniform.type === 'texture3D' && texture.isArrayTexture === false ) {
-
-					snippet = `${typePrefix}sampler3D ${ uniform.name };`;
-
-				} else if ( texture.compareFunction && textureNode.isSampleCompare() ) {
-
-					if ( texture.isArrayTexture === true ) {
-
-						snippet = `sampler2DArrayShadow ${ uniform.name };`;
-
-					} else {
-
-						snippet = `sampler2DShadow ${ uniform.name };`;
-
-					}
-
-				} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
-
-					snippet = `${typePrefix}sampler2DArray ${ uniform.name };`;
-
-				} else {
-
-					snippet = `${typePrefix}sampler2D ${ uniform.name };`;
-
-				}
-
-			} else if ( uniform.type === 'cubeTexture' ) {
-
-				snippet = `samplerCube ${ uniform.name };`;
-
-			} else if ( uniform.type === 'cubeDepthTexture' ) {
-
-				const texture = uniform.node.value;
-
-				if ( texture.compareFunction ) {
-
-					snippet = `samplerCubeShadow ${ uniform.name };`;
-
-				} else {
-
-					snippet = `samplerCube ${ uniform.name };`;
-
-				}
+				snippet = `${ this._getSamplerType( uniform.node, uniform.type ) } ${ uniform.name };`;
 
 			} else if ( uniform.type === 'buffer' ) {
 
@@ -1106,6 +1083,42 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Returns the GLSL sampler type of a texture node.
+	 *
+	 * @private
+	 * @param {TextureNode} textureNode - The texture node.
+	 * @param {string} type - The input type of the texture node.
+	 * @return {string} The sampler type.
+	 */
+	_getSamplerType( textureNode, type ) {
+
+		const texture = textureNode.value;
+
+		if ( type === 'cubeTexture' ) return 'samplerCube';
+		if ( type === 'cubeDepthTexture' ) return texture.compareFunction ? 'samplerCubeShadow' : 'samplerCube';
+
+		const componentType = this.getComponentTypeFromTexture( texture );
+		const typePrefix = componentType === 'float' ? '' : componentType.charAt( 0 );
+
+		if ( type === 'texture3D' && texture.isArrayTexture === false ) {
+
+			return `${typePrefix}sampler3D`;
+
+		} else if ( texture.compareFunction && textureNode.isSampleCompare() ) {
+
+			return texture.isArrayTexture === true ? 'sampler2DArrayShadow' : 'sampler2DShadow';
+
+		} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
+
+			return `${typePrefix}sampler2DArray`;
+
+		}
+
+		return `${typePrefix}sampler2D`;
+
+	}
+
+	/**
 	 * Returns the type for a given buffer attribute.
 	 *
 	 * @param {BufferAttribute} attribute - The buffer attribute.
@@ -1125,7 +1138,7 @@ ${ flowData.code }
 
 			if ( ( array instanceof Uint32Array || array instanceof Int32Array ) === false ) {
 
-				nodeType = nodeType.slice( 1 );
+				nodeType = this.changeComponentType( nodeType, 'float' );
 
 			}
 
@@ -1910,6 +1923,9 @@ void main() {
 	getUniformFromNode( node, type, shaderStage, name = null ) {
 
 		const uniformNode = super.getUniformFromNode( node, type, shaderStage, type === 'buffer' ? null : name );
+
+		if ( uniformNode.isParameterNode === true ) return uniformNode;
+
 		const nodeData = this.getDataFromNode( node, shaderStage, this.globalCache );
 
 		let uniformGPU = nodeData.uniformGPU;

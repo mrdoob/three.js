@@ -113,7 +113,7 @@
 				const colorsAttribute = new THREE.InstancedBufferAttribute( new Float32Array( colors ), 3 );
 
 				const instanceSizeBufferAttribute = new THREE.StorageInstancedBufferAttribute( sizes, 1 );
-				const instanceSizeStorage = storage( instanceSizeBufferAttribute, 'float', instanceSizeBufferAttribute.count );
+				const instanceSizeStorage = storage( instanceSizeBufferAttribute, 'float' );
 
 				computeSize = Fn( () => {
 

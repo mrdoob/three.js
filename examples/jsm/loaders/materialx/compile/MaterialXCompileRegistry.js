@@ -34,6 +34,9 @@ import {
 	pow,
 	sqrt,
 	sign,
+	attribute,
+	bool,
+	Fn,
 } from 'three/tsl';
 import {
 	getComponentCountForType,
@@ -116,7 +119,7 @@ const sampleTexture = ( textureFile, uvNode, compileContext, fallback, addressMo
 
 	if ( ! textureFile ) return fallback;
 
-	const textureUvNode = compileContext.mxFromBottomLeftUvSpace( uvNode );
+	const textureUvNode = compileContext.mxToImageUv( uvNode );
 	const sampled = texture( textureFile, textureUvNode );
 	return addressModes ? applyTextureAddressModeDefault( sampled, textureUvNode, addressModes, defaultNode ) : sampled;
 
@@ -325,6 +328,43 @@ const compileTexcoordNode = ( nodeX, compileContext ) => {
 
 };
 
+const GEOMPROP_ATTRIBUTE_TYPES = {
+	float: 'float',
+	integer: 'float',
+	boolean: 'float',
+	vector2: 'vec2',
+	vector3: 'vec3',
+	vector4: 'vec4',
+	color3: 'vec3',
+	color4: 'vec4',
+};
+
+// Built-in names resolve like defaultgeomprop; other names read the geometry attribute of that name.
+const compileGeomPropValueNode = ( nodeX, compileContext ) => {
+
+	const nameNode = nodeX.getChildByName( 'geomprop' );
+	const name = nameNode ? String( nameNode.value || '' ) : '';
+	const fallback = nodeX.getNodeByName( 'default' );
+	if ( name === '' ) return fallback;
+
+	const builtIn = compileContext.getGeomPropNode( name );
+	if ( builtIn ) return builtIn;
+
+	const attributeType = GEOMPROP_ATTRIBUTE_TYPES[ nodeX.type ];
+	if ( ! attributeType ) return fallback;
+
+	return Fn( ( builder ) => {
+
+		if ( builder.hasGeometryAttribute( name ) !== true ) return fallback;
+		const value = attribute( name, attributeType );
+		if ( nodeX.type === 'integer' ) return int( value );
+		if ( nodeX.type === 'boolean' ) return bool( value );
+		return value;
+
+	} )();
+
+};
+
 const compileGeomColorNode = ( nodeX ) => {
 
 	const indexNode = nodeX.getChildByName( 'index' );
@@ -352,9 +392,12 @@ const compileTiledImageNode = ( nodeX, compileContext ) => {
 
 	}
 
+	// ( texcoord * uvtiling - uvoffset ) / realworldimagesize * realworldtilesize, as in NG_tiledimage.
 	const uvTiling = nodeX.getNodeByName( 'uvtiling' );
 	const uvOffset = nodeX.getNodeByName( 'uvoffset' );
-	const transformedUv = compileContext.mxTransformUv( uvTiling, uvOffset, uvNode );
+	const realWorldImageSize = nodeX.getNodeByName( 'realworldimagesize' );
+	const realWorldTileSize = nodeX.getNodeByName( 'realworldtilesize' );
+	const transformedUv = mul( div( sub( mul( uvNode, uvTiling ), uvOffset ), realWorldImageSize ), realWorldTileSize );
 	const node = sampleTexture( textureFile, transformedUv, compileContext, textureDefault, addressModes, textureDefault );
 	return applyTextureColorSpace( node, file );
 
@@ -508,7 +551,7 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 	const offsetRange = nodeX.getNodeByName( 'offsetrange' );
 	const falloff = nodeX.getNodeByName( 'falloff' );
 
-	const transformedUv = compileContext.mxFromBottomLeftUvSpace( mul( uvNode, tiling ) );
+	const transformedUv = compileContext.mxToImageUv( mul( uvNode, tiling ) );
 	const tileData = compileContext.mxHextileCoord( transformedUv, rotation, rotationRange, scale, scaleRange, offset, offsetRange );
 
 	let sample0 = texture( textureFile, tileData.coords[ 0 ] ).grad(
@@ -935,6 +978,7 @@ function createMaterialXCompileRegistry() {
 	register( registry, [ 'bitangent' ], ( nodeX ) => compileNormalizedSpaceInputNode( nodeX, bitangentLocal, bitangentWorld ) );
 	register( registry, [ 'texcoord' ], ( nodeX, out, compileContext ) => compileTexcoordNode( nodeX, compileContext ) );
 	register( registry, [ 'geomcolor' ], ( nodeX ) => compileGeomColorNode( nodeX ) );
+	register( registry, [ 'geompropvalue' ], ( nodeX, out, compileContext ) => compileGeomPropValueNode( nodeX, compileContext ) );
 	register( registry, [ 'tiledimage' ], ( nodeX, out, compileContext ) => compileTiledImageNode( nodeX, compileContext ) );
 	register( registry, [ 'image' ], ( nodeX, out, compileContext ) => compileImageLikeNode( nodeX, compileContext ) );
 	register( registry, [ 'triplanarprojection' ], ( nodeX, out, compileContext ) => compileTriplanarProjectionNode( nodeX, compileContext ) );

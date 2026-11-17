@@ -3,7 +3,6 @@ import { submit } from './WebGPUUtils.js';
 import GPUBufferDescriptor from '../descriptors/GPUBufferDescriptor.js';
 import GPUCommandEncoderDescriptor from '../descriptors/GPUCommandEncoderDescriptor.js';
 
-import { Float16BufferAttribute } from '../../../core/BufferAttribute.js';
 import { isTypedArray, error } from '../../../utils.js';
 
 const _bufferDescriptor = new GPUBufferDescriptor();
@@ -25,10 +24,6 @@ if ( typeof Float16Array !== 'undefined' ) {
 
 }
 
-const typedAttributeToVertexFormatPrefix = new Map( [
-	[ Float16BufferAttribute, [ 'float16', ]],
-] );
-
 const typeArraysToVertexFormatPrefixForItemSize1 = new Map( [
 	[ Int32Array, 'sint32' ],
 	[ Uint32Array, 'uint32' ],
@@ -36,6 +31,38 @@ const typeArraysToVertexFormatPrefixForItemSize1 = new Map( [
 ] );
 
 const _tail = new Uint8Array( 4 );
+
+const _UintArrays = { 1: Uint8Array, 2: Uint16Array, 4: Uint32Array, 8: BigUint64Array };
+
+/**
+ * Copies the items of the given array bitwise into the padded array.
+ *
+ * @private
+ * @function
+ * @param {TypedArray} array - The source array.
+ * @param {TypedArray} paddedArray - The padded array of the same type.
+ * @param {number} count - The number of items.
+ * @param {number} itemSize - The item size of the source array.
+ * @param {number} paddedItemSize - The item size of the padded array.
+ */
+function copyPaddedItems( array, paddedArray, count, itemSize, paddedItemSize ) {
+
+	const UintArray = _UintArrays[ array.BYTES_PER_ELEMENT ];
+
+	const source = new UintArray( array.buffer, array.byteOffset, array.length );
+	const target = new UintArray( paddedArray.buffer, paddedArray.byteOffset, paddedArray.length );
+
+	for ( let i = 0; i < count; i ++ ) {
+
+		for ( let j = 0; j < itemSize; j ++ ) {
+
+			target[ i * paddedItemSize + j ] = source[ i * itemSize + j ];
+
+		}
+
+	}
+
+}
 
 /**
  * Writes a range of a typed array into the given GPU buffer. `writeBuffer()` requires
@@ -180,11 +207,7 @@ class WebGPUAttributeUtils {
 
 				const paddedArray = new array.constructor( bufferAttribute.count * paddedItemSize );
 
-				for ( let i = 0; i < bufferAttribute.count; i ++ ) {
-
-					paddedArray.set( array.subarray( i * itemSize, i * itemSize + itemSize ), i * paddedItemSize );
-
-				}
+				copyPaddedItems( array, paddedArray, bufferAttribute.count, itemSize, paddedItemSize );
 
 				if ( bufferAttribute.isStorageBufferAttribute || bufferAttribute.isStorageInstancedBufferAttribute ) {
 
@@ -252,11 +275,7 @@ class WebGPUAttributeUtils {
 
 			array = new array.constructor( bufferAttribute.count * paddedItemSize );
 
-			for ( let i = 0; i < bufferAttribute.count; i ++ ) {
-
-				array.set( bufferAttribute.array.subarray( i * itemSize, i * itemSize + itemSize ), i * paddedItemSize );
-
-			}
+			copyPaddedItems( bufferAttribute.array, array, bufferAttribute.count, itemSize, paddedItemSize );
 
 			if ( bufferAttribute.isStorageBufferAttribute || bufferAttribute.isStorageInstancedBufferAttribute ) {
 
@@ -600,7 +619,6 @@ class WebGPUAttributeUtils {
 
 		const { itemSize, normalized } = geometryAttribute;
 		const ArrayType = geometryAttribute.array.constructor;
-		const AttributeType = geometryAttribute.constructor;
 
 		let format;
 
@@ -610,7 +628,7 @@ class WebGPUAttributeUtils {
 
 		} else {
 
-			const prefixOptions = typedAttributeToVertexFormatPrefix.get( AttributeType ) || typedArraysToVertexFormatPrefix.get( ArrayType );
+			const prefixOptions = typedArraysToVertexFormatPrefix.get( ArrayType );
 			const prefix = prefixOptions[ normalized ? 1 : 0 ];
 
 			if ( prefix ) {

@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, orthographicDepthToViewZ, passTexture, perspectiveDepthToViewZ, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth } from 'three/tsl';
+import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
@@ -48,7 +48,7 @@ class SSRNode extends Node {
 	 *
 	 * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
 	 * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
-	 * @param {Node<vec3>} normalNode - A node that represents the beauty pass's normals.
+	 * @param {Node<vec3>} normalNode - A node that represents the beauty pass's unit view-space normals.
 	 * @param {SSRNodeOptions} [options] - Optional inputs for material and environment data.
 	 */
 	constructor( colorNode, depthNode, normalNode, options = {} ) {
@@ -851,24 +851,6 @@ class SSRNode extends Node {
 
 		}, { point: 'vec3', planePoint: 'vec3', planeNormal: 'vec3', return: 'float' } );
 
-		const getViewZ = Fn( ( [ depth ] ) => {
-
-			let viewZNode;
-
-			if ( this.camera.isPerspectiveCamera ) {
-
-				viewZNode = perspectiveDepthToViewZ( depth, this._cameraNear, this._cameraFar );
-
-			} else {
-
-				viewZNode = orthographicDepthToViewZ( depth, this._cameraNear, this._cameraFar );
-
-			}
-
-			return viewZNode;
-
-		} );
-
 		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
 
 		const sampleMarchNoise = this.stochastic === true ? bindAnalyticNoise( this._resolution, 47 ) : null;
@@ -905,7 +887,7 @@ class SSRNode extends Node {
 
 			const viewPosition = getViewPosition( uvPos, depth, this._cameraProjectionMatrixInverse ).toVar();
 			const worldPosition = this._cameraWorldMatrix.mul( vec4( viewPosition, 1.0 ) ).xyz.toVar();
-			const viewNormal = this.normalNode.rgb.normalize().toVar();
+			const viewNormal = this.normalNode.rgb.toVar();
 
 			const viewIncidentDir = ( ( this.camera.isPerspectiveCamera ) ? normalize( viewPosition ) : vec3( 0, 0, - 1 ) ).toVar();
 
@@ -1160,8 +1142,9 @@ class SSRNode extends Node {
 				} );
 
 				const uvS = xy.mul( invResolution ).toVar();
-				const d = sampleDepth( uvS ).toVar();
-				const vZ = getViewZ( d ).toVar();
+				const rawDepth = this.depthNode.sample( uvS ).r;
+				const d = projectionDepth( rawDepth, this._cameraNear, this._cameraFar ).toVar();
+				const vZ = depthToViewZ( rawDepth, this._cameraNear, this._cameraFar, this.camera ).toVar();
 
 				const viewReflectRayZ = reflectRayZAt( s ).toVar();
 
@@ -1188,7 +1171,7 @@ class SSRNode extends Node {
 
 					If( away.lessThanEqual( tk ), () => {
 
-						const vN = this.normalNode.sample( uvS ).rgb.normalize().toVar();
+						const vN = this.normalNode.sample( uvS ).rgb.toVar();
 
 						// the reflected ray is pointing towards the same side as the fragment's normal (current ray position),
 						// which means it wouldn't reflect off the surface. The loop continues to the next step for the next ray sample.
@@ -1248,8 +1231,8 @@ class SSRNode extends Node {
 
 							const sMid = hitSLo.add( hitSHi ).mul( 0.5 ).toVar();
 							const uvMid = screenPosAt( sMid ).mul( invResolution ).toConst();
-							const sceneZMid = getViewZ( sampleDepth( uvMid ) );
-							const frontFacing = dot( viewReflectDir, this.normalNode.sample( uvMid ).rgb.normalize() ).lessThan( 0 );
+							const sceneZMid = depthToViewZ( this.depthNode.sample( uvMid ).r, this._cameraNear, this._cameraFar, this.camera );
+							const frontFacing = dot( viewReflectDir, this.normalNode.sample( uvMid ).rgb ).lessThan( 0 );
 
 							If( reflectRayZAt( sMid ).lessThanEqual( sceneZMid ).and( frontFacing ), () => {
 
@@ -1290,7 +1273,7 @@ class SSRNode extends Node {
 					withinRange.assign( withinRange.and( isBackgroundDepth( hitD ).not() )
 						.and( pointToLineDistance( vP, viewPosition, d1viewPosition ).lessThanEqual( tk ) ) );
 
-					withinRange.assign( withinRange.and( dot( viewReflectDir, this.normalNode.sample( uvS ).rgb.normalize() ).lessThan( 0 ) ) );
+					withinRange.assign( withinRange.and( dot( viewReflectDir, this.normalNode.sample( uvS ).rgb ).lessThan( 0 ) ) );
 
 				}
 
@@ -1418,7 +1401,7 @@ export default SSRNode;
  * @function
  * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
  * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
- * @param {Node<vec3>} normalNode - A node that represents the beauty pass's normals.
+ * @param {Node<vec3>} normalNode - A node that represents the beauty pass's unit view-space normals.
  * @param {SSRNodeOptions} [options] - Optional inputs for material and environment data.
  * @returns {SSRNode}
  */

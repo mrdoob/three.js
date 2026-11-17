@@ -1103,6 +1103,61 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( 'updateWorldMatrix - ancestor changes', ( assert ) => {
+
+			const parent = new Object3D();
+			const object = new Object3D();
+			const child = new Object3D();
+
+			const m = new Matrix4();
+
+			parent.add( object );
+			object.add( child );
+
+			object.position.set( 1, 0, 0 );
+			object.updateMatrix();
+			object.matrixAutoUpdate = false;
+
+			child.position.set( 0, 0, 1 );
+
+			parent.updateMatrixWorld();
+
+			// moving the parent must be reflected in the world matrices of
+			// descendants, even if their local matrices did not change
+
+			parent.position.set( 0, 2, 0 );
+
+			object.updateWorldMatrix( true, false );
+
+			assert.deepEqual( object.matrixWorld.elements,
+				m.makeTranslation( 1, 2, 0 ).elements,
+				'Object\'s world matrix is updated when an ancestor changes even if matrixAutoUpdate is false' );
+
+			parent.position.set( 0, 3, 0 );
+
+			child.updateWorldMatrix( true, false );
+
+			assert.deepEqual( object.matrixWorld.elements,
+				m.makeTranslation( 1, 3, 0 ).elements,
+				'Intermediate ancestors are updated when a higher ancestor changes' );
+
+			assert.deepEqual( child.matrixWorld.elements,
+				m.makeTranslation( 1, 3, 1 ).elements,
+				'Child\'s world matrix includes all ancestor changes' );
+
+			// no ancestor changed, so nothing must be recomputed
+
+			parent.matrixAutoUpdate = false;
+			object.matrixWorld.identity();
+
+			object.updateWorldMatrix( true, false );
+
+			assert.deepEqual( object.matrixWorld.elements,
+				m.identity().elements,
+				'Object\'s world matrix is not recomputed if neither the object nor its ancestors need an update' );
+
+		} );
+
 		QUnit.test( 'toJSON', ( assert ) => {
 
 			const a = new Object3D();

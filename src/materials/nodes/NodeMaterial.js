@@ -25,6 +25,7 @@ import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { vertexColor } from '../../nodes/accessors/VertexColorNode.js';
 import { premultiplyAlpha } from '../../nodes/display/PremultiplyAlphaFunctions.js';
 import { subBuild } from '../../nodes/core/SubBuildNode.js';
+import { mrt } from '../../nodes/core/MRTNode.js';
 
 /**
  * Base class for all node materials.
@@ -130,6 +131,17 @@ class NodeMaterial extends Material {
 		 * @default null
 		 */
 		this.aoNode = null;
+
+		/**
+		 * The lighting of node materials might be influenced by a light map. The default
+		 * light map is inferred from a light map assigned to `lightMap` and the respective
+		 * `lightMapIntensity`. This node property allows to overwrite the default and define
+		 * the light map with a custom node instead, e.g. the output of a denoiser.
+		 *
+		 * @type {?Node<vec3>}
+		 * @default null
+		 */
+		this.lightMapNode = null;
 
 		/**
 		 * The diffuse color of node materials is by default inferred from the
@@ -560,24 +572,21 @@ class NodeMaterial extends Material {
 
 			if ( renderTarget !== null ) {
 
-				const mrt = renderer.getMRT();
+				const rendererMRT = renderer.getMRT();
 				const materialMRT = this.mrtNode;
 
-				if ( mrt !== null ) {
+				const needsMRT = renderTarget.textures.length > 1 && resultNode.isOutputStructNode !== true;
+
+				if ( rendererMRT !== null || materialMRT !== null || needsMRT ) {
 
 					if ( isCustomOutput ) output.assign( resultNode );
 
-					resultNode = mrt;
+					let mrtNode = mrt( { [ renderTarget.texture.name ]: output } );
 
-					if ( materialMRT !== null ) {
+					if ( rendererMRT !== null ) mrtNode = mrtNode.merge( rendererMRT );
+					if ( materialMRT !== null ) mrtNode = mrtNode.merge( materialMRT );
 
-						resultNode = mrt.merge( materialMRT );
-
-					}
-
-				} else if ( materialMRT !== null ) {
-
-					resultNode = materialMRT;
+					resultNode = mrtNode;
 
 				}
 
@@ -625,7 +634,7 @@ class NodeMaterial extends Material {
 
 			const samples = builder.renderer.currentSamples;
 
-			if ( this.alphaToCoverage && samples > 1 ) {
+			if ( this.alphaToCoverage && samples > 0 ) {
 
 				// to be added to flow when the color/alpha value has been determined
 				result = clippingAlpha();
@@ -989,7 +998,11 @@ class NodeMaterial extends Material {
 
 		let node = null;
 
-		if ( builder.material.lightMap ) {
+		if ( this.lightMapNode !== null ) {
+
+			node = new IrradianceNode( vec3( this.lightMapNode ) );
+
+		} else if ( builder.material.lightMap ) {
 
 			node = new IrradianceNode( materialLightMap );
 

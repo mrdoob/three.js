@@ -75,9 +75,9 @@ class SunLight extends Light {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.shadow = source.shadow.clone();
 

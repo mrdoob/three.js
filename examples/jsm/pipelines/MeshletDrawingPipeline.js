@@ -300,6 +300,21 @@ function isSupportedMaterial( material, renderer ) {
 }
 
 /**
+ * Returns `true` if the current render call is nested in another one, like a render to a render target in
+ * `onBeforeRender()`. The draw commands of the parent render are not submitted yet and can still refer to the
+ * buffers of the pipeline.
+ *
+ * @private
+ * @param {Renderer} renderer - The renderer.
+ * @return {boolean} Whether the render call is nested or not.
+ */
+function isNestedRender( renderer ) {
+
+	return renderer._callDepth > 0;
+
+}
+
+/**
  * Returns the accessors of matrices stored as four vec4 columns in a storage buffer of vec4 elements.
  *
  * @private
@@ -632,7 +647,7 @@ function createOcclusion( width, height ) {
 	} while ( levelWidth > 1 || levelHeight > 1 );
 
 	const hzbAttribute = new StorageBufferAttribute( new Float32Array( size ), 1 );
-	const hzbWrite = storage( hzbAttribute, 'float', size );
+	const hzbWrite = storage( hzbAttribute, 'float' );
 
 	// the texels at the border cover the remaining pixels, so odd sizes stay conservative
 
@@ -681,7 +696,7 @@ function createOcclusion( width, height ) {
 	return {
 		target,
 		scene: new Scene(),
-		hzb: storage( hzbAttribute, 'float', size ).toReadOnly(),
+		hzb: storage( hzbAttribute, 'float' ).toReadOnly(),
 		hzbLevels: uniformArray( levelData, 'vec4' ),
 		hzbLevelCount: uniform( levels.length, 'uint' ),
 		hzbSize: uniform( new Vector2( width, height ) ),
@@ -836,7 +851,7 @@ class MeshletCulling {
 		this.clusterDispatchAttribute = new IndirectStorageBufferAttribute( new Uint32Array( [ 0, 1, 1, 0 ] ), 4 );
 
 		const clusterDispatchAttribute = this.clusterDispatchAttribute;
-		const clusterDispatch = storage( clusterDispatchAttribute, 'uint', 4 );
+		const clusterDispatch = storage( clusterDispatchAttribute, 'uint' );
 
 		// the indirect draw arguments of the queues of the batches, followed by the arguments of the occlusion prepass
 
@@ -936,7 +951,7 @@ class MeshletCulling {
 				const bounds = instanceBounds.element( data );
 				const center = matrixWorld.mul( vec4( geometryBounds.xyz, 1.0 ) ).xyz.toVar();
 				const scale = bounds.w.abs();
-				const radius = scale.mul( geometryBounds.w ).add( bounds.x );
+				const radius = scale.mul( geometryBounds.w ).add( bounds.x ).toVar();
 				const cullBounds = deformBounds( center, radius );
 
 				const visible = bool( true ).toVar();
@@ -964,15 +979,18 @@ class MeshletCulling {
 
 				} );
 
-				// screen-space projected error: pixelError = errorWorld / dist * cotHalfFov * screenHeight / 2,
+				// screen-space projected error at the closest point of the bounding sphere:
+				// pixelError = errorWorld / dist * cotHalfFov * screenHeight / 2,
 				// orthographic views: pixelError = errorWorld * 2 / frustumHeight * screenHeight / 2
 
-				const lodDistance = select( lodPerspective.greaterThan( 0.5 ), max( 0.01, distance( lodPosition, center ) ), float( 1.0 ) );
+				const centerDistance = distance( lodPosition, center ).toVar();
+				const lodDistance = select( lodPerspective.greaterThan( 0.5 ), max( 0.01, centerDistance.sub( radius ) ), float( 1.0 ) );
 				const pixelFactor = lodScale.div( lodDistance ).toVar();
 
 				// the radius of the object on the screen in pixels, the objects smaller than the minimum are not drawn
 
-				const screenRadius = scale.mul( geometryBounds.w ).mul( pixelFactor ).toVar();
+				const screenDistance = select( lodPerspective.greaterThan( 0.5 ), max( 0.01, centerDistance ), float( 1.0 ) );
+				const screenRadius = scale.mul( geometryBounds.w ).mul( lodScale.div( screenDistance ) ).toVar();
 
 				If( screenRadius.lessThan( minScreenRadius ), () => {
 
@@ -1942,6 +1960,10 @@ class MeshletGeometryPool {
 
 		this.version = 0;
 
+		// the buffers replaced by reserve(), disposed by update() since a render can still refer to them
+
+		this.retired = [];
+
 	}
 
 	/**
@@ -1999,10 +2021,15 @@ class MeshletGeometryPool {
 	}
 
 	/**
-	 * Reclaims the elements of the removed geometries once they exceed half of the elements of the pool, so
-	 * removing many geometries moves the geometries once.
+	 * Disposes the replaced buffers and reclaims the elements of the removed geometries once they exceed half of
+	 * the elements of the pool, so removing many geometries moves the geometries once. Called before an outer
+	 * render only, when no draw commands refer to the buffers of the pool.
 	 */
 	update() {
+
+		for ( const attribute of this.retired ) attribute.dispose();
+
+		this.retired.length = 0;
 
 		if ( this.wasted > 0 && this.wasted > ( this.vertexEnd * 4 + this.indexEnd ) / 2 ) this.compact();
 
@@ -2052,7 +2079,7 @@ class MeshletGeometryPool {
 			const array = new Float32Array( Math.max( vertices * 4, Math.ceil( this.vertexArray.length * 1.5 / 4 ) * 4 ) );
 			array.set( this.vertexArray.subarray( 0, this.vertexEnd * 4 ) );
 
-			this.vertexAttribute.dispose();
+			this.retired.push( this.vertexAttribute );
 			this.vertexArray = array;
 			this.vertexAttribute = new StorageBufferAttribute( array, 4 );
 			this.vertexNode.value = this.vertexAttribute;
@@ -2065,7 +2092,7 @@ class MeshletGeometryPool {
 			const array = new Uint32Array( Math.max( indices, Math.ceil( this.indexArray.length * 1.5 ) ) );
 			array.set( this.indexArray.subarray( 0, this.indexEnd ) );
 
-			this.indexAttribute.dispose();
+			this.retired.push( this.indexAttribute );
 			this.indexArray = array;
 			this.indexAttribute = new StorageBufferAttribute( array, 1 );
 			this.indexNode.value = this.indexAttribute;
@@ -2082,6 +2109,10 @@ class MeshletGeometryPool {
 
 		this.vertexAttribute.dispose();
 		this.indexAttribute.dispose();
+
+		for ( const attribute of this.retired ) attribute.dispose();
+
+		this.retired.length = 0;
 
 	}
 
@@ -2249,8 +2280,8 @@ class MeshletBatch {
 			this.instanceAttribute = createAttribute( instanceArray, 4 );
 			this.instanceLayout = { local: worldCapacity * 16, data: worldCapacity * 32 };
 
-			const instanceRead = storage( this.instanceAttribute, 'vec4', instanceArray.length / 4 ).toReadOnly();
-			const instanceWrite = storage( this.instanceAttribute, 'vec4', instanceArray.length / 4 );
+			const instanceRead = storage( this.instanceAttribute, 'vec4' ).toReadOnly();
+			const instanceWrite = storage( this.instanceAttribute, 'vec4' );
 
 			objectWorld = createMatrices( instanceRead, 0 );
 			instanceLocal = createMatrices( instanceRead, worldCapacity * 4 );
@@ -2265,8 +2296,8 @@ class MeshletBatch {
 			const instanceDataWrite = { element: ( index ) => instanceWrite.element( uint( index ).add( worldCapacity * 8 ) ) };
 			const cullingWorld = culling.worldWrite;
 			const cullingBounds = culling.boundsWrite;
-			const lastObjectWorld = history === true ? storage( createAttribute( new Float32Array( capacity * 16 ), 16 ), 'mat4', capacity ) : null;
-			const lastInstanceLocal = history === true ? storage( createAttribute( new Float32Array( capacity * 16 ), 16 ), 'mat4', capacity ) : null;
+			const lastObjectWorld = history === true ? storage( createAttribute( new Float32Array( capacity * 16 ), 16 ), 'mat4' ) : null;
+			const lastInstanceLocal = history === true ? storage( createAttribute( new Float32Array( capacity * 16 ), 16 ), 'mat4' ) : null;
 
 			const transformCount = uniform( 0, 'uint' );
 			const transformPreviousCount = uniform( 0, 'uint' );
@@ -3528,9 +3559,12 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		super.begin( camera, renderContext );
 		this._checkedGeometries = new WeakSet();
 
-		// the vertices of disposed geometries are reclaimed before the render call
+		// the buffers of the pool are disposed and the geometries moved before an outer render only: the parent of
+		// a nested render can still hold draw commands referring to them
+		// TODO: consider a finish() method in the drawing pipeline, called once the draw commands of a render are
+		// submitted, to release the buffers there
 
-		this._geometryPool.update();
+		if ( isNestedRender( this.renderer ) === false ) this._geometryPool.update();
 
 		const renderer = this.renderer;
 		const renderTarget = renderer.getRenderTarget();

@@ -1,4 +1,5 @@
 import { error } from '../../utils.js';
+import { getByteLength } from '../../extras/TextureUtils.js';
 import {
 	ByteType, UnsignedByteType, ShortType, UnsignedShortType, HalfFloatType,
 	IntType, UnsignedIntType, FloatType,
@@ -62,7 +63,6 @@ class Info {
 		 * @property {number} triangles - The number of rendered triangle primitives of the current frame.
 		 * @property {number} points - The number of rendered point primitives of the current frame.
 		 * @property {number} lines - The number of rendered line primitives of the current frame.
-		 * @property {number} timestamp - The timestamp of the frame.
 		 */
 		this.render = {
 			calls: 0,
@@ -70,8 +70,7 @@ class Info {
 			drawCalls: 0,
 			triangles: 0,
 			points: 0,
-			lines: 0,
-			timestamp: 0,
+			lines: 0
 		};
 
 		/**
@@ -81,12 +80,10 @@ class Info {
 		 * @readonly
 		 * @property {number} calls - The number of compute calls since the app has been started.
 		 * @property {number} frameCalls - The number of compute calls of the current frame.
-		 * @property {number} timestamp - The timestamp of the frame when using `renderer.computeAsync()`.
 		 */
 		this.compute = {
 			calls: 0,
-			frameCalls: 0,
-			timestamp: 0
+			frameCalls: 0
 		};
 
 		/**
@@ -209,9 +206,6 @@ class Info {
 		this.render.calls = 0;
 		this.compute.calls = 0;
 
-		this.render.timestamp = 0;
-		this.compute.timestamp = 0;
-
 		for ( const prop in this.memory ) {
 
 			this.memory[ prop ] = 0;
@@ -226,15 +220,33 @@ class Info {
 	 * Tracks texture memory explicitly, updating counts and byte tracking.
 	 *
 	 * @param {Texture} texture
+	 * @param {Object} options - The texture's size and level information.
 	 */
-	createTexture( texture ) {
+	createTexture( texture, options ) {
 
-		const size = this._getTextureMemorySize( texture );
+		const size = this._getTextureMemorySize( texture, options );
 		this.memoryMap.set( texture, size );
 
 		this.memory.textures ++;
 		this.memory.total += size;
 		this.memory.texturesSize += size;
+
+	}
+
+	/**
+	 * Updates the tracked memory of a texture when its default texture is replaced with the loaded one.
+	 *
+	 * @param {Texture} texture
+	 * @param {Object} options - The texture's size and level information.
+	 */
+	updateTexture( texture, options ) {
+
+		const size = this._getTextureMemorySize( texture, options );
+		const delta = size - this.memoryMap.get( texture );
+		this.memoryMap.set( texture, size );
+
+		this.memory.total += delta;
+		this.memory.texturesSize += delta;
 
 	}
 
@@ -443,16 +455,11 @@ class Info {
 	 * Calculates the memory size of a texture in bytes.
 	 *
 	 * @param {Texture} texture - The texture to calculate the size for.
+	 * @param {Object} options - The texture's size and level information.
 	 * @return {number} The calculated size in bytes.
 	 * @private
 	 */
-	_getTextureMemorySize( texture ) {
-
-		if ( texture.isCompressedTexture ) {
-
-			return 1; // Fallback estimate since exact format decompressed isn't readily available without format maps
-
-		}
+	_getTextureMemorySize( texture, options ) {
 
 		let bytesPerChannel = 1;
 
@@ -472,42 +479,30 @@ class Info {
 		if ( texture.type === UnsignedShort4444Type || texture.type === UnsignedShort5551Type ) bytesPerPixel = 2;
 		else if ( texture.type === UnsignedInt248Type || texture.type === UnsignedInt5999Type || texture.type === UnsignedInt101111Type ) bytesPerPixel = 4;
 
-		const width = texture.width || 1;
-		const height = texture.height || 1;
-		const depth = texture.isCubeTexture ? 6 : ( texture.depth || 1 );
+		const { width, height, depth, levels } = options;
+		const is3D = texture.isData3DTexture === true || texture.is3DTexture === true;
 
-		let size = width * height * depth * bytesPerPixel;
-		const mipmaps = texture.mipmaps;
+		let size = 0;
 
-		if ( mipmaps.length > 0 ) {
+		for ( let i = 0; i < levels; i ++ ) {
 
-			let mipmapSize = 0;
-			for ( let i = 0; i < mipmaps.length; i ++ ) {
+			const levelWidth = Math.max( 1, width >> i );
+			const levelHeight = Math.max( 1, height >> i );
+			const levelDepth = is3D ? Math.max( 1, depth >> i ) : depth;
 
-				const mipmap = mipmaps[ i ];
-				if ( mipmap.data ) {
+			if ( texture.isCompressedTexture ) {
 
-					mipmapSize += mipmap.data.byteLength;
+				size += getByteLength( levelWidth, levelHeight, texture.format, texture.type ) * levelDepth;
 
-				} else {
+			} else {
 
-					const mipWidth = mipmap.width || Math.max( 1, width >> i );
-					const mipHeight = mipmap.height || Math.max( 1, height >> i );
-					mipmapSize += mipWidth * mipHeight * depth * bytesPerPixel;
-
-				}
+				size += levelWidth * levelHeight * levelDepth * bytesPerPixel;
 
 			}
 
-			size += mipmapSize;
-
-		} else if ( texture.generateMipmaps ) {
-
-			size = size * 1.333; // MiP chain approximation
-
 		}
 
-		return Math.round( size );
+		return size;
 
 	}
 

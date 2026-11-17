@@ -1,5 +1,5 @@
 import { StorageBufferAttribute, DynamicDrawUsage } from 'three/webgpu';
-import { Fn, Loop, atomicAdd, atomicLoad, atomicStore, instanceIndex, storage, uint } from 'three/tsl';
+import { Fn, Loop, atomicAdd, atomicExchange, atomicStore, instanceIndex, storage, uint } from 'three/tsl';
 
 /**
  * A reusable GPU counting sort.
@@ -85,35 +85,35 @@ class CountingSort {
 		 *
 		 * @type {StorageBufferNode}
 		 */
-		this.orderRead = storage( this.orderAttribute, 'uint', count ).toReadOnly();
+		this.orderRead = storage( this.orderAttribute, 'uint' ).toReadOnly();
 
 		/**
 		 * A writable storage node for the sorted order buffer.
 		 *
 		 * @type {StorageBufferNode}
 		 */
-		this.orderWrite = storage( this.orderAttribute, 'uint', count );
+		this.orderWrite = storage( this.orderAttribute, 'uint' );
 
 		/**
 		 * A read-only storage node holding each element's bin, computed during the histogram pass.
 		 *
 		 * @type {StorageBufferNode}
 		 */
-		this.binRead = storage( binAttribute, 'uint', count ).toReadOnly();
+		this.binRead = storage( binAttribute, 'uint' ).toReadOnly();
 
 		/**
 		 * A writable storage node holding each element's bin.
 		 *
 		 * @type {StorageBufferNode}
 		 */
-		this.binWrite = storage( binAttribute, 'uint', count );
+		this.binWrite = storage( binAttribute, 'uint' );
 
 		/**
 		 * An atomic storage node used to accumulate the per-bin histogram.
 		 *
 		 * @type {StorageBufferNode}
 		 */
-		this.histogramAtomic = storage( histogramAttribute, 'uint', binCount ).toAtomic();
+		this.histogramAtomic = storage( histogramAttribute, 'uint' ).toAtomic();
 
 		/**
 		 * An atomic storage node used both for the exclusive prefix sum of the histogram and, during
@@ -121,7 +121,7 @@ class CountingSort {
 		 *
 		 * @type {StorageBufferNode}
 		 */
-		this.offsetAtomic = storage( offsetAttribute, 'uint', binCount ).toAtomic();
+		this.offsetAtomic = storage( offsetAttribute, 'uint' ).toAtomic();
 
 		this._webGLBuffersEnabled = false;
 
@@ -129,7 +129,6 @@ class CountingSort {
 		this._cpuCounts = new Uint32Array( binCount );
 		this._cpuOffsets = new Uint32Array( binCount );
 
-		this._resetNode = null;
 		this._histogramNode = null;
 		this._prefixNode = null;
 		this._scatterNode = null;
@@ -146,13 +145,6 @@ class CountingSort {
 
 		const { binCount, workgroupSize, count } = this;
 
-		this._resetNode = Fn( () => {
-
-			atomicStore( this.histogramAtomic.element( instanceIndex ), uint( 0 ) );
-			atomicStore( this.offsetAtomic.element( instanceIndex ), uint( 0 ) );
-
-		} )().compute( binCount, [ workgroupSize ] ).setName( 'CountingSortReset' );
-
 		this._histogramNode = Fn( () => {
 
 			const bin = binNode().toVar( 'bin' );
@@ -168,7 +160,7 @@ class CountingSort {
 
 			Loop( { start: 0, end: binCount, type: 'uint', name: 'bin', condition: '<' }, ( { bin } ) => {
 
-				const binCountValue = atomicLoad( this.histogramAtomic.element( bin ) ).toVar( 'count' );
+				const binCountValue = atomicExchange( this.histogramAtomic.element( bin ), uint( 0 ) ).toVar( 'count' );
 				atomicStore( this.offsetAtomic.element( bin ), sum );
 				sum.addAssign( binCountValue );
 
@@ -195,7 +187,6 @@ class CountingSort {
 	compute( renderer ) {
 
 		renderer.compute( [
-			this._resetNode,
 			this._histogramNode,
 			this._prefixNode,
 			this._scatterNode
