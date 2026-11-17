@@ -828,14 +828,14 @@ class ShadowNode extends ShadowBaseNode {
 
 		const lastUpdate = this._lastUpdate;
 
-		const matchingShadows =
+		const hasMatchingShadows =
 			lastUpdate.frameId === frameId &&
 			lastUpdate.sceneId === scene.id &&
 			lastUpdate.layersMask === camera.layers.mask;
 
 		const isNestedRender = frame.renderer._callDepth > lastUpdate.callDepth;
 
-		return ( matchingShadows && isNestedRender ) === false;
+		return ( hasMatchingShadows && isNestedRender ) === false;
 
 	}
 
