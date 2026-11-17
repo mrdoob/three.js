@@ -1,0 +1,628 @@
+{
+  "assetURL": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Sponza/glTF/Sponza.gltf",
+  "results": [
+    {
+      "variant": "before",
+      "trial": 0,
+      "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "width": 1920,
+      "height": 1080,
+      "materials": 103,
+      "frames": 2640,
+      "elapsedMs": 8440.399999976158,
+      "msPerFrame": 3.1971212121121813,
+      "gpuMsPerFrame": 2.8385425492424243,
+      "disjoint": false,
+      "calls": 53,
+      "triangles": 183516
+    },
+    {
+      "variant": "after",
+      "trial": 0,
+      "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "width": 1920,
+      "height": 1080,
+      "materials": 103,
+      "frames": 2400,
+      "elapsedMs": 8652.600000023842,
+      "msPerFrame": 3.605250000009934,
+      "gpuMsPerFrame": 3.2635130875000002,
+      "disjoint": false,
+      "calls": 53,
+      "triangles": 183516
+    },
+    {
+      "variant": "after",
+      "trial": 1,
+      "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "width": 1920,
+      "height": 1080,
+      "materials": 103,
+      "frames": 2400,
+      "elapsedMs": 8471.599999904633,
+      "msPerFrame": 3.5298333332935967,
+      "gpuMsPerFrame": 3.174533091666667,
+      "disjoint": false,
+      "calls": 53,
+      "triangles": 183516
+    },
+    {
+      "variant": "before",
+      "trial": 1,
+      "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "width": 1920,
+      "height": 1080,
+      "materials": 103,
+      "frames": 2400,
+      "elapsedMs": 8532,
+      "msPerFrame": 3.555,
+      "gpuMsPerFrame": 3.2020525333333336,
+      "disjoint": false,
+      "calls": 53,
+      "triangles": 183516
+    },
+    {
+      "variant": "before",
+      "trial": 2,
+      "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "width": 1920,
+      "height": 1080,
+      "materials": 103,
+      "frames": 2400,
+      "elapsedMs": 8611.799999952316,
+      "msPerFrame": 3.588249999980132,
+      "gpuMsPerFrame": 3.2338951666666667,
+      "disjoint": false,
+      "calls": 53,
+      "triangles": 183516
+    },
+    {
+      "variant": "after",
+      "trial": 2,
+      "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "width": 1920,
+      "height": 1080,
+      "materials": 103,
+      "frames": 2400,
+      "elapsedMs": 8499.700000047684,
+      "msPerFrame": 3.541541666686535,
+      "gpuMsPerFrame": 3.1858198166666667,
+      "disjoint": false,
+      "calls": 53,
+      "triangles": 183516
+    },
+    {
+      "variant": "after",
+      "trial": 3,
+      "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "width": 1920,
+      "height": 1080,
+      "materials": 103,
+      "frames": 2400,
+      "elapsedMs": 8477,
+      "msPerFrame": 3.5320833333333335,
+      "gpuMsPerFrame": 3.175539720833333,
+      "disjoint": false,
+      "calls": 53,
+      "triangles": 183516
+    },
+    {
+      "variant": "before",
+      "trial": 3,
+      "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "width": 1920,
+      "height": 1080,
+      "materials": 103,
+      "frames": 2400,
+      "elapsedMs": 8526.5,
+      "msPerFrame": 3.5527083333333334,
+      "gpuMsPerFrame": 3.191926833333333,
+      "disjoint": false,
+      "calls": 53,
+      "triangles": 183516
+    },
+    {
+      "variant": "before",
+      "trial": 0,
+      "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "width": 3840,
+      "height": 2160,
+      "materials": 103,
+      "frames": 720,
+      "elapsedMs": 8844.800000071526,
+      "msPerFrame": 12.284444444543785,
+      "gpuMsPerFrame": 11.365096972222222,
+      "disjoint": false,
+      "calls": 53,
+      "triangles": 183516
+    },
+    {
+      "variant": "after",
+      "trial": 0,
+      "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "width": 3840,
+      "height": 2160,
+      "materials": 103,
+      "frames": 720,
+      "elapsedMs": 8587.700000047684,
+      "msPerFrame": 11.927361111177339,
+      "gpuMsPerFrame": 10.999754333333334,
+      "disjoint": false,
+      "calls": 53,
+      "triangles": 183516
+    },
+    {
+      "variant": "after",
+      "trial": 1,
+      "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "width": 3840,
+      "height": 2160,
+      "materials": 103,
+      "frames": 960,
+      "elapsedMs": 9499.399999976158,
+      "msPerFrame": 9.895208333308497,
+      "gpuMsPerFrame": 8.935819145833333,
+      "disjoint": false,
+      "calls": 53,
+      "triangles": 183516
+    },
+    {
+      "variant": "before",
+      "trial": 1,
+      "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "width": 3840,
+      "height": 2160,
+      "materials": 103,
+      "frames": 720,
+      "elapsedMs": 8745.400000095367,
+      "msPerFrame": 12.146388889021344,
+      "gpuMsPerFrame": 11.202367263888888,
+      "disjoint": false,
+      "calls": 53,
+      "triangles": 183516
+    },
+    {
+      "variant": "before",
+      "trial": 2,
+      "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "width": 3840,
+      "height": 2160,
+      "materials": 103,
+      "frames": 960,
+      "elapsedMs": 10214.199999928474,
+      "msPerFrame": 10.639791666592162,
+      "gpuMsPerFrame": 9.699909270833333,
+      "disjoint": false,
+      "calls": 53,
+      "triangles": 183516
+    },
+    {
+      "variant": "after",
+      "trial": 2,
+      "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "width": 3840,
+      "height": 2160,
+      "materials": 103,
+      "frames": 720,
+      "elapsedMs": 8863.800000071526,
+      "msPerFrame": 12.310833333432674,
+      "gpuMsPerFrame": 11.363798611111111,
+      "disjoint": false,
+      "calls": 53,
+      "triangles": 183516
+    },
+    {
+      "variant": "after",
+      "trial": 3,
+      "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "width": 3840,
+      "height": 2160,
+      "materials": 103,
+      "frames": 720,
+      "elapsedMs": 8878.600000023842,
+      "msPerFrame": 12.331388888922003,
+      "gpuMsPerFrame": 11.366655875,
+      "disjoint": false,
+      "calls": 53,
+      "triangles": 183516
+    },
+    {
+      "variant": "before",
+      "trial": 3,
+      "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "width": 3840,
+      "height": 2160,
+      "materials": 103,
+      "frames": 720,
+      "elapsedMs": 8638.699999928474,
+      "msPerFrame": 11.998194444345103,
+      "gpuMsPerFrame": 11.034652722222223,
+      "disjoint": false,
+      "calls": 53,
+      "triangles": 183516
+    }
+  ],
+  "summary": [
+    {
+      "width": 1920,
+      "before": {
+        "trials": 4,
+        "completedMsPerFrame": 3.4732698863564115,
+        "gpuMsPerFrame": 3.1166042706439394,
+        "gpuTrialMs": [
+          2.8385425492424243,
+          3.2020525333333336,
+          3.2338951666666667,
+          3.191926833333333
+        ],
+        "completedTrialMs": [
+          3.1971212121121813,
+          3.555,
+          3.588249999980132,
+          3.5527083333333334
+        ]
+      },
+      "after": {
+        "trials": 4,
+        "completedMsPerFrame": 3.5521770833308492,
+        "gpuMsPerFrame": 3.199851429166667,
+        "gpuTrialMs": [
+          3.2635130875000002,
+          3.174533091666667,
+          3.1858198166666667,
+          3.175539720833333
+        ],
+        "completedTrialMs": [
+          3.605250000009934,
+          3.5298333332935967,
+          3.541541666686535,
+          3.5320833333333335
+        ]
+      },
+      "gpuChangePercent": 2.671085299691489,
+      "completedChangePercent": 2.2718417962392934
+    },
+    {
+      "width": 3840,
+      "before": {
+        "trials": 4,
+        "completedMsPerFrame": 11.767204861125599,
+        "gpuMsPerFrame": 10.825506557291668,
+        "gpuTrialMs": [
+          11.365096972222222,
+          11.202367263888888,
+          9.699909270833333,
+          11.034652722222223
+        ],
+        "completedTrialMs": [
+          12.284444444543785,
+          12.146388889021344,
+          10.639791666592162,
+          11.998194444345103
+        ]
+      },
+      "after": {
+        "trials": 4,
+        "completedMsPerFrame": 11.616197916710128,
+        "gpuMsPerFrame": 10.666506991319444,
+        "gpuTrialMs": [
+          10.999754333333334,
+          8.935819145833333,
+          11.363798611111111,
+          11.366655875
+        ],
+        "completedTrialMs": [
+          11.927361111177339,
+          9.895208333308497,
+          12.310833333432674,
+          12.331388888922003
+        ]
+      },
+      "gpuChangePercent": -1.4687494310843818,
+      "completedChangePercent": -1.283286440557696
+    }
+  ],
+  "metadata": {
+    "framesPerGpuBatch": 24,
+    "minimumTrialSeconds": 8,
+    "backend": "WebGL2 ANGLE D3D11",
+    "gpu": "AMD Radeon(TM) Graphics integrated GPU, PCI 0x1638",
+    "devicePixelRatio": 1,
+    "antialias": false,
+    "browser": "Chrome 157.0.8103.79",
+    "after": "65004f563805b6bd4605ae3fcd8d382dc7a4741d",
+    "framesPerRotation": 240,
+    "notes": "Arithmetic mean of four trial means. GPU durations are batch timer query totals divided by frames, not individual frame latency samples. Completed frame wall time includes finish and scheduling overhead. No WebGPU measurement.",
+    "date": "2026-11-17",
+    "warmupSeconds": 3,
+    "driver": "31.0.12027.9001",
+    "before": "f9bb9a426b906dac0d96221faa1d64dd4bbd8090",
+    "cpu": "AMD Ryzen 7 5800H"
+  },
+  "assetHashes": [
+    {
+      "sha256": "C119BE5AAE2419A8120FD17691033CA28E0B5546CEF7E31D40F6DEC1543AFFEE",
+      "file": "10381718147657362067.jpg"
+    },
+    {
+      "sha256": "C915C9CC8BE8F198AB1CC3BC68C2F6C694B88432F381A8F27935D480141AE8F5",
+      "file": "10388182081421875623.jpg"
+    },
+    {
+      "sha256": "23C32277C33D8EAC091CD73DAF81561EBE3640EEDE49B037546ED5C244A01347",
+      "file": "11474523244911310074.jpg"
+    },
+    {
+      "sha256": "98E4C4A091FEA684CD693F3AE7EBE83E491969B501B4CD6E1FDD6A3CC1FA5CAB",
+      "file": "11490520546946913238.jpg"
+    },
+    {
+      "sha256": "DA2A0B308B4D6D57FFBCF4BB7509D4AFE91156D5D86D0396E83D7CAC883A4857",
+      "file": "11872827283454512094.jpg"
+    },
+    {
+      "sha256": "BEE42826D56D3FF719C4908C11EF65584FBE19E08273862FDE7EC1408E44BA25",
+      "file": "11968150294050148237.jpg"
+    },
+    {
+      "sha256": "9CBD61FCB8047F1C21450EFF05207B29D71824EDD75483267B5FBC2F7B21378C",
+      "file": "1219024358953944284.jpg"
+    },
+    {
+      "sha256": "FE640B8875C8FF04F4EC427274D2E799B703CFF384B9C2DAFEF63B61D05F34FA",
+      "file": "12501374198249454378.jpg"
+    },
+    {
+      "sha256": "8C26AE9523CFAE7A062FD074F74E0DDBB61630772F9A2130489E1D6E4724C38B",
+      "file": "13196865903111448057.jpg"
+    },
+    {
+      "sha256": "9158388312A76BA25A40D3B57978E1ACE224882E53198A766494D98F9118AEBA",
+      "file": "13824894030729245199.jpg"
+    },
+    {
+      "sha256": "B91209E6EDE0B905565BD719D6E27533ABC7A5930D031A454F9AAE65771FC4B0",
+      "file": "13982482287905699490.jpg"
+    },
+    {
+      "sha256": "994BA4E063564D75350CEEC1381347A620BAEF75F9CA689E28718A88C3E3BD88",
+      "file": "14118779221266351425.jpg"
+    },
+    {
+      "sha256": "55CBDA42C13377A71CB8EE78406309E888F56BC85AF9473CA84A6097F2252166",
+      "file": "14170708867020035030.jpg"
+    },
+    {
+      "sha256": "D14F693C5CF7D1E506865488FDB68DAADD42BBDCB0C534E2F96CCFD747E46A60",
+      "file": "14267839433702832875.jpg"
+    },
+    {
+      "sha256": "E8B68080EB4C5709536DFB7858D595D51D4BB725003E11B0F383ACF76A7E05A3",
+      "file": "14650633544276105767.jpg"
+    },
+    {
+      "sha256": "5BBD0CBF2DA7416D5620514EBB0C4837B0CCC841B649CF4070281AA333FF8520",
+      "file": "15295713303328085182.jpg"
+    },
+    {
+      "sha256": "8511ADA3C77ED171A21D58362D996B20CFA6C632FE4C95C3A8614E410E623A31",
+      "file": "15722799267630235092.jpg"
+    },
+    {
+      "sha256": "D6DF943A0DCF535D9DFB009C2833E0C7DC21939CFE3A2C10316C552B3DC3441B",
+      "file": "16275776544635328252.png"
+    },
+    {
+      "sha256": "21D5F7AB6A7D05200B76165771FB3C5F14D006236A9DD27FFF9EB92B69DE4FA6",
+      "file": "16299174074766089871.jpg"
+    },
+    {
+      "sha256": "5562F0E76CA213D72295E48B8A14A59EE1971F58A47F95E5C022A4E78371C5AA",
+      "file": "16885566240357350108.jpg"
+    },
+    {
+      "sha256": "CB09708202859D08764601ACC9C9EA3B5254B2C4FD39DCC6B6055768C77AEE9B",
+      "file": "17556969131407844942.jpg"
+    },
+    {
+      "sha256": "005B774A968C1F6AF00E4BF97AFD668A6A045126A94F524DF722BA19EDC77D61",
+      "file": "17876391417123941155.jpg"
+    },
+    {
+      "sha256": "0F25B73991003300BD5E2C8FCBC46EC4E2788A8DEB42321F575D5187AEE21B85",
+      "file": "2051777328469649772.jpg"
+    },
+    {
+      "sha256": "88861C8C7F10517C1D7942F316AAE3B74DC5B8AE2FAA2021D9DFE9D2C09FB24F",
+      "file": "2185409758123873465.jpg"
+    },
+    {
+      "sha256": "DA92FD0303571290C36B0F655F357FDA77015B788613C65B18346480E1BD8324",
+      "file": "2299742237651021498.jpg"
+    },
+    {
+      "sha256": "782C48410DB52360083719A48F8D15D29AA5CD4BEEB817F1FD195083B2FEB60A",
+      "file": "2374361008830720677.jpg"
+    },
+    {
+      "sha256": "12E1F2EA3C2714A6EC455FA8E623A702E33EF95765EBD09F7874A68FA55FD104",
+      "file": "2411100444841994089.jpg"
+    },
+    {
+      "sha256": "751606C94A5FE5BDA3BF6709E7F6A74363BD7902BF2353D54E55EF3B50007487",
+      "file": "2775690330959970771.jpg"
+    },
+    {
+      "sha256": "DFA17F2DEE2CD2D850585673D19D5CDA477A63E21659B346D8730E80EDD3B347",
+      "file": "2969916736137545357.jpg"
+    },
+    {
+      "sha256": "782C48410DB52360083719A48F8D15D29AA5CD4BEEB817F1FD195083B2FEB60A",
+      "file": "332936164838540657.jpg"
+    },
+    {
+      "sha256": "D939D2E8BF11C2CF375154129F861B982C786B83DB79CB9FDE1A2B94B46CAF62",
+      "file": "3371964815757888145.jpg"
+    },
+    {
+      "sha256": "967005CCFBF4D38F674DF41AEBB3E58AC1FDCD91F554EAD7ACFCC132372F8EC6",
+      "file": "3455394979645218238.jpg"
+    },
+    {
+      "sha256": "5A05DC004BBFF7E6F89CFFAB57AE4F4FE2CF04DFBD22B52EC85CF17BF92C8855",
+      "file": "3628158980083700836.jpg"
+    },
+    {
+      "sha256": "1C2FC5DDAEFC59763823F58D0450C00D114D89AB3D0AC395FD1316B664A8A56D",
+      "file": "3827035219084910048.jpg"
+    },
+    {
+      "sha256": "F0592537DA8EDC8476D9903F4AB1839D1A7AB0EFA2507D303E8720B57BEDF848",
+      "file": "4477655471536070370.jpg"
+    },
+    {
+      "sha256": "70EAA9EFCA842696271D2E4E04B1C77C087F8B5350D8D90940B800CC654B269A",
+      "file": "4601176305987539675.jpg"
+    },
+    {
+      "sha256": "21BB124F5B5D4D5E9C8D9773CD31DEDFC41B30EB302AF36E7257CF930152908E",
+      "file": "466164707995436622.jpg"
+    },
+    {
+      "sha256": "9D5FD79619A52DB0232EDB2287F5F05C0124C304355E3B035A4E48C0871090BF",
+      "file": "4675343432951571524.jpg"
+    },
+    {
+      "sha256": "259B6659CB2681E06EF04BECD49298D379F2F25B2CC468ACF0C2ADE4D190637C",
+      "file": "4871783166746854860.jpg"
+    },
+    {
+      "sha256": "70EAA9EFCA842696271D2E4E04B1C77C087F8B5350D8D90940B800CC654B269A",
+      "file": "4910669866631290573.jpg"
+    },
+    {
+      "sha256": "FBDB7BCCED57A005B84B4C3BBF744BAE6309804CCA51DABD9237E03A72FBC505",
+      "file": "4975155472559461469.jpg"
+    },
+    {
+      "sha256": "6FBDBF67D3501831AD3A4E2ADBF3D27E4C3D13BA1D655E5861C3F39B5F899F65",
+      "file": "5061699253647017043.png"
+    },
+    {
+      "sha256": "9330CF1D51C8F6924B6C9CE09F2DEDB21A82E1C7406C37D49CE95BECA40BB3BE",
+      "file": "5792855332885324923.jpg"
+    },
+    {
+      "sha256": "34B464EDDDBD2295B0EE23FA7A7A440A19456888C586ACDC47032F841B302ABD",
+      "file": "5823059166183034438.jpg"
+    },
+    {
+      "sha256": "C39C9F304C2605BE791B4C0A58CD0F8EB20DE2DD6A4A4AF893C4EB112D158353",
+      "file": "6047387724914829168.jpg"
+    },
+    {
+      "sha256": "170F6C637EBD71A101244EB4D80C3DCF7063CAF89E42053D3114D8AECA755CDF",
+      "file": "6151467286084645207.jpg"
+    },
+    {
+      "sha256": "70EAA9EFCA842696271D2E4E04B1C77C087F8B5350D8D90940B800CC654B269A",
+      "file": "6593109234861095314.jpg"
+    },
+    {
+      "sha256": "34F6408C6B8E8DC3C89D528E014EE3B254C7208C41339CFD15C4AE5151AD7CBE",
+      "file": "6667038893015345571.jpg"
+    },
+    {
+      "sha256": "1EA4F9BC86354D363EA8153DF9B7593C3BD3DA153C53B9624C1FD8A960CB3EBC",
+      "file": "6772804448157695701.jpg"
+    },
+    {
+      "sha256": "782C48410DB52360083719A48F8D15D29AA5CD4BEEB817F1FD195083B2FEB60A",
+      "file": "7056944414013900257.jpg"
+    },
+    {
+      "sha256": "D81EFCB42B3A044595CA984CB46D941B159064BDDAE9A43ED8D9582DB68D6B47",
+      "file": "715093869573992647.jpg"
+    },
+    {
+      "sha256": "430758549BA2189D94F06ABEAAE092BFC0A1D8C22AFC56F5CAF3F99C5EE7407C",
+      "file": "7268504077753552595.jpg"
+    },
+    {
+      "sha256": "9EDC7C1C73661658CD8ED7733728002D45FECD17CB37A962FB654FF1D8C1933D",
+      "file": "7441062115984513793.jpg"
+    },
+    {
+      "sha256": "9F849F0510CA0DF66BA1CBA2380A6A1B481444D9E64B68DA6B2CE202B54D9CEC",
+      "file": "755318871556304029.jpg"
+    },
+    {
+      "sha256": "C76E66915CE3ABAF2CE365B314CF1E1A95F77BD4791ADEBDAD01AB5C93658D0A",
+      "file": "759203620573749278.jpg"
+    },
+    {
+      "sha256": "DA33886BB34E236F0ED9616FF40E87D87C4AB5ED458858E0D96839FA717978AF",
+      "file": "7645212358685992005.jpg"
+    },
+    {
+      "sha256": "8AD0E8A9CA6DE602225A527361BC718881DE8741BC48927E27259A8803E7FED7",
+      "file": "7815564343179553343.jpg"
+    },
+    {
+      "sha256": "75328D1AAC87F8539BE2456E6A5392CEF7C6D08476D75585EAFCD334DBEEE0C5",
+      "file": "8006627369776289000.png"
+    },
+    {
+      "sha256": "4F06C93F8E9F90BE44A2E78847E57ACEC82BD793F58F7BE7F86B088150730B88",
+      "file": "8051790464816141987.jpg"
+    },
+    {
+      "sha256": "06C6480E207CE64F9E7C08DF3F7F21638DA7DA43F77682657F4C823ACD8C81A5",
+      "file": "8114461559286000061.jpg"
+    },
+    {
+      "sha256": "1DA7664B7B88AE58386A6E6B5ECA2829537818061D704F002356D8FC483C1A28",
+      "file": "8481240838833932244.jpg"
+    },
+    {
+      "sha256": "C288A37ED8373D1132644873624B096A72BA81D03CDA601E050A5DE24BA13C39",
+      "file": "8503262930880235456.jpg"
+    },
+    {
+      "sha256": "8E90E94CADF80528A3DF3496035D3C77900EBA24D88B1C1D31C9DCE77990FC44",
+      "file": "8747919177698443163.jpg"
+    },
+    {
+      "sha256": "73A94A12FB0A9AB4C75E40996C9A2D49AC45AC18A8C8AE81D5CEB1C8AE52D6DC",
+      "file": "8750083169368950601.jpg"
+    },
+    {
+      "sha256": "DC5BF5F3091B548F1DFE40410B1AA1E2E55D82E2D77BA57DBD1F92955A0D8FF8",
+      "file": "8773302468495022225.jpg"
+    },
+    {
+      "sha256": "93D495E33D754C5723C910E322AC94108FC753B65AF082A19BE5252905AA741B",
+      "file": "8783994986360286082.jpg"
+    },
+    {
+      "sha256": "7F55814430F289E89C7D675C3DB925EEE904FBC566FF83F4B49904DE53138E98",
+      "file": "9288698199695299068.jpg"
+    },
+    {
+      "sha256": "81B21B9352F1FB9CCFEAF237F8547B985DDBF0CFD7ADE7A4A8670B73A72B2CB5",
+      "file": "9916269861720640319.jpg"
+    },
+    {
+      "sha256": "FDBDBFB6A76EDEB6626F28A1401BC1536BB1C864131A64E90FBC3DF2D2D191BD",
+      "file": "Sponza.bin"
+    },
+    {
+      "sha256": "646C10CBC8FAB990CA29F363E90E2D65155F3A3569506852EB1434A9465B9501",
+      "file": "Sponza.gltf"
+    },
+    {
+      "sha256": "E2AB2939DDA535AD28779E41C20C98368F630F29C5824A0A5A430F47B3B6DA12",
+      "file": "white.png"
+    }
+  ]
+}

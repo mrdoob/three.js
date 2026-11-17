@@ -10,7 +10,7 @@ const after = path.resolve(process.env.IBL_AFTER || path.join(root, '../after'))
 const artifacts = process.env.SWARM_ARTIFACTS || path.join(root, '../results');
 fs.mkdirSync(artifacts, {recursive:true});
 const asset = path.join(artifacts,'Sponza.gltf');
-const assetURL='https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Sponza/glTF/Sponza.gltf';
+const assetURL='https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/4995a638c96dbc94376d3d6164e70fee3ac7f7a2/Models/Sponza/glTF/Sponza.gltf';
 if(!fs.existsSync(asset)){
  const response=await fetch(assetURL);
  if(!response.ok)throw new Error(`Asset HTTP ${response.status}`);
@@ -60,3 +60,4 @@ try{
  if(browser)await browser.close();
  await new Promise(r=>server.close(r));
 }
+
