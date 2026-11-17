@@ -236,6 +236,15 @@ class ShadowNode extends ShadowBaseNode {
 		this._cameraFrameId = new WeakMap();
 
 		/**
+		 * Describes the render call that last updated the shadow map. Used
+		 * to share the shadow map with render calls nested in that one.
+		 *
+		 * @type {{frameId: number, callDepth: number, sceneId: number, layersMask: number}}
+		 * @private
+		 */
+		this._lastUpdate = { frameId: - 1, callDepth: 0, sceneId: - 1, layersMask: 0 };
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -804,6 +813,33 @@ class ShadowNode extends ShadowBaseNode {
 	}
 
 	/**
+	 * Returns `true` if the shadow map must be rendered for the given frame. The shadow
+	 * map is rendered once per camera and frame. Renders nested in the one that has
+	 * updated the shadow map in the current frame share it.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 * @return {boolean} Whether the shadow map must be rendered.
+	 */
+	needsRefresh( frame ) {
+
+		const { frameId, camera, scene } = frame;
+
+		if ( this._cameraFrameId.get( camera ) === frameId ) return false;
+
+		const lastUpdate = this._lastUpdate;
+
+		const hasMatchingShadows =
+			lastUpdate.frameId === frameId &&
+			lastUpdate.sceneId === scene.id &&
+			lastUpdate.layersMask === camera.layers.mask;
+
+		const isNestedRender = frame.renderer._callDepth > lastUpdate.callDepth;
+
+		return ( hasMatchingShadows && isNestedRender ) === false;
+
+	}
+
+	/**
 	 * The implementation performs the update of the shadow map if necessary.
 	 *
 	 * @param {NodeFrame} frame - A reference to the current node frame.
@@ -820,17 +856,20 @@ class ShadowNode extends ShadowBaseNode {
 
 		if ( needsUpdate ) {
 
-			if ( this._cameraFrameId.get( frame.camera ) === frame.frameId ) {
-
-				needsUpdate = false;
-
-			}
+			needsUpdate = this.needsRefresh( frame );
 
 			this._cameraFrameId.set( frame.camera, frame.frameId );
 
 		}
 
 		if ( needsUpdate ) {
+
+			const lastUpdate = this._lastUpdate;
+
+			lastUpdate.frameId = frame.frameId;
+			lastUpdate.callDepth = frame.renderer._callDepth;
+			lastUpdate.sceneId = frame.scene.id;
+			lastUpdate.layersMask = frame.camera.layers.mask;
 
 			this.updateShadow( frame );
 
