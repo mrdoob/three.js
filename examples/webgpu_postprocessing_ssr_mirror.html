@@ -44,7 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -55,7 +55,6 @@
 		import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 		const params = {
-			normalFormat: 'octahedral',
 			output: 'Beauty', enabled: true, quality: 0.5, intensity: 1,
 			maxDistance: 1, thickness: 0.03, binaryRefine: false,
 			roughness: 1, blur: true, blurQuality: 1
@@ -138,119 +137,76 @@
 
 			//
 
-			let updateOutput, updateParameters, blurEnabled, disposePostProcessing;
+			renderPipeline = new THREE.RenderPipeline( renderer );
 
-			function updateNormalFormat() {
+			const scenePass = pass( scene, camera );
+			scenePass.setMRT( mrt( {
+				output: output,
+				normal: packNormalToOctahedral( normalView ),
+				metalrough: vec2( metalness, roughness ) // pack metalness and roughness into a single attachment
+			} ) );
 
-				if ( disposePostProcessing ) disposePostProcessing();
+			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
+			const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', ( node ) => {
 
-				renderPipeline = new THREE.RenderPipeline( renderer );
+				return colorSpaceToWorking( packNormalToRGB( unpackOctahedralToNormal( node.rg ) ), THREE.SRGBColorSpace );
 
-				const octahedralNormals = params.normalFormat === 'octahedral';
-				const normalDecode = octahedralNormals
-					? ( value ) => unpackOctahedralToNormal( value.rg )
-					: ( value ) => unpackRGBToNormal( value.rgb ).normalize();
+			} );
+			const scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
 
-				const scenePass = pass( scene, camera );
-				scenePass.setMRT( mrt( {
-					output: output,
-					normal: octahedralNormals ? packNormalToOctahedral( normalView ) : packNormalToRGB( normalView ),
-					metalrough: vec2( metalness, roughness ) // pack metalness and roughness into a single attachment
-				} ) );
+				return scenePass.getLinearDepthNode();
 
-				const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
-				const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', ( node ) => {
+			} );
+			const scenePassMetalRough = scenePass.getTextureNode( 'metalrough' ).toInspector( 'Metalness-Roughness' );
 
-					return colorSpaceToWorking( packNormalToRGB( normalDecode( node ) ), THREE.SRGBColorSpace );
+			// octahedral normals can't be filtered across their folds
 
-				} );
-				const scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
+			const normalTexture = scenePass.getTexture( 'normal' );
+			normalTexture.format = THREE.RGFormat;
+			normalTexture.minFilter = normalTexture.magFilter = THREE.NearestFilter;
 
-					return scenePass.getLinearDepthNode();
+			// optional: optimize bandwidth by reducing the texture precision for metal/roughness
 
-				} );
-				const scenePassMetalRough = scenePass.getTextureNode( 'metalrough' ).toInspector( 'Metalness-Roughness' );
+			const metalRoughTexture = scenePass.getTexture( 'metalrough' );
+			metalRoughTexture.type = THREE.UnsignedByteType;
 
-				// Both normal encodings use four bytes per pixel; metal/roughness uses RGBA8.
+			const sceneNormal = sample( ( uv ) => {
 
-				const normalTexture = scenePass.getTexture( 'normal' );
-				normalTexture.type = octahedralNormals ? THREE.HalfFloatType : THREE.UnsignedByteType;
-				normalTexture.format = octahedralNormals ? THREE.RGFormat : THREE.RGBAFormat;
-				// RGB8 normals filter in hardware. Octahedral coordinates cannot be interpolated across their folds.
-				normalTexture.minFilter = normalTexture.magFilter = octahedralNormals ? THREE.NearestFilter : THREE.LinearFilter;
+				return unpackOctahedralToNormal( scenePassNormal.sample( uv ).rg );
 
-				const metalRoughTexture = scenePass.getTexture( 'metalrough' );
-				metalRoughTexture.type = THREE.UnsignedByteType;
+			} );
 
-				const sceneNormal = sample( ( uv ) => normalDecode( scenePassNormal.sample( uv ) ) );
+			//
 
-				//
+			const reflection = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+				metalnessNode: scenePassMetalRough.r,
+				roughnessNode: scenePassMetalRough.g,
+				binaryRefine: params.binaryRefine
+			} ).toInspector( 'SSR' );
 
-				const reflection = ssr( scenePassColor, scenePassDepth, sceneNormal, {
-					metalnessNode: scenePassMetalRough.r,
-					roughnessNode: scenePassMetalRough.g,
-					binaryRefine: params.binaryRefine
-				} ).toInspector( 'SSR' );
+			const raw = passTexture( reflection, reflection.getRenderTarget().texture );
+			const blurred = reflection.getTextureNode();
+			const blurEnabled = uniform( 1 );
+			const combined = scenePassColor.rgb.add( mix( raw.rgb, blurred.rgb, blurEnabled ) );
+			const spatialAA = smaa( vec4( combined, 1 ) );
 
-				const raw = passTexture( reflection, reflection.getRenderTarget().texture );
-				const blurred = reflection.getTextureNode();
-				blurEnabled = uniform( Number( params.blur ) );
-				const combined = scenePassColor.rgb.add( mix( raw.rgb, blurred.rgb, blurEnabled ) );
-				const spatialAA = smaa( vec4( combined, 1 ) );
+			function updateOutput() {
 
-				updateOutput = function () {
-
-					let view;
+				let view;
 		
-					switch ( params.output ) {
+				switch ( params.output ) {
 
-						case 'Beauty': view = spatialAA; break;
-						case 'SSR': view = vec4( raw.rgb, 1 ); break;
-						case 'SSR DN': view = vec4( blurred.rgb, 1 ); break;
+					case 'Beauty': view = spatialAA; break;
+					case 'SSR': view = vec4( raw.rgb, 1 ); break;
+					case 'SSR DN': view = vec4( blurred.rgb, 1 ); break;
 
-					}
+				}
 
-					renderPipeline.outputNode = params.enabled ? view : scenePass;
-					renderPipeline.outputColorTransform = true;
-					renderPipeline.needsUpdate = true;
-
-				};
-
-				updateParameters = function () {
-
-					reflection.quality.value = params.quality;
-					reflection.intensity.value = params.intensity;
-					reflection.binaryRefine = params.binaryRefine;
-					reflection.maxDistance.value = params.maxDistance;
-					reflection.thickness.value = params.thickness;
-					reflection.blurQuality = params.blurQuality;
-
-				};
-
-				const nodes = new Set( [ scenePass, reflection, spatialAA, renderPipeline ] );
-
-				disposePostProcessing = () => {
-
-					for ( const node of nodes ) {
-
-						node.traverse?.( child => {
-
-							if ( child.isRTTNode ) nodes.add( child );
-
-						} );
-
-					}
-
-					for ( const node of nodes ) node.dispose();
-
-				};
-
-				updateParameters();
-				updateOutput();
+				renderPipeline.outputNode = params.enabled ? view : scenePass;
+				renderPipeline.outputColorTransform = true;
+				renderPipeline.needsUpdate = true;
 
 			}
-
-			updateNormalFormat();
 
 			controls = new OrbitControls( camera, renderer.domElement );
 			controls.enableDamping = true;
@@ -261,20 +217,19 @@
 			// GUI
 
 			const displayGui = renderer.inspector.createParameters( 'Display' );
-			displayGui.add( params, 'normalFormat', { 'RGB8': 'rgb', 'Octahedral RG16F': 'octahedral' } ).name( 'Normals' ).onChange( updateNormalFormat );
-			displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN' ] ).name( 'Output' ).info( 'DN means denoise; this mirror example uses spatial blur rather than stochastic denoising.' ).onChange( () => updateOutput() );
+			displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN' ] ).name( 'Output' ).info( 'DN means denoise; this mirror example uses spatial blur rather than stochastic denoising.' ).onChange( updateOutput );
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
-			ssrGui.add( params, 'enabled' ).name( 'Enabled' ).onChange( () => updateOutput() );
-			ssrGui.add( params, 'intensity', 0, 1 ).name( 'Intensity' ).onChange( () => updateParameters() );
-			ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( () => updateParameters() );
-			ssrGui.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( () => updateParameters() );
-			ssrGui.add( params, 'maxDistance', 0, 1 ).name( 'Max distance' ).onChange( () => updateParameters() );
-			ssrGui.add( params, 'thickness', 0, 0.05 ).name( 'Thickness' ).onChange( () => updateParameters() );
+			ssrGui.add( params, 'enabled' ).name( 'Enabled' ).onChange( updateOutput );
+			ssrGui.add( params, 'intensity', 0, 1 ).name( 'Intensity' ).onChange( updateParameters );
+			ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( updateParameters );
+			ssrGui.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( updateParameters );
+			ssrGui.add( params, 'maxDistance', 0, 1 ).name( 'Max distance' ).onChange( updateParameters );
+			ssrGui.add( params, 'thickness', 0, 0.05 ).name( 'Thickness' ).onChange( updateParameters );
 
 			const blurGui = renderer.inspector.createParameters( 'Blur' );
 			blurGui.add( params, 'blur' ).name( 'Enabled' ).onChange( value => blurEnabled.value = Number( value ) );
-			blurGui.add( params, 'blurQuality', 1, 3, 1 ).name( 'Quality' ).onChange( () => updateParameters() );
+			blurGui.add( params, 'blurQuality', 1, 3, 1 ).name( 'Quality' ).onChange( updateParameters );
 
 			const sceneGui = renderer.inspector.createParameters( 'Scene' );
 			sceneGui.add( params, 'roughness', 0, 1 ).name( 'Roughness' ).onChange( value => {
@@ -289,6 +244,17 @@
 
 			updateParameters();
 			updateOutput();
+
+			function updateParameters() {
+
+				reflection.quality.value = params.quality;
+				reflection.intensity.value = params.intensity;
+				reflection.binaryRefine = params.binaryRefine;
+				reflection.maxDistance.value = params.maxDistance;
+				reflection.thickness.value = params.thickness;
+				reflection.blurQuality = params.blurQuality;
+
+			}
 
 		}
 
