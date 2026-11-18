@@ -255,7 +255,7 @@ Sky.SkyShader = {
 		'mieDirectionalG': { value: 0.8 },
 		'mieDirectionalGSpread': { value: 0 },
 		'mieColor': { value: new Color( 0.451084, 0.681483, 1.0 ) },
-		'mieAbsorption': { value: new Color( 0, 0, 0 ) },
+		'mieAlbedo': { value: new Color( 1, 1, 1 ) },
 		'absorptionScale': { value: 1 },
 		'absorptionColor': { value: new Color( 0.3125, 1.0, 0.04375 ) },
 		'sunPosition': { value: new Vector3() },
@@ -279,7 +279,7 @@ Sky.SkyShader = {
 		uniform float turbidity;
 		uniform float mieCoefficient;
 		uniform vec3 mieColor;
-		uniform vec3 mieAbsorption;
+		uniform vec3 mieAlbedo;
 		uniform float absorptionScale;
 		uniform vec3 absorptionColor;
 
@@ -356,10 +356,9 @@ Sky.SkyShader = {
 			// rayleigh coefficients
 			vBetaR = rayleighColor * totalRayleigh * rayleighCoefficient;
 
-			// mie coefficients, extinction adds what the aerosols absorb
-			float mie = totalMie( turbidity ) * mieCoefficient;
-			vBetaM = mie * mieColor;
-			vBetaMExt = mie * ( mieColor + mieAbsorption );
+			// mie coefficients, the aerosols scatter mieAlbedo of the light they extinguish
+			vBetaMExt = totalMie( turbidity ) * mieCoefficient * mieColor;
+			vBetaM = vBetaMExt * mieAlbedo;
 
 			// sun-path transmittance through lower troposphere to cloud altitude (~2km)
 			float sunCloudCos = max( 0.0, vSunDirection.y + 0.03 );
@@ -435,8 +434,8 @@ Sky.SkyShader = {
 		// optical length at zenith for molecules
 		const float rayleighZenithLength = 8.4E3;
 		const float mieZenithLength = 1.25E3;
-		// 1 - cos of the angular radius of the sun disc
-		const float sunDiscVersine = 4.3323053551556446E-5;
+		// angular radius of the sun disc in radians
+		const float sunAngularRadius = 0.009308389071322325;
 
 		// 3.0 / ( 16.0 * pi )
 		const float THREE_OVER_SIXTEENPI = 0.05968310365946075;
@@ -490,8 +489,9 @@ Sky.SkyShader = {
 
 			// composition + solar disc with photospheric limb darkening: a linear law per channel
 			// ( u ~ 0.54, 0.62, 0.73 ), normalized so the disc keeps its average color
-			// small angles: the versine of the disc radius scales with sunSize squared
-			float mu2 = clamp( 1.0 - ( 1.0 - cosTheta ) / ( sunDiscVersine * sunSize * sunSize ), 0.0, 1.0 );
+			// small angles: 1 - cos( x ) = x * x / 2
+			float sunRadius = sunAngularRadius * sunSize;
+			float mu2 = clamp( 1.0 - 2.0 * ( 1.0 - cosTheta ) / ( sunRadius * sunRadius ), 0.0, 1.0 );
 			float mu = sqrt( mu2 );
 			vec3 sundisc = smoothstep( 0.0, 0.1, mu2 ) * ( vec3( 0.561, 0.479, 0.3568 ) + vec3( 0.6585, 0.7815, 0.9648 ) * mu ) * showSunDisc * smoothstep( -0.002, 0.002, direction.y );
 			vec3 sundiscColor = ( 760.0 * sundisc ) * min( vSunE * Fex, 80.0 );

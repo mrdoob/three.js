@@ -135,8 +135,9 @@ class SkyMesh extends Mesh {
 
 		/**
 		 * How much more directional Mie scattering is for blue than for red.
-		 * Dust grains of about the size of the wavelength scatter blue light
-		 * into a tighter halo around the sun, like the blue sunsets on Mars.
+		 * Blue uses {@link SkyMesh#mieDirectionalG} plus this value, red uses
+		 * it minus this value. Dust grains like those on Mars scatter blue
+		 * into a tighter halo around the sun, which turns sunsets blue.
 		 *
 		 * @type {UniformNode<float>}
 		 */
@@ -152,14 +153,14 @@ class SkyMesh extends Mesh {
 		this.mieColor = uniform( new Color( 0.451084, 0.681483, 1.0 ) );
 
 		/**
-		 * The color absorbed by aerosol particles, relative to the strength
-		 * of Mie scattering. Absorbing dust or haze tints the sky in the
-		 * complementary color. The default value represents the atmosphere
-		 * of Earth, whose aerosols absorb almost nothing.
+		 * The albedo of aerosol particles, the part of the light they scatter
+		 * instead of absorbing. White particles absorb nothing, like the haze
+		 * on Earth. Tinted particles, like the dust on Mars, give the haze
+		 * their color.
 		 *
 		 * @type {UniformNode<vec3>}
 		 */
-		this.mieAbsorption = uniform( new Color( 0, 0, 0 ) );
+		this.mieAlbedo = uniform( new Color( 1, 1, 1 ) );
 
 		/**
 		 * The strength of atmospheric absorption. Higher values remove
@@ -314,13 +315,12 @@ class SkyMesh extends Mesh {
 			// rayleigh coefficients
 			vBetaR.assign( betaR );
 
-			// varying vBetaM, extinction adds what the aerosols absorb
+			// varying vBetaM, the aerosols scatter mieAlbedo of the light they extinguish
 
 			const c = float( 0.2 ).mul( this.turbidity ).mul( 10E-18 );
 			const totalMie = float( 0.434 ).mul( c ).mul( MieConst );
-			const mie = totalMie.mul( this.mieCoefficient );
-			const betaM = mie.mul( this.mieColor );
-			const betaMExt = mie.mul( this.mieColor.add( this.mieAbsorption ) );
+			const betaMExt = totalMie.mul( this.mieCoefficient ).mul( this.mieColor );
+			const betaM = betaMExt.mul( this.mieAlbedo );
 
 			vBetaM.assign( betaM );
 			vBetaMExt.assign( betaMExt );
@@ -382,8 +382,8 @@ class SkyMesh extends Mesh {
 			// optical length at zenith for molecules
 			const rayleighZenithLength = float( 8.4E3 );
 			const mieZenithLength = float( 1.25E3 );
-			// 1 - cos of the angular radius of the sun disc
-			const sunDiscVersine = float( 4.3323053551556446E-5 );
+			// angular radius of the sun disc in radians
+			const sunAngularRadius = float( 0.009308389071322325 );
 
 			// 3.0 / ( 16.0 * pi )
 			const THREE_OVER_SIXTEENPI = float( 0.05968310365946075 );
@@ -435,8 +435,9 @@ class SkyMesh extends Mesh {
 
 			// composition + solar disc with photospheric limb darkening: a linear law per channel
 			// ( u ~ 0.54, 0.62, 0.73 ), normalized so the disc keeps its average color
-			// small angles: the versine of the disc radius scales with sunSize squared
-			const mu2 = clamp( float( 1.0 ).sub( float( 1.0 ).sub( cosTheta ).div( sunDiscVersine.mul( this.sunSize ).mul( this.sunSize ) ) ), 0.0, 1.0 );
+			// small angles: 1 - cos( x ) = x * x / 2
+			const sunRadius = sunAngularRadius.mul( this.sunSize );
+			const mu2 = clamp( sub( 1.0, sub( 1.0, cosTheta ).mul( 2.0 ).div( sunRadius.mul( sunRadius ) ) ), 0.0, 1.0 );
 			const mu = sqrt( mu2 );
 			const sundisc = smoothstep( 0.0, 0.1, mu2 ).mul( vec3( 0.561, 0.479, 0.3568 ).add( vec3( 0.6585, 0.7815, 0.9648 ).mul( mu ) ) ).mul( this.showSunDisc ).mul( smoothstep( - 0.002, 0.002, direction.y ) );
 			const sundiscColor = min( vSunE.mul( Fex ), 80.0 ).mul( 760.0 ).mul( sundisc );

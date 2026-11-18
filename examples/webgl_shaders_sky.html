@@ -51,6 +51,8 @@
 
 				/// GUI
 
+				// Earth is the base, the other planets override it
+
 				const presets = {
 					Earth: {
 						turbidity: 10,
@@ -60,7 +62,7 @@
 						mieDirectionalG: 0.7,
 						mieDirectionalGSpread: 0,
 						mieColor: new THREE.Color( 0.451084, 0.681483, 1.0 ),
-						mieAbsorption: new THREE.Color( 0, 0, 0 ),
+						mieAlbedo: new THREE.Color( 1, 1, 1 ),
 						absorptionScale: 1,
 						absorptionColor: new THREE.Color( 0.3125, 1.0, 0.04375 ),
 						sunSize: 1,
@@ -69,38 +71,30 @@
 						cloudElevation: 0.5
 					},
 					Mars: {
-						// thin CO2, dust that absorbs blue and scatters it forward, thin ice clouds
+						// thin air, large butterscotch dust grains, wispy ice clouds
 						turbidity: 15,
 						rayleigh: 0.05,
-						rayleighColor: new THREE.Color( 0.191785, 0.448125, 1.0 ),
 						mieCoefficient: 0.1,
 						mieDirectionalG: 0.6,
 						mieDirectionalGSpread: 0.15,
-						mieColor: new THREE.Color( 0.95, 0.6, 0.32 ),
-						mieAbsorption: new THREE.Color( 0.05, 0.4, 0.68 ),
+						mieColor: new THREE.Color( 1, 1, 1 ),
+						mieAlbedo: new THREE.Color( 0.95, 0.6, 0.32 ),
 						absorptionScale: 0,
-						absorptionColor: new THREE.Color( 0.3125, 1.0, 0.04375 ),
 						sunSize: 0.66,
 						cloudCoverage: 0.35,
 						cloudDensity: 0.05,
 						cloudElevation: 0.8
 					},
 					Titan: {
-						// dense nitrogen under a high tholin haze that absorbs blue
-						turbidity: 10,
+						// dense nitrogen, orange smog under a high haze that absorbs blue
 						rayleigh: 1,
-						rayleighColor: new THREE.Color( 0.191785, 0.448125, 1.0 ),
 						mieCoefficient: 0.1,
-						mieDirectionalG: 0.7,
-						mieDirectionalGSpread: 0,
-						mieColor: new THREE.Color( 0.9, 0.55, 0.25 ),
-						mieAbsorption: new THREE.Color( 0.1, 0.45, 0.75 ),
+						mieColor: new THREE.Color( 1, 1, 1 ),
+						mieAlbedo: new THREE.Color( 0.9, 0.55, 0.25 ),
 						absorptionScale: 50,
 						absorptionColor: new THREE.Color( 0.1, 0.4, 1.0 ),
 						sunSize: 0.11,
-						cloudCoverage: 0.2,
-						cloudDensity: 0.4,
-						cloudElevation: 0.5
+						cloudCoverage: 0.2
 					}
 				};
 
@@ -118,7 +112,7 @@
 
 				function applyPreset() {
 
-					const preset = presets[ effectController.planet ];
+					const preset = { ...presets.Earth, ...presets[ effectController.planet ] };
 
 					for ( const key in preset ) controllers[ key ].setValue( copy( preset[ key ] ) );
 
@@ -136,7 +130,7 @@
 					uniforms[ 'mieDirectionalG' ].value = effectController.mieDirectionalG;
 					uniforms[ 'mieDirectionalGSpread' ].value = effectController.mieDirectionalGSpread;
 					uniforms[ 'mieColor' ].value.copy( effectController.mieColor );
-					uniforms[ 'mieAbsorption' ].value.copy( effectController.mieAbsorption );
+					uniforms[ 'mieAlbedo' ].value.copy( effectController.mieAlbedo );
 					uniforms[ 'absorptionScale' ].value = effectController.absorptionScale;
 					uniforms[ 'absorptionColor' ].value.copy( effectController.absorptionColor );
 					uniforms[ 'cloudCoverage' ].value = effectController.cloudCoverage;
@@ -167,7 +161,7 @@
 				controllers.mieDirectionalG = gui.add( effectController, 'mieDirectionalG', 0.0, 1, 0.001 ).onChange( guiChanged );
 				controllers.mieDirectionalGSpread = gui.add( effectController, 'mieDirectionalGSpread', 0.0, 0.3, 0.001 ).onChange( guiChanged );
 				controllers.mieColor = gui.addColor( effectController, 'mieColor' ).onChange( guiChanged );
-				controllers.mieAbsorption = gui.addColor( effectController, 'mieAbsorption' ).onChange( guiChanged );
+				controllers.mieAlbedo = gui.addColor( effectController, 'mieAlbedo' ).onChange( guiChanged );
 				controllers.absorptionScale = gui.add( effectController, 'absorptionScale', 0.0, 50, 0.1 ).onChange( guiChanged );
 				controllers.absorptionColor = gui.addColor( effectController, 'absorptionColor' ).onChange( guiChanged );
 				gui.add( effectController, 'elevation', 0, 90, 0.1 ).onChange( guiChanged );
