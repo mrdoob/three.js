@@ -34,6 +34,14 @@ export default /* glsl */`
 
 	#endif
 
+	// Normal maps can bend the reflection below the surface, which occludes it.
+	// The face normal follows vertex displacement, the vertex normal follows smooth low-poly surfaces.
+	vec3 faceNormal = normalize( cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ) );
+
+	vec3 horizonVec = reflect( - geometryViewDir, geometryNormal );
+	float horizon = min( 1.0 + max( dot( horizonVec, nonPerturbedNormal ), dot( horizonVec, faceNormal ) ), 1.0 );
+	iblRadiance *= horizon * horizon;
+
 	#ifdef USE_RETROREFLECTION
 
 		#ifdef USE_ANISOTROPY
@@ -54,7 +62,10 @@ export default /* glsl */`
 
 	#ifdef USE_CLEARCOAT
 
-		clearcoatRadiance += getIBLRadiance( geometryViewDir, geometryClearcoatNormal, material.clearcoatRoughness );
+		vec3 clearcoatHorizonVec = reflect( - geometryViewDir, geometryClearcoatNormal );
+		float clearcoatHorizon = min( 1.0 + max( dot( clearcoatHorizonVec, nonPerturbedNormal ), dot( clearcoatHorizonVec, faceNormal ) ), 1.0 );
+
+		clearcoatRadiance += getIBLRadiance( geometryViewDir, geometryClearcoatNormal, material.clearcoatRoughness ) * clearcoatHorizon * clearcoatHorizon;
 
 	#endif
 
