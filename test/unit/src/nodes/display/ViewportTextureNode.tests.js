@@ -1,6 +1,7 @@
 import { viewportTexture } from '../../../../../src/nodes/display/ViewportTextureNode.js';
 import { FramebufferTexture } from '../../../../../src/textures/FramebufferTexture.js';
 import { RenderTarget } from '../../../../../src/core/RenderTarget.js';
+import CanvasTarget from '../../../../../src/renderers/common/CanvasTarget.js';
 
 export default QUnit.module( 'Nodes', () => {
 
@@ -162,7 +163,7 @@ export default QUnit.module( 'Nodes', () => {
 
 					// Create mock targets
 					const renderTarget = new RenderTarget( 512, 512 );
-					const canvasTarget = { isCanvasTarget: true }; // Mock canvas target
+					const canvasTarget = new CanvasTarget( document.createElement( 'canvas' ) );
 
 					// Create mock renderer that returns both targets
 					const mockRenderer = {
@@ -202,7 +203,7 @@ export default QUnit.module( 'Nodes', () => {
 
 					const node = viewportTexture();
 
-					const canvasTarget = { isCanvasTarget: true }; // Mock canvas target
+					const canvasTarget = new CanvasTarget( document.createElement( 'canvas' ) );
 
 					// Create mock renderer where renderTarget is null
 					const mockRenderer = {
