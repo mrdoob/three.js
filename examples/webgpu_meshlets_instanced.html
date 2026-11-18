@@ -62,7 +62,8 @@
 				occlusion: true,
 				meshlets: false,
 				lod: 3,
-				lodTransition: 0.5,
+				lodTransition: 0,
+				transitionRadius: 60,
 				rotate: true
 			};
 
@@ -92,8 +93,8 @@
 				await renderer.init();
 
 				pipelines = {
-					'Meshlet': new MeshletDrawingPipeline( { occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod, lodTransition: parameters.lodTransition, shadowLodThreshold: parameters.lod } ),
-					'Visibility Buffer': new VisibilityBufferDrawingPipeline( { occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod, lodTransition: parameters.lodTransition, shadowLodThreshold: parameters.lod } ),
+					'Meshlet': new MeshletDrawingPipeline( { occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod, lodTransition: parameters.lodTransition, transitionScreenRadius: parameters.transitionRadius, shadowLodThreshold: parameters.lod } ),
+					'Visibility Buffer': new VisibilityBufferDrawingPipeline( { occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod, lodTransition: parameters.lodTransition, transitionScreenRadius: parameters.transitionRadius, shadowLodThreshold: parameters.lod } ),
 					'Default (slow)': renderer.drawingPipeline
 				};
 				renderer.drawingPipeline = pipelines[ parameters.pipeline ];
@@ -278,6 +279,15 @@
 					for ( const pipeline of meshletPipelines ) pipeline.lodTransition = value;
 
 				} );
+
+				// the statues smaller on the screen switch their levels of detail without a transition
+
+				const transitionRadius = gui.add( parameters, 'transitionRadius', 0, 200, 1 ).name( 'Transition min radius (px)' ).onChange( value => {
+
+					for ( const pipeline of meshletPipelines ) pipeline.transitionScreenRadius = value;
+
+				} );
+				const depthPrepass = gui.add( pipelines[ 'Meshlet' ], 'depthPrepass' ).name( 'Depth prepass' ).onChange( prepare );
 				gui.add( parameters, 'occlusion' ).name( 'Occlusion culling' ).onChange( value => {
 
 					for ( const pipeline of meshletPipelines ) pipeline.occlusionCulling = value;
@@ -296,6 +306,8 @@
 				function updateGUI() {
 
 					parameters.pipeline !== 'Default (slow)' ? lodTransition.show() : lodTransition.hide();
+					parameters.pipeline !== 'Default (slow)' ? transitionRadius.show() : transitionRadius.hide();
+					parameters.pipeline === 'Meshlet' ? depthPrepass.show() : depthPrepass.hide();
 
 				}
 
@@ -332,6 +344,7 @@
 
 					const info = renderer.drawingPipeline.info;
 					text += ` | ${ formatCount( info.triangles ) } drawn in ${ formatCount( info.clusters ) } clusters`;
+					if ( info.transitionClusters > 0 ) text += ` (${ formatCount( info.transitionClusters ) } in transitions)`;
 
 				}
 
