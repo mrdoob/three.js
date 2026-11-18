@@ -70,7 +70,7 @@
 				bias: 0.025, // SSAO
 				blurEnabled: true, // SSAO
 				blurSharpness: 2, // SSAO
-				aoOnly: false,
+				output: 'Beauty',
 				transparentOpacity: 0.3
 			};
 
@@ -129,7 +129,7 @@
 
 				const prePassNormal = sample( ( uv ) => {
 
-					return unpackRGBToNormal( prePass.getTextureNode().sample( uv ).rgb ).normalize();
+					return unpackRGBToNormal( prePass.getTextureNode().sample( uv ) );
 
 				} );
 
@@ -162,8 +162,11 @@
 
 					scenePass.options.samples = useTRAA ? 0 : 4;
 
-					renderPipeline.outputNode = params.aoOnly ? vec4( vec3( aoNode ), 1 ) : ( useTRAA ? traaPass : scenePass );
-					renderer.toneMapping = params.aoOnly ? THREE.NoToneMapping : THREE.NeutralToneMapping;
+					const beauty = ( params.output === 'Beauty' );
+					const aoOutput = ( params.output === 'AO Raw' ) ? aoPass.getTextureNode().sample( screenUV ).r : aoNode;
+
+					renderPipeline.outputNode = beauty ? ( useTRAA ? traaPass : scenePass ) : vec4( vec3( aoOutput ), 1 );
+					renderer.toneMapping = beauty ? THREE.NeutralToneMapping : THREE.NoToneMapping;
 					renderPipeline.needsUpdate = true;
 
 				}
@@ -192,32 +195,17 @@
 					}
 
 					const aoTexture = aoPass.getTextureNode();
-					const size = vec2( textureSize( aoTexture ) );
 
-					if ( params.upsampling === 'Nearest' ) {
+					if ( params.upsampling === 'Joint bilateral' ) {
 
-						// Sampling the nearest texel center avoids interpolation.
-						aoNode = aoTexture.sample( screenUV.mul( size ).floor().add( 0.5 ).div( size ) ).r;
+						const guideNormal = sample( ( uv ) => prePassNormal.sample( uv ).xyz.normalize() );
+						const size = vec2( textureSize( aoTexture ) );
 
-					} else if ( params.upsampling === 'Joint bilateral' ) {
-
-						const lowResAO = sample( ( uv ) => vec4( vec3( aoTexture.sample( uv ).r ), 1 ) );
-						const lowResDepth = sample( ( uv ) => {
-
-							if ( params.aoType === 'SSAO' || params.resolutionScale >= 1 ) return prePassDepth.sample( uv ).r;
-
-							// GTAO uses the closest of four depth samples at reduced resolution.
-							const halfTexel = vec2( 0.5 ).div( vec2( textureSize( prePassDepth ) ) );
-							const depths = [[ - 1, - 1 ], [ 1, - 1 ], [ - 1, 1 ], [ 1, 1 ]].map( ( offset ) => prePassDepth.sample( uv.add( halfTexel.mul( vec2( ...offset ) ) ) ).r );
-							return depths.reduce( ( a, b ) => renderer.reversedDepthBuffer ? a.max( b ) : a.min( b ) );
-
-						} );
-						upsamplePass = rtt( jointBilateralUpsample( lowResAO, lowResDepth, prePassNormal, prePassDepth, prePassNormal, camera, { size } ).sample( screenUV ) );
+						upsamplePass = rtt( jointBilateralUpsample( aoTexture, prePassDepth, guideNormal, prePassDepth, guideNormal, camera, { size } ).sample( screenUV ) );
 						aoNode = upsamplePass.sample( screenUV ).r;
 
 					} else {
 
-						// Render target textures use linear filtering by default.
 						aoNode = aoTexture.sample( screenUV ).r;
 
 					}
@@ -583,13 +571,8 @@
 					updateControls();
 
 				} );
-				const resolutionScaleControl = gui.add( params, 'resolutionScale', 0.1, 1 ).name( 'resolution' ).onChange( () => {
-
-					updateParameters();
-					updateUpsampling();
-
-				} );
-				gui.add( params, 'upsampling', [ 'Nearest', 'Bilinear', 'Joint bilateral' ] ).name( 'upsampling' ).onChange( updateUpsampling );
+				const resolutionScaleControl = gui.add( params, 'resolutionScale', 0, 1 ).name( 'resolution' ).onChange( updateParameters );
+				gui.add( params, 'upsampling', [ 'Bilinear', 'Joint bilateral' ] ).onChange( updateUpsampling );
 				gui.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters ).debounce( 250 );
 				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
 
@@ -612,7 +595,7 @@
 					transparentMesh.material.opacity = value;
 
 				} );
-				gui.add( params, 'aoOnly' ).onChange( updateOutput );
+				gui.add( params, 'output', [ 'Beauty', 'AO Raw', 'AO Upsampled' ] ).onChange( updateOutput );
 
 				// show only the controls that apply to the active AO type
 
