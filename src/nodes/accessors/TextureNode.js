@@ -1034,37 +1034,26 @@ class TextureNode extends UniformNode {
 	}
 
 	/**
-	 * Copies sampling settings without changing the texture or its render dependency.
-	 *
-	 * @param {TextureNode} source - The texture node to copy sampling settings from.
-	 * @return {TextureNode} A reference to this node.
-	 */
-	copySamplingState( source ) {
-
-		this.uvNode = source.uvNode;
-		this.levelNode = source.levelNode;
-		this.biasNode = source.biasNode;
-		this.sampler = source.sampler;
-		this.depthNode = source.depthNode;
-		this.compareNode = source.compareNode;
-		this.gradNode = source.gradNode;
-		this.gatherNode = source.gatherNode;
-		this.offsetNode = source.offsetNode;
-
-		return this;
-
-	}
-
-	/**
 	 * Clones the texture node.
 	 *
 	 * @return {TextureNode} The cloned texture node.
 	 */
 	clone() {
 
-		const newNode = new this.constructor( this.value, this.uvNode, this.levelNode, this.biasNode );
+		const newNode = new this.constructor();
+		newNode.value = this.value;
+		newNode.uvNode = this.uvNode;
+		newNode.levelNode = this.levelNode;
+		newNode.biasNode = this.biasNode;
+		newNode.sampler = this.sampler;
+		newNode.depthNode = this.depthNode;
+		newNode.compareNode = this.compareNode;
+		newNode.gradNode = this.gradNode;
+		newNode.gatherNode = this.gatherNode;
+		newNode.offsetNode = this.offsetNode;
+		newNode.updateMatrix = this.updateMatrix;
 
-		return newNode.copySamplingState( this );
+		return newNode;
 
 	}
 

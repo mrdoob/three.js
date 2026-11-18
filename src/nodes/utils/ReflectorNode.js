@@ -156,9 +156,10 @@ class ReflectorNode extends TextureNode {
 
 	clone() {
 
-		const newNode = new this.constructor( { reflector: this._reflectorBaseNode } );
+		const newNode = super.clone();
+		newNode._reflectorBaseNode = this._reflectorBaseNode;
 
-		return newNode.copySamplingState( this );
+		return newNode;
 
 	}
 
