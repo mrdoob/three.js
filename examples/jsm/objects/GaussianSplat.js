@@ -231,7 +231,7 @@ class GaussianSplat extends Mesh {
 	}
 
 	/**
-	 * A parameter determining the size at which a splat is skipped when the splat's drawn size along its longest axis is smaller than this many pixels. 
+	 * A parameter determining the size at which a splat is skipped when the splat's drawn size along its longest axis is smaller than this many pixels.
 	 * A value of `0` will draw every splat.
 	 *
 	 * Sizes are measured by the pixels of the drawing buffer, as influenced by the current
@@ -658,12 +658,12 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 
 	// Each splat is stored in two vec4 words (32 bytes):
 	//
-	// - center: xyz is the position, w is the scale of the covariance
+    // - center: xyz is the position, w is the scale of the covariance
 	// - splat: xyz holds the six covariance values as half floats, w the RGBA8 color
 	//
-	// The covariance is divided by its largest value before it's converted, so the half floats
-	// stay within [ -1, 1 ] where they're most precise, and splats of any size neither overflow
-	// nor flush to zero. The vertex shader multiplies the scale back in.
+	// To keep covariants precise, the six covariance values by the largest value 
+	// before they are converted. This keeps the half floats closer to a [ -1, 1 ] 
+	// where they're most precise. 
 
 	const centerData = new Float32Array( count * 4 );
 	const splatData = new Uint32Array( count * 4 );
@@ -675,14 +675,12 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 		const i4 = i * 4;
 		const i6 = i * 6;
 
-		// the upper triangle of the symmetric covariance: c00, c01, c02, c11, c12, c22
-
-		const c00 = covariances[ i6 ];
-		const c01 = covariances[ i6 + 1 ];
-		const c02 = covariances[ i6 + 2 ];
-		const c11 = covariances[ i6 + 3 ];
-		const c12 = covariances[ i6 + 4 ];
-		const c22 = covariances[ i6 + 5 ];
+		const c00 = covariances[ i6 ]; // covariance along x
+		const c01 = covariances[ i6 + 1 ]; // covariance from x to y
+		const c02 = covariances[ i6 + 2 ]; // covariance from x to z
+		const c11 = covariances[ i6 + 3 ]; // covariance along y
+		const c12 = covariances[ i6 + 4 ]; // covariance from y to z
+		const c22 = covariances[ i6 + 5 ]; // covariance along z
 
 		const scale = Math.max( Math.abs( c00 ), Math.abs( c01 ), Math.abs( c02 ), Math.abs( c11 ), Math.abs( c12 ), Math.abs( c22 ) );
 		const invScale = scale > 0 ? 1 / scale : 0;
@@ -692,9 +690,9 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 		centerData[ i4 + 2 ] = centers[ i3 + 2 ];
 		centerData[ i4 + 3 ] = scale;
 
-		splatData[ i4 ] = packHalf2x16( c00 * invScale, c01 * invScale );
-		splatData[ i4 + 1 ] = packHalf2x16( c02 * invScale, c11 * invScale );
-		splatData[ i4 + 2 ] = packHalf2x16( c12 * invScale, c22 * invScale );
+		splatData[ i4 ] = DataUtils.packHalfFloatsToUint( c00 * invScale, c01 * invScale );
+		splatData[ i4 + 1 ] = DataUtils.packHalfFloatsToUint( c02 * invScale, c11 * invScale );
+		splatData[ i4 + 2 ] = DataUtils.packHalfFloatsToUint( c12 * invScale, c22 * invScale );
 
 		splatData[ i4 + 3 ] = ( colors[ i4 ] |
 			colors[ i4 + 1 ] << 8 |
@@ -726,14 +724,6 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 	}
 
 	return buffers;
-
-}
-
-// Packs two numbers as half floats into one 32-bit word, the first in the low 16 bits. This is
-// the layout `unpackHalf2x16()` reads.
-function packHalf2x16( a, b ) {
-
-	return ( DataUtils.toHalfFloat( a ) | ( DataUtils.toHalfFloat( b ) << 16 ) ) >>> 0;
 
 }
 
@@ -932,6 +922,7 @@ function createMaterialNodes( buffers, sort, localCameraPosition, minPixelSize )
 		const splatIndex = sort.orderRead.element( instanceIndex ).toVar( 'splatIndex' );
 		const centerData = buffers.centerRead.element( splatIndex ).toVar( 'centerData' );
 		const center = centerData.xyz.toVar( 'center' );
+		const covarianceScale = centerData.w.toVar( 'covarianceScale' );
 		const splatData = buffers.splatRead.element( splatIndex ).toVar( 'splatData' );
 		const color = unpackUnorm4x8( splatData.w ).toVar( 'splatColor' );
 		const rgb = color.rgb.toVar( 'splatRgb' );
@@ -961,11 +952,11 @@ function createMaterialNodes( buffers, sort, localCameraPosition, minPixelSize )
 		const r1 = vec3( m[ 0 ].y, m[ 1 ].y, m[ 2 ].y ).toVar( 'r1' );
 		const r2 = vec3( m[ 0 ].z, m[ 1 ].z, m[ 2 ].z ).toVar( 'r2' );
 
-		// the covariance is stored as half floats divided by the scale in center.w, see createStorageBuffers()
-
-		const covarianceScale = centerData.w;
+		// Cov X + Cov X-Y
 		const cov00_01 = unpackHalf2x16( splatData.x ).mul( covarianceScale ).toVar( 'cov00_01' );
+		// Cov X-Z + Cov Y
 		const cov02_11 = unpackHalf2x16( splatData.y ).mul( covarianceScale ).toVar( 'cov02_11' );
+		// Cov Y-Z + Cov Z
 		const cov12_22 = unpackHalf2x16( splatData.z ).mul( covarianceScale ).toVar( 'cov12_22' );
 
 		const cov0 = vec3( cov00_01.x, cov00_01.y, cov02_11.x ).toVar( 'cov0' );
