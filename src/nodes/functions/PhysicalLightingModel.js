@@ -307,6 +307,22 @@ const IBLSheenBRDF = /*@__PURE__*/ Fn( ( { normal, viewDir, roughness } ) => {
 
 }, { normal: 'vec3', viewDir: 'vec3', roughness: 'float', return: 'float' } );
 
+//
+//	Ambient occlusion
+//
+
+// Jimenez et al. 2016, "Practical Realtime Strategies for Accurate Indirect Occlusion"
+// Light surfaces bounce light back into their crevices, so they darken less
+const multiBounceOcclusion = /*@__PURE__*/ Fn( ( [ visibility, albedo ] ) => {
+
+	const a = albedo.mul( 2.0404 ).sub( 0.3324 );
+	const b = albedo.mul( - 4.7951 ).add( 0.6417 );
+	const c = albedo.mul( 2.7552 ).add( 0.6903 );
+
+	return visibility.mul( a ).add( b ).mul( visibility ).add( c ).mul( visibility ).max( visibility );
+
+} );
+
 const clearcoatF0 = vec3( 0.04 );
 const clearcoatF90 = float( 1 );
 
@@ -929,10 +945,10 @@ class PhysicalLightingModel extends LightingModel {
 
 		}
 
-		reflectedLight.indirectDiffuse.mulAssign( ambientOcclusion );
+		reflectedLight.indirectDiffuse.mulAssign( multiBounceOcclusion( ambientOcclusion, diffuseContribution ) );
 
 		const soNode = computeSpecularOcclusion( normalView, roughness );
-		reflectedLight.indirectSpecular.mulAssign( soNode );
+		reflectedLight.indirectSpecular.mulAssign( multiBounceOcclusion( soNode, specularColorBlended ) );
 
 	}
 
