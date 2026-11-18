@@ -2,13 +2,14 @@ import LightingNode from './LightingNode.js';
 import { isolate } from '../core/IsolateNode.js';
 import { roughness, clearcoatRoughness, retroreflectivity } from '../core/PropertyNode.js';
 import { cameraWorldMatrix } from '../accessors/Camera.js';
-import { normalView, clearcoatNormalView, normalWorld } from '../accessors/Normal.js';
+import { normalView, clearcoatNormalView, normalWorld, normalViewGeometry } from '../accessors/Normal.js';
 import { positionViewDirection } from '../accessors/Position.js';
 import { float, pow4 } from '../tsl/TSLBase.js';
 import { bentNormalView } from '../accessors/AccessorsUtils.js';
 import { pmremTexture } from '../pmrem/PMREMNode.js';
 import { materialEnvIntensity } from '../accessors/MaterialProperties.js';
 import { NodeUpdateType } from '../core/constants.js';
+import { negateOnBackSide } from '../display/FrontFacingNode.js';
 
 const _rendererCache = new WeakMap();
 
@@ -88,7 +89,11 @@ class EnvironmentNode extends LightingNode {
 		const useAnisotropy = material.useAnisotropy === true || material.anisotropy > 0;
 		const radianceNormalView = useAnisotropy ? bentNormalView : normalView;
 
+		const geometryNormalView = builder.isFlatShading() ? normalViewGeometry : negateOnBackSide( normalViewGeometry );
+
 		let radiance = isolate( envNode.context( createRadianceContext( roughness, radianceNormalView ) ).mul( materialEnvIntensity ) );
+
+		radiance = radiance.mul( horizonOcclusion( normalView, geometryNormalView ) );
 
 		if ( material.useRetroreflection === true || material.retroreflectivity > 0 ) {
 
@@ -117,7 +122,7 @@ class EnvironmentNode extends LightingNode {
 			const clearcoatRadianceContext = envNode.context( createRadianceContext( clearcoatRoughness, clearcoatNormalView ) ).mul( materialEnvIntensity );
 			const isolateClearcoatRadiance = isolate( clearcoatRadianceContext );
 
-			clearcoatRadiance.addAssign( isolateClearcoatRadiance );
+			clearcoatRadiance.addAssign( isolateClearcoatRadiance.mul( horizonOcclusion( clearcoatNormalView, geometryNormalView ) ) );
 
 		}
 
@@ -187,6 +192,15 @@ class EnvironmentNode extends LightingNode {
 }
 
 export default EnvironmentNode;
+
+// Normal maps can bend the reflection below the geometric surface, which occludes it
+const horizonOcclusion = ( normalViewNode, geometryNormalViewNode ) => {
+
+	const horizon = positionViewDirection.negate().reflect( normalViewNode ).dot( geometryNormalViewNode ).add( 1.0 ).min( 1.0 );
+
+	return horizon.mul( horizon );
+
+};
 
 const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 
