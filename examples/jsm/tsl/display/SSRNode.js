@@ -46,7 +46,7 @@ class SSRNode extends Node {
 	/**
 	 * Constructs a new SSR node.
 	 *
-	 * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
+	 * @param {Node<vec4>} colorNode - The radiance the reflections read: the beauty pass, or any node whose `sample( uv )` returns radiance, like a `ReprojectNode`.
 	 * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
 	 * @param {Node<vec3>} normalNode - A node that represents the beauty pass's unit view-space normals.
 	 * @param {SSRNodeOptions} [options] - Optional inputs for material and environment data.
@@ -88,7 +88,7 @@ class SSRNode extends Node {
 		this.envImportanceSampling = envImportanceSampling;
 
 		/**
-		 * The node that represents the beauty pass.
+		 * The radiance the reflections read, sampled at each hit.
 		 *
 		 * @type {Node<vec4>}
 		 */
@@ -1399,7 +1399,7 @@ export default SSRNode;
  *
  * @tsl
  * @function
- * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
+ * @param {Node<vec4>} colorNode - The radiance the reflections read: the beauty pass, or any node whose `sample( uv )` returns radiance, like a `ReprojectNode`.
  * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
  * @param {Node<vec3>} normalNode - A node that represents the beauty pass's unit view-space normals.
  * @param {SSRNodeOptions} [options] - Optional inputs for material and environment data.

@@ -25,6 +25,7 @@
 
 			<small>
 				One mirror trace per pixel, followed by a roughness-dependent blur post-process.<br />
+				Reflects the current frame or the reprojected previous frame.<br />
 				<a href="https://skfb.ly/6tqYD" target="_blank" rel="noopener">Steampunk Camera</a> by
 				<a href="https://sketchfab.com/lumoize" target="_blank" rel="noopener">dylanheyes</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.
 			</small>
@@ -44,8 +45,9 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, Fn, normalView, metalness, roughness, screenUV, color, sample, velocity, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+		import { reproject } from 'three/addons/tsl/display/ReprojectNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -55,7 +57,7 @@
 		import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 		const params = {
-			output: 'Beauty', enabled: true, quality: 0.5, intensity: 1,
+			output: 'Beauty', radiance: 'Current frame', enabled: true, quality: 0.5, intensity: 1,
 			maxDistance: 1, thickness: 0.03, binaryRefine: false,
 			roughness: 1, blur: true, blurQuality: 1
 		};
@@ -143,7 +145,8 @@
 			scenePass.setMRT( mrt( {
 				output: output,
 				normal: packNormalToOctahedral( normalView ),
-				metalrough: vec2( metalness, roughness ) // pack metalness and roughness into a single attachment
+				metalrough: vec2( metalness, roughness ), // pack metalness and roughness into a single attachment
+				velocity: velocity
 			} ) );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
@@ -178,17 +181,63 @@
 
 			//
 
-			const reflection = ssr( scenePassColor, scenePassDepth, sceneNormal, {
-				metalnessNode: scenePassMetalRough.r,
-				roughnessNode: scenePassMetalRough.g,
-				binaryRefine: params.binaryRefine
-			} ).toInspector( 'SSR' );
+			// the radiance SSR reflects: this frame's color, or the previous frame's output
+			// reprojected once per frame into a buffer or separately for each hit
 
-			const raw = passTexture( reflection, reflection.getRenderTarget().texture );
-			const blurred = reflection.getTextureNode();
+			const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
+			const scenePassPreviousDepth = scenePass.getPreviousTextureNode( 'depth' );
+
+			const radianceInputs = {
+				'Current frame': scenePassColor,
+				'Previous frame (buffer)': reproject( scenePassVelocity, scenePassDepth, scenePassPreviousDepth ),
+				'Previous frame (per hit)': reproject( scenePassVelocity, scenePassDepth, scenePassPreviousDepth, { cache: false } )
+			};
+
 			const blurEnabled = uniform( 1 );
-			const combined = scenePassColor.rgb.add( mix( raw.rgb, blurred.rgb, blurEnabled ) );
-			const spatialAA = smaa( vec4( combined, 1 ) );
+
+			let reflection, raw, blurred, beauty, spatialAA;
+
+			function updateRadiance() {
+
+				if ( reflection !== undefined ) {
+
+					reflection.dispose();
+					spatialAA.dispose();
+
+				}
+
+				const radiance = radianceInputs[ params.radiance ];
+
+				reflection = ssr( radiance, scenePassDepth, sceneNormal, {
+					camera,
+					metalnessNode: scenePassMetalRough.r,
+					roughnessNode: scenePassMetalRough.g,
+					binaryRefine: params.binaryRefine
+				} ).toInspector( 'SSR' );
+
+				raw = passTexture( reflection, reflection.getRenderTarget().texture );
+				blurred = reflection.getTextureNode();
+
+				// the previous frame inputs reflect the scene color this frame keeps for the next one
+
+				const sceneColor = radiance === scenePassColor ? scenePassColor : radiance.capture( scenePassColor );
+
+				beauty = vec4( sceneColor.rgb.add( mix( raw.rgb, blurred.rgb, blurEnabled ) ), 1 );
+
+				spatialAA = smaa( beauty );
+
+				updateParameters();
+				updateOutput();
+
+			}
+
+			// the other views still evaluate the beauty, so its capture keeps running
+
+			const withBeauty = ( node ) => node.bypass( Fn( () => {
+
+				beauty.toVar();
+
+			} )() );
 
 			function updateOutput() {
 
@@ -197,8 +246,8 @@
 				switch ( params.output ) {
 
 					case 'Beauty': view = spatialAA; break;
-					case 'SSR': view = vec4( raw.rgb, 1 ); break;
-					case 'SSR DN': view = vec4( blurred.rgb, 1 ); break;
+					case 'SSR': view = withBeauty( vec4( raw.rgb, 1 ) ); break;
+					case 'SSR DN': view = withBeauty( vec4( blurred.rgb, 1 ) ); break;
 
 				}
 
@@ -221,6 +270,7 @@
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
 			ssrGui.add( params, 'enabled' ).name( 'Enabled' ).onChange( updateOutput );
+			ssrGui.add( params, 'radiance', Object.keys( radianceInputs ) ).name( 'Radiance' ).onChange( updateRadiance );
 			ssrGui.add( params, 'intensity', 0, 1 ).name( 'Intensity' ).onChange( updateParameters );
 			ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( updateParameters );
 			ssrGui.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( updateParameters );
@@ -242,8 +292,7 @@
 
 			} );
 
-			updateParameters();
-			updateOutput();
+			updateRadiance();
 
 			function updateParameters() {
 
