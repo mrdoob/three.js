@@ -163,7 +163,11 @@
 					scenePass.options.samples = useTRAA ? 0 : 4;
 
 					const beauty = ( params.output === 'Beauty' );
-					const aoOutput = ( params.output === 'AO Raw' ) ? aoPass.getTextureNode().sample( screenUV ).r : aoNode;
+					const aoTexture = aoPass.getTextureNode();
+					const aoSize = vec2( textureSize( aoTexture ) );
+
+					// raw output samples texel centers to show the AO texels unfiltered
+					const aoOutput = ( params.output === 'AO Raw' ) ? aoTexture.sample( screenUV.mul( aoSize ).floor().add( 0.5 ).div( aoSize ) ).r : aoNode;
 
 					renderPipeline.outputNode = beauty ? ( useTRAA ? traaPass : scenePass ) : vec4( vec3( aoOutput ), 1 );
 					renderer.toneMapping = beauty ? THREE.NeutralToneMapping : THREE.NoToneMapping;
