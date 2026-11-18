@@ -897,6 +897,10 @@ class MeshletCulling {
 		this.minScreenRadius = uniform( 0.0 );
 		this.coarseScreenRadius = uniform( 0.0 );
 
+		// the radius of objects on the screen in pixels below which their levels of detail switch without a transition
+
+		this.transitionScreenRadius = uniform( 0.0 );
+
 		const { projScreenMatrix, frustumPlanes, cameraPosition, cameraZoom, lodPosition, lodScale, lodPerspective, lodThreshold, minScreenRadius, coarseScreenRadius } = this;
 
 		// the bounding sphere of the drawn positions: the positions can be deformed by the render call, like a curved
@@ -1041,7 +1045,7 @@ class MeshletCulling {
 					// crossfade into the next level before it reaches the threshold, clamped to half the
 					// error gap between the two levels so adjacent transitions cannot overlap
 
-					If( flags.bitAnd( FLAG_DITHER ).notEqual( uint( 0 ) ).and( this.lodTransition.greaterThan( 0 ) ).and( lodLevel.add( 1 ).lessThan( lodCount ) ).and( screenRadius.greaterThanEqual( coarseScreenRadius ) ), () => {
+					If( flags.bitAnd( FLAG_DITHER ).notEqual( uint( 0 ) ).and( this.lodTransition.greaterThan( 0 ) ).and( lodLevel.add( 1 ).lessThan( lodCount ) ).and( screenRadius.greaterThanEqual( coarseScreenRadius ) ).and( screenRadius.greaterThanEqual( this.transitionScreenRadius ) ), () => {
 
 						const next = geometryRow( geometryIndex, lodLevel.add( GEOMETRY_LOD_ROW + 1 ) );
 						const current = geometryRow( geometryIndex, lodLevel.add( GEOMETRY_LOD_ROW ) );
@@ -1737,6 +1741,7 @@ class MeshletCulling {
 		this.lodTransition.value = lodView.transition;
 		this.minScreenRadius.value = lodView.minScreenRadius;
 		this.coarseScreenRadius.value = lodView.coarseScreenRadius;
+		this.transitionScreenRadius.value = lodView.transitionScreenRadius;
 
 		const planes = frustum.planes;
 
@@ -3454,6 +3459,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 	 * @param {Object} [parameters] - The configuration parameter.
 	 * @param {number} [parameters.lodThreshold=1] - The projected error in pixels below which a simpler level of detail is selected.
 	 * @param {number} [parameters.lodTransition=0] - The fraction of `lodThreshold` over which adjacent levels of detail crossfade with a screen-door dither mask.
+	 * @param {number} [parameters.transitionScreenRadius=0] - The radius in pixels below which the levels of detail of objects switch without a transition, `0` crossfades all objects.
 	 * @param {number} [parameters.shadowLodThreshold=1] - The projected error in shadow map texels below which a simpler level of detail is selected for shadow casters.
 	 * @param {number} [parameters.minScreenRadius=0] - The radius in pixels below which objects are not drawn, `0` draws all objects.
 	 * @param {number} [parameters.coarseScreenRadius=0] - The radius in pixels below which objects are drawn with their simplest level of detail.
@@ -3461,7 +3467,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 	 * @param {boolean} [parameters.occlusionCulling=true] - Whether the clusters hidden by other clusters should be culled.
 	 * @param {boolean} [parameters.depthPrepass=false] - Whether the depth of the clusters should be drawn before their material.
 	 */
-	constructor( { lodThreshold = 1, lodTransition = 0, shadowLodThreshold = 1, minScreenRadius = 0, coarseScreenRadius = 0, debug = false, occlusionCulling = true, depthPrepass = false } = {} ) {
+	constructor( { lodThreshold = 1, lodTransition = 0, transitionScreenRadius = 0, shadowLodThreshold = 1, minScreenRadius = 0, coarseScreenRadius = 0, debug = false, occlusionCulling = true, depthPrepass = false } = {} ) {
 
 		super();
 
@@ -3490,6 +3496,16 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		 * @default 0
 		 */
 		this.lodTransition = lodTransition;
+
+		/**
+		 * The radius of the bounding sphere of objects on the screen in pixels below which their levels of detail
+		 * switch without a transition. The popping of small objects is hardly visible, while their transitions
+		 * draw two levels of detail. `0` crossfades all objects, see {@link MeshletDrawingPipeline#lodTransition}.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.transitionScreenRadius = transitionScreenRadius;
 
 		/**
 		 * The projected error in shadow map texels below which a simpler level of detail is selected for the
@@ -3590,7 +3606,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		this._meshletsSupported = false;
 		this._shadowPass = false;
 		this._sceneProjected = false;
-		this._lodView = { position: new Vector3(), scale: 1, perspective: 1, threshold: 1, transition: 0, minScreenRadius: 0, coarseScreenRadius: 0 };
+		this._lodView = { position: new Vector3(), scale: 1, perspective: 1, threshold: 1, transition: 0, transitionScreenRadius: 0, minScreenRadius: 0, coarseScreenRadius: 0 };
 
 		clusterProcessingReady.then( () => {
 
@@ -4516,6 +4532,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		lodView.transition = this._shadowPass === true ? 0 : this.lodTransition;
 		lodView.minScreenRadius = this.minScreenRadius;
 		lodView.coarseScreenRadius = this.coarseScreenRadius;
+		lodView.transitionScreenRadius = this.transitionScreenRadius;
 
 		const view = this.updateView( record, width, height );
 		const occlusion = view !== null ? view.occlusion : null;
