@@ -283,8 +283,7 @@
 				if ( splatRoot === undefined ) return;
 
 				scene.remove( splatRoot );
-				splats.geometry.dispose();
-				splats.material.dispose();
+				splats.dispose();
 				splats = undefined;
 				splatRoot = undefined;
 

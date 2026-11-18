@@ -253,6 +253,38 @@ class GaussianSplat extends Mesh {
 	}
 
 	/**
+	 * Frees the GPU-related resources allocated by this instance: the internal geometry and. Call this
+	 * method whenever the splat instance is no longer used in your app.
+	 */
+	dispose() {
+
+		this._buffers.centerAttribute.dispose();
+		this._buffers.splatAttribute.dispose();
+
+		for ( let degree = 1; degree <= this._buffers.sphericalHarmonicsDegree; degree ++ ) {
+
+			this._buffers[ `sphericalHarmonics${ degree }Attribute` ].dispose();
+
+		}
+
+		if ( this._buffers.sphericalHarmonicsContributionAttribute !== undefined ) {
+
+			this._buffers.sphericalHarmonicsContributionAttribute.dispose();
+
+		}
+
+		if ( this._sphericalHarmonicsComputeNode !== null ) this._sphericalHarmonicsComputeNode.dispose();
+
+		this._sort.dispose();
+
+		this.geometry.dispose();
+		this.material.dispose();
+
+		super.dispose();
+
+	}
+
+	/**
 	 * Updates the view-dependent spherical harmonics colors if the camera or
 	 * mesh transform has changed.
 	 *
@@ -708,6 +740,8 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 		count,
 		sphericalHarmonicsDegree,
 		webGLBuffersEnabled: false,
+		centerAttribute,
+		splatAttribute,
 		centerRead: storage( centerAttribute, 'vec4' ).toReadOnly(),
 		splatRead: storage( splatAttribute, 'uvec4' ).toReadOnly()
 	};
@@ -737,6 +771,7 @@ function ensureSphericalHarmonicsContributionBuffer( buffers ) {
 	// this additional buffer lazily only when the WebGPU pre-pass runs.
 	const attribute = new StorageBufferAttribute( new Float32Array( buffers.count * 4 ), 4 );
 
+	buffers.sphericalHarmonicsContributionAttribute = attribute;
 	buffers.sphericalHarmonicsContributionRead = storage( attribute, 'vec4' ).toReadOnly();
 	buffers.sphericalHarmonicsContributionWrite = storage( attribute, 'vec4' );
 
