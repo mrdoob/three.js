@@ -2199,7 +2199,7 @@ class VRMLLoader extends Loader {
 
 			}
 
-			const geometry = new ConeGeometry( radius, height, 16, 1, openEnded );
+			const geometry = new ConeGeometry( radius, height, 16, 1, openEnded, Math.PI / 2 ).rotateY( Math.PI / 2 );
 
 			return geometry;
 
@@ -2247,7 +2247,7 @@ class VRMLLoader extends Loader {
 
 			}
 
-			const geometry = new CylinderGeometry( radius, radius, height, 16, 1 );
+			const geometry = new CylinderGeometry( radius, radius, height, 16, 1, false, Math.PI / 2 ).rotateY( Math.PI / 2 );
 
 			return geometry;
 
@@ -2279,7 +2279,7 @@ class VRMLLoader extends Loader {
 
 			}
 
-			const geometry = new SphereGeometry( radius, 16, 16 );
+			const geometry = new SphereGeometry( radius, 16, 16, - Math.PI / 2 );
 
 			return geometry;
 
