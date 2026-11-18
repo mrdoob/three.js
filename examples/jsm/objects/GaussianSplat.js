@@ -658,12 +658,12 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 
 	// Each splat is stored in two vec4 words (32 bytes):
 	//
-    // - center: xyz is the position, w is the scale of the covariance
+	// - center: xyz is the position, w is the scale of the covariance
 	// - splat: xyz holds the six covariance values as half floats, w the RGBA8 color
 	//
-	// To keep covariants precise, the six covariance values by the largest value 
-	// before they are converted. This keeps the half floats closer to a [ -1, 1 ] 
-	// where they're most precise. 
+	// To keep covariants precise, the six covariance values by the largest value
+	// before they are converted. This keeps the half floats closer to a [ -1, 1 ]
+	// where they're most precise.
 
 	const centerData = new Float32Array( count * 4 );
 	const splatData = new Uint32Array( count * 4 );

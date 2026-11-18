@@ -190,7 +190,7 @@ function packHalfFloatToUint( a, b ) {
 
 /**
  * Unpacks a 32-bit word into two numbers, reading the low 16 bits and the high 16 bits
- * as half floats. 
+ * as half floats.
  *
  * @param {number} val - The U32 value that holds two packed FP16 values.
  * @param {Array<number>} [target=[]] - The array to write the result into.
