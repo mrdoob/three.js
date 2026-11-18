@@ -507,6 +507,14 @@ function WebGLState( gl, extensions ) {
 
 	}
 
+	function getBoundFramebuffer( target ) {
+
+		if ( target === gl.FRAMEBUFFER ) target = gl.DRAW_FRAMEBUFFER;
+
+		return currentBoundFramebuffers[ target ] || null;
+
+	}
+
 	function drawBuffers( renderTarget, framebuffer ) {
 
 		let drawBuffers = defaultDrawbuffers;
@@ -1324,6 +1332,7 @@ function WebGLState( gl, extensions ) {
 		disable: disable,
 
 		bindFramebuffer: bindFramebuffer,
+		getBoundFramebuffer: getBoundFramebuffer,
 		drawBuffers: drawBuffers,
 
 		useProgram: useProgram,

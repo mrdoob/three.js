@@ -3177,7 +3177,9 @@ class WebGLRenderer {
 
 			if ( framebuffer ) {
 
-				state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+				const currentFramebuffer = state.getBoundFramebuffer( _gl.READ_FRAMEBUFFER );
+
+				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, framebuffer );
 
 				try {
 
@@ -3215,10 +3217,7 @@ class WebGLRenderer {
 
 				} finally {
 
-					// restore framebuffer of current render target if necessary
-
-					const framebuffer = ( _currentRenderTarget !== null ) ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
-					state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+					state.bindFramebuffer( _gl.READ_FRAMEBUFFER, currentFramebuffer );
 
 				}
 
@@ -3265,8 +3264,9 @@ class WebGLRenderer {
 				// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
 				if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
 
-					// set the active frame buffer to the one we want to read
-					state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+					const currentFramebuffer = state.getBoundFramebuffer( _gl.READ_FRAMEBUFFER );
+
+					state.bindFramebuffer( _gl.READ_FRAMEBUFFER, framebuffer );
 
 					const texture = renderTarget.textures[ textureIndex ];
 					const textureFormat = texture.format;
@@ -3297,9 +3297,7 @@ class WebGLRenderer {
 					_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), 0 );
 					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, null );
 
-					// reset the frame buffer to the currently set buffer before waiting
-					const currFramebuffer = _currentRenderTarget !== null ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
-					state.bindFramebuffer( _gl.FRAMEBUFFER, currFramebuffer );
+					state.bindFramebuffer( _gl.READ_FRAMEBUFFER, currentFramebuffer );
 
 					// check if the commands have finished every 8 ms
 					const sync = _gl.fenceSync( _gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
