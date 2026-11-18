@@ -14,7 +14,7 @@ export default /* glsl */`
 
 		#if defined( STANDARD ) || defined( LAMBERT ) || defined( PHONG )
 
-			iblIrradiance += getIBLIrradiance( geometryNormal );
+			irradiance += getIBLIrradiance( geometryNormal );
 
 		#endif
 

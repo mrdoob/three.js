@@ -820,21 +820,7 @@ class PhysicalLightingModel extends LightingModel {
 	 */
 	indirectSpecular( builder ) {
 
-		const { radiance, iblIrradiance, reflectedLight } = builder.context;
-
-		if ( this.sheen === true ) {
-
-			this.sheenSpecularIndirect.addAssign( iblIrradiance.mul(
-				sheen,
-				IBLSheenBRDF( {
-					normal: normalView,
-					viewDir: positionViewDirection,
-					roughness: sheenRoughness
-				} ),
-				1 / Math.PI
-			) );
-
-		}
+		const { radiance, reflectedLight } = builder.context;
 
 		if ( this.clearcoat === true ) {
 
@@ -851,7 +837,6 @@ class PhysicalLightingModel extends LightingModel {
 
 		}
 
-		// Both indirect specular and indirect diffuse light accumulate here
 		// Compute multiscattering separately for dielectric and metallic, then mix
 
 		const singleScatteringDielectric = this.singleScatteringDielectric;
@@ -865,19 +850,9 @@ class PhysicalLightingModel extends LightingModel {
 		const singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, metalness );
 		const multiScattering = mix( multiScatteringDielectric, multiScatteringMetallic, metalness );
 
-		// Diffuse energy conservation uses dielectric path
-		const totalScatteringDielectric = singleScatteringDielectric.add( multiScatteringDielectric );
-
-		const diffuseAlbedo = this.diffuseRoughness
-			? this.eonDirectionalAlbedo.mul( metalness.oneMinus() )
-			: diffuseContribution;
-
-		const diffuse = diffuseAlbedo.mul( totalScatteringDielectric.oneMinus() );
-
-		const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI );
-
-		const indirectSpecular = radiance.mul( singleScattering ).add( multiScattering.mul( cosineWeightedIrradiance ) ).toVar();
-		const indirectDiffuse = diffuse.mul( cosineWeightedIrradiance ).toVar();
+		// The multiple scattering lobe has the shape of the single scattering lobe, so it scales the radiance, see
+		// Turquin, "Practical multiple scattering compensation for microfacet models"
+		const indirectSpecular = radiance.mul( singleScattering.add( multiScattering ) ).toVar();
 
 		if ( this.sheen === true ) {
 
@@ -886,13 +861,10 @@ class PhysicalLightingModel extends LightingModel {
 			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( sheenAlbedo ).oneMinus();
 
 			indirectSpecular.mulAssign( sheenEnergyComp );
-			indirectDiffuse.mulAssign( sheenEnergyComp );
 
 		}
 
 		reflectedLight.indirectSpecular.addAssign( indirectSpecular );
-
-		reflectedLight.indirectDiffuse.addAssign( indirectDiffuse );
 
 	}
 
