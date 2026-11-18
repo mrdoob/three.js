@@ -66,6 +66,90 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
+		QUnit.test( 'deleteGeometry deletes only the instances using that geometry', ( assert ) => {
+
+			const material = new MeshBasicMaterial();
+			const batchedMesh = new BatchedMesh( 16, 5000, 10000, material );
+
+			const geometryA = batchedMesh.addGeometry( new BoxGeometry() );
+			const geometryB = batchedMesh.addGeometry( new BoxGeometry() );
+			const geometryC = batchedMesh.addGeometry( new BoxGeometry() );
+
+			// 0: A, 1: B, 2: A, 3: C, 4: B, 5: A
+			const geometryOrder = [ geometryA, geometryB, geometryA, geometryC, geometryB, geometryA ];
+			for ( const geometryId of geometryOrder ) batchedMesh.addInstance( geometryId );
+
+			const activeIds = () => batchedMesh._instanceInfo.map( ( info, i ) => info.active ? i : - 1 ).filter( i => i !== - 1 );
+
+			batchedMesh.deleteInstance( 2 );
+			batchedMesh.deleteGeometry( geometryA );
+			assert.deepEqual( activeIds(), [ 1, 3, 4 ], 'instances of geometry A are deleted' );
+
+			// instances changed after the first deleteGeometry() must be tracked as well
+			batchedMesh.setGeometryIdAt( 1, geometryC );
+			const added = batchedMesh.addInstance( geometryB );
+			assert.strictEqual( added, 0, 'deleted instance id is reused' );
+
+			batchedMesh.deleteGeometry( geometryB );
+			assert.deepEqual( activeIds(), [ 1, 3 ], 'instances of geometry B are deleted, re-assigned instance is kept' );
+
+			batchedMesh.deleteGeometry( geometryC );
+			assert.deepEqual( activeIds(), [], 'instances of geometry C are deleted, including the re-assigned one' );
+			assert.strictEqual( batchedMesh.instanceCount, 0, 'no instances left' );
+
+			// deleting a geometry that was never instanced is fine
+			const geometryD = batchedMesh.addGeometry( new BoxGeometry() );
+			batchedMesh.deleteGeometry( geometryD );
+			assert.strictEqual( batchedMesh.instanceCount, 0, 'still no instances' );
+
+		} );
+
+		QUnit.test( 'deleteGeometry after setInstanceCount', ( assert ) => {
+
+			const material = new MeshBasicMaterial();
+			const batchedMesh = new BatchedMesh( 2, 5000, 10000, material );
+
+			const geometryA = batchedMesh.addGeometry( new BoxGeometry() );
+			const geometryB = batchedMesh.addGeometry( new BoxGeometry() );
+			batchedMesh.addInstance( geometryA );
+			batchedMesh.addInstance( geometryB );
+
+			// build the lookup, then grow the instance capacity and add instances past the old capacity
+			batchedMesh.deleteGeometry( geometryB );
+			batchedMesh.setInstanceCount( 8 );
+			for ( let i = 0; i < 6; i ++ ) batchedMesh.addInstance( geometryA );
+
+			batchedMesh.deleteGeometry( geometryA );
+			assert.strictEqual( batchedMesh.instanceCount, 0, 'all instances of geometry A are deleted' );
+
+		} );
+
+		QUnit.test( 'deleteGeometry after copy', ( assert ) => {
+
+			const material = new MeshBasicMaterial();
+			const source = new BatchedMesh( 8, 5000, 10000, material );
+
+			const geometryA = source.addGeometry( new BoxGeometry() );
+			const geometryB = source.addGeometry( new BoxGeometry() );
+			source.addInstance( geometryA );
+			source.addInstance( geometryB );
+
+			// build the lookup on the target before copying into it
+			const target = new BatchedMesh( 8, 5000, 10000, material );
+			target.addGeometry( new BoxGeometry() );
+			target.addInstance( 0 );
+			target.addInstance( 0 );
+			target.deleteGeometry( 0 );
+
+			target.copy( source );
+			target.deleteGeometry( geometryB );
+
+			assert.strictEqual( target._instanceInfo[ 0 ].active, true, 'instance of geometry A is kept' );
+			assert.strictEqual( target._instanceInfo[ 1 ].active, false, 'instance of geometry B is deleted' );
+			assert.strictEqual( source._instanceInfo[ 1 ].active, true, 'source is unchanged' );
+
+		} );
+
 		QUnit.test( 'setGeometrySize', ( assert ) => {
 
 			const material = new MeshBasicMaterial();
