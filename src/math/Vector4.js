@@ -493,11 +493,14 @@ class Vector4 {
 	 */
 	setAxisAngleFromQuaternion( q ) {
 
-		// q is assumed to be normalized
+		// q is assumed to be normalized. Clamp w, since rounding can leave it
+		// slightly outside [ - 1, 1 ] (e.g. 1.0000000000000002), which makes acos() NaN.
 
-		this.w = 2 * Math.acos( q.w );
+		const qw = clamp( q.w, - 1, 1 );
 
-		const s = Math.sqrt( 1 - q.w * q.w );
+		this.w = 2 * Math.acos( qw );
+
+		const s = Math.sqrt( 1 - qw * qw );
 
 		if ( s < 0.0001 ) {
 

@@ -1,5 +1,8 @@
 import { Vector4 } from '../../../../src/math/Vector4.js';
 import { Matrix4 } from '../../../../src/math/Matrix4.js';
+import { Quaternion } from '../../../../src/math/Quaternion.js';
+import { Euler } from '../../../../src/math/Euler.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 import {
 	x,
@@ -175,6 +178,31 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( c.y == 0, 'Passed!' );
 			assert.ok( c.z == 0, 'Passed!' );
 			assert.ok( c.w == 0, 'Passed!' );
+
+		} );
+
+		QUnit.test( 'setAxisAngleFromQuaternion', ( assert ) => {
+
+			const a = new Vector4();
+			const q = new Quaternion().setFromAxisAngle( new Vector3( 0, 1, 0 ), Math.PI / 2 );
+
+			a.setAxisAngleFromQuaternion( q );
+			assert.ok( Math.abs( a.x ) <= eps, 'Check x' );
+			assert.ok( Math.abs( a.y - 1 ) <= eps, 'Check y' );
+			assert.ok( Math.abs( a.z ) <= eps, 'Check z' );
+			assert.ok( Math.abs( a.w - Math.PI / 2 ) <= eps, 'Check w' );
+
+			// rounding can leave w just above 1, e.g. for q * q^-1
+			const r = new Quaternion().setFromEuler( new Euler( 0.1, 0.1, 0.5 ) );
+			q.copy( r ).multiply( r.clone().invert() );
+			assert.ok( q.w > 1, 'w is just above 1' );
+
+			a.setAxisAngleFromQuaternion( q );
+			assert.deepEqual( [ a.x, a.y, a.z, a.w ], [ 1, 0, 0, 0 ], 'Identity rotation, w > 1' );
+
+			a.setAxisAngleFromQuaternion( q.set( 0, 0, 0, - 1.0000000000000002 ) );
+			assert.ok( Math.abs( a.w - 2 * Math.PI ) <= eps, 'Identity rotation, w < -1' );
+			assert.ok( ! Number.isNaN( a.x ), 'Axis is not NaN' );
 
 		} );
 
