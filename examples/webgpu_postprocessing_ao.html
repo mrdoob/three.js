@@ -561,7 +561,10 @@
 				// GUI
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
-				gui.add( params, 'aoType', [ 'GTAO', 'SSAO' ] ).name( 'AO type' ).onChange( () => {
+				gui.add( params, 'output', [ 'Beauty', 'AO Raw', 'AO Upsampled' ] ).onChange( updateOutput );
+
+				const aoFolder = gui.addFolder( 'AO' );
+				aoFolder.add( params, 'aoType', [ 'GTAO', 'SSAO' ] ).name( 'AO type' ).onChange( () => {
 
 					// half resolution suffices for GTAO since TRAA smooths it, SSAO looks best at full resolution
 
@@ -571,31 +574,33 @@
 					updateControls();
 
 				} );
-				const resolutionScaleControl = gui.add( params, 'resolutionScale', 0, 1 ).name( 'resolution' ).onChange( updateParameters );
-				gui.add( params, 'upsampling', [ 'Bilinear', 'Joint bilateral' ] ).onChange( updateUpsampling );
-				gui.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters ).debounce( 250 );
-				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
+				const resolutionScaleControl = aoFolder.add( params, 'resolutionScale', 0, 1 ).name( 'resolution' ).onChange( updateParameters );
+				aoFolder.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters ).debounce( 250 );
+				aoFolder.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
+
+				const filteringFolder = gui.addFolder( 'Filtering' );
+				filteringFolder.add( params, 'upsampling', [ 'Bilinear', 'Joint bilateral' ] ).onChange( updateUpsampling );
 
 				const gtaoControls = [
-					gui.add( params, 'scale', 0.01, 2 ).onChange( updateParameters ),
-					gui.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters ),
-					gui.add( params, 'temporalFiltering' ).name( 'temporal filtering' ).onChange( updateParameters )
+					aoFolder.add( params, 'scale', 0.01, 2 ).onChange( updateParameters ),
+					aoFolder.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters ),
+					filteringFolder.add( params, 'temporalFiltering' ).name( 'temporal filtering' ).onChange( updateParameters )
 				];
 
 				const ssaoControls = [
-					gui.add( params, 'intensity', 0, 4 ).onChange( updateParameters ),
-					gui.add( params, 'bias', 0, 0.2 ).onChange( updateParameters ),
-					gui.add( params, 'blurEnabled' ).name( 'blur' ).onChange( updateParameters ),
-					gui.add( params, 'blurSharpness', 0, 8 ).name( 'blur sharpness' ).onChange( updateParameters )
+					aoFolder.add( params, 'intensity', 0, 4 ).onChange( updateParameters ),
+					aoFolder.add( params, 'bias', 0, 0.2 ).onChange( updateParameters ),
+					filteringFolder.add( params, 'blurEnabled' ).name( 'blur' ).onChange( updateParameters ),
+					filteringFolder.add( params, 'blurSharpness', 0, 8 ).name( 'blur sharpness' ).onChange( updateParameters )
 				];
 
-				gui.add( transparentMesh, 'visible' ).name( 'show transparent mesh' );
-				gui.add( params, 'transparentOpacity', 0, 1, 0.01 ).name( 'mesh opacity' ).onChange( ( value ) => {
+				const debugFolder = gui.addFolder( 'Debug' );
+				debugFolder.add( transparentMesh, 'visible' ).name( 'show transparent mesh' );
+				debugFolder.add( params, 'transparentOpacity', 0, 1, 0.01 ).name( 'mesh opacity' ).onChange( ( value ) => {
 
 					transparentMesh.material.opacity = value;
 
 				} );
-				gui.add( params, 'output', [ 'Beauty', 'AO Raw', 'AO Upsampled' ] ).onChange( updateOutput );
 
 				// show only the controls that apply to the active AO type
 
