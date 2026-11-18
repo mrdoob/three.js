@@ -207,8 +207,9 @@
 							if ( params.aoType === 'SSAO' || params.resolutionScale >= 1 ) return prePassDepth.sample( uv ).r;
 
 							// GTAO uses the closest of four depth samples at reduced resolution.
-							const depths = prePassDepth.gather().sample( uv );
-							return renderer.reversedDepthBuffer ? depths.x.max( depths.y ).max( depths.z ).max( depths.w ) : depths.x.min( depths.y ).min( depths.z ).min( depths.w );
+							const halfTexel = vec2( 0.5 ).div( vec2( textureSize( prePassDepth ) ) );
+							const depths = [[ - 1, - 1 ], [ 1, - 1 ], [ - 1, 1 ], [ 1, 1 ]].map( ( offset ) => prePassDepth.sample( uv.add( halfTexel.mul( vec2( ...offset ) ) ) ).r );
+							return depths.reduce( ( a, b ) => renderer.reversedDepthBuffer ? a.max( b ) : a.min( b ) );
 
 						} );
 						upsamplePass = rtt( jointBilateralUpsample( lowResAO, lowResDepth, prePassNormal, prePassDepth, prePassNormal, camera, { size } ).sample( screenUV ) );
