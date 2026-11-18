@@ -34,8 +34,10 @@ export default /* glsl */`
 
 	#endif
 
-	// Normal maps can bend the reflection below the geometric surface, which occludes it
-	float horizon = min( 1.0 + dot( reflect( - geometryViewDir, geometryNormal ), nonPerturbedNormal ), 1.0 );
+	// Normal maps can bend the reflection below the surface, which occludes it
+	vec3 faceNormal = normalize( cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ) );
+
+	float horizon = min( 1.0 + dot( reflect( - geometryViewDir, geometryNormal ), faceNormal ), 1.0 );
 	iblRadiance *= horizon * horizon;
 
 	#ifdef USE_RETROREFLECTION
@@ -58,7 +60,7 @@ export default /* glsl */`
 
 	#ifdef USE_CLEARCOAT
 
-		float clearcoatHorizon = min( 1.0 + dot( reflect( - geometryViewDir, geometryClearcoatNormal ), nonPerturbedNormal ), 1.0 );
+		float clearcoatHorizon = min( 1.0 + dot( reflect( - geometryViewDir, geometryClearcoatNormal ), faceNormal ), 1.0 );
 
 		clearcoatRadiance += getIBLRadiance( geometryViewDir, geometryClearcoatNormal, material.clearcoatRoughness ) * clearcoatHorizon * clearcoatHorizon;
 
