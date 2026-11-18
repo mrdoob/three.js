@@ -1183,15 +1183,21 @@ class MeshletCulling {
 
 					If( record.y.bitAnd( OCCLUDED ).notEqual( uint( 0 ) ), () => {
 
+						// the clusters of the coarser level of a transition have no visibility, they are never drawn in the first phase
+
 						If( coarse.not(), () => {
 
-							If( clusterVisibility.element( visibilityIndex ).notEqual( lodLevel.add( 1 ) ).and( transition.equal( 0 ) ), () => {
+							If( clusterVisibility.element( visibilityIndex ).notEqual( lodLevel.add( 1 ) ), () => {
 
 								atomicAdd( counters.element( this.occludedCounter ), 1 );
 
 							} );
 
 							clusterVisibility.element( visibilityIndex ).assign( uint( 0 ) );
+
+						} ).Else( () => {
+
+							atomicAdd( counters.element( this.occludedCounter ), 1 );
 
 						} );
 
@@ -1263,19 +1269,15 @@ class MeshletCulling {
 
 				};
 
-				// transitioning objects skip the phase-one occluder prepass, then test both levels against the phase-one HZB in phase two
+				// the finer level of a transition is culled like any level: its clusters visible in the previous frame are
+				// occluders of the first phase. the visibility of the coarser level would alias the clusters of the finer
+				// one, its clusters skip the first phase and are tested against the hierarchical depth in the second phase
 
 				if ( phase !== 'all' ) {
 
-					If( transition.greaterThan( 0 ), () => {
+					If( coarse, () => {
 
 						if ( phase === 'second' ) {
-
-							If( coarse.not(), () => {
-
-								clusterVisibility.element( visibilityIndex ).assign( uint( 0 ) );
-
-							} );
 
 							If( chunkVisible, () => {
 
@@ -1283,7 +1285,7 @@ class MeshletCulling {
 
 								If( occluded.not(), enqueue );
 
-								If( occluded.and( coarse.not() ), () => {
+								If( occluded, () => {
 
 									atomicAdd( counters.element( this.occludedCounter ), 1 );
 
@@ -2536,6 +2538,11 @@ class MeshletBatch {
 
 			if ( farClusterSource !== null ) this.prepassMeshes.push( this.createDepthMesh( culling.argsAttribute, farClusterSource, { ...shared, material: this.farMaterial }, FrontSide, this.getArgsOffset( 1, true ) ) );
 
+			// the finer level of the transitions without the dither mask: the holes of the mask would be the farthest
+			// depth of every tile of the hierarchical depth, the level of detail error is within the error of the levels
+
+			if ( ditherClusterSource !== null ) this.prepassMeshes.push( this.createDepthMesh( culling.argsAttribute, ditherClusterSource, shared, FrontSide, this.getArgsOffset( 1, true ) ) );
+
 		}
 
 	}
@@ -3517,11 +3524,12 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		/**
 		 * The clusters and triangles drawn by the GPU-driven pipeline in the main view, read from the counters of the
 		 * culling without waiting for the GPU. The values are updated every interval of frames, the triangles include the degenerate triangles which pad the clusters.
+		 * `transitionClusters` are the clusters of the dithered crossfades between levels of detail, included in `clusters`.
 		 *
-		 * @type {{clusters: number, triangles: number}}
+		 * @type {{clusters: number, triangles: number, transitionClusters: number}}
 		 * @readonly
 		 */
-		this.info = { clusters: 0, triangles: 0 };
+		this.info = { clusters: 0, triangles: 0, transitionClusters: 0 };
 
 		/**
 		 * Whether the clusters (meshlets) of the objects drawn by the GPU-driven pipeline should be shown
@@ -5007,6 +5015,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 			let exceeded = false;
 			let shrink = false;
 			let drawn = 0;
+			let transitionDrawn = 0;
 
 			if ( counters[ 0 ] > culling.capacity.clusters ) {
 
@@ -5023,8 +5032,10 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 					: Math.max( counters[ 1 + index * 2 ], batch.farMaterial !== null ? counters[ 2 + index * 2 ] : 0 );
 
 				const nearDrawn = Math.min( counters[ 1 + index * 2 ], queueCapacity );
+				const ditherDrawn = batch.ditherQueue === true ? Math.min( ditherVisible, queueCapacity - nearDrawn ) : 0;
+				transitionDrawn += ditherDrawn;
 				drawn += nearDrawn + ( batch.ditherQueue === true
-					? Math.min( ditherVisible, queueCapacity - nearDrawn )
+					? ditherDrawn
 					: ( batch.farMaterial !== null ? Math.min( counters[ 2 + index * 2 ], queueCapacity ) : 0 ) );
 
 				if ( visible > queueCapacity ) {
@@ -5052,6 +5063,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 				this.info.clusters = drawn;
 				this.info.triangles = drawn * MESHLET_SIZE;
+				this.info.transitionClusters = transitionDrawn;
 
 			}
 
