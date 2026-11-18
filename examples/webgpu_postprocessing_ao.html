@@ -584,7 +584,7 @@
 				const gtaoControls = [
 					aoFolder.add( params, 'scale', 0.01, 2 ).onChange( updateParameters ),
 					aoFolder.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters ),
-					filteringFolder.add( params, 'temporalFiltering' ).name( 'temporal filtering' ).onChange( updateParameters )
+					filteringFolder.add( params, 'temporalFiltering' ).name( 'temporal' ).onChange( updateParameters )
 				];
 
 				const ssaoControls = [
@@ -595,12 +595,12 @@
 				];
 
 				const debugFolder = gui.addFolder( 'Debug' );
-				debugFolder.add( transparentMesh, 'visible' ).name( 'show transparent mesh' );
-				debugFolder.add( params, 'transparentOpacity', 0, 1, 0.01 ).name( 'mesh opacity' ).onChange( ( value ) => {
+				debugFolder.add( transparentMesh, 'visible' ).name( 'transparent mesh' ).onChange( ( value ) => value ? opacityControl.show() : opacityControl.hide() );
+				const opacityControl = debugFolder.add( params, 'transparentOpacity', 0, 1, 0.01 ).name( 'mesh opacity' ).onChange( ( value ) => {
 
 					transparentMesh.material.opacity = value;
 
-				} );
+				} ).hide();
 
 				// show only the controls that apply to the active AO type
 
