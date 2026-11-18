@@ -14,6 +14,7 @@ import { morphReference, morphColor } from '../../nodes/accessors/Morph.js';
 import { fwidth, mix, smoothstep } from '../../nodes/math/MathNode.js';
 import { float, vec3, vec4, bool } from '../../nodes/tsl/TSLBase.js';
 import AONode from '../../nodes/lighting/AONode.js';
+import OcclusionAwareIrradianceNode from '../../nodes/lighting/OcclusionAwareIrradianceNode.js';
 import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
 import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
 import { depth, viewZToLogarithmicDepth, viewZToOrthographicDepth } from '../../nodes/display/ViewportDepthNode.js';
@@ -1046,11 +1047,15 @@ class NodeMaterial extends Material {
 
 		if ( builder.context.getGI ) {
 
-			const giNode = builder.context.getGI( null, builder );
+			let giNode = builder.context.getGI( null, builder );
 
 			if ( giNode !== null ) {
 
-				materialLightsNode.push( new IrradianceNode( giNode ) );
+				const aoNode = this.aoNode || ( builder.material.aoMap ? materialAO : null );
+
+				if ( aoNode !== null ) giNode = giNode.mul( aoNode );
+
+				materialLightsNode.push( new OcclusionAwareIrradianceNode( giNode ) );
 
 			}
 

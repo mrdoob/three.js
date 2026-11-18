@@ -830,7 +830,7 @@ class PhysicalLightingModel extends LightingModel {
 	 */
 	indirectDiffuse( builder ) {
 
-		const { irradiance, reflectedLight } = builder.context;
+		const { ambientOcclusion, irradiance, occlusionAwareIrradiance, reflectedLight } = builder.context;
 
 		// Energy reflected by the specular lobe is not available to the diffuse layer
 		const singleScattering = this.singleScatteringDielectric;
@@ -840,13 +840,15 @@ class PhysicalLightingModel extends LightingModel {
 			? this.eonDirectionalAlbedo.mul( metalness.oneMinus(), 1 / Math.PI )
 			: BRDF_Lambert( { diffuseColor: diffuseContribution } );
 
-		const diffuse = irradiance.mul( diffuseBRDF ).mul( singleScattering.add( multiScattering ).oneMinus() ).toVar();
+		const diffuseIrradiance = irradiance.mul( multiBounceOcclusion( ambientOcclusion, diffuseContribution ) ).add( occlusionAwareIrradiance );
+
+		const diffuse = diffuseIrradiance.mul( diffuseBRDF ).mul( singleScattering.add( multiScattering ).oneMinus() ).toVar();
 
 		if ( this.sheen === true ) {
 
 			const sheenAlbedo = IBLSheenBRDF( { normal: normalView, viewDir: positionViewDirection, roughness: sheenRoughness } );
 
-			this.sheenSpecularIndirect.addAssign( irradiance.mul( sheen, sheenAlbedo, 1 / Math.PI ) );
+			this.sheenSpecularIndirect.addAssign( irradiance.mul( ambientOcclusion ).add( occlusionAwareIrradiance ).mul( sheen, sheenAlbedo, 1 / Math.PI ) );
 
 			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( sheenAlbedo ).oneMinus();
 
@@ -938,14 +940,6 @@ class PhysicalLightingModel extends LightingModel {
 			this.clearcoatSpecularIndirect.mulAssign( computeSpecularOcclusion( clearcoatNormalView, clearcoatRoughness ) );
 
 		}
-
-		if ( this.sheen === true ) {
-
-			this.sheenSpecularIndirect.mulAssign( ambientOcclusion );
-
-		}
-
-		reflectedLight.indirectDiffuse.mulAssign( multiBounceOcclusion( ambientOcclusion, diffuseContribution ) );
 
 		const soNode = computeSpecularOcclusion( normalView, roughness );
 		reflectedLight.indirectSpecular.mulAssign( multiBounceOcclusion( soNode, specularColorBlended ) );
