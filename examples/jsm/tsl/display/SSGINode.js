@@ -68,6 +68,17 @@ class SSGINode extends Node {
 		this.beautyNode = beautyNode;
 
 		/**
+		 * Whether the input beauty node is owned by this effect, i.e. it was
+		 * created by `convertToTexture()` in the factory function. Owned nodes
+		 * are disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsBeautyNode = false;
+
+		/**
 		 * A node that represents the scene's depth.
 		 *
 		 * @type {TextureNode}
@@ -686,6 +697,7 @@ class SSGINode extends Node {
 
 		super.dispose();
 
+		if ( this._ownsBeautyNode === true ) this.beautyNode.dispose();
 		this._ssgiRenderTarget.dispose();
 
 		this._material.dispose();
@@ -707,4 +719,13 @@ export default SSGINode;
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {SSGINode}
  */
-export const ssgi = ( beautyNode, depthNode, normalNode, camera ) => new SSGINode( convertToTexture( beautyNode ), depthNode, normalNode, camera );
+export const ssgi = ( beautyNode, depthNode, normalNode, camera ) => {
+
+	const textureNode = convertToTexture( beautyNode );
+	const effect = new SSGINode( textureNode, depthNode, normalNode, camera );
+
+	effect._ownsBeautyNode = textureNode.isRTTNode === true && textureNode !== beautyNode;
+
+	return effect;
+
+};

@@ -41,6 +41,17 @@ class GaussianBlurNode extends Node {
 		this.textureNode = textureNode;
 
 		/**
+		 * Whether the input texture node is owned by this effect, i.e. it was
+		 * created by `convertToTexture()` in the factory function. Owned nodes
+		 * are disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsTextureNode = false;
+
+		/**
 		 * Defines the direction and radius of the blur.
 		 *
 		 * @type {Node<vec2|float>}
@@ -306,6 +317,8 @@ class GaussianBlurNode extends Node {
 	 */
 	dispose() {
 
+		if ( this._ownsTextureNode === true ) this.textureNode.dispose();
+
 		this._horizontalRT.dispose();
 		this._verticalRT.dispose();
 
@@ -390,7 +403,16 @@ export default GaussianBlurNode;
  * @param {number} [options.resolutionScale=1] - The resolution of the effect. 0.5 means half the resolution of the texture node.
  * @returns {GaussianBlurNode}
  */
-export const gaussianBlur = ( node, directionNode, sigma, options = {} ) => new GaussianBlurNode( convertToTexture( node ), directionNode, sigma, options );
+export const gaussianBlur = ( node, directionNode, sigma, options = {} ) => {
+
+	const textureNode = convertToTexture( node );
+	const effect = new GaussianBlurNode( textureNode, directionNode, sigma, options );
+
+	effect._ownsTextureNode = textureNode.isRTTNode === true && textureNode !== node;
+
+	return effect;
+
+};
 
 /**
  * TSL function for creating a gaussian blur node for post processing with enabled premultiplied alpha.

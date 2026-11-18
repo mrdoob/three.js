@@ -47,6 +47,17 @@ class BilateralBlurNode extends Node {
 		this.textureNode = textureNode;
 
 		/**
+		 * Whether the input texture node is owned by this effect, i.e. it was
+		 * created by `convertToTexture()` in the factory function. Owned nodes
+		 * are disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsTextureNode = false;
+
+		/**
 		 * Defines the direction and radius of the blur.
 		 *
 		 * @type {Node<vec2|float>}
@@ -326,6 +337,7 @@ class BilateralBlurNode extends Node {
 
 		super.dispose();
 
+		if ( this._ownsTextureNode === true ) this.textureNode.dispose();
 		this._horizontalRT.dispose();
 		this._verticalRT.dispose();
 
@@ -374,4 +386,13 @@ export default BilateralBlurNode;
  * @param {number} sigmaColor - Controls the intensity kernel. Higher values allow more color difference to be blurred together.
  * @returns {BilateralBlurNode}
  */
-export const bilateralBlur = ( node, directionNode, sigma, sigmaColor ) => new BilateralBlurNode( convertToTexture( node ), directionNode, sigma, sigmaColor );
+export const bilateralBlur = ( node, directionNode, sigma, sigmaColor ) => {
+
+	const textureNode = convertToTexture( node );
+	const effect = new BilateralBlurNode( textureNode, directionNode, sigma, sigmaColor );
+
+	effect._ownsTextureNode = textureNode.isRTTNode === true && textureNode !== node;
+
+	return effect;
+
+};

@@ -44,6 +44,17 @@ class ChromaticAberrationNode extends Node {
 		this.textureNode = textureNode;
 
 		/**
+		 * Whether the input texture node is owned by this effect, i.e. it was
+		 * created by `convertToTexture()` in the factory function. Owned nodes
+		 * are disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsTextureNode = false;
+
+		/**
 		 * A node holding the strength of the effect.
 		 *
 		 * @type {Node}
@@ -136,6 +147,18 @@ class ChromaticAberrationNode extends Node {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the effect is no longer required.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		if ( this._ownsTextureNode === true ) this.textureNode.dispose();
+
+	}
+
 }
 
 export default ChromaticAberrationNode;
@@ -153,11 +176,16 @@ export default ChromaticAberrationNode;
  */
 export const chromaticAberration = ( node, strength = 1.0, center = null, scale = 1.1 ) => {
 
-	return new ChromaticAberrationNode(
-		convertToTexture( node ),
+	const textureNode = convertToTexture( node );
+	const effect = new ChromaticAberrationNode(
+		textureNode,
 		nodeObject( strength ),
 		nodeObject( center ),
 		nodeObject( scale )
 	);
+
+	effect._ownsTextureNode = textureNode.isRTTNode === true && textureNode !== node;
+
+	return effect;
 
 };

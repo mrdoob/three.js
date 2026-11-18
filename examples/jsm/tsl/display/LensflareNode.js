@@ -47,6 +47,17 @@ class LensflareNode extends Node {
 		 */
 		this.textureNode = textureNode;
 
+		/**
+		 * Whether the input texture node is owned by this effect, i.e. it was
+		 * created by `convertToTexture()` in the factory function. Owned nodes
+		 * are disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsTextureNode = false;
+
 		const {
 			ghostTint = vec3( 1, 1, 1 ),
 			threshold = float( 0.5 ),
@@ -255,6 +266,7 @@ class LensflareNode extends Node {
 
 		super.dispose();
 
+		if ( this._ownsTextureNode === true ) this.textureNode.dispose();
 		this._renderTarget.dispose();
 		this._material.dispose();
 
@@ -279,4 +291,13 @@ export default LensflareNode;
  * @param {number} [params.downSampleRatio=4] - Defines how downsampling since the effect is usually not rendered at full resolution.
  * @returns {LensflareNode}
  */
-export const lensflare = ( node, params ) => new LensflareNode( convertToTexture( node ), params );
+export const lensflare = ( node, params ) => {
+
+	const textureNode = convertToTexture( node );
+	const effect = new LensflareNode( textureNode, params );
+
+	effect._ownsTextureNode = textureNode.isRTTNode === true && textureNode !== node;
+
+	return effect;
+
+};

@@ -42,6 +42,17 @@ class SMAANode extends Node {
 		this.textureNode = textureNode;
 
 		/**
+		 * Whether the input texture node is owned by this effect, i.e. it was
+		 * created by `convertToTexture()` in the factory function. Owned nodes
+		 * are disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsTextureNode = false;
+
+		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
@@ -677,6 +688,7 @@ class SMAANode extends Node {
 
 		super.dispose();
 
+		if ( this._ownsTextureNode === true ) this.textureNode.dispose();
 		this._renderTargetEdges.dispose();
 		this._renderTargetWeights.dispose();
 		this._renderTargetBlend.dispose();
@@ -726,4 +738,13 @@ export default SMAANode;
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @returns {SMAANode}
  */
-export const smaa = ( node ) => new SMAANode( convertToTexture( node ) );
+export const smaa = ( node ) => {
+
+	const textureNode = convertToTexture( node );
+	const effect = new SMAANode( textureNode );
+
+	effect._ownsTextureNode = textureNode.isRTTNode === true && textureNode !== node;
+
+	return effect;
+
+};

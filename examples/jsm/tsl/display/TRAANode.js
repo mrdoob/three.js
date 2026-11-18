@@ -67,6 +67,17 @@ class TRAANode extends Node {
 		this.beautyNode = beautyNode;
 
 		/**
+		 * Whether the input beauty node is owned by this effect, i.e. it was
+		 * created by `convertToTexture()` in the factory function. Owned nodes
+		 * are disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsBeautyNode = false;
+
+		/**
 		 * A node that represents the scene's velocity.
 		 *
 		 * @type {TextureNode}
@@ -618,6 +629,7 @@ class TRAANode extends Node {
 
 		super.dispose();
 
+		if ( this._ownsBeautyNode === true ) this.beautyNode.dispose();
 		this._historyRenderTarget.dispose();
 		this._resolveRenderTarget.dispose();
 		this._previousDepthRenderTarget.dispose();
@@ -643,4 +655,13 @@ const _haltonOffsets = /*@__PURE__*/ computeHaltonOffsets( 32 );
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {TRAANode}
  */
-export const traa = ( beautyNode, depthNode, velocityNode, camera ) => new TRAANode( convertToTexture( beautyNode ), depthNode, velocityNode, camera );
+export const traa = ( beautyNode, depthNode, velocityNode, camera ) => {
+
+	const textureNode = convertToTexture( beautyNode );
+	const effect = new TRAANode( textureNode, depthNode, velocityNode, camera );
+
+	effect._ownsBeautyNode = textureNode.isRTTNode === true && textureNode !== beautyNode;
+
+	return effect;
+
+};

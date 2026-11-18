@@ -37,6 +37,17 @@ class TransitionNode extends Node {
 		this.textureNodeA = textureNodeA;
 
 		/**
+		 * Whether `textureNodeA` is owned by this effect, i.e. it was created
+		 * by `convertToTexture()` in the factory function. Owned nodes are
+		 * disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsTextureNodeA = false;
+
+		/**
 		 * A texture node that represents the beauty pass of the second scene.
 		 *
 		 * @type {TextureNode}
@@ -44,11 +55,33 @@ class TransitionNode extends Node {
 		this.textureNodeB = textureNodeB;
 
 		/**
+		 * Whether `textureNodeB` is owned by this effect, i.e. it was created
+		 * by `convertToTexture()` in the factory function. Owned nodes are
+		 * disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsTextureNodeB = false;
+
+		/**
 		 * A texture that defines how the transition effect should look like.
 		 *
 		 * @type {TextureNode}
 		 */
 		this.mixTextureNode = mixTextureNode;
+
+		/**
+		 * Whether `mixTextureNode` is owned by this effect, i.e. it was created
+		 * by `convertToTexture()` in the factory function. Owned nodes are
+		 * disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsMixTextureNode = false;
 
 		/**
 		 * The interpolation factor that controls the mix.
@@ -121,6 +154,20 @@ class TransitionNode extends Node {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the effect is no longer required.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		if ( this._ownsTextureNodeA === true ) this.textureNodeA.dispose();
+		if ( this._ownsTextureNodeB === true ) this.textureNodeB.dispose();
+		if ( this._ownsMixTextureNode === true ) this.mixTextureNode.dispose();
+
+	}
+
 }
 
 export default TransitionNode;
@@ -138,4 +185,17 @@ export default TransitionNode;
  * @param {Node<float> | number} useTexture - Whether `mixTextureNode` should influence the transition or not.
  * @returns {TransitionNode}
  */
-export const transition = ( nodeA, nodeB, mixTextureNode, mixRatio, threshold, useTexture ) => new TransitionNode( convertToTexture( nodeA ), convertToTexture( nodeB ), convertToTexture( mixTextureNode ), nodeObject( mixRatio ), nodeObject( threshold ), nodeObject( useTexture ) );
+export const transition = ( nodeA, nodeB, mixTextureNode, mixRatio, threshold, useTexture ) => {
+
+	const textureNodeA = convertToTexture( nodeA );
+	const textureNodeB = convertToTexture( nodeB );
+	const convertedMixTextureNode = convertToTexture( mixTextureNode );
+	const effect = new TransitionNode( textureNodeA, textureNodeB, convertedMixTextureNode, nodeObject( mixRatio ), nodeObject( threshold ), nodeObject( useTexture ) );
+
+	effect._ownsTextureNodeA = textureNodeA.isRTTNode === true && textureNodeA !== nodeA;
+	effect._ownsTextureNodeB = textureNodeB.isRTTNode === true && textureNodeB !== nodeB;
+	effect._ownsMixTextureNode = convertedMixTextureNode.isRTTNode === true && convertedMixTextureNode !== mixTextureNode;
+
+	return effect;
+
+};

@@ -77,6 +77,17 @@ class TAAUNode extends Node {
 		this.beautyNode = beautyNode;
 
 		/**
+		 * Whether the input beauty node is owned by this effect, i.e. it was
+		 * created by `convertToTexture()` in the factory function. Owned nodes
+		 * are disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsBeautyNode = false;
+
+		/**
 		 * A node that represents the scene's depth.
 		 *
 		 * @type {TextureNode}
@@ -672,6 +683,7 @@ class TAAUNode extends Node {
 
 		super.dispose();
 
+		if ( this._ownsBeautyNode === true ) this.beautyNode.dispose();
 		this._historyRenderTarget.dispose();
 		this._resolveRenderTarget.dispose();
 		this._previousDepthRenderTarget.dispose();
@@ -698,4 +710,13 @@ const _haltonOffsets = /*@__PURE__*/ computeHaltonOffsets( 32 );
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {TAAUNode}
  */
-export const taau = ( beautyNode, depthNode, velocityNode, camera ) => new TAAUNode( convertToTexture( beautyNode ), depthNode, velocityNode, camera );
+export const taau = ( beautyNode, depthNode, velocityNode, camera ) => {
+
+	const textureNode = convertToTexture( beautyNode );
+	const effect = new TAAUNode( textureNode, depthNode, velocityNode, camera );
+
+	effect._ownsBeautyNode = textureNode.isRTTNode === true && textureNode !== beautyNode;
+
+	return effect;
+
+};

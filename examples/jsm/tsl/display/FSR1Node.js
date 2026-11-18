@@ -53,6 +53,17 @@ class FSR1Node extends Node {
 		this.textureNode = textureNode;
 
 		/**
+		 * Whether the input texture node is owned by this effect, i.e. it was
+		 * created by `convertToTexture()` in the factory function. Owned nodes
+		 * are disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsTextureNode = false;
+
+		/**
 		 * RCAS sharpening strength. 0 = maximum, 2 = none.
 		 *
 		 * @type {Node<float>}
@@ -456,6 +467,7 @@ class FSR1Node extends Node {
 
 		super.dispose();
 
+		if ( this._ownsTextureNode === true ) this.textureNode.dispose();
 		this._easuRT.dispose();
 		this._rcasRT.dispose();
 
@@ -478,4 +490,13 @@ export default FSR1Node;
  * @param {(boolean|Node<bool>)} [denoise=false] - Whether to attenuate RCAS sharpening in noisy areas.
  * @returns {FSR1Node}
  */
-export const fsr1 = ( node, sharpness, denoise ) => new FSR1Node( convertToTexture( node ), sharpness, denoise );
+export const fsr1 = ( node, sharpness, denoise ) => {
+
+	const textureNode = convertToTexture( node );
+	const effect = new FSR1Node( textureNode, sharpness, denoise );
+
+	effect._ownsTextureNode = textureNode.isRTTNode === true && textureNode !== node;
+
+	return effect;
+
+};

@@ -50,6 +50,17 @@ class SharpenNode extends Node {
 		this.textureNode = textureNode;
 
 		/**
+		 * Whether the input texture node is owned by this effect, i.e. it was
+		 * created by `convertToTexture()` in the factory function. Owned nodes
+		 * are disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsTextureNode = false;
+
+		/**
 		 * Sharpening strength. 0 = maximum, 2 = none.
 		 *
 		 * @type {Node<float>}
@@ -261,6 +272,7 @@ class SharpenNode extends Node {
 
 		super.dispose();
 
+		if ( this._ownsTextureNode === true ) this.textureNode.dispose();
 		this._renderTarget.dispose();
 
 		if ( this._material !== null ) this._material.dispose();
@@ -281,4 +293,13 @@ export default SharpenNode;
  * @param {(boolean|Node<bool>)} [denoise=false] - Whether to attenuate sharpening in noisy areas.
  * @returns {SharpenNode}
  */
-export const sharpen = ( node, sharpness, denoise ) => new SharpenNode( convertToTexture( node ), sharpness, denoise );
+export const sharpen = ( node, sharpness, denoise ) => {
+
+	const textureNode = convertToTexture( node );
+	const effect = new SharpenNode( textureNode, sharpness, denoise );
+
+	effect._ownsTextureNode = textureNode.isRTTNode === true && textureNode !== node;
+
+	return effect;
+
+};

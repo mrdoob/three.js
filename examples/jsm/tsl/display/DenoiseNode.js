@@ -120,6 +120,17 @@ class DenoiseNode extends Node {
 		this.inputNode = inputNode;
 
 		/**
+		 * Whether the input node is owned by this effect, i.e. it was created
+		 * by `convertToTexture()` in the factory function. Owned nodes are
+		 * disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsInputNode = false;
+
+		/**
 		 * Screen space: the depth of the scene.
 		 *
 		 * @type {?TextureNode}
@@ -580,6 +591,8 @@ class DenoiseNode extends Node {
 	 * Frees internal resources. This method should be called when the node is no longer required.
 	 */
 	dispose() {
+
+		if ( this._ownsInputNode === true ) this.inputNode.dispose();
 
 		for ( const target of [ ...this._targets, this._renderTarget, this._prepareTarget, ...( this._historyTargets || [] ) ] ) {
 
@@ -1625,7 +1638,17 @@ function createMaterial( name, count, body ) {
  * @param {Object} [options={}] - The guides and options, see {@link DenoiseNode}.
  * @returns {DenoiseNode}
  */
-export const denoise = ( node, options = {} ) => new DenoiseNode( convertToTexture( nodeObject( node ) ), { ...options, temporal: false } );
+export const denoise = ( node, options = {} ) => {
+
+	const input = nodeObject( node );
+	const inputNode = convertToTexture( input );
+	const effect = new DenoiseNode( inputNode, { ...options, temporal: false } );
+
+	effect._ownsInputNode = inputNode.isRTTNode === true && inputNode !== input;
+
+	return effect;
+
+};
 
 /**
  * TSL function for creating a denoise node that accumulates a noisy screen-space effect in time before filtering it,
@@ -1637,4 +1660,14 @@ export const denoise = ( node, options = {} ) => new DenoiseNode( convertToTextu
  * @param {Object} [options={}] - The guides and options, see {@link DenoiseNode}.
  * @returns {DenoiseNode}
  */
-export const temporalDenoise = ( node, options = {} ) => new DenoiseNode( convertToTexture( nodeObject( node ) ), { ...options, temporal: true } );
+export const temporalDenoise = ( node, options = {} ) => {
+
+	const input = nodeObject( node );
+	const inputNode = convertToTexture( input );
+	const effect = new DenoiseNode( inputNode, { ...options, temporal: true } );
+
+	effect._ownsInputNode = inputNode.isRTTNode === true && inputNode !== input;
+
+	return effect;
+
+};

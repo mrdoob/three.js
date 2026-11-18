@@ -35,6 +35,17 @@ class RGBShiftNode extends Node {
 		this.textureNode = textureNode;
 
 		/**
+		 * Whether the input texture node is owned by this effect, i.e. it was
+		 * created by `convertToTexture()` in the factory function. Owned nodes
+		 * are disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsTextureNode = false;
+
+		/**
 		 * The amount of the RGB shift.
 		 *
 		 * @type {Node<float>}
@@ -79,6 +90,18 @@ class RGBShiftNode extends Node {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the effect is no longer required.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		if ( this._ownsTextureNode === true ) this.textureNode.dispose();
+
+	}
+
 }
 
 export default RGBShiftNode;
@@ -93,4 +116,13 @@ export default RGBShiftNode;
  * @param {number|Node<float>} [angle=0] - Defines in which direction colors are shifted.
  * @returns {RGBShiftNode}
  */
-export const rgbShift = ( node, amount, angle ) => new RGBShiftNode( convertToTexture( node ), amount, angle );
+export const rgbShift = ( node, amount, angle ) => {
+
+	const textureNode = convertToTexture( node );
+	const effect = new RGBShiftNode( textureNode, amount, angle );
+
+	effect._ownsTextureNode = textureNode.isRTTNode === true && textureNode !== node;
+
+	return effect;
+
+};

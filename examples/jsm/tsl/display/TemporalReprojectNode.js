@@ -543,6 +543,17 @@ class TemporalReprojectNode extends Node {
 		this.camera = camera;
 
 		/**
+		 * Whether the input beauty node is owned by this effect, i.e. it was
+		 * created by `convertToTexture()` in the factory function. Owned nodes
+		 * are disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsBeautyNode = false;
+
+		/**
 		 * @type {TemporalReprojectMode}
 		 */
 		this.mode = mode;
@@ -986,6 +997,7 @@ class TemporalReprojectNode extends Node {
 
 		super.dispose();
 
+		if ( this._ownsBeautyNode === true ) this.beautyNode.dispose();
 		this._previousNormalTexture.dispose();
 
 		if ( this._previousDepthNode.value !== this._historyRenderTarget.depthTexture ) {
@@ -1020,11 +1032,20 @@ export default TemporalReprojectNode;
  * @param {TemporalReprojectNodeOptions} [options]
  * @returns {TemporalReprojectNode}
  */
-export const temporalReproject = ( beautyNode, depthNode, normalNode, velocityNode, camera, options = {} ) => new TemporalReprojectNode(
-	convertToTexture( beautyNode ),
-	nodeObject( depthNode ),
-	nodeObject( normalNode ),
-	nodeObject( velocityNode ),
-	camera,
-	options
-);
+export const temporalReproject = ( beautyNode, depthNode, normalNode, velocityNode, camera, options = {} ) => {
+
+	const textureNode = convertToTexture( beautyNode );
+	const effect = new TemporalReprojectNode(
+		textureNode,
+		nodeObject( depthNode ),
+		nodeObject( normalNode ),
+		nodeObject( velocityNode ),
+		camera,
+		options
+	);
+
+	effect._ownsBeautyNode = textureNode.isRTTNode === true && textureNode !== beautyNode;
+
+	return effect;
+
+};

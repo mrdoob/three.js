@@ -44,6 +44,17 @@ class DepthOfFieldNode extends Node {
 		this.textureNode = textureNode;
 
 		/**
+		 * Whether the input texture node is owned by this effect, i.e. it was
+		 * created by `convertToTexture()` in the factory function. Owned nodes
+		 * are disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsTextureNode = false;
+
+		/**
 		 * Represents the viewZ depth values of the scene.
 		 *
 		 * @type {Node<float>}
@@ -529,6 +540,7 @@ class DepthOfFieldNode extends Node {
 
 		super.dispose();
 
+		if ( this._ownsTextureNode === true ) this.textureNode.dispose();
 		this._CoCRT.dispose();
 		this._CoCBlurredRT.dispose();
 		this._blur64RT.dispose();
@@ -562,4 +574,13 @@ export default DepthOfFieldNode;
  * @param {Node<float> | number} bokehScale - A unitless value for artistic purposes to adjust the size of the bokeh.
  * @returns {DepthOfFieldNode}
  */
-export const dof = ( node, viewZNode, focusDistance = 1, focalLength = 1, bokehScale = 1 ) => new DepthOfFieldNode( convertToTexture( node ), nodeObject( viewZNode ), nodeObject( focusDistance ), nodeObject( focalLength ), nodeObject( bokehScale ) );
+export const dof = ( node, viewZNode, focusDistance = 1, focalLength = 1, bokehScale = 1 ) => {
+
+	const textureNode = convertToTexture( node );
+	const effect = new DepthOfFieldNode( textureNode, nodeObject( viewZNode ), nodeObject( focusDistance ), nodeObject( focalLength ), nodeObject( bokehScale ) );
+
+	effect._ownsTextureNode = textureNode.isRTTNode === true && textureNode !== node;
+
+	return effect;
+
+};

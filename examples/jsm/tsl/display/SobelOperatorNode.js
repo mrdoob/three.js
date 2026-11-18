@@ -34,6 +34,17 @@ class SobelOperatorNode extends Node {
 		this.textureNode = textureNode;
 
 		/**
+		 * Whether the input texture node is owned by this effect, i.e. it was
+		 * created by `convertToTexture()` in the factory function. Owned nodes
+		 * are disposed in `dispose()`, caller-owned nodes are not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._ownsTextureNode = false;
+
+		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
 		 * its internal uniforms once per frame in `updateBefore()`.
 		 *
@@ -153,6 +164,18 @@ class SobelOperatorNode extends Node {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the effect is no longer required.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		if ( this._ownsTextureNode === true ) this.textureNode.dispose();
+
+	}
+
 }
 
 export default SobelOperatorNode;
@@ -165,4 +188,13 @@ export default SobelOperatorNode;
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @returns {SobelOperatorNode}
  */
-export const sobel = ( node ) => new SobelOperatorNode( convertToTexture( node ) );
+export const sobel = ( node ) => {
+
+	const textureNode = convertToTexture( node );
+	const effect = new SobelOperatorNode( textureNode );
+
+	effect._ownsTextureNode = textureNode.isRTTNode === true && textureNode !== node;
+
+	return effect;
+
+};
