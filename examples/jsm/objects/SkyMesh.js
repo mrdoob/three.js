@@ -143,6 +143,16 @@ class SkyMesh extends Mesh {
 		this.mieColor = uniform( new Color( 0.451084, 0.681483, 1.0 ) );
 
 		/**
+		 * The color absorbed by aerosol particles, relative to the strength
+		 * of Mie scattering. Absorbing dust or haze tints the sky in the
+		 * complementary color. The default value represents the atmosphere
+		 * of Earth, whose aerosols absorb almost nothing.
+		 *
+		 * @type {UniformNode<vec3>}
+		 */
+		this.mieAbsorption = uniform( new Color( 0, 0, 0 ) );
+
+		/**
 		 * The strength of atmospheric absorption. Higher values remove
 		 * more of {@link SkyMesh#absorptionColor} from the sunlight and
 		 * tint the sky in the complementary color.
@@ -166,6 +176,13 @@ class SkyMesh extends Mesh {
 		 * @type {UniformNode<vec3>}
 		 */
 		this.sunPosition = uniform( new Vector3() );
+
+		/**
+		 * The size of the sun disc relative to the sun seen from Earth.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.sunSize = uniform( 1 );
 
 		/**
 		 * The cloud scale uniform.
@@ -235,6 +252,7 @@ class SkyMesh extends Mesh {
 		const vSunFex = varyingProperty( 'vec3' );
 		const vBetaR = varyingProperty( 'vec3' );
 		const vBetaM = varyingProperty( 'vec3' );
+		const vBetaMExt = varyingProperty( 'vec3' );
 
 		const vertexNode = /*@__PURE__*/ Fn( ( builder ) => {
 
@@ -249,7 +267,7 @@ class SkyMesh extends Mesh {
 			// const v = float( 4.0 );
 			// const K = vec3( 0.686, 0.678, 0.666 );
 			// MieConst = pi * pow( ( 2.0 * pi ) / lambda, vec3( v - 2.0 ) ) * K
-			const MieConst = this.mieColor.mul( 4.0790479543861094E14 );
+			const MieConst = float( 4.0790479543861094E14 );
 
 			// earth shadow hack
 			// cutoffAngle = pi / 1.95;
@@ -287,19 +305,22 @@ class SkyMesh extends Mesh {
 			// rayleigh coefficients
 			vBetaR.assign( betaR );
 
-			// varying vBetaM
+			// varying vBetaM, extinction adds what the aerosols absorb
 
 			const c = float( 0.2 ).mul( this.turbidity ).mul( 10E-18 );
 			const totalMie = float( 0.434 ).mul( c ).mul( MieConst );
-			const betaM = totalMie.mul( this.mieCoefficient );
+			const mie = totalMie.mul( this.mieCoefficient );
+			const betaM = mie.mul( this.mieColor );
+			const betaMExt = mie.mul( this.mieColor.add( this.mieAbsorption ) );
 
 			vBetaM.assign( betaM );
+			vBetaMExt.assign( betaMExt );
 
 			// sun-path transmittance through lower troposphere to cloud altitude (~2km)
 
 			const sunCloudCos = max( 0.0, angle.add( 0.03 ) );
 			const sunCloudAirMass = float( 2.0 ).div( sunCloudCos.add( sqrt( sunCloudCos.mul( sunCloudCos ).add( 0.012 ) ) ) );
-			vSunFex.assign( exp( betaR.mul( 4600.0 ).add( betaM.mul( 190.0 ) ).mul( sunCloudAirMass ).negate() ) );
+			vSunFex.assign( exp( betaR.mul( 4600.0 ).add( betaMExt.mul( 190.0 ) ).mul( sunCloudAirMass ).negate() ) );
 
 			// position
 
@@ -352,8 +373,8 @@ class SkyMesh extends Mesh {
 			// optical length at zenith for molecules
 			const rayleighZenithLength = float( 8.4E3 );
 			const mieZenithLength = float( 1.25E3 );
-			// 66 arc seconds -> degrees, and the cosine of that
-			const sunAngularDiameterCos = float( 0.9999566769464484 );
+			// 1 - cos of the angular radius of the sun disc
+			const sunDiscVersine = float( 4.3323053551556446E-5 );
 
 			// 3.0 / ( 16.0 * pi )
 			const THREE_OVER_SIXTEENPI = float( 0.05968310365946075 );
@@ -371,7 +392,7 @@ class SkyMesh extends Mesh {
 			const sM = mieZenithLength.mul( inverse );
 
 			// combined extinction factor
-			const Fex = exp( mul( vBetaR, sR ).add( mul( vBetaM, sM ) ).negate() );
+			const Fex = exp( mul( vBetaR, sR ).add( mul( vBetaMExt, sM ) ).negate() );
 
 			// in scattering
 			const cosTheta = dot( direction, vSunDirection );
@@ -390,7 +411,7 @@ class SkyMesh extends Mesh {
 			const mPhase = ONE_OVER_FOURPI.mul( float( 1.0 ).sub( g2 ) ).mul( invSqrt.mul( invSqrt ).mul( invSqrt ) ).mul( smoothstep( - 0.06, 0.0, direction.y ) );
 			const betaMTheta = vBetaM.mul( mPhase );
 
-			const betaScatOverExt = add( betaRTheta, betaMTheta ).div( add( vBetaR, vBetaM ) );
+			const betaScatOverExt = add( betaRTheta, betaMTheta ).div( add( vBetaR, vBetaMExt ) );
 			const LinBase = max( vec3( 0.0 ), vSunE.mul( betaScatOverExt ).mul( sub( 1.0, Fex ) ) );
 			const Lin = LinBase.mul( sqrt( LinBase ) ).toVar();
 			const sunHorizon = clamp( sub( 1.0, vSunDirection.y ), 0.0, 1.0 );
@@ -403,7 +424,8 @@ class SkyMesh extends Mesh {
 
 			// composition + solar disc with photospheric limb darkening: a linear law per channel
 			// ( u ~ 0.54, 0.62, 0.73 ), normalized so the disc keeps its average color
-			const mu2 = clamp( cosTheta.sub( sunAngularDiameterCos ).mul( 23082.0 ), 0.0, 1.0 );
+			// small angles: the versine of the disc radius scales with sunSize squared
+			const mu2 = clamp( float( 1.0 ).sub( float( 1.0 ).sub( cosTheta ).div( sunDiscVersine.mul( this.sunSize ).mul( this.sunSize ) ) ), 0.0, 1.0 );
 			const mu = sqrt( mu2 );
 			const sundisc = smoothstep( 0.0, 0.1, mu2 ).mul( vec3( 0.561, 0.479, 0.3568 ).add( vec3( 0.6585, 0.7815, 0.9648 ).mul( mu ) ) ).mul( this.showSunDisc ).mul( smoothstep( - 0.002, 0.002, direction.y ) );
 			const sundiscColor = min( vSunE.mul( Fex ), 80.0 ).mul( 760.0 ).mul( sundisc );
@@ -618,7 +640,7 @@ class SkyMesh extends Mesh {
 									// Attenuate overhead sky ambient through column above hEff to shade flat cloud bases
 									const dayFactor = max( smoothstep( - 0.1, 0.02, vSunDirection.y ), 0.03 );
 									const sunColor = vSunE.mul( vSunFex ).mul( mix( 0.011, 0.028, smoothstep( 0.0, 0.5, vSunDirection.y ) ) );
-									const ambientScat = vBetaR.mul( THREE_OVER_SIXTEENPI.mul( 1.5 ) ).add( vBetaM.mul( ONE_OVER_FOURPI ) ).div( add( vBetaR, vBetaM ) );
+									const ambientScat = vBetaR.mul( THREE_OVER_SIXTEENPI.mul( 1.5 ) ).add( vBetaM.mul( ONE_OVER_FOURPI ) ).div( add( vBetaR, vBetaMExt ) );
 									const ambientBase = max( vec3( 0.0 ), vSunE.mul( ambientScat ).mul( sub( 1.0, Fex ) ) );
 									const skyAmbientTop = ambientBase.mul( sqrt( ambientBase ) ).mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) );
 
@@ -629,7 +651,7 @@ class SkyMesh extends Mesh {
 
 									// Composite through sub-cloud airlight while occluding solar disc and nightsky behind clouds
 									const airFraction = mix( 0.35, 0.08, this.cloudElevation );
-									const cloudOpticalDepth = dot( mul( vBetaR, sR ).mul( airFraction ).add( mul( vBetaM, sM ).mul( min( 1.0, airFraction.mul( 2.5 ) ) ) ), vec3( 0.2126, 0.7152, 0.0722 ) );
+									const cloudOpticalDepth = dot( mul( vBetaR, sR ).mul( airFraction ).add( mul( vBetaMExt, sM ).mul( min( 1.0, airFraction.mul( 2.5 ) ) ) ), vec3( 0.2126, 0.7152, 0.0722 ) );
 									const cloudTransmittance = exp( cloudOpticalDepth.negate() );
 									const aerialCloud = mix( skyInscatter, cloudColor, cloudTransmittance );
 									texColor.assign( mix( texColor, aerialCloud, alpha ) );
