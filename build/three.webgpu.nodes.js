@@ -17687,6 +17687,47 @@ const packNormalToRGB = ( node ) => nodeObject( node ).mul( 0.5 ).add( 0.5 );
 const unpackRGBToNormal = ( node ) => nodeObject( node ).mul( 2.0 ).sub( 1 );
 
 /**
+ * Encodes a nonzero direction as signed octahedral coordinates in `[-1, 1]`
+ * (Cigolle et al., {@link https://jcgt.org/published/0003/02/01/ A Survey of Efficient Representations for Independent Unit Vectors}, 2014).
+ * Store the result in a signed two-channel format such as RG16F or RG16 snorm. The input does not need to be normalized.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec3>} normal - The nonzero direction to encode.
+ * @return {Node<vec2>} The signed octahedral coordinates.
+ */
+const packNormalToOctahedral = /*@__PURE__*/ Fn( ( [ normal ] ) => {
+
+	const p = normal.xy.div( normal.x.abs().add( normal.y.abs() ).add( normal.z.abs() ) ).toVar();
+
+	// zero counts as positive, otherwise the negative Z pole collapses onto the positive one
+
+	const signNotZero = vec2( p.x.greaterThanEqual( 0 ).select( 1, -1 ), p.y.greaterThanEqual( 0 ).select( 1, -1 ) );
+	return normal.z.lessThan( 0 ).select( p.yx.abs().oneMinus().mul( signNotZero ), p );
+
+}, { normal: 'vec3', return: 'vec2' } );
+
+/**
+ * Decodes signed octahedral coordinates into a unit direction.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec2>} encoded - The signed octahedral coordinates in `[-1, 1]`.
+ * @return {Node<vec3>} The normalized direction.
+ */
+const unpackOctahedralToNormal = /*@__PURE__*/ Fn( ( [ encoded ] ) => {
+
+	// Rune Stubbe's decoder, see https://x.com/Stubbesaurus/status/937994790553227264
+
+	const normal = vec3( encoded, float( 1 ).sub( encoded.x.abs() ).sub( encoded.y.abs() ) ).toVar();
+	const t = normal.z.negate().max( 0 ).toVar();
+	normal.x.addAssign( normal.x.greaterThanEqual( 0 ).select( t.negate(), t ) );
+	normal.y.addAssign( normal.y.greaterThanEqual( 0 ).select( t.negate(), t ) );
+	return normal.normalize();
+
+}, { encoded: 'vec2', return: 'vec3' } );
+
+/**
  * Unpacks a tangent space normal, reconstructing the Z component by projecting the X,Y coordinates onto the hemisphere.
  * The X,Y coordinates are expected to be in the [-1, 1] range.
  *
@@ -21579,7 +21620,6 @@ class LightingContextNode extends ContextNode {
 	 * @return {{
 	 * radiance: Node<vec3>,
 	 * irradiance: Node<vec3>,
-	 * iblIrradiance: Node<vec3>,
 	 * ambientOcclusion: Node<float>,
 	 * reflectedLight: {directDiffuse: Node<vec3>, directSpecular: Node<vec3>, indirectDiffuse: Node<vec3>, indirectSpecular: Node<vec3>},
 	 * backdrop: Node<vec3>,
@@ -21605,7 +21645,6 @@ class LightingContextNode extends ContextNode {
 		const context = {
 			radiance: vec3().toVar( 'radiance' ),
 			irradiance: vec3().toVar( 'irradiance' ),
-			iblIrradiance: vec3().toVar( 'iblIrradiance' ),
 			ambientOcclusion: float( 1 ).toVar( 'ambientOcclusion' ),
 			reflectedLight,
 			materialLightings,
@@ -26318,6 +26357,16 @@ class LightingModel {
 	indirect( /*builder*/ ) { }
 
 	/**
+	 * This method is intended for reflecting ambient lights and light probes, which stand
+	 * in for a distant environment. It is called by the light nodes while they are set up.
+	 *
+	 * @abstract
+	 * @param {function(Node<vec3>):Node<vec3>} irradianceAt - Returns the light's irradiance for a world space direction.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	indirectRadiance( /*irradianceAt, builder*/ ) { }
+
+	/**
 	 * This method is intended for implementing the ambient occlusion term.
 	 * Unlike other methods, this method must be called manually by the lighting
 	 * model in its indirect term.
@@ -27709,6 +27758,22 @@ const IBLSheenBRDF = /*@__PURE__*/ Fn( ( { normal, viewDir, roughness } ) => {
 
 }, { normal: 'vec3', viewDir: 'vec3', roughness: 'float', return: 'float' } );
 
+//
+//	Ambient occlusion
+//
+
+// Jimenez et al. 2016, "Practical Realtime Strategies for Accurate Indirect Occlusion"
+// Light surfaces bounce light back into their crevices, so they darken less
+const multiBounceOcclusion = /*@__PURE__*/ Fn( ( [ visibility, albedo ] ) => {
+
+	const a = albedo.mul( 2.0404 ).sub( 0.3324 );
+	const b = albedo.mul( -4.7951 ).add( 0.6417 );
+	const c = albedo.mul( 2.7552 ).add( 0.6903 );
+
+	return visibility.mul( a ).add( b ).mul( visibility ).add( c ).mul( visibility ).max( visibility );
+
+} );
+
 const clearcoatF0 = vec3( 0.04 );
 const clearcoatF90 = float( 1 );
 
@@ -28181,6 +28246,35 @@ class PhysicalLightingModel extends LightingModel {
 	}
 
 	/**
+	 * Reflects ambient lights and light probes, which stand in for a distant
+	 * environment that reflects its irradiance / PI.
+	 *
+	 * @param {function(Node<vec3>):Node<vec3>} irradianceAt - Returns the light's irradiance for a world space direction.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	indirectRadiance( irradianceAt, builder ) {
+
+		const radianceAt = ( normal, roughness ) => {
+
+			// Mixing the reflection with the normal is more accurate for rough objects, see EnvironmentNode
+			const reflectVec = positionViewDirection.negate().reflect( normal );
+			const direction = pow4( roughness ).mix( reflectVec, normal ).normalize().transformDirection( cameraWorldMatrix );
+
+			return irradianceAt( direction ).div( Math.PI );
+
+		};
+
+		builder.context.radiance.addAssign( radianceAt( normalView, roughness ) );
+
+		if ( this.clearcoat === true ) {
+
+			this.clearcoatRadiance.addAssign( radianceAt( clearcoatNormalView, clearcoatRoughness ) );
+
+		}
+
+	}
+
+	/**
 	 * Implements the indirect diffuse term.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -28222,21 +28316,7 @@ class PhysicalLightingModel extends LightingModel {
 	 */
 	indirectSpecular( builder ) {
 
-		const { radiance, iblIrradiance, reflectedLight } = builder.context;
-
-		if ( this.sheen === true ) {
-
-			this.sheenSpecularIndirect.addAssign( iblIrradiance.mul(
-				sheen,
-				IBLSheenBRDF( {
-					normal: normalView,
-					viewDir: positionViewDirection,
-					roughness: sheenRoughness
-				} ),
-				1 / Math.PI
-			) );
-
-		}
+		const { radiance, reflectedLight } = builder.context;
 
 		if ( this.clearcoat === true ) {
 
@@ -28253,7 +28333,6 @@ class PhysicalLightingModel extends LightingModel {
 
 		}
 
-		// Both indirect specular and indirect diffuse light accumulate here
 		// Compute multiscattering separately for dielectric and metallic, then mix
 
 		const singleScatteringDielectric = this.singleScatteringDielectric;
@@ -28267,19 +28346,9 @@ class PhysicalLightingModel extends LightingModel {
 		const singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, metalness );
 		const multiScattering = mix( multiScatteringDielectric, multiScatteringMetallic, metalness );
 
-		// Diffuse energy conservation uses dielectric path
-		const totalScatteringDielectric = singleScatteringDielectric.add( multiScatteringDielectric );
-
-		const diffuseAlbedo = this.diffuseRoughness
-			? this.eonDirectionalAlbedo.mul( metalness.oneMinus() )
-			: diffuseContribution;
-
-		const diffuse = diffuseAlbedo.mul( totalScatteringDielectric.oneMinus() );
-
-		const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI );
-
-		const indirectSpecular = radiance.mul( singleScattering ).add( multiScattering.mul( cosineWeightedIrradiance ) ).toVar();
-		const indirectDiffuse = diffuse.mul( cosineWeightedIrradiance ).toVar();
+		// The multiple scattering lobe has the shape of the single scattering lobe, so it scales the radiance, see
+		// Turquin, "Practical multiple scattering compensation for microfacet models"
+		const indirectSpecular = radiance.mul( singleScattering.add( multiScattering ) ).toVar();
 
 		if ( this.sheen === true ) {
 
@@ -28288,13 +28357,10 @@ class PhysicalLightingModel extends LightingModel {
 			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( sheenAlbedo ).oneMinus();
 
 			indirectSpecular.mulAssign( sheenEnergyComp );
-			indirectDiffuse.mulAssign( sheenEnergyComp );
 
 		}
 
 		reflectedLight.indirectSpecular.addAssign( indirectSpecular );
-
-		reflectedLight.indirectDiffuse.addAssign( indirectDiffuse );
 
 	}
 
@@ -28307,16 +28373,20 @@ class PhysicalLightingModel extends LightingModel {
 
 		const { ambientOcclusion, reflectedLight } = builder.context;
 
-		const dotNV = normalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
+		const computeSpecularOcclusion = ( normal, roughness ) => {
 
-		const aoNV = dotNV.add( ambientOcclusion );
-		const aoExp = roughness.mul( -16 ).oneMinus().negate().exp2();
+			const dotNV = normal.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
 
-		const aoNode = ambientOcclusion.sub( aoNV.pow( aoExp ).oneMinus() ).clamp();
+			const aoNV = dotNV.add( ambientOcclusion );
+			const aoExp = roughness.mul( -16 ).oneMinus().negate().exp2();
+
+			return ambientOcclusion.sub( aoNV.pow( aoExp ).oneMinus() ).clamp();
+
+		};
 
 		if ( this.clearcoat === true ) {
 
-			this.clearcoatSpecularIndirect.mulAssign( ambientOcclusion );
+			this.clearcoatSpecularIndirect.mulAssign( computeSpecularOcclusion( clearcoatNormalView, clearcoatRoughness ) );
 
 		}
 
@@ -28326,8 +28396,10 @@ class PhysicalLightingModel extends LightingModel {
 
 		}
 
-		reflectedLight.indirectDiffuse.mulAssign( ambientOcclusion );
-		reflectedLight.indirectSpecular.mulAssign( aoNode );
+		reflectedLight.indirectDiffuse.mulAssign( multiBounceOcclusion( ambientOcclusion, diffuseContribution ) );
+
+		const soNode = computeSpecularOcclusion( normalView, roughness );
+		reflectedLight.indirectSpecular.mulAssign( multiBounceOcclusion( soNode, specularColorBlended ) );
 
 	}
 
@@ -29674,7 +29746,7 @@ class EnvironmentNode extends LightingNode {
 
 		builder.context.radiance.addAssign( radiance );
 
-		builder.context.iblIrradiance.addAssign( isolateIrradiance );
+		builder.context.irradiance.addAssign( isolateIrradiance );
 
 		//
 
@@ -48315,8 +48387,9 @@ class ShadowBaseNode extends Node {
 	 * Constructs a new shadow base node.
 	 *
 	 * @param {Light} light - The shadow casting light.
+	 * @param {LightShadow} [shadow=light.shadow] - The light shadow.
 	 */
-	constructor( light ) {
+	constructor( light, shadow = light.shadow ) {
 
 		super();
 
@@ -48326,6 +48399,32 @@ class ShadowBaseNode extends Node {
 		 * @type {Light}
 		 */
 		this.light = light;
+
+		/**
+		 * The light shadow which defines the properties light's
+		 * shadow.
+		 *
+		 * @type {LightShadow}
+		 */
+		this.shadow = shadow;
+
+		/**
+		 * A Weak Map holding the current frame ID per camera. Used
+		 * to control the update of shadow maps.
+		 *
+		 * @type {WeakMap<Camera,number>}
+		 * @private
+		 */
+		this._cameraFrameId = new WeakMap();
+
+		/**
+		 * Describes the render call that last updated the shadow map. Used
+		 * to share the shadow map with render calls nested in that one.
+		 *
+		 * @type {{frameId: number, callDepth: number, sceneId: number, layersMask: number}}
+		 * @private
+		 */
+		this._lastUpdate = { frameId: -1, callDepth: 0, sceneId: -1, layersMask: 0 };
 
 		/**
 		 * Overwritten since shadows are updated by default per render.
@@ -48398,6 +48497,81 @@ class ShadowBaseNode extends Node {
 		// Use assign inside an Fn()
 
 		shadowPositionWorld.assign( material.receivedShadowPositionNode || context.shadowPositionWorld || positionWorld );
+
+	}
+
+	/**
+	 * Updates the shadow. Must be implemented by subclasses.
+	 *
+	 * @abstract
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
+	updateShadow( /*frame*/ ) {}
+
+	/**
+	 * Returns `true` if the shadow map must be rendered for the given frame. The shadow
+	 * map is rendered once per camera and frame. Renders nested in the one that has
+	 * updated the shadow map in the current frame share it.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 * @return {boolean} Whether the shadow map must be rendered.
+	 */
+	needsRefresh( frame ) {
+
+		const { frameId, camera, scene } = frame;
+
+		if ( this._cameraFrameId.get( camera ) === frameId ) return false;
+
+		const lastUpdate = this._lastUpdate;
+
+		const hasMatchingShadows =
+			lastUpdate.frameId === frameId &&
+			lastUpdate.sceneId === scene.id &&
+			lastUpdate.layersMask === camera.layers.mask;
+
+		const isNestedRender = frame.renderer._callDepth > lastUpdate.callDepth;
+
+		return ( hasMatchingShadows && isNestedRender ) === false;
+
+	}
+
+	/**
+	 * The implementation performs the update of the shadow map if necessary.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
+	updateBefore( frame ) {
+
+		// do not render shadow maps during precompilation
+
+		if ( frame.renderer._precompilationState !== null ) return false;
+
+		const { shadow } = this;
+
+		let needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
+
+		if ( needsUpdate ) {
+
+			needsUpdate = this.needsRefresh( frame );
+
+			this._cameraFrameId.set( frame.camera, frame.frameId );
+
+		}
+
+		if ( needsUpdate ) {
+
+			const lastUpdate = this._lastUpdate;
+
+			lastUpdate.frameId = frame.frameId;
+			lastUpdate.callDepth = frame.renderer._callDepth;
+			lastUpdate.sceneId = frame.scene.id;
+			lastUpdate.layersMask = frame.camera.layers.mask;
+
+			this.updateShadow( frame );
+
+			shadow.needsUpdate = false;
+
+		}
 
 	}
 
@@ -48674,16 +48848,7 @@ class ShadowNode extends ShadowBaseNode {
 	 */
 	constructor( light, shadow = null ) {
 
-		super( light );
-
-		/**
-		 * The light shadow which defines the properties light's
-		 * shadow.
-		 *
-		 * @type {?LightShadow}
-		 * @default null
-		 */
-		this.shadow = shadow || light.shadow;
+		super( light, shadow || light.shadow );
 
 		/**
 		 * A reference to the shadow map which is a render target.
@@ -48757,15 +48922,6 @@ class ShadowNode extends ShadowBaseNode {
 		 * @default null
 		 */
 		this._currentTransmitted = null;
-
-		/**
-		 * A Weak Map holding the current frame ID per camera. Used
-		 * to control the update of shadow maps.
-		 *
-		 * @type {WeakMap<Camera,number>}
-		 * @private
-		 */
-		this._cameraFrameId = new WeakMap();
 
 		/**
 		 * This flag can be used for type testing.
@@ -49330,43 +49486,6 @@ class ShadowNode extends ShadowBaseNode {
 
 			this.vsmMaterialHorizontal.dispose();
 			this.vsmMaterialHorizontal = null;
-
-		}
-
-	}
-
-	/**
-	 * The implementation performs the update of the shadow map if necessary.
-	 *
-	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 */
-	updateBefore( frame ) {
-
-		// do not render shadow maps during precompilation
-
-		if ( frame.renderer._precompilationState !== null ) return false;
-
-		const { shadow } = this;
-
-		let needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
-
-		if ( needsUpdate ) {
-
-			if ( this._cameraFrameId.get( frame.camera ) === frame.frameId ) {
-
-				needsUpdate = false;
-
-			}
-
-			this._cameraFrameId.set( frame.camera, frame.frameId );
-
-		}
-
-		if ( needsUpdate ) {
-
-			this.updateShadow( frame );
-
-			shadow.needsUpdate = false;
 
 		}
 
@@ -58042,9 +58161,13 @@ class AmbientLightNode extends AnalyticLightNode {
 
 	}
 
-	setup( { context } ) {
+	setup( builder ) {
 
-		context.irradiance.addAssign( this.colorNode );
+		const { colorNode } = this;
+
+		builder.context.irradiance.addAssign( colorNode );
+
+		builder.context.lightingModel.indirectRadiance( () => colorNode, builder );
 
 	}
 
@@ -58151,12 +58274,18 @@ class HemisphereLightNode extends AnalyticLightNode {
 
 		const { colorNode, groundColorNode, lightDirectionNode } = this;
 
-		const dotNL = normalWorld.dot( lightDirectionNode );
-		const hemiDiffuseWeight = dotNL.mul( 0.5 ).add( 0.5 );
+		const irradianceAt = ( direction ) => {
 
-		const irradiance = mix( groundColorNode, colorNode, hemiDiffuseWeight );
+			const dotNL = direction.dot( lightDirectionNode );
+			const hemiDiffuseWeight = dotNL.mul( 0.5 ).add( 0.5 );
 
-		builder.context.irradiance.addAssign( irradiance );
+			return mix( groundColorNode, colorNode, hemiDiffuseWeight );
+
+		};
+
+		builder.context.irradiance.addAssign( irradianceAt( normalWorld ) );
+
+		builder.context.lightingModel.indirectRadiance( irradianceAt, builder );
 
 	}
 
@@ -58473,9 +58602,11 @@ class LightProbeNode extends AnalyticLightNode {
 
 	setup( builder ) {
 
-		const irradiance = getShIrradianceAt( normalWorld, this.lightProbe );
+		const irradianceAt = ( direction ) => getShIrradianceAt( direction, this.lightProbe );
 
-		builder.context.irradiance.addAssign( irradiance );
+		builder.context.irradiance.addAssign( irradianceAt( normalWorld ) );
+
+		builder.context.lightingModel.indirectRadiance( irradianceAt, builder );
 
 	}
 
@@ -89753,8 +89884,6 @@ class WebGPUBackend extends Backend {
 
 		this.device = device;
 
-		this.updateSize();
-
 	}
 
 	/**
@@ -91381,7 +91510,11 @@ class WebGPUBackend extends Backend {
 
 		// pipeline
 
-		const pipelineGPU = this.get( pipeline ).pipeline;
+		const pipelineData = this.get( pipeline );
+
+		if ( pipelineData.error === true ) return;
+
+		const pipelineGPU = pipelineData.pipeline;
 
 		if ( groupGPU.currentPipeline !== pipelineGPU ) {
 
@@ -91709,7 +91842,6 @@ class WebGPUBackend extends Backend {
 		const pipelineData = this.get( pipeline );
 		const pipelineGPU = pipelineData.pipeline;
 
-		// Skip if pipeline has error
 		if ( pipelineData.error === true ) return;
 
 		const drawParams = renderObject.getDrawParameters();
@@ -92473,7 +92605,12 @@ class WebGPUBackend extends Backend {
 	 */
 	updateSize() {
 
-		this.delete( this.renderer.getCanvasTarget() );
+		// the context configuration does not depend on the canvas size, so only the descriptor is reset
+
+		const canvasData = this.get( this.renderer.getCanvasTarget() );
+
+		delete canvasData.descriptor;
+		delete canvasData.samples;
 
 	}
 
@@ -94864,6 +95001,7 @@ var Three_TSL = /*#__PURE__*/Object.freeze({
 	pack4xU8: pack4xU8,
 	pack4xU8Clamp: pack4xU8Clamp,
 	packHalf2x16: packHalf2x16,
+	packNormalToOctahedral: packNormalToOctahedral,
 	packNormalToRGB: packNormalToRGB,
 	packSnorm2x16: packSnorm2x16,
 	packSnorm4x8: packSnorm4x8,
@@ -95047,6 +95185,7 @@ var Three_TSL = /*#__PURE__*/Object.freeze({
 	unpack4xU8: unpack4xU8,
 	unpackHalf2x16: unpackHalf2x16,
 	unpackNormal: unpackNormal,
+	unpackOctahedralToNormal: unpackOctahedralToNormal,
 	unpackRGBToNormal: unpackRGBToNormal,
 	unpackSnorm2x16: unpackSnorm2x16,
 	unpackSnorm4x8: unpackSnorm4x8,
