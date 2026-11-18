@@ -3154,8 +3154,9 @@ class WebGLRenderer {
 		 * @param {TypedArray} buffer - The result buffer.
 		 * @param {number} [activeCubeFaceIndex] - The active cube face index.
 		 * @param {number} [textureIndex=0] - The texture index of an MRT render target.
+		 * @param {number} [activeMipmapLevel=0] - The active mipmap level.
 		 */
-		this.readRenderTargetPixels = function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex, textureIndex = 0 ) {
+		this.readRenderTargetPixels = function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex, textureIndex = 0, activeMipmapLevel = 0 ) {
 
 			if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
 
@@ -3170,10 +3171,10 @@ class WebGLRenderer {
 
 				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
-				// Custom mip chains store one framebuffer per level; read level 0.
-				if ( Array.isArray( framebuffer ) ) framebuffer = framebuffer[ 0 ];
-
 			}
+
+			// Custom mip chains store one framebuffer per level; read level 0.
+			if ( Array.isArray( framebuffer ) ) framebuffer = framebuffer[ activeMipmapLevel ];
 
 			if ( framebuffer ) {
 
@@ -3239,9 +3240,10 @@ class WebGLRenderer {
 		 * @param {TypedArray} buffer - The result buffer.
 		 * @param {number} [activeCubeFaceIndex] - The active cube face index.
 		 * @param {number} [textureIndex=0] - The texture index of an MRT render target.
+		 * @param {number} [activeMipmapLevel=0] - The active mipmap level.
 		 * @return {Promise<TypedArray>} A Promise that resolves when the read has been finished. The resolve provides the read data as a typed array.
 		 */
-		this.readRenderTargetPixelsAsync = async function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex, textureIndex = 0 ) {
+		this.readRenderTargetPixelsAsync = async function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex, textureIndex = 0, activeMipmapLevel = 0 ) {
 
 			if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
 
@@ -3254,10 +3256,10 @@ class WebGLRenderer {
 
 				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
-				// Custom mip chains store one framebuffer per level; read level 0.
-				if ( Array.isArray( framebuffer ) ) framebuffer = framebuffer[ 0 ];
-
 			}
+
+			// Custom mip chains store one framebuffer per level; read level 0.
+			if ( Array.isArray( framebuffer ) ) framebuffer = framebuffer[ activeMipmapLevel ];
 
 			if ( framebuffer ) {
 
