@@ -1261,8 +1261,8 @@ class VRMLLoader extends Loader {
 
 				if ( transformData ) {
 
-					material.map.center.copy( transformData.center );
-					material.map.rotation = transformData.rotation;
+					material.map.center.addVectors( transformData.center, transformData.translation ).negate();
+					material.map.rotation = - transformData.rotation;
 					material.map.repeat.copy( transformData.scale );
 					material.map.offset.copy( transformData.translation );
 
