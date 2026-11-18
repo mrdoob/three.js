@@ -9,7 +9,8 @@ import {
 	RepeatWrapping,
 	Vector3,
 	Vector4,
-	NodeMaterial
+	NodeMaterial,
+	warnOnce
 } from 'three/webgpu';
 
 import { Fn, float, floor, fract, vec2, vec3, abs, acos, add, mul, clamp, dot, exp, inverseSqrt, max, min, mix, modelViewProjection, normalize, positionWorld, smoothstep, sqrt, sub, varyingProperty, vec4, uniform, cameraPosition, time, If, Loop, rtt, uv, log2 } from 'three/tsl';
@@ -20,6 +21,23 @@ const NOISE_CELLS = 32;
 const OCTAVE_LEVEL = 1.0566; // log2( 2.08 ), the mipmap step between noise octaves
 
 const _viewport = /*@__PURE__*/ new Vector4();
+
+// warns when the deprecated uniform is set, reads stay silent for the renderer
+function deprecateValue( uniform, message ) {
+
+	let value = uniform.value;
+
+	Object.defineProperty( uniform, 'value', {
+		get: () => value,
+		set: ( newValue ) => {
+
+			warnOnce( message );
+			value = newValue;
+
+		}
+	} );
+
+}
 
 // gradient at a lattice corner, wrapped so the texture tiles; sinless hash so every GPU produces the same clouds
 const gradient = /*@__PURE__*/ Fn( ( [ i ] ) => {
@@ -94,8 +112,11 @@ class SkyMesh extends Mesh {
 		 * Higher values produce a hazier sky.
 		 *
 		 * @type {UniformNode<float>}
+		 * @deprecated since r188. Multiply {@link SkyMesh#mieCoefficient} by turbidity / 2 instead.
 		 */
 		this.turbidity = uniform( 2 );
+
+		deprecateValue( this.turbidity, 'SkyMesh: "turbidity" has been deprecated. Multiply "mieCoefficient" by turbidity / 2 instead.' ); // @deprecated r188
 
 		/**
 		 * The strength of Rayleigh scattering by air molecules
@@ -105,15 +126,6 @@ class SkyMesh extends Mesh {
 		 * @type {UniformNode<float>}
 		 */
 		this.rayleigh = uniform( 1 );
-
-		/**
-		 * The color of Rayleigh scattering which defines the spectrum
-		 * of the molecular sky. The default value represents the
-		 * atmosphere of Earth.
-		 *
-		 * @type {UniformNode<vec3>}
-		 */
-		this.rayleighColor = uniform( new Color( 0.191785, 0.448125, 1.0 ) );
 
 		/**
 		 * The strength of Mie scattering by aerosol particles
@@ -270,7 +282,7 @@ class SkyMesh extends Mesh {
 			// const lambda = vec3( 680E-9, 550E-9, 450E-9 );
 			// this pre-calculation replaces older TotalRayleigh(vec3 lambda) function:
 			// (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn))
-			const totalRayleigh = this.rayleighColor.mul( 3.0265902468824876E-5 );
+			const totalRayleigh = vec3( 5.804542996261093E-6, 1.3562911419845635E-5, 3.0265902468824876E-5 );
 
 			// mie stuff
 			// K coefficient for the primaries

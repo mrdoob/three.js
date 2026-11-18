@@ -15,7 +15,8 @@ import {
 	UniformsUtils,
 	Vector3,
 	Vector4,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	warnOnce
 } from 'three';
 
 // The cloud noise is baked into a texture of NOISE_SIZE texels that tiles over NOISE_CELLS noise cells.
@@ -23,6 +24,23 @@ const NOISE_SIZE = 512;
 const NOISE_CELLS = 32;
 
 const _viewport = /*@__PURE__*/ new Vector4();
+
+// warns when the deprecated uniform is set, reads stay silent for the renderer
+function deprecateValue( uniform, message ) {
+
+	let value = uniform.value;
+
+	Object.defineProperty( uniform, 'value', {
+		get: () => value,
+		set: ( newValue ) => {
+
+			warnOnce( message );
+			value = newValue;
+
+		}
+	} );
+
+}
 
 /**
  * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight](https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight)
@@ -75,6 +93,8 @@ class Sky extends Mesh {
 		} );
 
 		super( new BoxGeometry( 1, 1, 1 ), material );
+
+		deprecateValue( material.uniforms.turbidity, 'Sky: "turbidity" has been deprecated. Multiply "mieCoefficient" by turbidity / 2 instead.' ); // @deprecated r188
 
 		/**
 		 * This flag can be used for type testing.
@@ -250,7 +270,6 @@ Sky.SkyShader = {
 	uniforms: {
 		'turbidity': { value: 2 },
 		'rayleigh': { value: 1 },
-		'rayleighColor': { value: new Color( 0.191785, 0.448125, 1.0 ) },
 		'mieCoefficient': { value: 0.005 },
 		'mieDirectionalG': { value: 0.8 },
 		'mieDirectionalGSpread': { value: 0 },
@@ -275,7 +294,6 @@ Sky.SkyShader = {
 	vertexShader: /* glsl */`
 		uniform vec3 sunPosition;
 		uniform float rayleigh;
-		uniform vec3 rayleighColor;
 		uniform float turbidity;
 		uniform float mieCoefficient;
 		uniform vec3 mieColor;
@@ -298,7 +316,7 @@ Sky.SkyShader = {
 		const vec3 lambda = vec3( 680E-9, 550E-9, 450E-9 );
 		// this pre-calculation replaces older TotalRayleigh(vec3 lambda) function:
 		// (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn))
-		const float totalRayleigh = 3.0265902468824876E-5;
+		const vec3 totalRayleigh = vec3( 5.804542996261093E-6, 1.3562911419845635E-5, 3.0265902468824876E-5 );
 
 		// mie stuff
 		// K coefficient for the primaries
@@ -354,7 +372,7 @@ Sky.SkyShader = {
 
 			// extinction (absorption + out scattering)
 			// rayleigh coefficients
-			vBetaR = rayleighColor * totalRayleigh * rayleighCoefficient;
+			vBetaR = totalRayleigh * rayleighCoefficient;
 
 			// mie coefficients, the aerosols scatter mieAlbedo of the light they extinguish
 			vBetaMExt = totalMie( turbidity ) * mieCoefficient * mieColor;

@@ -111,9 +111,8 @@
 
 				const skyUniforms = sky.material.uniforms;
 
-				skyUniforms[ 'turbidity' ].value = 10;
 				skyUniforms[ 'rayleigh' ].value = 2;
-				skyUniforms[ 'mieCoefficient' ].value = 0.005;
+				skyUniforms[ 'mieCoefficient' ].value = 0.025;
 				skyUniforms[ 'mieDirectionalG' ].value = 0.8;
 				skyUniforms[ 'cloudCoverage' ].value = 0.4;
 				skyUniforms[ 'cloudDensity' ].value = 0.5;
