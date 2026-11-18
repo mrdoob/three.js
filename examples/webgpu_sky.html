@@ -76,8 +76,6 @@
 						absorptionScale: 1,
 						absorptionColor: new THREE.Color( 0.3125, 1.0, 0.04375 ),
 						sunSize: 1,
-						elevation: 65,
-						azimuth: 0,
 						cloudCoverage: 0.4,
 						cloudDensity: 0.4,
 						cloudElevation: 0.5
@@ -92,8 +90,6 @@
 						mieAlbedo: new THREE.Color( 0.95, 0.6, 0.48 ),
 						absorptionScale: 0,
 						sunSize: 0.66,
-						elevation: 3,
-						azimuth: - 150,
 						cloudCoverage: 0.35,
 						cloudDensity: 0.05,
 						cloudElevation: 0.8
@@ -107,14 +103,14 @@
 						absorptionScale: 50,
 						absorptionColor: new THREE.Color( 0.1, 0.4, 1.0 ),
 						sunSize: 0.11,
-						elevation: 30,
-						azimuth: - 150,
 						cloudCoverage: 0.2
 					}
 				};
 
 				const effectController = {
 					planet: 'Earth',
+					elevation: 3,
+					azimuth: - 150,
 					exposure: 0.05,
 					showSunDisc: true
 				};
@@ -172,8 +168,8 @@
 				controllers.mieAlbedo = gui.addColor( effectController, 'mieAlbedo' ).onChange( guiChanged );
 				controllers.absorptionScale = gui.add( effectController, 'absorptionScale', 0.0, 50, 0.1 ).onChange( guiChanged );
 				controllers.absorptionColor = gui.addColor( effectController, 'absorptionColor' ).onChange( guiChanged );
-				controllers.elevation = gui.add( effectController, 'elevation', 0, 90, 0.1 ).onChange( guiChanged );
-				controllers.azimuth = gui.add( effectController, 'azimuth', - 180, 180, 0.1 ).onChange( guiChanged );
+				gui.add( effectController, 'elevation', 0, 90, 0.1 ).onChange( guiChanged );
+				gui.add( effectController, 'azimuth', - 180, 180, 0.1 ).onChange( guiChanged );
 				controllers.sunSize = gui.add( effectController, 'sunSize', 0.05, 2, 0.01 ).onChange( guiChanged );
 				gui.add( effectController, 'exposure', 0, 1, 0.0001 ).onChange( guiChanged );
 				gui.add( effectController, 'showSunDisc' ).onChange( guiChanged );
