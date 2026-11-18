@@ -165,14 +165,12 @@ class CSMShadowNode extends ShadowBaseNode {
 		};
 		this.mainFrustum = new CSMFrustum( data );
 
-		const light = this.light;
-
 		for ( let i = 0; i < this.cascades; i ++ ) {
 
 			const lwLight = new LwLight();
 			lwLight.castShadow = true;
 
-			const lShadow = light.shadow.clone();
+			const lShadow = this.shadow.clone();
 			lShadow.bias = lShadow.bias * ( i + 1 );
 
 			this.lights.push( lwLight );
