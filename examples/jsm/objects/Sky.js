@@ -253,6 +253,7 @@ Sky.SkyShader = {
 		'rayleighColor': { value: new Color( 0.191785, 0.448125, 1.0 ) },
 		'mieCoefficient': { value: 0.005 },
 		'mieDirectionalG': { value: 0.8 },
+		'mieDirectionalGSpread': { value: 0 },
 		'mieColor': { value: new Color( 0.451084, 0.681483, 1.0 ) },
 		'mieAbsorption': { value: new Color( 0, 0, 0 ) },
 		'absorptionScale': { value: 1 },
@@ -377,6 +378,7 @@ Sky.SkyShader = {
 		varying vec3 vSunFex;
 
 		uniform float mieDirectionalG;
+		uniform float mieDirectionalGSpread;
 		uniform float sunSize;
 		uniform float cloudScale;
 		uniform float cloudSpeed;
@@ -445,9 +447,9 @@ Sky.SkyShader = {
 			return THREE_OVER_SIXTEENPI * ( 1.0 + cosTheta * cosTheta );
 		}
 
-		float hgPhase( float cosTheta, float g ) {
-			float g2 = g * g;
-			float invSqrt = inversesqrt( max( 1e-4, 1.0 - 2.0 * g * cosTheta + g2 ) );
+		vec3 hgPhase( float cosTheta, vec3 g ) {
+			vec3 g2 = g * g;
+			vec3 invSqrt = inversesqrt( max( vec3( 1e-4 ), 1.0 - 2.0 * g * cosTheta + g2 ) );
 			return ONE_OVER_FOURPI * ( 1.0 - g2 ) * ( invSqrt * invSqrt * invSqrt );
 		}
 
@@ -471,7 +473,9 @@ Sky.SkyShader = {
 			float rPhase = rayleighPhase( ( cosTheta * horizonMask ) * 0.5 + 0.5 );
 			vec3 betaRTheta = vBetaR * rPhase;
 
-			float mPhase = hgPhase( cosTheta, mieDirectionalG ) * smoothstep( -0.06, 0.0, direction.y );
+			// shorter wavelengths can scatter more strongly forward
+			vec3 g = clamp( mieDirectionalG + mieDirectionalGSpread * vec3( -1.0, 0.0, 1.0 ), -0.99, 0.99 );
+			vec3 mPhase = hgPhase( cosTheta, g ) * smoothstep( -0.06, 0.0, direction.y );
 			vec3 betaMTheta = vBetaM * mPhase;
 
 			vec3 betaScatOverExt = ( betaRTheta + betaMTheta ) / ( vBetaR + vBetaMExt );

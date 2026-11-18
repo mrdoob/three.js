@@ -134,6 +134,15 @@ class SkyMesh extends Mesh {
 		this.mieDirectionalG = uniform( 0.8 );
 
 		/**
+		 * How much more directional Mie scattering is for blue than for red.
+		 * Dust grains of about the size of the wavelength scatter blue light
+		 * into a tighter halo around the sun, like the blue sunsets on Mars.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.mieDirectionalGSpread = uniform( 0 );
+
+		/**
 		 * The color of Mie scattering which defines the spectrum of
 		 * the haze around the sun and along the horizon. The default
 		 * value represents the atmosphere of Earth.
@@ -406,8 +415,10 @@ class SkyMesh extends Mesh {
 
 			// betaMTheta
 
-			const g2 = this.mieDirectionalG.mul( this.mieDirectionalG );
-			const invSqrt = inverseSqrt( max( 1e-4, float( 1.0 ).sub( float( 2.0 ).mul( this.mieDirectionalG ).mul( cosTheta ) ).add( g2 ) ) );
+			// shorter wavelengths can scatter more strongly forward
+			const g = clamp( this.mieDirectionalG.add( this.mieDirectionalGSpread.mul( vec3( - 1.0, 0.0, 1.0 ) ) ), - 0.99, 0.99 );
+			const g2 = g.mul( g );
+			const invSqrt = inverseSqrt( max( vec3( 1e-4 ), float( 1.0 ).sub( float( 2.0 ).mul( g ).mul( cosTheta ) ).add( g2 ) ) );
 			const mPhase = ONE_OVER_FOURPI.mul( float( 1.0 ).sub( g2 ) ).mul( invSqrt.mul( invSqrt ).mul( invSqrt ) ).mul( smoothstep( - 0.06, 0.0, direction.y ) );
 			const betaMTheta = vBetaM.mul( mPhase );
 
