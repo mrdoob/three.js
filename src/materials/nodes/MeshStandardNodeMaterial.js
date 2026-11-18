@@ -5,6 +5,7 @@ import { materialRoughness, materialMetalness } from '../../nodes/accessors/Mate
 import getRoughness from '../../nodes/functions/material/getRoughness.js';
 import PhysicalLightingModel from '../../nodes/functions/PhysicalLightingModel.js';
 import EnvironmentNode from '../../nodes/lighting/EnvironmentNode.js';
+import IndirectLightingNode from '../../nodes/lighting/IndirectLightingNode.js';
 import { float, vec3 } from '../../nodes/tsl/TSLBase.js';
 
 import { MeshStandardMaterial } from '../MeshStandardMaterial.js';
@@ -114,6 +115,26 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 		}
 
 		return envNode ? new EnvironmentNode( envNode ) : null;
+
+	}
+
+	/**
+	 * Overwritten since this type of material resolves its indirect specular and indirect
+	 * diffuse light from the sources of the context, see {@link builtinIndirectContext},
+	 * with the environment as the last source of both.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Array<LightingNode>} The lighting nodes.
+	 */
+	setupIndirectLightings( builder ) {
+
+		const { indirectSpecular = [], indirectDiffuse = [] } = this.transparent === true ? {} : builder.context;
+
+		const environmentNode = this.setupEnvironment( builder );
+
+		if ( environmentNode === null && indirectSpecular.length === 0 && indirectDiffuse.length === 0 ) return [];
+
+		return [ new IndirectLightingNode( indirectSpecular, indirectDiffuse, environmentNode ) ];
 
 	}
 

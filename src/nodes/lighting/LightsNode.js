@@ -33,7 +33,9 @@ const outgoingLight = property( 'vec3', 'outgoingLight' );
  */
 const sortLights = ( lights ) => {
 
-	return lights.sort( ( a, b ) => a.id - b.id );
+	// the indirect lighting resolves last, in front of what the lights reflect
+
+	return lights.sort( ( a, b ) => ( a.isIndirectLightingNode === true ) - ( b.isIndirectLightingNode === true ) || a.id - b.id );
 
 };
 

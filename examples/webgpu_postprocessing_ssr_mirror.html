@@ -25,7 +25,7 @@
 
 			<small>
 				One mirror trace per pixel, followed by a roughness-dependent blur post-process.<br />
-				Reflects the current frame or the reprojected previous frame.<br />
+				The materials reflect the previous frame through their BRDF, in front of the environment.<br />
 				<a href="https://skfb.ly/6tqYD" target="_blank" rel="noopener">Steampunk Camera</a> by
 				<a href="https://sketchfab.com/lumoize" target="_blank" rel="noopener">dylanheyes</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.
 			</small>
@@ -45,7 +45,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, Fn, normalView, metalness, roughness, screenUV, color, sample, velocity, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, Fn, builtinIndirectContext, normalView, metalness, roughness, screenUV, color, sample, velocity, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { reproject } from 'three/addons/tsl/display/ReprojectNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
@@ -57,7 +57,7 @@
 		import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 		const params = {
-			output: 'Beauty', radiance: 'Current frame', enabled: true, quality: 0.5, intensity: 1,
+			output: 'Beauty', radiance: 'Previous frame (buffer)', enabled: true, quality: 0.5, intensity: 1,
 			maxDistance: 1, thickness: 0.03, binaryRefine: false,
 			roughness: 1, blur: true, blurQuality: 1
 		};
@@ -141,16 +141,17 @@
 
 			renderPipeline = new THREE.RenderPipeline( renderer );
 
+			// the pre-pass renders the opaque geometry SSR traces, without shading it
+
 			const scenePass = pass( scene, camera );
+			scenePass.transparent = false;
 			scenePass.setMRT( mrt( {
-				output: output,
-				normal: packNormalToOctahedral( normalView ),
+				output: packNormalToOctahedral( normalView ),
 				metalrough: vec2( metalness, roughness ), // pack metalness and roughness into a single attachment
 				velocity: velocity
 			} ) );
 
-			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
-			const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', ( node ) => {
+			const scenePassNormal = scenePass.getTextureNode( 'output' ).toInspector( 'Normal', ( node ) => {
 
 				return colorSpaceToWorking( packNormalToRGB( unpackOctahedralToNormal( node.rg ) ), THREE.SRGBColorSpace );
 
@@ -164,7 +165,7 @@
 
 			// octahedral normals can't be filtered across their folds
 
-			const normalTexture = scenePass.getTexture( 'normal' );
+			const normalTexture = scenePass.getTexture( 'output' );
 			normalTexture.format = THREE.RGFormat;
 			normalTexture.minFilter = normalTexture.magFilter = THREE.NearestFilter;
 
@@ -181,30 +182,26 @@
 
 			//
 
-			// the radiance SSR reflects: this frame's color, or the previous frame's output
-			// reprojected once per frame into a buffer or separately for each hit
+			// SSR reflects the previous frame's output, reprojected once per frame into a buffer or separately for each hit
 
 			const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
 			const scenePassPreviousDepth = scenePass.getPreviousTextureNode( 'depth' );
 
 			const radianceInputs = {
-				'Current frame': scenePassColor,
 				'Previous frame (buffer)': reproject( scenePassVelocity, scenePassDepth, scenePassPreviousDepth ),
 				'Previous frame (per hit)': reproject( scenePassVelocity, scenePassDepth, scenePassPreviousDepth, { cache: false } )
 			};
 
 			const blurEnabled = uniform( 1 );
 
-			let reflection, raw, blurred, beauty, spatialAA;
+			const beautyPass = pass( scene, camera );
+			const spatialAA = smaa( beautyPass );
+
+			let reflection, raw, blurred, beauty;
 
 			function updateRadiance() {
 
-				if ( reflection !== undefined ) {
-
-					reflection.dispose();
-					spatialAA.dispose();
-
-				}
+				if ( reflection !== undefined ) reflection.dispose();
 
 				const radiance = radianceInputs[ params.radiance ];
 
@@ -218,22 +215,21 @@
 				raw = passTexture( reflection, reflection.getRenderTarget().texture );
 				blurred = reflection.getTextureNode();
 
-				// the previous frame inputs reflect the scene color this frame keeps for the next one
+				// the materials reflect SSR through their BRDF, and the environment where SSR has no coverage
 
-				const sceneColor = radiance === scenePassColor ? scenePassColor : radiance.capture( scenePassColor );
+				beautyPass.contextNode = builtinIndirectContext( { specular: [ mix( raw.sample( screenUV ), reflection.getSpecularSource(), blurEnabled ) ] } );
+				beautyPass.needsUpdate = true;
 
-				// the reflection is radiance premultiplied by its coverage, which a metal reflects in full
+				// keep this frame's output for the next frame to reflect
 
-				beauty = vec4( sceneColor.rgb.add( mix( raw.rgb, blurred.rgb, blurEnabled ).mul( scenePassMetalRough.r ) ), 1 );
-
-				spatialAA = smaa( beauty );
+				beauty = radiance.capture( beautyPass );
 
 				updateParameters();
 				updateOutput();
 
 			}
 
-			// the other views still evaluate the beauty, so its capture keeps running
+			// every view evaluates the beauty, so its capture keeps running
 
 			const withBeauty = ( node ) => node.bypass( Fn( () => {
 
@@ -248,13 +244,13 @@
 				switch ( params.output ) {
 
 					case 'Beauty': view = spatialAA; break;
-					case 'SSR': view = withBeauty( vec4( raw.rgb, 1 ) ); break;
-					case 'SSR DN': view = withBeauty( vec4( blurred.rgb, 1 ) ); break;
-					case 'Coverage': view = withBeauty( vec4( blurred.aaa, 1 ) ); break;
+					case 'SSR': view = vec4( raw.rgb, 1 ); break;
+					case 'SSR DN': view = vec4( blurred.rgb, 1 ); break;
+					case 'Coverage': view = vec4( blurred.aaa, 1 ); break;
 
 				}
 
-				renderPipeline.outputNode = params.enabled ? view : scenePass;
+				renderPipeline.outputNode = withBeauty( view );
 				renderPipeline.outputColorTransform = true;
 				renderPipeline.needsUpdate = true;
 
@@ -272,7 +268,7 @@
 			displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN', 'Coverage' ] ).name( 'Output' ).info( 'DN means denoise; this mirror example uses spatial blur rather than stochastic denoising.' ).onChange( updateOutput );
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
-			ssrGui.add( params, 'enabled' ).name( 'Enabled' ).onChange( updateOutput );
+			ssrGui.add( params, 'enabled' ).name( 'Enabled' ).onChange( updateParameters );
 			ssrGui.add( params, 'radiance', Object.keys( radianceInputs ) ).name( 'Radiance' ).onChange( updateRadiance );
 			ssrGui.add( params, 'intensity', 0, 1 ).name( 'Intensity' ).onChange( updateParameters );
 			ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( updateParameters );
@@ -300,7 +296,7 @@
 			function updateParameters() {
 
 				reflection.quality.value = params.quality;
-				reflection.intensity.value = params.intensity;
+				reflection.intensity.value = params.enabled ? params.intensity : 0;
 				reflection.binaryRefine = params.binaryRefine;
 				reflection.maxDistance.value = params.maxDistance;
 				reflection.thickness.value = params.thickness;

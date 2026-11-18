@@ -112,12 +112,12 @@ export { default as DirectionalLightNode } from './lighting/DirectionalLightNode
 export { default as EnvironmentNode } from './lighting/EnvironmentNode.js';
 export { default as HemisphereLightNode } from './lighting/HemisphereLightNode.js';
 export { default as IESSpotLightNode } from './lighting/IESSpotLightNode.js';
+export { default as IndirectLightingNode } from './lighting/IndirectLightingNode.js';
 export { default as IrradianceNode } from './lighting/IrradianceNode.js';
 export { default as LightingContextNode } from './lighting/LightingContextNode.js';
 export { default as LightingNode } from './lighting/LightingNode.js';
 export { default as LightProbeNode } from './lighting/LightProbeNode.js';
 export { default as LightsNode } from './lighting/LightsNode.js';
-export { default as OcclusionAwareIrradianceNode } from './lighting/OcclusionAwareIrradianceNode.js';
 export { default as PointLightNode } from './lighting/PointLightNode.js';
 export { default as PointShadowNode } from './lighting/PointShadowNode.js';
 export { default as ProjectorLightNode } from './lighting/ProjectorLightNode.js';
