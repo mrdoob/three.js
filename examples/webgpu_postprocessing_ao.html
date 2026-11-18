@@ -39,7 +39,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { sample, pass, mrt, rtt, screenUV, textureSize, normalView, velocity, vec2, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext } from 'three/tsl';
+			import { sample, pass, mrt, rtt, reference, screenUV, textureSize, normalView, velocity, vec2, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { ssao } from 'three/addons/tsl/display/SSAONode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
@@ -205,7 +205,23 @@
 						const guideNormal = sample( ( uv ) => prePassNormal.sample( uv ).xyz.normalize() );
 						const size = vec2( textureSize( aoTexture ) );
 
-						upsamplePass = rtt( jointBilateralUpsample( aoTexture, prePassDepth, guideNormal, prePassDepth, guideNormal, camera, { size } ).sample( screenUV ) );
+						// reduced resolution GTAO shades each texel at the nearest of the four depths around it,
+						// the guide depth must match or AO leaks across silhouettes
+						// TODO: share this with GTAONode
+
+						const lowResDepth = sample( ( uv ) => {
+
+							const halfTexel = vec2( 0.5 ).div( vec2( textureSize( prePassDepth ) ) );
+							const depths = [[ - 1, - 1 ], [ 1, - 1 ], [ - 1, 1 ], [ 1, 1 ]].map( ( offset ) => prePassDepth.sample( uv.add( halfTexel.mul( vec2( ...offset ) ) ) ).r );
+							const nearest = depths.reduce( ( a, b ) => renderer.reversedDepthBuffer ? a.max( b ) : a.min( b ) );
+
+							return reference( 'resolutionScale', 'float', params ).lessThan( 1 ).select( nearest, prePassDepth.sample( uv ).r );
+
+						} );
+
+						const guideDepth = ( params.aoType === 'GTAO' ) ? lowResDepth : prePassDepth;
+
+						upsamplePass = rtt( jointBilateralUpsample( aoTexture, guideDepth, guideNormal, prePassDepth, guideNormal, camera, { size } ).sample( screenUV ) );
 						aoNode = upsamplePass.sample( screenUV ).r;
 
 					} else {
