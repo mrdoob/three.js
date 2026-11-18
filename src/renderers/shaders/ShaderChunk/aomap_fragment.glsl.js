@@ -7,7 +7,7 @@ export default /* glsl */`
 	reflectedLight.indirectDiffuse *= ambientOcclusion;
 
 	#if defined( USE_CLEARCOAT ) 
-		clearcoatSpecularIndirect *= ambientOcclusion;
+		clearcoatSpecularIndirect *= computeSpecularOcclusion( saturate( dot( geometryClearcoatNormal, geometryViewDir ) ), ambientOcclusion, material.clearcoatRoughness );
 	#endif
 
 	#if defined( USE_SHEEN ) 
