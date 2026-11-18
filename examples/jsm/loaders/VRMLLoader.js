@@ -2199,7 +2199,9 @@ class VRMLLoader extends Loader {
 
 			}
 
-			const geometry = new ConeGeometry( radius, height, 16, 1, openEnded );
+			const geometry = new ConeGeometry( radius, height, 16, 1, openEnded, Math.PI );
+
+			alignCapUVs( geometry, radius );
 
 			return geometry;
 
@@ -2247,7 +2249,9 @@ class VRMLLoader extends Loader {
 
 			}
 
-			const geometry = new CylinderGeometry( radius, radius, height, 16, 1 );
+			const geometry = new CylinderGeometry( radius, radius, height, 16, 1, false, Math.PI );
+
+			alignCapUVs( geometry, radius );
 
 			return geometry;
 
@@ -2279,7 +2283,7 @@ class VRMLLoader extends Loader {
 
 			}
 
-			const geometry = new SphereGeometry( radius, 16, 16 );
+			const geometry = new SphereGeometry( radius, 16, 16, - Math.PI / 2 );
 
 			return geometry;
 
@@ -3344,6 +3348,22 @@ class VRMLLoader extends Loader {
 			}
 
 			geometry.setAttribute( 'color', colorAttribute );
+
+		}
+
+		function alignCapUVs( geometry, radius ) {
+
+			const positionAttribute = geometry.attributes.position;
+			const normalAttribute = geometry.attributes.normal;
+			const uvAttribute = geometry.attributes.uv;
+
+			for ( let i = 0; i < uvAttribute.count; i ++ ) {
+
+				const sign = normalAttribute.getY( i ); // 1 at the top cap, - 1 at the bottom cap
+
+				if ( Math.abs( sign ) === 1 ) uvAttribute.setXY( i, 0.5 + positionAttribute.getX( i ) / ( 2 * radius ), 0.5 - sign * positionAttribute.getZ( i ) / ( 2 * radius ) );
+
+			}
 
 		}
 
