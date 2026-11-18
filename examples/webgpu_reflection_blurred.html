@@ -139,7 +139,7 @@
 				reflection.target.rotateX( - Math.PI / 2 );
 				scene.add( reflection.target );
 
-				const floorMaterial = new THREE.MeshStandardNodeMaterial();
+				const floorMaterial = new THREE.MeshLambertNodeMaterial();
 				floorMaterial.transparent = true;
 				floorMaterial.colorNode = Fn( () => {
 
