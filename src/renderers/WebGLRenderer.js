@@ -3170,10 +3170,10 @@ class WebGLRenderer {
 
 				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
-				// Custom mip chains store one framebuffer per level; read level 0.
-				if ( Array.isArray( framebuffer ) ) framebuffer = framebuffer[ 0 ];
-
 			}
+
+			// Custom mip chains store one framebuffer per level; read level 0.
+			if ( Array.isArray( framebuffer ) ) framebuffer = framebuffer[ 0 ];
 
 			if ( framebuffer ) {
 
@@ -3254,10 +3254,10 @@ class WebGLRenderer {
 
 				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
-				// Custom mip chains store one framebuffer per level; read level 0.
-				if ( Array.isArray( framebuffer ) ) framebuffer = framebuffer[ 0 ];
-
 			}
+
+			// Custom mip chains store one framebuffer per level; read level 0.
+			if ( Array.isArray( framebuffer ) ) framebuffer = framebuffer[ 0 ];
 
 			if ( framebuffer ) {
 
