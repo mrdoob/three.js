@@ -136,6 +136,18 @@ class ChromaticAberrationNode extends Node {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the effect is no longer required.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		if ( this.textureNode.intermediate === true ) this.textureNode.dispose();
+
+	}
+
 }
 
 export default ChromaticAberrationNode;
@@ -154,7 +166,7 @@ export default ChromaticAberrationNode;
 export const chromaticAberration = ( node, strength = 1.0, center = null, scale = 1.1 ) => {
 
 	return new ChromaticAberrationNode(
-		convertToTexture( node ),
+		convertToTexture( node, null, null, { intermediate: true } ),
 		nodeObject( strength ),
 		nodeObject( center ),
 		nodeObject( scale )

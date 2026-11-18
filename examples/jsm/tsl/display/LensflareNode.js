@@ -258,6 +258,8 @@ class LensflareNode extends Node {
 		this._renderTarget.dispose();
 		this._material.dispose();
 
+		if ( this.textureNode.intermediate === true ) this.textureNode.dispose();
+
 	}
 
 }
@@ -279,4 +281,4 @@ export default LensflareNode;
  * @param {number} [params.downSampleRatio=4] - Defines how downsampling since the effect is usually not rendered at full resolution.
  * @returns {LensflareNode}
  */
-export const lensflare = ( node, params ) => new LensflareNode( convertToTexture( node ), params );
+export const lensflare = ( node, params ) => new LensflareNode( convertToTexture( node, null, null, { intermediate: true } ), params );

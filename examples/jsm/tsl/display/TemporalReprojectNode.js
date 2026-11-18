@@ -1005,6 +1005,8 @@ class TemporalReprojectNode extends Node {
 		this._resolveMaterial.dispose();
 		this._seedMaterial.dispose();
 
+		if ( this.beautyNode.intermediate === true ) this.beautyNode.dispose();
+
 	}
 
 }
@@ -1021,7 +1023,7 @@ export default TemporalReprojectNode;
  * @returns {TemporalReprojectNode}
  */
 export const temporalReproject = ( beautyNode, depthNode, normalNode, velocityNode, camera, options = {} ) => new TemporalReprojectNode(
-	convertToTexture( beautyNode ),
+	convertToTexture( beautyNode, null, null, { intermediate: true } ),
 	nodeObject( depthNode ),
 	nodeObject( normalNode ),
 	nodeObject( velocityNode ),

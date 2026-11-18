@@ -319,6 +319,8 @@ class GaussianBlurNode extends Node {
 
 		}
 
+		if ( this.textureNode.intermediate === true ) this.textureNode.dispose();
+
 		super.dispose();
 
 	}
@@ -390,7 +392,7 @@ export default GaussianBlurNode;
  * @param {number} [options.resolutionScale=1] - The resolution of the effect. 0.5 means half the resolution of the texture node.
  * @returns {GaussianBlurNode}
  */
-export const gaussianBlur = ( node, directionNode, sigma, options = {} ) => new GaussianBlurNode( convertToTexture( node ), directionNode, sigma, options );
+export const gaussianBlur = ( node, directionNode, sigma, options = {} ) => new GaussianBlurNode( convertToTexture( node, null, null, { intermediate: true } ), directionNode, sigma, options );
 
 /**
  * TSL function for creating a gaussian blur node for post processing with enabled premultiplied alpha.

@@ -153,6 +153,18 @@ class SobelOperatorNode extends Node {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the effect is no longer required.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		if ( this.textureNode.intermediate === true ) this.textureNode.dispose();
+
+	}
+
 }
 
 export default SobelOperatorNode;
@@ -165,4 +177,4 @@ export default SobelOperatorNode;
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @returns {SobelOperatorNode}
  */
-export const sobel = ( node ) => new SobelOperatorNode( convertToTexture( node ) );
+export const sobel = ( node ) => new SobelOperatorNode( convertToTexture( node, null, null, { intermediate: true } ) );
