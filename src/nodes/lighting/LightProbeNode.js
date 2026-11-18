@@ -63,9 +63,11 @@ class LightProbeNode extends AnalyticLightNode {
 
 	setup( builder ) {
 
-		const irradiance = getShIrradianceAt( normalWorld, this.lightProbe );
+		const irradianceAt = ( direction ) => getShIrradianceAt( direction, this.lightProbe );
 
-		builder.context.irradiance.addAssign( irradiance );
+		builder.context.irradiance.addAssign( irradianceAt( normalWorld ) );
+
+		builder.context.lightingModel.indirectRadiance( irradianceAt, builder );
 
 	}
 

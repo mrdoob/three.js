@@ -359,8 +359,14 @@ IncidentLight directLight;
 
 #if defined( RE_IndirectSpecular )
 
-	vec3 radiance = vec3( 0.0 );
+	vec3 radiance = getIndirectLightRadiance( geometryViewDir, geometryNormal, material.roughness );
 	vec3 clearcoatRadiance = vec3( 0.0 );
+
+	#ifdef USE_CLEARCOAT
+
+		clearcoatRadiance += getIndirectLightRadiance( geometryViewDir, geometryClearcoatNormal, material.clearcoatRoughness );
+
+	#endif
 
 #endif
 `,
