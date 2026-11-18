@@ -4,7 +4,11 @@ export default /* glsl */`
 	// reads channel R, compatible with a combined OcclusionRoughnessMetallic (RGB) texture
 	float ambientOcclusion = ( texture2D( aoMap, vAoMapUv ).r - 1.0 ) * aoMapIntensity + 1.0;
 
-	reflectedLight.indirectDiffuse *= ambientOcclusion;
+	#if defined( STANDARD )
+		reflectedLight.indirectDiffuse *= computeMultiBounceOcclusion( ambientOcclusion, material.diffuseContribution );
+	#else
+		reflectedLight.indirectDiffuse *= ambientOcclusion;
+	#endif
 
 	#if defined( USE_CLEARCOAT ) 
 		clearcoatSpecularIndirect *= computeSpecularOcclusion( saturate( dot( geometryClearcoatNormal, geometryViewDir ) ), ambientOcclusion, material.clearcoatRoughness );
@@ -18,7 +22,9 @@ export default /* glsl */`
 
 		float dotNV = saturate( dot( geometryNormal, geometryViewDir ) );
 
-		reflectedLight.indirectSpecular *= computeSpecularOcclusion( dotNV, ambientOcclusion, material.roughness );
+		float specularOcclusion = computeSpecularOcclusion( dotNV, ambientOcclusion, material.roughness );
+
+		reflectedLight.indirectSpecular *= computeMultiBounceOcclusion( specularOcclusion, material.specularColorBlended );
 
 	#endif
 

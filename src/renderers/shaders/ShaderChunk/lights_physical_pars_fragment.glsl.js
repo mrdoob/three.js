@@ -729,4 +729,16 @@ float computeSpecularOcclusion( const in float dotNV, const in float ambientOccl
 	return saturate( pow( dotNV + ambientOcclusion, exp2( - 16.0 * roughness - 1.0 ) ) - 1.0 + ambientOcclusion );
 
 }
+
+// Jimenez et al. 2016, "Practical Realtime Strategies for Accurate Indirect Occlusion"
+// Light surfaces bounce light back into their crevices, so they darken less
+vec3 computeMultiBounceOcclusion( const in float visibility, const in vec3 albedo ) {
+
+	vec3 a = 2.0404 * albedo - 0.3324;
+	vec3 b = - 4.7951 * albedo + 0.6417;
+	vec3 c = 2.7552 * albedo + 0.6903;
+
+	return max( vec3( visibility ), ( ( visibility * a + b ) * visibility + c ) * visibility );
+
+}
 `;
