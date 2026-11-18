@@ -176,6 +176,36 @@ function fromHalfFloat( val ) {
 }
 
 /**
+ * Packs two numbers as half floats into one 32-bit word, the first in the low 16 bits. This is
+ *
+ * @param {number} a - The value to pack into the lower 16 bits of the 32-bit word.
+ * @param {number} b - The value to pack into the higher 16 bits of the 32-bit word
+ * @return {number} The U32 value that represents the two packed FP16 values.
+ */
+function packHalfFloatToUint( a, b ) {
+
+	return ( DataUtils.toHalfFloat( a ) | ( DataUtils.toHalfFloat( b ) << 16 ) ) >>> 0;
+
+}
+
+/**
+ * Unpacks a 32-bit word into two numbers, reading the low 16 bits and the high 16 bits
+ * as half floats. 
+ *
+ * @param {number} val - The U32 value that holds two packed FP16 values.
+ * @param {Array<number>} [target=[]] - The array to write the result into.
+ * @return {Array<number>} The two FP32 values, the low 16 bits first.
+ */
+function unpackHalfFloatsFromUint( val, target = [] ) {
+
+	target[ 0 ] = fromHalfFloat( val & 0xffff );
+	target[ 1 ] = fromHalfFloat( val >>> 16 );
+
+	return target;
+
+}
+
+/**
  * A class containing utility functions for data.
  *
  * @hideconstructor
@@ -205,6 +235,33 @@ class DataUtils {
 	static fromHalfFloat( val ) {
 
 		return fromHalfFloat( val );
+
+	}
+
+	/**
+ 	  * Packs two numbers as half floats into one 32-bit word, the first in the low 16 bits. This is
+      *
+      * @param {number} a - The value to pack into the lower 16 bits of the 32-bit word.
+      * @param {number} b - The value to pack into the higher 16 bits of the 32-bit word
+      * @return {number} The U32 value that represents the two packed FP16 values.
+      */
+	static packHalfFloatsToUint( a, b ) {
+
+		return packHalfFloatToUint( a, b );
+
+	}
+
+	/**
+	 * Unpacks a 32-bit word into two numbers, reading the low 16 bits and the high 16 bits
+	 * as half floats.
+	 *
+	 * @param {number} val - The U32 value that holds two packed FP16 values.
+	 * @param {Array<number>} [target=[]] - The array to write the result into.
+	 * @return {Array<number>} The two FP32 values.
+	 */
+	static unpackHalfFloatsFromUint( val, target = [] ) {
+
+		return unpackHalfFloatsFromUint( val, target );
 
 	}
 
