@@ -1047,13 +1047,9 @@ class NodeMaterial extends Material {
 
 		if ( builder.context.getGI ) {
 
-			let giNode = builder.context.getGI( null, builder );
+			const giNode = builder.context.getGI( null, builder );
 
 			if ( giNode !== null ) {
-
-				const aoNode = this.aoNode || ( builder.material.aoMap ? materialAO : null );
-
-				if ( aoNode !== null ) giNode = giNode.mul( aoNode );
 
 				materialLightsNode.push( new OcclusionAwareIrradianceNode( giNode ) );
 
