@@ -308,8 +308,14 @@ class RTTNode extends TextureNode {
 
 	clone() {
 
-		const newNode = new TextureNode( this.value, this.uvNode, this.levelNode );
+		const newNode = new TextureNode( this.value, this.uvNode, this.levelNode, this.biasNode );
 		newNode.sampler = this.sampler;
+		newNode.depthNode = this.depthNode;
+		newNode.compareNode = this.compareNode;
+		newNode.gradNode = this.gradNode;
+		newNode.gatherNode = this.gatherNode;
+		newNode.offsetNode = this.offsetNode;
+		newNode.updateMatrix = this.updateMatrix;
 		newNode.referenceNode = this;
 
 		return newNode;
