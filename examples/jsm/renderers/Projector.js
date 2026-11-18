@@ -707,7 +707,7 @@ class Projector {
 
 								if ( material === undefined ) continue;
 
-								for ( let i = group.start, l = group.start + group.count; i < l; i += 3 ) {
+								for ( let i = group.start, l = Math.min( indices.length, group.start + group.count ); i < l; i += 3 ) {
 
 									renderList.pushTriangle( indices[ i ], indices[ i + 1 ], indices[ i + 2 ], material );
 
@@ -739,7 +739,7 @@ class Projector {
 
 								if ( material === undefined ) continue;
 
-								for ( let i = group.start, l = group.start + group.count; i < l; i += 3 ) {
+								for ( let i = group.start, l = Math.min( positions.length / 3, group.start + group.count ); i < l; i += 3 ) {
 
 									renderList.pushTriangle( i, i + 1, i + 2, material );
 
