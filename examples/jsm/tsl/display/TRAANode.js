@@ -357,7 +357,7 @@ class TRAANode extends Node {
 		_quadMesh.render( renderer );
 		renderer.setRenderTarget( null );
 
-		// store the depth for the next frame
+		// store the depth and camera matrices for the next frame
 
 		this._reprojectNode.update( renderer );
 

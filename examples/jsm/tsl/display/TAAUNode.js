@@ -384,7 +384,7 @@ class TAAUNode extends Node {
 
 		renderer.copyTextureToTexture( this._resolveRenderTarget.texture, this._historyRenderTarget.texture );
 
-		// store the depth for the next frame
+		// store the depth and camera matrices for the next frame
 
 		this._reprojectNode.update( renderer );
 

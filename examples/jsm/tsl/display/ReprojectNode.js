@@ -1,20 +1,5 @@
-import { DepthTexture, Matrix4, Node, RenderTarget } from 'three/webgpu';
+import { DepthTexture, Node, RenderTarget } from 'three/webgpu';
 import { texture, uniform, uv, vec2 } from 'three/tsl';
-
-// a uniform holding the value the given matrix had in the previous frame
-
-const previous = ( matrix ) => {
-
-	const current = new Matrix4();
-
-	return uniform( new Matrix4() ).onFrameUpdate( ( frame, self ) => {
-
-		self.value.copy( current );
-		current.copy( matrix );
-
-	} );
-
-};
 
 /**
  * Maps the current frame to the previous one, for effects that reuse data of the
@@ -88,6 +73,13 @@ class ReprojectNode extends Node {
 		this.previousDepthNode = texture( this._previousDepthRenderTarget.depthTexture );
 
 		/**
+		 * The camera's world matrix.
+		 *
+		 * @type {UniformNode<mat4>}
+		 */
+		this.cameraWorldMatrix = uniform( camera.matrixWorld );
+
+		/**
 		 * The camera's view matrix.
 		 *
 		 * @type {UniformNode<mat4>}
@@ -95,18 +87,39 @@ class ReprojectNode extends Node {
 		this.cameraViewMatrix = uniform( camera.matrixWorldInverse );
 
 		/**
+		 * The camera's projection matrix inverse.
+		 *
+		 * @type {UniformNode<mat4>}
+		 */
+		this.cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
+
+		/**
 		 * The previous frame's camera world matrix.
 		 *
 		 * @type {UniformNode<mat4>}
 		 */
-		this.previousCameraWorldMatrix = previous( camera.matrixWorld );
+		this.previousCameraWorldMatrix = uniform( camera.matrixWorld.clone() );
+
+		/**
+		 * The previous frame's camera view matrix.
+		 *
+		 * @type {UniformNode<mat4>}
+		 */
+		this.previousCameraViewMatrix = uniform( camera.matrixWorldInverse.clone() );
+
+		/**
+		 * The previous frame's camera projection matrix.
+		 *
+		 * @type {UniformNode<mat4>}
+		 */
+		this.previousCameraProjectionMatrix = uniform( camera.projectionMatrix.clone() );
 
 		/**
 		 * The previous frame's camera projection matrix inverse.
 		 *
 		 * @type {UniformNode<mat4>}
 		 */
-		this.previousCameraProjectionMatrixInverse = previous( camera.projectionMatrixInverse );
+		this.previousCameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse.clone() );
 
 	}
 
@@ -128,8 +141,8 @@ class ReprojectNode extends Node {
 	}
 
 	/**
-	 * Stores the scene's depth for the next frame. Call it once per frame after
-	 * the previous depth has been read.
+	 * Stores the scene's depth and the camera matrices for the next frame. Call it
+	 * once per frame after the effect has rendered.
 	 *
 	 * @param {Renderer} renderer - The renderer.
 	 */
@@ -151,6 +164,11 @@ class ReprojectNode extends Node {
 		}
 
 		renderer.copyTextureToTexture( depth, previousDepth );
+
+		this.previousCameraWorldMatrix.value.copy( this.camera.matrixWorld );
+		this.previousCameraViewMatrix.value.copy( this.camera.matrixWorldInverse );
+		this.previousCameraProjectionMatrix.value.copy( this.camera.projectionMatrix );
+		this.previousCameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
 
 	}
 
