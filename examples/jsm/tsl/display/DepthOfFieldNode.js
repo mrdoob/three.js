@@ -3,6 +3,7 @@ import { convertToTexture, nodeObject, Fn, uniform, smoothstep, step, texture, m
 import { gaussianBlur } from './GaussianBlurNode.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
+const _size = /*@__PURE__*/ new Vector2();
 let _rendererState;
 
 /**
@@ -280,8 +281,8 @@ class DepthOfFieldNode extends Node {
 
 		// resize
 
-		const map = this.textureNode.value;
-		this.setSize( map.image.width, map.image.height );
+		renderer.getDrawingBufferSize( _size );
+		this.setSize( _size.x, _size.y );
 
 		// save state
 
