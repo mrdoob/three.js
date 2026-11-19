@@ -986,7 +986,7 @@ class SSRNode extends Node {
 
 				if ( ! ( this.historyTexture && this.velocityTexture ) ) return color;
 
-				const velocity = this.velocityTexture.sample( uvHit ).xy;
+				const velocity = this.velocityTexture.sample( uvHit ).xy.mul( vec2( 0.5, - 0.5 ) ); // NDC to UV offset
 				const historyUV = uvHit.sub( velocity );
 				const historyBounce = texture( this.historyTexture, historyUV ).toVar();
 				const sampleDecay = historyBounce.a.oneMinus();
