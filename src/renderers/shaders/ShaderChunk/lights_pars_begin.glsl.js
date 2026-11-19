@@ -230,6 +230,18 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 
 	}
 
+	vec3 getHemisphereLightRadiance( const in HemisphereLight hemiLight, const in vec3 reflectVec, const in float roughness ) {
+
+		// GGX prefiltering of a sharp sky/ground horizon: Student-t marginal at low roughness, cosine irradiance at roughness = 1
+		float alpha = pow2( roughness );
+		float t = 2.0 * alpha / ( 1.0 + alpha );
+		float dotRL = dot( reflectVec, hemiLight.direction );
+		float hemiSpecularWeight = 0.5 * dotRL * inversesqrt( max( mix( pow2( t ), 1.0, pow2( dotRL ) ), 1e-8 ) ) + 0.5;
+
+		return mix( hemiLight.groundColor, hemiLight.skyColor, hemiSpecularWeight ) * RECIPROCAL_PI;
+
+	}
+
 #endif
 
 // Ambient lights and light probes stand in for a distant environment, so they reflect their irradiance / PI
@@ -251,7 +263,7 @@ vec3 getIndirectLightRadiance( const in vec3 viewDir, const in vec3 normal, cons
 		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-			irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], reflectVec );
+			irradiance += getHemisphereLightRadiance( hemisphereLights[ i ], reflectVec, roughness ) * PI;
 
 		}
 		#pragma unroll_loop_end

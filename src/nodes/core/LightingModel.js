@@ -67,7 +67,7 @@ class LightingModel {
 	 * in for a distant environment. It is called by the light nodes while they are set up.
 	 *
 	 * @abstract
-	 * @param {function(Node<vec3>):Node<vec3>} irradianceAt - Returns the light's irradiance for a world space direction.
+	 * @param {function(Node<vec3>, Node<float>):Node<vec3>} irradianceAt - Returns the light's prefiltered radiance * PI for a world space direction and roughness.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
 	indirectRadiance( /*irradianceAt, builder*/ ) { }
