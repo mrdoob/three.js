@@ -1,9 +1,15 @@
 import {
+	Data3DTexture,
+	DataUtils,
 	DirectionalLight,
 	Group,
-	LightProbe,
-	WebGLCubeRenderTarget
+	HalfFloatType,
+	LinearFilter,
+	RGBAFormat,
+	WebGLCubeRenderTarget,
+	warnOnce
 } from 'three';
+import { LightProbeGridWebGL } from '../lighting/LightProbeGridWebGL.js';
 
 class SessionLightProbe {
 
@@ -93,9 +99,33 @@ class SessionLightProbe {
 		const lightEstimate = xrFrame.getLightEstimate( this.lightProbe );
 		if ( lightEstimate ) {
 
-			// We can copy the estimate's spherical harmonics array directly into the light probe.
-			this.xrLight.lightProbe.sh.fromArray( lightEstimate.sphericalHarmonicsCoefficients );
-			this.xrLight.lightProbe.intensity = 1.0;
+			// Pack the 9 L2 SH coefficients into the 1x1x1 LightProbeGrid atlas (7 sub-volumes x 3 padded slices).
+			const sh = lightEstimate.sphericalHarmonicsCoefficients;
+			const texture = this.xrLight.lightProbeGrid.texture;
+			const data = texture.image.data;
+
+			for ( let t = 0; t < 7; t ++ ) {
+
+				const src = t * 4;
+				const r = DataUtils.toHalfFloat( sh[ src ] );
+				const g = DataUtils.toHalfFloat( sh[ src + 1 ] );
+				const b = DataUtils.toHalfFloat( sh[ src + 2 ] );
+				const a = src + 3 < 27 ? DataUtils.toHalfFloat( sh[ src + 3 ] ) : 0;
+
+				for ( let s = 0; s < 3; s ++ ) {
+
+					const dst = ( t * 3 + s ) * 4;
+					data[ dst ] = r;
+					data[ dst + 1 ] = g;
+					data[ dst + 2 ] = b;
+					data[ dst + 3 ] = a;
+
+				}
+
+			}
+
+			texture.needsUpdate = true;
+			this.xrLight.lightProbeGrid.visible = true;
 
 			// For the directional light we have to normalize the color and set the scalar as the
 			// intensity, since WebXR can return color values that exceed 1.0.
@@ -153,13 +183,21 @@ export class XREstimatedLight extends Group {
 		super();
 
 		/**
-		 * The light probe that represents the estimated light.
+		 * A 1x1x1 light probe grid that represents the estimated spherical harmonics irradiance.
 		 *
-		 * @type {LightProbe}
+		 * @type {LightProbeGridWebGL}
 		 */
-		this.lightProbe = new LightProbe();
-		this.lightProbe.intensity = 0;
-		this.add( this.lightProbe );
+		this.lightProbeGrid = new LightProbeGridWebGL( 1e5, 1e5, 1e5, 1, 1, 1 );
+		this.lightProbeGrid.visible = false;
+
+		const atlasTexture = new Data3DTexture( new Uint16Array( 21 * 4 ), 1, 1, 21 );
+		atlasTexture.format = RGBAFormat;
+		atlasTexture.type = HalfFloatType;
+		atlasTexture.minFilter = LinearFilter;
+		atlasTexture.magFilter = LinearFilter;
+		this.lightProbeGrid.texture = atlasTexture;
+
+		this.add( this.lightProbeGrid );
 
 		/**
 		 * Represents the primary light from the XR environment.
@@ -246,8 +284,10 @@ export class XREstimatedLight extends Group {
 
 			}
 
-			this.remove( this.lightProbe );
-			this.lightProbe = null;
+			this.lightProbeGrid.texture.dispose();
+			this.lightProbeGrid.dispose();
+			this.remove( this.lightProbeGrid );
+			this.lightProbeGrid = null;
 
 			this.remove( this.directionalLight );
 			this.directionalLight = null;
@@ -255,6 +295,17 @@ export class XREstimatedLight extends Group {
 			this.environment = null;
 
 		};
+
+	}
+
+	/**
+	 * @deprecated since r188. Use {@link XREstimatedLight#lightProbeGrid} instead.
+	 * @type {LightProbeGridWebGL}
+	 */
+	get lightProbe() {
+
+		warnOnce( 'XREstimatedLight: "lightProbe" has been replaced by "lightProbeGrid".' ); // @deprecated r188
+		return this.lightProbeGrid;
 
 	}
 

@@ -178,13 +178,10 @@ function WebGLLights( extensions ) {
 			numDirectionalShadows: - 1,
 			numPointShadows: - 1,
 			numSpotShadows: - 1,
-			numSpotMaps: - 1,
-
-			numLightProbes: - 1
+			numSpotMaps: - 1
 		},
 
 		ambient: [ 0, 0, 0 ],
-		probe: [],
 		sun: [],
 		sunShadow: [],
 		sunShadowMap: [],
@@ -207,12 +204,9 @@ function WebGLLights( extensions ) {
 		pointShadowMap: [],
 		pointShadowMatrix: [],
 		hemi: [],
-		numSpotLightShadowsWithMaps: 0,
-		numLightProbes: 0
+		numSpotLightShadowsWithMaps: 0
 
 	};
-
-	for ( let i = 0; i < 9; i ++ ) state.probe.push( new Vector3() );
 
 	const vector3 = new Vector3();
 	const matrix4 = new Matrix4();
@@ -221,8 +215,6 @@ function WebGLLights( extensions ) {
 	function setup( lights ) {
 
 		let r = 0, g = 0, b = 0;
-
-		for ( let i = 0; i < 9; i ++ ) state.probe[ i ].set( 0, 0, 0 );
 
 		let sunLength = 0;
 		let numSunShadows = 0;
@@ -238,8 +230,6 @@ function WebGLLights( extensions ) {
 		let numSpotShadows = 0;
 		let numSpotMaps = 0;
 		let numSpotShadowsWithMaps = 0;
-
-		let numLightProbes = 0;
 
 		// ordering : [shadow casting + map texturing, map texturing, shadow casting, none ]
 		lights.sort( shadowCastingAndTexturingLightsFirst );
@@ -275,16 +265,6 @@ function WebGLLights( extensions ) {
 				r += color.r * intensity;
 				g += color.g * intensity;
 				b += color.b * intensity;
-
-			} else if ( light.isLightProbe ) {
-
-				for ( let j = 0; j < 9; j ++ ) {
-
-					state.probe[ j ].addScaledVector( light.sh.coefficients[ j ], intensity );
-
-				}
-
-				numLightProbes ++;
 
 			} else if ( light.isSunLight ) {
 
@@ -500,8 +480,7 @@ function WebGLLights( extensions ) {
 			hash.numDirectionalShadows !== numDirectionalShadows ||
 			hash.numPointShadows !== numPointShadows ||
 			hash.numSpotShadows !== numSpotShadows ||
-			hash.numSpotMaps !== numSpotMaps ||
-			hash.numLightProbes !== numLightProbes ) {
+			hash.numSpotMaps !== numSpotMaps ) {
 
 			state.sun.length = sunLength;
 			state.directional.length = directionalLength;
@@ -525,7 +504,6 @@ function WebGLLights( extensions ) {
 			state.spotLightMatrix.length = numSpotShadows + numSpotMaps - numSpotShadowsWithMaps;
 			state.spotLightMap.length = numSpotMaps;
 			state.numSpotLightShadowsWithMaps = numSpotShadowsWithMaps;
-			state.numLightProbes = numLightProbes;
 
 			hash.sunLength = sunLength;
 			hash.directionalLength = directionalLength;
@@ -539,8 +517,6 @@ function WebGLLights( extensions ) {
 			hash.numPointShadows = numPointShadows;
 			hash.numSpotShadows = numSpotShadows;
 			hash.numSpotMaps = numSpotMaps;
-
-			hash.numLightProbes = numLightProbes;
 
 			state.version = nextVersion ++;
 

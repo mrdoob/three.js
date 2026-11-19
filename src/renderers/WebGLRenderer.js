@@ -131,7 +131,7 @@ class WebGLRenderer {
 
 		const uintClearColor = new Uint32Array( 4 );
 		const intClearColor = new Int32Array( 4 );
-		const lightProbeGridUniforms = { textures: [], min: [], max: [], resolution: [] };
+		const lightProbeGridUniforms = { textures: [], min: [], max: [], resolution: [], intensity: [] };
 
 		let currentRenderList = null;
 		let currentRenderState = null;
@@ -2298,7 +2298,6 @@ class WebGLRenderer {
 				// wire up the material to this renderer's lighting state
 
 				uniforms.ambientLightColor.value = lights.state.ambient;
-				uniforms.lightProbe.value = lights.state.probe;
 				uniforms.sunLights.value = lights.state.sun;
 				uniforms.sunLightShadows.value = lights.state.sunShadow;
 				uniforms.directionalLights.value = lights.state.directional;
@@ -2801,6 +2800,7 @@ class WebGLRenderer {
 						grids.min[ count ] = grid.boundingBox.min;
 						grids.max[ count ] = grid.boundingBox.max;
 						grids.resolution[ count ] = grid.resolution;
+						grids.intensity[ count ] = grid.intensity;
 						count ++;
 
 					}
@@ -2811,6 +2811,7 @@ class WebGLRenderer {
 					m_uniforms.probesMin.value = grids.min;
 					m_uniforms.probesMax.value = grids.max;
 					m_uniforms.probesResolution.value = grids.resolution;
+					m_uniforms.probesIntensity.value = grids.intensity;
 
 				}
 
@@ -2863,7 +2864,6 @@ class WebGLRenderer {
 		function markUniformsLightsNeedsUpdate( uniforms, value ) {
 
 			uniforms.ambientLightColor.needsUpdate = value;
-			uniforms.lightProbe.needsUpdate = value;
 
 			uniforms.sunLights.needsUpdate = value;
 			uniforms.sunLightShadows.needsUpdate = value;
