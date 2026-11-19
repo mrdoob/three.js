@@ -738,15 +738,14 @@ class MaterialXNode {
 
 	}
 
-	// the geometric property each nodedef input defaults to, e.g. `Nworld` for a world space normal
+	// the geometric property each nodedef input defaults to by input name, e.g. { normal: 'Nworld' }
 	getInputGeomProps() {
 
 		const geomProps = {};
-		if ( this.nodeDef === null ) return geomProps;
+		const inputs = this.nodeDef !== null ? this.nodeDef.inputs : {};
+		for ( const name in inputs ) {
 
-		for ( const [ name, input ] of Object.entries( this.nodeDef.inputs ) ) {
-
-			if ( input.defaultgeomprop ) geomProps[ name ] = input.defaultgeomprop;
+			geomProps[ name ] = inputs[ name ].defaultgeomprop;
 
 		}
 
