@@ -1,6 +1,7 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4 } from 'three/webgpu';
 import { float, Fn, max, texture, uniform, uv, vec4, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
-import { clipAABB, computeHaltonOffsets, flickerReduction, Reprojection, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
+import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth } from '../utils/TAAUtils.js';
+import { Reprojection } from '../../utils/Reprojection.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -213,6 +214,7 @@ class TRAANode extends Node {
 		 * @type {Reprojection}
 		 */
 		this._reprojection = new Reprojection( depthNode, velocityNode, camera );
+		this._reprojection.previousDepthNode.value.name = 'TRAANode.previousDepth';
 
 		/**
 		 * The node used to render the scene's velocity.
@@ -473,7 +475,7 @@ class TRAANode extends Node {
 			// sample the previous depth
 
 			const historyUV = this._reprojection.getHistoryUV( uvNode, closestPositionTexel ).toConst();
-			const previousDepth = samplePreviousDepth( this._reprojection.previousDepthNode, historyUV, this._reprojection.previousCameraProjectionMatrixInverse, this._reprojection.previousCameraWorldMatrix, this._reprojection.cameraViewMatrix, this._cameraNearFar, this.camera );
+			const previousDepth = this._reprojection.getPreviousDepth( historyUV, this._cameraNearFar );
 
 			// history is considered valid when the UV is in range and there's no disocclusion except on edges
 

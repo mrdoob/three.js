@@ -1,6 +1,6 @@
 import { EPSILON, Fn, If, abs, convertToTexture, dFdx, dFdy, dot, exp, float, floor, fwidth, getViewPosition, ivec2, luminance, max, min, mix, nodeObject, normalize, passTexture, screenCoordinate, select, smoothstep, sqrt, struct, texture, textureLoad, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4, velocity, context, OnBeforeRenderPipeline, OnAfterRenderPipeline, isBackgroundDepth } from 'three/tsl';
 import { HalfFloatType, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2 } from 'three/webgpu';
-import { Reprojection } from '../utils/TAAUtils.js';
+import { Reprojection } from '../../utils/Reprojection.js';
 import { ENV_RAY_LENGTH, ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
 
 // Reprojection helpers
@@ -499,6 +499,7 @@ class TemporalReprojectNode extends Node {
 		this._resolution = uniform( new Vector2() );
 
 		this._reprojection = new Reprojection( depthNode, velocityNode, camera );
+		this._reprojection.previousDepthNode.value.name = 'TemporalReprojectNode.previousDepth';
 
 		this.maxFrames = uniform( 32 );
 		this.hitPointReprojection = uniform( hitPointReprojection, 'bool' );
