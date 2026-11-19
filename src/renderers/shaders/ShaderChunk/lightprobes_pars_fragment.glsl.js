@@ -15,7 +15,10 @@ uniform vec3 probesResolution[ NUM_LIGHT_PROBE_GRIDS ];
 bool isInsideLightProbeGrid( vec3 worldPos, vec3 worldNormal, vec3 probesMin, vec3 probesMax, vec3 probesResolution ) {
 
 	vec3 spacing = ( probesMax - probesMin ) / probesResolution;
-	vec3 samplePos = worldPos + worldNormal * spacing * 0.5;
+
+	// An axis with a single probe isn't offset along the normal, since that offset would span the whole grid.
+
+	vec3 samplePos = worldPos + worldNormal * spacing * 0.5 * step( 1.5, probesResolution );
 
 	// Grow the bounds by 1% of a cell, so fragments on the bounds aren't left out by
 	// precision errors or samples outside of the triangle.
