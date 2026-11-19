@@ -120,7 +120,7 @@ class MeshPhongMaterial extends Material {
 		/**
 		 * Intensity of the ambient occlusion effect. Range is `[0,1]`, where `0`
 		 * disables ambient occlusion. Where intensity is `1` and the AO map's
-		 * red channel is also `1`, ambient light is fully occluded on a surface.
+		 * red channel is `0`, ambient light is fully occluded on a surface.
 		 *
 		 * @type {number}
 		 * @default 1
