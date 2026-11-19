@@ -11,6 +11,7 @@ uniform highp sampler3D probesSH[ NUM_LIGHT_PROBE_GRIDS ];
 uniform vec3 probesMin[ NUM_LIGHT_PROBE_GRIDS ];
 uniform vec3 probesMax[ NUM_LIGHT_PROBE_GRIDS ];
 uniform vec3 probesResolution[ NUM_LIGHT_PROBE_GRIDS ];
+uniform float probesIntensity[ NUM_LIGHT_PROBE_GRIDS ];
 
 bool isInsideLightProbeGrid( vec3 worldPos, vec3 worldNormal, vec3 probesMin, vec3 probesMax, vec3 probesResolution ) {
 

@@ -255,7 +255,7 @@ IncidentLight directLight;
 		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_LIGHT_PROBE_GRIDS; i ++ ) {
 
-			if ( probeGrid == UNROLLED_LOOP_INDEX ) irradiance += getLightProbeGridIrradiance( probesSH[ i ], probesMin[ i ], probesMax[ i ], probesResolution[ i ], probeWorldPos, probeWorldNormal );
+			if ( probeGrid == UNROLLED_LOOP_INDEX ) irradiance += getLightProbeGridIrradiance( probesSH[ i ], probesMin[ i ], probesMax[ i ], probesResolution[ i ], probeWorldPos, probeWorldNormal ) * probesIntensity[ i ];
 
 		}
 		#pragma unroll_loop_end
