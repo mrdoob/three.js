@@ -205,8 +205,6 @@
 						const guideNormal = sample( ( uv ) => prePassNormal.sample( uv ).xyz.normalize() );
 						const size = vec2( textureSize( aoTexture ) );
 
-						// the guide depth must match the depth the AO was shaded at or it leaks across silhouettes
-
 						const guideDepth = ( params.aoType === 'GTAO' ) ? aoPass.getDepthNode() : prePassDepth;
 
 						upsamplePass = rtt( jointBilateralUpsample( aoTexture, guideDepth, guideNormal, prePassDepth, guideNormal, camera, { size } ).sample( screenUV ) );

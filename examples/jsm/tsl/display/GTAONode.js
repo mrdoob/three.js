@@ -1,6 +1,5 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
 import { reference, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sample, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
-import { gatherNearestDepth } from '../utils/DepthUtils.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -318,9 +317,7 @@ class GTAONode extends Node {
 	}
 
 	/**
-	 * Returns the depth the effect shades its texels at, which at a reduced resolution
-	 * is the nearest of the four depths around each texel. Use it as the low resolution
-	 * guide depth when upsampling the effect, e.g. with `jointBilateralUpsample()`.
+	 * Returns the depth the effect is computed at, e.g. as the guide depth for upsampling it.
 	 *
 	 * @return {SampleNode} The depth, samplable at the texel centers of the effect.
 	 */
@@ -644,6 +641,25 @@ class GTAONode extends Node {
 }
 
 export default GTAONode;
+
+// returns the nearest and farthest of the four depths around the uv and the texel center of the nearest
+
+function gatherNearestDepth( depthNode, uv, builder ) {
+
+	const g = depthNode.gather().sample( uv ).toConst();
+	const minDepth = min( min( g.x, g.y ), min( g.z, g.w ) ).toConst();
+	const maxDepth = max( max( g.x, g.y ), max( g.z, g.w ) ).toConst();
+
+	const reversed = builder.renderer.reversedDepthBuffer === true;
+	const nearest = reversed ? maxDepth : minDepth;
+	const farthest = reversed ? minDepth : maxDepth;
+
+	const size = vec2( textureSize( depthNode, 0 ) );
+	const offset = g.w.equal( nearest ).select( vec2( 0.5, 0.5 ), g.z.equal( nearest ).select( vec2( 1.5, 0.5 ), g.y.equal( nearest ).select( vec2( 1.5, 1.5 ), vec2( 0.5, 1.5 ) ) ) );
+
+	return { nearest, farthest, uv: uv.mul( size ).sub( 0.5 ).floor().add( offset ).div( size ) };
+
+}
 
 /**
  * Generates the AO's noise texture for the given size.

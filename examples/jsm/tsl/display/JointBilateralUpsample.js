@@ -1,24 +1,16 @@
 import { Fn, float, getViewPosition, sample, textureSize, uniform, vec2, vec4 } from 'three/tsl';
 
 /**
- * Upsamples a reduced resolution effect to full resolution with a joint bilateral
- * filter: the four nearest low resolution texels are bilinearly weighted and then
- * rejected by their distance to the surface plane and their normal difference against
- * the full resolution guides, so the result does not bleed across silhouettes.
- *
- * A small floor on the weights fades the result to plain bilinear interpolation when
- * no texel matches.
- *
- * All four channels are filtered alike by default. With the `coverage` option the
- * input is expected to store a signal in RGB and its coverage in alpha: RGB is then
- * averaged weighted by coverage, alpha by the filter weights alone.
+ * Upsamples a reduced resolution effect with a joint bilateral filter: the bilinear
+ * weights of the four nearest texels are scaled by how well their depth and normal
+ * match the full resolution guides, so the result does not bleed across silhouettes.
  *
  * Reference: {@link https://johanneskopf.de/publications/jbu/}
  *
  * @tsl
  * @function
  * @param {Node<vec4>} inputNode - The low resolution texture to upsample.
- * @param {Node<float>} lowDepthNode - Depth of the input's texels, in the red channel. Must be a texture at the input's resolution, unless `options.size` is set.
+ * @param {Node<float>} lowDepthNode - Depth of the input's texels, in the red channel.
  * @param {Node<vec3>} lowNormalNode - Normalized view-space normals at the input's resolution.
  * @param {Node<float>} depthNode - Full resolution depth, in the red channel.
  * @param {Node<vec3>} normalNode - Normalized full resolution view-space normals.
@@ -26,8 +18,8 @@ import { Fn, float, getViewPosition, sample, textureSize, uniform, vec2, vec4 } 
  * @param {Object} [options={}] - The filter options.
  * @param {Node<float>|number} [options.depthTolerance=0.005] - The distance to the surface plane, relative to the view depth, at which a texel is rejected.
  * @param {number} [options.normalPower=8] - How strongly a normal difference rejects a texel. Must be a power of two.
- * @param {Node<vec2>} [options.size] - The size of the input's texel grid. When set, the low resolution depth and normal can be any nodes that are samplable at the input's texel centers. Defaults to the size of `lowDepthNode`.
- * @param {boolean} [options.coverage=false] - Whether the input's alpha is the coverage of its RGB signal.
+ * @param {Node<vec2>} [options.size] - The size of the input's texel grid. Defaults to the size of `lowDepthNode`, which must then be a texture.
+ * @param {boolean} [options.coverage=false] - Whether the input's alpha is the coverage of its RGB, which is then averaged weighted by it.
  * @returns {SampleNode} The upsampled result, samplable at any coordinate.
  */
 export const jointBilateralUpsample = ( inputNode, lowDepthNode, lowNormalNode, depthNode, normalNode, camera, options = {} ) => {
@@ -45,11 +37,9 @@ export const jointBilateralUpsample = ( inputNode, lowDepthNode, lowNormalNode, 
 
 		const viewPosition = ( uv, depth ) => getViewPosition( uv, depth, projectionInverse );
 
-		// the low resolution depths are read first: when they gather() from the full resolution depth texture,
-		// WGSL requires that to precede a plain read of it
+		// read the low resolution depths first, WGSL fails on a gather() that follows a plain read of the same texture
 		const tapUVs = [[ 0, 0 ], [ 1, 0 ], [ 0, 1 ], [ 1, 1 ]].map( ( offset ) => base.add( vec2( ...offset ) ).add( 0.5 ).div( size ).toConst() );
 
-		// a low resolution depth texture is read in one fetch, ordered like textureGather()
 		const gathered = gridSize === null ? lowDepthNode.gather().sample( base.add( 1 ).div( size ) ).toConst() : null;
 		const tapDepths = gathered !== null ? [ gathered.w, gathered.z, gathered.x, gathered.y ] : tapUVs.map( ( tapUV ) => lowDepthNode.sample( tapUV ).r.toConst() );
 
@@ -66,8 +56,7 @@ export const jointBilateralUpsample = ( inputNode, lowDepthNode, lowNormalNode, 
 
 				const tapUV = tapUVs[ y * 2 + x ];
 
-				// distance to the plane of the full resolution surface, which unlike a view depth
-				// difference stays small along a slanted surface
+				// the distance to the surface plane stays small along slanted surfaces
 				const planeDistance = viewPosition( tapUV, tapDepths[ y * 2 + x ] ).sub( position ).dot( n );
 				const depthWeight = planeDistance.div( tolerance ).pow2().negate().exp();
 				let normalWeight = lowNormalNode.sample( tapUV ).dot( n ).max( 0 );
