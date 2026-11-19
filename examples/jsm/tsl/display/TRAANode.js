@@ -1,7 +1,6 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4 } from 'three/webgpu';
-import { float, Fn, max, texture, uniform, uv, vec4, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline, getViewPosition, projectionDepth, viewZToOrthographicDepth, viewZToPerspectiveDepth } from 'three/tsl';
-import { reproject } from './ReprojectNode.js';
-import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth } from '../utils/TAAUtils.js';
+import { float, Fn, max, texture, uniform, uv, vec4, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
+import { clipAABB, computeHaltonOffsets, flickerReduction, Reprojection, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -211,9 +210,9 @@ class TRAANode extends Node {
 		 * Maps the current frame to the previous one.
 		 *
 		 * @private
-		 * @type {ReprojectNode}
+		 * @type {Reprojection}
 		 */
-		this._reprojectNode = reproject( depthNode, velocityNode, camera );
+		this._reprojection = new Reprojection( depthNode, velocityNode, camera );
 
 		/**
 		 * The node used to render the scene's velocity.
@@ -326,7 +325,7 @@ class TRAANode extends Node {
 
 		//
 
-		const needsRestart = this._reprojectNode.needsHistoryReset() ||
+		const needsRestart = this._reprojection.needsHistoryReset() ||
 			this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
 		this.setSize( width, height );
 
@@ -360,7 +359,7 @@ class TRAANode extends Node {
 
 		// store the depth and camera matrices for the next frame
 
-		this._reprojectNode.update( renderer );
+		this._reprojection.update( renderer );
 
 		// restore
 
@@ -473,14 +472,8 @@ class TRAANode extends Node {
 
 			// sample the previous depth
 
-			const historyUV = this._reprojectNode.getHistoryUV( uvNode, closestPositionTexel ).toConst();
-			const depth = projectionDepth( this._reprojectNode.previousDepthNode.sample( historyUV ).r, this._cameraNearFar.x, this._cameraNearFar.y );
-			const positionView = getViewPosition( historyUV, depth, this._reprojectNode.previousCameraProjectionMatrixInverse );
-			const positionWorld = this._reprojectNode.previousCameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz;
-			const viewZ = this._reprojectNode.cameraViewMatrix.mul( vec4( positionWorld, 1 ) ).z;
-			const previousDepth = this.camera.isOrthographicCamera
-				? viewZToOrthographicDepth( viewZ, this._cameraNearFar.x, this._cameraNearFar.y )
-				: viewZToPerspectiveDepth( viewZ, this._cameraNearFar.x, this._cameraNearFar.y );
+			const historyUV = this._reprojection.getHistoryUV( uvNode, closestPositionTexel ).toConst();
+			const previousDepth = samplePreviousDepth( this._reprojection.previousDepthNode, historyUV, this._reprojection.previousCameraProjectionMatrixInverse, this._reprojection.previousCameraWorldMatrix, this._reprojection.cameraViewMatrix, this._cameraNearFar, this.camera );
 
 			// history is considered valid when the UV is in range and there's no disocclusion except on edges
 
@@ -541,7 +534,7 @@ class TRAANode extends Node {
 		this._historyRenderTarget.dispose();
 		this._resolveRenderTarget.dispose();
 
-		this._reprojectNode.dispose();
+		this._reprojection.dispose();
 
 		this._resolveMaterial.dispose();
 

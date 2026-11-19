@@ -1,6 +1,6 @@
 import { EPSILON, Fn, If, abs, convertToTexture, dFdx, dFdy, dot, exp, float, floor, fwidth, getViewPosition, ivec2, luminance, max, min, mix, nodeObject, normalize, passTexture, screenCoordinate, select, smoothstep, sqrt, struct, texture, textureLoad, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4, velocity, context, OnBeforeRenderPipeline, OnAfterRenderPipeline, isBackgroundDepth } from 'three/tsl';
 import { HalfFloatType, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2 } from 'three/webgpu';
-import { reproject } from './ReprojectNode.js';
+import { Reprojection } from '../utils/TAAUtils.js';
 import { ENV_RAY_LENGTH, ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
 
 // Reprojection helpers
@@ -498,7 +498,7 @@ class TemporalReprojectNode extends Node {
 
 		this._resolution = uniform( new Vector2() );
 
-		this._reprojectNode = reproject( depthNode, velocityNode, camera );
+		this._reprojection = new Reprojection( depthNode, velocityNode, camera );
 
 		this.maxFrames = uniform( 32 );
 		this.hitPointReprojection = uniform( hitPointReprojection, 'bool' );
@@ -579,7 +579,7 @@ class TemporalReprojectNode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		const needsRestart = this._reprojectNode.needsHistoryReset() ||
+		const needsRestart = this._reprojection.needsHistoryReset() ||
 			this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
 		this.setSize( width, height );
 
@@ -627,7 +627,7 @@ class TemporalReprojectNode extends Node {
 
 		// store the depth, camera matrices and normals for the next frame
 
-		this._reprojectNode.update( renderer );
+		this._reprojection.update( renderer );
 		renderer.copyTextureToTexture( this.normalNode.value, this._previousNormalTexture );
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );
@@ -693,7 +693,7 @@ class TemporalReprojectNode extends Node {
 	_buildResolve() {
 
 		const isSpecular = this.mode === 'specular';
-		const reprojection = this._reprojectNode;
+		const reprojection = this._reprojection;
 		const sampleHistory4Tap = createSampleHistory4Tap( this.normalDecode );
 
 		const resolve = Fn( () => {
@@ -900,7 +900,7 @@ class TemporalReprojectNode extends Node {
 
 		this._previousNormalTexture.dispose();
 
-		this._reprojectNode.dispose();
+		this._reprojection.dispose();
 		this._historyRenderTarget.dispose();
 		this._resolveRenderTarget.dispose();
 		this._resolveMaterial.dispose();
