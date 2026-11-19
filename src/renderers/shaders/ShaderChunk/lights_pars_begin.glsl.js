@@ -236,7 +236,11 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 		float alpha = pow2( roughness );
 		float t = 2.0 * alpha / ( 1.0 + alpha );
 		float dotRL = dot( reflectVec, hemiLight.direction );
-		float hemiSpecularWeight = saturate( 0.5 * dotRL / max( sqrt( mix( pow2( t ), 1.0, pow2( dotRL ) ) ), 1e-4 ) + 0.5 );
+
+		// Box filtered over the pixel footprint, so the horizon doesn't alias on smooth surfaces
+		float pixelHalfWidth = 0.5 * length( vec2( dFdx( dotRL ), dFdy( dotRL ) ) );
+		float lobeWidth2 = pow2( t ) * ( 1.0 - pow2( dotRL ) );
+		float hemiSpecularWeight = saturate( dotRL / max( sqrt( pow2( dotRL + pixelHalfWidth ) + lobeWidth2 ) + sqrt( pow2( dotRL - pixelHalfWidth ) + lobeWidth2 ), 2e-4 ) + 0.5 );
 
 		return mix( hemiLight.groundColor, hemiLight.skyColor, hemiSpecularWeight ) * RECIPROCAL_PI;
 

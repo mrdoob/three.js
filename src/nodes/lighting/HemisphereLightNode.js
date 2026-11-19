@@ -1,6 +1,7 @@
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { mix } from '../math/MathNode.js';
+import { vec2 } from '../tsl/TSLBase.js';
 import { normalWorld } from '../accessors/Normal.js';
 import { lightPosition } from '../accessors/Lights.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
@@ -86,7 +87,11 @@ class HemisphereLightNode extends AnalyticLightNode {
 			const alpha = roughness.pow2();
 			const t = alpha.mul( 2.0 ).div( alpha.add( 1.0 ) );
 			const dotRL = direction.dot( lightDirectionNode );
-			const hemiSpecularWeight = dotRL.div( mix( t.pow2(), 1.0, dotRL.pow2() ).sqrt().max( 1e-4 ) ).mul( 0.5 ).add( 0.5 ).saturate();
+
+			// Box filtered over the pixel footprint, so the horizon doesn't alias on smooth surfaces
+			const pixelHalfWidth = vec2( dotRL.dFdx(), dotRL.dFdy() ).length().mul( 0.5 );
+			const lobeWidth2 = t.pow2().mul( dotRL.pow2().oneMinus() );
+			const hemiSpecularWeight = dotRL.div( dotRL.add( pixelHalfWidth ).pow2().add( lobeWidth2 ).sqrt().add( dotRL.sub( pixelHalfWidth ).pow2().add( lobeWidth2 ).sqrt() ).max( 2e-4 ) ).add( 0.5 ).saturate();
 
 			return mix( groundColorNode, colorNode, hemiSpecularWeight ).div( Math.PI );
 
