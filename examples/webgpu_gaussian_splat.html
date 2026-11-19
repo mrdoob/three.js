@@ -63,6 +63,20 @@
 			let pointerDownY = 0;
 
 			const sources = {
+				splatLab: {
+					name: 'Splat Lab (SPZ v4)',
+					url: './models/spz/splat_lab.v4.spz',
+					loader: SPZLoader,
+					cameraPosition: new THREE.Vector3( 0, 0.35, 1 ),
+					rotation: new THREE.Euler( - Math.PI * 0.09, 0, Math.PI ),
+					credit: {
+						author: 'Felix Herbst',
+						authorUrl: 'https://superspl.at/user/hybridherbst',
+						source: 'https://superspl.at/scene/a91eee9d',
+						license: 'CC Attribution',
+						licenseUrl: 'http://creativecommons.org/licenses/by/4.0/'
+					}
+				},
 				millipede: {
 					name: 'Millipede (SPLAT)',
 					url: './models/splat/millipede.splat',
