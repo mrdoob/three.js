@@ -141,6 +141,24 @@ class ReprojectNode extends Node {
 	}
 
 	/**
+	 * Returns whether the stored depth has a different size, format or type from
+	 * the current depth. Check before rendering to restart incompatible history.
+	 *
+	 * @return {boolean} Whether the history needs to be reset.
+	 */
+	needsHistoryReset() {
+
+		const depth = this.depthNode.value;
+		const previousDepth = this.previousDepthNode.value;
+
+		return previousDepth.image.width !== depth.image.width ||
+			previousDepth.image.height !== depth.image.height ||
+			previousDepth.format !== depth.format ||
+			previousDepth.type !== depth.type;
+
+	}
+
+	/**
 	 * Stores the scene's depth and the camera matrices for the next frame. Call it
 	 * once per frame after the effect has rendered.
 	 *
@@ -153,7 +171,7 @@ class ReprojectNode extends Node {
 
 		const { width, height } = depth.image;
 
-		if ( previousDepth.image.width !== width || previousDepth.image.height !== height ) {
+		if ( this.needsHistoryReset() ) {
 
 			previousDepth.image.width = width;
 			previousDepth.image.height = height;

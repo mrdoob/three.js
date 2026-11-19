@@ -349,6 +349,7 @@ class TAAUNode extends Node {
 		//
 
 		const needsRestart =
+			this._reprojectNode.needsHistoryReset() ||
 			this._historyRenderTarget.width !== outputWidth ||
 			this._historyRenderTarget.height !== outputHeight;
 

@@ -579,7 +579,8 @@ class TemporalReprojectNode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		const needsRestart = this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
+		const needsRestart = this._reprojectNode.needsHistoryReset() ||
+			this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
 		this.setSize( width, height );
 
 		let historySwappedForRestart = false;
@@ -590,7 +591,7 @@ class TemporalReprojectNode extends Node {
 			this._previousNormalTexture = this.normalNode.value.clone();
 			this._previousNormalNode.value = this._previousNormalTexture;
 
-			// External history (e.g. denoise feedback) is stale at the old resolution — use
+			// External history (e.g. denoise feedback) is incompatible after a restart — use
 			// freshly seeded internal history for this frame instead.
 			if ( this.accumulate === false && this._externalHistoryTexture !== null ) {
 

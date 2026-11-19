@@ -326,7 +326,8 @@ class TRAANode extends Node {
 
 		//
 
-		const needsRestart = this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
+		const needsRestart = this._reprojectNode.needsHistoryReset() ||
+			this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
 		this.setSize( width, height );
 
 		// swap history and resolve
