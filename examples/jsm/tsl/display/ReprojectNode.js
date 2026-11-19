@@ -1,5 +1,5 @@
-import { Matrix4, Node } from 'three/webgpu';
-import { uniform, uv, vec2 } from 'three/tsl';
+import { DepthTexture, Matrix4, Node, RenderTarget } from 'three/webgpu';
+import { texture, uniform, uv, vec2 } from 'three/tsl';
 
 // a uniform holding the value the given matrix had in the previous frame
 
@@ -42,7 +42,7 @@ class ReprojectNode extends Node {
 	/**
 	 * Constructs a new reproject node.
 	 *
-	 * @param {PassTextureNode} depthNode - The scene's depth. It must be a texture of a pass.
+	 * @param {TextureNode} depthNode - The scene's depth.
 	 * @param {TextureNode} velocityNode - The scene's velocity.
 	 * @param {Camera} camera - The camera the scene is rendered with.
 	 */
@@ -53,7 +53,7 @@ class ReprojectNode extends Node {
 		/**
 		 * The scene's depth.
 		 *
-		 * @type {PassTextureNode}
+		 * @type {TextureNode}
 		 */
 		this.depthNode = depthNode;
 
@@ -72,11 +72,20 @@ class ReprojectNode extends Node {
 		this.camera = camera;
 
 		/**
+		 * The render target that holds the depth of the previous frame.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
+		this._previousDepthRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, depthTexture: new DepthTexture(), count: 0 } );
+		this._previousDepthRenderTarget.depthTexture.name = 'ReprojectNode.previousDepth';
+
+		/**
 		 * The previous frame's depth.
 		 *
-		 * @type {PassTextureNode}
+		 * @type {TextureNode}
 		 */
-		this.previousDepthNode = depthNode.passNode.getPreviousTextureNode( depthNode.textureName );
+		this.previousDepthNode = texture( this._previousDepthRenderTarget.depthTexture );
 
 		/**
 		 * The camera's view matrix.
@@ -119,6 +128,33 @@ class ReprojectNode extends Node {
 	}
 
 	/**
+	 * Stores the scene's depth for the next frame. Call it once per frame after
+	 * the previous depth has been read.
+	 *
+	 * @param {Renderer} renderer - The renderer.
+	 */
+	update( renderer ) {
+
+		const depth = this.depthNode.value;
+		const previousDepth = this._previousDepthRenderTarget.depthTexture;
+
+		const { width, height } = depth.image;
+
+		if ( previousDepth.image.width !== width || previousDepth.image.height !== height ) {
+
+			previousDepth.image.width = width;
+			previousDepth.image.height = height;
+			previousDepth.format = depth.format;
+			previousDepth.type = depth.type;
+			previousDepth.needsUpdate = true;
+
+		}
+
+		renderer.copyTextureToTexture( depth, previousDepth );
+
+	}
+
+	/**
 	 * This method is used to setup the effect's TSL code.
 	 *
 	 * @return {Node<vec2>}
@@ -126,6 +162,18 @@ class ReprojectNode extends Node {
 	setup() {
 
 		return this.getHistoryUV( uv() );
+
+	}
+
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the node is no longer required.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		this._previousDepthRenderTarget.dispose();
 
 	}
 
@@ -138,7 +186,7 @@ export default ReprojectNode;
  *
  * @tsl
  * @function
- * @param {PassTextureNode} depthNode - The scene's depth. It must be a texture of a pass.
+ * @param {TextureNode} depthNode - The scene's depth.
  * @param {TextureNode} velocityNode - The scene's velocity.
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {ReprojectNode}

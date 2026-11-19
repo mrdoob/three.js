@@ -357,6 +357,10 @@ class TRAANode extends Node {
 		_quadMesh.render( renderer );
 		renderer.setRenderTarget( null );
 
+		// store the depth for the next frame
+
+		this._reprojectNode.update( renderer );
+
 		// restore
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );
@@ -529,6 +533,8 @@ class TRAANode extends Node {
 
 		this._historyRenderTarget.dispose();
 		this._resolveRenderTarget.dispose();
+
+		this._reprojectNode.dispose();
 
 		this._resolveMaterial.dispose();
 

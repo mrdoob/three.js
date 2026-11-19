@@ -384,6 +384,10 @@ class TAAUNode extends Node {
 
 		renderer.copyTextureToTexture( this._resolveRenderTarget.texture, this._historyRenderTarget.texture );
 
+		// store the depth for the next frame
+
+		this._reprojectNode.update( renderer );
+
 		// restore
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );
@@ -582,6 +586,8 @@ class TAAUNode extends Node {
 
 		this._historyRenderTarget.dispose();
 		this._resolveRenderTarget.dispose();
+
+		this._reprojectNode.dispose();
 
 		this._resolveMaterial.dispose();
 		this._seedMaterial.dispose();
