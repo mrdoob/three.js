@@ -230,7 +230,7 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 
 	}
 
-	vec3 getHemisphereLightRadiance( const in HemisphereLight hemiLight, const in vec3 reflectVec, const in float roughness ) {
+	vec3 getHemisphereLightRadiance( const in HemisphereLight hemiLight, const in vec3 reflectVec, const in vec3 normal, const in float roughness ) {
 
 		// GGX prefiltering of a sharp sky/ground horizon: Student-t marginal at low roughness, cosine irradiance at roughness = 1
 		float alpha = pow2( roughness );
@@ -240,7 +240,22 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 		// Box filtered over the pixel footprint, so the horizon doesn't alias on smooth surfaces
 		float pixelHalfWidth = 0.5 * length( vec2( dFdx( dotRL ), dFdy( dotRL ) ) );
 		float lobeWidth2 = pow2( t ) * ( 1.0 - pow2( dotRL ) );
-		float hemiSpecularWeight = saturate( dotRL / max( sqrt( pow2( dotRL + pixelHalfWidth ) + lobeWidth2 ) + sqrt( pow2( dotRL - pixelHalfWidth ) + lobeWidth2 ), 2e-4 ) + 0.5 );
+		float skyWeight = saturate( dotRL / max( sqrt( pow2( dotRL + pixelHalfWidth ) + lobeWidth2 ) + sqrt( pow2( dotRL - pixelHalfWidth ) + lobeWidth2 ), 2e-4 ) + 0.5 );
+
+		// That lobe is a cosine lobe around reflectVec stretched by t. Remove the sky it reaches behind the surface, which the surface can't see,
+		// and renormalize to the visible part. Lambert's polygon formula gives the lobe over both half spaces in closed form
+		vec3 skyAxis = normalize( t * hemiLight.direction + ( 1.0 - t ) * dotRL * reflectVec );
+		vec3 behindAxis = - normalize( t * normal + ( 1.0 - t ) * dot( reflectVec, normal ) * reflectVec );
+		float a = dot( skyAxis, reflectVec );
+		float b = dot( behindAxis, reflectVec );
+		float ab = dot( skyAxis, behindAxis );
+		float det = max( abs( dot( reflectVec, cross( skyAxis, behindAxis ) ) ), 1e-4 );
+		float skyFraction = 0.5 * a + 0.5;
+		float behindFraction = 0.5 * b + 0.5;
+		float behindSky = ( atan( det, a * b - ab ) + a * atan( det, ab * a - b ) + b * atan( det, ab * b - a ) ) * RECIPROCAL_PI * 0.5;
+		behindSky = clamp( behindSky, max( skyFraction + behindFraction - 1.0, 0.0 ), min( skyFraction, behindFraction ) );
+
+		float hemiSpecularWeight = saturate( ( skyWeight - behindSky ) / max( 1.0 - behindFraction, 1e-4 ) );
 
 		return mix( hemiLight.groundColor, hemiLight.skyColor, hemiSpecularWeight ) * RECIPROCAL_PI;
 
@@ -262,7 +277,7 @@ vec3 getIndirectLightRadiance( const in vec3 viewDir, const in vec3 normal, cons
 		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-			radiance += getHemisphereLightRadiance( hemisphereLights[ i ], reflectVec, roughness );
+			radiance += getHemisphereLightRadiance( hemisphereLights[ i ], reflectVec, normal, roughness );
 
 		}
 		#pragma unroll_loop_end

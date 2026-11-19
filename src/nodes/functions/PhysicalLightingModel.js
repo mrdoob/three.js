@@ -798,7 +798,7 @@ class PhysicalLightingModel extends LightingModel {
 	 * Reflects ambient and hemisphere lights, which stand in for a distant
 	 * environment that reflects its prefiltered radiance.
 	 *
-	 * @param {function(Node<vec3>, Node<float>):Node<vec3>} radianceAt - Returns the light's prefiltered radiance for a world space direction and roughness.
+	 * @param {function(Node<vec3>, Node<float>, Node<vec3>):Node<vec3>} radianceAt - Returns the light's prefiltered radiance for a world space direction, roughness and surface normal.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
 	indirectRadiance( radianceAt, builder ) {
@@ -809,7 +809,7 @@ class PhysicalLightingModel extends LightingModel {
 			const reflectVec = positionViewDirection.negate().reflect( normal );
 			const direction = pow4( roughness ).mix( reflectVec, normal ).normalize().transformDirection( cameraWorldMatrix );
 
-			return radianceAt( direction, roughness );
+			return radianceAt( direction, roughness, normal.transformDirection( cameraWorldMatrix ) );
 
 		};
 
