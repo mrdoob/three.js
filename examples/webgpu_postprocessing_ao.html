@@ -203,11 +203,10 @@
 					if ( params.upsampling === 'Joint bilateral' ) {
 
 						const guideNormal = sample( ( uv ) => prePassNormal.sample( uv ).xyz.normalize() );
-						const size = vec2( textureSize( aoTexture ) );
 
 						const guideDepth = ( params.aoType === 'GTAO' ) ? aoPass.getDepthNode() : prePassDepth;
 
-						upsamplePass = rtt( jointBilateralUpsample( aoTexture, guideDepth, guideNormal, prePassDepth, guideNormal, camera, { size } ).sample( screenUV ) );
+						upsamplePass = rtt( jointBilateralUpsample( aoTexture, guideDepth, guideNormal, prePassDepth, guideNormal, camera ).sample( screenUV ) );
 						aoNode = upsamplePass.sample( screenUV ).r;
 
 					} else {
