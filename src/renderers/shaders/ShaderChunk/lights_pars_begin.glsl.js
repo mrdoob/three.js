@@ -232,21 +232,15 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 
 #endif
 
-// Ambient lights and light probes stand in for a distant environment, so they reflect their irradiance / PI
+// Ambient and hemisphere lights stand in for a distant environment, so they reflect their irradiance / PI
 vec3 getIndirectLightRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness ) {
-
-	// Mixing the reflection with the normal is more accurate for rough objects, see getIBLRadiance()
-	vec3 reflectVec = normalize( mix( reflect( - viewDir, normal ), normal, pow4( roughness ) ) );
 
 	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
 
-	#if defined( USE_LIGHT_PROBES )
-
-		irradiance += getLightProbeIrradiance( lightProbe, reflectVec );
-
-	#endif
-
 	#if ( NUM_HEMI_LIGHTS > 0 )
+
+		// Mixing the reflection with the normal is more accurate for rough objects, see getIBLRadiance()
+		vec3 reflectVec = normalize( mix( reflect( - viewDir, normal ), normal, pow4( roughness ) ) );
 
 		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
