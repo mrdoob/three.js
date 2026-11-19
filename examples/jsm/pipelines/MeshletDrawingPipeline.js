@@ -23,7 +23,7 @@ import {
 } from 'three/webgpu';
 
 import {
-	Fn, If, Loop, vec2, vec3, vec4, uvec4, int, uint, float, max, min, clamp, ceil, log2, select, dot, bool, distance, length, normalize, textureLoad, ivec2, mat4, sqrt,
+	Fn, If, Loop, fract, floor, screenCoordinate, vec2, vec3, vec4, uvec4, int, uint, float, max, min, clamp, ceil, log2, select, dot, bool, distance, length, normalize, textureLoad, ivec2, mat4, sqrt,
 	storage, uniform, uniformArray, instanceIndex, vertexIndex, varying, context as contextNode, overrideNodes, Return,
 	modelWorldMatrix, modelWorldMatrixInverse, modelNormalMatrix, modelPosition, modelViewPosition, mat3,
 	positionLocal, positionPrevious, normalLocal, transformNormal, velocity, materialColor,
@@ -98,11 +98,17 @@ const CULLED = 255;
 const LOD_MASK = 255;
 const OCCLUDED = 256;
 const FAR = 512;
+const TRANSITION_SHIFT = 10;
+const TRANSITION_MASK = 63;
+const CHUNK_MASK = 0xffffff;
+const COARSE_BIT = 1 << 24;
+const COVERAGE_SHIFT = 25;
 
 // the flags of a batch
 
 const FLAG_CONE = 1;
 const FLAG_FAR = 2;
+const FLAG_DITHER = 4;
 const MAX_UNUSED_PROJECTIONS = 60;
 
 // the shared attribute of the vertex pulling geometries, the number of vertices limits the hardware draws of the visibility buffer drawing pipeline
@@ -884,11 +890,16 @@ class MeshletCulling {
 		this.lodScale = uniform( 1.0 );
 		this.lodPerspective = uniform( 1.0 );
 		this.lodThreshold = uniform( 1.0 );
+		this.lodTransition = uniform( 0.0 );
 
 		// the radius of objects on the screen in pixels below which they are not drawn, or drawn with their simplest level
 
 		this.minScreenRadius = uniform( 0.0 );
 		this.coarseScreenRadius = uniform( 0.0 );
+
+		// the radius of objects on the screen in pixels below which their levels of detail switch without a transition
+
+		this.transitionScreenRadius = uniform( 0.0 );
 
 		const { projScreenMatrix, frustumPlanes, cameraPosition, cameraZoom, lodPosition, lodScale, lodPerspective, lodThreshold, minScreenRadius, coarseScreenRadius } = this;
 
@@ -928,6 +939,7 @@ class MeshletCulling {
 
 			const lodLevel = uint( CULLED ).toVar();
 			const clusterCount = uint( 0 ).toVar();
+			const transition = uint( 0 ).toVar();
 			const scaleBits = uint( 0 ).toVar();
 
 			// the scale of the object and the margin of its deformed positions for the cluster culling, as half floats rounded
@@ -1030,6 +1042,26 @@ class MeshletCulling {
 
 					clusterCount.assign( uint( geometryRow( geometryIndex, lodLevel.add( GEOMETRY_LOD_ROW ) ).y ).div( MESHLET_SIZE ) );
 
+					// crossfade into the next level before it reaches the threshold, clamped to half the
+					// error gap between the two levels so adjacent transitions cannot overlap
+
+					If( flags.bitAnd( FLAG_DITHER ).notEqual( uint( 0 ) ).and( this.lodTransition.greaterThan( 0 ) ).and( lodLevel.add( 1 ).lessThan( lodCount ) ).and( screenRadius.greaterThanEqual( coarseScreenRadius ) ).and( screenRadius.greaterThanEqual( this.transitionScreenRadius ) ), () => {
+
+						const next = geometryRow( geometryIndex, lodLevel.add( GEOMETRY_LOD_ROW + 1 ) );
+						const current = geometryRow( geometryIndex, lodLevel.add( GEOMETRY_LOD_ROW ) );
+						const nextError = next.w.mul( scale ).mul( pixelFactor );
+						const gap = next.w.sub( current.w ).mul( scale ).mul( pixelFactor );
+						const band = min( lodThreshold.mul( this.lodTransition ), gap.mul( 0.5 ) ).max( 1e-6 );
+						transition.assign( uint( clamp( float( 1.0 ).sub( nextError.sub( lodThreshold ).div( band ) ), 0.0, 1.0 ).mul( TRANSITION_MASK ) ) );
+
+						If( transition.greaterThan( 0 ), () => {
+
+							clusterCount.addAssign( uint( next.y ).div( MESHLET_SIZE ) );
+
+						} );
+
+					} );
+
 					// the far material beyond the switch distance
 
 					If( flags.bitAnd( FLAG_FAR ).notEqual( uint( 0 ) ).and( levelDistance.greaterThanEqual( dataFar.y ) ), () => {
@@ -1062,7 +1094,7 @@ class MeshletCulling {
 
 			If( slot.lessThan( objectEnd ), () => {
 
-				instanceRecord.element( slot ).assign( uvec4( firstCluster, lodLevel.bitOr( batch.shiftLeft( 16 ) ), scaleBits, slotData ) );
+				instanceRecord.element( slot ).assign( uvec4( firstCluster, lodLevel.bitOr( transition.shiftLeft( TRANSITION_SHIFT ) ).bitOr( batch.shiftLeft( 16 ) ), scaleBits, slotData ) );
 
 			} );
 
@@ -1112,7 +1144,9 @@ class MeshletCulling {
 			const slot = clusterOwner.element( clusterIndex ).toVar();
 			const record = instanceRecord.element( slot ).toVar();
 			const chunk = clusterIndex.sub( record.x ).toVar();
-			const lodLevel = record.y.bitAnd( LOD_MASK );
+			const lodLevel = record.y.bitAnd( LOD_MASK ).toVar();
+			const transition = record.y.shiftRight( TRANSITION_SHIFT ).bitAnd( TRANSITION_MASK ).toVar();
+			const coarse = bool( false ).toVar();
 			const far = record.y.bitAnd( FAR ).notEqual( uint( 0 ) );
 			const batch = record.y.shiftRight( 16 ).toVar();
 			const geometryIndex = record.w.shiftRight( GEOMETRY_SHIFT ).toVar();
@@ -1123,6 +1157,16 @@ class MeshletCulling {
 			const batchQueues = rowBits( batch, 1 );
 			const batchGeometry = row( batch, 2 );
 			const geometryLevels = geometryRowBits( geometryIndex, 1 );
+			const fineCount = uint( geometryRow( geometryIndex, lodLevel.add( GEOMETRY_LOD_ROW ) ).y ).div( MESHLET_SIZE );
+
+			If( transition.greaterThan( 0 ).and( chunk.greaterThanEqual( fineCount ) ), () => {
+
+				chunk.subAssign( fineCount );
+				lodLevel.addAssign( 1 );
+				coarse.assign( true );
+
+			} );
+
 			const lodData = geometryRow( geometryIndex, lodLevel.add( GEOMETRY_LOD_ROW ) );
 
 			const local = slot.sub( uint( batchObjects.x ) );
@@ -1143,13 +1187,23 @@ class MeshletCulling {
 
 					If( record.y.bitAnd( OCCLUDED ).notEqual( uint( 0 ) ), () => {
 
-						If( clusterVisibility.element( visibilityIndex ).notEqual( lodLevel.add( 1 ) ), () => {
+						// the clusters of the coarser level of a transition have no visibility, they are never drawn in the first phase
+
+						If( coarse.not(), () => {
+
+							If( clusterVisibility.element( visibilityIndex ).notEqual( lodLevel.add( 1 ) ), () => {
+
+								atomicAdd( counters.element( this.occludedCounter ), 1 );
+
+							} );
+
+							clusterVisibility.element( visibilityIndex ).assign( uint( 0 ) );
+
+						} ).Else( () => {
 
 							atomicAdd( counters.element( this.occludedCounter ), 1 );
 
 						} );
-
-						clusterVisibility.element( visibilityIndex ).assign( uint( 0 ) );
 
 						Return();
 
@@ -1200,21 +1254,56 @@ class MeshletCulling {
 
 				} );
 
-				// the near or the far queue of the batch
+				// the opaque near queue, the far material queue, or the reverse-growing dither transition queue
 
 				const enqueue = () => {
 
-					const queue = select( far, uint( 1 ), uint( 0 ) );
+					const dither = uint( batchGeometry.w ).bitAnd( FLAG_DITHER ).notEqual( uint( 0 ) ).and( transition.greaterThan( 0 ) );
+					const queue = select( far.or( dither ), uint( 1 ), uint( 0 ) );
 					const queueCapacity = uint( batchObjects.w );
 					const item = atomicAdd( counters.element( batch.mul( 2 ).add( 1 ).add( queue ) ), 1 );
 
 					If( item.lessThan( queueCapacity ), () => {
 
-						workQueue.element( uint( batchObjects.z ).add( queue.mul( queueCapacity ) ).add( item ) ).assign( uvec4( local, lodTriangleStart, lodNumTriangles, chunk ) );
+						const writeIndex = select( dither, uint( batchObjects.z ).add( queueCapacity.sub( 1 ).sub( item ) ), uint( batchObjects.z ).add( queue.mul( queueCapacity ) ).add( item ) );
+
+						workQueue.element( writeIndex ).assign( uvec4( local, lodTriangleStart, lodNumTriangles, chunk.bitOr( transition.shiftLeft( COVERAGE_SHIFT ) ).bitOr( select( coarse, uint( COARSE_BIT ), uint( 0 ) ) ) ) );
 
 					} );
 
 				};
+
+				// the finer level of a transition is culled like any level: its clusters visible in the previous frame are
+				// occluders of the first phase. the visibility of the coarser level would alias the clusters of the finer
+				// one, its clusters skip the first phase and are tested against the hierarchical depth in the second phase
+
+				if ( phase !== 'all' ) {
+
+					If( coarse, () => {
+
+						if ( phase === 'second' ) {
+
+							If( chunkVisible, () => {
+
+								const occluded = isOccluded( projScreenMatrix, chunkCullBounds );
+
+								If( occluded.not(), enqueue );
+
+								If( occluded, () => {
+
+									atomicAdd( counters.element( this.occludedCounter ), 1 );
+
+								} );
+
+							} );
+
+						}
+
+						Return();
+
+					} );
+
+				}
 
 				If( chunkVisible, () => {
 
@@ -1262,11 +1351,15 @@ class MeshletCulling {
 		const createArgs = ( prepass, name ) => Fn( () => {
 
 			const batch = instanceIndex.div( 2 );
+			const queue = instanceIndex.mod( 2 );
 			const queueCapacity = rowBits( batch, 0 ).w;
+			const dither = uint( row( batch, 2 ).w ).bitAnd( FLAG_DITHER ).notEqual( uint( 0 ) ).and( queue.equal( 1 ) );
+			const nearCount = min( countersRead.element( batch.mul( 2 ).add( 1 ) ), queueCapacity );
+			const limit = select( dither, queueCapacity.sub( nearCount ), queueCapacity );
 			const base = prepass === true ? instanceIndex.mul( 4 ).add( this.prepassArgsBase ) : instanceIndex.mul( 4 );
 
 			args.element( base ).assign( uint( MESHLET_SIZE * 3 ) );
-			args.element( base.add( 1 ) ).assign( min( countersRead.element( instanceIndex.add( 1 ) ), queueCapacity ) );
+			args.element( base.add( 1 ) ).assign( min( countersRead.element( instanceIndex.add( 1 ) ), limit ) );
 			args.element( base.add( 2 ) ).assign( uint( 0 ) );
 			args.element( base.add( 3 ) ).assign( uint( 0 ) );
 
@@ -1437,11 +1530,11 @@ class MeshletCulling {
 	 */
 	add( batch ) {
 
-		const { capacity: objects, maxChunks } = batch;
+		const { capacity: objects, maxChunks, maxPairChunks } = batch;
 		const capacity = this.capacity;
 
 		const queueCount = batch.farMaterial !== null ? 2 : 1;
-		const queueCapacity = getQueueCapacity( objects, maxChunks, batch.queueBudget );
+		const queueCapacity = getQueueCapacity( objects, maxPairChunks, batch.queueBudget );
 		const visibility = this.occlusion !== null ? objects * maxChunks : 0;
 
 		const data = batch.source !== null ? 0 : objects;
@@ -1473,7 +1566,7 @@ class MeshletCulling {
 
 		bits.set( [ this.objectEnd, 0, this.queueEnd, queueCapacity ], base );
 		bits.set( [ batch.dataOffset, 0, this.visibilityEnd, maxChunks ], base + 4 );
-		values.set( [ 0, 0, batch.lodCount, ( batch.cone === true ? FLAG_CONE : 0 ) | ( batch.farMaterial !== null ? FLAG_FAR : 0 ) ], base + 8 );
+		values.set( [ 0, 0, batch.lodCount, ( batch.cone === true ? FLAG_CONE : 0 ) | ( batch.farMaterial !== null ? FLAG_FAR : 0 ) | ( batch.ditherQueue === true ? FLAG_DITHER : 0 ) ], base + 8 );
 
 		// the batch of each slot of the range
 
@@ -1645,8 +1738,10 @@ class MeshletCulling {
 		this.lodScale.value = lodView.scale;
 		this.lodPerspective.value = lodView.perspective;
 		this.lodThreshold.value = lodView.threshold;
+		this.lodTransition.value = lodView.transition;
 		this.minScreenRadius.value = lodView.minScreenRadius;
 		this.coarseScreenRadius.value = lodView.coarseScreenRadius;
+		this.transitionScreenRadius.value = lodView.transitionScreenRadius;
 
 		const planes = frustum.planes;
 
@@ -2138,7 +2233,8 @@ class MeshletBatch {
 	 * @param {MeshletCulling} culling - The culling of the render list.
 	 * @param {Object} [parameters] - The configuration parameter.
 	 * @param {boolean} [parameters.debug=false] - Whether the clusters are shown instead of the material.
-	 * @param {number} [parameters.lodCount=clusters.lodCount] - The number of levels of detail used.
+	 * @param {boolean} [parameters.dither=false] - Whether adjacent levels of detail crossfade in a second draw queue.
+	 * @param {number} [parameters.lodCount=MAX_LODS] - The number of levels of detail used.
 	 * @param {?Object} [parameters.view=null] - The view of the render list, if the draw needs one.
 	 * @param {boolean} [parameters.depthPrepass=false] - Whether the depth of the clusters is drawn before the material.
 	 * @param {boolean} [parameters.instanced=false] - Whether the objects are instanced meshes, whose instances are drawn as objects.
@@ -2149,8 +2245,11 @@ class MeshletBatch {
 	 * another group of the objects. The transforms, bounds and instance data of the objects are read from this batch, which
 	 * uploads them, instead of being stored again.
 	 * @param {number} [parameters.queueBudget=0] - The minimum number of work items of a queue of the batch, see getQueueCapacity().
+	 * @param {number} [parameters.maxChunks=clusters.maxChunks] - The maximum clusters of a single level of detail.
+	 * @param {number} [parameters.maxPairChunks=maxChunks] - The maximum clusters of an adjacent crossfaded pair of levels.
+	 * @param {?Object} [parameters.pool=null] - The geometry pool.
 	 */
-	constructor( clusters, material, receiveShadow, capacity, renderer, culling, { debug = false, lodCount = MAX_LODS, view = null, depthPrepass = false, instanced = false, instanceColor = false, farMaterial = null, source = null, queueBudget = 0, maxChunks = clusters.maxChunks, pool = null } = {} ) {
+	constructor( clusters, material, receiveShadow, capacity, renderer, culling, { debug = false, dither = false, lodCount = MAX_LODS, view = null, depthPrepass = false, instanced = false, instanceColor = false, farMaterial = null, source = null, queueBudget = 0, maxChunks = clusters.maxChunks, maxPairChunks = maxChunks, pool = null } = {} ) {
 
 		const shadow = culling.shadow;
 
@@ -2166,6 +2265,7 @@ class MeshletBatch {
 		this.materialVersion = material.version;
 		this.farMaterial = shadow === false ? farMaterial : null;
 		this.farMaterialVersion = farMaterial !== null ? farMaterial.version : - 1;
+		this.ditherQueue = dither === true && this.farMaterial === null;
 		this.debug = debug;
 		this.shadow = shadow;
 		this.culling = culling;
@@ -2179,6 +2279,7 @@ class MeshletBatch {
 		this.lodCount = lodCount;
 		this.queueBudget = queueBudget;
 		this.maxChunks = maxChunks;
+		this.maxPairChunks = Math.max( maxChunks, maxPairChunks );
 		this.pool = pool;
 		this.count = 0;
 		this.view = view;
@@ -2189,6 +2290,7 @@ class MeshletBatch {
 		this.ownedGeometries = [];
 		this.indirectGeometries = [];
 		this.meshes = [];
+		this.clusterMesh = null;
 		this.prepassMeshes = [];
 		this.computeNodes = [];
 
@@ -2406,26 +2508,29 @@ class MeshletBatch {
 
 		// one draw instance per cluster of 64 triangles, the far queue follows the near queue
 
-		const createSource = ( queue ) => {
+		const createSource = ( index ) => {
 
-			const workItem = workQueue.element( queue === 0 ? drawInstanceIndex : drawInstanceIndex.add( maxWorkItems.mul( queue ) ) );
+			const workItem = workQueue.element( index );
 
 			return {
 				instance: workItem.x,
-				triangle: workItem.y.add( workItem.w.mul( MESHLET_SIZE ) ).add( vertexIndex.div( 3 ) ),
+				triangle: workItem.y.add( workItem.w.bitAnd( CHUNK_MASK ).mul( MESHLET_SIZE ) ).add( vertexIndex.div( 3 ) ),
 				corner: vertexIndex.mod( 3 )
 			};
 
 		};
 
-		const clusterSource = createSource( 0 );
-		const farClusterSource = this.farMaterial !== null ? createSource( 1 ) : null;
+		const ditherIndex = maxWorkItems.sub( 1 ).sub( drawInstanceIndex );
+		const clusterSource = createSource( drawInstanceIndex );
+		const farClusterSource = this.farMaterial !== null ? createSource( drawInstanceIndex.add( maxWorkItems ) ) : null;
+		const ditherClusterSource = this.ditherQueue === true ? createSource( ditherIndex ) : null;
+		const ditherTransition = this.ditherQueue === true ? workQueue.element( ditherIndex ).w : null;
 
 		const shared = {
 			createAttribute, clusters, material, renderer, receiveShadow, debug, shadow, depthPrepass, capacity,
 			position, normal, vertexUv, hasAttribute, attribute, indexBuffer, instanceWorld, instanceMvp, instanced: gpuTransform, objectWorld, instanceLocal, instanceData,
 			workQueue, workQueueCountRead, maxWorkItems, projScreenMatrix: culling.projScreenMatrix, viewSize: culling.viewSize,
-			clusterSource, farClusterSource
+			clusterSource, farClusterSource, ditherClusterSource, ditherTransition
 		};
 
 		this.setupDraw( shared );
@@ -2437,6 +2542,11 @@ class MeshletBatch {
 			this.prepassMeshes.push( this.createDepthMesh( culling.argsAttribute, clusterSource, shared, FrontSide, this.getArgsOffset( 0, true ) ) );
 
 			if ( farClusterSource !== null ) this.prepassMeshes.push( this.createDepthMesh( culling.argsAttribute, farClusterSource, { ...shared, material: this.farMaterial }, FrontSide, this.getArgsOffset( 1, true ) ) );
+
+			// the finer level of the transitions without the dither mask: the holes of the mask would be the farthest
+			// depth of every tile of the hierarchical depth, the level of detail error is within the error of the levels
+
+			if ( ditherClusterSource !== null ) this.prepassMeshes.push( this.createDepthMesh( culling.argsAttribute, ditherClusterSource, shared, FrontSide, this.getArgsOffset( 1, true ) ) );
 
 		}
 
@@ -2502,17 +2612,27 @@ class MeshletBatch {
 	 */
 	setupDraw( shared ) {
 
-		const { clusterSource, farClusterSource } = shared;
+		const { clusterSource, farClusterSource, ditherClusterSource, ditherTransition } = shared;
 
-		// one draw per queue: the material, and the far material beyond the switch distance
+		// one draw per queue: the opaque material, and either the far material or the dithered transition clusters
 
-		const queues = [ { source: clusterSource, material: shared.material } ];
+		const queues = [ { source: clusterSource, material: shared.material, transition: null } ];
 
-		if ( farClusterSource !== null ) queues.push( { source: farClusterSource, material: this.farMaterial } );
+		if ( farClusterSource !== null ) queues.push( { source: farClusterSource, material: this.farMaterial, transition: null } );
+		if ( ditherClusterSource !== null ) queues.push( { source: ditherClusterSource, material: shared.material, transition: ditherTransition } );
 
 		for ( let queue = 0; queue < queues.length; queue ++ ) {
 
-			const mesh = this.createPulledMesh( this.culling.argsAttribute, queues[ queue ].source, { ...shared, material: queues[ queue ].material }, this.getArgsOffset( queue ) );
+			const { source, material, transition } = queues[ queue ];
+			const mesh = this.createPulledMesh( this.culling.argsAttribute, source, { ...shared, material }, this.getArgsOffset( queue ), transition );
+
+			if ( transition !== null ) {
+
+				mesh.renderOrder = mesh.depthMesh !== undefined ? 2 : 1;
+
+				if ( mesh.depthMesh !== undefined ) mesh.depthMesh.renderOrder = 1;
+
+			}
 
 			this.meshes.push( mesh );
 
@@ -2574,9 +2694,10 @@ class MeshletBatch {
 	 *
 	 * @param {Object} source - The object, triangle and corner nodes of the current vertex.
 	 * @param {Object} shared - The nodes and resources of the batch.
-	 * @return {{context: ContextNode, positionNode: ?Node<vec3>, colorNode: ?Node<vec3>}} The context node, the position node and the instance color of the materials.
+	 * @param {?Node<uint>} [lodTransition=null] - The packed level transition of the cluster, if crossfaded.
+	 * @return {{context: ContextNode, positionNode: ?Node<vec3>, colorNode: ?Node<vec3>, maskNode: ?Node<bool>}} The context node, the position node, the instance color and the dither mask of the materials.
 	 */
-	createPulledContext( source, shared ) {
+	createPulledContext( source, shared, lodTransition = null ) {
 
 		const { clusters, material, position, normal, vertexUv, hasAttribute, attribute, indexBuffer, instanceWorld, instanced, objectWorld, instanceLocal, instanceData, capacity } = shared;
 
@@ -2661,7 +2782,26 @@ class MeshletBatch {
 			[ velocity.previousModelWorldMatrix, previousMatrixWorld ]
 		], contextNode( { getAttribute } ) );
 
-		return { context, positionNode, colorNode };
+		if ( lodTransition === null ) {
+
+			return { context, positionNode, colorNode, maskNode: null };
+
+		}
+
+		const transition = varying( lodTransition, 'vMeshletLodTransition' );
+		const maskNode = Fn( () => {
+
+			const coverage = transition.shiftRight( COVERAGE_SHIFT ).bitAnd( TRANSITION_MASK );
+			const pixel = floor( screenCoordinate.xy );
+			const noise = fract( fract( pixel.dot( vec2( 0.06711056, 0.00583715 ) ) ).mul( 52.9829189 ) );
+			const threshold = float( coverage ).div( TRANSITION_MASK );
+			const coarse = transition.bitAnd( COARSE_BIT ).notEqual( 0 );
+
+			return coverage.equal( 0 ).or( select( coarse, noise.lessThan( threshold ), noise.greaterThanEqual( threshold ) ) );
+
+		} )();
+
+		return { context, positionNode, colorNode, maskNode };
 
 	}
 
@@ -2674,11 +2814,12 @@ class MeshletBatch {
 	 * @param {Object} shared - The nodes and resources of the batch.
 	 * @param {number} side - The side of the triangles to draw.
 	 * @param {number} [drawOffset=0] - The offset in bytes of the indirect draw arguments.
+	 * @param {?Node<uint>} [lodTransition=null] - The packed level transition of the cluster, if crossfaded.
 	 * @return {Mesh} The mesh.
 	 */
-	createDepthMesh( drawAttribute, source, shared, side, drawOffset = 0 ) {
+	createDepthMesh( drawAttribute, source, shared, side, drawOffset = 0, lodTransition = null ) {
 
-		const pulled = this.createPulledContext( source, shared );
+		const pulled = this.createPulledContext( source, shared, lodTransition );
 
 		// alpha-tested materials discard the same fragments in the depth of shadows and of the occlusion view
 
@@ -2696,7 +2837,7 @@ class MeshletBatch {
 		}
 
 		material.positionNode = pulled.positionNode;
-		material.maskNode = shared.material.maskNode || null;
+		material.maskNode = pulled.maskNode !== null ? ( shared.material.maskNode ? pulled.maskNode.and( shared.material.maskNode ) : pulled.maskNode ) : shared.material.maskNode || null;
 		material.contextNode = pulled.context;
 		material.blending = NoBlending;
 		material.fog = false;
@@ -2721,9 +2862,10 @@ class MeshletBatch {
 	 * @param {Object} source - The object, triangle and corner nodes of the current vertex.
 	 * @param {Object} shared - The nodes and resources of the batch.
 	 * @param {number} [drawOffset=0] - The offset in bytes of the indirect draw arguments.
+	 * @param {?Node<uint>} [lodTransition=null] - The packed level transition of the cluster, if crossfaded.
 	 * @return {Mesh} The mesh.
 	 */
-	createPulledMesh( drawAttribute, source, shared, drawOffset = 0 ) {
+	createPulledMesh( drawAttribute, source, shared, drawOffset = 0, lodTransition = null ) {
 
 		const { material, renderer, receiveShadow, debug, shadow, depthPrepass } = shared;
 
@@ -2733,7 +2875,7 @@ class MeshletBatch {
 
 			const side = ( material.shadowSide !== null && material.shadowSide !== undefined ) ? material.shadowSide : BackSide;
 
-			const mesh = this.createDepthMesh( drawAttribute, source, shared, side, drawOffset );
+			const mesh = this.createDepthMesh( drawAttribute, source, shared, side, drawOffset, lodTransition );
 			mesh.castShadow = true;
 
 			return mesh;
@@ -2741,7 +2883,7 @@ class MeshletBatch {
 		}
 
 		const geometry = this.createPulledGeometry( drawAttribute, drawOffset );
-		const pulled = this.createPulledContext( source, shared );
+		const pulled = this.createPulledContext( source, shared, lodTransition );
 
 		let drawMaterial;
 
@@ -2762,7 +2904,7 @@ class MeshletBatch {
 		}
 
 		drawMaterial.positionNode = pulled.positionNode;
-		drawMaterial.maskNode = material.maskNode || null;
+		drawMaterial.maskNode = pulled.maskNode !== null ? ( material.maskNode ? pulled.maskNode.and( material.maskNode ) : pulled.maskNode ) : material.maskNode || null;
 		drawMaterial.contextNode = depthPrepass ? contextNode( pulled.context, { invariant: true } ) : pulled.context;
 
 		const mesh = new Mesh( geometry, drawMaterial );
@@ -2777,7 +2919,7 @@ class MeshletBatch {
 			depthMaterial.colorWrite = false;
 			depthMaterial.fog = false;
 			depthMaterial.positionNode = pulled.positionNode;
-			depthMaterial.maskNode = material.maskNode || null;
+			depthMaterial.maskNode = pulled.maskNode !== null ? ( material.maskNode ? pulled.maskNode.and( material.maskNode ) : pulled.maskNode ) : material.maskNode || null;
 			depthMaterial.contextNode = contextNode( pulled.context, { invariant: true } );
 
 			const depthMesh = new Mesh( geometry, depthMaterial );
@@ -3316,6 +3458,8 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 	 *
 	 * @param {Object} [parameters] - The configuration parameter.
 	 * @param {number} [parameters.lodThreshold=1] - The projected error in pixels below which a simpler level of detail is selected.
+	 * @param {number} [parameters.lodTransition=0] - The fraction of `lodThreshold` over which adjacent levels of detail crossfade with a screen-door dither mask.
+	 * @param {number} [parameters.transitionScreenRadius=0] - The radius in pixels below which the levels of detail of objects switch without a transition, `0` crossfades all objects.
 	 * @param {number} [parameters.shadowLodThreshold=1] - The projected error in shadow map texels below which a simpler level of detail is selected for shadow casters.
 	 * @param {number} [parameters.minScreenRadius=0] - The radius in pixels below which objects are not drawn, `0` draws all objects.
 	 * @param {number} [parameters.coarseScreenRadius=0] - The radius in pixels below which objects are drawn with their simplest level of detail.
@@ -3323,7 +3467,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 	 * @param {boolean} [parameters.occlusionCulling=true] - Whether the clusters hidden by other clusters should be culled.
 	 * @param {boolean} [parameters.depthPrepass=false] - Whether the depth of the clusters should be drawn before their material.
 	 */
-	constructor( { lodThreshold = 1, shadowLodThreshold = 1, minScreenRadius = 0, coarseScreenRadius = 0, debug = false, occlusionCulling = true, depthPrepass = false } = {} ) {
+	constructor( { lodThreshold = 1, lodTransition = 0, transitionScreenRadius = 0, shadowLodThreshold = 1, minScreenRadius = 0, coarseScreenRadius = 0, debug = false, occlusionCulling = true, depthPrepass = false } = {} ) {
 
 		super();
 
@@ -3343,6 +3487,25 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		 * @default 1
 		 */
 		this.lodThreshold = lodThreshold;
+
+		/**
+		 * The fraction of `lodThreshold` over which adjacent levels of detail crossfade with a complementary
+		 * screen-door dither mask (`0` disables transitions).
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.lodTransition = lodTransition;
+
+		/**
+		 * The radius of the bounding sphere of objects on the screen in pixels below which their levels of detail
+		 * switch without a transition. The popping of small objects is hardly visible, while their transitions
+		 * draw two levels of detail. `0` crossfades all objects, see {@link MeshletDrawingPipeline#lodTransition}.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.transitionScreenRadius = transitionScreenRadius;
 
 		/**
 		 * The projected error in shadow map texels below which a simpler level of detail is selected for the
@@ -3377,11 +3540,12 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		/**
 		 * The clusters and triangles drawn by the GPU-driven pipeline in the main view, read from the counters of the
 		 * culling without waiting for the GPU. The values are updated every interval of frames, the triangles include the degenerate triangles which pad the clusters.
+		 * `transitionClusters` are the clusters of the dithered crossfades between levels of detail, included in `clusters`.
 		 *
-		 * @type {{clusters: number, triangles: number}}
+		 * @type {{clusters: number, triangles: number, transitionClusters: number}}
 		 * @readonly
 		 */
-		this.info = { clusters: 0, triangles: 0 };
+		this.info = { clusters: 0, triangles: 0, transitionClusters: 0 };
 
 		/**
 		 * Whether the clusters (meshlets) of the objects drawn by the GPU-driven pipeline should be shown
@@ -3442,7 +3606,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		this._meshletsSupported = false;
 		this._shadowPass = false;
 		this._sceneProjected = false;
-		this._lodView = { position: new Vector3(), scale: 1, perspective: 1, threshold: 1, minScreenRadius: 0, coarseScreenRadius: 0 };
+		this._lodView = { position: new Vector3(), scale: 1, perspective: 1, threshold: 1, transition: 0, transitionScreenRadius: 0, minScreenRadius: 0, coarseScreenRadius: 0 };
 
 		clusterProcessingReady.then( () => {
 
@@ -4168,6 +4332,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 				queueBudget: Infinity, // all clusters until measured, so a single render like a shadow map isn't incomplete
 				queueMeasured: false,
 				maxChunks: 0,
+				maxPairChunks: 0,
 				geometryIndices: null,
 				batch: null,
 				version: data.captureId
@@ -4307,6 +4472,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 		return new MeshletBatch( entry.clusters, entry.material, entry.receiveShadow, capacity, this.renderer, culling, {
 			debug: this.debug,
+			dither: this._shadowPass === false && entry.farMaterial === null && entry.objectClusters.some( ( clusters ) => clusters.lodCount > 1 ),
 			depthPrepass: this._usesDepthPrepass(),
 			instanced: entry.instanced,
 			instanceColor: entry.instanceColor,
@@ -4314,6 +4480,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 			source: entry.source !== null ? entry.source.batch : null,
 			queueBudget: entry.queueBudget,
 			maxChunks: entry.maxChunks,
+			maxPairChunks: entry.maxPairChunks,
 			pool: this._geometryPool,
 			view
 		} );
@@ -4362,8 +4529,10 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		lodView.scale = camera.projectionMatrix.elements[ 5 ] * height / 2;
 		lodView.perspective = camera.isPerspectiveCamera === true ? 1 : 0;
 		lodView.threshold = this._shadowPass === true ? this.shadowLodThreshold : this.lodThreshold;
+		lodView.transition = this._shadowPass === true ? 0 : this.lodTransition;
 		lodView.minScreenRadius = this.minScreenRadius;
 		lodView.coarseScreenRadius = this.coarseScreenRadius;
+		lodView.transitionScreenRadius = this.transitionScreenRadius;
 
 		const view = this.updateView( record, width, height );
 		const occlusion = view !== null ? view.occlusion : null;
@@ -4520,6 +4689,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		// batches. batches sharing the objects of another batch are created after it, with its capacity
 
 		const getSource = ( entry ) => entry.source !== null ? entry.source.batch : null;
+		const usesDither = ( entry ) => this._shadowPass === false && entry.farMaterial === null && entry.objectClusters.some( ( clusters ) => clusters.lodCount > 1 );
 
 		const needsBatch = ( entry ) => {
 
@@ -4527,21 +4697,41 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 			return batch === null || batch.added === false || batch.culling !== record.culling || entry.count > batch.capacity || batch.depthPrepass !== this._usesDepthPrepass() ||
 				batch.materialVersion !== entry.material.version || ( batch.farMaterial !== null && batch.farMaterialVersion !== batch.farMaterial.version ) || batch.debug !== this.debug ||
+				( batch.clusterMesh !== null && batch.ditherQueue !== usesDither( entry ) ) ||
 				batch.source !== getSource( entry ) || ( entry.source !== null && batch.capacity !== entry.source.batch.capacity );
 
 		};
 
 		const getCapacity = ( entry ) => Math.min( Math.max( entry.batch !== null ? entry.batch.capacity : 64, Math.ceil( entry.count * BATCH_GROWTH / 64 ) * 64 ), this.maxInstances );
 
-		// the clusters per object of a batch: the most detailed level of the geometries of its objects
+		// the clusters per object of a batch: the most detailed level of the geometries of its objects, or the largest
+		// adjacent pair when levels crossfade
+
+		const useTransitions = this.lodTransition > 0 && this._shadowPass === false;
 
 		for ( const entry of active ) {
 
 			let maxChunks = 0;
+			let maxPairChunks = 0;
 
-			for ( const clusters of entry.objectClusters ) maxChunks = Math.max( maxChunks, clusters.maxChunks );
+			for ( const clusters of entry.objectClusters ) {
+
+				maxChunks = Math.max( maxChunks, clusters.maxChunks );
+
+				if ( useTransitions === true && entry.farMaterial === null ) {
+
+					for ( let j = 0; j < clusters.lodCount - 1; j ++ ) {
+
+						maxPairChunks = Math.max( maxPairChunks, ( clusters.lodOffsetValues[ j ].y + clusters.lodOffsetValues[ j + 1 ].y ) / MESHLET_SIZE );
+
+					}
+
+				}
+
+			}
 
 			entry.maxChunks = maxChunks;
+			entry.maxPairChunks = Math.max( maxChunks, maxPairChunks );
 
 		}
 
@@ -4559,7 +4749,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 				const batch = entry.batch;
 
-				if ( resize === true || needsBatch( entry ) === true || entry.maxChunks > batch.maxChunks || ( entry.source !== null && waiting.has( entry.source ) ) ||
+				if ( resize === true || needsBatch( entry ) === true || entry.maxChunks > batch.maxChunks || entry.maxPairChunks > batch.maxPairChunks || ( entry.source !== null && waiting.has( entry.source ) ) ||
 					entry.objectClusters.some( ( clusters ) => culling.getGeometry( clusters ) === - 1 ) ) {
 
 					waiting.add( entry );
@@ -4591,7 +4781,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 		if ( rebuild === false ) {
 
-			rebuild = this._addGeometries( record.culling, active ) === false || active.some( ( entry ) => entry.batch !== null && entry.maxChunks > entry.batch.maxChunks );
+			rebuild = this._addGeometries( record.culling, active ) === false || active.some( ( entry ) => entry.batch !== null && ( entry.maxChunks > entry.batch.maxChunks || entry.maxPairChunks > entry.batch.maxPairChunks ) );
 
 		}
 
@@ -4634,6 +4824,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 					capacities.set( entry, entry.batch.capacity );
 
 					entry.batch.maxChunks = Math.max( entry.batch.maxChunks, entry.maxChunks );
+					entry.batch.maxPairChunks = Math.max( entry.batch.maxPairChunks, entry.maxPairChunks );
 
 				} else {
 
@@ -4797,6 +4988,8 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 			for ( const mesh of batch.meshes ) {
 
+				if ( mesh.renderOrder > 0 && this.lodTransition === 0 ) continue;
+
 				super.pushRenderItem( renderList, mesh, mesh.geometry, mesh.material, entry.groupOrder, entry.z, null, entry.clippingContext );
 
 			}
@@ -4839,6 +5032,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 			let exceeded = false;
 			let shrink = false;
 			let drawn = 0;
+			let transitionDrawn = 0;
 
 			if ( counters[ 0 ] > culling.capacity.clusters ) {
 
@@ -4849,9 +5043,17 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 			for ( const [ entry, batch, index, queueCapacity ] of batches ) {
 
-				const visible = Math.max( counters[ 1 + index * 2 ], batch.farMaterial !== null ? counters[ 2 + index * 2 ] : 0 );
+				const ditherVisible = batch.ditherQueue === true ? counters[ 2 + index * 2 ] : 0;
+				const visible = batch.ditherQueue === true
+					? counters[ 1 + index * 2 ] + ditherVisible
+					: Math.max( counters[ 1 + index * 2 ], batch.farMaterial !== null ? counters[ 2 + index * 2 ] : 0 );
 
-				drawn += Math.min( counters[ 1 + index * 2 ], queueCapacity ) + ( batch.farMaterial !== null ? Math.min( counters[ 2 + index * 2 ], queueCapacity ) : 0 );
+				const nearDrawn = Math.min( counters[ 1 + index * 2 ], queueCapacity );
+				const ditherDrawn = batch.ditherQueue === true ? Math.min( ditherVisible, queueCapacity - nearDrawn ) : 0;
+				transitionDrawn += ditherDrawn;
+				drawn += nearDrawn + ( batch.ditherQueue === true
+					? ditherDrawn
+					: ( batch.farMaterial !== null ? Math.min( counters[ 2 + index * 2 ], queueCapacity ) : 0 ) );
 
 				if ( visible > queueCapacity ) {
 
@@ -4864,7 +5066,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 					entry.queueBudget = Math.ceil( visible * CULLING_GROWTH );
 
-					if ( queueCapacity > getQueueCapacity( batch.capacity, batch.maxChunks, entry.queueBudget ) * 4 ) shrink = true;
+					if ( queueCapacity > getQueueCapacity( batch.capacity, batch.maxPairChunks, entry.queueBudget ) * 4 ) shrink = true;
 
 				}
 
@@ -4878,6 +5080,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 				this.info.clusters = drawn;
 				this.info.triangles = drawn * MESHLET_SIZE;
+				this.info.transitionClusters = transitionDrawn;
 
 			}
 
@@ -4970,12 +5173,13 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 			const objects = capacities[ i ];
 			const queueCount = farMaterial !== null && shadow === false ? 2 : 1;
 			const maxChunks = Math.max( entries[ i ].maxChunks, batch !== null ? batch.maxChunks : 0 );
+			const maxPairChunks = Math.max( entries[ i ].maxPairChunks, batch !== null ? batch.maxPairChunks : 0, maxChunks );
 
 			capacity.batches ++;
 			capacity.objects += objects;
 			capacity.data += source !== null ? 0 : objects;
-			capacity.queue += getQueueCapacity( objects, maxChunks, entries[ i ].queueBudget ) * queueCount;
-			capacity.clusters += objects * maxChunks;
+			capacity.queue += getQueueCapacity( objects, maxPairChunks, entries[ i ].queueBudget ) * queueCount;
+			capacity.clusters += entries[ i ].queueMeasured === false ? objects * maxPairChunks : objects * maxChunks;
 			capacity.visibility += occlusion === true ? objects * maxChunks : 0;
 
 			for ( const clusters of entries[ i ].objectClusters ) {
@@ -5264,6 +5468,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 				queueBudget: Infinity, // all clusters until measured, so a single render like a shadow map isn't incomplete
 				queueMeasured: false,
 				maxChunks: 0,
+				maxPairChunks: 0,
 				geometryIndices: null,
 				batch: null
 			};
