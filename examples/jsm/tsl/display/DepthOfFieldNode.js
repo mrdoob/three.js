@@ -476,6 +476,13 @@ class DepthOfFieldNode extends Node {
 		this._compositeMaterial.fragmentNode = composite();
 		this._compositeMaterial.needsUpdate = true;
 
+		//
+
+		const properties = builder.getNodeProperties( this );
+		properties.textureNode = this.textureNode;
+
+		//
+
 		return this._textureNode;
 
 	}
