@@ -207,9 +207,15 @@ function toAttenuationDistance( distanceNode, hasAttenuationColorInput ) {
 // defaults to `Nworld` is a world space normal, and an object space normal otherwise.
 function toNormalView( normalNode, geomProp ) {
 
-	if ( geomProp === 'Nworld' ) return transformNormalByViewMatrix( normalNode, cameraViewMatrix );
+	if ( geomProp === 'Nworld' ) {
 
-	return transformNormalToView( normalNode );
+		return transformNormalByViewMatrix( normalNode, cameraViewMatrix );
+
+	} else {
+
+		return transformNormalToView( normalNode );
+
+	}
 
 }
 
