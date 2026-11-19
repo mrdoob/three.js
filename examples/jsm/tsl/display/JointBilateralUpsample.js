@@ -2,8 +2,8 @@ import { Fn, float, getViewPosition, sample, textureSize, uniform, vec2, vec4 } 
 
 /**
  * Upsamples a reduced resolution effect with a joint bilateral filter: the bilinear
- * weights of the four nearest texels are scaled by how well their depth and normal
- * match the full resolution guides, so the result does not bleed across silhouettes.
+ * weights of the four nearest texels are scaled by how well their depth matches the
+ * full resolution depth, so the result does not bleed across silhouettes.
  *
  * Reference: {@link https://johanneskopf.de/publications/jbu/}
  *
@@ -11,19 +11,16 @@ import { Fn, float, getViewPosition, sample, textureSize, uniform, vec2, vec4 } 
  * @function
  * @param {Node<vec4>} inputNode - The low resolution effect to upsample.
  * @param {Node<float>} lowDepthNode - Depth of the input's texels, in the red channel.
- * @param {Node<vec3>} lowNormalNode - Normalized view-space normals at the input's resolution.
  * @param {Node<float>} depthNode - Full resolution depth, in the red channel.
- * @param {Node<vec3>} normalNode - Normalized full resolution view-space normals.
  * @param {Camera} camera - The camera the scene is rendered with.
  * @param {Object} [options={}] - The filter options.
- * @param {Node<float>|number} [options.depthTolerance=0.005] - The distance to the surface plane, relative to the view depth, at which a texel is rejected.
- * @param {number} [options.normalPower=8] - How strongly a normal difference rejects a texel. Must be a power of two.
+ * @param {Node<float>|number} [options.depthTolerance=0.005] - The view depth difference, relative to the view depth, at which a texel is rejected.
  * @param {Node<vec2>} [options.size] - The size of the input's texel grid. Defaults to the size of `inputNode`, which must then be a texture.
  * @returns {SampleNode} The upsampled result, samplable at any coordinate.
  */
-export const jointBilateralUpsample = ( inputNode, lowDepthNode, lowNormalNode, depthNode, normalNode, camera, options = {} ) => {
+export const jointBilateralUpsample = ( inputNode, lowDepthNode, depthNode, camera, options = {} ) => {
 
-	const { depthTolerance = 0.005, normalPower = 8, size = vec2( textureSize( inputNode ) ) } = options;
+	const { depthTolerance = 0.005, size = vec2( textureSize( inputNode ) ) } = options;
 
 	const projectionInverse = uniform( camera.projectionMatrixInverse );
 
@@ -33,16 +30,15 @@ export const jointBilateralUpsample = ( inputNode, lowDepthNode, lowNormalNode, 
 		const base = pixel.floor();
 		const fraction = pixel.fract();
 
-		const viewPosition = ( uv, depth ) => getViewPosition( uv, depth, projectionInverse );
+		const viewZ = ( uv, depth ) => getViewPosition( uv, depth, projectionInverse ).z;
 
 		// read the low resolution depths first, WGSL fails on a gather() that follows a plain read of the same texture
 		const tapUVs = [[ 0, 0 ], [ 1, 0 ], [ 0, 1 ], [ 1, 1 ]].map( ( offset ) => base.add( vec2( ...offset ) ).add( 0.5 ).div( size ).toConst() );
 
 		const tapDepths = tapUVs.map( ( tapUV ) => lowDepthNode.sample( tapUV ).r.toConst() );
 
-		const position = viewPosition( coordinate, depthNode.sample( coordinate ).r ).toConst();
-		const n = normalNode.sample( coordinate ).toConst();
-		const tolerance = position.z.abs().mul( depthTolerance ).max( 0.001 );
+		const z = viewZ( coordinate, depthNode.sample( coordinate ).r ).toConst();
+		const tolerance = z.abs().mul( depthTolerance ).max( 0.001 );
 
 		const sum = vec4( 0 ).toVar();
 		const total = float( 0 ).toVar();
@@ -53,14 +49,10 @@ export const jointBilateralUpsample = ( inputNode, lowDepthNode, lowNormalNode, 
 
 				const tapUV = tapUVs[ y * 2 + x ];
 
-				// the distance to the surface plane stays small along slanted surfaces
-				const planeDistance = viewPosition( tapUV, tapDepths[ y * 2 + x ] ).sub( position ).dot( n );
-				const depthWeight = planeDistance.div( tolerance ).pow2().negate().exp();
-				let normalWeight = lowNormalNode.sample( tapUV ).dot( n ).max( 0 );
-				for ( let power = 1; power < normalPower; power *= 2 ) normalWeight = normalWeight.toConst().pow2();
+				const depthWeight = viewZ( tapUV, tapDepths[ y * 2 + x ] ).sub( z ).div( tolerance ).pow2().negate().exp();
 				const wx = x === 0 ? fraction.x.oneMinus() : fraction.x;
 				const wy = y === 0 ? fraction.y.oneMinus() : fraction.y;
-				const weight = wx.mul( wy ).mul( depthWeight.mul( normalWeight ).add( 1e-4 ) ).toConst();
+				const weight = wx.mul( wy ).mul( depthWeight.add( 1e-4 ) ).toConst();
 				sum.addAssign( inputNode.sample( tapUV ).mul( weight ) );
 				total.addAssign( weight );
 
