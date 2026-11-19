@@ -236,7 +236,7 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 		float alpha = pow2( roughness );
 		float t = 2.0 * alpha / ( 1.0 + alpha );
 		float dotRL = dot( reflectVec, hemiLight.direction );
-		float hemiSpecularWeight = 0.5 * dotRL * inversesqrt( max( mix( pow2( t ), 1.0, pow2( dotRL ) ), 1e-8 ) ) + 0.5;
+		float hemiSpecularWeight = saturate( 0.5 * dotRL / max( sqrt( mix( pow2( t ), 1.0, pow2( dotRL ) ) ), 1e-4 ) + 0.5 );
 
 		return mix( hemiLight.groundColor, hemiLight.skyColor, hemiSpecularWeight ) * RECIPROCAL_PI;
 
@@ -244,10 +244,11 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 
 #endif
 
-// Ambient and hemisphere lights stand in for a distant environment, so they reflect their irradiance / PI
+// Ambient and hemisphere lights stand in for a distant environment, so they reflect its prefiltered radiance
 vec3 getIndirectLightRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness ) {
 
-	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
+	// A uniform environment reflects its irradiance / PI at any roughness
+	vec3 radiance = getAmbientLightIrradiance( ambientLightColor ) * RECIPROCAL_PI;
 
 	#if ( NUM_HEMI_LIGHTS > 0 )
 
@@ -257,14 +258,14 @@ vec3 getIndirectLightRadiance( const in vec3 viewDir, const in vec3 normal, cons
 		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-			irradiance += getHemisphereLightRadiance( hemisphereLights[ i ], reflectVec, roughness ) * PI;
+			radiance += getHemisphereLightRadiance( hemisphereLights[ i ], reflectVec, roughness );
 
 		}
 		#pragma unroll_loop_end
 
 	#endif
 
-	return irradiance * RECIPROCAL_PI;
+	return radiance;
 
 }
 

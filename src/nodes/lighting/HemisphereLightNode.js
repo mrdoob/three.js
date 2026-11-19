@@ -85,10 +85,10 @@ class HemisphereLightNode extends AnalyticLightNode {
 			// GGX prefiltering of a sharp sky/ground horizon: Student-t marginal at low roughness, cosine irradiance at roughness = 1
 			const alpha = roughness.pow2();
 			const t = alpha.mul( 2.0 ).div( alpha.add( 1.0 ) );
-			const dotRL = direction.dot( lightDirectionNode ).toConst();
-			const hemiSpecularWeight = dotRL.mul( mix( t.pow2(), 1.0, dotRL.pow2() ).max( 1e-8 ).inverseSqrt() ).mul( 0.5 ).add( 0.5 );
+			const dotRL = direction.dot( lightDirectionNode );
+			const hemiSpecularWeight = dotRL.div( mix( t.pow2(), 1.0, dotRL.pow2() ).sqrt().max( 1e-4 ) ).mul( 0.5 ).add( 0.5 ).saturate();
 
-			return mix( groundColorNode, colorNode, hemiSpecularWeight );
+			return mix( groundColorNode, colorNode, hemiSpecularWeight ).div( Math.PI );
 
 		};
 
