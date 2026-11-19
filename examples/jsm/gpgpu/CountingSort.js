@@ -257,6 +257,23 @@ class CountingSort {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
+	dispose() {
+
+		this.orderAttribute.dispose();
+		this.binRead.value.dispose();
+		this.histogramAtomic.value.dispose();
+		this.offsetAtomic.value.dispose();
+
+		if ( this._histogramNode !== null ) this._histogramNode.dispose();
+		if ( this._prefixNode !== null ) this._prefixNode.dispose();
+		if ( this._scatterNode !== null ) this._scatterNode.dispose();
+
+	}
+
 }
 
 export { CountingSort };
