@@ -263,21 +263,18 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 
 #endif
 
-// Ambient and hemisphere lights stand in for a distant environment, so they reflect its prefiltered radiance
-vec3 getIndirectLightRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness ) {
+// Physical materials reflect ambient and hemisphere lights as a distant environment, looked up along lookupVec like getIBLRadiance()
+vec3 getIndirectLightRadiance( const in vec3 lookupVec, const in vec3 normal, const in float roughness ) {
 
 	// A uniform environment reflects its irradiance / PI at any roughness
 	vec3 radiance = getAmbientLightIrradiance( ambientLightColor ) * RECIPROCAL_PI;
 
 	#if ( NUM_HEMI_LIGHTS > 0 )
 
-		// Mixing the reflection with the normal is more accurate for rough objects, see getIBLRadiance()
-		vec3 reflectVec = normalize( mix( reflect( - viewDir, normal ), normal, pow4( roughness ) ) );
-
 		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-			radiance += getHemisphereLightRadiance( hemisphereLights[ i ], reflectVec, normal, roughness );
+			radiance += getHemisphereLightRadiance( hemisphereLights[ i ], lookupVec, normal, roughness );
 
 		}
 		#pragma unroll_loop_end

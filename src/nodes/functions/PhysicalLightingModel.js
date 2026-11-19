@@ -10,6 +10,7 @@ import { LTC_Evaluate, LTC_Uv } from './BSDF/LTC.js';
 import LightingModel from '../core/LightingModel.js';
 import { diffuseColor, diffuseContribution, diffuseRoughness, specularColor, specularColorBlended, specularF90, roughness, metalness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor, dispersion, retroreflectivity } from '../core/PropertyNode.js';
 import { normalView, clearcoatNormalView, normalWorld } from '../accessors/Normal.js';
+import { bentNormalView } from '../accessors/AccessorsUtils.js';
 import { positionViewDirection, positionView, positionWorld } from '../accessors/Position.js';
 import { Fn, float, vec2, vec3, vec4, mat3, If, pow4 } from '../tsl/TSLBase.js';
 import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep } from '../math/MathNode.js';
@@ -803,21 +804,30 @@ class PhysicalLightingModel extends LightingModel {
 	 */
 	indirectRadiance( radianceAt, builder ) {
 
-		const reflectedRadiance = ( normal, roughness ) => {
+		// Same lookup as EnvironmentNode, mixed with the normal like the reflection
+		const radianceAlong = ( lookupVec, lookupNormal, normal, roughness ) => {
 
-			// Mixing the reflection with the normal is more accurate for rough objects, see EnvironmentNode
-			const reflectVec = positionViewDirection.negate().reflect( normal );
-			const direction = pow4( roughness ).mix( reflectVec, normal ).normalize().transformDirection( cameraWorldMatrix );
+			const direction = pow4( roughness ).mix( lookupVec, lookupNormal ).normalize().transformDirection( cameraWorldMatrix );
 
 			return radianceAt( direction, roughness, normal.transformDirection( cameraWorldMatrix ) );
 
 		};
 
-		builder.context.radiance.addAssign( reflectedRadiance( normalView, roughness ) );
+		const radianceNormal = this.anisotropy === true ? bentNormalView : normalView;
+
+		let radiance = radianceAlong( positionViewDirection.negate().reflect( radianceNormal ), radianceNormal, normalView, roughness );
+
+		if ( this.retroreflection === true ) {
+
+			radiance = retroreflectivity.clamp().mix( radiance, radianceAlong( positionViewDirection, radianceNormal, normalView, roughness ) );
+
+		}
+
+		builder.context.radiance.addAssign( radiance );
 
 		if ( this.clearcoat === true ) {
 
-			this.clearcoatRadiance.addAssign( reflectedRadiance( clearcoatNormalView, clearcoatRoughness ) );
+			this.clearcoatRadiance.addAssign( radianceAlong( positionViewDirection.negate().reflect( clearcoatNormalView ), clearcoatNormalView, clearcoatNormalView, clearcoatRoughness ) );
 
 		}
 

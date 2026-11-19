@@ -1,4 +1,18 @@
 export default /* glsl */`
+#ifdef USE_ANISOTROPY
+
+	// https://google.github.io/filament/Filament.md.html#lighting/imagebasedlights/anisotropy
+	vec3 getAnisotropyBentNormal( const in vec3 viewDir, const in vec3 normal, const in float roughness, const in vec3 bitangent, const in float anisotropy ) {
+
+		vec3 bentNormal = cross( bitangent, viewDir );
+		bentNormal = normalize( cross( bentNormal, bitangent ) );
+
+		return normalize( mix( bentNormal, normal, pow2( pow2( 1.0 - anisotropy * ( 1.0 - roughness ) ) ) ) );
+
+	}
+
+#endif
+
 #ifdef USE_ENVMAP
 
 	vec3 getIBLIrradiance( const in vec3 normal ) {
@@ -73,12 +87,7 @@ export default /* glsl */`
 
 			#ifdef ENVMAP_TYPE_PMREM
 
-			  // https://google.github.io/filament/Filament.md.html#lighting/imagebasedlights/anisotropy
-				vec3 bentNormal = cross( bitangent, viewDir );
-				bentNormal = normalize( cross( bentNormal, bitangent ) );
-				bentNormal = normalize( mix( bentNormal, normal, pow2( pow2( 1.0 - anisotropy * ( 1.0 - roughness ) ) ) ) );
-
-				return getIBLRadiance( viewDir, bentNormal, roughness );
+				return getIBLRadiance( viewDir, getAnisotropyBentNormal( viewDir, normal, roughness, bitangent, anisotropy ), roughness );
 
 			#else
 
@@ -94,12 +103,7 @@ export default /* glsl */`
 
 				#ifdef ENVMAP_TYPE_PMREM
 
-				  // https://google.github.io/filament/Filament.md.html#lighting/imagebasedlights/anisotropy
-					vec3 bentNormal = cross( bitangent, viewDir );
-					bentNormal = normalize( cross( bentNormal, bitangent ) );
-					bentNormal = normalize( mix( bentNormal, normal, pow2( pow2( 1.0 - anisotropy * ( 1.0 - roughness ) ) ) ) );
-
-					return getIBLRetroRadiance( viewDir, bentNormal, roughness );
+					return getIBLRetroRadiance( viewDir, getAnisotropyBentNormal( viewDir, normal, roughness, bitangent, anisotropy ), roughness );
 
 				#else
 
