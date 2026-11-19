@@ -116,26 +116,22 @@ export const sampleCurrentDepth = Fn( ( [ depthNode, positionTexel, cameraNearFa
  * @tsl
  * @private
  * @function
- * @param {TextureNode} previousDepthNode - The previous depth buffer.
+ * @param {ReprojectNode} reprojectNode - The reproject node.
  * @param {Node<vec2>} uv - The uv coordinates.
- * @param {Node<mat4>} previousCameraProjectionMatrixInverse - The previous camera projection matrix inverse.
- * @param {Node<mat4>} previousCameraWorldMatrix - The previous camera world matrix.
- * @param {Node<mat4>} cameraWorldMatrixInverse - The current camera world matrix inverse.
  * @param {Node<vec2>} cameraNearFar - The camera's near and far.
- * @param {Camera} camera - The camera.
  * @return {Node<float>} The reprojected depth.
  */
-export const samplePreviousDepth = Fn( ( [ previousDepthNode, uv, previousCameraProjectionMatrixInverse, previousCameraWorldMatrix, cameraWorldMatrixInverse, cameraNearFar, camera ] ) => {
+export const samplePreviousDepth = ( reprojectNode, uv, cameraNearFar ) => {
 
-	const depth = projectionDepth( previousDepthNode.sample( uv ).r, cameraNearFar.x, cameraNearFar.y );
-	const positionView = getViewPosition( uv, depth, previousCameraProjectionMatrixInverse );
-	const positionWorld = previousCameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz;
-	const viewZ = cameraWorldMatrixInverse.mul( vec4( positionWorld, 1 ) ).z;
-	return camera.isOrthographicCamera
+	const depth = projectionDepth( reprojectNode.previousDepthNode.sample( uv ).r, cameraNearFar.x, cameraNearFar.y );
+	const positionView = getViewPosition( uv, depth, reprojectNode.previousCameraProjectionMatrixInverse );
+	const positionWorld = reprojectNode.previousCameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz;
+	const viewZ = reprojectNode.cameraViewMatrix.mul( vec4( positionWorld, 1 ) ).z;
+	return reprojectNode.camera.isOrthographicCamera
 		? viewZToOrthographicDepth( viewZ, cameraNearFar.x, cameraNearFar.y )
 		: viewZToPerspectiveDepth( viewZ, cameraNearFar.x, cameraNearFar.y );
 
-} );
+};
 
 /**
  * Computes a sequence of Halton(2, 3) jitter offsets in the range [0, 1].

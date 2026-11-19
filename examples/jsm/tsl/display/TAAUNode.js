@@ -1,5 +1,6 @@
-import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
+import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4 } from 'three/webgpu';
 import { exp, float, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, ivec2, mix, outputStruct, struct, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
+import { reproject } from './ReprojectNode.js';
 import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -174,18 +175,6 @@ class TAAUNode extends Node {
 		this._resolveRenderTarget.texture.name = 'TAAUNode.resolve';
 
 		/**
-		 * Render target whose depth attachment holds the previous frame's
-		 * depth buffer. This render target is sized independently of the
-		 * history target so it can match the (lower-resolution) input depth
-		 * texture.
-		 *
-		 * @private
-		 * @type {RenderTarget}
-		 */
-		this._previousDepthRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, depthTexture: new DepthTexture(), count: 0 } );
-		this._previousDepthRenderTarget.depthTexture.name = 'TAAUNode.previousDepth';
-
-		/**
 		 * Material used for the resolve step.
 		 *
 		 * @private
@@ -240,52 +229,12 @@ class TAAUNode extends Node {
 		this._cameraNearFar = uniform( new Vector2() );
 
 		/**
-		 * A uniform node holding the camera world matrix.
+		 * Maps the current frame to the previous one.
 		 *
 		 * @private
-		 * @type {UniformNode<mat4>}
+		 * @type {ReprojectNode}
 		 */
-		this._cameraWorldMatrix = uniform( new Matrix4() );
-
-		/**
-		 * A uniform node holding the camera world matrix inverse.
-		 *
-		 * @private
-		 * @type {UniformNode<mat4>}
-		 */
-		this._cameraWorldMatrixInverse = uniform( new Matrix4() );
-
-		/**
-		 * A uniform node holding the camera projection matrix inverse.
-		 *
-		 * @private
-		 * @type {UniformNode<mat4>}
-		 */
-		this._cameraProjectionMatrixInverse = uniform( new Matrix4() );
-
-		/**
-		 * A uniform node holding the previous frame's view matrix.
-		 *
-		 * @private
-		 * @type {UniformNode<mat4>}
-		 */
-		this._previousCameraWorldMatrix = uniform( new Matrix4() );
-
-		/**
-		 * A uniform node holding the previous frame's projection matrix inverse.
-		 *
-		 * @private
-		 * @type {UniformNode<mat4>}
-		 */
-		this._previousCameraProjectionMatrixInverse = uniform( new Matrix4() );
-
-		/**
-		 * A texture node for the previous depth buffer.
-		 *
-		 * @private
-		 * @type {TextureNode}
-		 */
-		this._previousDepthNode = texture( this._previousDepthRenderTarget.depthTexture );
+		this._reprojectNode = reproject( depthNode, velocityNode, camera );
 
 	}
 
@@ -385,17 +334,7 @@ class TAAUNode extends Node {
 
 		const { renderer } = frame;
 
-		// store previous frame matrices before updating current ones
-
-		this._previousCameraWorldMatrix.value.copy( this._cameraWorldMatrix.value );
-		this._previousCameraProjectionMatrixInverse.value.copy( this._cameraProjectionMatrixInverse.value );
-
-		// update camera matrices uniforms
-
 		this._cameraNearFar.value.set( this.camera.near, this.camera.far );
-		this._cameraWorldMatrix.value.copy( this.camera.matrixWorld );
-		this._cameraWorldMatrixInverse.value.copy( this.camera.matrixWorldInverse );
-		this._cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
 
 		// the output dimensions are derived from the renderer's drawing buffer
 
@@ -445,33 +384,6 @@ class TAAUNode extends Node {
 
 		renderer.copyTextureToTexture( this._resolveRenderTarget.texture, this._historyRenderTarget.texture );
 
-		// Copy the current scene depth into the previous-depth texture. We
-		// keep the destination size locked to the source's actual dimensions
-		// so that any one-frame timing mismatch between the scene pass's depth
-		// attachment and the beauty render target's bookkeeping cannot
-		// produce a copy with mismatched extents (which WebGPU rejects for
-		// depth/stencil formats).
-
-		const currentDepth = this.depthNode.value;
-		const srcW = currentDepth.image !== null && currentDepth.image !== undefined ? currentDepth.image.width : 0;
-		const srcH = currentDepth.image !== null && currentDepth.image !== undefined ? currentDepth.image.height : 0;
-
-		if ( srcW > 0 && srcH > 0 ) {
-
-			const dstDepth = this._previousDepthRenderTarget.depthTexture;
-
-			if ( dstDepth.image.width !== srcW || dstDepth.image.height !== srcH ) {
-
-				dstDepth.image.width = srcW;
-				dstDepth.image.height = srcH;
-				dstDepth.needsUpdate = true;
-
-			}
-
-			renderer.copyTextureToTexture( currentDepth, dstDepth );
-
-		}
-
 		// restore
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );
@@ -512,9 +424,6 @@ class TAAUNode extends Node {
 			} );
 
 		}
-
-		this._previousDepthRenderTarget.depthTexture.format = this.depthNode.value.format;
-		this._previousDepthRenderTarget.depthTexture.type = this.depthNode.value.type;
 
 		const historyNode = texture( this._historyRenderTarget.textures[ 0 ] );
 		const lockNode = texture( this._historyRenderTarget.textures[ 1 ] );
@@ -557,9 +466,8 @@ class TAAUNode extends Node {
 
 			// reproject using the velocity sampled at the dilated depth tap
 
-			const offsetUV = this.velocityNode.load( closestPositionTexel ).xy.mul( vec2( 0.5, - 0.5 ) );
-			const historyUV = uvNode.sub( offsetUV );
-			const previousDepth = samplePreviousDepth( this._previousDepthNode, historyUV, this._previousCameraProjectionMatrixInverse, this._previousCameraWorldMatrix, this._cameraWorldMatrixInverse, this._cameraNearFar, this.camera );
+			const historyUV = this._reprojectNode.getHistoryUV( uvNode, closestPositionTexel ).toConst();
+			const previousDepth = samplePreviousDepth( this._reprojectNode, historyUV, this._cameraNearFar );
 
 			// history validity
 
@@ -674,7 +582,6 @@ class TAAUNode extends Node {
 
 		this._historyRenderTarget.dispose();
 		this._resolveRenderTarget.dispose();
-		this._previousDepthRenderTarget.dispose();
 
 		this._resolveMaterial.dispose();
 		this._seedMaterial.dispose();
