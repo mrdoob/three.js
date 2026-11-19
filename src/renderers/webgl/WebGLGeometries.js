@@ -96,7 +96,7 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 		}
 
-		const count = geometryIndex !== null ? geometryIndex.array.length : ( geometryPosition.array.length / 3 ) - 1;
+		const count = geometryIndex !== null ? geometryIndex.array.length : geometryPosition.count - 1;
 
 		// check whether a 32 bit or 16 bit buffer is required to store the indices
 		// account for PRIMITIVE_RESTART_FIXED_INDEX, #24565
