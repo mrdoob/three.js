@@ -1,6 +1,7 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4 } from 'three/webgpu';
 import { exp, float, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, ivec2, mix, outputStruct, struct, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
-import { clipAABB, computeHaltonOffsets, flickerReduction, Reprojection, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
+import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth } from '../utils/TAAUtils.js';
+import { Reprojection } from '../../utils/Reprojection.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -234,6 +235,7 @@ class TAAUNode extends Node {
 		 * @type {Reprojection}
 		 */
 		this._reprojection = new Reprojection( depthNode, velocityNode, camera );
+		this._reprojection.previousDepthNode.value.name = 'TAAUNode.previousDepth';
 
 	}
 
@@ -471,7 +473,7 @@ class TAAUNode extends Node {
 			// reproject using the velocity sampled at the dilated depth tap
 
 			const historyUV = this._reprojection.getHistoryUV( uvNode, closestPositionTexel ).toConst();
-			const previousDepth = samplePreviousDepth( this._reprojection.previousDepthNode, historyUV, this._reprojection.previousCameraProjectionMatrixInverse, this._reprojection.previousCameraWorldMatrix, this._reprojection.cameraViewMatrix, this._cameraNearFar, this.camera );
+			const previousDepth = this._reprojection.getPreviousDepth( historyUV, this._cameraNearFar );
 
 			// history validity
 
