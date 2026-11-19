@@ -93,8 +93,7 @@ class HemisphereLightNode extends AnalyticLightNode {
 			const lobeWidth2 = t.pow2().mul( dotRL.pow2().oneMinus() );
 			const skyWeight = dotRL.div( dotRL.add( pixelHalfWidth ).pow2().add( lobeWidth2 ).sqrt().add( dotRL.sub( pixelHalfWidth ).pow2().add( lobeWidth2 ).sqrt() ).max( 2e-4 ) ).add( 0.5 ).saturate();
 
-			// That lobe is a cosine lobe around the direction stretched by t. Remove the sky it reaches behind the surface, which the surface can't see,
-			// and renormalize to the visible part. Lambert's polygon formula gives the lobe over both half spaces in closed form
+			// The lobe is a cosine lobe stretched by t: remove the sky it reaches behind the surface (Lambert's polygon formula) and renormalize
 			const skyAxis = lightDirectionNode.mul( t ).add( direction.mul( t.oneMinus().mul( dotRL ) ) ).normalize();
 			const behindAxis = normal.mul( t ).add( direction.mul( t.oneMinus().mul( direction.dot( normal ) ) ) ).normalize().negate();
 			const a = skyAxis.dot( direction );
@@ -103,8 +102,10 @@ class HemisphereLightNode extends AnalyticLightNode {
 			const det = direction.dot( cross( skyAxis, behindAxis ) ).abs().max( 1e-4 );
 			const skyFraction = a.mul( 0.5 ).add( 0.5 );
 			const behindFraction = b.mul( 0.5 ).add( 0.5 );
-			const behindSky = atan( det, a.mul( b ).sub( ab ) ).add( a.mul( atan( det, ab.mul( a ).sub( b ) ) ) ).add( b.mul( atan( det, ab.mul( b ).sub( a ) ) ) ).div( 2 * Math.PI )
-				.clamp( skyFraction.add( behindFraction ).sub( 1.0 ).max( 0.0 ), skyFraction.min( behindFraction ) );
+			const behindSkyRaw = atan( det, a.mul( b ).sub( ab ) ).add( a.mul( atan( det, ab.mul( a ).sub( b ) ) ) ).add( b.mul( atan( det, ab.mul( b ).sub( a ) ) ) ).div( 2 * Math.PI );
+
+			// The bounds keep nearly collinear axes exact, like floors, ceilings and roughness = 1
+			const behindSky = behindSkyRaw.clamp( skyFraction.add( behindFraction ).sub( 1.0 ).max( 0.0 ), skyFraction.min( behindFraction ) );
 
 			const hemiSpecularWeight = skyWeight.sub( behindSky ).div( behindFraction.oneMinus().max( 1e-4 ) ).saturate();
 

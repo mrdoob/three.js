@@ -272,7 +272,7 @@ IncidentLight directLight;
 
 #if defined( RE_IndirectSpecular )
 
-	// Same lookup as the environment map in lights_fragment_maps, mixed with the normal like getIBLRadiance()
+	// Same lookups as the environment map in lights_fragment_maps
 	#ifdef USE_ANISOTROPY
 
 		vec3 radianceNormal = getAnisotropyBentNormal( geometryViewDir, geometryNormal, material.roughness, material.anisotropyB, material.anisotropy );
@@ -283,13 +283,11 @@ IncidentLight directLight;
 
 	#endif
 
-	vec3 radianceVec = normalize( mix( reflect( - geometryViewDir, radianceNormal ), radianceNormal, pow4( material.roughness ) ) );
-	vec3 radiance = getIndirectLightRadiance( radianceVec, geometryNormal, material.roughness );
+	vec3 radiance = getIndirectLightRadiance( reflect( - geometryViewDir, radianceNormal ), radianceNormal, geometryNormal, material.roughness );
 
 	#ifdef USE_RETROREFLECTION
 
-		vec3 retroRadianceVec = normalize( mix( geometryViewDir, radianceNormal, pow4( material.roughness ) ) );
-		radiance = mix( radiance, getIndirectLightRadiance( retroRadianceVec, geometryNormal, material.roughness ), saturate( material.retroreflectivity ) );
+		radiance = mix( radiance, getIndirectLightRadiance( geometryViewDir, radianceNormal, geometryNormal, material.roughness ), saturate( material.retroreflectivity ) );
 
 	#endif
 
@@ -297,8 +295,7 @@ IncidentLight directLight;
 
 	#ifdef USE_CLEARCOAT
 
-		vec3 clearcoatRadianceVec = normalize( mix( reflect( - geometryViewDir, geometryClearcoatNormal ), geometryClearcoatNormal, pow4( material.clearcoatRoughness ) ) );
-		clearcoatRadiance += getIndirectLightRadiance( clearcoatRadianceVec, geometryClearcoatNormal, material.clearcoatRoughness );
+		clearcoatRadiance += getIndirectLightRadiance( reflect( - geometryViewDir, geometryClearcoatNormal ), geometryClearcoatNormal, geometryClearcoatNormal, material.clearcoatRoughness );
 
 	#endif
 

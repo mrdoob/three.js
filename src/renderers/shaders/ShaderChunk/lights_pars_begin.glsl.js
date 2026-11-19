@@ -230,29 +230,30 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 
 	}
 
-	vec3 getHemisphereLightRadiance( const in HemisphereLight hemiLight, const in vec3 reflectVec, const in vec3 normal, const in float roughness ) {
+	vec3 getHemisphereLightRadiance( const in HemisphereLight hemiLight, const in vec3 radianceVec, const in vec3 normal, const in float roughness ) {
 
 		// GGX prefiltering of a sharp sky/ground horizon: Student-t marginal at low roughness, cosine irradiance at roughness = 1
 		float alpha = pow2( roughness );
 		float t = 2.0 * alpha / ( 1.0 + alpha );
-		float dotRL = dot( reflectVec, hemiLight.direction );
+		float dotRL = dot( radianceVec, hemiLight.direction );
 
 		// Box filtered over the pixel footprint, so the horizon doesn't alias on smooth surfaces
 		float pixelHalfWidth = 0.5 * length( vec2( dFdx( dotRL ), dFdy( dotRL ) ) );
 		float lobeWidth2 = pow2( t ) * ( 1.0 - pow2( dotRL ) );
 		float skyWeight = saturate( dotRL / max( sqrt( pow2( dotRL + pixelHalfWidth ) + lobeWidth2 ) + sqrt( pow2( dotRL - pixelHalfWidth ) + lobeWidth2 ), 2e-4 ) + 0.5 );
 
-		// That lobe is a cosine lobe around reflectVec stretched by t. Remove the sky it reaches behind the surface, which the surface can't see,
-		// and renormalize to the visible part. Lambert's polygon formula gives the lobe over both half spaces in closed form
-		vec3 skyAxis = normalize( t * hemiLight.direction + ( 1.0 - t ) * dotRL * reflectVec );
-		vec3 behindAxis = - normalize( t * normal + ( 1.0 - t ) * dot( reflectVec, normal ) * reflectVec );
-		float a = dot( skyAxis, reflectVec );
-		float b = dot( behindAxis, reflectVec );
+		// The lobe is a cosine lobe stretched by t: remove the sky it reaches behind the surface (Lambert's polygon formula) and renormalize
+		vec3 skyAxis = normalize( t * hemiLight.direction + ( 1.0 - t ) * dotRL * radianceVec );
+		vec3 behindAxis = - normalize( t * normal + ( 1.0 - t ) * dot( radianceVec, normal ) * radianceVec );
+		float a = dot( skyAxis, radianceVec );
+		float b = dot( behindAxis, radianceVec );
 		float ab = dot( skyAxis, behindAxis );
-		float det = max( abs( dot( reflectVec, cross( skyAxis, behindAxis ) ) ), 1e-4 );
+		float det = max( abs( dot( radianceVec, cross( skyAxis, behindAxis ) ) ), 1e-4 );
 		float skyFraction = 0.5 * a + 0.5;
 		float behindFraction = 0.5 * b + 0.5;
 		float behindSky = ( atan( det, a * b - ab ) + a * atan( det, ab * a - b ) + b * atan( det, ab * b - a ) ) * RECIPROCAL_PI * 0.5;
+
+		// The bounds keep nearly collinear axes exact, like floors, ceilings and roughness = 1
 		behindSky = clamp( behindSky, max( skyFraction + behindFraction - 1.0, 0.0 ), min( skyFraction, behindFraction ) );
 
 		float hemiSpecularWeight = saturate( ( skyWeight - behindSky ) / max( 1.0 - behindFraction, 1e-4 ) );
@@ -263,18 +264,21 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 
 #endif
 
-// Physical materials reflect ambient and hemisphere lights as a distant environment, looked up along lookupVec like getIBLRadiance()
-vec3 getIndirectLightRadiance( const in vec3 lookupVec, const in vec3 normal, const in float roughness ) {
+// Physical materials reflect ambient and hemisphere lights as a distant environment, looked up like getIBLRadiance()
+vec3 getIndirectLightRadiance( const in vec3 lookupVec, const in vec3 lookupNormal, const in vec3 normal, const in float roughness ) {
 
 	// A uniform environment reflects its irradiance / PI at any roughness
 	vec3 radiance = getAmbientLightIrradiance( ambientLightColor ) * RECIPROCAL_PI;
 
 	#if ( NUM_HEMI_LIGHTS > 0 )
 
+		// Mixing the lookup with the normal is more accurate for rough objects, see getIBLRadiance()
+		vec3 radianceVec = normalize( mix( lookupVec, lookupNormal, pow4( roughness ) ) );
+
 		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-			radiance += getHemisphereLightRadiance( hemisphereLights[ i ], lookupVec, normal, roughness );
+			radiance += getHemisphereLightRadiance( hemisphereLights[ i ], radianceVec, normal, roughness );
 
 		}
 		#pragma unroll_loop_end

@@ -63,8 +63,8 @@ class LightingModel {
 	indirect( /*builder*/ ) { }
 
 	/**
-	 * This method is intended for reflecting ambient and hemisphere lights, which stand
-	 * in for a distant environment. It is called by the light nodes while they are set up.
+	 * This method is intended for reflecting ambient and hemisphere lights as a distant
+	 * environment. It is called by the light nodes while they are set up.
 	 *
 	 * @abstract
 	 * @param {function(Node<vec3>, Node<float>, Node<vec3>):Node<vec3>} radianceAt - Returns the light's prefiltered radiance for a world space direction, roughness and surface normal.
