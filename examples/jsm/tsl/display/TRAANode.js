@@ -1,7 +1,7 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4 } from 'three/webgpu';
-import { float, Fn, max, texture, uniform, uv, vec4, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
+import { float, Fn, max, texture, uniform, uv, vec4, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline, getViewPosition, projectionDepth, viewZToOrthographicDepth, viewZToPerspectiveDepth } from 'three/tsl';
 import { reproject } from './ReprojectNode.js';
-import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
+import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth } from '../utils/TAAUtils.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -473,7 +473,13 @@ class TRAANode extends Node {
 			// sample the previous depth
 
 			const historyUV = this._reprojectNode.getHistoryUV( uvNode, closestPositionTexel ).toConst();
-			const previousDepth = samplePreviousDepth( this._reprojectNode, historyUV, this._cameraNearFar );
+			const depth = projectionDepth( this._reprojectNode.previousDepthNode.sample( historyUV ).r, this._cameraNearFar.x, this._cameraNearFar.y );
+			const positionView = getViewPosition( historyUV, depth, this._reprojectNode.previousCameraProjectionMatrixInverse );
+			const positionWorld = this._reprojectNode.previousCameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz;
+			const viewZ = this._reprojectNode.cameraViewMatrix.mul( vec4( positionWorld, 1 ) ).z;
+			const previousDepth = this.camera.isOrthographicCamera
+				? viewZToOrthographicDepth( viewZ, this._cameraNearFar.x, this._cameraNearFar.y )
+				: viewZToPerspectiveDepth( viewZ, this._cameraNearFar.x, this._cameraNearFar.y );
 
 			// history is considered valid when the UV is in range and there's no disocclusion except on edges
 

@@ -1,7 +1,7 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4 } from 'three/webgpu';
-import { exp, float, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, ivec2, mix, outputStruct, struct, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
+import { exp, float, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, ivec2, mix, outputStruct, struct, context, OnBeforeRenderPipeline, OnAfterRenderPipeline, getViewPosition, projectionDepth, viewZToOrthographicDepth, viewZToPerspectiveDepth } from 'three/tsl';
 import { reproject } from './ReprojectNode.js';
-import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
+import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth } from '../utils/TAAUtils.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -471,7 +471,13 @@ class TAAUNode extends Node {
 			// reproject using the velocity sampled at the dilated depth tap
 
 			const historyUV = this._reprojectNode.getHistoryUV( uvNode, closestPositionTexel ).toConst();
-			const previousDepth = samplePreviousDepth( this._reprojectNode, historyUV, this._cameraNearFar );
+			const depth = projectionDepth( this._reprojectNode.previousDepthNode.sample( historyUV ).r, this._cameraNearFar.x, this._cameraNearFar.y );
+			const positionView = getViewPosition( historyUV, depth, this._reprojectNode.previousCameraProjectionMatrixInverse );
+			const positionWorld = this._reprojectNode.previousCameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz;
+			const viewZ = this._reprojectNode.cameraViewMatrix.mul( vec4( positionWorld, 1 ) ).z;
+			const previousDepth = this.camera.isOrthographicCamera
+				? viewZToOrthographicDepth( viewZ, this._cameraNearFar.x, this._cameraNearFar.y )
+				: viewZToPerspectiveDepth( viewZ, this._cameraNearFar.x, this._cameraNearFar.y );
 
 			// history validity
 

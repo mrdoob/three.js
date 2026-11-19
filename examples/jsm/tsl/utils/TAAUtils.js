@@ -1,4 +1,4 @@
-import { add, float, Fn, If, luminance, max, struct, vec2, vec4, getViewPosition, projectionDepth, viewZToOrthographicDepth, viewZToPerspectiveDepth } from 'three/tsl';
+import { add, float, Fn, If, luminance, max, struct, vec2, vec4, projectionDepth } from 'three/tsl';
 
 /**
  * Optimized version of AABB clipping.
@@ -109,29 +109,6 @@ export const sampleCurrentDepth = Fn( ( [ depthNode, positionTexel, cameraNearFa
 	return currentDepthStruct( closestDepth, closestPositionTexel, farthestDepth );
 
 } );
-
-/**
- * Samples the previous depth buffer and reprojects the depth into the current view.
- *
- * @tsl
- * @private
- * @function
- * @param {ReprojectNode} reprojectNode - The reproject node.
- * @param {Node<vec2>} uv - The uv coordinates.
- * @param {Node<vec2>} cameraNearFar - The camera's near and far.
- * @return {Node<float>} The reprojected depth.
- */
-export const samplePreviousDepth = ( reprojectNode, uv, cameraNearFar ) => {
-
-	const depth = projectionDepth( reprojectNode.previousDepthNode.sample( uv ).r, cameraNearFar.x, cameraNearFar.y );
-	const positionView = getViewPosition( uv, depth, reprojectNode.previousCameraProjectionMatrixInverse );
-	const positionWorld = reprojectNode.previousCameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz;
-	const viewZ = reprojectNode.cameraViewMatrix.mul( vec4( positionWorld, 1 ) ).z;
-	return reprojectNode.camera.isOrthographicCamera
-		? viewZToOrthographicDepth( viewZ, cameraNearFar.x, cameraNearFar.y )
-		: viewZToPerspectiveDepth( viewZ, cameraNearFar.x, cameraNearFar.y );
-
-};
 
 /**
  * Computes a sequence of Halton(2, 3) jitter offsets in the range [0, 1].
