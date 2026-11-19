@@ -43,7 +43,7 @@ function getWireframeIndex( geometry ) {
 
 	const geometryIndex = geometry.index;
 	const geometryPosition = geometry.attributes.position;
-	const count = geometryIndex !== null ? geometryIndex.array.length : ( geometryPosition.array.length / 3 ) - 1;
+	const count = geometryIndex !== null ? geometryIndex.count : geometryPosition.count - 1;
 
 	const IndexBufferAttribute = geometryPosition.count >= 65535 ? Uint32BufferAttribute : Uint16BufferAttribute;
 	const attribute = new IndexBufferAttribute( Math.ceil( count / 3 ) * 6, 1 );
