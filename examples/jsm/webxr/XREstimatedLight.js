@@ -6,8 +6,7 @@ import {
 	HalfFloatType,
 	LinearFilter,
 	RGBAFormat,
-	WebGLCubeRenderTarget,
-	warnOnce
+	WebGLCubeRenderTarget
 } from 'three';
 import { LightProbeGridWebGL } from '../lighting/LightProbeGridWebGL.js';
 
@@ -101,7 +100,7 @@ class SessionLightProbe {
 
 			// Pack the 9 L2 SH coefficients into the 1x1x1 LightProbeGrid atlas (7 sub-volumes x 3 padded slices).
 			const sh = lightEstimate.sphericalHarmonicsCoefficients;
-			const texture = this.xrLight.lightProbeGrid.texture;
+			const texture = this.xrLight.lightProbe.texture;
 			const data = texture.image.data;
 
 			for ( let t = 0; t < 7; t ++ ) {
@@ -125,7 +124,7 @@ class SessionLightProbe {
 			}
 
 			texture.needsUpdate = true;
-			this.xrLight.lightProbeGrid.visible = true;
+			this.xrLight.lightProbe.visible = true;
 
 			// For the directional light we have to normalize the color and set the scalar as the
 			// intensity, since WebXR can return color values that exceed 1.0.
@@ -187,17 +186,17 @@ export class XREstimatedLight extends Group {
 		 *
 		 * @type {LightProbeGridWebGL}
 		 */
-		this.lightProbeGrid = new LightProbeGridWebGL( 1e5, 1e5, 1e5, 1, 1, 1 );
-		this.lightProbeGrid.visible = false;
+		this.lightProbe = new LightProbeGridWebGL( 1e5, 1e5, 1e5, 1, 1, 1 );
+		this.lightProbe.visible = false;
 
 		const atlasTexture = new Data3DTexture( new Uint16Array( 21 * 4 ), 1, 1, 21 );
 		atlasTexture.format = RGBAFormat;
 		atlasTexture.type = HalfFloatType;
 		atlasTexture.minFilter = LinearFilter;
 		atlasTexture.magFilter = LinearFilter;
-		this.lightProbeGrid.texture = atlasTexture;
+		this.lightProbe.texture = atlasTexture;
 
-		this.add( this.lightProbeGrid );
+		this.add( this.lightProbe );
 
 		/**
 		 * Represents the primary light from the XR environment.
@@ -284,10 +283,10 @@ export class XREstimatedLight extends Group {
 
 			}
 
-			this.lightProbeGrid.texture.dispose();
-			this.lightProbeGrid.dispose();
-			this.remove( this.lightProbeGrid );
-			this.lightProbeGrid = null;
+			this.lightProbe.texture.dispose();
+			this.lightProbe.dispose();
+			this.remove( this.lightProbe );
+			this.lightProbe = null;
 
 			this.remove( this.directionalLight );
 			this.directionalLight = null;
@@ -295,17 +294,6 @@ export class XREstimatedLight extends Group {
 			this.environment = null;
 
 		};
-
-	}
-
-	/**
-	 * @deprecated since r188. Use {@link XREstimatedLight#lightProbeGrid} instead.
-	 * @type {LightProbeGridWebGL}
-	 */
-	get lightProbe() {
-
-		warnOnce( 'XREstimatedLight: "lightProbe" has been replaced by "lightProbeGrid".' ); // @deprecated r188
-		return this.lightProbeGrid;
 
 	}
 
