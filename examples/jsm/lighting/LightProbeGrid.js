@@ -357,16 +357,6 @@ function ensureBakeMaterials( cubemapSize, faceMap, batchMap ) {
  * lit node material automatically. When using {@link WebGLRenderer}, import the
  * grid from `LightProbeGridWebGL.js` instead.
  *
- * A grid with a single probe lights everything inside its volume the same way,
- * depending only on the direction a surface faces. Use it for ambient lighting
- * that doesn't change with position:
- *
- * ```js
- * const probe = new LightProbeGrid( 10, 10, 10, 1, 1, 1 );
- * probe.bake( renderer, scene );
- * scene.add( probe );
- * ```
- *
  * The baked data is stored in a single RGBA `RenderTarget3D` atlas that packs
  * the nine L2 SH coefficients into seven sub-volumes stacked along Z. Baking is
  * fully GPU-resident: cubemap rendering, SH projection, and texture packing all

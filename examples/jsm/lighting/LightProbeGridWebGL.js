@@ -63,16 +63,6 @@ const ATLAS_PADDING = 1;
  * Note that this class can only be used with {@link WebGLRenderer}.
  * For {@link WebGPURenderer}, use {@link LightProbeGrid}.
  *
- * A grid with a single probe lights everything inside its volume the same way,
- * depending only on the direction a surface faces. Use it for ambient lighting
- * that doesn't change with position:
- *
- * ```js
- * const probe = new LightProbeGridWebGL( 10, 10, 10, 1, 1, 1 );
- * probe.bake( renderer, scene );
- * scene.add( probe );
- * ```
- *
  * All seven packed SH sub-volumes are stored in a **single** RGBA
  * `WebGL3DRenderTarget` using a texture-atlas layout along the Z axis.
  * Each sub-volume occupies `( nz + 2 )` atlas slices: one padding slice at
