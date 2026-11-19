@@ -158,6 +158,8 @@ export function computeHaltonOffsets( length ) {
  *
  * It holds the previous frame's depth and camera matrices for validating the history.
  *
+ * Note: This class can only be used with `WebGPURenderer`.
+ *
  * @private
  */
 export class Reprojection {
