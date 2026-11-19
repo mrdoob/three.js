@@ -45,13 +45,17 @@ export const jointBilateralUpsample = ( inputNode, lowDepthNode, lowNormalNode, 
 
 		const viewPosition = ( uv, depth ) => getViewPosition( uv, depth, projectionInverse );
 
-		const position = viewPosition( coordinate, depthNode.sample( coordinate ).r ).toConst();
-		const n = normalNode.sample( coordinate ).toConst();
-		const tolerance = position.z.abs().mul( depthTolerance ).max( 0.001 );
+		// the low resolution depths are read first: when they gather() from the full resolution depth texture,
+		// WGSL requires that to precede a plain read of it
+		const tapUVs = [[ 0, 0 ], [ 1, 0 ], [ 0, 1 ], [ 1, 1 ]].map( ( offset ) => base.add( vec2( ...offset ) ).add( 0.5 ).div( size ).toConst() );
 
 		// a low resolution depth texture is read in one fetch, ordered like textureGather()
 		const gathered = gridSize === null ? lowDepthNode.gather().sample( base.add( 1 ).div( size ) ).toConst() : null;
-		const tapDepths = gathered !== null ? [ gathered.w, gathered.z, gathered.x, gathered.y ] : null;
+		const tapDepths = gathered !== null ? [ gathered.w, gathered.z, gathered.x, gathered.y ] : tapUVs.map( ( tapUV ) => lowDepthNode.sample( tapUV ).r.toConst() );
+
+		const position = viewPosition( coordinate, depthNode.sample( coordinate ).r ).toConst();
+		const n = normalNode.sample( coordinate ).toConst();
+		const tolerance = position.z.abs().mul( depthTolerance ).max( 0.001 );
 
 		const sum = vec4( 0 ).toVar();
 		const total = float( 0 ).toVar();
@@ -60,12 +64,11 @@ export const jointBilateralUpsample = ( inputNode, lowDepthNode, lowNormalNode, 
 
 			for ( let x = 0; x <= 1; x ++ ) {
 
-				const tapUV = base.add( vec2( x, y ) ).add( 0.5 ).div( size ).toConst();
+				const tapUV = tapUVs[ y * 2 + x ];
 
 				// distance to the plane of the full resolution surface, which unlike a view depth
 				// difference stays small along a slanted surface
-				const tapDepth = tapDepths !== null ? tapDepths[ y * 2 + x ] : lowDepthNode.sample( tapUV ).r;
-				const planeDistance = viewPosition( tapUV, tapDepth ).sub( position ).dot( n );
+				const planeDistance = viewPosition( tapUV, tapDepths[ y * 2 + x ] ).sub( position ).dot( n );
 				const depthWeight = planeDistance.div( tolerance ).pow2().negate().exp();
 				let normalWeight = lowNormalNode.sample( tapUV ).dot( n ).max( 0 );
 				for ( let power = 1; power < normalPower; power *= 2 ) normalWeight = normalWeight.toConst().pow2();
