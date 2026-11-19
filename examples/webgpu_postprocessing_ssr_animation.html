@@ -39,19 +39,20 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, velocity } from 'three/tsl';
+			import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, velocity, float, vec3, ivec2, Fn, positionPrevious, textureSize, getViewPosition, getScreenPosition, isBackgroundDepth } from 'three/tsl';
 			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 			import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 			import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { smaa } from 'three/addons/tsl/display/SMAANode.js';
+			import { Reprojection } from 'three/addons/utils/Reprojection.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const params = {
-				output: 'Beauty', traa: true,
+				output: 'Beauty', traa: true, traceSource: 'Current',
 				quality: 0.5, binaryRefine: false, maxDistance: 20, thickness: 0.12,
 				denoise: true, lumaPhi: 0.75,
 				roughness: 0.18, animate: true, orbit: false
@@ -62,6 +63,23 @@
 
 			const spheres = [];
 			let time = 0;
+
+			// The scene buffers carry TRAA jitter, which the unjittered velocity and camera matrices do not.
+
+			let reprojection, hasHistory = false;
+
+			const currentJitter = new THREE.Vector2();
+			const previousJitter = uniform( new THREE.Vector2() );
+			const jitterDelta = uniform( new THREE.Vector2() );
+			const historyValid = uniform( false ).onRenderUpdate( () => {
+
+				// Capture the jitter while TRAA applies it, in whichever pass reprojects history.
+				const e = camera.projectionMatrix.elements;
+				currentJitter.set( - e[ 8 ] * 0.5, e[ 9 ] * 0.5 );
+				jitterDelta.value.copy( previousJitter.value ).sub( currentJitter );
+				return historyValid.value;
+
+			} );
 
 			init();
 
@@ -187,7 +205,8 @@
 					output: output,
 					diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
 					normal: packNormalToOctahedral( normalView ),
-					velocity: vec4( velocity, materialRoughness, 0 )
+					// Previous view depth in velocity.w follows both camera and object motion.
+					velocity: vec4( velocity, materialRoughness, velocity.previousCameraViewMatrix.mul( velocity.previousModelWorldMatrix ).mul( vec4( positionPrevious, 1 ) ).z.toVarying() )
 				} ) );
 
 				// octahedral normals can't be filtered across their folds
@@ -215,56 +234,154 @@
 					scenePassVelocity.sample( uv ).z
 				) );
 
-				// ssr
+				// Reproject each trace sample into the previous frame's beauty.
 
-				const ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
-					stochastic: true,
-					diffuseNode: scenePassDiffuseColor,
-					metalnessNode: scenePassDiffuseColor.a,
-					roughnessNode: sceneRoughness,
-					binaryRefine: params.binaryRefine
-				} ).toInspector( 'SSR' );
+				reprojection = new Reprojection( scenePassDepth, scenePassVelocity, camera );
 
-				const ssrTexture = ssrNode.getTextureNode();
+				function previousTraceSource( useVelocity ) {
 
-				// denoise
+					return sample( uv => Fn( () => {
 
-				const temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
-					mode: 'specular',
-					accumulate: false,
-					normalDecode: normalDecode
-				} );
-				temporalReprojectNode.maxFrames.value = 16;
-				temporalReprojectNode.clampIntensity.value = 0.25;
+						// Allocate history only when this source is compiled for the first time.
+						const previousColor = scenePass.getPreviousTextureNode( 'output' );
+						const previousDepth = reprojection.previousDepthNode;
+						let historyUV, expectedZ;
 
-				const denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
-					depth: scenePassDepth,
-					normal: sceneNormal,
-					raw: ssrNode,
-					metalRoughness: sceneMetalRough,
-					mode: 'specular',
-					accumulate: true
-				} );
-				denoiseNode.depthPhi.value = 20;
-				denoiseNode.normalPhi.value = 0.3;
-				denoiseNode.radius.value = 1.5;
-				denoiseNode.alphaPhi.value = 5;
-				denoiseNode.strength.value = 0.725;
-				denoiseNode.adaptiveTrust.value = 1;
+						if ( useVelocity ) {
 
-				// feed the denoised result + velocity back into SSR for multi-bounce reflections
+							// Load motion and expected depth from one surface at silhouettes.
+							const motionSize = ivec2( textureSize( scenePassVelocity ) );
+							const motionTexel = ivec2( uv.mul( vec2( motionSize ) ) ).clamp( ivec2( 0 ), motionSize.sub( 1 ) );
+							historyUV = reprojection.getHistoryUV( uv, motionTexel ).add( jitterDelta ).toConst();
+							expectedZ = scenePassVelocity.load( motionTexel ).w;
 
-				ssrNode.setHistory( denoiseNode, scenePassVelocity );
-				temporalReprojectNode.setHistoryTexture( denoiseNode );
+						} else {
 
-				// composite
+							// Camera reprojection assumes the surface did not move in world space.
+							const depth = scenePassDepth.sample( uv ).r;
+							const viewPosition = getViewPosition( uv, depth, reprojection.cameraProjectionMatrixInverse );
+							const previousPosition = reprojection.previousCameraViewMatrix.mul( reprojection.cameraWorldMatrix.mul( vec4( viewPosition, 1 ) ) ).xyz.toConst();
+							historyUV = getScreenPosition( previousPosition, reprojection.previousCameraProjectionMatrix ).add( previousJitter ).toConst();
+							expectedZ = previousPosition.z;
 
+						}
+
+						const size = vec2( textureSize( previousDepth ) );
+						const pixel = historyUV.mul( size ).sub( 0.5 );
+						const base = pixel.floor();
+						const fraction = pixel.fract();
+						const inBounds = p => p.greaterThanEqual( 0 ).all().and( p.lessThanEqual( 1 ).all() );
+						const valid = historyValid.and( inBounds( historyUV ) )
+							.and( isBackgroundDepth( scenePassDepth.sample( uv ).r ).not() )
+							.and( expectedZ.lessThan( camera.near * - 1 ) );
+
+						// Allow a small pixel footprint for depth variation on sloping surfaces, plus half-float rounding.
+						const pixelDepth = reprojection.previousCameraProjectionMatrixInverse.element( 1 ).y.abs().mul( expectedZ.abs() ).mul( 3 ).div( size.y );
+						const tolerance = pixelDepth.max( expectedZ.abs().mul( 0.002 ) ).max( 0.001 );
+						const radiance = vec3( 0 ).toVar();
+						const support = float( 0 ).toVar();
+
+						// Validate each bilinear tap so interpolation cannot pull color across an occlusion edge.
+						for ( let y = 0; y <= 1; y ++ ) {
+
+							for ( let x = 0; x <= 1; x ++ ) {
+
+								const tapUV = base.add( vec2( x, y ) ).add( 0.5 ).div( size ).toConst();
+								const depth = previousDepth.sample( tapUV ).r;
+								const viewZ = getViewPosition( tapUV, depth, reprojection.previousCameraProjectionMatrixInverse ).z;
+								const accepted = valid.and( inBounds( tapUV ) ).and( isBackgroundDepth( depth ).not() )
+									.and( viewZ.sub( expectedZ ).abs().lessThanEqual( tolerance ) );
+								const weightX = x === 0 ? fraction.x.oneMinus() : fraction.x;
+								const weightY = y === 0 ? fraction.y.oneMinus() : fraction.y;
+								const weight = weightX.mul( weightY ).mul( accepted ).toConst();
+								radiance.addAssign( previousColor.sample( tapUV ).rgb.mul( weight ) );
+								support.addAssign( weight );
+
+							}
+
+						}
+
+						// Missing history contributes no radiance; alpha records valid bilinear support.
+						return vec4( radiance.div( support.max( 1e-6 ) ), support );
+
+					} )() );
+
+				}
+
+				const traceSources = {
+					'Current': scenePassColor,
+					'Previous (Velocity)': previousTraceSource( true ),
+					'Previous (Camera)': previousTraceSource( false )
+				};
+
+				let ssrNode, ssrTexture, temporalReprojectNode, denoiseNode, temporalAA, spatialAA;
 				const denoiseEnabled = uniform( 1 );
 
-				const combined = scenePassColor.rgb.add( mix( ssrTexture.rgb, denoiseNode.rgb, denoiseEnabled ) );
+				function updateTraceSource() {
 
-				const temporalAA = traa( vec4( combined, 1 ), scenePassDepth, scenePassVelocity, camera );
-				const spatialAA = smaa( vec4( combined, 1 ) );
+					// Replace the effect graph so changing its input stays local to this example.
+					for ( const effect of [ ssrNode, temporalReprojectNode, denoiseNode, temporalAA, spatialAA ] ) {
+
+						if ( effect !== undefined ) effect.dispose();
+
+					}
+
+					hasHistory = false;
+
+					// ssr
+
+					ssrNode = ssr( traceSources[ params.traceSource ], scenePassDepth, sceneNormal, {
+						camera,
+						stochastic: true,
+						diffuseNode: scenePassDiffuseColor,
+						metalnessNode: scenePassDiffuseColor.a,
+						roughnessNode: sceneRoughness,
+						binaryRefine: params.binaryRefine
+					} ).toInspector( 'SSR' );
+
+					ssrTexture = ssrNode.getTextureNode();
+
+					// denoise
+
+					temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
+						mode: 'specular',
+						accumulate: false,
+						normalDecode: normalDecode
+					} );
+					temporalReprojectNode.maxFrames.value = 16;
+					temporalReprojectNode.clampIntensity.value = 0.25;
+
+					denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
+						depth: scenePassDepth,
+						normal: sceneNormal,
+						raw: ssrNode,
+						metalRoughness: sceneMetalRough,
+						mode: 'specular',
+						accumulate: true
+					} );
+					denoiseNode.depthPhi.value = 20;
+					denoiseNode.normalPhi.value = 0.3;
+					denoiseNode.radius.value = 1.5;
+					denoiseNode.alphaPhi.value = 5;
+					denoiseNode.strength.value = 0.725;
+					denoiseNode.adaptiveTrust.value = 1;
+
+					// feed the denoised result + velocity back into SSR for multi-bounce reflections
+
+					ssrNode.setHistory( denoiseNode, scenePassVelocity );
+					temporalReprojectNode.setHistoryTexture( denoiseNode );
+
+					// composite
+
+					const combined = scenePassColor.rgb.add( mix( ssrTexture.rgb, denoiseNode.rgb, denoiseEnabled ) );
+
+					temporalAA = traa( vec4( combined, 1 ), scenePassDepth, scenePassVelocity, camera );
+					spatialAA = smaa( vec4( combined, 1 ) );
+
+					updateParameters();
+					updateOutput();
+
+				}
 
 				function updateOutput() {
 
@@ -302,6 +419,7 @@
 				displayGui.add( params, 'traa' ).name( 'TRAA' ).onChange( updateOutput );
 
 				const ssrGui = renderer.inspector.createParameters( 'SSR' );
+				ssrGui.add( params, 'traceSource', Object.keys( traceSources ) ).name( 'Trace source' ).onChange( updateTraceSource );
 				ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( updateParameters );
 				ssrGui.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( updateParameters );
 				ssrGui.add( params, 'maxDistance', 0.01, 50, 0.01 ).name( 'Max distance' ).onChange( updateParameters );
@@ -326,8 +444,7 @@
 				sceneGui.add( params, 'animate' ).name( 'Animation' );
 				sceneGui.add( params, 'orbit' ).name( 'Orbit camera' );
 
-				updateParameters();
-				updateOutput();
+				updateTraceSource();
 
 				//
 
@@ -343,6 +460,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				hasHistory = false;
 
 			}
 
@@ -368,7 +486,21 @@
 				controls.autoRotate = params.orbit;
 				controls.update( delta );
 
+				const usePrevious = params.traceSource !== 'Current';
+
+				historyValid.value = usePrevious && hasHistory && reprojection.needsHistoryReset() === false;
+
 				renderPipeline.render();
+
+				if ( usePrevious ) {
+
+					// store the depth, camera matrices and jitter for the next frame
+
+					reprojection.update( renderer );
+					previousJitter.value.copy( currentJitter );
+					hasHistory = true;
+
+				}
 
 			}
 
