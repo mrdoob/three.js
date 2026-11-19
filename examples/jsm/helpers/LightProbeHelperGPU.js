@@ -1,7 +1,8 @@
 import {
 	Mesh,
 	NodeMaterial,
-	SphereGeometry
+	SphereGeometry,
+	warnOnce
 } from 'three/webgpu';
 import { float, Fn, getShIrradianceAt, normalWorld, uniformArray, uniform, vec4 } from 'three/tsl';
 
@@ -16,6 +17,7 @@ import { float, Fn, getShIrradianceAt, normalWorld, uniformArray, uniform, vec4 
  * scene.add( helper );
  * ```
  *
+ * @deprecated since r188.
  * @private
  * @augments Mesh
  * @three_import import { LightProbeHelper } from 'three/addons/helpers/LightProbeHelperGPU.js';
@@ -25,10 +27,13 @@ class LightProbeHelper extends Mesh {
 	/**
 	 * Constructs a new light probe helper.
 	 *
+	 * @deprecated since r188.
 	 * @param {LightProbe} lightProbe - The light probe to visualize.
 	 * @param {number} [size=1] - The size of the helper.
 	 */
 	constructor( lightProbe, size = 1 ) {
+
+		warnOnce( 'LightProbeHelper: "LightProbeHelper" has been removed. Use "LightProbeGridHelper" instead.' ); // @deprecated r188
 
 		const sh = uniformArray( lightProbe.sh.coefficients );
 		const intensity = uniform( lightProbe.intensity );

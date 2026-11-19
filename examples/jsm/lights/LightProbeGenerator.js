@@ -9,12 +9,14 @@ import {
 	HalfFloatType,
 	DataUtils,
 	WebGLCoordinateSystem,
-	FloatType
+	FloatType,
+	warnOnce
 } from 'three';
 
 /**
  * Utility class for creating instances of {@link LightProbe}.
  *
+ * @deprecated since r188.
  * @hideconstructor
  * @three_import import { LightProbeGenerator } from 'three/addons/lights/LightProbeGenerator.js';
  */
@@ -24,10 +26,13 @@ class LightProbeGenerator {
 	 * Creates a light probe from the given (radiance) environment map.
 	 * The method expects that the environment map is represented as a cube texture.
 	 *
+	 * @deprecated since r188.
 	 * @param {CubeTexture} cubeTexture - The environment map.
 	 * @return {LightProbe} The created light probe.
 	 */
 	static fromCubeTexture( cubeTexture ) {
+
+		warnOnce( 'LightProbeGenerator: "LightProbeGenerator" has been removed. Use "LightProbeGrid" or "Scene.environment" instead.' ); // @deprecated r188
 
 		// https://www.ppsloan.org/publications/StupidSH36.pdf
 
@@ -149,12 +154,15 @@ class LightProbeGenerator {
 	 * The cube render target must be in RGBA so `cubeRenderTarget.texture.format` must be
 	 * set to {@link RGBAFormat}.
 	 *
+	 * @deprecated since r188.
 	 * @async
 	 * @param {WebGPURenderer|WebGLRenderer} renderer - The renderer.
 	 * @param {CubeRenderTarget|WebGLCubeRenderTarget} cubeRenderTarget - The environment map.
 	 * @return {Promise<LightProbe>} A Promise that resolves with the created light probe.
 	 */
 	static async fromCubeRenderTarget( renderer, cubeRenderTarget ) {
+
+		warnOnce( 'LightProbeGenerator: "LightProbeGenerator" has been removed. Use "LightProbeGrid" or "Scene.environment" instead.' ); // @deprecated r188
 
 		const flip = renderer.coordinateSystem === WebGLCoordinateSystem ? - 1 : 1;
 

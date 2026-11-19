@@ -119,8 +119,6 @@ const UniformsLib = {
 
 		ambientLightColor: { value: [] },
 
-		lightProbe: { value: [] },
-
 		sunLights: { value: [], properties: {
 			direction: {},
 			color: {}

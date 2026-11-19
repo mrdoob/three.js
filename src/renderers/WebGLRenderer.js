@@ -2298,7 +2298,6 @@ class WebGLRenderer {
 				// wire up the material to this renderer's lighting state
 
 				uniforms.ambientLightColor.value = lights.state.ambient;
-				uniforms.lightProbe.value = lights.state.probe;
 				uniforms.sunLights.value = lights.state.sun;
 				uniforms.sunLightShadows.value = lights.state.sunShadow;
 				uniforms.directionalLights.value = lights.state.directional;
@@ -2863,7 +2862,6 @@ class WebGLRenderer {
 		function markUniformsLightsNeedsUpdate( uniforms, value ) {
 
 			uniforms.ambientLightColor.needsUpdate = value;
-			uniforms.lightProbe.needsUpdate = value;
 
 			uniforms.sunLights.needsUpdate = value;
 			uniforms.sunLightShadows.needsUpdate = value;

@@ -1,7 +1,8 @@
 import {
 	Mesh,
 	ShaderMaterial,
-	SphereGeometry
+	SphereGeometry,
+	warnOnce
 } from 'three';
 
 /**
@@ -15,6 +16,7 @@ import {
  * scene.add( helper );
  * ```
  *
+ * @deprecated since r188.
  * @augments Mesh
  * @three_import import { LightProbeHelper } from 'three/addons/helpers/LightProbeHelper.js';
  */
@@ -23,10 +25,13 @@ class LightProbeHelper extends Mesh {
 	/**
 	 * Constructs a new light probe helper.
 	 *
+	 * @deprecated since r188.
 	 * @param {LightProbe} lightProbe - The light probe to visualize.
 	 * @param {number} [size=1] - The size of the helper.
 	 */
 	constructor( lightProbe, size = 1 ) {
+
+		warnOnce( 'LightProbeHelper: "LightProbeHelper" has been removed. Use "LightProbeGridHelper" instead.' ); // @deprecated r188
 
 		const material = new ShaderMaterial( {
 
