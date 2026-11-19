@@ -194,7 +194,7 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.ROUGHNESS ) { // TODO: cleanup similar branches
 
-			const roughnessNode = this.getFloat( scope );
+			const roughnessNode = material.roughness !== undefined ? this.getFloat( scope ) : float( 0 );
 
 			if ( material.roughnessMap && material.roughnessMap.isTexture === true ) {
 
@@ -222,7 +222,7 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.METALNESS ) {
 
-			const metalnessNode = this.getFloat( scope );
+			const metalnessNode = material.metalness !== undefined ? this.getFloat( scope ) : float( 0 );
 
 			if ( material.metalnessMap && material.metalnessMap.isTexture === true ) {
 
