@@ -63,7 +63,7 @@ class LightingModel {
 	indirect( /*builder*/ ) { }
 
 	/**
-	 * This method is intended for reflecting ambient lights and light probes, which stand
+	 * This method is intended for reflecting ambient and hemisphere lights, which stand
 	 * in for a distant environment. It is called by the light nodes while they are set up.
 	 *
 	 * @abstract

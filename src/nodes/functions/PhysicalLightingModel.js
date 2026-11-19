@@ -795,7 +795,7 @@ class PhysicalLightingModel extends LightingModel {
 	}
 
 	/**
-	 * Reflects ambient lights and light probes, which stand in for a distant
+	 * Reflects ambient and hemisphere lights, which stand in for a distant
 	 * environment that reflects its irradiance / PI.
 	 *
 	 * @param {function(Node<vec3>, Node<float>):Node<vec3>} irradianceAt - Returns the light's prefiltered radiance * PI for a world space direction and roughness.
