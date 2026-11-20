@@ -39,6 +39,23 @@ class StorageInstancedBufferAttribute extends InstancedBufferAttribute {
 		 */
 		this.isStorageInstancedBufferAttribute = true;
 
+		/**
+		 * The Pixel Buffer Object (PBO) used to represent the data of the attribute
+		 * on backends without support for storage buffers.
+		 *
+		 * @type {undefined | DataTexture}
+		 * @default true
+		 */
+		this.pbo = undefined;
+
+		/**
+		 * The TextureNode used to represent the attribute's PBO.
+		 *
+		 * @type {undefined | TextureNode}
+		 * @default true
+		 */
+		this.pboNode = undefined;
+
 	}
 
 	/**
