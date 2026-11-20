@@ -1128,7 +1128,7 @@ class NodeMaterial extends Material {
 
 		let outgoingLightNode = this.setupOutgoingLight( builder );
 
-		if ( lightsNode && ( materialLightings.length > 0 || lightsNode.getScope().hasLights ) ) {
+		if ( lightsNode && ( materialLightings.length > 0 || lightsNode.hasLights ) ) {
 
 			const lightingModel = this.setupLightingModel( builder ) || null;
 
