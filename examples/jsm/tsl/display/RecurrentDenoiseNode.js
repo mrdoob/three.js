@@ -372,9 +372,9 @@ class RecurrentDenoiseNode extends Node {
 
 		const { renderer } = frame;
 
-		const drawingBufferSize = renderer.getDrawingBufferSize( _size );
-		const width = drawingBufferSize.width;
-		const height = drawingBufferSize.height;
+		// the effect renders at the resolution of its depth input
+
+		const { width, height } = this.depthNode !== null ? this.depthNode.value.image : renderer.getDrawingBufferSize( _size );
 
 		const needsRestart = this._renderTarget.width !== width || this._renderTarget.height !== height;
 		this.setSize( width, height );

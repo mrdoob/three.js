@@ -159,7 +159,7 @@
 			},
 		};
 
-		let camera, scene, model, renderer, renderPipeline, ssrNode, ssrTexture, temporalReprojectNode, denoiseNode;
+		let camera, scene, model, renderer, renderPipeline, ssrNode, ssrTexture, ssrUpsampled, temporalReprojectNode, denoiseNode, denoiseUpsampled;
 		let controls;
 		let combinedOutputNode, scenePassColor, scenePassDepth, scenePassVelocity;
 		let gammaUniform, contrastUniform, saturationUniform;
@@ -284,7 +284,7 @@
 				binaryRefine: params.ssr.binaryRefine
 			} ).toInspector( 'SSR' );
 
-			// downsample: at a ratio above 1, the reflections are computed from downsampled inputs and upsampled afterwards
+			// downsample: at a ratio above 1, the reflections are computed and denoised from downsampled inputs and upsampled afterwards
 
 			const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
 
@@ -293,6 +293,7 @@
 			const downsampleDiffuseColor = downsample.getTextureNode( 'diffuseColor' );
 			const downsampleVelocity = downsample.getTextureNode( 'velocity' );
 			const downsampleNormal = sample( ( uv ) => normalDecode( downsample.getTextureNode( 'normal' ).sample( uv ) ) );
+			const downsampleMetalRough = sample( ( uv ) => vec2( downsampleDiffuseColor.sample( uv ).a, downsampleVelocity.sample( uv ).z ) );
 
 			// without depth rejection, the joint bilateral filter is a bilinear filter
 
@@ -318,13 +319,21 @@
 				ssrNode.metalnessNode = reduced ? downsampleDiffuseColor.a : scenePassDiffuseColor.a;
 				ssrNode.roughnessNode = reduced ? downsampleVelocity.z : scenePassVelocity.z;
 
+				temporalReprojectNode.depthNode = ssrNode.depthNode;
+				temporalReprojectNode.normalNode = reduced ? downsample.getTextureNode( 'normal' ) : scenePassNormal;
+				temporalReprojectNode.velocityNode = reduced ? downsampleVelocity : scenePassVelocity;
+
+				denoiseNode.depthNode = ssrNode.depthNode;
+				denoiseNode.normalNode = ssrNode.normalNode;
+				denoiseNode.roughnessMetalnessNode = reduced ? downsampleMetalRough : scenePassMetalRough;
+
 				renderPipeline.needsUpdate = true;
 
 				reduced ? upsamplerControl.show() : upsamplerControl.hide();
 
 			}
 
-			ssrTexture = upsample( ssrNode.getTextureNode() );
+			ssrTexture = ssrNode.getTextureNode();
 
 			temporalReprojectNode = temporalReproject( ssrTexture, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
 				mode: 'specular',
@@ -347,7 +356,10 @@
 			ssrNode.setHistory( denoiseNode, scenePassVelocity );
 			temporalReprojectNode.setHistoryTexture( denoiseNode );
 
-			const denoisePassBlend = vec4( denoiseNode.rgb, ssrTexture.a.greaterThan( 0 ).toVar() );
+			ssrUpsampled = upsample( ssrTexture );
+			denoiseUpsampled = upsample( denoiseNode.getTextureNode() );
+
+			const denoisePassBlend = vec4( denoiseUpsampled.rgb, ssrUpsampled.a.greaterThan( 0 ).toVar() );
 
 			gammaUniform = uniform( params.post.grading.gamma );
 			contrastUniform = uniform( params.post.grading.contrast );
@@ -555,14 +567,14 @@
 			switch ( params.output ) {
 
 				case 0: node = applyPostProcessing( combinedOutputNode ); break; // Beauty
-				case 1: node = applyGrading( vec4( ssrTexture.rgb, 1 ) ); break; // SSR
-				case 4: node = applyGrading( vec4( denoiseNode.rgb, 1 ) ); break; // SSR DN
-				case 6: node = vec4( denoiseNode.aaa, 1 ); break; // Accumulation Speed (Alpha)
-				case 7: node = vec4( ssrTexture.aaa, 1 ); break; // Ray Length
+				case 1: node = applyGrading( vec4( ssrUpsampled.rgb, 1 ) ); break; // SSR
+				case 4: node = applyGrading( vec4( denoiseUpsampled.rgb, 1 ) ); break; // SSR DN
+				case 6: node = vec4( denoiseUpsampled.aaa, 1 ); break; // Accumulation Speed (Alpha)
+				case 7: node = vec4( ssrUpsampled.aaa, 1 ); break; // Ray Length
 				case OUTPUT_COMPARE_DENOISE:
 					node = buildCompareNode(
-						applyGrading( vec4( denoiseNode.rgb, 1 ) ),
-						applyGrading( vec4( ssrTexture.rgb, 1 ) )
+						applyGrading( vec4( denoiseUpsampled.rgb, 1 ) ),
+						applyGrading( vec4( ssrUpsampled.rgb, 1 ) )
 					);
 					break;
 				case OUTPUT_COMPARE_SSR:

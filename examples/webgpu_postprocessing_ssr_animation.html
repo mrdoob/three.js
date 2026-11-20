@@ -227,15 +227,17 @@
 					binaryRefine: params.binaryRefine
 				} ).toInspector( 'SSR' );
 
-				// downsample: at a ratio above 1, the reflections are computed from downsampled inputs and upsampled afterwards
+				// downsample: at a ratio above 1, the reflections are computed and denoised from downsampled inputs and upsampled afterwards
 
 				const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
 
 				const downsample = depthAwareDownsample( scenePassDepth, { normal: scenePassNormal, diffuseColor: scenePassDiffuseColor, velocity: scenePassVelocity } );
 				const downsampleDepth = downsample.getTextureNode( 'depth' );
 				const downsampleDiffuseColor = downsample.getTextureNode( 'diffuseColor' );
+				const downsampleVelocity = downsample.getTextureNode( 'velocity' );
 				const downsampleNormal = sample( ( uv ) => normalDecode( downsample.getTextureNode( 'normal' ).sample( uv ) ) );
-				const downsampleRoughness = sample( ( uv ) => downsample.getTextureNode( 'velocity' ).sample( uv ).z );
+				const downsampleRoughness = sample( ( uv ) => downsampleVelocity.sample( uv ).z );
+				const downsampleMetalRough = sample( ( uv ) => vec2( downsampleDiffuseColor.sample( uv ).a, downsampleVelocity.sample( uv ).z ) );
 
 				// without depth rejection, the joint bilateral filter is a bilinear filter
 
@@ -261,13 +263,21 @@
 					ssrNode.metalnessNode = reduced ? downsampleDiffuseColor.a : scenePassDiffuseColor.a;
 					ssrNode.roughnessNode = reduced ? downsampleRoughness : sceneRoughness;
 
+					temporalReprojectNode.depthNode = ssrNode.depthNode;
+					temporalReprojectNode.normalNode = reduced ? downsample.getTextureNode( 'normal' ) : scenePassNormal;
+					temporalReprojectNode.velocityNode = reduced ? downsampleVelocity : scenePassVelocity;
+
+					denoiseNode.depthNode = ssrNode.depthNode;
+					denoiseNode.normalNode = ssrNode.normalNode;
+					denoiseNode.roughnessMetalnessNode = reduced ? downsampleMetalRough : sceneMetalRough;
+
 					renderPipeline.needsUpdate = true;
 
 					reduced ? upsamplerControl.show() : upsamplerControl.hide();
 
 				}
 
-				const ssrTexture = upsample( ssrNode.getTextureNode() );
+				const ssrTexture = ssrNode.getTextureNode();
 
 				// denoise
 
@@ -303,7 +313,10 @@
 
 				const denoiseEnabled = uniform( 1 );
 
-				const combined = scenePassColor.rgb.add( mix( ssrTexture.rgb, denoiseNode.rgb, denoiseEnabled ) );
+				const ssrUpsampled = upsample( ssrTexture );
+				const denoiseUpsampled = upsample( denoiseNode.getTextureNode() );
+
+				const combined = scenePassColor.rgb.add( mix( ssrUpsampled.rgb, denoiseUpsampled.rgb, denoiseEnabled ) );
 
 				const temporalAA = traa( vec4( combined, 1 ), scenePassDepth, scenePassVelocity, camera );
 				const spatialAA = smaa( vec4( combined, 1 ) );
@@ -315,8 +328,8 @@
 					switch ( params.output ) {
 
 						case 'Beauty': outputNode = params.traa ? temporalAA : spatialAA; break;
-						case 'SSR': outputNode = vec4( ssrTexture.rgb, 1 ); break;
-						case 'SSR DN': outputNode = vec4( denoiseNode.rgb, 1 ); break;
+						case 'SSR': outputNode = vec4( ssrUpsampled.rgb, 1 ); break;
+						case 'SSR DN': outputNode = vec4( denoiseUpsampled.rgb, 1 ); break;
 
 					}
 
