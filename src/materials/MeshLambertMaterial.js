@@ -312,9 +312,10 @@ class MeshLambertMaterial extends Material {
 		this.reflectivity = 1;
 
 		/**
-		 * Scales the effect of the environment map by multiplying its color. Only applies to
-		 * {@link MeshLambertMaterial#envMap}. When the material is lit by
-		 * {@link Scene#environment}, {@link Scene#environmentIntensity} is used instead.
+		 * Scales the diffuse image-based lighting of the environment map. Only has an effect
+		 * with `WebGLRenderer` when {@link MeshLambertMaterial#envMap} is a PMREM texture. It does not
+		 * affect the reflection blended in via {@link MeshLambertMaterial#combine}. When the material is lit
+		 * by {@link Scene#environment}, {@link Scene#environmentIntensity} is used instead.
 		 *
 		 * @type {number}
 		 * @default 1

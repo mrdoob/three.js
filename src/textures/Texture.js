@@ -273,9 +273,9 @@ class Texture extends EventDispatcher {
 		 * If set to `true`, the alpha channel, if present, is multiplied into the
 		 * color channels when the texture is uploaded to the GPU.
 		 *
-		 * Note that with `WebGLRenderer` this property has no effect when using `ImageBitmap`.
-		 * You need to configure premultiply alpha on bitmap creation instead. `WebGPURenderer`
-		 * applies this property to `ImageBitmap` as well.
+		 * Note that with `WebGLRenderer` and the WebGL backend of `WebGPURenderer` this property
+		 * has no effect when using `ImageBitmap`. You need to configure premultiply alpha on bitmap
+		 * creation instead. The WebGPU backend applies this property to `ImageBitmap` as well.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -286,9 +286,9 @@ class Texture extends EventDispatcher {
 		 * If set to `true`, the texture is flipped along the vertical axis when
 		 * uploaded to the GPU.
 		 *
-		 * Note that with `WebGLRenderer` this property has no effect when using `ImageBitmap`.
-		 * You need to configure the flip on bitmap creation instead. `WebGPURenderer`
-		 * applies this property to `ImageBitmap` as well.
+		 * Note that with `WebGLRenderer` and the WebGL backend of `WebGPURenderer` this property
+		 * has no effect when using `ImageBitmap`. You need to configure the flip on bitmap
+		 * creation instead. The WebGPU backend applies this property to `ImageBitmap` as well.
 		 *
 		 * @type {boolean}
 		 * @default true
@@ -425,8 +425,8 @@ class Texture extends EventDispatcher {
 	}
 
 	/**
-	 * The depth of the texture in pixels. Returns `0` for 2D textures and
-	 * cube textures.
+	 * The depth of the texture in pixels, read from `image.depth`. Returns `0` if the
+	 * image has no depth, e.g. for cube textures and image, canvas or video sources.
 	 */
 	get depth() {
 

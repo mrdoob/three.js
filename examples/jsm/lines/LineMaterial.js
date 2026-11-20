@@ -594,7 +594,8 @@ class LineMaterial extends ShaderMaterial {
 	}
 
 	/**
-	 * The scale of the dashes and gaps.
+	 * Scales the line distances before dashing. Values greater than `1` make dashes
+	 * and gaps shorter.
 	 *
 	 * @type {number}
 	 * @default 1
