@@ -273,7 +273,7 @@ export function builtinAOContext( aoNode, node = null ) {
 /**
  * TSL function for defining the sources of indirect light of the materials of a given node,
  * e.g. of a pass. The sources are asked in order, in front of the environment and of what
- * the lights reflect. Transparent materials keep their default indirect lighting.
+ * the lights reflect.
  *
  * @tsl
  * @function

@@ -128,7 +128,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 	 */
 	setupIndirectLightings( builder ) {
 
-		const { indirectSpecular = [], indirectDiffuse = [] } = this.transparent === true ? {} : builder.context;
+		const { indirectSpecular = [], indirectDiffuse = [] } = builder.context;
 
 		const environmentNode = this.setupEnvironment( builder );
 

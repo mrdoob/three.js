@@ -1060,7 +1060,7 @@ class NodeMaterial extends Material {
 
 		}
 
-		const diffuse = this.transparent !== true ? builder.context.indirectDiffuse : undefined;
+		const diffuse = builder.context.indirectDiffuse;
 
 		if ( diffuse !== undefined ) {
 
