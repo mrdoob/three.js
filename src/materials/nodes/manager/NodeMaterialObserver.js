@@ -580,7 +580,7 @@ class NodeMaterialObserver {
 	 * Returns `true` if the given render object has not changed its state.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
-	 * @param {Array<Light>} lightsData - The current material lights.
+	 * @param {Array<Object>} lightsData - The lights data of the current material lights.
 	 * @param {number} renderId - The current render ID.
 	 * @return {boolean} Whether the given render object is equal to its cached state or not.
 	 */
@@ -966,7 +966,7 @@ class NodeMaterialObserver {
 	 * Returns the lights data for the given material lights.
 	 *
 	 * @param {Array<Light>} materialLights - The material lights.
-	 * @param {Array<Object>} lights - The array that is cleared and then filled with the lights data.
+	 * @param {Array<Object>} lights - The target array that receives the lights data.
 	 * @return {Array<Object>} The lights data for the given material lights.
 	 */
 	getLightsData( materialLights, lights ) {

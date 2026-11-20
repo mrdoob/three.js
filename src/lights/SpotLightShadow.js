@@ -3,7 +3,7 @@ import { RAD2DEG } from '../math/MathUtils.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 
 /**
- * Represents the shadow configuration of directional lights.
+ * Represents the shadow configuration of spot lights.
  *
  * @augments LightShadow
  */

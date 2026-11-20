@@ -118,7 +118,7 @@ class LightShadow {
 
 		/**
 		 * Defines the width and height of the shadow map. Higher values give better quality
-		 * shadows at the cost of computation time. Values must be powers of two.
+		 * shadows at the cost of computation time. Point light shadows only use the width.
 		 *
 		 * @type {Vector2}
 		 * @default (512,512)
@@ -126,7 +126,8 @@ class LightShadow {
 		this.mapSize = new Vector2( 512, 512 );
 
 		/**
-		 * The type of shadow texture. The default is `UnsignedByteType`.
+		 * The type of the shadow map's color texture. The default is `UnsignedByteType`.
+		 * Only supported with `WebGPURenderer`, and not for point light shadows.
 		 *
 		 * @type {number}
 		 * @default UnsignedByteType

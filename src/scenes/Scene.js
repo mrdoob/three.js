@@ -32,7 +32,8 @@ class Scene extends Object3D {
 		 *
 		 * - A color for defining a uniform colored background.
 		 * - A texture for defining a (flat) textured background.
-		 * - Cube textures or equirectangular textures for defining a skybox.
+		 * - Cube textures, or equirectangular textures with `mapping` set to
+		 * `EquirectangularReflectionMapping`, for defining a skybox.
 		 *
 		 * @type {?(Color|Texture)}
 		 * @default null
@@ -40,9 +41,10 @@ class Scene extends Object3D {
 		this.background = null;
 
 		/**
-		 * Sets the environment map for all physical materials in the scene. However,
-		 * it's not possible to overwrite an existing texture assigned to the `envMap`
-		 * material property.
+		 * Sets the environment map used for image-based lighting of {@link MeshStandardMaterial}
+		 * and {@link MeshPhysicalMaterial} (with `WebGLRenderer` also {@link MeshLambertMaterial}
+		 * and {@link MeshPhongMaterial}). However, it's not possible to overwrite an existing
+		 * texture assigned to the `envMap` material property.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -87,7 +89,9 @@ class Scene extends Object3D {
 
 		/**
 		 * Attenuates the color of the environment. Only influences environment maps
-		 * assigned to {@link Scene#environment}.
+		 * assigned to {@link Scene#environment}. Materials lit by the scene environment
+		 * use this value instead of their own `envMapIntensity`, which only applies to
+		 * a material's own `envMap`.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -95,8 +99,9 @@ class Scene extends Object3D {
 		this.environmentIntensity = 1;
 
 		/**
-		 * The rotation of the environment map in radians. Only influences physical materials
-		 * in the scene when {@link Scene#environment} is used.
+		 * The rotation of the environment map in radians. Only influences materials
+		 * lit by {@link Scene#environment}, which use this value instead of their own
+		 * `envMapRotation`.
 		 *
 		 * @type {Euler}
 		 * @default (0,0,0)

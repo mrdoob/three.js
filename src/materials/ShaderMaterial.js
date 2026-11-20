@@ -173,7 +173,7 @@ class ShaderMaterial extends Material {
 		 *
 		 * ```js
 		 * const material = new ShaderMaterial( {
-		 *     uniforms: UniformsUtils.merge( [ UniformsLib[ 'fog' ], shaderUniforms ] );
+		 *     uniforms: UniformsUtils.merge( [ UniformsLib[ 'fog' ], shaderUniforms ] ),
 		 *     vertexShader: vertexShader,
 		 *     fragmentShader: fragmentShader,
 		 *     fog: true

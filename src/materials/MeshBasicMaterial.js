@@ -105,7 +105,8 @@ class MeshBasicMaterial extends Material {
 		this.aoMapIntensity = 1.0;
 
 		/**
-		 * Specular map used by the material.
+		 * The red channel of this texture is used as a scalar strength that affects
+		 * how much of the environment map affects the surface.
 		 *
 		 * `specularMap` represents color data, and the texture must be assigned a
 		 * {@link Texture#colorSpace}. Most `specularMap` textures set

@@ -6,18 +6,11 @@ import { Light } from './Light.js';
  * Light probes are an alternative way of adding light to a 3D scene. Unlike
  * classical light sources (e.g. directional, point or spot lights), light
  * probes do not emit light. Instead they store information about light
- * passing through 3D space. During rendering, the light that hits a 3D
- * object is approximated by using the data from the light probe.
+ * passing through 3D space.
  *
- * Light probes are usually created from (radiance) environment maps. The
- * class {@link LightProbeGenerator} can be used to create light probes from
- * cube textures or render targets. However, light estimation data could also
- * be provided in other forms e.g. by WebXR. This enables the rendering of
- * augmented reality content that reacts to real world lighting.
- *
- * The current probe implementation in three.js supports so-called diffuse
- * light probes. This type of light probe is functionally equivalent to an
- * irradiance environment map.
+ * Note: Light probes are no longer evaluated by `WebGLRenderer` or `WebGPURenderer`,
+ * so adding one to a scene has no effect. Use {@link LightProbeGrid} or
+ * {@link Scene#environment} instead.
  *
  * @deprecated since r188.
  * @augments Light
@@ -28,7 +21,7 @@ class LightProbe extends Light {
 	 * Constructs a new light probe.
 	 *
 	 * @deprecated since r188.
-	 * @param {SphericalHarmonics3} sh - The spherical harmonics which represents encoded lighting information.
+	 * @param {SphericalHarmonics3} [sh] - The spherical harmonics which represents encoded lighting information.
 	 * @param {number} [intensity=1] - The light's strength/intensity.
 	 */
 	constructor( sh = new SphericalHarmonics3(), intensity = 1 ) {
