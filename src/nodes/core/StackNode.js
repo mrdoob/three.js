@@ -24,6 +24,39 @@ const isAssignableExpression = ( builder, node ) => {
 };
 
 /**
+ * Whether the given node of a stack is dead code, see {@link Node#isDeadCode}. A node that calls a function
+ * which is not pure is kept, since the function can assign values which are read, see {@link StackNode#isPure}.
+ *
+ * @private
+ * @param {NodeBuilder} builder - The current node builder.
+ * @param {Node} node - The node to check.
+ * @return {boolean} Whether the node is dead code.
+ */
+const isDeadNode = ( builder, node ) => builder.getNodeProperties( node ).callsFunction !== true && node.isDeadCode( builder );
+
+/**
+ * Whether the dead code of the given stack is removed in the analyze stage. A value can be read in the next iteration
+ * of a loop before it is assigned, so the outermost loop body analyzes its nodes until no node is added, but the nodes
+ * of the blocks in it, e.g. the branches of an `If()`, are all analyzed, since they are not analyzed again.
+ *
+ * @private
+ * @param {NodeBuilder} builder - The current node builder.
+ * @param {StackNode} parentStack - The active stack where the stack is built.
+ * @return {boolean} Whether the dead code of the stack is removed.
+ */
+const removesDeadCode = ( builder, parentStack ) => {
+
+	const block = builder.context.nodeBlock;
+
+	if ( block === undefined ) return true;
+
+	// the body of the outermost loop
+
+	return block.parent === null && parentStack !== undefined && block.stack === parentStack && block.node === parentStack._currentNode;
+
+};
+
+/**
  * Stack is a helper for Nodes that need to produce stack-based code instead of continuous flow.
  * They are usually needed in cases like `If`, `Else`.
  *
@@ -366,11 +399,41 @@ class StackNode extends Node {
 
 	}
 
+	/**
+	 * Whether the nodes of this stack only declare variables and compute values, e.g. the body of a function
+	 * which does not assign a value or call a function that is not pure.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether the stack is pure.
+	 */
+	isPure( builder ) {
+
+		return this.nodes.every( ( node ) => ( node.isVarNode === true || isAssignableExpression( builder, node ) ) && builder.getNodeProperties( node ).callsFunction !== true );
+
+	}
+
+	isDeadCode( builder ) {
+
+		// e.g. the branch of an `If()` that only assigns values which are never read
+
+		return ! this.outputNode && this.nodes.every( ( node ) => isAssignableExpression( builder, node ) || isDeadNode( builder, node ) );
+
+	}
+
+	analyze( builder ) {
+
+		// the nodes of the stack are analyzed by build(), so the dead code is not analyzed
+
+		builder.increaseUsage( this );
+
+	}
+
 	build( builder, ...params ) {
 
 		this._setupInspector( builder );
 
 		const previousStack = getCurrentStack();
+		const parentStack = builder.getActiveStack();
 
 		const buildStage = builder.buildStage;
 
@@ -380,57 +443,62 @@ class StackNode extends Node {
 
 		//
 
-		for ( let i = 0; i < this.nodes.length; i ++ ) {
+		let result;
 
-			const node = this.nodes[ i ];
-			const previousNode = this._currentNode;
+		if ( buildStage === 'analyze' ) {
 
-			this._currentNode = node;
+			// the output is analyzed before the nodes, so the reads of a value are counted before its assignments
 
-			if ( isAssignableExpression( builder, node ) ) continue;
+			if ( this.outputNode ) this.outputNode.build( builder, ...params );
 
-			if ( buildStage === 'setup' ) {
+			this._analyzeNodes( builder, removesDeadCode( builder, parentStack ) );
 
-				node.build( builder );
+		} else {
 
-			} else if ( buildStage === 'analyze' ) {
+			for ( let i = 0; i < this.nodes.length; i ++ ) {
 
-				node.build( builder, this );
+				const node = this.nodes[ i ];
 
-			} else if ( buildStage === 'generate' ) {
+				if ( isAssignableExpression( builder, node ) ) continue;
 
-				const stages = builder.getDataFromNode( node, 'any' ).stages;
-				const parents = stages && stages[ builder.shaderStage ];
+				if ( buildStage === 'setup' ) {
 
-				if ( node.isVarNode && parents && parents.length === 1 && parents[ 0 ] && parents[ 0 ].isStackNode ) {
+					this._buildNode( builder, node );
 
-					continue; // skip var nodes that are only used in .toVarying()
+				} else if ( buildStage === 'generate' ) {
+
+					if ( isDeadNode( builder, node ) ) continue;
+
+					const stages = builder.getDataFromNode( node, 'any' ).stages;
+					const parents = stages && stages[ builder.shaderStage ];
+
+					if ( node.isVarNode && parents && parents.length === 1 && parents[ 0 ] && parents[ 0 ].isStackNode ) {
+
+						continue; // skip var nodes that are only used in .toVarying()
+
+					}
+
+					this._buildNode( builder, node, 'void' );
 
 				}
 
-				node.build( builder, 'void' );
-
 			}
 
-			this._currentNode = previousNode;
+			if ( this.outputNode ) {
+
+				const buildResult = this.outputNode.build( builder, ...params );
+
+				if ( buildStage !== 'generate' || this.outputNode.getNodeType( builder ) !== 'void' ) {
+
+					result = buildResult;
+
+				}
+
+			}
 
 		}
 
-		//
-
-		let result;
-
-		if ( this.outputNode ) {
-
-			const buildResult = this.outputNode.build( builder, ...params );
-
-			if ( builder.buildStage !== 'generate' || this.outputNode.getNodeType( builder ) !== 'void' ) {
-
-				result = buildResult;
-
-			}
-
-		} else {
+		if ( ! this.outputNode ) {
 
 			result = super.build( builder, ...params );
 
@@ -441,6 +509,63 @@ class StackNode extends Node {
 		builder.removeActiveStack( this );
 
 		return result;
+
+	}
+
+	/**
+	 * Analyzes the nodes in reverse order, so the reads of a value are counted before its
+	 * assignments and the dead code is not analyzed, see {@link Node#isDeadCode}. The nodes
+	 * are analyzed again until no node is added, e.g. a value read in a loop before it is assigned.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {boolean} removeDeadCode - Whether the dead code is not analyzed.
+	 */
+	_analyzeNodes( builder, removeDeadCode ) {
+
+		const analyzedNodes = new Set();
+
+		let analyzed = true;
+
+		while ( analyzed === true ) {
+
+			analyzed = false;
+
+			for ( let i = this.nodes.length - 1; i >= 0; i -- ) {
+
+				const node = this.nodes[ i ];
+
+				if ( analyzedNodes.has( node ) || isAssignableExpression( builder, node ) || ( removeDeadCode && isDeadNode( builder, node ) ) ) continue;
+
+				analyzedNodes.add( node );
+				analyzed = true;
+
+				this._buildNode( builder, node, this );
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Builds a node of the stack as the current node, so the nodes added
+	 * to the stack during its build are added after it.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Node} node - The node to build.
+	 * @param {?(string|Node)} [output] - The output of the build.
+	 */
+	_buildNode( builder, node, output ) {
+
+		const previousNode = this._currentNode;
+
+		this._currentNode = node;
+
+		node.build( builder, output );
+
+		this._currentNode = previousNode;
 
 	}
 

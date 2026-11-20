@@ -686,6 +686,166 @@ while ( ( nodeVar0 < 3 ) ) {
 
 nodeVar0
 
+// dead code removes unused variable
+
+var result : f32;
+
+result = 2.0;
+
+result
+
+// dead code removes chain of unused variables
+
+0.0
+
+// dead code removes unused branch
+
+var result : f32;
+
+result = 0.0;
+
+result
+
+// dead code removes assignment in a branch
+
+var result : f32;
+
+result = 0.0;
+
+if ( ( nodeVarying0.x > 0.5 ) ) {
+
+	result = 1.0;
+
+}
+
+result
+
+// dead code removes assignment in the if branch
+
+var result : f32;
+
+result = 0.0;
+
+if ( !( ( nodeVarying0.x > 0.5 ) ) ) {
+
+	result = 2.0;
+
+}
+
+result
+
+// dead code removes unused loop
+
+var result : f32;
+
+result = 0.0;
+
+result
+
+// dead code removes assignment in a loop
+
+var sum : f32;
+
+sum = 0.0;
+
+for ( var i : i32 = 0; i < 4; i ++ ) {
+
+	sum = ( sum + f32( i ) );
+
+}
+
+sum
+
+// dead code removes call of pure function
+
+1.0
+
+// dead code keeps loop bound
+
+var count : i32;
+var sum : i32;
+
+count = 1;
+sum = 0;
+count = 3;
+
+for ( var i : i32 = 0; i < count; i ++ ) {
+
+	sum = ( sum + 1 );
+
+}
+
+sum
+
+// dead code keeps loop condition
+
+var done : bool;
+var sum : i32;
+
+done = false;
+sum = 0;
+
+while ( ( ! done ) ) {
+
+	sum = ( sum + 1 );
+
+	if ( ( sum > 2 ) ) {
+
+		done = true;
+
+	}
+
+}
+
+sum
+
+// dead code keeps loop carried value in a branch
+
+var sum : i32;
+var carried : i32;
+var next : i32;
+
+sum = 0;
+carried = 7;
+next = 0;
+
+for ( var i : i32 = 0; i < 3; i ++ ) {
+
+	sum = ( sum + carried );
+	next = 2;
+
+	if ( ( i < 2 ) ) {
+
+		carried = next;
+		sum = ( sum + 1 );
+
+	}
+
+}
+
+sum
+
+// dead code keeps assignment with side effects
+
+var result : i32;
+var unused : i32;
+
+result = 0;
+unused = 0;
+result = ( result + 2 );
+unused = 1;
+
+result
+
+// dead code keeps condition with side effects
+
+var result : i32;
+
+result = 0;
+result = ( result + 4 );
+
+result
+
 // function inline reuse
 
 let nodeConst0 = ( 3.0 * 3.0 );
