@@ -42,6 +42,8 @@
 			import { sample, pass, mrt, screenUV, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { ssao } from 'three/addons/tsl/display/SSAONode.js';
+			import { hiZ } from 'three/addons/tsl/display/HiZNode.js';
+			import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -60,7 +62,7 @@
 				aoType: 'GTAO',
 				samples: 16,
 				radius: 0.4,
-				resolutionScale: 0.5,
+				resolution: 1,
 				scale: 1.5, // GTAO
 				thickness: 1, // GTAO
 				temporalFiltering: true, // GTAO
@@ -139,6 +141,17 @@
 				const normalTexture = prePass.getTexture( 'output' );
 				normalTexture.type = THREE.UnsignedByteType;
 
+				// downsampled depth and normal for computing the AO in a reduced resolution
+
+				const downsample = depthAwareDownsample( hiZ( prePassDepth, { maxLevel: 2 } ), { normal: prePass.getTextureNode() } );
+
+				const downsampleDepth = downsample.getTextureNode( 'depth' );
+				const downsampleNormal = sample( ( uv ) => {
+
+					return unpackRGBToNormal( downsample.getTextureNode( 'normal' ).sample( uv ) );
+
+				} );
+
 				// scene pass
 
 				const scenePass = pass( scene, camera ).toInspector( 'Color' );
@@ -170,9 +183,16 @@
 
 					if ( aoPass ) aoPass.dispose();
 
+					const reduced = params.resolution > 0;
+
+					if ( reduced ) downsample.level = params.resolution;
+
+					const depth = reduced ? downsampleDepth : prePassDepth;
+					const normal = reduced ? downsampleNormal : prePassNormal;
+
 					aoPass = ( params.aoType === 'SSAO' )
-						? ssao( prePassDepth, prePassNormal, camera ).toInspector( 'SSAO', ( inspectNode ) => inspectNode.r )
-						: ao( prePassDepth, prePassNormal, camera ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
+						? ssao( depth, normal, camera ).toInspector( 'SSAO', ( inspectNode ) => inspectNode.r )
+						: ao( depth, normal, camera ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
 
 					updateParameters();
 
@@ -531,13 +551,13 @@
 
 					// half resolution suffices for GTAO since TRAA smooths it, SSAO looks best at full resolution
 
-					resolutionScaleControl.setValue( params.aoType === 'SSAO' ? 1 : 0.5 );
+					resolutionControl.setValue( params.aoType === 'SSAO' ? 0 : 1 );
 
 					createAO();
 					updateControls();
 
 				} );
-				const resolutionScaleControl = gui.add( params, 'resolutionScale', 0, 1 ).name( 'resolution' ).onChange( updateParameters );
+				const resolutionControl = gui.add( params, 'resolution', { full: 0, half: 1, quarter: 2 } ).onChange( createAO );
 				gui.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters ).debounce( 250 );
 				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
 
@@ -588,7 +608,6 @@
 
 				aoPass.samples.value = params.samples;
 				aoPass.radius.value = params.radius;
-				aoPass.resolutionScale = params.resolutionScale;
 
 				if ( params.aoType === 'SSAO' ) {
 

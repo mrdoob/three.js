@@ -115,7 +115,6 @@
 			roughness: 0.3,
 
 			ssr: {
-				resolutionScale: 1,
 				quality: 0.25,
 				mirrorBias: 0,
 				maxDistance: 0.4,
@@ -413,7 +412,6 @@
 
 			if ( ! ssrNode ) return;
 
-			ssrNode.resolutionScale = params.ssr.resolutionScale;
 			ssrNode.quality.value = params.ssr.quality;
 			ssrNode.mirrorBias.value = params.ssr.mirrorBias;
 			// stepExponent / screenEdgeFadeBlack / binaryRefine are build-time constants: assigning

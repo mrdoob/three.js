@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
+import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
@@ -6,7 +6,6 @@ import { boxBlur } from './boxBlur.js';
 import ImportanceSampledEnvironment from './ImportanceSampledEnvironment.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
 let _rendererState;
 
 // Maximum ray-march step count; `quality` (0..1) scales it to a fixed per-ray count.
@@ -162,17 +161,6 @@ class SSRNode extends Node {
 		 * @default false
 		 */
 		this._reflectNonMetals = reflectNonMetals;
-
-		/**
-		 * The resolution scale. Valid values are in the range
-		 * `[0,1]`. `1` means best quality but also results in
-		 * more computational overhead. Setting to `0.5` means
-		 * the effect is computed in half-resolution.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.resolutionScale = 1;
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
@@ -674,9 +662,6 @@ class SSRNode extends Node {
 	 */
 	setSize( width, height ) {
 
-		width = Math.round( this.resolutionScale * width );
-		height = Math.round( this.resolutionScale * height );
-
 		this._resolution.value.set( width, height );
 		this._ssrRenderTarget.setSize( width, height );
 		this._blurRenderTarget.setSize( width, height );
@@ -775,11 +760,11 @@ class SSRNode extends Node {
 		const ssrRenderTarget = this._ssrRenderTarget;
 		const blurRenderTarget = this._blurRenderTarget;
 
-		const size = renderer.getDrawingBufferSize( _size );
+		const { width, height } = this.depthNode.value.image;
 
 		_quadMesh.material = this._ssrMaterial;
 
-		this.setSize( size.width, size.height );
+		this.setSize( width, height );
 
 		// Advance the noise index once per frame (matches SSGI / Denoise).
 		this._noiseIndex.value = ( this._noiseIndex.value + 1 ) % 0x7fffffff;
@@ -875,17 +860,13 @@ class SSRNode extends Node {
 		const ssr = Fn( () => {
 
 			const noise = this.stochastic === true ? sampleMarchNoise( uvNode, this._noiseIndex ) : null;
-			// reconstruct at the depth texel center
 
-			const depthSize = vec2( textureSize( this.depthNode ) ).toConst();
-			const uvPos = uvNode.mul( depthSize ).floor().add( 0.5 ).div( depthSize ).toVar();
-
-			const depth = sampleDepth( uvPos ).toVar();
+			const depth = sampleDepth( uvNode ).toVar();
 
 			// Skip background pixels (cleared far-plane depth); the target is cleared each frame.
 			isBackgroundDepth( depth ).discard();
 
-			const viewPosition = getViewPosition( uvPos, depth, this._cameraProjectionMatrixInverse ).toVar();
+			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar();
 			const worldPosition = this._cameraWorldMatrix.mul( vec4( viewPosition, 1.0 ) ).xyz.toVar();
 			const viewNormal = this.normalNode.rgb.toVar();
 
@@ -904,7 +885,7 @@ class SSRNode extends Node {
 			const roughness = float( this.roughnessNode );
 			const glossiness = min( roughness.div( 0.25 ), 1 ).oneMinus();
 			// Only the fade-to-black miss path reads this, and that path is baked out otherwise.
-			const surfaceBorderFactor = this.screenEdgeFadeBlack ? computeScreenBorderFactor( uvPos, this.screenEdgeFade ) : null;
+			const surfaceBorderFactor = this.screenEdgeFadeBlack ? computeScreenBorderFactor( uvNode, this.screenEdgeFade ) : null;
 			const hitBorderWidth = this.screenEdgeFade.mul( glossiness );
 
 			const V = viewIncidentDir.negate().normalize().toVar();
@@ -925,7 +906,7 @@ class SSRNode extends Node {
 				Xi.y.assign( mix( Xi.y, 0.0, this.mirrorBias.mul( Xi.w.sqrt() ) ) );
 
 				// The base color only feeds the metalness F0 fallback.
-				const albedo = ( this.specularNode === null && this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ).toVar();
+				const albedo = ( this.specularNode === null && this.diffuseNode !== null ? this.diffuseNode.sample( uvNode ).rgb : vec3( 1 ) ).toVar();
 				const ggxSample = ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi, this.specularNode, this.specularF90Node ?? 1 ).toVar();
 
 				// Sometimes the GGX sample is facing away from the surface, so we need to re-sample.
@@ -947,7 +928,7 @@ class SSRNode extends Node {
 
 					if ( this.envImportanceSampling ) {
 
-						const Xi2 = bindAnalyticNoise( this._resolution, 59 )( uvPos, this._noiseIndex );
+						const Xi2 = bindAnalyticNoise( this._resolution, 59 )( uvNode, this._noiseIndex );
 
 						envColor.assign( this._importanceEnvironment.sampleEnvironmentMIS( {
 							cameraWorldMatrix: this._cameraWorldMatrix,
@@ -1036,7 +1017,7 @@ class SSRNode extends Node {
 
 			}
 
-			const d0 = uvPos.mul( this._resolution ).xy.toVar();
+			const d0 = uvNode.mul( this._resolution ).xy.toVar();
 			const d1 = getScreenPosition( d1viewPosition, this._cameraProjectionMatrix ).mul( this._resolution ).toVar();
 
 			// clip the ray to the screen so all steps land on visible texels

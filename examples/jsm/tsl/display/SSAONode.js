@@ -3,7 +3,6 @@ import { reference, getViewPosition, getScreenPositionFromClip, vogelDiskSample,
 import { depthAwareBlur } from './depthAwareBlur.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
 
 let _rendererState;
 
@@ -63,15 +62,6 @@ class SSAONode extends Node {
 		this.normalNode = normalNode;
 
 		/**
-		 * The resolution scale. The effect renders at a fraction of the drawing buffer
-		 * for extra speed; `0.5` is a good default for a low-frequency signal like AO.
-		 *
-		 * @type {number}
-		 * @default 0.5
-		 */
-		this.resolutionScale = 0.5;
-
-		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
@@ -126,7 +116,7 @@ class SSAONode extends Node {
 		this.blurSharpness = uniform( 2 );
 
 		/**
-		 * The resolution of the effect. Set from the drawing buffer size and `resolutionScale`.
+		 * The resolution of the effect, which is the resolution of the depth node.
 		 *
 		 * @type {Vector2}
 		 */
@@ -255,9 +245,6 @@ class SSAONode extends Node {
 	 */
 	setSize( width, height ) {
 
-		width = Math.max( 1, Math.round( this.resolutionScale * width ) );
-		height = Math.max( 1, Math.round( this.resolutionScale * height ) );
-
 		this.resolution.set( width, height );
 		this._aoRenderTarget.setSize( width, height );
 		this._blurRenderTarget.setSize( width, height );
@@ -275,8 +262,8 @@ class SSAONode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		const size = renderer.getDrawingBufferSize( _size );
-		this.setSize( size.width, size.height );
+		const { width, height } = this.depthNode.value.image;
+		this.setSize( width, height );
 
 		renderer.setClearColor( 0xffffff, 1 );
 
