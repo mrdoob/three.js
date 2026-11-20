@@ -19658,10 +19658,27 @@ class ViewportTextureNode extends TextureNode {
 		/**
 		 * The framebuffer texture for the current renderer context.
 		 *
-		 * @type {WeakMap<RenderTarget, FramebufferTexture>}
+		 * @type {Map<(RenderTarget|CanvasTarget), FramebufferTexture>}
 		 * @private
 		 */
-		this._cacheTextures = new WeakMap();
+		this._cacheTextures = new Map();
+
+		/**
+		 * Disposes the framebuffer texture of a disposed render target or canvas target.
+		 *
+		 * @type {Function}
+		 * @private
+		 */
+		this._onReferenceDispose = ( event ) => {
+
+			const reference = event.target;
+
+			reference.removeEventListener( 'dispose', this._onReferenceDispose );
+
+			this._cacheTextures.get( reference ).dispose();
+			this._cacheTextures.delete( reference );
+
+		};
 
 	}
 
@@ -19676,36 +19693,27 @@ class ViewportTextureNode extends TextureNode {
 	 */
 	getTextureForReference( reference = null ) {
 
-		let defaultFramebuffer;
-		let cacheTextures;
-
-		if ( this.referenceNode ) {
-
-			defaultFramebuffer = this.referenceNode.defaultFramebuffer;
-			cacheTextures = this.referenceNode._cacheTextures;
-
-		} else {
-
-			defaultFramebuffer = this.defaultFramebuffer;
-			cacheTextures = this._cacheTextures;
-
-		}
+		const node = this.referenceNode ? this.referenceNode : this;
 
 		if ( reference === null ) {
 
-			return defaultFramebuffer;
+			return node.defaultFramebuffer;
 
 		}
 
-		if ( cacheTextures.has( reference ) === false ) {
+		let framebufferTexture = node._cacheTextures.get( reference );
 
-			const framebufferTexture = defaultFramebuffer.clone();
+		if ( framebufferTexture === undefined ) {
 
-			cacheTextures.set( reference, framebufferTexture );
+			framebufferTexture = node.defaultFramebuffer.clone();
+
+			node._cacheTextures.set( reference, framebufferTexture );
+
+			reference.addEventListener( 'dispose', node._onReferenceDispose );
 
 		}
 
-		return cacheTextures.get( reference );
+		return framebufferTexture;
 
 	}
 
@@ -19770,6 +19778,25 @@ class ViewportTextureNode extends TextureNode {
 		renderer.copyFramebufferToTexture( framebufferTexture );
 
 		framebufferTexture.generateMipmaps = currentGenerateMipmaps;
+
+	}
+
+	/**
+	 * Frees internal resources. Should be called when the node is no longer in use.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		for ( const [ reference, framebufferTexture ] of this._cacheTextures ) {
+
+			reference.removeEventListener( 'dispose', this._onReferenceDispose );
+
+			framebufferTexture.dispose();
+
+		}
+
+		this._cacheTextures.clear();
 
 	}
 
@@ -22636,7 +22663,7 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.ROUGHNESS ) { // TODO: cleanup similar branches
 
-			const roughnessNode = this.getFloat( scope );
+			const roughnessNode = material.roughness !== undefined ? this.getFloat( scope ) : float( 0 );
 
 			if ( material.roughnessMap && material.roughnessMap.isTexture === true ) {
 
@@ -22664,7 +22691,7 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.METALNESS ) {
 
-			const metalnessNode = this.getFloat( scope );
+			const metalnessNode = material.metalness !== undefined ? this.getFloat( scope ) : float( 0 );
 
 			if ( material.metalnessMap && material.metalnessMap.isTexture === true ) {
 
@@ -28354,13 +28381,9 @@ class NodeMaterial extends Material {
 
 		if ( builder.context.getGI ) {
 
-			let giNode = builder.context.getGI( null, builder );
+			const giNode = builder.context.getGI( null, builder );
 
 			if ( giNode !== null ) {
-
-				const aoNode = this.aoNode || ( builder.material.aoMap ? materialAO : null );
-
-				if ( aoNode !== null ) giNode = giNode.mul( aoNode );
 
 				materialLightsNode.push( new OcclusionAwareIrradianceNode( giNode ) );
 
@@ -29494,6 +29517,21 @@ class StorageInstancedBufferAttribute extends InstancedBufferAttribute {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Available only in {@link WebGPURenderer}.
+	 */
+	dispose() {
+
+		if ( this.pbo !== undefined ) {
+
+			this.pbo.dispose();
+
+		}
+
+		super.dispose();
+
+	}
+
 }
 
 /**
@@ -29534,6 +29572,21 @@ class StorageBufferAttribute extends BufferAttribute {
 		 * @default true
 		 */
 		this.isStorageBufferAttribute = true;
+
+	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Available only in {@link WebGPURenderer}.
+	 */
+	dispose() {
+
+		if ( this.pbo !== undefined ) {
+
+			this.pbo.dispose();
+
+		}
+
+		super.dispose();
 
 	}
 
