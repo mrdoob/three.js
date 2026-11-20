@@ -123,13 +123,13 @@ export class LUT3dlLoader extends Loader {
 		}
 
 		const gridLines = result[ 0 ].trim().split( /\s+/g ).map( Number );
-		const gridStep = gridLines[ 1 ] - gridLines[ 0 ];
 		const size = gridLines.length;
 		const sizeSq = size ** 2;
+		const gridStep = ( gridLines[ size - 1 ] - gridLines[ 0 ] ) / ( size - 1 );
 
-		for ( let i = 1, l = gridLines.length; i < l; ++ i ) {
+		for ( let i = 1; i < size; ++ i ) {
 
-			if ( gridStep !== ( gridLines[ i ] - gridLines[ i - 1 ] ) ) {
+			if ( Math.abs( gridLines[ i ] - gridLines[ 0 ] - i * gridStep ) > 1 ) {
 
 				throw new Error( 'THREE.LUT3dlLoader: Inconsistent grid size' );
 
@@ -165,7 +165,7 @@ export class LUT3dlLoader extends Loader {
 
 		// Determine the bit depth to scale the values to [0.0, 1.0].
 		const bits = Math.max( 0, Math.ceil( Math.log2( maxValue ) ) );
-		const maxBitValue = Math.pow( 2, bits );
+		const maxBitValue = Math.max( 1, Math.pow( 2, bits ) - 1 );
 
 		const data = this.type === UnsignedByteType ? new Uint8Array( dataFloat.length ) : dataFloat;
 		const scale = this.type === UnsignedByteType ? 255 : 1;
