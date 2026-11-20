@@ -1,5 +1,5 @@
-import { FloatType, NearestFilter, Node, NodeMaterial, NodeUpdateType, QuadMesh, RendererUtils, RenderTarget, RGFormat, Vector2 } from 'three/webgpu';
-import { Fn, If, Loop, context, float, ivec2, max, min, nodeObject, outputStruct, passTexture, screenCoordinate, textureLoad, uniform, uvec2, vec2, vec4 } from 'three/tsl';
+import { FloatType, NearestFilter, Node, NodeMaterial, NodeUpdateType, QuadMesh, RendererUtils, RenderTarget, RedFormat, Vector2 } from 'three/webgpu';
+import { Fn, If, Loop, context, float, ivec2, nodeObject, outputStruct, passTexture, screenCoordinate, textureLoad, uniform, uvec2, vec2, vec3, vec4 } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
@@ -9,9 +9,9 @@ let _rendererState;
  * Downsamples the scene's depth and further screen-space inputs like normals for effects
  * that are computed in a reduced resolution.
  *
- * Each texel holds the nearest and farthest depth of the texels it covers, and all other
- * inputs are taken from the texel holding the nearest depth. The inputs of an effect are
- * thus consistent and the effect itself doesn't have to know about the reduced resolution.
+ * Each texel holds the nearest depth of the texels it covers, and all other inputs are
+ * taken from the texel holding that depth. The inputs of an effect are thus consistent
+ * and the effect itself doesn't have to know about the reduced resolution.
  *
  * The resolution is halved per level by rounding down, so the last texel of an odd sized
  * level also covers the remaining row or column.
@@ -95,7 +95,7 @@ class DepthAwareDownsampleNode extends Node {
 
 		/**
 		 * The render target the inputs are downsampled into. The first texture holds
-		 * the nearest and farthest depth in its red and green channel.
+		 * the nearest depth.
 		 *
 		 * @private
 		 * @type {RenderTarget}
@@ -105,7 +105,7 @@ class DepthAwareDownsampleNode extends Node {
 		const depthTexture = this._renderTarget.textures[ 0 ];
 		depthTexture.name = 'DepthAwareDownsample.depth';
 		depthTexture.type = FloatType;
-		depthTexture.format = RGFormat;
+		depthTexture.format = RedFormat;
 		depthTexture.minFilter = NearestFilter;
 		depthTexture.magFilter = NearestFilter;
 
@@ -140,8 +140,8 @@ class DepthAwareDownsampleNode extends Node {
 	/**
 	 * Returns a downsampled input as a texture node.
 	 *
-	 * @param {string} [name='depth'] - The name of the input. The red channel of `depth` is the nearest
-	 * depth so it can be used like the scene's depth, the green channel is the farthest depth.
+	 * @param {string} [name='depth'] - The name of the input. `depth` is the nearest depth and can be
+	 * used like the scene's depth.
 	 * @return {PassTextureNode} A texture node that represents the downsampled input.
 	 */
 	getTextureNode( name = 'depth' ) {
@@ -169,22 +169,6 @@ class DepthAwareDownsampleNode extends Node {
 		this._size.value.set( width, height );
 		this._renderTarget.setSize( Math.max( 1, width >> this.level ), Math.max( 1, height >> this.level ) );
 
-		const names = Object.keys( this.textureNodes );
-
-		for ( let i = 0; i < names.length; i ++ ) {
-
-			const source = this.textureNodes[ names[ i ] ].value;
-			const texture = this._renderTarget.textures[ i + 1 ];
-
-			texture.format = source.format;
-			texture.type = source.type;
-			texture.minFilter = source.minFilter;
-			texture.magFilter = source.magFilter;
-
-		}
-
-		//
-
 		_quadMesh.material = this._material;
 		_quadMesh.name = 'Depth-Aware Downsample';
 
@@ -205,6 +189,26 @@ class DepthAwareDownsampleNode extends Node {
 	 */
 	setup( builder ) {
 
+		// the scene's depth must be updated before this node
+
+		builder.getNodeProperties( this ).depthNode = this.depthNode;
+
+		// the downsampled inputs have the format of their sources
+
+		const sources = Object.values( this.textureNodes );
+
+		for ( let i = 0; i < sources.length; i ++ ) {
+
+			const source = sources[ i ].value;
+			const texture = this._renderTarget.textures[ i + 1 ];
+
+			texture.format = source.format;
+			texture.type = source.type;
+			texture.minFilter = source.minFilter;
+			texture.magFilter = source.magFilter;
+
+		}
+
 		const reversed = builder.renderer.reversedDepthBuffer;
 
 		// the last cell of a level also covers the remaining row or column of an odd sized source
@@ -216,12 +220,11 @@ class DepthAwareDownsampleNode extends Node {
 		const begin = cell.shiftLeft( shift ).toConst();
 		const end = cell.equal( last ).select( size, begin.add( uvec2( 1 ).shiftLeft( shift ) ) ).toConst();
 
-		// find the nearest and farthest depth of the cell and the texel that holds the nearest one
+		// find the nearest depth of the cell and the texel that holds it
 
 		const result = Fn( () => {
 
 			const nearest = float( reversed ? 0 : 1 ).toVar();
-			const farthest = float( reversed ? 1 : 0 ).toVar();
 			const coord = ivec2( begin ).toVar();
 
 			Loop( { start: begin.y, end: end.y, type: 'uint', name: 'y' }, ( { y } ) => {
@@ -237,22 +240,20 @@ class DepthAwareDownsampleNode extends Node {
 
 					} );
 
-					farthest.assign( reversed ? min( farthest, depth ) : max( farthest, depth ) );
-
 				} );
 
 			} );
 
-			return vec4( nearest, farthest, vec2( coord ) );
+			return vec3( nearest, vec2( coord ) );
 
 		} )().toConst();
 
-		const coord = ivec2( result.zw );
+		const coord = ivec2( result.yz );
 
-		const textures = Object.values( this.textureNodes ).map( ( node ) => textureLoad( node, coord ) );
+		const textures = sources.map( ( node ) => textureLoad( node, coord ) );
 
 		this._material.contextNode = context( builder.getSharedContext() );
-		this._material.fragmentNode = outputStruct( vec4( result.xy, 0, 1 ), ...textures );
+		this._material.fragmentNode = outputStruct( vec4( result.x, 0, 0, 1 ), ...textures );
 		this._material.needsUpdate = true;
 
 		return this._textureNodes.depth;

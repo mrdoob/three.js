@@ -56,7 +56,7 @@ class GTAONode extends Node {
 	/**
 	 * Constructs a new GTAO node.
 	 *
-	 * @param {Node<float>} depthNode - A node that represents the scene's depth.
+	 * @param {TextureNode} depthNode - A texture node that represents the scene's depth.
 	 * @param {?Node<vec3>} normalNode - A node that represents the scene's normals.
 	 * @param {Camera} camera - The camera the scene is rendered with.
 	 */
@@ -65,9 +65,9 @@ class GTAONode extends Node {
 		super( 'float' );
 
 		/**
-		 * A node that represents the scene's depth.
+		 * A texture node that represents the scene's depth.
 		 *
-		 * @type {Node<float>}
+		 * @type {TextureNode}
 		 */
 		this.depthNode = depthNode;
 
@@ -689,7 +689,7 @@ function generateMagicSquare( size ) {
  *
  * @tsl
  * @function
- * @param {Node<float>} depthNode - A node that represents the scene's depth.
+ * @param {TextureNode} depthNode - A texture node that represents the scene's depth.
  * @param {?Node<vec3>} normalNode - A node that represents the scene's normals.
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {GTAONode}

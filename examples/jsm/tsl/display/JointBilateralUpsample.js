@@ -32,7 +32,6 @@ export const jointBilateralUpsample = ( inputNode, lowDepthNode, depthNode, came
 
 		const viewZ = ( uv, depth ) => getViewPosition( uv, depth, projectionInverse ).z;
 
-		// read the low resolution depths first, WGSL fails on a gather() that follows a plain read of the same texture
 		const tapUVs = [[ 0, 0 ], [ 1, 0 ], [ 0, 1 ], [ 1, 1 ]].map( ( offset ) => base.add( vec2( ...offset ) ).add( 0.5 ).div( size ).toConst() );
 
 		const tapDepths = tapUVs.map( ( tapUV ) => lowDepthNode.sample( tapUV ).r.toConst() );
