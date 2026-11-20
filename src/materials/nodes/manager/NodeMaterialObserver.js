@@ -966,6 +966,7 @@ class NodeMaterialObserver {
 	 * Returns the lights data for the given material lights.
 	 *
 	 * @param {Array<Light>} materialLights - The material lights.
+	 * @param {Array<Object>} lights - The array that is cleared and then filled with the lights data.
 	 * @return {Array<Object>} The lights data for the given material lights.
 	 */
 	getLightsData( materialLights, lights ) {

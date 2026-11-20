@@ -552,6 +552,7 @@ function createDeformation( positionNode, instanceMatrix, instance, bounds, { un
  * @private
  * @param {boolean} receiveShadow - Whether the objects receive shadows.
  * @param {boolean} instanced - Whether the objects are instanced meshes.
+ * @param {boolean} instanceColor - Whether the objects use per-instance colors.
  * @param {?Material} farMaterial - The material beyond the switch distance of merged levels.
  * @return {string} The key.
  */
@@ -4435,8 +4436,6 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 	 * @param {number} width - The width of the view in pixels.
 	 * @param {number} height - The height of the view in pixels.
 	 * @param {boolean} occlusion - Whether the clusters are occlusion culled.
-	 * @param {boolean} shadow - Whether the culling draws a shadow map.
-	 * @param {number} [clusterBudget=0] - The measured number of clusters of the visible objects.
 	 * @return {?Object} The view, or `null` if the draw doesn't need one.
 	 */
 	createView( width, height, occlusion ) {
