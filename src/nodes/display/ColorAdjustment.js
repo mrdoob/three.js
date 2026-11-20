@@ -69,8 +69,8 @@ export const vibrance = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 0 ) ] )
 }, { color: 'vec3', adjustment: 'float', return: 'vec3' } );
 
 /**
- * Rotates the hue of the given RGB color around the gray axis. The average of the RGB
- * components is preserved, the perceived luminance is not.
+ * Rotates the hue of the given RGB color around the gray axis. The perceived luminance
+ * is not preserved.
  *
  * @tsl
  * @function

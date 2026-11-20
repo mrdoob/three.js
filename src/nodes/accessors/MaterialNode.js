@@ -632,7 +632,8 @@ export const materialClearcoatRoughness = /*@__PURE__*/ nodeImmutable( MaterialN
 
 /**
  * TSL object that represents the clearcoat normal of the current material.
- * The value will be either `clearcoatNormalMap` or `normalView`.
+ * The value will be either the normal perturbed by `clearcoatNormalMap` (scaled by
+ * `clearcoatNormalScale`) or `normalView`.
  *
  * @tsl
  * @type {Node<vec3>}

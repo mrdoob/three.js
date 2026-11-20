@@ -45,7 +45,7 @@ class StorageTextureNode extends TextureNode {
 	 * Constructs a new storage texture node.
 	 *
 	 * @param {StorageTexture} value - The storage texture.
-	 * @param {Node<vec2|vec3>} uvNode - The uv node.
+	 * @param {Node<uvec2|uvec3>} uvNode - The integer texel coordinates (not normalized uvs).
 	 * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
 	 */
 	constructor( value, uvNode, storeNode = null ) {

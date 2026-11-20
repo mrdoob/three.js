@@ -1,7 +1,7 @@
 import { Fn } from '../tsl/TSLBase.js';
 
 /**
- * Generates a hash value in the range `[0, 1)` from the given seed. The seed is
+ * Generates a hash value in the range `[0, 1]` from the given seed. The seed is
  * converted to `uint`, so the fractional part of a float seed is discarded.
  *
  * @tsl

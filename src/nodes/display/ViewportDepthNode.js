@@ -35,7 +35,8 @@ class ViewportDepthNode extends Node {
 		 * - `ViewportDepthNode.DEPTH_BASE`: Allows to define a value for the current fragment's depth.
 		 * - `ViewportDepthNode.DEPTH`: Represents the depth value for the current fragment (`valueNode` is ignored).
 		 * - `ViewportDepthNode.LINEAR_DEPTH`: Represents the linear (orthographic) depth value of the current fragment.
-		 * If a `valueNode` is set, the scope can be used to convert perspective depth data to linear data.
+		 * If a `valueNode` is set, the scope can be used to convert a depth buffer value (perspective, orthographic
+		 * or logarithmic) to linear depth.
 		 *
 		 * @type {('depth'|'depthBase'|'linearDepth')}
 		 */

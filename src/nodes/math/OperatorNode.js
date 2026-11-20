@@ -464,7 +464,8 @@ export const div = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '/' ).setPar
 /**
  * Computes the remainder of dividing the first node by the second one. Float operands
  * use floored modulo (`a - b * floor( a / b )`, the result has the sign of `b`), integer
- * operands use the truncated `%` remainder.
+ * operands use the `%` operator (truncated remainder with WebGPU, undefined for negative
+ * operands with WebGL).
  *
  * @tsl
  * @function

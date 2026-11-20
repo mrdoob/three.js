@@ -88,9 +88,9 @@ export const normalWorldGeometry = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 /**
  * TSL object that represents the shading normal of the current rendered object in view space.
- * In the fragment stage, the value includes the material's normal or bump mapping (or
- * `normalNode`) and is flipped on back faces. Use {@link normalViewGeometry} for the
- * unperturbed vertex normal.
+ * In the fragment stage, the value is the material's `normalNode` if set, otherwise the
+ * normal with the material's normal or bump mapping applied, flipped on back faces. Use
+ * {@link normalViewGeometry} for the unperturbed vertex normal.
  *
  * @tsl
  * @type {Node<vec3>}

@@ -26,7 +26,7 @@ export const isBackgroundDepth = /*@__PURE__*/ Fn( ( [ depth ], builder ) => {
  * @tsl
  * @function
  * @param {Node<vec2>} screenPosition - The fragment's screen position expressed as uv coordinates (origin at the top-left, like {@link screenUV}).
- * @param {Node<float>} depth - The fragment's raw (non-linear) depth buffer value.
+ * @param {Node<float>} depth - The fragment's raw depth buffer value (not linearized).
  * @param {Node<mat4>} projectionMatrixInverse - The camera's inverse projection matrix.
  * @return {Node<vec3>} The fragments position in view space.
  */
