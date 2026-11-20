@@ -227,19 +227,6 @@ class TRAANode extends Node {
 	}
 
 	/**
-	 * The previous frame's depth and camera matrices. Share it with other
-	 * effects that reuse the previous frame instead of storing them twice.
-	 *
-	 * @type {Reprojection}
-	 * @readonly
-	 */
-	get reprojection() {
-
-		return this._reprojection;
-
-	}
-
-	/**
 	 * Returns the result of the effect as a texture node.
 	 *
 	 * @return {PassTextureNode} A texture node that represents the result of the effect.

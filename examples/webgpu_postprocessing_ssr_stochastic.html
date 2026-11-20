@@ -63,7 +63,7 @@
 		import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
 		import { traa } from 'three/addons/tsl/display/TRAANode.js';
-		import { PreviousFrameSource, previousViewZ } from 'three/addons/tsl/utils/PreviousFrameSource.js';
+		import { reprojectedBeauty, previousViewZ } from 'three/addons/tsl/display/ReprojectedBeautyNode.js';
 
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -116,7 +116,6 @@
 			roughness: 0.3,
 
 			ssr: {
-				traceSource: 'Per Lookup',
 				resolutionScale: 1,
 				quality: 0.25,
 				mirrorBias: 0,
@@ -161,7 +160,7 @@
 		};
 
 		let camera, scene, model, renderer, renderPipeline, ssrNode, temporalReprojectNode, denoiseNode;
-		let controls, previousFrame;
+		let controls;
 		let combinedOutputNode, scenePassColor, scenePassDepth, scenePassVelocity;
 		let gammaUniform, contrastUniform, saturationUniform;
 		const temporalOutputs = new Map();
@@ -275,7 +274,8 @@
 				scenePassVelocity.sample( uv ).z
 			) ).toInspector( 'Metalness/Roughness' );
 
-			ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+			ssrNode = ssr( reprojectedBeauty( scenePass ), scenePassDepth, sceneNormal, {
+				camera,
 				stochastic: true,
 				diffuseNode: scenePassDiffuseColor,
 				metalnessNode: scenePassDiffuseColor.a,
@@ -318,24 +318,6 @@
 			outputNode.toInspector( 'Combined SSR' );
 			combinedOutputNode = outputNode;
 
-			const temporalAA = traa( applyGrading( combinedOutputNode ), scenePassDepth, scenePassVelocity, camera );
-			temporalOutputs.set( combinedOutputNode, temporalAA );
-
-			// trace the previous frame, reprojected per lookup or once per frame into a buffer
-
-			previousFrame = new PreviousFrameSource( scenePass, temporalAA.reprojection );
-
-			const traceSources = { 'Per Lookup': previousFrame.node, 'Buffer': previousFrame.bufferNode };
-
-			function updateTraceSource() {
-
-				ssrNode.colorNode = traceSources[ params.ssr.traceSource ];
-				renderPipeline.needsUpdate = true;
-
-			}
-
-			updateTraceSource();
-
 			renderPipeline.outputNode = applyPostProcessing( combinedOutputNode );
 			renderPipeline.outputColorTransform = false;
 
@@ -376,7 +358,6 @@
 			displayGui.add( params.post, 'traa' ).name( 'TRAA' ).onChange( updateOutputNode );
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
-			ssrGui.add( params.ssr, 'traceSource', Object.keys( traceSources ) ).name( 'Trace source' ).onChange( updateTraceSource );
 			ssrGui.add( params.ssr, 'intensity', 0, 4 ).name( 'Intensity' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'binaryRefine' ).name( 'Binary refine' ).onChange( applyParams );
@@ -586,8 +567,6 @@
 			controls.update();
 
 			renderPipeline.render();
-
-			previousFrame.update( renderer );
 
 		}
 

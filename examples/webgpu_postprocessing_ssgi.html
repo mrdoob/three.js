@@ -39,13 +39,13 @@
 			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec3, vec4, packNormalToRGB, unpackRGBToNormal, sample } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
-			import { PreviousFrameSource, previousViewZ } from 'three/addons/tsl/utils/PreviousFrameSource.js';
+			import { reprojectedBeauty, previousViewZ } from 'three/addons/tsl/display/ReprojectedBeautyNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, renderPipeline, controls, previousFrame;
+			let camera, scene, renderer, renderPipeline, controls;
 
 			init();
 
@@ -113,7 +113,7 @@
 
 				// gi
 
-				const giPass = ssgi( scenePassColor, scenePassDepth, sceneNormal, camera );
+				const giPass = ssgi( reprojectedBeauty( scenePass ), scenePassDepth, sceneNormal, camera );
 				giPass.sliceCount.value = 2;
 				giPass.stepCount.value = 8;
 
@@ -129,19 +129,6 @@
 
 				const traaPass = traa( compositePass, scenePassDepth, scenePassVelocity, camera );
 				renderPipeline.outputNode = traaPass;
-
-				// trace the previous frame, reprojected per lookup or once per frame into a buffer
-
-				previousFrame = new PreviousFrameSource( scenePass, traaPass.reprojection );
-
-				const traceSources = { 'Per Lookup': previousFrame.node, 'Buffer': previousFrame.bufferNode };
-
-				function updateTraceSource() {
-
-					giPass.beautyNode = traceSources[ params.traceSource ];
-					renderPipeline.needsUpdate = true;
-
-				}
 
 				// Cornell Box inspired scene
 
@@ -234,17 +221,13 @@
 				//
 
 				const params = {
-					output: 0,
-					traceSource: 'Buffer'
+					output: 0
 				};
-
-				updateTraceSource();
 
 				const types = { Combined: 0, Direct: 3, AO: 1, GI: 2 };
 
 				const gui = renderer.inspector.createParameters( 'SSGI settings' );
 				gui.add( params, 'output', types ).onChange( updatePostprocessing );
-				gui.add( params, 'traceSource', Object.keys( traceSources ) ).name( 'trace source' ).onChange( updateTraceSource );
 				gui.add( giPass.sliceCount, 'value', 1, 4, 1 ).name( 'slice count' );
 				gui.add( giPass.stepCount, 'value', 1, 32, 1 ).name( 'step count' );
 				gui.add( giPass.radius, 'value', 1, 25 ).name( 'radius' );
@@ -302,8 +285,6 @@
 				controls.update();
 
 				renderPipeline.render();
-
-				previousFrame.update( renderer );
 
 			}
 

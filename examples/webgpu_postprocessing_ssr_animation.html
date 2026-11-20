@@ -45,21 +45,21 @@
 			import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { smaa } from 'three/addons/tsl/display/SMAANode.js';
-			import { PreviousFrameSource, previousViewZ } from 'three/addons/tsl/utils/PreviousFrameSource.js';
+			import { reprojectedBeauty, previousViewZ } from 'three/addons/tsl/display/ReprojectedBeautyNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const params = {
-				output: 'Beauty', traa: true, traceSource: 'Per Lookup',
+				output: 'Beauty', traa: true,
 				quality: 0.5, binaryRefine: false, maxDistance: 20, thickness: 0.12,
 				denoise: true, lumaPhi: 0.75,
 				roughness: 0.18, animate: true, orbit: false
 			};
 
 			let camera, scene, renderer, renderPipeline;
-			let controls, timer, floor, torusKnot, previousFrame;
+			let controls, timer, floor, torusKnot;
 
 			const spheres = [];
 			let time = 0;
@@ -218,7 +218,8 @@
 
 				// ssr
 
-				const ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+				const ssrNode = ssr( reprojectedBeauty( scenePass ), scenePassDepth, sceneNormal, {
+					camera,
 					stochastic: true,
 					diffuseNode: scenePassDiffuseColor,
 					metalnessNode: scenePassDiffuseColor.a,
@@ -267,21 +268,6 @@
 				const temporalAA = traa( vec4( combined, 1 ), scenePassDepth, scenePassVelocity, camera );
 				const spatialAA = smaa( vec4( combined, 1 ) );
 
-				// trace the previous frame, reprojected per lookup or once per frame into a buffer
-
-				previousFrame = new PreviousFrameSource( scenePass, temporalAA.reprojection );
-
-				const traceSources = { 'Per Lookup': previousFrame.node, 'Buffer': previousFrame.bufferNode };
-
-				function updateTraceSource() {
-
-					ssrNode.colorNode = traceSources[ params.traceSource ];
-					renderPipeline.needsUpdate = true;
-
-				}
-
-				updateTraceSource();
-
 				function updateOutput() {
 
 					let outputNode;
@@ -318,7 +304,6 @@
 				displayGui.add( params, 'traa' ).name( 'TRAA' ).onChange( updateOutput );
 
 				const ssrGui = renderer.inspector.createParameters( 'SSR' );
-				ssrGui.add( params, 'traceSource', Object.keys( traceSources ) ).name( 'Trace source' ).onChange( updateTraceSource );
 				ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( updateParameters );
 				ssrGui.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( updateParameters );
 				ssrGui.add( params, 'maxDistance', 0.01, 50, 0.01 ).name( 'Max distance' ).onChange( updateParameters );
@@ -386,8 +371,6 @@
 				controls.update( delta );
 
 				renderPipeline.render();
-
-				previousFrame.update( renderer );
 
 			}
 
