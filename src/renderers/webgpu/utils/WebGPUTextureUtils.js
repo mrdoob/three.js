@@ -1475,7 +1475,7 @@ class WebGPUTextureUtils {
  * Returns the GPU format for the given texture.
  *
  * @param {Texture} texture - The texture.
- * @param {GPUDevice} [device] - The GPU device which is used for feature detection.
+ * @param {GPUDevice} device - The GPU device which is used for feature detection.
  * @return {string} The GPU format.
  */
 export function getFormat( texture, device ) {

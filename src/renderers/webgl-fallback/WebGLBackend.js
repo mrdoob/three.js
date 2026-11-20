@@ -43,7 +43,7 @@ class WebGLBackend extends Backend {
 	 */
 
 	/**
-	 * Constructs a new WebGPU backend.
+	 * Constructs a new WebGL 2 backend.
 	 *
 	 * @param {WebGLBackend~Options} [parameters] - The configuration parameter.
 	 */
@@ -585,9 +585,10 @@ class WebGLBackend extends Backend {
 
 	/**
 	 * This method processes the result of occlusion queries and writes it
-	 * into the occlusion data of the render context.
+	 * into the occlusion data of the render context. The results are polled
+	 * once per animation frame until all queries are available, so the method
+	 * does not return a Promise.
 	 *
-	 * @async
 	 * @param {RenderContext} renderContext - The render context.
 	 */
 	resolveOccludedAsync( renderContext ) {
@@ -881,7 +882,8 @@ class WebGLBackend extends Backend {
 	 * @param {Node} computeNode - The compute node.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
-	 * @param {?number} [count=null] - The count of compute invocations. If `null`, the count is determined by the compute node.
+	 * @param {?(number|Array<number>|IndirectStorageBufferAttribute)} [count=null] - The count of compute invocations. If `null`, the count is determined by the compute node.
+	 * Workgroup grids and indirect dispatches are not supported: only the first element of an array is used as the count of invocations.
 	 */
 	compute( computeGroup, computeNode, bindings, pipeline, count = null ) {
 

@@ -193,10 +193,10 @@ class GLSLNodeBuilder extends NodeBuilder {
 		super( object, renderer, new GLSLNodeParser() );
 
 		/**
-		 * A dictionary holds for each shader stage ('vertex', 'fragment', 'compute')
-		 * another dictionary which manages UBOs per group ('render','frame','object').
+		 * A dictionary that holds the UBO of each uniform group ('render','frame','object')
+		 * by group name. The UBOs are shared by all shader stages.
 		 *
-		 * @type {Object<string,Object<string,NodeUniformsGroup>>}
+		 * @type {Object<string,NodeUniformsGroup>}
 		 */
 		this.uniformGroups = {};
 
@@ -446,6 +446,9 @@ ${ flowData.code }
 	 * Setups the Pixel Buffer Object (PBO) for the given storage
 	 * buffer node.
 	 *
+	 * Note: The `array` of the storage buffer attribute is replaced
+	 * with a padded copy that fits the dimensions of the texture.
+	 *
 	 * @param {StorageBufferNode} storageBufferNode - The storage buffer node.
 	 */
 	setupPBO( storageBufferNode ) {
@@ -548,11 +551,11 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Setups the Pixel Buffer Object (PBO) for the given storage
-	 * buffer node.
+	 * Generates the code that reads the given storage array element from
+	 * the Pixel Buffer Object (PBO) of its storage buffer.
 	 *
 	 * @param {StorageArrayElementNode} storageArrayElementNode - The storage array element node.
-	 * @return {string} The property name.
+	 * @return {string} The name of the variable holding the element.
 	 */
 	generatePBO( storageArrayElementNode ) {
 
@@ -1452,7 +1455,7 @@ ${ flowData.code }
 	/**
 	 * Returns the draw index builtin.
 	 *
-	 * @return {?string} The drawIndex shader string. Returns `null` if `WEBGL_multi_draw` isn't supported by the device.
+	 * @return {string} The drawIndex shader string. Returns a uniform if `WEBGL_multi_draw` isn't supported by the device.
 	 */
 	getDrawIndex() {
 
@@ -1638,7 +1641,7 @@ ${ flowData.code }
 	/**
 	 * Enables hardware clipping.
 	 *
-	 * @param {string} planeCount - The clipping plane count.
+	 * @param {number} planeCount - The clipping plane count.
 	 */
 	enableHardwareClipping( planeCount ) {
 
@@ -1771,7 +1774,7 @@ void main() {
 	 *
 	 * @private
 	 * @param {Object} shaderData - The shader data.
-	 * @return {string} The vertex shader.
+	 * @return {string} The fragment shader.
 	 */
 	_getGLSLFragmentCode( shaderData ) {
 
