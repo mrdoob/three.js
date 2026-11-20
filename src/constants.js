@@ -1667,7 +1667,7 @@ export const TimestampQuery = {
 };
 
 /**
- * Represents mouse buttons and interaction types in context of controls.
+ * Represents the different interpolation sampling types.
  *
  * @type {ConstantsInterpolationSamplingType}
  * @constant
@@ -1718,8 +1718,8 @@ export const RenderObjectRefreshType = {
  * This type represents mouse buttons and interaction types in context of controls.
  *
  * @typedef {Object} ConstantsMouse
- * @property {number} MIDDLE - The left mouse button.
- * @property {number} LEFT - The middle mouse button.
+ * @property {number} LEFT - The left mouse button.
+ * @property {number} MIDDLE - The middle mouse button.
  * @property {number} RIGHT - The right mouse button.
  * @property {number} ROTATE - A rotate interaction.
  * @property {number} DOLLY - A dolly interaction.

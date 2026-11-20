@@ -96,7 +96,7 @@ class PassMultipleTextureNode extends PassTextureNode {
 	}
 
 	/**
-	 * Constructs a new pass texture node.
+	 * Constructs a new pass multiple texture node.
 	 *
 	 * @param {PassNode} passNode - The pass node.
 	 * @param {string} textureName - The output texture name.
@@ -1001,7 +1001,7 @@ class PassNode extends Node {
 	}
 
 	/**
-	 * Sets the size of the pass's render target. Honors the pixel ratio.
+	 * Sets the size of the pass's render target in physical pixels. The size is multiplied by the resolution scale.
 	 *
 	 * @param {number} width - The width to set.
 	 * @param {number} height - The height to set.
@@ -1044,9 +1044,9 @@ class PassNode extends Node {
 	 * in sync with the pass's dimensions. To reverse the process and use auto-sizing again, call the method
 	 * with `null` as the single argument.
 	 *
-	 * @param {?(number | Vector4)} x - The horizontal coordinate for the lower left corner of the box in logical pixel unit.
+	 * @param {?(number | Vector4)} x - The horizontal coordinate for the upper left corner of the box in logical pixel unit.
 	 * Instead of passing four arguments, the method also works with a single four-dimensional vector.
-	 * @param {number} y - The vertical coordinate for the lower left corner of the box in logical pixel unit.
+	 * @param {number} y - The vertical coordinate for the upper left corner of the box in logical pixel unit.
 	 * @param {number} width - The width of the scissor box in logical pixel unit.
 	 * @param {number} height - The height of the scissor box in logical pixel unit.
 	 */
@@ -1079,8 +1079,8 @@ class PassNode extends Node {
 	 * with the pass's dimensions. To reverse the process and use auto-sizing again, call the method
 	 * with `null` as the single argument.
 	 *
-	 * @param {number | Vector4} x - The horizontal coordinate for the lower left corner of the viewport origin in logical pixel unit.
-	 * @param {number} y - The vertical coordinate for the lower left corner of the viewport origin  in logical pixel unit.
+	 * @param {number | Vector4} x - The horizontal coordinate for the upper left corner of the viewport origin in logical pixel unit.
+	 * @param {number} y - The vertical coordinate for the upper left corner of the viewport origin in logical pixel unit.
 	 * @param {number} width - The width of the viewport in logical pixel unit.
 	 * @param {number} height - The height of the viewport in logical pixel unit.
 	 */

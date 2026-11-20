@@ -87,7 +87,11 @@ export const normalWorldGeometry = /*@__PURE__*/ ( Fn( ( builder ) => {
 }, 'vec3' ).once() )();
 
 /**
- * TSL object that represents the vertex normal of the current rendered object in view space.
+ * TSL object that represents the shading normal of the current rendered object in view space.
+ * In the fragment stage, the value is the material's `normalNode` if set, otherwise the
+ * normal with the material's normal or bump mapping applied, flipped on back faces
+ * (`MeshBasicNodeMaterial` always uses the vertex normal). Use {@link normalViewGeometry}
+ * for the unperturbed vertex normal.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -119,7 +123,9 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 }, 'vec3' ).once( [ 'NORMAL', 'VERTEX' ] ) )().toVar( 'normalView' );
 
 /**
- * TSL object that represents the vertex normal of the current rendered object in world space.
+ * TSL object that represents the shading normal of the current rendered object in world space.
+ * It is derived from {@link normalView}, so it includes normal or bump mapping. Use
+ * {@link normalWorldGeometry} for the unperturbed vertex normal.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -127,7 +133,8 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 export const normalWorld = /*@__PURE__*/ normalView.transformNormalByInverseViewMatrix( cameraViewMatrix ).toVar( 'normalWorld' );
 
 /**
- * TSL object that represents the clearcoat vertex normal of the current rendered object in view space.
+ * TSL object that represents the clearcoat normal of the current rendered object in view space.
+ * In the fragment stage, the value includes the material's `clearcoatNormalMap` (or `clearcoatNormalNode`).
  *
  * @tsl
  * @type {Node<vec3>}
@@ -177,7 +184,6 @@ addMethodChaining( 'transformNormal', transformNormal );
  * @tsl
  * @function
  * @param {Node<vec3>} normal - The normal.
- * @param {NodeBuilder} builder - The current node builder.
  * @return {Node<vec3>} The transformed normal.
  */
 export const transformNormalToView = /*@__PURE__*/ Fn( ( [ normal ], builder ) => {

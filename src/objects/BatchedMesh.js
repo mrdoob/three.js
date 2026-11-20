@@ -209,7 +209,7 @@ class BatchedMesh extends Mesh {
 		this.isBatchedMesh = true;
 
 		/**
-		 * When set ot `true`, the individual objects of a batch are frustum culled.
+		 * When set to `true`, the individual objects of a batch are frustum culled.
 		 *
 		 * @type {boolean}
 		 * @default true

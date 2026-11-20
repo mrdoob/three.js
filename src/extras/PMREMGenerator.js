@@ -154,7 +154,7 @@ class PMREMGenerator {
 	 * at least 256.
 	 *
 	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
-	 * @param {?WebGLCubeRenderTarget} [renderTarget=null] - The render target to use.
+	 * @param {?WebGLCubeRenderTarget} [renderTarget=null] - A PMREM previously returned by this generator to reuse. Its size must match the PMREM being generated.
 	 * @return {WebGLCubeRenderTarget} The resulting PMREM.
 	 */
 	fromEquirectangular( equirectangular, renderTarget = null ) {
@@ -168,7 +168,7 @@ class PMREMGenerator {
 	 * the input, rounded down to a power of two and at least 256.
 	 *
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
-	 * @param {?WebGLCubeRenderTarget} [renderTarget=null] - The render target to use.
+	 * @param {?WebGLCubeRenderTarget} [renderTarget=null] - A PMREM previously returned by this generator to reuse. Its size must match the PMREM being generated.
 	 * @return {WebGLCubeRenderTarget} The resulting PMREM.
 	 */
 	fromCubemap( cubemap, renderTarget = null ) {

@@ -18,7 +18,7 @@ class UniformArrayElementNode extends ArrayElementNode {
 	}
 
 	/**
-	 * Constructs a new buffer node.
+	 * Constructs a new uniform array element node.
 	 *
 	 * @param {UniformArrayNode} uniformArrayNode - The uniform array node to access.
 	 * @param {IndexNode} indexNode - The index data that define the position of the accessed element in the array.

@@ -204,7 +204,7 @@ class ObjectLoader extends Loader {
 	 * but can also be used directly to parse a previously loaded JSON structure.
 	 *
 	 * @param {Object} json - The serialized 3D object.
-	 * @param {onLoad} onLoad - Executed when all resources (e.g. textures) have been fully loaded.
+	 * @param {function(Object3D)} [onLoad] - Executed when all resources (e.g. textures) have been fully loaded.
 	 * @return {Object3D} The parsed 3D object.
 	 */
 	parse( json, onLoad ) {
@@ -286,7 +286,7 @@ class ObjectLoader extends Loader {
 	 *
 	 * @static
 	 * @param {string} type - The geometry type.
-	 * @param {BufferGeometry.constructor} geometryClass - The geometry class.
+	 * @param {BufferGeometry.constructor} geometryClass - The geometry class. It must implement a static `fromJSON( data, shapes )` method.
 	 */
 	static registerGeometry( type, geometryClass ) {
 

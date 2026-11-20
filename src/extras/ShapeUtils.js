@@ -8,10 +8,11 @@ import { Earcut } from './Earcut.js';
 class ShapeUtils {
 
 	/**
-	 * Calculate area of a ( 2D ) contour polygon.
+	 * Calculate the signed area of a ( 2D ) contour polygon. The result is
+	 * negative for a clockwise winding order.
 	 *
 	 * @param {Array<Vector2>} contour - An array of 2D points.
-	 * @return {number} The area.
+	 * @return {number} The signed area.
 	 */
 	static area( contour ) {
 

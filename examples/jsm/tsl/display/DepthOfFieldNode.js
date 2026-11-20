@@ -564,9 +564,9 @@ export default DepthOfFieldNode;
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Node<float>} viewZNode - Represents the viewZ depth values of the scene.
- * @param {Node<float> | number} focusDistance - Defines the effect's focus which is the distance along the camera's look direction in world units.
- * @param {Node<float> | number} focalLength - How far an object can be from the focal plane before it goes completely out-of-focus in world units.
- * @param {Node<float> | number} bokehScale - A unitless value for artistic purposes to adjust the size of the bokeh.
+ * @param {Node<float> | number} [focusDistance=1] - Defines the effect's focus which is the distance along the camera's look direction in world units.
+ * @param {Node<float> | number} [focalLength=1] - How far an object can be from the focal plane before it goes completely out-of-focus in world units.
+ * @param {Node<float> | number} [bokehScale=1] - A unitless value for artistic purposes to adjust the size of the bokeh.
  * @returns {DepthOfFieldNode}
  */
 export const dof = ( node, viewZNode, focusDistance = 1, focalLength = 1, bokehScale = 1 ) => new DepthOfFieldNode( convertToTexture( node ), nodeObject( viewZNode ), nodeObject( focusDistance ), nodeObject( focalLength ), nodeObject( bokehScale ) );

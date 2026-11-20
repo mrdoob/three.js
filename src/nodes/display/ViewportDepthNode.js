@@ -35,7 +35,8 @@ class ViewportDepthNode extends Node {
 		 * - `ViewportDepthNode.DEPTH_BASE`: Allows to define a value for the current fragment's depth.
 		 * - `ViewportDepthNode.DEPTH`: Represents the depth value for the current fragment (`valueNode` is ignored).
 		 * - `ViewportDepthNode.LINEAR_DEPTH`: Represents the linear (orthographic) depth value of the current fragment.
-		 * If a `valueNode` is set, the scope can be used to convert perspective depth data to linear data.
+		 * If a `valueNode` is set, the scope can be used to convert a depth buffer value (perspective, orthographic
+		 * or logarithmic) to linear depth.
 		 *
 		 * @type {('depth'|'depthBase'|'linearDepth')}
 		 */
@@ -375,17 +376,20 @@ const depthBase = /*@__PURE__*/ nodeProxy( ViewportDepthNode, ViewportDepthNode.
 export const depth = /*@__PURE__*/ nodeImmutable( ViewportDepthNode, ViewportDepthNode.DEPTH );
 
 /**
- * TSL function for converting a perspective depth value to linear depth.
+ * TSL function for converting a depth buffer value to linear depth in the `[0, 1]` range (near to far).
+ * Perspective, orthographic and logarithmic depth are handled according to the camera and renderer.
  *
  * @tsl
  * @function
- * @param {?Node<float>} [value=null] - The perspective depth. If `null` is provided, the current fragment's depth is used.
+ * @param {?Node<float>} [value=null] - The depth buffer value. If `null` is provided, the current fragment's depth is used.
  * @returns {ViewportDepthNode<float>}
  */
 export const linearDepth = /*@__PURE__*/ nodeProxy( ViewportDepthNode, ViewportDepthNode.LINEAR_DEPTH ).setParameterLength( 0, 1 );
 
 /**
- * TSL object that represents the linear (orthographic) depth value of the current fragment
+ * TSL object that represents the linear (orthographic) depth stored in the viewport depth texture
+ * at the current fragment's screen position, i.e. the depth of the geometry behind the fragment.
+ * Use `linearDepth()` for the depth of the current fragment itself.
  *
  * @tsl
  * @type {ViewportDepthNode}

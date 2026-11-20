@@ -15,10 +15,11 @@ import { positionViewDirection } from './Position.js';
 export const TBNViewMatrix = /*@__PURE__*/ mat3( tangentView, bitangentView, normalView ).toVar( 'TBNViewMatrix' );
 
 /**
- * TSL object that represents the parallax direction.
+ * TSL object that represents the parallax direction, which is the surface-to-camera
+ * direction in tangent space.
  *
  * @tsl
- * @type {Node<mat3>}
+ * @type {Node<vec3>}
  */
 export const parallaxDirection = /*@__PURE__*/ positionViewDirection.mul( TBNViewMatrix )/*.normalize()*/;
 
@@ -34,11 +35,11 @@ export const parallaxDirection = /*@__PURE__*/ positionViewDirection.mul( TBNVie
 export const parallaxUV = ( uv, scale ) => uv.sub( parallaxDirection.mul( scale ) );
 
 /**
- * TSL function for computing bent normals.
+ * TSL object that represents the bent normal in view space, used for
+ * anisotropic image-based lighting.
  *
  * @tsl
- * @function
- * @returns {Node<vec3>} Bent normals.
+ * @type {Node<vec3>}
  */
 export const bentNormalView = /*@__PURE__*/ ( Fn( () => {
 

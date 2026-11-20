@@ -62,7 +62,8 @@ class InterleavedBufferAttribute {
 		/**
 		 * Whether the data are normalized or not, see {@link BufferAttribute#normalized}
 		 *
-		 * @type {InterleavedBuffer}
+		 * @type {boolean}
+		 * @default false
 		 */
 		this.normalized = normalized;
 
@@ -103,7 +104,7 @@ class InterleavedBufferAttribute {
 	 * Flag to indicate that this attribute has changed and should be re-sent to
 	 * the GPU. Set this to `true` when you modify the value of the array.
 	 *
-	 * @type {number}
+	 * @type {boolean}
 	 * @default false
 	 * @param {boolean} value
 	 */
@@ -489,7 +490,7 @@ class InterleavedBufferAttribute {
 	/**
 	 * Serializes the buffer attribute into JSON.
 	 *
-	 * If no parameter is provided, cloning an interleaved buffer attribute will de-interleave buffer data.
+	 * If no parameter is provided, serializing an interleaved buffer attribute will de-interleave buffer data.
 	 *
 	 * @param {Object} [data] - An optional value holding meta information about the serialization.
 	 * @return {Object} A JSON object representing the serialized buffer attribute.

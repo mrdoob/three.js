@@ -29,7 +29,7 @@ class SpotLightHelper extends Object3D {
 	/**
 	 * Constructs a new spot light helper.
 	 *
-	 * @param {HemisphereLight} light - The light to be visualized.
+	 * @param {SpotLight} light - The light to be visualized.
 	 * @param {number|Color|string} [color] - The helper's color. If not set, the helper will take
 	 * the color of the light.
 	 */

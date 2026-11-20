@@ -141,7 +141,9 @@ class Raycaster {
 	/**
 	 * Uses the given WebXR controller to compute a new origin and direction for the internal ray.
 	 *
-	 * @param {WebXRController} controller - The controller to copy the position and direction from.
+	 * @param {Group} controller - The target ray space of the controller, as returned by {@link WebXRManager#getController}
+	 * or {@link XRManager#getController}.
+	 * The ray's origin and direction are copied from its world matrix.
 	 * @return {Raycaster} A reference to this raycaster.
 	 */
 	setFromXRController( controller ) {
@@ -162,12 +164,14 @@ class Raycaster {
 	 * @property {number} distanceToRay -  Some 3D objects e.g. {@link Points} provide the distance of the
 	 * intersection to the nearest point on the ray. For other objects it will be `undefined`.
 	 * @property {Vector3} point - The intersection point, in world coordinates.
-	 * @property {Object} face - The face that has been intersected.
+	 * @property {?Object} face - The face that has been intersected. Its `normal` is defined in the local space
+	 * of the intersected geometry. `null` for 3D objects without faces like points, lines or sprites.
 	 * @property {number} faceIndex - The face index.
 	 * @property {Object3D} object - The 3D object that has been intersected.
 	 * @property {Vector2} uv - U,V coordinates at point of intersection.
 	 * @property {Vector2} uv1 - Second set of U,V coordinates at point of intersection.
-	 * @property {Vector3} normal - Interpolated normal vector at point of intersection.
+	 * @property {Vector3} normal - Interpolated normal vector at point of intersection, in the local space of the
+	 * intersected geometry (not in world space). The normal is flipped so it faces against the ray's direction.
 	 * @property {number} instanceId - The index number of the instance where the ray
 	 * intersects the {@link InstancedMesh}.
 	 * @property {number} batchId - The index number of the instance where the ray

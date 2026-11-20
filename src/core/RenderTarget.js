@@ -262,7 +262,7 @@ class RenderTarget extends EventDispatcher {
 		this.samples = options.samples;
 
 		/**
-		 * Whether to this target is used in multiview rendering.
+		 * Whether this target is used in multiview rendering.
 		 *
 		 * @type {boolean}
 		 * @default false

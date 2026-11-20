@@ -18,7 +18,7 @@ class BitcountNode extends MathNode {
 	}
 
 	/**
-	 * Constructs a new math node.
+	 * Constructs a new bitcount node.
 	 *
 	 * @param {'countTrailingZeros'|'countLeadingZeros'|'countOneBits'} method - The method name.
 	 * @param {Node} aNode - The first input.
@@ -392,7 +392,7 @@ export default BitcountNode;
  * Finds the number of consecutive 0 bits from the least significant bit of the input value,
  * which is also the index of the least significant bit of the input value.
  *
- * Can only be used with {@link WebGPURenderer} and a WebGPU backend.
+ * Can only be used with {@link WebGPURenderer}. The WebGL 2 backend uses an emulated implementation.
  *
  * @tsl
  * @function
@@ -404,7 +404,7 @@ export const countTrailingZeros = /*@__PURE__*/ nodeProxyAssignable( BitcountNod
 /**
  * Finds the number of consecutive 0 bits starting from the most significant bit of the input value.
  *
- * Can only be used with {@link WebGPURenderer} and a WebGPU backend.
+ * Can only be used with {@link WebGPURenderer}. The WebGL 2 backend uses an emulated implementation.
  *
  * @tsl
  * @function
@@ -416,10 +416,11 @@ export const countLeadingZeros = /*@__PURE__*/ nodeProxyAssignable( BitcountNode
 /**
  * Finds the number of '1' bits set in the input value
  *
- * Can only be used with {@link WebGPURenderer} and a WebGPU backend.
+ * Can only be used with {@link WebGPURenderer}. The WebGL 2 backend uses an emulated implementation.
  *
  * @tsl
  * @function
+ * @param {Node | number} x - The input value.
  * @returns {Node}
  */
 export const countOneBits = /*@__PURE__*/ nodeProxyAssignable( BitcountNode, BitcountNode.COUNT_ONE_BITS ).setParameterLength( 1 );

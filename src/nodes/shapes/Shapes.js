@@ -7,7 +7,7 @@ import { uv } from '../accessors/UV.js';
  *
  * @tsl
  * @function
- * @param {Node<vec2>} coord - The uv to generate the circle.
+ * @param {Node<vec2>} [coord=uv()] - The uv to generate the circle.
  * @return {Node<float>} The circle shape.
  */
 export const shapeCircle = /*@__PURE__*/ Fn( ( [ coord = uv() ], { renderer, material } ) => {

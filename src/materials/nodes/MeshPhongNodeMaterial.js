@@ -23,7 +23,7 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 	}
 
 	/**
-	 * Constructs a new mesh lambert node material.
+	 * Constructs a new mesh phong node material.
 	 *
 	 * @param {Object} [parameters] - The configuration parameter.
 	 */

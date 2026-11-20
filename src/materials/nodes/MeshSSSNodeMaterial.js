@@ -92,7 +92,8 @@ class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 		super( parameters );
 
 		/**
-		 * Represents the thickness color.
+		 * Represents the thickness color. Subsurface scattering is only enabled
+		 * when this node is set.
 		 *
 		 * @type {?Node<vec3>}
 		 * @default null
@@ -140,7 +141,8 @@ class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 	 * Whether the lighting model should use SSS or not.
 	 *
 	 * @type {boolean}
-	 * @default true
+	 * @readonly
+	 * @default false
 	 */
 	get useSSS() {
 

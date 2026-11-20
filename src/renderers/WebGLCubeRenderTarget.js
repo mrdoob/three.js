@@ -39,7 +39,7 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 		/**
 		 * Overwritten with a different texture type.
 		 *
-		 * @type {DataArrayTexture}
+		 * @type {CubeTexture}
 		 */
 		this.texture = new CubeTexture( images );
 		this._setTextureOptions( options );

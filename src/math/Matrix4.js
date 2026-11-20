@@ -14,9 +14,9 @@ import { Vector3 } from './Vector3.js';
  *
  * A Note on Row-Major and Column-Major Ordering:
  *
- * The constructor and {@link Matrix3#set} method take arguments in
+ * The constructor and {@link Matrix4#set} method take arguments in
  * [row-major](https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order)
- * order, while internally they are stored in the {@link Matrix3#elements} array in column-major order.
+ * order, while internally they are stored in the {@link Matrix4#elements} array in column-major order.
  * This means that calling:
  * ```js
  * const m = new THREE.Matrix4();
@@ -206,7 +206,8 @@ class Matrix4 {
 	}
 
 	/**
-	 * Set the upper 3x3 elements of this matrix to the values of given 3x3 matrix.
+	 * Sets the upper-left 3x3 elements of this matrix to the values of the given 3x3 matrix
+	 * and the remaining elements to the identity (the translation is reset).
 	 *
 	 * @param {Matrix3} m - The 3x3 matrix.
 	 * @return {Matrix4} A reference to this matrix.
@@ -473,7 +474,8 @@ class Matrix4 {
 
 	/**
 	 * Sets the rotation component of the transformation matrix, looking from `eye` towards
-	 * `target`, and oriented by the up-direction.
+	 * `target`, and oriented by the up-direction. Following the camera convention, the
+	 * negative z-axis of the result points towards `target`. The translation is not modified.
 	 *
 	 * @param {Vector3} eye - The eye vector.
 	 * @param {Vector3} target - The target vector.

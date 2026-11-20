@@ -23,7 +23,7 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 	}
 
 	/**
-	 * Constructs a new mesh normal node material.
+	 * Constructs a new mesh matcap node material.
 	 *
 	 * @param {Object} [parameters] - The configuration parameter.
 	 */

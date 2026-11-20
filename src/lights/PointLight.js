@@ -24,7 +24,7 @@ class PointLight extends Light {
 	 * @param {(number|Color|string)} [color=0xffffff] - The light's color.
 	 * @param {number} [intensity=1] - The light's strength/intensity measured in candela (cd).
 	 * @param {number} [distance=0] - Maximum range of the light. `0` means no limit.
-	 * @param {number} [decay=2] - The amount the light dims along the distance of the light.
+	 * @param {number} [decay=2] - The exponent of the light's distance falloff.
 	 */
 	constructor( color, intensity, distance = 0, decay = 2 ) {
 
@@ -54,8 +54,9 @@ class PointLight extends Light {
 		this.distance = distance;
 
 		/**
-		 * The amount the light dims along the distance of the light. In context of
-		 * physically-correct rendering the default value should not be changed.
+		 * The exponent of the light's distance falloff (`1 / distance^decay`). The
+		 * default `2` gives physically correct inverse-square falloff and should not
+		 * be changed in context of physically-correct rendering.
 		 *
 		 * @type {number}
 		 * @default 2

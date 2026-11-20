@@ -85,7 +85,8 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		/**
 		 * The clearcoat normal of physical materials is by default inferred from the `clearcoatNormalMap`
 		 * property. This node property allows to overwrite the default
-		 * and define the clearcoat normal with a node instead.
+		 * and define the clearcoat normal with a node instead. The node must return a normal
+		 * in view space.
 		 *
 		 * If you don't want to overwrite the clearcoat normal but modify the existing
 		 * value instead, use {@link materialClearcoatNormal}.
@@ -279,13 +280,15 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		/**
 		 * The anisotropy of physical materials is by default inferred from the
-		 * `anisotropy` property. This node property allows to overwrite the default
-		 * and define the anisotropy with a node instead.
+		 * `anisotropy`, `anisotropyRotation` and `anisotropyMap` properties. This node
+		 * property allows to overwrite the default and define the anisotropy with a
+		 * tangent-space vector instead. Its direction is the anisotropy direction and
+		 * its length is the anisotropy strength in the range `[0,1]`.
 		 *
 		 * If you don't want to overwrite the anisotropy but modify the existing
 		 * value instead, use {@link materialAnisotropy}.
 		 *
-		 * @type {?Node<float>}
+		 * @type {?Node<vec2>}
 		 * @default null
 		 */
 		this.anisotropyNode = null;
@@ -300,7 +303,8 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	 * Whether the lighting model should use clearcoat or not.
 	 *
 	 * @type {boolean}
-	 * @default true
+	 * @readonly
+	 * @default false
 	 */
 	get useClearcoat() {
 
@@ -312,6 +316,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	 * Whether the lighting model should use EON rough diffuse reflection or not.
 	 *
 	 * @type {boolean}
+	 * @readonly
 	 * @default false
 	 */
 	get useDiffuseRoughness() {
@@ -324,7 +329,8 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	 * Whether the lighting model should use iridescence or not.
 	 *
 	 * @type {boolean}
-	 * @default true
+	 * @readonly
+	 * @default false
 	 */
 	get useIridescence() {
 
@@ -336,7 +342,8 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	 * Whether the lighting model should use sheen or not.
 	 *
 	 * @type {boolean}
-	 * @default true
+	 * @readonly
+	 * @default false
 	 */
 	get useSheen() {
 
@@ -348,7 +355,8 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	 * Whether the lighting model should use anisotropy or not.
 	 *
 	 * @type {boolean}
-	 * @default true
+	 * @readonly
+	 * @default false
 	 */
 	get useAnisotropy() {
 
@@ -360,7 +368,8 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	 * Whether the lighting model should use transmission or not.
 	 *
 	 * @type {boolean}
-	 * @default true
+	 * @readonly
+	 * @default false
 	 */
 	get useTransmission() {
 
@@ -372,7 +381,8 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	 * Whether the lighting model should use dispersion or not.
 	 *
 	 * @type {boolean}
-	 * @default true
+	 * @readonly
+	 * @default false
 	 */
 	get useDispersion() {
 
@@ -384,7 +394,8 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	 * Whether the lighting model should use retroreflection or not.
 	 *
 	 * @type {boolean}
-	 * @default true
+	 * @readonly
+	 * @default false
 	 */
 	get useRetroreflection() {
 

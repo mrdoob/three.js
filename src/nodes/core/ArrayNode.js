@@ -10,7 +10,7 @@ import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
  * 	vec3( 0, 0, 1 )
  * ] );
  *
- * const redColor = tintColors.element( 0 );
+ * const redColor = colors.element( 0 );
  * ```
  *
  * @augments Node

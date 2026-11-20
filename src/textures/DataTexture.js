@@ -75,7 +75,7 @@ class DataTexture extends Texture {
 		 *
 		 * Overwritten and set to `1` by default.
 		 *
-		 * @type {boolean}
+		 * @type {number}
 		 * @default 1
 		 */
 		this.unpackAlignment = 1;

@@ -30,7 +30,7 @@ class MRTNode extends OutputStructNode {
 	}
 
 	/**
-	 * Constructs a new output struct node.
+	 * Constructs a new MRT node.
 	 *
 	 * @param {Object<string, Node>} outputNodes - The MRT outputs.
 	 */
@@ -137,7 +137,7 @@ class MRTNode extends OutputStructNode {
 	 * Returns `true` if the MRT node has an output with the given name.
 	 *
 	 * @param {string} name - The name of the output.
-	 * @return {NodeBuilder} Whether the MRT node has an output for the given name or not.
+	 * @return {boolean} Whether the MRT node has an output for the given name or not.
 	 */
 	has( name ) {
 

@@ -123,10 +123,11 @@ class NodeMaterial extends Material {
 		 * The lighting of node materials might be influenced by ambient occlusion.
 		 * The default AO is inferred from an ambient occlusion map assigned to `aoMap`
 		 * and the respective `aoMapIntensity`. This node property allows to overwrite
-		 * the default and define the ambient occlusion with a custom node instead.
+		 * the default and define the ambient occlusion with a custom node instead. A value
+		 * of `1` means no occlusion and `0` full occlusion.
 		 *
-		 * If you don't want to overwrite the diffuse color but modify the existing
-		 * values instead, use {@link materialAO}.
+		 * If you don't want to overwrite the ambient occlusion but modify the existing
+		 * value instead, use {@link materialAO}.
 		 *
 		 * @type {?Node<float>}
 		 * @default null
@@ -168,7 +169,8 @@ class NodeMaterial extends Material {
 		/**
 		 * The normals of node materials are by default inferred from the `normalMap`/`normalScale`
 		 * or `bumpMap`/`bumpScale` properties. This node property allows to overwrite the default
-		 * and define the normals with a node instead.
+		 * and define the normals with a node instead. The node must return a normal in view space,
+		 * e.g. `transformNormalToView( normal )` for a normal in local space.
 		 *
 		 * If you don't want to overwrite the normals but modify the existing values instead,
 		 * use {@link materialNormal}.
@@ -205,7 +207,8 @@ class NodeMaterial extends Material {
 		 * material.backdropNode = saturation( viewportSharedTexture().rgb, 0 );
 		 * ```
 		 *
-		 * Backdrop computations are part of the lighting so only lit materials can use this property.
+		 * If the material is lit, the backdrop is composed inside the lighting. Otherwise, it
+		 * replaces the outgoing light (mixed by `backdropAlphaNode` if set).
 		 *
 		 * @type {?Node<vec3>}
 		 * @default null
@@ -292,20 +295,21 @@ class NodeMaterial extends Material {
 		this.depthNode = null;
 
 		/**
-		 * Allows to overwrite the position used for shadow map rendering which
-		 * is by default {@link positionWorld}, the vertex position
+		 * Allows to overwrite the position used to look up shadow maps when this material
+		 * receives shadows. The default is {@link positionWorld}, the vertex position
 		 * in world space.
 		 *
-		 * @type {?Node<float>}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.receivedShadowPositionNode = null;
 
 		/**
-		 * Allows to overwrite the geometry position used for shadow map projection which
-		 * is by default {@link positionLocal}, the vertex position in local space.
+		 * Allows to overwrite the local vertex position used when rendering this object
+		 * into shadow maps. The default is {@link NodeMaterial#positionNode} if set,
+		 * otherwise {@link positionLocal}, the vertex position in local space.
 		 *
-		 * @type {?Node<float>}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.castShadowPositionNode = null;
@@ -329,7 +333,8 @@ class NodeMaterial extends Material {
 
 		/**
 		 * This node can be used to influence how an object using this node material
-		 * casts shadows. To apply a color to shadows, you can simply do:
+		 * casts shadows. To apply a color to shadows, enable `renderer.shadowMap.transmitted`
+		 * and do:
 		 *
 		 * ```js
 		 * material.castShadowNode = vec4( 1, 0, 0, 1 );
@@ -387,7 +392,7 @@ class NodeMaterial extends Material {
 		/**
 		 * This node property can be used if you need complete freedom in implementing
 		 * the vertex shader. Assigning a node will replace the built-in material logic
-		 * used in the vertex stage.
+		 * used in the vertex stage. The node must return the vertex position in clip space.
 		 *
 		 * @type {?Node<vec4>}
 		 * @default null
@@ -741,7 +746,7 @@ class NodeMaterial extends Material {
 	 * Setups the position in clip space.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {Node<vec4>} The position in view space.
+	 * @return {Node<vec4>} The position in clip space.
 	 */
 	setupModelViewProjection( /*builder*/ ) {
 
@@ -1017,7 +1022,7 @@ class NodeMaterial extends Material {
 	 * Setups the lights node based on the scene, environment and material.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {LightingNode<Array>} The lights node.
+	 * @return {Array<LightingNode>} The material lighting nodes.
 	 */
 	setupMaterialLightings( builder ) {
 
@@ -1128,7 +1133,7 @@ class NodeMaterial extends Material {
 
 		let outgoingLightNode = this.setupOutgoingLight( builder );
 
-		if ( lightsNode && ( materialLightings.length > 0 || lightsNode.getScope().hasLights ) ) {
+		if ( lightsNode && ( materialLightings.length > 0 || lightsNode.hasLights !== false ) ) {
 
 			const lightingModel = this.setupLightingModel( builder ) || null;
 
