@@ -335,7 +335,9 @@ class MeshStandardMaterial extends Material {
 		this.envMap = null;
 
 		/**
-		 * The rotation of the environment map in radians.
+		 * The rotation of the environment map in radians. Only applies to
+		 * {@link MeshStandardMaterial#envMap}. When the material is lit by
+		 * {@link Scene#environment}, {@link Scene#environmentRotation} is used instead.
 		 *
 		 * @type {Euler}
 		 * @default (0,0,0)
@@ -343,7 +345,9 @@ class MeshStandardMaterial extends Material {
 		this.envMapRotation = new Euler();
 
 		/**
-		 * Scales the effect of the environment map by multiplying its color.
+		 * Scales the effect of the environment map by multiplying its color. Only applies to
+		 * {@link MeshStandardMaterial#envMap}. When the material is lit by
+		 * {@link Scene#environment}, {@link Scene#environmentIntensity} is used instead.
 		 *
 		 * @type {number}
 		 * @default 1

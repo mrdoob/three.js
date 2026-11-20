@@ -18,8 +18,8 @@ class CompressedArrayTexture extends CompressedTexture {
 	 * @param {number} width - The width of the texture.
 	 * @param {number} height - The height of the texture.
 	 * @param {number} depth - The depth of the texture.
-	 * @param {number} [format=RGBAFormat] - The min filter value.
-	 * @param {number} [type=UnsignedByteType] - The min filter value.
+	 * @param {number} [format=RGBAFormat] - The texture format.
+	 * @param {number} [type=UnsignedByteType] - The texture type.
 	 */
 	constructor( mipmaps, width, height, depth, format, type ) {
 

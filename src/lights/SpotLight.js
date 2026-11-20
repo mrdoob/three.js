@@ -19,7 +19,6 @@ import { Object3D } from '../core/Object3D.js';
  * spotLight.shadow.mapSize.height = 1024;
  * spotLight.shadow.camera.near = 500;
  * spotLight.shadow.camera.far = 4000;
- * spotLight.shadow.camera.fov = 30;s
  * ```
  *
  * @augments Light
@@ -34,7 +33,7 @@ class SpotLight extends Light {
 	 * @param {number} [distance=0] - Maximum range of the light. `0` means no limit.
 	 * @param {number} [angle=Math.PI/3] - Maximum angle of light dispersion from its direction whose upper bound is `Math.PI/2`.
 	 * @param {number} [penumbra=0] - Percent of the spotlight cone that is attenuated due to penumbra. Value range is `[0,1]`.
-	 * @param {number} [decay=2] - The amount the light dims along the distance of the light.
+	 * @param {number} [decay=2] - The exponent of the light's distance falloff.
 	 */
 	constructor( color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 2 ) {
 
@@ -94,8 +93,9 @@ class SpotLight extends Light {
 		this.penumbra = penumbra;
 
 		/**
-		 * The amount the light dims along the distance of the light. In context of
-		 * physically-correct rendering the default value should not be changed.
+		 * The exponent of the light's distance falloff (`1 / distance^decay`). The
+		 * default `2` gives physically correct inverse-square falloff and should not
+		 * be changed in context of physically-correct rendering.
 		 *
 		 * @type {number}
 		 * @default 2
@@ -103,12 +103,10 @@ class SpotLight extends Light {
 		this.decay = decay;
 
 		/**
-		 * A texture used to modulate the color of the light. The spot light
-		 * color is mixed with the RGB value of this texture, with a ratio
-		 * corresponding to its alpha value. The cookie-like masking effect is
-		 * reproduced using pixel values (0, 0, 0, 1-cookie_value).
-		 *
-		 * *Warning*: This property is disabled if {@link Object3D#castShadow} is set to `false`.
+		 * A texture projected from the light that modulates its color. The spot light
+		 * color is multiplied by the RGB value of this texture. The projection uses the
+		 * frustum of the shadow camera (see {@link SpotLightShadow#focus}) and works
+		 * whether or not {@link Object3D#castShadow} is enabled.
 		 *
 		 * @type {?Texture}
 		 * @default null

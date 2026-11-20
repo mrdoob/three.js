@@ -18,15 +18,19 @@ import { warnOnce } from '../../utils.js';
 const _defaultValues = /*@__PURE__*/ new LineDashedMaterial();
 
 /**
- * Varying node representing the world position of the segment start in view space.
+ * Varying node representing the position of the segment start in view space.
  * Used for distance and coordinate calculations across the fragment shader.
+ *
+ * @private
  * @type {VaryingNode<vec3>}
  */
 const worldStart = varyingProperty( 'vec3', 'worldStart' );
 
 /**
- * Varying node representing the world position of the segment end in view space.
+ * Varying node representing the position of the segment end in view space.
  * Used for distance and coordinate calculations across the fragment shader.
+ *
+ * @private
  * @type {VaryingNode<vec3>}
  */
 const worldEnd = varyingProperty( 'vec3', 'worldEnd' );
@@ -34,6 +38,8 @@ const worldEnd = varyingProperty( 'vec3', 'worldEnd' );
 /**
  * Varying node representing the accumulated distance along the line.
  * Crucial for correctly computing dashed line intervals in fragment stage.
+ *
+ * @private
  * @type {VaryingNode<float>}
  */
 const lineDistance = varyingProperty( 'float', 'lineDistance' );
@@ -41,6 +47,8 @@ const lineDistance = varyingProperty( 'float', 'lineDistance' );
 /**
  * Varying node representing the interpolated world/view position of the current fragment.
  * Used for line/ray distance checks under perspective projection.
+ *
+ * @private
  * @type {VaryingNode<vec4>}
  */
 const worldPos = varyingProperty( 'vec4', 'worldPos' );
@@ -49,6 +57,7 @@ const worldPos = varyingProperty( 'vec4', 'worldPos' );
  * Trims the line segment to avoid rendering behind the camera near plane.
  * Computes an interpolation factor (alpha) to clamp the segment's coordinate.
  *
+ * @private
  * @param {Object} inputs
  * @param {Node<vec4>} inputs.start - Segment start position in view space.
  * @param {Node<vec4>} inputs.end - Segment end position in view space.
@@ -72,6 +81,7 @@ const trimSegmentAlpha = Fn( ( { start, end } ) => {
  * Calculates the closest points on two 3D lines.
  * Used for perspective-correct line rendering and coordinates interpolation.
  *
+ * @private
  * @param {Object} inputs
  * @param {Node<vec3>} inputs.p1 - Start of line 1.
  * @param {Node<vec3>} inputs.p2 - End of line 1.
@@ -106,7 +116,7 @@ const closestLineToLine = Fn( ( { p1, p2, p3, p4 } ) => {
  * TSL node acting as a custom Model-View-Projection (MVP) for fat lines,
  * expanding 3D segments into screen/world-facing ribbons of a specified width.
  *
- * @tsl
+ * @private
  * @type {Node<vec4>}
  */
 const mvpLine = Fn( ( { material } ) => {
@@ -300,7 +310,7 @@ const mvpLine = Fn( ( { material } ) => {
  * TSL fragment node that computes the shape/coverage (alpha) of the fat line segment.
  * Handles dash/gap generation, alpha-to-coverage rendering, and round endcaps.
  *
- * @tsl
+ * @private
  * @type {Node<float>}
  */
 const alphaLine = Fn( ( { material, renderer } ) => {
@@ -492,8 +502,9 @@ class Line2NodeMaterial extends NodeMaterial {
 		this.gapSizeNode = null;
 
 		/**
-		 * Blending is set to `NoBlending` since transparency
-		 * is not supported, yet.
+		 * Blending is set to `NoBlending`. When `transparent` is `true`, the line
+		 * is blended in the shader over the opaque scene, so other transparent
+		 * objects are not visible behind it.
 		 *
 		 * @type {number}
 		 * @default 0

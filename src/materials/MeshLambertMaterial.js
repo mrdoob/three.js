@@ -239,11 +239,11 @@ class MeshLambertMaterial extends Material {
 		this.displacementBias = 0;
 
 		/**
-		 * Specular map used by the material.
+		 * The red channel of this texture is used as a scalar strength that affects
+		 * how much of the environment map affects the surface.
 		 *
-		 * `specularMap` represents color data, and the texture must be assigned a
-		 * {@link Texture#colorSpace}. Most `specularMap` textures set
-		 * `texture.colorSpace = SRGBColorSpace`.
+		 * `specularMap` represents non-color data. Any texture assigned must have
+		 * `texture.colorSpace = NoColorSpace` (default).
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -282,7 +282,9 @@ class MeshLambertMaterial extends Material {
 		this.envMap = null;
 
 		/**
-		 * The rotation of the environment map in radians.
+		 * The rotation of the environment map in radians. Only applies to
+		 * {@link MeshLambertMaterial#envMap}. When the material is lit by
+		 * {@link Scene#environment}, {@link Scene#environmentRotation} is used instead.
 		 *
 		 * @type {Euler}
 		 * @default (0,0,0)
@@ -292,7 +294,7 @@ class MeshLambertMaterial extends Material {
 		/**
 		 * How to combine the result of the surface's color with the environment map, if any.
 		 *
-		 * When set to `MixOperation`, the {@link MeshBasicMaterial#reflectivity} is used to
+		 * When set to `MixOperation`, the {@link MeshLambertMaterial#reflectivity} is used to
 		 * blend between the two colors.
 		 *
 		 * @type {(MultiplyOperation|MixOperation|AddOperation)}
@@ -310,7 +312,9 @@ class MeshLambertMaterial extends Material {
 		this.reflectivity = 1;
 
 		/**
-		 * Scales the effect of the environment map by multiplying its color.
+		 * Scales the effect of the environment map by multiplying its color. Only applies to
+		 * {@link MeshLambertMaterial#envMap}. When the material is lit by
+		 * {@link Scene#environment}, {@link Scene#environmentIntensity} is used instead.
 		 *
 		 * @type {number}
 		 * @default 1

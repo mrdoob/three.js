@@ -93,7 +93,9 @@ class PointsMaterial extends Material {
 		this.alphaMap = null;
 
 		/**
-		 * Defines the size of the points in pixels.
+		 * Defines the size of the points in pixels. When {@link PointsMaterial#sizeAttenuation}
+		 * is `true` and a perspective camera is used, the size is additionally scaled by
+		 * `( 0.5 * canvasHeight ) / viewDepth`.
 		 *
 		 * Might be capped if the value exceeds hardware dependent parameters like [gl.ALIASED_POINT_SIZE_RANGE](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParameter).
 		 *

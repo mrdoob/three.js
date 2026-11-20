@@ -56,7 +56,7 @@ class TextureSource {
 		 * This property is only relevant when {@link TextureSource#needsUpdate} is set to `true` and
 		 * provides more control on how texture data should be processed. When `dataReady` is set
 		 * to `false`, the engine performs the memory allocation (if necessary) but does not transfer
-		 * the data into the GPU memory.
+		 * the data into the GPU memory. Only supported by `WebGLRenderer`.
 		 *
 		 * @type {boolean}
 		 * @default true
