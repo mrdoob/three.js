@@ -246,7 +246,6 @@ function weldPositions( sourcePositions, referencedVertices, bounds ) {
 function buildTriangleBuffers( elementCount, sourceIndices, vertexMap, positions ) {
 
 	const triangleCount = elementCount / 3;
-	const faces = new Uint32Array( triangleCount * 4 );
 	const triangles = new Uint32Array( elementCount );
 
 	for ( let i = 0; i < triangleCount; i ++ ) {
@@ -299,18 +298,13 @@ function buildTriangleBuffers( elementCount, sourceIndices, vertexMap, positions
 
 		}
 
-		const faceOffset = i * 4;
-		faces[ faceOffset ] = a;
-		faces[ faceOffset + 1 ] = b;
-		faces[ faceOffset + 2 ] = c;
-		faces[ faceOffset + 3 ] = TRI_INDEX;
 		triangles[ triangleOffset ] = a;
 		triangles[ triangleOffset + 1 ] = b;
 		triangles[ triangleOffset + 2 ] = c;
 
 	}
 
-	return { faces, triangles };
+	return triangles;
 
 }
 
@@ -844,9 +838,6 @@ class SculptorMesh {
 
 	initFromGeometry( geometry ) {
 
-		this._tagFlag = 1;
-		this._sculptFlag = 1;
-
 		const posAttr = geometry.getAttribute( 'position' );
 
 		if ( posAttr === undefined || posAttr.itemSize !== 3 || posAttr.count === 0 ) {
@@ -866,22 +857,39 @@ class SculptorMesh {
 		const { elementCount, sourceIndices, referencedVertices } = readSourceElements( index, sourceVertexCount );
 		const { positions: sourcePositions, bounds } = readSourcePositions( posAttr, referencedVertices );
 		const { positions: weldedPositions, vertexMap } = weldPositions( sourcePositions, referencedVertices, bounds );
-		const { faces, triangles } = buildTriangleBuffers( elementCount, sourceIndices, vertexMap, weldedPositions );
-		const vertexCount = weldedPositions.length / 3;
-		const triangleCount = elementCount / 3;
+		const triangles = buildTriangleBuffers( elementCount, sourceIndices, vertexMap, weldedPositions );
+		this._initFromBuffers( weldedPositions, triangles, weldedPositions.length / 3, elementCount / 3 );
+		this._topologyVersion = 0;
+
+	}
+
+	_initFromBuffers( positions, triangles, vertexCount, triangleCount ) {
+
+		this._tagFlag = 1;
+		this._sculptFlag = 1;
+
 		const vertexDataLength = vertexCount * 3;
+		const faces = new Uint32Array( triangleCount * 4 );
+
+		for ( let i = 0; i < triangleCount; i ++ ) {
+
+			faces[ i * 4 ] = triangles[ i * 3 ];
+			faces[ i * 4 + 1 ] = triangles[ i * 3 + 1 ];
+			faces[ i * 4 + 2 ] = triangles[ i * 3 + 2 ];
+			faces[ i * 4 + 3 ] = TRI_INDEX;
+
+		}
 
 		this._nbVertices = vertexCount;
 		this._nbFaces = triangleCount;
-		this._topologyVersion = 0;
 		this._leavesToUpdate.length = 0;
 
-		this._verticesXYZ = new Float32Array( weldedPositions );
+		this._verticesXYZ = new Float32Array( positions );
 		this._normalsXYZ = new Float32Array( vertexDataLength );
 		this._renderNormalsXYZ = new Float32Array( vertexDataLength );
 
 		this._facesABCD = faces;
-		this._trianglesABC = triangles;
+		this._trianglesABC = new Uint32Array( triangles );
 		this._vertOnEdge = new Uint8Array( vertexCount );
 		this._vertTagFlags = new Int32Array( vertexCount );
 		this._vertSculptFlags = new Int32Array( vertexCount );
@@ -894,6 +902,33 @@ class SculptorMesh {
 
 		this._initTopology();
 		this._updateGeometry();
+
+	}
+
+	/**
+	 * Returns a compact copy of the vertices and triangles, for {@link SculptorMesh#setState}.
+	 */
+	getState() {
+
+		return {
+			vertexCount: this._nbVertices,
+			triangleCount: this._nbFaces,
+			positions: this._verticesXYZ.slice( 0, this._nbVertices * 3 ),
+			triangles: this._trianglesABC.slice( 0, this._nbFaces * 3 )
+		};
+
+	}
+
+	/**
+	 * Replaces the mesh with a state from {@link SculptorMesh#getState}. Unlike
+	 * {@link SculptorMesh#initFromGeometry} it does not weld, so the exact topology
+	 * comes back. The topology version keeps increasing.
+	 */
+	setState( state ) {
+
+		const version = this._topologyVersion + 1;
+		this._initFromBuffers( state.positions, state.triangles, state.vertexCount, state.triangleCount );
+		this._topologyVersion = version;
 
 	}
 

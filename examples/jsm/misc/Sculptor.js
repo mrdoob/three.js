@@ -57,6 +57,7 @@ const STAMP_SPACING_RATIO = 0.15;
 const TOPOLOGY_HYSTERESIS2 = 2.05 * 2.05;
 const UNIFORM_SCALE_TOLERANCE = 1e-10;
 const CLAY_OFFSET_RATIO = 0.1;
+const DEFAULT_HISTORY_LIMIT = 20;
 
 /**
  * Fires when a pointer or programmatic stroke begins.
@@ -310,6 +311,7 @@ function compactDirtyVertices( vertices, vertexCount ) {
  * The mesh must use one material and a non-zero uniform world scale without
  * shear. Skinned, instanced and batched meshes are not supported.
  *
+ * Finished strokes can be reverted with {@link Sculptor#undo} and {@link Sculptor#redo}.
  * Sculptor manages bounds, draw range and spare buffer capacity. Geometry and
  * attributes may be replaced as capacity changes; do not cache them. Use
  * {@link Sculptor#getGeometry} for a compact copy for export or geometry processing.
@@ -414,6 +416,11 @@ class Sculptor extends EventDispatcher {
 		this._dirtyVertices = [];
 		this._geometrySynced = false;
 		this._boundsDirty = false;
+		this._historyLimit = DEFAULT_HISTORY_LIMIT;
+		this._undoStack = [];
+		this._redoStack = [];
+		this._strokeSnapshot = null;
+		this._strokeChanged = false;
 
 		this._prepareGeometry();
 		this._syncGeometry();
@@ -474,11 +481,13 @@ class Sculptor extends EventDispatcher {
 	}
 
 	/**
-	 * Disconnects the sculptor. The mesh and its geometry are not disposed.
+	 * Disconnects the sculptor and clears its history. The mesh and its geometry
+	 * are not disposed.
 	 */
 	dispose() {
 
 		this.disconnect();
+		this.clearHistory();
 
 	}
 
@@ -958,6 +967,8 @@ class Sculptor extends EventDispatcher {
 
 		if ( this._sculpting ) return this;
 
+		this._strokeSnapshot = this._historyLimit > 0 ? this._sculptMesh.getState() : null;
+		this._strokeChanged = false;
 		this._sculpting = true;
 		this.dispatchEvent( _startEvent );
 		return this;
@@ -995,6 +1006,17 @@ class Sculptor extends EventDispatcher {
 
 		this._sculptMesh.balanceOctree();
 		if ( this._boundsDirty ) this._computeExactBounds();
+
+		if ( this._strokeSnapshot !== null && this._strokeChanged ) {
+
+			this._undoStack.push( this._strokeSnapshot );
+			this._redoStack.length = 0;
+			this._trimHistory();
+
+		}
+
+		this._strokeSnapshot = null;
+		this._strokeChanged = false;
 		this.dispatchEvent( _endEvent );
 		return this;
 
@@ -1247,6 +1269,7 @@ class Sculptor extends EventDispatcher {
 		if ( vertices.length === 0 ) return;
 
 		this._boundsDirty = true;
+		this._strokeChanged = true;
 		const positions = this._sculptMesh.getVertices();
 		const geometry = this.mesh.geometry;
 		const box = geometry.boundingBox;
@@ -1390,6 +1413,123 @@ class Sculptor extends EventDispatcher {
 
 		sphere.radius = Math.sqrt( radius2 );
 		this._boundsDirty = false;
+
+	}
+
+	_trimHistory() {
+
+		const excess = this._undoStack.length - this._historyLimit;
+		if ( excess > 0 ) this._undoStack.splice( 0, excess );
+
+	}
+
+	_travelHistory( from, to ) {
+
+		if ( this._sculpting || from.length === 0 ) return this;
+
+		to.push( this._sculptMesh.getState() );
+		this._sculptMesh.setState( from.pop() );
+		this._dirtyVertices.length = 0;
+		this._clearHit();
+		this._syncGeometry();
+		this._computeExactBounds();
+
+		return this;
+
+	}
+
+	/**
+	 * Reverts the last finished stroke, remeshing included, and fires `change`.
+	 * Does nothing while a stroke is active or when there is nothing to undo.
+	 *
+	 * @return {Sculptor} A reference to this sculptor.
+	 */
+	undo() {
+
+		return this._travelHistory( this._undoStack, this._redoStack );
+
+	}
+
+	/**
+	 * Reapplies the last undone stroke and fires `change`. Does nothing while a
+	 * stroke is active or when there is nothing to redo. A new stroke clears the
+	 * redo history.
+	 *
+	 * @return {Sculptor} A reference to this sculptor.
+	 */
+	redo() {
+
+		return this._travelHistory( this._redoStack, this._undoStack );
+
+	}
+
+	/**
+	 * Returns whether there is a finished stroke to undo.
+	 *
+	 * @return {boolean} Whether {@link Sculptor#undo} has an effect.
+	 */
+	canUndo() {
+
+		return this._sculpting === false && this._undoStack.length > 0;
+
+	}
+
+	/**
+	 * Returns whether there is an undone stroke to redo.
+	 *
+	 * @return {boolean} Whether {@link Sculptor#redo} has an effect.
+	 */
+	canRedo() {
+
+		return this._sculpting === false && this._redoStack.length > 0;
+
+	}
+
+	/**
+	 * Drops all undo and redo steps.
+	 *
+	 * @return {Sculptor} A reference to this sculptor.
+	 */
+	clearHistory() {
+
+		this._undoStack.length = 0;
+		this._redoStack.length = 0;
+		return this;
+
+	}
+
+	/**
+	 * Returns the maximum number of strokes kept for undo.
+	 *
+	 * @return {number} The history limit.
+	 */
+	getHistoryLimit() {
+
+		return this._historyLimit;
+
+	}
+
+	/**
+	 * Sets the maximum number of strokes kept for undo. Each step stores a copy of
+	 * the vertices and triangles, so dense meshes need a lower limit. `0` disables
+	 * history and clears it. The oldest steps are dropped when the limit shrinks.
+	 *
+	 * @param {number} value - A non-negative integer. Defaults to `20`.
+	 * @return {Sculptor} A reference to this sculptor.
+	 */
+	setHistoryLimit( value ) {
+
+		if ( Number.isInteger( value ) === false || value < 0 ) {
+
+			throw new RangeError( 'Sculptor: historyLimit must be a non-negative integer.' );
+
+		}
+
+		this._historyLimit = value;
+		this._trimHistory();
+		if ( value === 0 ) this.clearHistory();
+
+		return this;
 
 	}
 
