@@ -93,7 +93,7 @@ class RenderOutputNode extends Node {
 	 * Sets the tone mapping type.
 	 *
 	 * @param {number} value - The tone mapping type.
-	 * @return {ToneMappingNode} A reference to this node.
+	 * @return {RenderOutputNode} A reference to this node.
 	 */
 	setToneMapping( value ) {
 

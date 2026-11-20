@@ -44,7 +44,9 @@ export const bitangentGeometry = /*@__PURE__*/ getBitangent( normalGeometry.cros
 export const bitangentLocal = /*@__PURE__*/ getBitangent( normalLocal.cross( tangentLocal ), 'v_bitangentLocal' ).normalize().toVar( 'bitangentLocal' );
 
 /**
- * TSL object that represents the vertex bitangent in view space of the current rendered object.
+ * TSL object that represents the bitangent in view space of the current rendered object.
+ * In the fragment stage, it is derived from the shading normal {@link normalView}, so it
+ * follows normal or bump mapping.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -74,7 +76,9 @@ export const bitangentView = /*@__PURE__*/ ( Fn( ( builder ) => {
 }, 'vec3' ).once( [ 'NORMAL', 'VERTEX' ] ) )().toVar( 'bitangentView' );
 
 /**
- * TSL object that represents the vertex bitangent in world space of the current rendered object.
+ * TSL object that represents the bitangent in world space of the current rendered object.
+ * In the fragment stage, it is derived from the shading normal {@link normalWorld}, so it
+ * follows normal or bump mapping.
  *
  * @tsl
  * @type {Node<vec3>}

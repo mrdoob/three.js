@@ -322,7 +322,9 @@ class ShadowBaseNode extends Node {
 }
 
 /**
- * TSL object that represents the vertex position in world space during the shadow pass.
+ * TSL object that represents the world space position used to look up the shadow map when receiving
+ * shadows. Defaults to `positionWorld`. It is replaced by `material.receivedShadowPositionNode`
+ * if set, or by the ray sample position when rendering volumetric lighting.
  *
  * @tsl
  * @type {Node<vec3>}

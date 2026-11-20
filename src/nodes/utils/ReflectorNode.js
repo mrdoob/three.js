@@ -67,7 +67,7 @@ class ReflectorNode extends TextureNode {
 	 * @param {boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
 	 * @param {boolean} [parameters.depth=false] - Whether depth data should be generated or not.
 	 * @param {number} [parameters.samples] - Anti-Aliasing samples of the internal render-target.
-	 * @param {TextureNode} [parameters.defaultTexture] - The default texture node.
+	 * @param {Texture} [parameters.defaultTexture] - The default texture.
 	 * @param {ReflectorBaseNode} [parameters.reflector] - The reflector base node.
 	 */
 	constructor( parameters = {} ) {
@@ -648,12 +648,12 @@ class ReflectorBaseNode extends Node {
  * @function
  * @param {Object} [parameters={}] - An object holding configuration parameters.
  * @param {Object3D} [parameters.target=new Object3D()] - The 3D object the reflector is linked to.
- * @param {number} [parameters.resolution=1] - The resolution scale.
+ * @param {number} [parameters.resolutionScale=1] - The resolution scale.
  * @param {boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
  * @param {boolean} [parameters.bounces=true] - Whether reflectors can render other reflector nodes or not.
  * @param {boolean} [parameters.depth=false] - Whether depth data should be generated or not.
  * @param {number} [parameters.samples] - Anti-Aliasing samples of the internal render-target.
- * @param {TextureNode} [parameters.defaultTexture] - The default texture node.
+ * @param {Texture} [parameters.defaultTexture] - The default texture.
  * @param {ReflectorBaseNode} [parameters.reflector] - The reflector base node.
  * @returns {ReflectorNode}
  */

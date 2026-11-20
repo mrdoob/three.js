@@ -66,7 +66,9 @@ export const positionWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
 }, 'vec3' ).once( [ 'POSITION' ] ) )();
 
 /**
- * TSL object that represents the position world direction of the current rendered object.
+ * TSL object that represents the normalized direction from the origin of the current rendered
+ * object to the vertex in world space. The rotation and scale of the world matrix are applied,
+ * the translation is ignored.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -102,7 +104,8 @@ export const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
 }, 'vec3' ).once( [ 'POSITION', 'VERTEX' ] ) )();
 
 /**
- * TSL object that represents the position view direction of the current rendered object.
+ * TSL object that represents the normalized direction from the fragment toward the camera
+ * in view space. For orthographic cameras, the value is `( 0, 0, 1 )`.
  *
  * @tsl
  * @type {VaryingNode<vec3>}

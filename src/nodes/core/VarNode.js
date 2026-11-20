@@ -260,7 +260,7 @@ const createVar = /*@__PURE__*/ nodeProxy( VarNode );
  * @tsl
  * @function
  * @param {Node} node - The node for which a variable should be created.
- * @param {?string} name - The name of the variable in the shader.
+ * @param {?string} [name=null] - The name of the variable in the shader.
  * @returns {VarNode}
  */
 export const Var = ( node, name = null ) => createVar( node, name ).toStack();
@@ -271,7 +271,7 @@ export const Var = ( node, name = null ) => createVar( node, name ).toStack();
  * @tsl
  * @function
  * @param {Node} node - The node for which a constant should be created.
- * @param {?string} name - The name of the constant in the shader.
+ * @param {?string} [name=null] - The name of the constant in the shader.
  * @returns {VarNode}
  */
 export const Const = ( node, name = null ) => createVar( node, name, true ).toStack();

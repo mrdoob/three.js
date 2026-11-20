@@ -829,7 +829,7 @@ class TextureNode extends UniformNode {
 	/**
 	 * TSL function for creating a texture node that fetches/loads texels without interpolation.
 	 *
-	 * @param {Node<uvec2>} uvNode - The uv node.
+	 * @param {Node<uvec2>} uvNode - The integer texel coordinates (not normalized uvs).
 	 * @returns {TextureNode} A texture node representing the texture load.
 	 */
 	load( uvNode ) {
@@ -1108,7 +1108,7 @@ export const texture = ( value = EmptyTexture, uvNode = null, levelNode = null, 
  *
  * @tsl
  * @function
- * @param {?Texture} value - The texture.
+ * @param {?Texture} [value=EmptyTexture] - The texture.
  * @returns {TextureNode}
  */
 export const uniformTexture = ( value = EmptyTexture ) => {
@@ -1127,9 +1127,8 @@ export const uniformTexture = ( value = EmptyTexture ) => {
  * @tsl
  * @function
  * @param {?(Texture|TextureNode)} [value=EmptyTexture] - The texture.
- * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
+ * @param {?Node<ivec2|uvec2>} [uvNode=null] - The integer texel coordinates (not normalized uvs).
  * @param {?Node<int>} [levelNode=null] - The level node.
- * @param {?Node<float>} [biasNode=null] - The bias node.
  * @returns {TextureNode}
  */
 export const textureLoad = ( ...params ) => texture( ...params ).setSampler( false );

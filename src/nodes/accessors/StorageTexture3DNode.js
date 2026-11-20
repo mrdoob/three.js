@@ -19,7 +19,7 @@ class StorageTexture3DNode extends StorageTextureNode {
 	 * Constructs a new 3D storage texture node.
 	 *
 	 * @param {Storage3DTexture} value - The 3D storage texture.
-	 * @param {Node<vec3>} uvNode - The uv node.
+	 * @param {Node<uvec3>} uvNode - The integer texel coordinates (not normalized uvs).
 	 * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
 	 */
 	constructor( value, uvNode, storeNode = null ) {
@@ -93,7 +93,7 @@ export default StorageTexture3DNode;
  * @tsl
  * @function
  * @param {Storage3DTexture} value - The 3D storage texture.
- * @param {?Node<vec3>} [uvNode=null] - The uv node.
+ * @param {?Node<uvec3>} [uvNode=null] - The integer texel coordinates (not normalized uvs).
  * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
  * @returns {StorageTexture3DNode}
  */

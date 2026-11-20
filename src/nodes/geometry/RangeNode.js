@@ -182,12 +182,13 @@ class RangeNode extends Node {
 export default RangeNode;
 
 /**
- * TSL function for creating a range node.
+ * TSL function for creating a range node. The bounds must be constant values,
+ * uniforms or other dynamic nodes are not supported.
  *
  * @tsl
  * @function
- * @param {Node<any>} [minNode=float()] - A node defining the lower bound of the range.
- * @param {Node<any>} [maxNode=float()] - A node defining the upper bound of the range.
+ * @param {number|Color|Vector2|Vector3|Vector4} minNode - The lower bound of the range.
+ * @param {number|Color|Vector2|Vector3|Vector4} maxNode - The upper bound of the range.
  * @returns {RangeNode}
  */
 export const range = /*@__PURE__*/ nodeProxy( RangeNode ).setParameterLength( 2 );
