@@ -40,7 +40,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, vec3, vec4, mrt, rtt, uniform, screenUV, velocity, builtinShadowContext } from 'three/tsl';
+			import { pass, vec3, vec4, mrt, screenUV, velocity, builtinShadowContext, rtt, uniform, Fn } from 'three/tsl';
 			import { sss } from 'three/addons/tsl/display/SSSNode.js';
 			import { hiZ } from 'three/addons/tsl/display/HiZNode.js';
 			import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
@@ -158,24 +158,47 @@
 
 				// sss
 
-				// downsample: the shadows are computed from a downsampled depth and upsampled afterwards
+				const sssPass = sss( prePassDepth, camera, dirLight );
+				sssPass.maxDistance.value = 0.2;
+				sssPass.useTemporalFiltering = true;
+
+				// scene context
+
+				// downsample: at a ratio above 1, the shadows are computed from downsampled inputs and upsampled afterwards
+
+				const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
 
 				const downsample = depthAwareDownsample( hiZ( prePassDepth, { maxLevel: 2 } ) );
-				downsample.level = 0;
-
 				const downsampleDepth = downsample.getTextureNode( 'depth' );
 
 				// without depth rejection, the joint bilateral filter is a bilinear filter
 
 				const depthTolerance = uniform( 0.005 );
 
-				const sssPass = sss( downsampleDepth, camera, dirLight );
-				sssPass.maxDistance.value = 0.2;
-				sssPass.useTemporalFiltering = true;
+				const upsample = ( node ) => {
 
-				// scene context
+					const upsampled = rtt( jointBilateralUpsample( node, downsampleDepth, prePassDepth, camera, { depthTolerance } ).sample( screenUV ) ).sample( screenUV );
 
-				const sssSample = rtt( jointBilateralUpsample( sssPass.getTextureNode(), downsampleDepth, prePassDepth, camera, { depthTolerance } ).sample( screenUV ) ).sample( screenUV ).r;
+					return Fn( () => ( downsampleParams.level > 0 ) ? upsampled : node )();
+
+				};
+
+				function updateDownsample() {
+
+					const reduced = downsampleParams.level > 0;
+
+					if ( reduced ) downsample.level = downsampleParams.level;
+
+					sssPass.depthNode = reduced ? downsampleDepth : prePassDepth;
+
+					scenePass.needsUpdate = true;
+					renderPipeline.needsUpdate = true;
+
+					reduced ? upsamplerControl.show() : upsamplerControl.hide();
+
+				}
+
+				const sssSample = upsample( sssPass.getTextureNode().sample( screenUV ) ).r;
 				const sssContext = builtinShadowContext( sssSample, dirLight );
 
 				scenePass.contextNode = sssContext;
@@ -210,11 +233,14 @@
 				gui.add( sssPass.thickness, 'value', 0.01, 0.1 ).name( 'thickness' );
 				gui.add( sssPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );
 
-				const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
-
 				const downsampleGui = renderer.inspector.createParameters( 'Downsample' );
-				downsampleGui.add( downsampleParams, 'level', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => downsample.level = Number( value ) );
-				downsampleGui.add( downsampleParams, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 );
+				downsampleGui.add( downsampleParams, 'level', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => {
+
+					downsampleParams.level = Number( value );
+					updateDownsample();
+
+				} );
+				const upsamplerControl = downsampleGui.add( downsampleParams, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 ).hide();
 
 				function updatePostprocessing() {
 

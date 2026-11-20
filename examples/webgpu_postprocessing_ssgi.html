@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec3, vec4, packNormalToRGB, unpackRGBToNormal, sample, rtt, uniform, screenUV } from 'three/tsl';
+			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec3, vec4, packNormalToRGB, unpackRGBToNormal, sample, rtt, uniform, screenUV, Fn } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
 			import { hiZ } from 'three/addons/tsl/display/HiZNode.js';
 			import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
@@ -107,11 +107,23 @@
 				const normalTexture = scenePass.getTexture( 'normal' );
 				normalTexture.type = THREE.UnsignedByteType;
 
-				// downsample: the GI is computed from downsampled inputs and upsampled afterwards
+				const sceneNormal = sample( ( uv ) => {
+
+					return unpackRGBToNormal( scenePassNormal.sample( uv ) );
+
+				} );
+
+				// gi
+
+				const giPass = ssgi( scenePassColor, scenePassDepth, sceneNormal, camera );
+				giPass.sliceCount.value = 2;
+				giPass.stepCount.value = 8;
+
+				// downsample: at a ratio above 1, the GI is computed from downsampled inputs and upsampled afterwards
+
+				const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
 
 				const downsample = depthAwareDownsample( hiZ( scenePassDepth, { maxLevel: 2 } ), { normal: scenePassNormal } );
-				downsample.level = 0;
-
 				const downsampleDepth = downsample.getTextureNode( 'depth' );
 				const downsampleNormal = sample( ( uv ) => {
 
@@ -122,13 +134,29 @@
 				// without depth rejection, the joint bilateral filter is a bilinear filter
 
 				const depthTolerance = uniform( 0.005 );
-				const upsample = ( node ) => rtt( jointBilateralUpsample( node, downsampleDepth, scenePassDepth, camera, { depthTolerance } ).sample( screenUV ) ).sample( screenUV );
 
-				// gi
+				const upsample = ( node ) => {
 
-				const giPass = ssgi( scenePassColor, downsampleDepth, downsampleNormal, camera );
-				giPass.sliceCount.value = 2;
-				giPass.stepCount.value = 8;
+					const upsampled = rtt( jointBilateralUpsample( node, downsampleDepth, scenePassDepth, camera, { depthTolerance } ).sample( screenUV ) ).sample( screenUV );
+
+					return Fn( () => ( downsampleParams.level > 0 ) ? upsampled : node )();
+
+				};
+
+				function updateDownsample() {
+
+					const reduced = downsampleParams.level > 0;
+
+					if ( reduced ) downsample.level = downsampleParams.level;
+
+					giPass.depthNode = reduced ? downsampleDepth : scenePassDepth;
+					giPass.normalNode = reduced ? downsampleNormal : sceneNormal;
+
+					renderPipeline.needsUpdate = true;
+
+					reduced ? upsamplerControl.show() : upsamplerControl.hide();
+
+				}
 
 				// composite
 
@@ -253,11 +281,14 @@
 				gui.add( giPass.useScreenSpaceSampling, 'value' ).name( 'screen-space sampling' );
 				gui.add( giPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );
 
-				const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
-
 				const downsampleGui = renderer.inspector.createParameters( 'Downsample' );
-				downsampleGui.add( downsampleParams, 'level', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => downsample.level = Number( value ) );
-				downsampleGui.add( downsampleParams, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 );
+				downsampleGui.add( downsampleParams, 'level', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => {
+
+					downsampleParams.level = Number( value );
+					updateDownsample();
+
+				} );
+				const upsamplerControl = downsampleGui.add( downsampleParams, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 ).hide();
 
 				function updatePostprocessing( value ) {
 

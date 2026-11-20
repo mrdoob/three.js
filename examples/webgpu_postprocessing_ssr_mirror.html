@@ -44,7 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking, rtt } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking, rtt, Fn } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { hiZ } from 'three/addons/tsl/display/HiZNode.js';
 		import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
@@ -173,11 +173,25 @@
 			const metalRoughTexture = scenePass.getTexture( 'metalrough' );
 			metalRoughTexture.type = THREE.UnsignedByteType;
 
-			// downsample: the reflections are computed from downsampled inputs and upsampled afterwards
+			const sceneNormal = sample( ( uv ) => {
+
+				return unpackOctahedralToNormal( scenePassNormal.sample( uv ).rg );
+
+			} );
+
+			//
+
+			const reflection = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+				metalnessNode: scenePassMetalRough.r,
+				roughnessNode: scenePassMetalRough.g,
+				binaryRefine: params.binaryRefine
+			} ).toInspector( 'SSR' );
+
+			// downsample: at a ratio above 1, the reflections are computed from downsampled inputs and upsampled afterwards
+
+			const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
 
 			const downsample = depthAwareDownsample( hiZ( scenePassDepth, { maxLevel: 2 } ), { normal: scenePassNormal, metalrough: scenePassMetalRough } );
-			downsample.level = 0;
-
 			const downsampleDepth = downsample.getTextureNode( 'depth' );
 			const downsampleMetalRough = downsample.getTextureNode( 'metalrough' );
 			const downsampleNormal = sample( ( uv ) => {
@@ -189,15 +203,31 @@
 			// without depth rejection, the joint bilateral filter is a bilinear filter
 
 			const depthTolerance = uniform( 0.005 );
-			const upsample = ( node ) => rtt( jointBilateralUpsample( node, downsampleDepth, scenePassDepth, camera, { depthTolerance } ).sample( screenUV ) );
 
-			//
+			const upsample = ( node ) => {
 
-			const reflection = ssr( scenePassColor, downsampleDepth, downsampleNormal, {
-				metalnessNode: downsampleMetalRough.r,
-				roughnessNode: downsampleMetalRough.g,
-				binaryRefine: params.binaryRefine
-			} ).toInspector( 'SSR' );
+				const upsampled = rtt( jointBilateralUpsample( node, downsampleDepth, scenePassDepth, camera, { depthTolerance } ).sample( screenUV ) ).sample( screenUV );
+
+				return Fn( () => ( downsampleParams.level > 0 ) ? upsampled : node )();
+
+			};
+
+			function updateDownsample() {
+
+				const reduced = downsampleParams.level > 0;
+
+				if ( reduced ) downsample.level = downsampleParams.level;
+
+				reflection.depthNode = reduced ? downsampleDepth : scenePassDepth;
+				reflection.normalNode = reduced ? downsampleNormal : sceneNormal;
+				reflection.metalnessNode = reduced ? downsampleMetalRough.r : scenePassMetalRough.r;
+				reflection.roughnessNode = reduced ? downsampleMetalRough.g : scenePassMetalRough.g;
+
+				renderPipeline.needsUpdate = true;
+
+				reduced ? upsamplerControl.show() : upsamplerControl.hide();
+
+			}
 
 			const raw = upsample( passTexture( reflection, reflection.getRenderTarget().texture ) );
 			const blurred = upsample( reflection.getTextureNode() );
@@ -231,14 +261,17 @@
 
 			// GUI
 
-			const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
-
-			const downsampleGui = renderer.inspector.createParameters( 'Downsample' );
-			downsampleGui.add( downsampleParams, 'level', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => downsample.level = Number( value ) );
-			downsampleGui.add( downsampleParams, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 );
-
 			const displayGui = renderer.inspector.createParameters( 'Display' );
 			displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN' ] ).name( 'Output' ).info( 'DN means denoise; this mirror example uses spatial blur rather than stochastic denoising.' ).onChange( updateOutput );
+
+			const downsampleGui = renderer.inspector.createParameters( 'Downsample' );
+			downsampleGui.add( downsampleParams, 'level', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => {
+
+				downsampleParams.level = Number( value );
+				updateDownsample();
+
+			} );
+			const upsamplerControl = downsampleGui.add( downsampleParams, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 ).hide();
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
 			ssrGui.add( params, 'enabled' ).name( 'Enabled' ).onChange( updateOutput );

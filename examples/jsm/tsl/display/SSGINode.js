@@ -408,6 +408,10 @@ class SSGINode extends Node {
 	 */
 	setup( builder ) {
 
+		// the depth node defines the resolution of the effect and must be updated first
+
+		builder.getNodeProperties( this ).depthNode = this.depthNode;
+
 		const renderer = builder.renderer;
 
 		if ( renderer.backend.isWebGPUBackend === true && renderer.hasFeature( 'rg11b10ufloat-renderable' ) === false ) {

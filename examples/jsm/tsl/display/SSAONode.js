@@ -305,6 +305,10 @@ class SSAONode extends Node {
 	 */
 	setup( builder ) {
 
+		// the depth node defines the resolution of the effect and must be updated first
+
+		builder.getNodeProperties( this ).depthNode = this.depthNode;
+
 		const uvNode = uv();
 
 		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );

@@ -41,11 +41,8 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec4, packNormalToRGB, unpackRGBToNormal, sample, rtt, uniform, screenUV } from 'three/tsl';
+			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec4, packNormalToRGB, unpackRGBToNormal, sample } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
-			import { hiZ } from 'three/addons/tsl/display/HiZNode.js';
-			import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
-			import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 			import { temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
@@ -157,33 +154,16 @@
 
 				} );
 
-				// downsample: the GI is computed from downsampled inputs and upsampled afterwards
-
-				const downsample = depthAwareDownsample( hiZ( scenePassDepth, { maxLevel: 2 } ), { normal: scenePassNormal } );
-				downsample.level = 0;
-
-				const downsampleDepth = downsample.getTextureNode( 'depth' );
-				const downsampleNormal = sample( ( uv ) => {
-
-					return unpackRGBToNormal( downsample.getTextureNode( 'normal' ).sample( uv ) );
-
-				} );
-
-				// without depth rejection, the joint bilateral filter is a bilinear filter
-
-				const depthTolerance = uniform( 0.005 );
-				const upsample = ( node ) => rtt( jointBilateralUpsample( node, downsampleDepth, scenePassDepth, camera, { depthTolerance } ).sample( screenUV ) ).sample( screenUV );
-
 				// gi
 
-				const giPass = ssgi( scenePassColor, downsampleDepth, downsampleNormal, camera );
+				const giPass = ssgi( scenePassColor, scenePassDepth, sceneNormal, camera );
 				giPass.sliceCount.value = 2;
 				giPass.stepCount.value = 8;
 
 				// denoise: GI in rgb and AO in alpha, accumulated in time
 
-				const ao = upsample( giPass.getAONode().toInspector( 'SSGI.AO' ) );
-				const gi = upsample( giPass.getGINode().toInspector( 'SSGI.GI' ) );
+				const ao = giPass.getAONode().toInspector( 'SSGI.AO' );
+				const gi = giPass.getGINode().toInspector( 'SSGI.GI' );
 
 				const denoiseNode = temporalDenoise( vec4( gi.rgb, ao.r ), { depth: scenePassDepth, normal: sceneNormal, camera, velocity: scenePassVelocity, alpha: true } );
 				const denoised = denoiseNode.getTextureNode().toInspector( 'Denoise' );
@@ -199,14 +179,6 @@
 
 				const traaPass = traa( compositePass, scenePassDepth, scenePassVelocity, camera );
 				renderPipeline.outputNode = traaPass;
-
-				// downsample
-
-				const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
-
-				const downsampleGui = renderer.inspector.createParameters( 'Downsample' );
-				downsampleGui.add( downsampleParams, 'level', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => downsample.level = Number( value ) );
-				downsampleGui.add( downsampleParams, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 );
 
 				// light
 

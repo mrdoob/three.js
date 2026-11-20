@@ -39,7 +39,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { sample, pass, mrt, rtt, uniform, screenUV, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext } from 'three/tsl';
+			import { sample, pass, mrt, screenUV, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext, rtt, uniform } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { ssao } from 'three/addons/tsl/display/SSAONode.js';
 			import { hiZ } from 'three/addons/tsl/display/HiZNode.js';
@@ -57,7 +57,7 @@
 
 			let camera, scene, renderer, renderPipeline, controls;
 
-			let aoPass, upsamplePass, traaPass, transparentMesh;
+			let aoPass, aoNode, upsamplePass, traaPass, transparentMesh;
 
 			const params = {
 				aoType: 'GTAO',
@@ -129,6 +129,12 @@
 					velocity: velocity
 				} ) );
 
+				const prePassNormal = sample( ( uv ) => {
+
+					return unpackRGBToNormal( prePass.getTextureNode().sample( uv ) );
+
+				} );
+
 				const prePassDepth = prePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => prePass.getLinearDepthNode() );
 				const prePassVelocity = prePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
 
@@ -137,11 +143,9 @@
 				const normalTexture = prePass.getTexture( 'output' );
 				normalTexture.type = THREE.UnsignedByteType;
 
-				// downsample: the AO is computed from downsampled inputs and upsampled afterwards
+				// downsample: at a ratio above 1, the AO is computed from downsampled inputs and upsampled afterwards
 
 				const downsample = depthAwareDownsample( hiZ( prePassDepth, { maxLevel: 2 } ), { normal: prePass.getTextureNode() } );
-				downsample.level = params.downsample;
-
 				const downsampleDepth = downsample.getTextureNode( 'depth' );
 				const downsampleNormal = sample( ( uv ) => {
 
@@ -174,7 +178,7 @@
 
 					scenePass.options.samples = useTRAA ? 0 : 4;
 
-					renderPipeline.outputNode = params.aoOnly ? vec4( vec3( upsamplePass.sample( screenUV ).r ), 1 ) : ( useTRAA ? traaPass : scenePass );
+					renderPipeline.outputNode = params.aoOnly ? vec4( vec3( aoNode ), 1 ) : ( useTRAA ? traaPass : scenePass );
 					renderer.toneMapping = params.aoOnly ? THREE.NoToneMapping : THREE.NeutralToneMapping;
 					renderPipeline.needsUpdate = true;
 
@@ -182,22 +186,26 @@
 
 				function createAO() {
 
-					if ( aoPass ) {
+					if ( aoPass ) aoPass.dispose();
+					if ( upsamplePass ) upsamplePass.dispose();
 
-						aoPass.dispose();
-						upsamplePass.dispose();
+					const reduced = params.downsample > 0;
 
-					}
+					if ( reduced ) downsample.level = params.downsample;
+
+					const depth = reduced ? downsampleDepth : prePassDepth;
+					const normal = reduced ? downsampleNormal : prePassNormal;
 
 					aoPass = ( params.aoType === 'SSAO' )
-						? ssao( downsampleDepth, downsampleNormal, camera ).toInspector( 'SSAO', ( inspectNode ) => inspectNode.r )
-						: ao( downsampleDepth, downsampleNormal, camera ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
+						? ssao( depth, normal, camera ).toInspector( 'SSAO', ( inspectNode ) => inspectNode.r )
+						: ao( depth, normal, camera ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
 
-					upsamplePass = rtt( jointBilateralUpsample( aoPass.getTextureNode(), downsampleDepth, prePassDepth, camera, { depthTolerance } ).sample( screenUV ) );
+					upsamplePass = reduced ? rtt( jointBilateralUpsample( aoPass.getTextureNode(), downsampleDepth, prePassDepth, camera, { depthTolerance } ).sample( screenUV ) ) : null;
+					aoNode = ( reduced ? upsamplePass : aoPass.getTextureNode() ).sample( screenUV ).r;
 
 					updateParameters();
 
-					scenePass.contextNode = builtinAOContext( upsamplePass.sample( screenUV ).r );
+					scenePass.contextNode = builtinAOContext( aoNode );
 					scenePass.needsUpdate = true;
 
 					updateOutput();
@@ -553,6 +561,7 @@
 					// half resolution suffices for GTAO since TRAA smooths it, SSAO looks best at full resolution
 
 					downsampleControl.setValue( params.aoType === 'SSAO' ? 0 : 1 );
+					params.downsample = ( params.aoType === 'SSAO' ) ? 0 : 1;
 
 					createAO();
 					updateControls();
@@ -562,8 +571,15 @@
 				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
 
 				const downsampleFolder = gui.addFolder( 'Downsample' );
-				const downsampleControl = downsampleFolder.add( params, 'downsample', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => downsample.level = Number( value ) );
-				downsampleFolder.add( params, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 );
+				const downsampleControl = downsampleFolder.add( params, 'downsample', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => {
+
+					params.downsample = Number( value );
+
+					createAO();
+					updateControls();
+
+				} );
+				const upsamplerControl = downsampleFolder.add( params, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 );
 
 				const gtaoControls = [
 					gui.add( params, 'scale', 0.01, 2 ).onChange( updateParameters ),
@@ -589,6 +605,8 @@
 				// show only the controls that apply to the active AO type
 
 				function updateControls() {
+
+					params.downsample > 0 ? upsamplerControl.show() : upsamplerControl.hide();
 
 					if ( params.aoType === 'GTAO' ) {
 

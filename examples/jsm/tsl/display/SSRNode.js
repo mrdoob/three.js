@@ -813,6 +813,10 @@ class SSRNode extends Node {
 	 */
 	setup( builder ) {
 
+		// the depth node defines the resolution of the effect and must be updated first
+
+		builder.getNodeProperties( this ).depthNode = this.depthNode;
+
 		const uvNode = uv();
 
 		const pointToLineDistance = Fn( ( [ point, linePointA, linePointB ] ) => {

@@ -57,7 +57,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation, rtt } from 'three/tsl';
+		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation, rtt, Fn } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { hiZ } from 'three/addons/tsl/display/HiZNode.js';
 		import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
@@ -275,29 +275,55 @@
 				scenePassVelocity.sample( uv ).z
 			) ).toInspector( 'Metalness/Roughness' );
 
-			// downsample: the reflections are computed from downsampled inputs and upsampled afterwards
+			ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+				stochastic: true,
+				diffuseNode: scenePassDiffuseColor,
+				metalnessNode: scenePassDiffuseColor.a,
+				roughnessNode: scenePassVelocity.z,
+				environmentNode: hdrTexture,
+				envImportanceSampling: params.ssr.envImportanceSampling,
+				binaryRefine: params.ssr.binaryRefine
+			} ).toInspector( 'SSR' );
+
+			// downsample: at a ratio above 1, the reflections are computed from downsampled inputs and upsampled afterwards
+
+			const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
 
 			const downsample = depthAwareDownsample( hiZ( scenePassDepth, { maxLevel: 2 } ), { normal: scenePassNormal, diffuseColor: scenePassDiffuseColor, velocity: scenePassVelocity } );
-			downsample.level = 0;
-
 			const downsampleDepth = downsample.getTextureNode( 'depth' );
 			const downsampleDiffuseColor = downsample.getTextureNode( 'diffuseColor' );
+			const downsampleVelocity = downsample.getTextureNode( 'velocity' );
 			const downsampleNormal = sample( ( uv ) => normalDecode( downsample.getTextureNode( 'normal' ).sample( uv ) ) );
 
 			// without depth rejection, the joint bilateral filter is a bilinear filter
 
 			const depthTolerance = uniform( 0.005 );
-			const upsample = ( node ) => rtt( jointBilateralUpsample( node, downsampleDepth, scenePassDepth, camera, { depthTolerance } ).sample( screenUV ) );
 
-			ssrNode = ssr( scenePassColor, downsampleDepth, downsampleNormal, {
-				stochastic: true,
-				diffuseNode: downsampleDiffuseColor,
-				metalnessNode: downsampleDiffuseColor.a,
-				roughnessNode: downsample.getTextureNode( 'velocity' ).z,
-				environmentNode: hdrTexture,
-				envImportanceSampling: params.ssr.envImportanceSampling,
-				binaryRefine: params.ssr.binaryRefine
-			} ).toInspector( 'SSR' );
+			const upsample = ( node ) => {
+
+				const upsampled = rtt( jointBilateralUpsample( node, downsampleDepth, scenePassDepth, camera, { depthTolerance } ).sample( screenUV ) ).sample( screenUV );
+
+				return Fn( () => ( downsampleParams.level > 0 ) ? upsampled : node )();
+
+			};
+
+			function updateDownsample() {
+
+				const reduced = downsampleParams.level > 0;
+
+				if ( reduced ) downsample.level = downsampleParams.level;
+
+				ssrNode.depthNode = reduced ? downsampleDepth : scenePassDepth;
+				ssrNode.normalNode = reduced ? downsampleNormal : sceneNormal;
+				ssrNode.diffuseNode = reduced ? downsampleDiffuseColor : scenePassDiffuseColor;
+				ssrNode.metalnessNode = reduced ? downsampleDiffuseColor.a : scenePassDiffuseColor.a;
+				ssrNode.roughnessNode = reduced ? downsampleVelocity.z : scenePassVelocity.z;
+
+				renderPipeline.needsUpdate = true;
+
+				reduced ? upsamplerControl.show() : upsamplerControl.hide();
+
+			}
 
 			ssrTexture = upsample( ssrNode.getTextureNode() );
 
@@ -369,15 +395,18 @@
 				'Accumulation Speed (Alpha)': 6
 			};
 
-			const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
-
-			const downsampleGui = renderer.inspector.createParameters( 'Downsample' );
-			downsampleGui.add( downsampleParams, 'level', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => downsample.level = Number( value ) );
-			downsampleGui.add( downsampleParams, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 );
-
 			const displayGui = renderer.inspector.createParameters( 'Display' );
 			displayGui.add( params, 'output', outputTypes ).name( 'Output' ).onChange( updateOutputNode );
 			displayGui.add( params.post, 'traa' ).name( 'TRAA' ).onChange( updateOutputNode );
+
+			const downsampleGui = renderer.inspector.createParameters( 'Downsample' );
+			downsampleGui.add( downsampleParams, 'level', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => {
+
+				downsampleParams.level = Number( value );
+				updateDownsample();
+
+			} );
+			const upsamplerControl = downsampleGui.add( downsampleParams, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 ).hide();
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
 			ssrGui.add( params.ssr, 'intensity', 0, 4 ).name( 'Intensity' ).onChange( applyParams );
