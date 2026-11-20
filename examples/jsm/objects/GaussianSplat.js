@@ -638,7 +638,7 @@ function createGeometry( count ) {
  */
 function packHalfFloatsToUint( a, b ) {
 
-	return ( toHalfFloat( a ) | ( toHalfFloat( b ) << 16 ) ) >>> 0;
+	return ( DataUtils.toHalfFloat( a ) | ( DataUtils.toHalfFloat( b ) << 16 ) ) >>> 0;
 
 }
 
