@@ -46,7 +46,6 @@
 		import * as THREE from 'three/webgpu';
 		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking, rtt, Fn } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
-		import { hiZ } from 'three/addons/tsl/display/HiZNode.js';
 		import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
 		import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
@@ -191,7 +190,7 @@
 
 			const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
 
-			const downsample = depthAwareDownsample( hiZ( scenePassDepth, { maxLevel: 2 } ), { normal: scenePassNormal, metalrough: scenePassMetalRough } );
+			const downsample = depthAwareDownsample( scenePassDepth, { normal: scenePassNormal, metalrough: scenePassMetalRough } );
 			const downsampleDepth = downsample.getTextureNode( 'depth' );
 			const downsampleMetalRough = downsample.getTextureNode( 'metalrough' );
 			const downsampleNormal = sample( ( uv ) => {

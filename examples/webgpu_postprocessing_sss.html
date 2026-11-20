@@ -42,7 +42,6 @@
 			import * as THREE from 'three/webgpu';
 			import { pass, vec3, vec4, mrt, screenUV, velocity, builtinShadowContext, rtt, uniform, Fn } from 'three/tsl';
 			import { sss } from 'three/addons/tsl/display/SSSNode.js';
-			import { hiZ } from 'three/addons/tsl/display/HiZNode.js';
 			import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
 			import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
@@ -168,7 +167,7 @@
 
 				const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
 
-				const downsample = depthAwareDownsample( hiZ( prePassDepth, { maxLevel: 2 } ) );
+				const downsample = depthAwareDownsample( prePassDepth );
 				const downsampleDepth = downsample.getTextureNode( 'depth' );
 
 				// without depth rejection, the joint bilateral filter is a bilinear filter

@@ -1,5 +1,5 @@
-import { FloatType, NearestFilter, Node, NodeMaterial, NodeUpdateType, QuadMesh, RendererUtils, RenderTarget, RGFormat } from 'three/webgpu';
-import { Fn, If, Loop, context, ivec2, nodeObject, outputStruct, passTexture, screenCoordinate, textureLoad, uint, uniform, uvec2, vec2, vec4 } from 'three/tsl';
+import { FloatType, NearestFilter, Node, NodeMaterial, NodeUpdateType, QuadMesh, RendererUtils, RenderTarget, RGFormat, Vector2 } from 'three/webgpu';
+import { Fn, If, Loop, context, float, ivec2, max, min, nodeObject, outputStruct, passTexture, screenCoordinate, textureLoad, uniform, uvec2, vec2, vec4 } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
@@ -9,14 +9,15 @@ let _rendererState;
  * Downsamples the scene's depth and further screen-space inputs like normals for effects
  * that are computed in a reduced resolution.
  *
- * Each texel holds the nearest depth of the texels it covers, read from the given depth
- * hierarchy, and all other inputs are taken from the texel holding that depth. The inputs
- * of an effect are thus consistent and the effect itself doesn't have to know about the
- * reduced resolution.
+ * Each texel holds the nearest and farthest depth of the texels it covers, and all other
+ * inputs are taken from the texel holding the nearest depth. The inputs of an effect are
+ * thus consistent and the effect itself doesn't have to know about the reduced resolution.
+ *
+ * The resolution is halved per level by rounding down, so the last texel of an odd sized
+ * level also covers the remaining row or column.
  *
  * ```js
- * const depthHierarchy = hiZ( scenePassDepth, { maxLevel: 1 } );
- * const downsample = depthAwareDownsample( depthHierarchy, { normal: scenePassNormal } );
+ * const downsample = depthAwareDownsample( scenePassDepth, { normal: scenePassNormal } );
  *
  * const aoPass = ao( downsample.getTextureNode( 'depth' ), downsample.getTextureNode( 'normal' ), camera );
  * ```
@@ -35,20 +36,20 @@ class DepthAwareDownsampleNode extends Node {
 	/**
 	 * Constructs a new depth-aware downsample node.
 	 *
-	 * @param {HiZNode} hiZNode - The depth hierarchy of the scene's depth.
+	 * @param {TextureNode} depthNode - The scene's depth.
 	 * @param {Object<string,TextureNode>} [textureNodes={}] - The texture nodes to downsample along with the depth.
 	 * They must have the resolution of the scene's depth.
 	 */
-	constructor( hiZNode, textureNodes = {} ) {
+	constructor( depthNode, textureNodes = {} ) {
 
 		super( 'vec4' );
 
 		/**
-		 * The depth hierarchy of the scene's depth.
+		 * The scene's depth.
 		 *
-		 * @type {HiZNode}
+		 * @type {TextureNode}
 		 */
-		this.hiZNode = hiZNode;
+		this.depthNode = depthNode;
 
 		/**
 		 * The texture nodes to downsample along with the depth.
@@ -58,8 +59,7 @@ class DepthAwareDownsampleNode extends Node {
 		this.textureNodes = textureNodes;
 
 		/**
-		 * The level of the depth hierarchy to downsample to. `1` is half and `2` is
-		 * quarter resolution. Must not exceed the last level of the depth hierarchy.
+		 * The level to downsample to. `1` is half and `2` is quarter resolution.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -82,6 +82,14 @@ class DepthAwareDownsampleNode extends Node {
 		 * @type {UniformNode<uint>}
 		 */
 		this._level = uniform( 1, 'uint' );
+
+		/**
+		 * The size of the scene's depth as a uniform.
+		 *
+		 * @private
+		 * @type {UniformNode<vec2>}
+		 */
+		this._size = uniform( new Vector2() );
 
 		const names = Object.keys( textureNodes );
 
@@ -155,10 +163,11 @@ class DepthAwareDownsampleNode extends Node {
 
 		//
 
-		const { width, height } = this.hiZNode.levels[ this.level ];
+		const { width, height } = this.depthNode.value.image;
 
 		this._level.value = this.level;
-		this._renderTarget.setSize( width, height );
+		this._size.value.set( width, height );
+		this._renderTarget.setSize( Math.max( 1, width >> this.level ), Math.max( 1, height >> this.level ) );
 
 		const names = Object.keys( this.textureNodes );
 
@@ -196,41 +205,54 @@ class DepthAwareDownsampleNode extends Node {
 	 */
 	setup( builder ) {
 
-		// the depth hierarchy must be updated before this node
+		const reversed = builder.renderer.reversedDepthBuffer;
 
-		builder.getNodeProperties( this ).hiZNode = this.hiZNode;
+		// the last cell of a level also covers the remaining row or column of an odd sized source
 
-		const begin = uvec2( screenCoordinate.xy ).shiftLeft( uvec2( this._level ) );
-		const cell = this.hiZNode.getPixelCellNode( this._level, vec2( begin ) );
+		const size = uvec2( this._size );
+		const shift = uvec2( this._level );
+		const cell = uvec2( screenCoordinate.xy );
+		const last = size.shiftRight( shift ).max( uvec2( 1 ) ).sub( uvec2( 1 ) );
+		const begin = cell.shiftLeft( shift ).toConst();
+		const end = cell.equal( last ).select( size, begin.add( uvec2( 1 ).shiftLeft( shift ) ) ).toConst();
 
-		// find the texel of the cell that holds the nearest depth
+		// find the nearest and farthest depth of the cell and the texel that holds the nearest one
 
-		const coord = Fn( () => {
+		const result = Fn( () => {
 
+			const nearest = float( reversed ? 0 : 1 ).toVar();
+			const farthest = float( reversed ? 1 : 0 ).toVar();
 			const coord = ivec2( begin ).toVar();
 
-			Loop( { start: begin.y, end: uint( cell.end.y ), type: 'uint', name: 'y' }, ( { y } ) => {
+			Loop( { start: begin.y, end: end.y, type: 'uint', name: 'y' }, ( { y } ) => {
 
-				Loop( { start: begin.x, end: uint( cell.end.x ), type: 'uint', name: 'x' }, ( { x } ) => {
+				Loop( { start: begin.x, end: end.x, type: 'uint', name: 'x' }, ( { x } ) => {
 
-					If( textureLoad( this.hiZNode.depthNode, ivec2( x, y ) ).r.equal( cell.depth ), () => {
+					const depth = textureLoad( this.depthNode, ivec2( x, y ) ).r.toVar();
 
+					If( reversed ? depth.greaterThan( nearest ) : depth.lessThan( nearest ), () => {
+
+						nearest.assign( depth );
 						coord.assign( ivec2( x, y ) );
 
 					} );
+
+					farthest.assign( reversed ? min( farthest, depth ) : max( farthest, depth ) );
 
 				} );
 
 			} );
 
-			return coord;
+			return vec4( nearest, farthest, vec2( coord ) );
 
-		} )();
+		} )().toConst();
+
+		const coord = ivec2( result.zw );
 
 		const textures = Object.values( this.textureNodes ).map( ( node ) => textureLoad( node, coord ) );
 
 		this._material.contextNode = context( builder.getSharedContext() );
-		this._material.fragmentNode = outputStruct( vec4( cell.depth, cell.farthest, 0, 1 ), ...textures );
+		this._material.fragmentNode = outputStruct( vec4( result.xy, 0, 1 ), ...textures );
 		this._material.needsUpdate = true;
 
 		return this._textureNodes.depth;
@@ -260,8 +282,8 @@ export default DepthAwareDownsampleNode;
  *
  * @tsl
  * @function
- * @param {HiZNode} hiZNode - The depth hierarchy of the scene's depth.
+ * @param {TextureNode} depthNode - The scene's depth.
  * @param {Object<string,TextureNode>} [textureNodes={}] - The texture nodes to downsample along with the depth.
  * @returns {DepthAwareDownsampleNode}
  */
-export const depthAwareDownsample = ( hiZNode, textureNodes ) => new DepthAwareDownsampleNode( nodeObject( hiZNode ), textureNodes );
+export const depthAwareDownsample = ( depthNode, textureNodes ) => new DepthAwareDownsampleNode( nodeObject( depthNode ), textureNodes );

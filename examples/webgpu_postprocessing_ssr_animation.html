@@ -41,7 +41,6 @@
 			import * as THREE from 'three/webgpu';
 			import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, velocity, rtt, screenUV, Fn } from 'three/tsl';
 			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
-			import { hiZ } from 'three/addons/tsl/display/HiZNode.js';
 			import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
 			import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 			import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
@@ -232,7 +231,7 @@
 
 				const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
 
-				const downsample = depthAwareDownsample( hiZ( scenePassDepth, { maxLevel: 2 } ), { normal: scenePassNormal, diffuseColor: scenePassDiffuseColor, velocity: scenePassVelocity } );
+				const downsample = depthAwareDownsample( scenePassDepth, { normal: scenePassNormal, diffuseColor: scenePassDiffuseColor, velocity: scenePassVelocity } );
 				const downsampleDepth = downsample.getTextureNode( 'depth' );
 				const downsampleDiffuseColor = downsample.getTextureNode( 'diffuseColor' );
 				const downsampleNormal = sample( ( uv ) => normalDecode( downsample.getTextureNode( 'normal' ).sample( uv ) ) );

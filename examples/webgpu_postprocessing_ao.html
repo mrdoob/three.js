@@ -42,7 +42,6 @@
 			import { sample, pass, mrt, screenUV, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext, rtt, uniform, textureSize, vec2 } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { ssao } from 'three/addons/tsl/display/SSAONode.js';
-			import { hiZ } from 'three/addons/tsl/display/HiZNode.js';
 			import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
 			import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
@@ -145,7 +144,7 @@
 
 				// downsample: at a ratio above 1, the AO is computed from downsampled inputs and upsampled afterwards
 
-				const downsample = depthAwareDownsample( hiZ( prePassDepth, { maxLevel: 2 } ), { normal: prePass.getTextureNode() } );
+				const downsample = depthAwareDownsample( prePassDepth, { normal: prePass.getTextureNode() } );
 				const downsampleDepth = downsample.getTextureNode( 'depth' );
 				const downsampleNormal = sample( ( uv ) => {
 
