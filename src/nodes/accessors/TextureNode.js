@@ -566,7 +566,9 @@ class TextureNode extends UniformNode {
 		properties.biasNode = this.biasNode;
 		properties.compareNode = compareNode;
 		properties.compareStepNode = compareStepNode;
-		properties.gradNode = gradNode;
+		// the gradients are properties of their own, so they are analyzed as the other inputs
+		properties.gradNodeX = gradNode !== null ? gradNode[ 0 ] : null;
+		properties.gradNodeY = gradNode !== null ? gradNode[ 1 ] : null;
 		properties.gatherNode = this.gatherNode;
 		properties.depthNode = this.depthNode;
 		properties.offsetNode = this.offsetNode;
@@ -703,7 +705,7 @@ class TextureNode extends UniformNode {
 
 			if ( propertyName === undefined ) {
 
-				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNode, gatherNode, offsetNode } = properties;
+				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNodeX, gradNodeY, gatherNode, offsetNode } = properties;
 
 				const uvSnippet = this.generateUV( builder, uvNode );
 				const levelSnippet = levelNode ? levelNode.build( builder, 'float' ) : null;
@@ -711,7 +713,7 @@ class TextureNode extends UniformNode {
 				const depthSnippet = depthNode ? depthNode.build( builder, 'int' ) : null;
 				const compareSnippet = compareNode ? compareNode.build( builder, 'float' ) : null;
 				const compareStepSnippet = compareStepNode ? compareStepNode.build( builder, 'float' ) : null;
-				const gradSnippet = gradNode ? [ gradNode[ 0 ].build( builder, 'vec2' ), gradNode[ 1 ].build( builder, 'vec2' ) ] : null;
+				const gradSnippet = gradNodeX ? [ gradNodeX.build( builder, 'vec2' ), gradNodeY.build( builder, 'vec2' ) ] : null;
 				const gatherSnippet = gatherNode ? gatherNode.build( builder, 'int' ) : null;
 				const offsetSnippet = offsetNode ? this.generateOffset( builder, offsetNode ) : null;
 

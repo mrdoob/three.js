@@ -825,6 +825,23 @@ for ( var i : i32 = 0; i < 3; i ++ ) {
 
 sum
 
+// dead code keeps texture gradient
+
+var grad : vec2<f32>;
+var nodeVar0 : vec4<f32>;
+
+grad = vec2<f32>( 1.0, 1.0 );
+
+if ( ( nodeVarying0.y > 0.5 ) ) {
+
+	grad = vec2<f32>( 0.0 );
+
+}
+
+nodeVar0 = textureSampleGrad( nodeUniform0, nodeUniform0_sampler, nodeVarying0, grad, grad );
+
+nodeVar0
+
 // dead code keeps assignment with side effects
 
 var result : i32;

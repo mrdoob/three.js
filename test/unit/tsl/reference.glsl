@@ -791,6 +791,40 @@ for ( int i = 0; i < 3; i ++ ) {
 
 sum
 
+// dead code keeps texture gradient
+
+vec2 grad;
+vec2 nodeVar0;
+vec2 nodeVar1;
+bool nodeVar2;
+vec2 nodeVar3;
+vec4 nodeVar4;
+grad = vec2( 1.0, 1.0 );
+
+if ( ( nodeVarying0.y > 0.5 ) ) {
+
+	grad = vec2( 0.0 );
+
+}
+
+nodeVar0 = nodeVarying0;
+nodeVar2 = bool( nodeUniform1 );
+
+if ( nodeVar2 ) {
+
+	nodeVar3 = nodeVar0;
+	nodeVar1 = vec2( nodeVar3.x, 1.0 - nodeVar3.y );
+
+} else {
+
+	nodeVar1 = nodeVar0;
+
+}
+
+nodeVar4 = textureGrad( nodeUniform0, nodeVar1, grad, grad );
+
+nodeVar4
+
 // dead code keeps assignment with side effects
 
 int result;

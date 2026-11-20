@@ -723,6 +723,20 @@ export const cases = {
 	} )(),
 
 	// A function that assigns a value which is read is not pure, so its call is kept even if its value is not read.
+	'dead code keeps texture gradient': () => Fn( () => {
+
+		const grad = vec2( 1 ).toVar( 'grad' );
+
+		If( uv().y.greaterThan( 0.5 ), () => {
+
+			grad.assign( 0 );
+
+		} );
+
+		return texture( new Texture(), uv() ).grad( grad, grad );
+
+	} )(),
+
 	'dead code keeps assignment with side effects': () => Fn( () => {
 
 		const result = int( 0 ).toVar( 'result' );
