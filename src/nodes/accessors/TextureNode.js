@@ -561,6 +561,12 @@ class TextureNode extends UniformNode {
 
 		}
 
+		if ( this.gatherNode !== null ) {
+
+			builder.addSamplerNode( this );
+
+		}
+
 		properties.uvNode = uvNode;
 		properties.levelNode = levelNode;
 		properties.biasNode = this.biasNode;

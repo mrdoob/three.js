@@ -391,6 +391,13 @@ class GLSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * GLSL samples textures without separate samplers.
+	 *
+	 * @param {TextureNode} textureNode - The texture node.
+	 */
+	addSamplerNode( /* textureNode */ ) {}
+
+	/**
 	 * Returns the parameters that pass a texture to a function: the texture and its y-flip.
 	 * Cube textures are not flipped, see {@link CubeTextureNode#setupUV}.
 	 *

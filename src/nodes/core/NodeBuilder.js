@@ -2904,6 +2904,18 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Requests a sampler for the binding of the given texture node.
+	 *
+	 * @abstract
+	 * @param {TextureNode} textureNode - The texture node.
+	 */
+	addSamplerNode( /* textureNode */ ) {
+
+		warn( 'Abstract function.' );
+
+	}
+
+	/**
 	 * Returns the parameters that pass a texture to a function: the texture node, and the nodes
 	 * the backend needs to sample it, e.g. its sampler. The parameters are passed in this order,
 	 * with the given names in the code of the function.
