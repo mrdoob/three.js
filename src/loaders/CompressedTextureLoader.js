@@ -32,7 +32,8 @@ class CompressedTextureLoader extends Loader {
 	 * directly be used for material creation. If you do it this way, the texture
 	 * may pop up in your scene once the respective loading process is finished.
 	 *
-	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {string|Array<string>} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * Alternatively, an array of six URLs (one per cube face) to load a compressed cube texture.
 	 * @param {function(CompressedTexture)} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
 	 * @param {onErrorCallback} onError - Executed when errors occur.
@@ -158,7 +159,7 @@ class CompressedTextureLoader extends Loader {
  *
  * @typedef {Object} CompressedTextureLoader~TexData
  * @property {number} width - The width of the base mip.
- * @property {number} height - The width of the base mip.
+ * @property {number} height - The height of the base mip.
  * @property {boolean} isCubemap - Whether the data represent a cubemap or not.
  * @property {number} mipmapCount - The mipmap count.
  * @property {Array<{data:TypedArray,width:number,height:number}>} mipmaps - An array holding the mipmaps.

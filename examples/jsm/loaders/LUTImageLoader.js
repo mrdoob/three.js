@@ -51,7 +51,8 @@ export class LUTImageLoader extends Loader {
 	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
 	 * @param {function({size:number,texture3D:Data3DTexture})} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
-	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @param {function((Event|Error))} onError - Executed when errors occur. Receives the image's `error` event if the
+	 * image fails to load, or an `Error` if the LUT data cannot be read.
 	 */
 	load( url, onLoad, onProgress, onError ) {
 

@@ -189,7 +189,7 @@ class DataTextureLoader extends Loader {
  * @typedef {Object} DataTextureLoader~TexData
  * @property {Object} [image] - An object holding width, height and the texture data.
  * @property {number} [width] - The width of the base mip.
- * @property {number} [height] - The width of the base mip.
+ * @property {number} [height] - The height of the base mip.
  * @property {TypedArray} [data] - The texture data.
  * @property {number} [format] - The texture format.
  * @property {number} [type] - The texture type.

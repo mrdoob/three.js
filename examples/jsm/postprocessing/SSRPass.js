@@ -841,7 +841,7 @@ class SSRPass extends Pass {
  * @property {Scene} scene - The scene to render.
  * @property {Camera} camera - The camera.
  * @property {number} [width=512] - The width of the effect.
- * @property {number} [height=512] - The width of the effect.
+ * @property {number} [height=512] - The height of the effect.
  * @property {?Array<Object3D>} [selects=null] - Which 3D objects should be affected by SSR. If not set, the entire scene is affected.
  * @property {boolean} [bouncing=false] - Whether bouncing is enabled or not.
  * @property {?ReflectorForSSRPass} [groundReflector=null] - A ground reflector.

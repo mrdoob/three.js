@@ -17,9 +17,10 @@ class NodeMaterialLoader extends MaterialLoader {
 		super( manager );
 
 		/**
-		 * Represents a dictionary of node types.
+		 * Represents a dictionary of deserialized node instances, keyed by UUID.
+		 * They are assigned to the node properties of the parsed material.
 		 *
-		 * @type {Object<string,Node.constructor>}
+		 * @type {Object<string,Node>}
 		 */
 		this.nodes = {};
 
@@ -36,7 +37,7 @@ class NodeMaterialLoader extends MaterialLoader {
 	 * Parses the node material from the given JSON.
 	 *
 	 * @param {Object} json - The JSON definition
-	 * @return {NodeMaterial}. The parsed material.
+	 * @return {Material} The parsed material.
 	 */
 	parse( json ) {
 
@@ -58,10 +59,10 @@ class NodeMaterialLoader extends MaterialLoader {
 	}
 
 	/**
-	 * Defines the dictionary of node types.
+	 * Defines the dictionary of deserialized node instances.
 	 *
-	 * @param {Object<string,Node.constructor>} value - The node library defined as `<classname,class>`.
-	 * @return {NodeLoader} A reference to this loader.
+	 * @param {Object<string,Node>} value - The node instances defined as `<uuid,node>`.
+	 * @return {NodeMaterialLoader} A reference to this loader.
 	 */
 	setNodes( value ) {
 
@@ -74,7 +75,7 @@ class NodeMaterialLoader extends MaterialLoader {
 	 * Defines the dictionary of node material types.
 	 *
 	 * @param {Object<string,NodeMaterial.constructor>} value - The node material library defined as `<classname,class>`.
-	 * @return {NodeLoader} A reference to this loader.
+	 * @return {NodeMaterialLoader} A reference to this loader.
 	 */
 	setNodeMaterials( value ) {
 
@@ -87,7 +88,7 @@ class NodeMaterialLoader extends MaterialLoader {
 	 * Creates a node material from the given type.
 	 *
 	 * @param {string} type - The node material type.
-	 * @return {Node} The created node material instance.
+	 * @return {Material} The created material instance.
 	 */
 	createMaterialFromType( type ) {
 

@@ -11,7 +11,7 @@ class QuaternionLinearInterpolant extends Interpolant {
 	/**
 	 * Constructs a new SLERP interpolant.
 	 *
-	 * @param {TypedArray} parameterPositions - The parameter positions hold the interpolation factors.
+	 * @param {TypedArray} parameterPositions - The ascending parameter positions of the samples, e.g. keyframe times.
 	 * @param {TypedArray} sampleValues - The sample values.
 	 * @param {number} sampleSize - The sample size
 	 * @param {TypedArray} [resultBuffer] - The result buffer.

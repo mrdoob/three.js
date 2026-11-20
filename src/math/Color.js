@@ -237,7 +237,7 @@ class Color {
 	}
 
 	/**
-	 * Sets this color from RGB values.
+	 * Sets this color from HSL values.
 	 *
 	 * @param {number} h - Hue value between `0.0` and `1.0`.
 	 * @param {number} s - Saturation value between `0.0` and `1.0`.
@@ -720,6 +720,7 @@ class Color {
 
 	/**
 	 * Subtracts the RGB values of the given color from the RGB values of this color.
+	 * The resulting components are clamped to a minimum of `0`.
 	 *
 	 * @param {Color} color - The color to subtract.
 	 * @return {Color} A reference to this color.
