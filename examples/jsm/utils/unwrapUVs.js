@@ -1,13 +1,28 @@
-import { Box2, BufferGeometry, Float32BufferAttribute, Vector2, Vector3 } from 'three';
+import { Box2, BufferGeometry, Float32BufferAttribute, InstancedBufferAttribute, Matrix4, Vector2, Vector3 } from 'three';
 import { remapAttribute } from './BufferGeometryUtils.js';
 import { potpack } from '../libs/potpack.module.js';
 
 /**
  * Generates a unique UV atlas for the meshes in a hierarchy, measured in world space.
  * Each mesh receives a new geometry. Skinned and morphed meshes are unwrapped in
- * their current pose. InstancedMesh and BatchedMesh are skipped with a warning.
+ * their current pose. BatchedMesh is skipped with a warning.
  * Excluded faces collapse onto the UV of a neighboring chart vertex, or (0, 0) if
  * isolated, and get a faceCharts entry of -1.
+ *
+ * With a `pageSize` below the `resolution`, the charts are packed at the density of the
+ * `resolution` into as many square pages of `pageSize` as they need, e.g. for devices that
+ * limit the texture size. Whole meshes are assigned to pages, since a mesh samples one light
+ * map, and the page of each mesh is stored in `mesh.userData.lightMapPage`. A mesh too large
+ * for a page gets a lower density.
+ *
+ * `mesh.userData.lightMapScale` multiplies the density of a mesh, e.g. `0.5` for meshes whose
+ * lighting varies little. Meshes with a scale of `0` are left out of the atlas and lose the
+ * attribute, e.g. small props that light probes light instead.
+ *
+ * The instances of an instanced mesh share the charts of its geometry and each one gets an
+ * atlas region of the same size, at the mean scale of the instances. The attribute maps the
+ * charts into a unit square, and the instanced attributes `instanceLightMapScale` and
+ * `instanceLightMapOffset` map it into the region of each instance.
  *
  * @three_import import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
  *
@@ -16,40 +31,61 @@ import { potpack } from '../libs/potpack.module.js';
  * @param {string} [options.attribute='uv1'] - Output attribute: uv, uv1, uv2, uv3.
  * @param {string} [options.mode='lightmap'] - 'lightmap' or 'normal'. Normal tries LSCM.
  * @param {number} [options.resolution=1024] - Square atlas size in pixels, integer >= 4.
- * @param {number} [options.padding=4] - Nonnegative gutter in pixels; 2 * padding + 1 must be less than resolution.
+ * @param {number} [options.pageSize=resolution] - Maximum page size in pixels; smaller sizes split the atlas into pages.
+ * @param {number} [options.padding=4] - Nonnegative gutter in pixels; 2 * padding + 1 must be less than resolution and pageSize.
  * @param {number} [options.texelsPerUnit=0] - Common world density; zero fits the atlas. Must be nonnegative.
  * @param {boolean} [options.respectUVSeams] - Cut discontinuities in existing uv (normal default).
  * @param {boolean} [options.useInputUVs=false] - Preserve valid authored UV charts before trying LSCM.
- * @return {?Object} Atlas size, density, chart bounds, mesh vertex/face mappings and warning
- * counts (excluded faces, tiny faces under 0.01 atlas pixels squared and single-triangle
- * charts, which signal fragmentation), or null if the charts do not fit. Meshes are left
- * unchanged in that case. Charts that fail Float32 validation are split and repacked;
- * single faces that still fail are excluded.
+ * @param {string} [options.inputAttribute='uv'] - The authored UVs of `respectUVSeams` and `useInputUVs`.
+ * @return {?Object} Page size, page count, density, chart bounds with their pages, mesh vertex/face
+ * mappings with their pages, the meshes left out and warning counts (excluded faces, tiny faces
+ * under 0.01 atlas pixels squared and single-triangle charts, which signal fragmentation), or null
+ * if the charts do not fit. Meshes are left unchanged in that case. Charts that fail Float32
+ * validation are split and repacked; single faces that still fail are excluded.
  */
 function unwrapUVs( root, options = {} ) {
 
 	const settings = {
 		attribute: 'uv1', mode: 'lightmap', resolution: 1024, padding: 4,
 		texelsPerUnit: 0,
-		useInputUVs: false,
+		useInputUVs: false, inputAttribute: 'uv',
 		...options, maxAreaRatio: 2
 	};
 	settings.maxStretch = settings.mode === 'normal' ? 2 : 1.5;
 	settings.respectUVSeams ??= settings.mode === 'normal';
+	settings.pageSize = Math.min( settings.pageSize ?? settings.resolution, settings.resolution );
 	root.updateWorldMatrix( true, true );
 
-	const records = [];
+	const records = [], excluded = [];
 	root.traverse( mesh => {
 
 		if ( ! mesh.isMesh ) return;
-		if ( mesh.isInstancedMesh || mesh.isBatchedMesh ) {
+		if ( mesh.isBatchedMesh ) {
 
-			console.warn( 'THREE.unwrapUVs(): InstancedMesh and BatchedMesh are not supported. Skipping mesh.', mesh );
+			console.warn( 'THREE.unwrapUVs(): BatchedMesh is not supported. Skipping mesh.', mesh );
 			return;
 
 		}
 
-		records.push( readMesh( mesh, settings ) );
+		let scale = mesh.userData.lightMapScale ?? 1;
+		if ( ! ( scale >= 0 && scale < Infinity ) ) {
+
+			console.warn( `THREE.unwrapUVs(): Invalid lightMapScale of mesh "${ mesh.name }", using 1.` );
+			scale = 1;
+
+		}
+
+		if ( scale === 0 || ( mesh.isInstancedMesh && mesh.count === 0 ) ) {
+
+			excluded.push( mesh );
+			return;
+
+		}
+
+		const record = readMesh( mesh, settings );
+		record.densityScale = scale * ( mesh.isInstancedMesh ? meanInstanceScale( mesh ) : 1 );
+		record.instances = mesh.isInstancedMesh ? mesh.count : 0;
+		records.push( record );
 
 	} );
 
@@ -64,11 +100,15 @@ function unwrapUVs( root, options = {} ) {
 
 	}
 
-	let density;
+	let density, pages;
 	for ( ; ; ) {
 
-		density = packCharts( charts, settings );
-		if ( density === null ) return null;
+		for ( const record of records ) record.charts = [];
+		for ( const chart of charts ) chart.record.charts.push( chart );
+
+		const packed = packCharts( records, settings );
+		if ( packed === null ) return null;
+		( { density, pages } = packed );
 
 		const failed = [];
 		for ( let i = charts.length - 1; i >= 0; i -- ) {
@@ -100,14 +140,28 @@ function unwrapUVs( root, options = {} ) {
 
 	}
 
-	for ( const record of records ) record.mesh.geometry = rebuildGeometry( record, charts, settings );
+	for ( const record of records ) {
+
+		record.mesh.geometry = rebuildGeometry( record, charts, settings );
+		record.mesh.userData.lightMapPage = record.page;
+
+	}
+
+	for ( const mesh of excluded ) {
+
+		if ( mesh.geometry.hasAttribute( settings.attribute ) ) mesh.geometry = withoutAttribute( mesh.geometry, settings.attribute );
+		delete mesh.userData.lightMapPage;
+
+	}
 
 	let tinyFaces = 0;
 	for ( const chart of charts ) {
 
+		// The UVs of instanced charts span an instance region rather than the page.
+		const { instances, regionSize } = chart.record, pixels = instances > 0 ? regionSize.w * regionSize.h : settings.pageSize ** 2;
 		for ( const [ t, triangle ] of chart.triangles.entries() ) {
 
-			if ( ! chart.dropped.has( t ) && Math.abs( cross2( ...triangle.map( i => chart.outputUV[ i ] ) ) ) * settings.resolution ** 2 / 2 < 0.01 ) tinyFaces ++;
+			if ( ! chart.dropped.has( t ) && Math.abs( cross2( ...triangle.map( i => chart.outputUV[ i ] ) ) ) * pixels / 2 < 0.01 ) tinyFaces ++;
 
 		}
 
@@ -117,10 +171,16 @@ function unwrapUVs( root, options = {} ) {
 	const singleTriangleCharts = charts.filter( chart => chart.faces.length === 1 ).length;
 
 	return {
-		attribute: settings.attribute, resolution: settings.resolution, padding: settings.padding,
+		attribute: settings.attribute, resolution: settings.pageSize, pages, padding: settings.padding,
 		texelsPerUnit: density,
-		charts: charts.map( chart => ( { x: chart.box.x, y: chart.box.y, width: chart.box.w, height: chart.box.h } ) ),
-		meshes: records.map( record => ( { mesh: record.mesh, sourceVertices: record.sourceVertices, faceCharts: record.faceCharts } ) ),
+		charts: charts.map( chart => {
+
+			const region = chart.record.regions?.[ 0 ] ?? { x: 0, y: 0 };
+			return { x: region.x + chart.box.x, y: region.y + chart.box.y, width: chart.box.w, height: chart.box.h, page: chart.record.page };
+
+		} ),
+		meshes: records.map( record => ( { mesh: record.mesh, page: record.page, sourceVertices: record.sourceVertices, faceCharts: record.faceCharts } ) ),
+		excluded,
 		warnings: { excludedFaces, tinyFaces, singleTriangleCharts }
 	};
 
@@ -182,7 +242,7 @@ function readMesh( mesh, settings ) {
 
 	}
 
-	const uv = geometry.getAttribute( 'uv' );
+	const uv = geometry.getAttribute( settings.inputAttribute );
 	for ( const edge of edges.values() ) {
 
 		// Pair opposite half-edges by closest normal, so duplicated double-sided shells
@@ -241,13 +301,20 @@ function equalUV( uv, a, b ) {
 
 }
 
-function growCharts( record, settings ) {
+function growCharts( record, settings, subset = null ) {
 
 	const assigned = new Uint8Array( record.faces.length ), charts = [];
+	if ( subset !== null ) {
+
+		assigned.fill( 1 );
+		for ( const f of subset ) assigned[ f ] = 0;
+
+	}
+
 	// Lightmap charts use planar projection; keep the costlier LSCM charts smaller.
 	const limit = settings.mode === 'lightmap' ? 8192 : 2048;
 	// Wider normal cones in normal mode give LSCM useful curved patches to solve.
-	const cosine = settings.useInputUVs && record.original.attributes.uv ? - 1 : settings.mode === 'normal' ? 0.35 : 1 / settings.maxStretch;
+	const cosine = settings.useInputUVs && record.original.attributes[ settings.inputAttribute ] ? - 1 : settings.mode === 'normal' ? 0.35 : 1 / settings.maxStretch;
 	for ( let seed = 0; seed < assigned.length; seed ++ ) {
 
 		if ( assigned[ seed ] || record.faces[ seed ].ignored ) continue;
@@ -282,7 +349,7 @@ function parameterize( record, faces, settings, charts ) {
 	const axis = Math.abs( normal.x ) < 0.8 ? new Vector3( 1, 0, 0 ) : new Vector3( 0, 1, 0 );
 	const u = axis.cross( normal ).normalize(), v = new Vector3().crossVectors( normal, u );
 	const vertexMap = new Map(), positions = [], uv = [], triangles = [];
-	const useInput = settings.useInputUVs && record.original.attributes.uv;
+	const useInput = settings.useInputUVs && record.original.attributes[ settings.inputAttribute ];
 	const origin = record.points[ record.faces[ faces[ 0 ] ].vertices[ 0 ] ];
 	let worldArea = 0;
 	for ( const f of faces ) {
@@ -334,8 +401,10 @@ function parameterize( record, faces, settings, charts ) {
 		if ( useInput && ( settings.mode === 'lightmap' || faces.length === 1 ) ) {
 
 			// Reproject a rejected lightmap island before splitting its authored UVs
-			// into one chart per triangle. Normal mode already tries LSCM above.
-			parameterize( record, faces, { ...settings, useInputUVs: false }, charts );
+			// into one chart per triangle. Normal mode already tries LSCM above. The island
+			// grows new charts, since halving it until the pieces pass leaves many small charts.
+			const projected = { ...settings, useInputUVs: false };
+			for ( const chart of growCharts( record, projected, faces ) ) parameterize( record, chart, projected, charts );
 			return;
 
 		}
@@ -550,20 +619,36 @@ function alignChart( uv ) {
 
 }
 
-function packCharts( charts, settings ) {
+function packCharts( records, settings ) {
 
-	if ( charts.length === 0 ) return 0;
+	if ( records.every( record => record.charts.length === 0 ) ) {
+
+		for ( const record of records ) record.page = 0;
+		return { density: 0, pages: 1 };
+
+	}
+
 	// Half a pixel beyond the requested gutter protects the texel-center boundary.
 	const border = settings.padding + 0.5;
+
+	// The instances of an instanced mesh share one layout of its charts.
+	function layoutRecord( record, density ) {
+
+		const scale = density * record.densityScale;
+		const boxes = record.charts.map( chart => ( {
+			chart, record, w: Math.max( 1, Math.ceil( chart.width * scale + border * 2 ) ),
+			h: Math.max( 1, Math.ceil( chart.height * scale + border * 2 ) )
+		} ) );
+		if ( record.instances === 0 || boxes.length === 0 ) return boxes;
+		const { w, h } = potpack( boxes );
+		return Array.from( { length: record.instances }, ( v, instance ) => ( { record, instance, charts: boxes, w, h } ) );
+
+	}
+
 	function pack( density ) {
 
-		const boxes = charts.map( chart => ( {
-			chart, w: Math.max( 1, Math.ceil( chart.width * density + border * 2 ) ),
-			h: Math.max( 1, Math.ceil( chart.height * density + border * 2 ) )
-		} ) );
-		const result = potpack( boxes );
-		if ( result.w > settings.resolution || result.h > settings.resolution ) return packShelves( boxes, settings.resolution );
-		return boxes;
+		const boxes = records.flatMap( record => layoutRecord( record, density ) );
+		return fits( boxes, settings.resolution ) ? boxes : null;
 
 	}
 
@@ -572,7 +657,13 @@ function packCharts( charts, settings ) {
 
 	if ( ! boxes ) {
 
-		const area = charts.reduce( ( sum, chart ) => sum + chart.width * chart.height, 0 );
+		let area = 0;
+		for ( const record of records ) {
+
+			for ( const chart of record.charts ) area += chart.width * chart.height * record.densityScale ** 2 * Math.max( record.instances, 1 );
+
+		}
+
 		let low = 0, high = settings.resolution / Math.sqrt( area );
 		for ( let iteration = 0; iteration < 24; iteration ++ ) {
 
@@ -599,8 +690,100 @@ function packCharts( charts, settings ) {
 
 	}
 
-	for ( const box of boxes ) box.chart.box = { x: box.x, y: box.y, w: box.w, h: box.h };
-	return density;
+	let pages = 1;
+	if ( settings.pageSize < settings.resolution ) {
+
+		const paged = packPages( records, density, settings.pageSize, layoutRecord );
+		if ( paged === null ) {
+
+			console.warn( 'THREE.unwrapUVs(): Charts do not fit the pages. Increase the page size or reduce the padding.' );
+			return null;
+
+		}
+
+		boxes = paged.boxes;
+		pages = paged.pages;
+
+	}
+
+	for ( const record of records ) record.page = 0;
+
+	for ( const box of boxes ) {
+
+		const page = box.page ?? 0;
+		box.record.page = page;
+		if ( box.chart ) {
+
+			box.chart.box = { x: box.x, y: box.y, w: box.w, h: box.h };
+			continue;
+
+		}
+
+		// Instance regions; the charts are placed in the shared layout of the region.
+		const record = box.record;
+		record.regions ??= [];
+		record.regions[ box.instance ] = { x: box.x, y: box.y };
+		record.regionSize = { w: box.w, h: box.h };
+		for ( const local of box.charts ) local.chart.box = { x: local.x, y: local.y, w: local.w, h: local.h };
+
+	}
+
+	return { density, pages };
+
+}
+
+function fits( boxes, size ) {
+
+	const result = potpack( boxes );
+	return ( result.w <= size && result.h <= size ) || packShelves( boxes, size ) !== null;
+
+}
+
+// Whole meshes, largest first, go to the first page they fit, which is repacked.
+function packPages( records, density, size, layoutRecord ) {
+
+	const groups = [];
+	for ( const record of records ) {
+
+		let boxes = layoutRecord( record, density ), attempts = 0;
+		while ( boxes.length > 0 && ! fits( boxes, size ) ) {
+
+			if ( attempts ++ === 0 ) console.warn( `THREE.unwrapUVs(): Mesh "${ record.mesh.name }" does not fit a page, reducing its density.` );
+			if ( attempts > 64 ) return null;
+			record.densityScale *= 0.9;
+			boxes = layoutRecord( record, density );
+
+		}
+
+		if ( boxes.length > 0 ) groups.push( { boxes, area: boxes.reduce( ( sum, box ) => sum + box.w * box.h, 0 ) } );
+
+	}
+
+	groups.sort( ( a, b ) => b.area - a.area );
+	const pages = [];
+	for ( const group of groups ) {
+
+		let page = pages.find( page => page.area + group.area <= size * size && fits( page.boxes.concat( group.boxes ), size ) );
+		if ( page === undefined ) pages.push( page = { boxes: [], area: 0 } );
+		for ( const box of group.boxes ) page.boxes.push( box );
+		page.area += group.area;
+
+	}
+
+	const boxes = [];
+	pages.forEach( ( page, index ) => {
+
+		fits( page.boxes, size );
+		for ( const box of page.boxes ) {
+
+			box.page = index;
+			boxes.push( box );
+
+		}
+
+	} );
+
+	return { boxes, pages: pages.length };
 
 }
 
@@ -641,16 +824,21 @@ function packShelves( boxes, resolution ) {
 function validateFloat32Chart( chart, settings, density ) {
 
 	const border = settings.padding + 0.5;
-	chart.outputUV = chart.uv.map( p => [
-		Math.fround( ( chart.box.x + border + p[ 0 ] * density ) / settings.resolution ),
-		Math.fround( ( chart.box.y + border + p[ 1 ] * density ) / settings.resolution )
-	] );
+	const record = chart.record, scale = density * record.densityScale;
+	const toUV = ( p, width, height ) => [
+		Math.fround( ( chart.box.x + border + p[ 0 ] * scale ) / width ),
+		Math.fround( ( chart.box.y + border + p[ 1 ] * scale ) / height )
+	];
+	const pageUV = chart.uv.map( p => toUV( p, settings.pageSize, settings.pageSize ) );
+	// Instanced charts map into the unit square of the instance regions, which the instance
+	// scales stretch back to the proportions validated here.
+	chart.outputUV = record.instances > 0 ? chart.uv.map( p => toUV( p, record.regionSize.w, record.regionSize.h ) ) : pageUV;
 	// Validate the coordinates the GPU actually receives, not just the solver's
 	// doubles. Slivers can collapse or reverse after atlas translation/rounding.
 	const limits = { ...settings, maxStretch: settings.maxStretch * ( 1 + 5e-4 ), maxAreaRatio: settings.maxAreaRatio * ( 1 + 5e-4 ) };
 	// Drops are recomputed on every pass, so a repack at another density can restore them.
 	chart.dropped = new Set();
-	if ( checkChart( chart.positions, chart.triangles, chart.outputUV, chart.worldArea, limits ) ) return true;
+	if ( checkChart( chart.positions, chart.triangles, pageUV, chart.worldArea, limits ) ) return true;
 
 	// Drop failing single faces and subtexel faces; anything else needs a split.
 	const triangles = [];
@@ -658,7 +846,7 @@ function validateFloat32Chart( chart, settings, density ) {
 	for ( let i = 0; i < chart.triangles.length; i ++ ) {
 
 		const triangle = chart.triangles[ i ], face = chart.record.faces[ chart.faces[ i ] ];
-		if ( chart.triangles.length === 1 || face.area * density * density < 1 && ! checkChart( chart.positions, [ triangle ], chart.outputUV, face.area, limits ) ) {
+		if ( chart.triangles.length === 1 || face.area * scale * scale < 1 && ! checkChart( chart.positions, [ triangle ], pageUV, face.area, limits ) ) {
 
 			chart.dropped.add( i );
 			worldArea -= face.area;
@@ -671,7 +859,7 @@ function validateFloat32Chart( chart, settings, density ) {
 
 	}
 
-	return triangles.length === 0 || checkChart( chart.positions, triangles, chart.outputUV, worldArea, limits ) ? true : null;
+	return triangles.length === 0 || checkChart( chart.positions, triangles, pageUV, worldArea, limits ) ? true : null;
 
 }
 
@@ -719,7 +907,14 @@ function rebuildGeometry( record, charts, settings ) {
 	geometry.setDrawRange( original.drawRange.start, original.drawRange.count );
 	for ( const group of original.groups ) geometry.addGroup( group.start, group.count, group.materialIndex );
 
-	for ( const name of Object.keys( original.attributes ) ) geometry.setAttribute( name, remapAttribute( original.attributes[ name ], source, buffers ) );
+	for ( const name of Object.keys( original.attributes ) ) {
+
+		// Instanced attributes are per instance, not per vertex.
+		const attribute = original.attributes[ name ];
+		geometry.setAttribute( name, isInstanced( attribute ) ? attribute : remapAttribute( attribute, source, buffers ) );
+
+	}
+
 	for ( const name of Object.keys( original.morphAttributes ) ) {
 
 		geometry.morphAttributes[ name ] = original.morphAttributes[ name ].map( attribute => remapAttribute( attribute, source, buffers ) );
@@ -729,8 +924,58 @@ function rebuildGeometry( record, charts, settings ) {
 	geometry.setIndex( indices );
 	geometry.setAttribute( settings.attribute, new Float32BufferAttribute( values, 2 ) );
 	if ( settings.attribute === 'uv' ) geometry.deleteAttribute( 'tangent' );
+	if ( record.instances > 0 ) {
+
+		// The instance attributes map the unit square into the region of each instance.
+		const offsets = new Float32Array( record.instances * 2 ), scales = new Float32Array( record.instances * 2 );
+		for ( let i = 0; record.regions !== undefined && i < record.instances; i ++ ) {
+
+			offsets[ i * 2 ] = record.regions[ i ].x / settings.pageSize;
+			offsets[ i * 2 + 1 ] = record.regions[ i ].y / settings.pageSize;
+			scales[ i * 2 ] = record.regionSize.w / settings.pageSize;
+			scales[ i * 2 + 1 ] = record.regionSize.h / settings.pageSize;
+
+		}
+
+		geometry.setAttribute( 'instanceLightMapOffset', new InstancedBufferAttribute( offsets, 2 ) );
+		geometry.setAttribute( 'instanceLightMapScale', new InstancedBufferAttribute( scales, 2 ) );
+
+	}
+
 	record.sourceVertices = Uint32Array.from( source );
 	return geometry;
+
+}
+
+function isInstanced( attribute ) {
+
+	return attribute.isInstancedBufferAttribute === true || attribute.data?.isInstancedInterleavedBuffer === true;
+
+}
+
+// A geometry that shares the buffers of another one without an attribute.
+function withoutAttribute( original, name ) {
+
+	const geometry = new BufferGeometry();
+	geometry.name = original.name;
+	geometry.morphTargetsRelative = original.morphTargetsRelative;
+	geometry.userData = original.userData;
+	geometry.setDrawRange( original.drawRange.start, original.drawRange.count );
+	for ( const group of original.groups ) geometry.addGroup( group.start, group.count, group.materialIndex );
+	for ( const key of Object.keys( original.attributes ) ) if ( key !== name ) geometry.setAttribute( key, original.attributes[ key ] );
+	for ( const key of Object.keys( original.morphAttributes ) ) geometry.morphAttributes[ key ] = original.morphAttributes[ key ];
+	geometry.setIndex( original.index );
+	return geometry;
+
+}
+
+// The mean linear scale of the instances, which sets the density of their shared charts.
+function meanInstanceScale( mesh ) {
+
+	const matrix = new Matrix4();
+	let sum = 0;
+	for ( let i = 0; i < mesh.count; i ++ ) sum += Math.cbrt( Math.abs( mesh.getMatrixAt( i, matrix ).determinant() ) );
+	return sum / mesh.count || 1;
 
 }
 
