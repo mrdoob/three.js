@@ -44,9 +44,10 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, velocity, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
+		import { PreviousFrameSource, previousViewZ } from 'three/addons/tsl/utils/PreviousFrameSource.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -55,13 +56,13 @@
 		import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 		const params = {
-			output: 'Beauty', enabled: true, quality: 0.5, intensity: 1,
+			output: 'Beauty', enabled: true, traceSource: 'Current', quality: 0.5, intensity: 1,
 			maxDistance: 1, thickness: 0.03, binaryRefine: false,
 			roughness: 1, blur: true, blurQuality: 1
 		};
 
 		let camera, scene, model, renderer, renderPipeline;
-		let controls;
+		let controls, previousFrame;
 
 		init();
 
@@ -143,7 +144,8 @@
 			scenePass.setMRT( mrt( {
 				output: output,
 				normal: packNormalToOctahedral( normalView ),
-				metalrough: vec2( metalness, roughness ) // pack metalness and roughness into a single attachment
+				metalrough: vec2( metalness, roughness ), // pack metalness and roughness into a single attachment
+				velocity: vec4( velocity, 0, previousViewZ )
 			} ) );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
@@ -158,6 +160,7 @@
 
 			} );
 			const scenePassMetalRough = scenePass.getTextureNode( 'metalrough' ).toInspector( 'Metalness-Roughness' );
+			const scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
 
 			// octahedral normals can't be filtered across their folds
 
@@ -183,6 +186,19 @@
 				roughnessNode: scenePassMetalRough.g,
 				binaryRefine: params.binaryRefine
 			} ).toInspector( 'SSR' );
+
+			// trace the current frame or the previous frame, reprojected per lookup or into a buffer
+
+			previousFrame = new PreviousFrameSource( scenePass, scenePassDepth, scenePassVelocity, camera );
+
+			const traceSources = { 'Current': scenePassColor, 'Previous (Velocity)': previousFrame.node, 'Previous (Buffer)': previousFrame.bufferNode };
+
+			function updateTraceSource() {
+
+				reflection.colorNode = traceSources[ params.traceSource ];
+				renderPipeline.needsUpdate = true;
+
+			}
 
 			const raw = passTexture( reflection, reflection.getRenderTarget().texture );
 			const blurred = reflection.getTextureNode();
@@ -221,6 +237,7 @@
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
 			ssrGui.add( params, 'enabled' ).name( 'Enabled' ).onChange( updateOutput );
+			ssrGui.add( params, 'traceSource', Object.keys( traceSources ) ).name( 'Trace source' ).onChange( updateTraceSource );
 			ssrGui.add( params, 'intensity', 0, 1 ).name( 'Intensity' ).onChange( updateParameters );
 			ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( updateParameters );
 			ssrGui.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( updateParameters );
@@ -272,6 +289,8 @@
 			controls.update();
 
 			renderPipeline.render();
+
+			previousFrame.update( renderer );
 
 		}
 
