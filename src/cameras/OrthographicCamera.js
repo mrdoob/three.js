@@ -91,11 +91,11 @@ class OrthographicCamera extends Camera {
 		this.bottom = bottom;
 
 		/**
-		 * The camera's near plane. The valid range is greater than or equal to `0`
-		 * and less than the current value of {@link OrthographicCamera#far}.
+		 * The camera's near plane. The value must be less than the current value of
+		 * {@link OrthographicCamera#far}.
 		 *
-		 * Note that, unlike for the {@link PerspectiveCamera}, `0` is a
-		 * valid value for an orthographic camera's near plane.
+		 * Note that, unlike for the {@link PerspectiveCamera}, `0` and negative values
+		 * are valid for an orthographic camera's near plane.
 		 *
 		 * @type {number}
 		 * @default 0.1

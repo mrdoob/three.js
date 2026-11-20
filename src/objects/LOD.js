@@ -180,11 +180,12 @@ class LOD extends Object3D {
 
 	/**
 	 * Returns a reference to the 3D object of the level that is active at the
-	 * given distance, i.e. the last level whose distance is less than or equal
-	 * to the given distance.
+	 * given distance, i.e. the last level whose distance (reduced by its hysteresis
+	 * if its object is visible) is less than or equal to the given distance, or the
+	 * first level if there is none.
 	 *
 	 * @param {number} distance - The LOD distance.
-	 * @return {?Object3D} The found 3D object. `null` if no 3D object has been found.
+	 * @return {?Object3D} The found 3D object. `null` if no levels are defined.
 	 */
 	getObjectForDistance( distance ) {
 

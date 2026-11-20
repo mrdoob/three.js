@@ -3,8 +3,6 @@
  *
  * The renderer does not construct a VBO for this kind of attribute. Instead, it uses
  * whatever VBO is passed in constructor and can later be altered via the `buffer` property.
- * After changing `buffer`, `type` or `elementSize`, set {@link GLBufferAttribute#needsUpdate}
- * to `true` so the renderer picks up the new values.
  *
  * The most common use case for this class is when some kind of GPGPU calculation interferes
  * or even produces the VBOs in question.
@@ -97,9 +95,8 @@ class GLBufferAttribute {
 	}
 
 	/**
-	 * Flag to indicate that this attribute has changed. Set this to `true` after
-	 * changing `buffer`, `type` or `elementSize` (e.g. via `setBuffer()` or `setType()`)
-	 * so the renderer picks up the new values.
+	 * Flag to indicate that this attribute has changed. Setting it to `true` increments
+	 * {@link GLBufferAttribute#version}.
 	 *
 	 * @type {boolean}
 	 * @default false

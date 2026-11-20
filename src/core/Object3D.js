@@ -425,7 +425,8 @@ class Object3D extends EventDispatcher {
 
 	/**
 	 * A callback that is executed immediately before a 3D object is rendered.
-	 * Only invoked for renderable 3D objects like meshes, lines, points or sprites.
+	 * Only invoked for renderable 3D objects like meshes, lines, points or sprites, and for
+	 * the scene passed to `render()` (with different arguments).
 	 *
 	 * @param {Renderer|WebGLRenderer} renderer - The renderer.
 	 * @param {Object3D} scene - The scene.
@@ -438,7 +439,8 @@ class Object3D extends EventDispatcher {
 
 	/**
 	 * A callback that is executed immediately after a 3D object is rendered.
-	 * Only invoked for renderable 3D objects like meshes, lines, points or sprites.
+	 * Only invoked for renderable 3D objects like meshes, lines, points or sprites, and for
+	 * the scene passed to `render()` (with different arguments).
 	 *
 	 * @param {Renderer|WebGLRenderer} renderer - The renderer.
 	 * @param {Object3D} scene - The scene.
