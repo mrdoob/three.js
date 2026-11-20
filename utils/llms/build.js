@@ -164,6 +164,7 @@ await renderer.init();
 When using WebGPURenderer, use TSL instead of raw GLSL for custom materials:
 
 \`\`\`js
+import * as THREE from 'three/webgpu';
 import { texture, uv, color } from 'three/tsl';
 
 const material = new THREE.MeshStandardNodeMaterial();
@@ -340,6 +341,7 @@ await renderer.init();
 When using WebGPURenderer, use TSL instead of raw GLSL for custom materials:
 
 \`\`\`js
+import * as THREE from 'three/webgpu';
 import { texture, uv, color } from 'three/tsl';
 
 const material = new THREE.MeshStandardNodeMaterial();
