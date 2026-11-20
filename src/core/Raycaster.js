@@ -141,7 +141,8 @@ class Raycaster {
 	/**
 	 * Uses the given WebXR controller to compute a new origin and direction for the internal ray.
 	 *
-	 * @param {Group} controller - The target ray space of the controller, as returned by {@link WebXRManager#getController}.
+	 * @param {Group} controller - The target ray space of the controller, as returned by {@link WebXRManager#getController}
+	 * or {@link XRManager#getController}.
 	 * The ray's origin and direction are copied from its world matrix.
 	 * @return {Raycaster} A reference to this raycaster.
 	 */

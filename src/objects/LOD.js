@@ -180,7 +180,7 @@ class LOD extends Object3D {
 
 	/**
 	 * Returns a reference to the 3D object of the level that is active at the
-	 * given distance, i.e. the last level whose distance (reduced by its hysteresis
+	 * given distance, i.e. the last level whose distance (reduced by `distance * hysteresis`
 	 * if its object is visible) is less than or equal to the given distance, or the
 	 * first level if there is none.
 	 *

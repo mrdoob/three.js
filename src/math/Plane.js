@@ -169,7 +169,8 @@ class Plane {
 	}
 
 	/**
-	 * Returns the signed distance from the given point to this plane.
+	 * Returns the signed distance from the given point to this plane. The distance is
+	 * positive if the point lies on the side of the plane the normal points to.
 	 *
 	 * @param {Vector3} point - The point to compute the distance for.
 	 * @return {number} The signed distance.

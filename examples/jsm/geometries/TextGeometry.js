@@ -91,7 +91,7 @@ class TextGeometry extends ExtrudeGeometry {
  * @property {number} [steps=1] - Number of points used for subdividing segments along the depth of the extruded spline.
  * @property {boolean} [bevelEnabled=false] - Whether to beveling to the shape or not.
  * @property {number} [bevelThickness=10] - How far the bevel extends along the extrusion axis, below `z = 0`
- * and beyond `depth`. The total thickness is `depth + 2 * bevelThickness`.
+ * and beyond `depth`. With bevels enabled, the total thickness is `depth + 2 * bevelThickness`.
  * @property {number} [bevelSize=8] - Distance from the shape outline that the bevel extends.
  * @property {number} [bevelOffset=0] - Distance from the shape outline that the bevel starts.
  * @property {number} [bevelSegments=3] - Number of bevel layers.
