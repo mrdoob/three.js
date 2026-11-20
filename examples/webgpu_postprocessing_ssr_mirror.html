@@ -46,8 +46,9 @@
 		import * as THREE from 'three/webgpu';
 		import { pass, mrt, output, normalView, metalness, roughness, velocity, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
-		import { traa } from 'three/addons/tsl/display/TRAANode.js';
+		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 		import { PreviousFrameSource, previousViewZ } from 'three/addons/tsl/utils/PreviousFrameSource.js';
+		import { Reprojection } from 'three/addons/utils/Reprojection.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -191,11 +192,11 @@
 			const blurred = reflection.getTextureNode();
 			const blurEnabled = uniform( 1 );
 			const combined = scenePassColor.rgb.add( mix( raw.rgb, blurred.rgb, blurEnabled ) );
-			const temporalAA = traa( vec4( combined, 1 ), scenePassDepth, scenePassVelocity, camera );
+			const spatialAA = smaa( vec4( combined, 1 ) );
 
 			// trace the previous frame, reprojected per lookup or once per frame into a buffer
 
-			previousFrame = new PreviousFrameSource( scenePass, temporalAA.reprojection );
+			previousFrame = new PreviousFrameSource( scenePass, new Reprojection( scenePassDepth, scenePassVelocity, camera ) );
 
 			const traceSources = { 'Per Lookup': previousFrame.node, 'Buffer': previousFrame.bufferNode };
 
@@ -214,7 +215,7 @@
 		
 				switch ( params.output ) {
 
-					case 'Beauty': view = temporalAA; break;
+					case 'Beauty': view = spatialAA; break;
 					case 'SSR': view = vec4( raw.rgb, 1 ); break;
 					case 'SSR DN': view = vec4( blurred.rgb, 1 ); break;
 
