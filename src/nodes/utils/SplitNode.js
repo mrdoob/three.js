@@ -106,17 +106,6 @@ class SplitNode extends Node {
 
 	}
 
-	/**
-	 * Returns the scope of the node.
-	 *
-	 * @return {Node} The scope of the node.
-	 */
-	getScope() {
-
-		return this.node.getScope();
-
-	}
-
 	generate( builder, output ) {
 
 		const node = this.node;
