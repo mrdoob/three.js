@@ -73,12 +73,18 @@ class HemisphereLightNode extends AnalyticLightNode {
 
 		const { colorNode, groundColorNode, lightDirectionNode } = this;
 
-		const dotNL = normalWorld.dot( lightDirectionNode );
-		const hemiDiffuseWeight = dotNL.mul( 0.5 ).add( 0.5 );
+		const irradianceAt = ( direction ) => {
 
-		const irradiance = mix( groundColorNode, colorNode, hemiDiffuseWeight );
+			const dotNL = direction.dot( lightDirectionNode );
+			const hemiDiffuseWeight = dotNL.mul( 0.5 ).add( 0.5 );
 
-		builder.context.irradiance.addAssign( irradiance );
+			return mix( groundColorNode, colorNode, hemiDiffuseWeight );
+
+		};
+
+		builder.context.irradiance.addAssign( irradianceAt( normalWorld ) );
+
+		builder.context.lightingModel.indirectRadiance( irradianceAt, builder );
 
 	}
 

@@ -7,7 +7,6 @@ import { RectAreaLight } from '../../../lights/RectAreaLight.js';
 import { SpotLight } from '../../../lights/SpotLight.js';
 import { AmbientLight } from '../../../lights/AmbientLight.js';
 import { HemisphereLight } from '../../../lights/HemisphereLight.js';
-import { LightProbe } from '../../../lights/LightProbe.js';
 import IESSpotLight from '../../../lights/webgpu/IESSpotLight.js';
 import ProjectorLight from '../../../lights/webgpu/ProjectorLight.js';
 import {
@@ -17,7 +16,6 @@ import {
 	SpotLightNode,
 	AmbientLightNode,
 	HemisphereLightNode,
-	LightProbeNode,
 	IESSpotLightNode,
 	ProjectorLightNode
 } from '../../../nodes/Nodes.js';
@@ -32,7 +30,6 @@ RectAreaLight.registerNode( RectAreaLightNode );
 SpotLight.registerNode( SpotLightNode );
 AmbientLight.registerNode( AmbientLightNode );
 HemisphereLight.registerNode( HemisphereLightNode );
-LightProbe.registerNode( LightProbeNode );
 IESSpotLight.registerNode( IESSpotLightNode );
 ProjectorLight.registerNode( ProjectorLightNode );
 

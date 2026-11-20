@@ -2,6 +2,7 @@ import {
 	BackSide,
 	BoxGeometry,
 	BufferGeometry,
+	Color,
 	Float32BufferAttribute,
 	HalfFloatType,
 	LinearFilter,
@@ -14,7 +15,8 @@ import {
 	UniformsUtils,
 	Vector3,
 	Vector4,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	warnOnce
 } from 'three';
 
 // The cloud noise is baked into a texture of NOISE_SIZE texels that tiles over NOISE_CELLS noise cells.
@@ -22,6 +24,23 @@ const NOISE_SIZE = 512;
 const NOISE_CELLS = 32;
 
 const _viewport = /*@__PURE__*/ new Vector4();
+
+// warns when the deprecated uniform is set, reads stay silent for the renderer
+function deprecateValue( uniform, message ) {
+
+	let value = uniform.value;
+
+	Object.defineProperty( uniform, 'value', {
+		get: () => value,
+		set: ( newValue ) => {
+
+			warnOnce( message );
+			value = newValue;
+
+		}
+	} );
+
+}
 
 /**
  * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight](https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight)
@@ -74,6 +93,8 @@ class Sky extends Mesh {
 		} );
 
 		super( new BoxGeometry( 1, 1, 1 ), material );
+
+		deprecateValue( material.uniforms.turbidity, 'Sky: "turbidity" has been deprecated. Multiply "mieCoefficient" by turbidity / 2 instead.' ); // @deprecated r188
 
 		/**
 		 * This flag can be used for type testing.
@@ -251,7 +272,13 @@ Sky.SkyShader = {
 		'rayleigh': { value: 1 },
 		'mieCoefficient': { value: 0.005 },
 		'mieDirectionalG': { value: 0.8 },
+		'mieDirectionalGSpread': { value: 0 },
+		'mieColor': { value: new Color( 0.451084, 0.681483, 1.0 ) },
+		'mieAlbedo': { value: new Color( 1, 1, 1 ) },
+		'absorptionScale': { value: 1 },
+		'absorptionColor': { value: new Color( 0.3125, 1.0, 0.04375 ) },
 		'sunPosition': { value: new Vector3() },
+		'sunSize': { value: 1 },
 		'cloudScale': { value: 0.0002 },
 		'cloudSpeed': { value: 0.00002 },
 		'cloudCoverage': { value: 0.4 },
@@ -269,11 +296,16 @@ Sky.SkyShader = {
 		uniform float rayleigh;
 		uniform float turbidity;
 		uniform float mieCoefficient;
+		uniform vec3 mieColor;
+		uniform vec3 mieAlbedo;
+		uniform float absorptionScale;
+		uniform vec3 absorptionColor;
 
 		varying vec3 vWorldPosition;
 		varying vec3 vSunDirection;
 		varying vec3 vBetaR;
 		varying vec3 vBetaM;
+		varying vec3 vBetaMExt;
 		varying vec3 vSunE;
 		varying vec3 vSunFex;
 
@@ -291,20 +323,21 @@ Sky.SkyShader = {
 		const float v = 4.0;
 		const vec3 K = vec3( 0.686, 0.678, 0.666 );
 		// MieConst = pi * pow( ( 2.0 * pi ) / lambda, vec3( v - 2.0 ) ) * K
-		const vec3 MieConst = vec3( 1.8399918514433978E14, 2.7798023919660528E14, 4.0790479543861094E14 );
+		const float MieConst = 4.0790479543861094E14;
 
 		// earth shadow hack
 		// cutoffAngle = pi / 1.95;
 		const float cutoffAngle = 1.6110731556870734;
 		const float steepness = 1.5;
 		const float EE = 1000.0;
+		const float ozoneExtinction = 0.016;
 
 		float sunIntensity( float zenithAngleCos ) {
 			zenithAngleCos = clamp( zenithAngleCos, -1.0, 1.0 );
 			return EE * max( 0.0, 1.0 - exp( -( ( cutoffAngle - acos( zenithAngleCos ) ) / steepness ) ) );
 		}
 
-		vec3 totalMie( float T ) {
+		float totalMie( float T ) {
 			float c = ( 0.2 * T ) * 10E-18;
 			return 0.434 * c * MieConst;
 		}
@@ -331,7 +364,7 @@ Sky.SkyShader = {
 			// stratospheric ozone (Chappuis band) absorption along incoming sun path
 			float sunCos = max( 0.0, vSunDirection.y );
 			float sunOzoneAirMass = 1.0 / sqrt( sunCos * sunCos + 0.004 );
-			vSunE = sunIntensity( vSunDirection.y ) * exp( -vec3( 0.005, 0.016, 0.0007 ) * sunOzoneAirMass );
+			vSunE = sunIntensity( vSunDirection.y ) * exp( -( absorptionScale * ozoneExtinction ) * absorptionColor * sunOzoneAirMass );
 
 			float sunfade = 1.0 - clamp( 1.0 - exp( vSunDirection.y ), 0.0, 1.0 );
 
@@ -341,13 +374,14 @@ Sky.SkyShader = {
 			// rayleigh coefficients
 			vBetaR = totalRayleigh * rayleighCoefficient;
 
-			// mie coefficients
-			vBetaM = totalMie( turbidity ) * mieCoefficient;
+			// mie coefficients, the aerosols scatter mieAlbedo of the light they extinguish
+			vBetaMExt = totalMie( turbidity ) * mieCoefficient * mieColor;
+			vBetaM = vBetaMExt * mieAlbedo;
 
 			// sun-path transmittance through lower troposphere to cloud altitude (~2km)
 			float sunCloudCos = max( 0.0, vSunDirection.y + 0.03 );
 			float sunCloudAirMass = 2.0 / ( sunCloudCos + sqrt( sunCloudCos * sunCloudCos + 0.012 ) );
-			vSunFex = exp( -( ( vBetaR * 4600.0 + vBetaM * 190.0 ) * sunCloudAirMass ) );
+			vSunFex = exp( -( ( vBetaR * 4600.0 + vBetaMExt * 190.0 ) * sunCloudAirMass ) );
 
 		}`,
 
@@ -356,10 +390,13 @@ Sky.SkyShader = {
 		varying vec3 vSunDirection;
 		varying vec3 vBetaR;
 		varying vec3 vBetaM;
+		varying vec3 vBetaMExt;
 		varying vec3 vSunE;
 		varying vec3 vSunFex;
 
 		uniform float mieDirectionalG;
+		uniform float mieDirectionalGSpread;
+		uniform float sunSize;
 		uniform float cloudScale;
 		uniform float cloudSpeed;
 		uniform float cloudCoverage;
@@ -415,8 +452,8 @@ Sky.SkyShader = {
 		// optical length at zenith for molecules
 		const float rayleighZenithLength = 8.4E3;
 		const float mieZenithLength = 1.25E3;
-		// 66 arc seconds -> degrees, and the cosine of that
-		const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;
+		// angular radius of the sun disc in radians
+		const float sunAngularRadius = 0.009308389071322325;
 
 		// 3.0 / ( 16.0 * pi )
 		const float THREE_OVER_SIXTEENPI = 0.05968310365946075;
@@ -427,9 +464,9 @@ Sky.SkyShader = {
 			return THREE_OVER_SIXTEENPI * ( 1.0 + cosTheta * cosTheta );
 		}
 
-		float hgPhase( float cosTheta, float g ) {
-			float g2 = g * g;
-			float invSqrt = inversesqrt( max( 1e-4, 1.0 - 2.0 * g * cosTheta + g2 ) );
+		vec3 hgPhase( float cosTheta, vec3 g ) {
+			vec3 g2 = g * g;
+			vec3 invSqrt = inversesqrt( max( vec3( 1e-4 ), 1.0 - 2.0 * g * cosTheta + g2 ) );
 			return ONE_OVER_FOURPI * ( 1.0 - g2 ) * ( invSqrt * invSqrt * invSqrt );
 		}
 
@@ -444,7 +481,7 @@ Sky.SkyShader = {
 			float sM = mieZenithLength * inverse;
 
 			// combined extinction factor
-			vec3 Fex = exp( -( vBetaR * sR + vBetaM * sM ) );
+			vec3 Fex = exp( -( vBetaR * sR + vBetaMExt * sM ) );
 
 			// in scattering
 			float cosTheta = dot( direction, vSunDirection );
@@ -453,10 +490,12 @@ Sky.SkyShader = {
 			float rPhase = rayleighPhase( ( cosTheta * horizonMask ) * 0.5 + 0.5 );
 			vec3 betaRTheta = vBetaR * rPhase;
 
-			float mPhase = hgPhase( cosTheta, mieDirectionalG ) * smoothstep( -0.06, 0.0, direction.y );
+			// shorter wavelengths can scatter more strongly forward
+			vec3 g = clamp( mieDirectionalG + mieDirectionalGSpread * vec3( -1.0, 0.0, 1.0 ), -0.99, 0.99 );
+			vec3 mPhase = hgPhase( cosTheta, g ) * smoothstep( -0.06, 0.0, direction.y );
 			vec3 betaMTheta = vBetaM * mPhase;
 
-			vec3 betaScatOverExt = ( betaRTheta + betaMTheta ) / ( vBetaR + vBetaM );
+			vec3 betaScatOverExt = ( betaRTheta + betaMTheta ) / ( vBetaR + vBetaMExt );
 			vec3 LinBase = max( vec3( 0.0 ), vSunE * betaScatOverExt * ( 1.0 - Fex ) );
 			vec3 Lin = LinBase * sqrt( LinBase );
 			float sunHorizon = clamp( 1.0 - vSunDirection.y, 0.0, 1.0 );
@@ -468,7 +507,9 @@ Sky.SkyShader = {
 
 			// composition + solar disc with photospheric limb darkening: a linear law per channel
 			// ( u ~ 0.54, 0.62, 0.73 ), normalized so the disc keeps its average color
-			float mu2 = clamp( ( cosTheta - sunAngularDiameterCos ) * 23082.0, 0.0, 1.0 );
+			// small angles: 1 - cos( x ) = x * x / 2
+			float sunRadius = sunAngularRadius * sunSize;
+			float mu2 = clamp( 1.0 - 2.0 * ( 1.0 - cosTheta ) / ( sunRadius * sunRadius ), 0.0, 1.0 );
 			float mu = sqrt( mu2 );
 			vec3 sundisc = smoothstep( 0.0, 0.1, mu2 ) * ( vec3( 0.561, 0.479, 0.3568 ) + vec3( 0.6585, 0.7815, 0.9648 ) * mu ) * showSunDisc * smoothstep( -0.002, 0.002, direction.y );
 			vec3 sundiscColor = ( 760.0 * sundisc ) * min( vSunE * Fex, 80.0 );
@@ -634,7 +675,7 @@ Sky.SkyShader = {
 									// Attenuate overhead sky ambient through column above hEff to shade flat cloud bases
 									float dayFactor = max( smoothstep( -0.1, 0.02, vSunDirection.y ), 0.03 );
 									vec3 sunColor = vSunE * vSunFex * mix( 0.011, 0.028, smoothstep( 0.0, 0.5, vSunDirection.y ) );
-									vec3 ambientScat = ( vBetaR * ( THREE_OVER_SIXTEENPI * 1.5 ) + vBetaM * ONE_OVER_FOURPI ) / ( vBetaR + vBetaM );
+									vec3 ambientScat = ( vBetaR * ( THREE_OVER_SIXTEENPI * 1.5 ) + vBetaM * ONE_OVER_FOURPI ) / ( vBetaR + vBetaMExt );
 									vec3 ambientBase = max( vec3( 0.0 ), vSunE * ambientScat * ( 1.0 - Fex ) );
 									vec3 skyAmbientTop = ambientBase * sqrt( ambientBase ) * 0.04 + vec3( 0.0, 0.0003, 0.00075 );
 
@@ -645,7 +686,7 @@ Sky.SkyShader = {
 
 									// Composite through sub-cloud airlight while occluding solar disc and nightsky behind clouds
 									float airFraction = mix( 0.35, 0.08, cloudElevation );
-									float cloudOpticalDepth = dot( vBetaR * sR * airFraction + vBetaM * sM * min( 1.0, airFraction * 2.5 ), vec3( 0.2126, 0.7152, 0.0722 ) );
+									float cloudOpticalDepth = dot( vBetaR * sR * airFraction + vBetaMExt * sM * min( 1.0, airFraction * 2.5 ), vec3( 0.2126, 0.7152, 0.0722 ) );
 									float cloudTransmittance = exp( -cloudOpticalDepth );
 									vec3 aerialCloud = mix( skyInscatter, cloudColor, cloudTransmittance );
 									texColor = mix( texColor, aerialCloud, alpha );

@@ -131,7 +131,7 @@ class WebGLRenderer {
 
 		const uintClearColor = new Uint32Array( 4 );
 		const intClearColor = new Int32Array( 4 );
-		const lightProbeGridUniforms = { textures: [], min: [], max: [], resolution: [] };
+		const lightProbeGridUniforms = { textures: [], min: [], max: [], resolution: [], intensity: [] };
 
 		let currentRenderList = null;
 		let currentRenderState = null;
@@ -2298,7 +2298,6 @@ class WebGLRenderer {
 				// wire up the material to this renderer's lighting state
 
 				uniforms.ambientLightColor.value = lights.state.ambient;
-				uniforms.lightProbe.value = lights.state.probe;
 				uniforms.sunLights.value = lights.state.sun;
 				uniforms.sunLightShadows.value = lights.state.sunShadow;
 				uniforms.directionalLights.value = lights.state.directional;
@@ -2801,6 +2800,7 @@ class WebGLRenderer {
 						grids.min[ count ] = grid.boundingBox.min;
 						grids.max[ count ] = grid.boundingBox.max;
 						grids.resolution[ count ] = grid.resolution;
+						grids.intensity[ count ] = grid.intensity;
 						count ++;
 
 					}
@@ -2811,6 +2811,7 @@ class WebGLRenderer {
 					m_uniforms.probesMin.value = grids.min;
 					m_uniforms.probesMax.value = grids.max;
 					m_uniforms.probesResolution.value = grids.resolution;
+					m_uniforms.probesIntensity.value = grids.intensity;
 
 				}
 
@@ -2863,7 +2864,6 @@ class WebGLRenderer {
 		function markUniformsLightsNeedsUpdate( uniforms, value ) {
 
 			uniforms.ambientLightColor.needsUpdate = value;
-			uniforms.lightProbe.needsUpdate = value;
 
 			uniforms.sunLights.needsUpdate = value;
 			uniforms.sunLightShadows.needsUpdate = value;
@@ -3170,14 +3170,16 @@ class WebGLRenderer {
 
 				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
-				// Custom mip chains store one framebuffer per level; read level 0.
-				if ( Array.isArray( framebuffer ) ) framebuffer = framebuffer[ 0 ];
-
 			}
+
+			// Custom mip chains store one framebuffer per level; read level 0.
+			if ( Array.isArray( framebuffer ) ) framebuffer = framebuffer[ 0 ];
 
 			if ( framebuffer ) {
 
-				state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+				const currentFramebuffer = state.getBoundFramebuffer( _gl.READ_FRAMEBUFFER );
+
+				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, framebuffer );
 
 				try {
 
@@ -3215,10 +3217,7 @@ class WebGLRenderer {
 
 				} finally {
 
-					// restore framebuffer of current render target if necessary
-
-					const framebuffer = ( _currentRenderTarget !== null ) ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
-					state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+					state.bindFramebuffer( _gl.READ_FRAMEBUFFER, currentFramebuffer );
 
 				}
 
@@ -3255,18 +3254,19 @@ class WebGLRenderer {
 
 				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
-				// Custom mip chains store one framebuffer per level; read level 0.
-				if ( Array.isArray( framebuffer ) ) framebuffer = framebuffer[ 0 ];
-
 			}
+
+			// Custom mip chains store one framebuffer per level; read level 0.
+			if ( Array.isArray( framebuffer ) ) framebuffer = framebuffer[ 0 ];
 
 			if ( framebuffer ) {
 
 				// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
 				if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
 
-					// set the active frame buffer to the one we want to read
-					state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+					const currentFramebuffer = state.getBoundFramebuffer( _gl.READ_FRAMEBUFFER );
+
+					state.bindFramebuffer( _gl.READ_FRAMEBUFFER, framebuffer );
 
 					const texture = renderTarget.textures[ textureIndex ];
 					const textureFormat = texture.format;
@@ -3297,9 +3297,7 @@ class WebGLRenderer {
 					_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), 0 );
 					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, null );
 
-					// reset the frame buffer to the currently set buffer before waiting
-					const currFramebuffer = _currentRenderTarget !== null ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
-					state.bindFramebuffer( _gl.FRAMEBUFFER, currFramebuffer );
+					state.bindFramebuffer( _gl.READ_FRAMEBUFFER, currentFramebuffer );
 
 					// check if the commands have finished every 8 ms
 					const sync = _gl.fenceSync( _gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );

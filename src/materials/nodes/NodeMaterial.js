@@ -14,6 +14,7 @@ import { morphReference, morphColor } from '../../nodes/accessors/Morph.js';
 import { fwidth, mix, smoothstep } from '../../nodes/math/MathNode.js';
 import { float, vec3, vec4, bool } from '../../nodes/tsl/TSLBase.js';
 import AONode from '../../nodes/lighting/AONode.js';
+import OcclusionAwareIrradianceNode from '../../nodes/lighting/OcclusionAwareIrradianceNode.js';
 import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
 import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
 import { depth, viewZToLogarithmicDepth, viewZToOrthographicDepth } from '../../nodes/display/ViewportDepthNode.js';
@@ -1050,7 +1051,7 @@ class NodeMaterial extends Material {
 
 			if ( giNode !== null ) {
 
-				materialLightsNode.push( new IrradianceNode( giNode ) );
+				materialLightsNode.push( new OcclusionAwareIrradianceNode( giNode ) );
 
 			}
 
@@ -1127,7 +1128,7 @@ class NodeMaterial extends Material {
 
 		let outgoingLightNode = this.setupOutgoingLight( builder );
 
-		if ( lightsNode && ( materialLightings.length > 0 || lightsNode.getScope().hasLights ) ) {
+		if ( lightsNode && ( materialLightings.length > 0 || lightsNode.hasLights !== false ) ) {
 
 			const lightingModel = this.setupLightingModel( builder ) || null;
 

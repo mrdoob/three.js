@@ -1,4 +1,5 @@
 import { SphericalHarmonics3 } from '../math/SphericalHarmonics3.js';
+import { warnOnce } from '../utils.js';
 import { Light } from './Light.js';
 
 /**
@@ -18,6 +19,7 @@ import { Light } from './Light.js';
  * light probes. This type of light probe is functionally equivalent to an
  * irradiance environment map.
  *
+ * @deprecated since r188.
  * @augments Light
  */
 class LightProbe extends Light {
@@ -25,12 +27,15 @@ class LightProbe extends Light {
 	/**
 	 * Constructs a new light probe.
 	 *
+	 * @deprecated since r188.
 	 * @param {SphericalHarmonics3} sh - The spherical harmonics which represents encoded lighting information.
 	 * @param {number} [intensity=1] - The light's strength/intensity.
 	 */
 	constructor( sh = new SphericalHarmonics3(), intensity = 1 ) {
 
 		super( undefined, intensity );
+
+		warnOnce( 'LightProbe: "LightProbe" has been removed. Use "LightProbeGrid" or "Scene.environment" instead.' ); // @deprecated r188
 
 		/**
 		 * This flag can be used for type testing.

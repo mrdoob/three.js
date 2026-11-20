@@ -1036,7 +1036,7 @@ function computeMorphedAttributes( object ) {
 				group = groups[ i ];
 
 				start = Math.max( group.start, drawRange.start );
-				end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
+				end = Math.min( index.count, Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) ) );
 
 				for ( j = start, jl = end; j < jl; j += 3 ) {
 
@@ -1118,7 +1118,7 @@ function computeMorphedAttributes( object ) {
 				group = groups[ i ];
 
 				start = Math.max( group.start, drawRange.start );
-				end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
+				end = Math.min( positionAttribute.count, Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) ) );
 
 				for ( j = start, jl = end; j < jl; j += 3 ) {
 

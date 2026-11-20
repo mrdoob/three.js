@@ -943,7 +943,7 @@ class BufferGeometry extends EventDispatcher {
 			const start = group.start;
 			const count = group.count;
 
-			for ( let j = start, jl = start + count; j < jl; j += 3 ) {
+			for ( let j = start, jl = Math.min( index.count, start + count ); j < jl; j += 3 ) {
 
 				handleTriangle(
 					index.getX( j + 0 ),

@@ -1,6 +1,7 @@
-import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
-import { float, Fn, max, texture, uniform, uv, vec2, vec4, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
-import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
+import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4 } from 'three/webgpu';
+import { float, Fn, max, texture, uniform, uv, vec4, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
+import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth } from '../utils/TAAUtils.js';
+import { Reprojection } from '../../utils/Reprojection.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -157,15 +158,6 @@ class TRAANode extends Node {
 		this._resolveRenderTarget.texture.name = 'TRAANode.resolve';
 
 		/**
-		 * The render target that holds the depth of the previous frame.
-		 *
-		 * @private
-		 * @type {RenderTarget}
-		 */
-		this._previousDepthRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, depthTexture: new DepthTexture(), count: 0 } );
-		this._previousDepthRenderTarget.depthTexture.name = 'TRAANode.previousDepth';
-
-		/**
 		 * Material used for the resolve step.
 		 *
 		 * @private
@@ -208,46 +200,6 @@ class TRAANode extends Node {
 		this._cameraNearFar = uniform( new Vector2() );
 
 		/**
-		 * A uniform node holding the camera world matrix.
-		 *
-		 * @private
-		 * @type {UniformNode<mat4>}
-		 */
-		this._cameraWorldMatrix = uniform( new Matrix4() );
-
-		/**
-		 * A uniform node holding the camera world matrix inverse.
-		 *
-		 * @private
-		 * @type {UniformNode<mat4>}
-		 */
-		this._cameraWorldMatrixInverse = uniform( new Matrix4() );
-
-		/**
-		 * A uniform node holding the camera projection matrix inverse.
-		 *
-		 * @private
-		 * @type {UniformNode<mat4>}
-		 */
-		this._cameraProjectionMatrixInverse = uniform( new Matrix4() );
-
-		/**
-		 * A uniform node holding the previous frame's view matrix.
-		 *
-		 * @private
-		 * @type {UniformNode<mat4>}
-		 */
-		this._previousCameraWorldMatrix = uniform( new Matrix4() );
-
-		/**
-		 * A uniform node holding the previous frame's projection matrix inverse.
-		 *
-		 * @private
-		 * @type {UniformNode<mat4>}
-		 */
-		this._previousCameraProjectionMatrixInverse = uniform( new Matrix4() );
-
-		/**
 		 * A texture node for the history.
 		 *
 		 * @private
@@ -256,12 +208,13 @@ class TRAANode extends Node {
 		this._historyTextureNode = texture( this._historyRenderTarget.texture );
 
 		/**
-		 * A texture node for the previous depth buffer.
+		 * Maps the current frame to the previous one.
 		 *
 		 * @private
-		 * @type {TextureNode}
+		 * @type {Reprojection}
 		 */
-		this._previousDepthNode = texture( this._previousDepthRenderTarget.depthTexture );
+		this._reprojection = new Reprojection( depthNode, velocityNode, camera );
+		this._reprojection.previousDepthNode.value.name = 'TRAANode.previousDepth';
 
 		/**
 		 * The node used to render the scene's velocity.
@@ -294,16 +247,6 @@ class TRAANode extends Node {
 
 		this._historyRenderTarget.setSize( width, height );
 		this._resolveRenderTarget.setSize( width, height );
-
-		const previousDepthTexture = this._previousDepthRenderTarget.depthTexture;
-
-		if ( previousDepthTexture.image.width !== width || previousDepthTexture.image.height !== height ) {
-
-			previousDepthTexture.image.width = width;
-			previousDepthTexture.image.height = height;
-			previousDepthTexture.needsUpdate = true;
-
-		}
 
 		this._invSize.value.set( 1 / width, 1 / height );
 
@@ -371,17 +314,7 @@ class TRAANode extends Node {
 
 		const { renderer } = frame;
 
-		// store previous frame matrices before updating current ones
-
-		this._previousCameraWorldMatrix.value.copy( this._cameraWorldMatrix.value );
-		this._previousCameraProjectionMatrixInverse.value.copy( this._cameraProjectionMatrixInverse.value );
-
-		// update camera matrices uniforms
-
 		this._cameraNearFar.value.set( this.camera.near, this.camera.far );
-		this._cameraWorldMatrix.value.copy( this.camera.matrixWorld );
-		this._cameraWorldMatrixInverse.value.copy( this.camera.matrixWorldInverse );
-		this._cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
 
 		// keep the TRAA in sync with the dimensions of the beauty node
 
@@ -394,7 +327,8 @@ class TRAANode extends Node {
 
 		//
 
-		const needsRestart = this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
+		const needsRestart = this._reprojection.needsHistoryReset() ||
+			this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
 		this.setSize( width, height );
 
 		// swap history and resolve
@@ -425,21 +359,9 @@ class TRAANode extends Node {
 		_quadMesh.render( renderer );
 		renderer.setRenderTarget( null );
 
-		// Copy current depth to previous depth buffer
+		// store the depth and camera matrices for the next frame
 
-		const size = renderer.getDrawingBufferSize( _size );
-
-		// only allow the depth copy if the dimensions of the history render target match with the drawing
-		// render buffer and thus the depth texture of the scene. For some reasons, there are timing issues
-		// with WebGPU resulting in different size of the drawing buffer and the beauty render target when
-		// resizing the browser window. This does not happen with the WebGL backend
-
-		if ( this._historyRenderTarget.height === size.height && this._historyRenderTarget.width === size.width ) {
-
-			const currentDepth = this.depthNode.value;
-			renderer.copyTextureToTexture( currentDepth, this._previousDepthRenderTarget.depthTexture );
-
-		}
+		this._reprojection.update( renderer );
 
 		// restore
 
@@ -477,9 +399,6 @@ class TRAANode extends Node {
 			} );
 
 		}
-
-		this._previousDepthRenderTarget.depthTexture.format = this.depthNode.value.format;
-		this._previousDepthRenderTarget.depthTexture.type = this.depthNode.value.type;
 
 		if ( builder.context.velocity !== undefined ) {
 
@@ -553,14 +472,10 @@ class TRAANode extends Node {
 			const closestPositionTexel = currentDepth.get( 'closestPositionTexel' );
 			const farthestDepth = currentDepth.get( 'farthestDepth' );
 
-			// convert the NDC offset to UV offset
-
-			const offsetUV = this.velocityNode.load( closestPositionTexel ).xy.mul( vec2( 0.5, - 0.5 ) );
-
 			// sample the previous depth
 
-			const historyUV = uvNode.sub( offsetUV );
-			const previousDepth = samplePreviousDepth( this._previousDepthNode, historyUV, this._previousCameraProjectionMatrixInverse, this._previousCameraWorldMatrix, this._cameraWorldMatrixInverse, this._cameraNearFar, this.camera );
+			const historyUV = this._reprojection.getHistoryUV( uvNode, closestPositionTexel ).toConst();
+			const previousDepth = this._reprojection.getPreviousDepth( historyUV, this._cameraNearFar );
 
 			// history is considered valid when the UV is in range and there's no disocclusion except on edges
 
@@ -582,7 +497,7 @@ class TRAANode extends Node {
 			if ( this.useSubpixelCorrection ) {
 
 				// Increase the minimum weight towards the current frame when the velocity is more subpixel.
-				currentWeight.addAssign( subpixelCorrection( offsetUV, textureSize ).mul( 0.25 ) );
+				currentWeight.addAssign( subpixelCorrection( uvNode.sub( historyUV ), textureSize ).mul( 0.25 ) );
 
 			}
 
@@ -620,7 +535,8 @@ class TRAANode extends Node {
 
 		this._historyRenderTarget.dispose();
 		this._resolveRenderTarget.dispose();
-		this._previousDepthRenderTarget.dispose();
+
+		this._reprojection.dispose();
 
 		this._resolveMaterial.dispose();
 

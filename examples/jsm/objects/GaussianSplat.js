@@ -433,6 +433,40 @@ class GaussianSplat extends Mesh {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever the splat instance is no longer used in your app.
+	 */
+	dispose() {
+
+		this._buffers.centerAttribute.dispose();
+		this._buffers.covarianceAAttribute.dispose();
+		this._buffers.covarianceBAttribute.dispose();
+		this._buffers.colorAttribute.dispose();
+
+		for ( let degree = 1; degree <= this._buffers.sphericalHarmonicsDegree; degree ++ ) {
+
+			this._buffers[ `sphericalHarmonics${ degree }Attribute` ].dispose();
+
+		}
+
+		if ( this._buffers.sphericalHarmonicsContributionAttribute !== undefined ) {
+
+			this._buffers.sphericalHarmonicsContributionAttribute.dispose();
+
+		}
+
+		if ( this._sphericalHarmonicsComputeNode !== null ) this._sphericalHarmonicsComputeNode.dispose();
+
+		this._sort.dispose();
+
+		this.geometry.dispose();
+		this.material.dispose();
+
+		super.dispose();
+
+	}
+
 	_needsSort( camera ) {
 
 		_modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, this.matrixWorld );
@@ -669,6 +703,10 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 		count,
 		sphericalHarmonicsDegree,
 		webGLBuffersEnabled: false,
+		centerAttribute,
+		covarianceAAttribute,
+		covarianceBAttribute,
+		colorAttribute,
 		centerRead: storage( centerAttribute, 'vec4' ).toReadOnly(),
 		covarianceARead: storage( covarianceAAttribute, 'vec4' ).toReadOnly(),
 		covarianceBRead: storage( covarianceBAttribute, 'vec4' ).toReadOnly(),
@@ -700,6 +738,7 @@ function ensureSphericalHarmonicsContributionBuffer( buffers ) {
 	// this additional buffer lazily only when the WebGPU pre-pass runs.
 	const attribute = new StorageBufferAttribute( new Float32Array( buffers.count * 4 ), 4 );
 
+	buffers.sphericalHarmonicsContributionAttribute = attribute;
 	buffers.sphericalHarmonicsContributionRead = storage( attribute, 'vec4' ).toReadOnly();
 	buffers.sphericalHarmonicsContributionWrite = storage( attribute, 'vec4' );
 

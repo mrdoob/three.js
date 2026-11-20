@@ -142,16 +142,7 @@ class ShadowNode extends ShadowBaseNode {
 	 */
 	constructor( light, shadow = null ) {
 
-		super( light );
-
-		/**
-		 * The light shadow which defines the properties light's
-		 * shadow.
-		 *
-		 * @type {?LightShadow}
-		 * @default null
-		 */
-		this.shadow = shadow || light.shadow;
+		super( light, shadow || light.shadow );
 
 		/**
 		 * A reference to the shadow map which is a render target.
@@ -225,15 +216,6 @@ class ShadowNode extends ShadowBaseNode {
 		 * @default null
 		 */
 		this._currentTransmitted = null;
-
-		/**
-		 * A Weak Map holding the current frame ID per camera. Used
-		 * to control the update of shadow maps.
-		 *
-		 * @type {WeakMap<Camera,number>}
-		 * @private
-		 */
-		this._cameraFrameId = new WeakMap();
 
 		/**
 		 * This flag can be used for type testing.
@@ -798,43 +780,6 @@ class ShadowNode extends ShadowBaseNode {
 
 			this.vsmMaterialHorizontal.dispose();
 			this.vsmMaterialHorizontal = null;
-
-		}
-
-	}
-
-	/**
-	 * The implementation performs the update of the shadow map if necessary.
-	 *
-	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 */
-	updateBefore( frame ) {
-
-		// do not render shadow maps during precompilation
-
-		if ( frame.renderer._precompilationState !== null ) return false;
-
-		const { shadow } = this;
-
-		let needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
-
-		if ( needsUpdate ) {
-
-			if ( this._cameraFrameId.get( frame.camera ) === frame.frameId ) {
-
-				needsUpdate = false;
-
-			}
-
-			this._cameraFrameId.set( frame.camera, frame.frameId );
-
-		}
-
-		if ( needsUpdate ) {
-
-			this.updateShadow( frame );
-
-			shadow.needsUpdate = false;
 
 		}
 

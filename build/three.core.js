@@ -13193,6 +13193,7 @@ class Object3D extends EventDispatcher {
 	 * @param {boolean} [updateChildren=false] Whether descendant nodes should be updated or not.
 	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
 	 * when {@link Object3D#matrixWorldNeedsUpdate} is `false`.
+	 * @return {boolean} Whether the world matrix has changed or not.
 	 */
 	updateWorldMatrix( updateParents, updateChildren, force = false ) {
 
@@ -13200,7 +13201,7 @@ class Object3D extends EventDispatcher {
 
 		if ( updateParents === true && parent !== null ) {
 
-			parent.updateWorldMatrix( true, false );
+			if ( parent.updateWorldMatrix( true, false ) === true ) force = true;
 
 		}
 
@@ -13243,6 +13244,8 @@ class Object3D extends EventDispatcher {
 			}
 
 		}
+
+		return force;
 
 	}
 
@@ -19088,7 +19091,7 @@ class BufferGeometry extends EventDispatcher {
 			const start = group.start;
 			const count = group.count;
 
-			for ( let j = start, jl = start + count; j < jl; j += 3 ) {
+			for ( let j = start, jl = Math.min( index.count, start + count ); j < jl; j += 3 ) {
 
 				handleTriangle(
 					index.getX( j + 0 ),
@@ -23628,7 +23631,8 @@ class MeshBasicMaterial extends Material {
 		this.map = null;
 
 		/**
-		 * The light map. Requires a second set of UVs.
+		 * The light map. Uses `uv` by default, set {@link Texture#channel} to use
+		 * a different set of UVs.
 		 *
 		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
 		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
@@ -23649,8 +23653,10 @@ class MeshBasicMaterial extends Material {
 		this.lightMapIntensity = 1.0;
 
 		/**
-		 * The red channel of this texture is used as the ambient occlusion map.
-		 * Requires a second set of UVs.
+		 * The red channel of this texture is used as the ambient occlusion map,
+		 * where `0` fully occludes ambient light and `1` does not occlude it.
+		 * Uses `uv` by default, set {@link Texture#channel} to use a different
+		 * set of UVs.
 		 *
 		 * `aoMap` represents non-color data. Any texture assigned must have
 		 * `texture.colorSpace = NoColorSpace` (default).
@@ -23662,8 +23668,7 @@ class MeshBasicMaterial extends Material {
 
 		/**
 		 * Intensity of the ambient occlusion effect. Range is `[0,1]`, where `0`
-		 * disables ambient occlusion. Where intensity is `1` and the AO map's
-		 * red channel is also `1`, ambient light is fully occluded on a surface.
+		 * disables ambient occlusion and `1` applies the AO map at full strength.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -37865,7 +37870,7 @@ class WireframeGeometry extends BufferGeometry {
 					const groupStart = group.start;
 					const groupCount = group.count;
 
-					for ( let i = groupStart, l = ( groupStart + groupCount ); i < l; i += 3 ) {
+					for ( let i = groupStart, l = Math.min( indices.count, ( groupStart + groupCount ) ); i < l; i += 3 ) {
 
 						for ( let j = 0; j < 3; j ++ ) {
 
@@ -38847,7 +38852,8 @@ class MeshStandardMaterial extends Material {
 		this.map = null;
 
 		/**
-		 * The light map. Requires a second set of UVs.
+		 * The light map. Uses `uv` by default, set {@link Texture#channel} to use
+		 * a different set of UVs.
 		 *
 		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
 		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
@@ -38868,8 +38874,10 @@ class MeshStandardMaterial extends Material {
 		this.lightMapIntensity = 1.0;
 
 		/**
-		 * The red channel of this texture is used as the ambient occlusion map.
-		 * Requires a second set of UVs.
+		 * The red channel of this texture is used as the ambient occlusion map,
+		 * where `0` fully occludes ambient light and `1` does not occlude it.
+		 * Uses `uv` by default, set {@link Texture#channel} to use a different
+		 * set of UVs.
 		 *
 		 * `aoMap` represents non-color data. Any texture assigned must have
 		 * `texture.colorSpace = NoColorSpace` (default).
@@ -38881,8 +38889,7 @@ class MeshStandardMaterial extends Material {
 
 		/**
 		 * Intensity of the ambient occlusion effect. Range is `[0,1]`, where `0`
-		 * disables ambient occlusion. Where intensity is `1` and the AO map's
-		 * red channel is also `1`, ambient light is fully occluded on a surface.
+		 * disables ambient occlusion and `1` applies the AO map at full strength.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -39960,7 +39967,8 @@ class MeshPhongMaterial extends Material {
 		this.map = null;
 
 		/**
-		 * The light map. Requires a second set of UVs.
+		 * The light map. Uses `uv` by default, set {@link Texture#channel} to use
+		 * a different set of UVs.
 		 *
 		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
 		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
@@ -39981,8 +39989,10 @@ class MeshPhongMaterial extends Material {
 		this.lightMapIntensity = 1.0;
 
 		/**
-		 * The red channel of this texture is used as the ambient occlusion map.
-		 * Requires a second set of UVs.
+		 * The red channel of this texture is used as the ambient occlusion map,
+		 * where `0` fully occludes ambient light and `1` does not occlude it.
+		 * Uses `uv` by default, set {@link Texture#channel} to use a different
+		 * set of UVs.
 		 *
 		 * `aoMap` represents non-color data. Any texture assigned must have
 		 * `texture.colorSpace = NoColorSpace` (default).
@@ -39994,8 +40004,7 @@ class MeshPhongMaterial extends Material {
 
 		/**
 		 * Intensity of the ambient occlusion effect. Range is `[0,1]`, where `0`
-		 * disables ambient occlusion. Where intensity is `1` and the AO map's
-		 * red channel is also `1`, ambient light is fully occluded on a surface.
+		 * disables ambient occlusion and `1` applies the AO map at full strength.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -40403,7 +40412,8 @@ class MeshToonMaterial extends Material {
 		this.gradientMap = null;
 
 		/**
-		 * The light map. Requires a second set of UVs.
+		 * The light map. Uses `uv` by default, set {@link Texture#channel} to use
+		 * a different set of UVs.
 		 *
 		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
 		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
@@ -40424,8 +40434,10 @@ class MeshToonMaterial extends Material {
 		this.lightMapIntensity = 1.0;
 
 		/**
-		 * The red channel of this texture is used as the ambient occlusion map.
-		 * Requires a second set of UVs.
+		 * The red channel of this texture is used as the ambient occlusion map,
+		 * where `0` fully occludes ambient light and `1` does not occlude it.
+		 * Uses `uv` by default, set {@link Texture#channel} to use a different
+		 * set of UVs.
 		 *
 		 * `aoMap` represents non-color data. Any texture assigned must have
 		 * `texture.colorSpace = NoColorSpace` (default).
@@ -40437,8 +40449,7 @@ class MeshToonMaterial extends Material {
 
 		/**
 		 * Intensity of the ambient occlusion effect. Range is `[0,1]`, where `0`
-		 * disables ambient occlusion. Where intensity is `1` and the AO map's
-		 * red channel is also `1`, ambient light is fully occluded on a surface.
+		 * disables ambient occlusion and `1` applies the AO map at full strength.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -40927,7 +40938,8 @@ class MeshLambertMaterial extends Material {
 		this.map = null;
 
 		/**
-		 * The light map. Requires a second set of UVs.
+		 * The light map. Uses `uv` by default, set {@link Texture#channel} to use
+		 * a different set of UVs.
 		 *
 		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
 		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
@@ -40948,8 +40960,10 @@ class MeshLambertMaterial extends Material {
 		this.lightMapIntensity = 1.0;
 
 		/**
-		 * The red channel of this texture is used as the ambient occlusion map.
-		 * Requires a second set of UVs.
+		 * The red channel of this texture is used as the ambient occlusion map,
+		 * where `0` fully occludes ambient light and `1` does not occlude it.
+		 * Uses `uv` by default, set {@link Texture#channel} to use a different
+		 * set of UVs.
 		 *
 		 * `aoMap` represents non-color data. Any texture assigned must have
 		 * `texture.colorSpace = NoColorSpace` (default).
@@ -40961,8 +40975,7 @@ class MeshLambertMaterial extends Material {
 
 		/**
 		 * Intensity of the ambient occlusion effect. Range is `[0,1]`, where `0`
-		 * disables ambient occlusion. Where intensity is `1` and the AO map's
-		 * red channel is also `1`, ambient light is fully occluded on a surface.
+		 * disables ambient occlusion and `1` applies the AO map at full strength.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -47058,7 +47071,7 @@ class Camera extends Object3D {
 
 	updateWorldMatrix( updateParents, updateChildren, force = false ) {
 
-		super.updateWorldMatrix( updateParents, updateChildren, force );
+		const updated = super.updateWorldMatrix( updateParents, updateChildren, force );
 
 		// exclude scale from view matrix to be glTF conform
 
@@ -47073,6 +47086,8 @@ class Camera extends Object3D {
 			this.matrixWorldInverse.compose( _position$2, _quaternion$2, _scale$2.set( 1, 1, 1 ) ).invert();
 
 		}
+
+		return updated;
 
 	}
 
@@ -48804,6 +48819,7 @@ class SphericalHarmonics3 {
  * light probes. This type of light probe is functionally equivalent to an
  * irradiance environment map.
  *
+ * @deprecated since r188.
  * @augments Light
  */
 class LightProbe extends Light {
@@ -48811,12 +48827,15 @@ class LightProbe extends Light {
 	/**
 	 * Constructs a new light probe.
 	 *
+	 * @deprecated since r188.
 	 * @param {SphericalHarmonics3} sh - The spherical harmonics which represents encoded lighting information.
 	 * @param {number} [intensity=1] - The light's strength/intensity.
 	 */
 	constructor( sh = new SphericalHarmonics3(), intensity = 1 ) {
 
 		super( undefined, intensity );
+
+		warnOnce( 'LightProbe: "LightProbe" has been removed. Use "LightProbeGrid" or "Scene.environment" instead.' ); // @deprecated r188
 
 		/**
 		 * This flag can be used for type testing.

@@ -57,11 +57,9 @@ class ToonLightingModel extends LightingModel {
 	 */
 	indirect( builder ) {
 
-		const { ambientOcclusion, irradiance, reflectedLight } = builder.context;
+		const { ambientOcclusion, irradiance, occlusionAwareIrradiance, reflectedLight } = builder.context;
 
-		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
-
-		reflectedLight.indirectDiffuse.mulAssign( ambientOcclusion );
+		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( ambientOcclusion ).add( occlusionAwareIrradiance ).mul( BRDF_Lambert( { diffuseColor } ) ) );
 
 	}
 

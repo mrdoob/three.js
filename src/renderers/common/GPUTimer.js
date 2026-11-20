@@ -2,9 +2,6 @@
  * Measures the GPU time of the render and compute passes issued between {@link GPUTimer#begin} and
  * {@link GPUTimer#end}, from the start of the first pass to the end of the last one.
  *
- * Timers can overlap and end in any order: a pass counts toward every active timer. In WebGL only one
- * timer can run at a time and an overlapping one returns `null`.
- *
  * Requires the `timestamp-query` feature in WebGPU or the `EXT_disjoint_timer_query_webgl2` extension
  * in WebGL. Otherwise the results are `null`.
  *
@@ -13,7 +10,7 @@
  *
  * timer.begin();
  * renderer.render( scene, camera );
- * const milliseconds = await timer.end();
+ * const { delta } = await timer.end();
  * ```
  */
 class GPUTimer {
@@ -61,12 +58,18 @@ class GPUTimer {
 	}
 
 	/**
-	 * Stops timing and returns the GPU time of the passes issued since {@link GPUTimer#begin}. The timer
-	 * can begin a new measurement before the result is read.
+	 * Stops timing and returns the GPU timing of the passes issued since {@link GPUTimer#begin}.
+	 * The timer can begin a new measurement before the result is read.
+	 *
+	 * - `start`: The GPU timestamp of the start of the first pass.
+	 * - `end`: The GPU timestamp of the end of the last pass.
+	 * - `delta`: The time between them, `0` without any pass.
+	 *
+	 * The timestamps can only be compared with each other, and are `null` in WebGL or without any pass.
+	 * The result is `null` when the backend doesn't support timing.
 	 *
 	 * @async
-	 * @return {Promise<?number>} The GPU time in milliseconds, `0` without any pass, or `null` when the
-	 * backend doesn't support timing.
+	 * @return {Promise<?{start: ?number, end: ?number, delta: number}>} The GPU timing in milliseconds.
 	 */
 	end() {
 

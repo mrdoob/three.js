@@ -63,7 +63,6 @@ class Info {
 		 * @property {number} triangles - The number of rendered triangle primitives of the current frame.
 		 * @property {number} points - The number of rendered point primitives of the current frame.
 		 * @property {number} lines - The number of rendered line primitives of the current frame.
-		 * @property {number} timestamp - The timestamp of the frame.
 		 */
 		this.render = {
 			calls: 0,
@@ -71,8 +70,7 @@ class Info {
 			drawCalls: 0,
 			triangles: 0,
 			points: 0,
-			lines: 0,
-			timestamp: 0,
+			lines: 0
 		};
 
 		/**
@@ -82,12 +80,10 @@ class Info {
 		 * @readonly
 		 * @property {number} calls - The number of compute calls since the app has been started.
 		 * @property {number} frameCalls - The number of compute calls of the current frame.
-		 * @property {number} timestamp - The timestamp of the frame when using `renderer.computeAsync()`.
 		 */
 		this.compute = {
 			calls: 0,
-			frameCalls: 0,
-			timestamp: 0
+			frameCalls: 0
 		};
 
 		/**
@@ -209,9 +205,6 @@ class Info {
 
 		this.render.calls = 0;
 		this.compute.calls = 0;
-
-		this.render.timestamp = 0;
-		this.compute.timestamp = 0;
 
 		for ( const prop in this.memory ) {
 

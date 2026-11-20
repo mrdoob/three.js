@@ -1,4 +1,4 @@
-import { add, float, Fn, If, luminance, max, struct, vec2, vec4, getViewPosition, projectionDepth, viewZToOrthographicDepth, viewZToPerspectiveDepth } from 'three/tsl';
+import { add, float, Fn, If, luminance, max, struct, vec2, vec4, projectionDepth } from 'three/tsl';
 
 /**
  * Optimized version of AABB clipping.
@@ -107,33 +107,6 @@ export const sampleCurrentDepth = Fn( ( [ depthNode, positionTexel, cameraNearFa
 	}
 
 	return currentDepthStruct( closestDepth, closestPositionTexel, farthestDepth );
-
-} );
-
-/**
- * Samples the previous depth buffer and reprojects the depth into the current view.
- *
- * @tsl
- * @private
- * @function
- * @param {TextureNode} previousDepthNode - The previous depth buffer.
- * @param {Node<vec2>} uv - The uv coordinates.
- * @param {Node<mat4>} previousCameraProjectionMatrixInverse - The previous camera projection matrix inverse.
- * @param {Node<mat4>} previousCameraWorldMatrix - The previous camera world matrix.
- * @param {Node<mat4>} cameraWorldMatrixInverse - The current camera world matrix inverse.
- * @param {Node<vec2>} cameraNearFar - The camera's near and far.
- * @param {Camera} camera - The camera.
- * @return {Node<float>} The reprojected depth.
- */
-export const samplePreviousDepth = Fn( ( [ previousDepthNode, uv, previousCameraProjectionMatrixInverse, previousCameraWorldMatrix, cameraWorldMatrixInverse, cameraNearFar, camera ] ) => {
-
-	const depth = projectionDepth( previousDepthNode.sample( uv ).r, cameraNearFar.x, cameraNearFar.y );
-	const positionView = getViewPosition( uv, depth, previousCameraProjectionMatrixInverse );
-	const positionWorld = previousCameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz;
-	const viewZ = cameraWorldMatrixInverse.mul( vec4( positionWorld, 1 ) ).z;
-	return camera.isOrthographicCamera
-		? viewZToOrthographicDepth( viewZ, cameraNearFar.x, cameraNearFar.y )
-		: viewZToPerspectiveDepth( viewZ, cameraNearFar.x, cameraNearFar.y );
 
 } );
 

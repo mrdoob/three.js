@@ -63,6 +63,16 @@ class LightingModel {
 	indirect( /*builder*/ ) { }
 
 	/**
+	 * This method is intended for reflecting ambient and hemisphere lights, which stand
+	 * in for a distant environment. It is called by the light nodes while they are set up.
+	 *
+	 * @abstract
+	 * @param {function(Node<vec3>):Node<vec3>} irradianceAt - Returns the light's irradiance for a world space direction.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	indirectRadiance( /*irradianceAt, builder*/ ) { }
+
+	/**
 	 * This method is intended for implementing the ambient occlusion term.
 	 * Unlike other methods, this method must be called manually by the lighting
 	 * model in its indirect term.

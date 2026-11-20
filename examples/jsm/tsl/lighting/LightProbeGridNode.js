@@ -1,5 +1,5 @@
 import { AnalyticLightNode, NodeUpdateType, Vector3 } from 'three/webgpu';
-import { INFINITY, If, array, getShIrradianceAt, normalWorld, positionWorld, renderGroup, texture3D, uniform, vec3 } from 'three/tsl';
+import { INFINITY, If, array, getShIrradianceAt, normalWorld, positionWorld, renderGroup, step, texture3D, uniform, vec3 } from 'three/tsl';
 
 // Padding texels at each boundary of every atlas sub-volume.
 export const ATLAS_PADDING = 1;
@@ -133,7 +133,10 @@ class LightProbeGridNode extends AnalyticLightNode {
 		const res = this._resolution;
 
 		const spacing = max.sub( min ).div( res );
-		const samplePos = positionWorld.add( normalWorld.mul( spacing ).mul( 0.5 ) );
+
+		// An axis with a single probe isn't offset along the normal, since that offset would span the whole grid.
+
+		const samplePos = positionWorld.add( normalWorld.mul( spacing ).mul( 0.5 ).mul( step( 1.5, res ) ) );
 
 		// Grow the bounds by 1% of a cell, so fragments on the bounds aren't left out by
 		// precision errors or samples outside of the triangle.
