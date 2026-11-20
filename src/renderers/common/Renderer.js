@@ -138,8 +138,8 @@ class Renderer {
 	 * @property {boolean} [depth=true] - Whether the default framebuffer should have a depth buffer or not.
 	 * @property {boolean} [stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
 	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
-	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. This parameter can set to any other integer value than 0
-	 * to overwrite the default.
+	 * @property {number} [samples=0] - The number of MSAA samples. When `antialias` is `true`, `4` samples are used by default. A value other than `0`
+	 * overwrites the default and enables MSAA even without `antialias`. The WebGPU backend only supports `4` samples.
 	 * @property {?Function} [getFallback=null] - This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
 	 * @property {number} [outputBufferType=HalfFloatType] - Defines the type of output buffers. The default `HalfFloatType` is recommend for best
 	 * quality. To save memory and bandwidth, `UnsignedByteType` might be used. This will reduce rendering quality though.
@@ -2613,8 +2613,8 @@ class Renderer {
 	}
 
 	/**
-	 * Defines the scissor test. Only affects rendering to the canvas. When a render
-	 * target is set, its own {@link RenderTarget#scissorTest} is used.
+	 * Defines the scissor test. For render calls, it only affects rendering to the canvas.
+	 * When a render target is set, its own {@link RenderTarget#scissorTest} is used.
 	 *
 	 * @param {boolean} boolean - Whether the scissor test should be enabled or not.
 	 */
@@ -2771,10 +2771,11 @@ class Renderer {
 	 * in a previous render. The object must have `occlusionTest` set to `true`.
 	 * Occlusion query results are resolved asynchronously so they lag behind by a
 	 * few frames. This method must be called during a render call (e.g. in a node
-	 * update or `onBeforeRender()`), otherwise it returns `null`.
+	 * update or `onBeforeRender()`), otherwise it returns `null`. It returns `undefined`
+	 * until the first occlusion query results are available.
 	 *
 	 * @param {Object3D} object - The 3D object to test.
-	 * @return {?boolean} Whether the 3D object is fully occluded or not.
+	 * @return {(boolean|null|undefined)} Whether the 3D object is fully occluded or not.
 	 */
 	isOccluded( object ) {
 

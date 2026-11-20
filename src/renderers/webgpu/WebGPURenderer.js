@@ -44,10 +44,10 @@ class WebGPURenderer extends Renderer {
 	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not. MSAA is disabled on devices
 	 * running in WebGPU compatibility mode.
 	 * @property {number} [samples=0] - The number of MSAA samples. When `antialias` is `true`, `4` samples are used by default. A value other than `0`
-	 * overwrites the default and enables MSAA even without `antialias`. The WebGPU backend only supports `4` samples: lower values disable MSAA,
-	 * higher values are clamped to `4`.
+	 * overwrites the default and enables MSAA even without `antialias`. The WebGPU backend only supports `4` samples (higher values are
+	 * clamped to `4`).
 	 * @property {boolean} [forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
-	 * @property {boolean} [multiview=false] - If set to `true`, the renderer will use multiview during WebXR rendering if `OVR_multiview2` is supported.
+	 * @property {boolean} [multiview=false] - If set to `true`, the renderer will use multiview during WebXR rendering if `OVR_multiview2` and WebXR layers are supported.
 	 * WebGL 2 backend only.
 	 * @property {HTMLCanvasElement|OffscreenCanvas} [canvas] - The canvas the renderer draws its output to. If not provided, a new canvas is created.
 	 * @property {GPUCanvasContext|WebGL2RenderingContext} [context] - An existing rendering context of `canvas`. It must match the backend in use:
