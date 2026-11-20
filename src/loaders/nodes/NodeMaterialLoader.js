@@ -37,7 +37,7 @@ class NodeMaterialLoader extends MaterialLoader {
 	 * Parses the node material from the given JSON.
 	 *
 	 * @param {Object} json - The JSON definition
-	 * @return {NodeMaterial}. The parsed material.
+	 * @return {Material} The parsed material.
 	 */
 	parse( json ) {
 

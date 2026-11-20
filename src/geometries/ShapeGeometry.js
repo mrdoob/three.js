@@ -27,7 +27,8 @@ class ShapeGeometry extends BufferGeometry {
 	 * Constructs a new shape geometry.
 	 *
 	 * @param {Shape|Array<Shape>} [shapes] - A shape or an array of shapes.
-	 * @param {number} [curveSegments=12] - Number of segments per curve of the shape.
+	 * @param {number} [curveSegments=12] - Number of segments per curve of the shape. Line segments are never
+	 * subdivided, see {@link CurvePath#getPoints}.
 	 */
 	constructor( shapes = new Shape( [ new Vector2( 0, 0.5 ), new Vector2( - 0.5, - 0.5 ), new Vector2( 0.5, - 0.5 ) ] ), curveSegments = 12 ) {
 

@@ -668,7 +668,7 @@ KeyframeTrack.prototype.ValueTypeName = '';
 /**
  * The time buffer type of this keyframe track.
  *
- * @type {TypedArray|Array}
+ * @type {(TypedArray.constructor|Array.constructor)}
  * @default Float32Array
  */
 KeyframeTrack.prototype.TimeBufferType = Float32Array;
@@ -676,7 +676,7 @@ KeyframeTrack.prototype.TimeBufferType = Float32Array;
 /**
  * The value buffer type of this keyframe track.
  *
- * @type {TypedArray|Array}
+ * @type {(TypedArray.constructor|Array.constructor)}
  * @default Float32Array
  */
 KeyframeTrack.prototype.ValueBufferType = Float32Array;

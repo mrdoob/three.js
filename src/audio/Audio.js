@@ -168,8 +168,8 @@ class Audio extends Object3D {
 		 * Indicates whether the audio playback can be controlled
 		 * with method like {@link Audio#play} or {@link Audio#pause}.
 		 *
-		 * This flag will be automatically set when audio sources are
-		 * defined.
+		 * This flag is set to `false` by {@link Audio#setNodeSource},
+		 * {@link Audio#setMediaElementSource} and {@link Audio#setMediaStreamSource}.
 		 *
 		 * @type {boolean}
 		 * @readonly
@@ -683,8 +683,8 @@ class Audio extends Object3D {
 
 	/**
 	 * Sets the loop start value which defines where in the audio buffer the replay should
-	 * start, in seconds. Only used when {@link Audio#loop} is `true` and applied on the
-	 * next call of {@link Audio#play}.
+	 * start, in seconds. Only used when {@link Audio#loop} is `true` and {@link Audio#loopEnd}
+	 * is greater than this value, and applied on the next call of {@link Audio#play}.
 	 *
 	 * @param {number} value - The loop start value.
 	 * @return {Audio} A reference to this instance.
@@ -699,8 +699,9 @@ class Audio extends Object3D {
 
 	/**
 	 * Sets the loop end value which defines where in the audio buffer the replay should
-	 * stop, in seconds. A value of `0` loops to the end of the buffer. Only used when
-	 * {@link Audio#loop} is `true` and applied on the next call of {@link Audio#play}.
+	 * stop, in seconds. A value of `0` (the default) loops the whole buffer and also ignores
+	 * {@link Audio#loopStart}. Only used when {@link Audio#loop} is `true` and applied on the
+	 * next call of {@link Audio#play}.
 	 *
 	 * @param {number} value - The loop end value.
 	 * @return {Audio} A reference to this instance.

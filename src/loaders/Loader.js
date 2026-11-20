@@ -32,7 +32,7 @@ class Loader {
 		this.crossOrigin = 'anonymous';
 
 		/**
-		 * Whether `fetch()` requests include credentials.
+		 * Whether cross-origin `fetch()` requests include credentials.
 		 *
 		 * @type {boolean}
 		 * @default false

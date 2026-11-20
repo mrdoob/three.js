@@ -219,7 +219,8 @@ class CurvePath extends Curve {
 	 * is `true`, the first point is appended at the end if necessary.
 	 *
 	 * @param {number} [divisions=12] - The number of divisions per curve. Line curves always use
-	 * one division, ellipse curves twice this value and spline curves this value times their point count.
+	 * one division, ellipse curves twice this value and {@link SplineCurve} instances this value times their
+	 * point count. All other curves use this value.
 	 * @return {Array<(Vector2|Vector3)>} An array holding the sampled curve values.
 	 */
 	getPoints( divisions = 12 ) {

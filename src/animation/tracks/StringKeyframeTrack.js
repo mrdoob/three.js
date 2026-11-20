@@ -37,7 +37,7 @@ StringKeyframeTrack.prototype.ValueTypeName = 'string';
 /**
  * The value buffer type of this keyframe track.
  *
- * @type {TypedArray|Array}
+ * @type {(TypedArray.constructor|Array.constructor)}
  * @default Array
  */
 StringKeyframeTrack.prototype.ValueBufferType = Array;
