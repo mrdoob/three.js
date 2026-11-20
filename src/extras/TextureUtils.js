@@ -6,7 +6,7 @@ import { AlphaFormat, RedFormat, RedIntegerFormat, RGFormat, RGIntegerFormat, RG
  * the texture. Akin to CSS `object-fit: contain`
  *
  * @param {Texture} texture - The texture.
- * @param {number} aspect - The texture's aspect ratio.
+ * @param {number} aspect - The aspect ratio (width / height) of the surface the texture is displayed on.
  * @return {Texture} The updated texture.
  */
 function contain( texture, aspect ) {
@@ -41,7 +41,7 @@ function contain( texture, aspect ) {
  * Akin to CSS `object-fit: cover`.
  *
  * @param {Texture} texture - The texture.
- * @param {number} aspect - The texture's aspect ratio.
+ * @param {number} aspect - The aspect ratio (width / height) of the surface the texture is displayed on.
  * @return {Texture} The updated texture.
  */
 function cover( texture, aspect ) {
@@ -241,7 +241,7 @@ class TextureUtils {
 	 * the texture. Akin to CSS `object-fit: contain`
 	 *
 	 * @param {Texture} texture - The texture.
-	 * @param {number} aspect - The texture's aspect ratio.
+	 * @param {number} aspect - The aspect ratio (width / height) of the surface the texture is displayed on.
 	 * @return {Texture} The updated texture.
 	 */
 	static contain( texture, aspect ) {
@@ -256,7 +256,7 @@ class TextureUtils {
 	 * Akin to CSS `object-fit: cover`.
 	 *
 	 * @param {Texture} texture - The texture.
-	 * @param {number} aspect - The texture's aspect ratio.
+	 * @param {number} aspect - The aspect ratio (width / height) of the surface the texture is displayed on.
 	 * @return {Texture} The updated texture.
 	 */
 	static cover( texture, aspect ) {

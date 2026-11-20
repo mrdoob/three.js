@@ -2164,6 +2164,7 @@ ${ flowData.code }
 	 * Returns the variables of the given shader stage as a WGSL string.
 	 *
 	 * @param {string} shaderStage - The shader stage.
+	 * @param {boolean} [global=false] - Whether the variables are global.
 	 * @return {string} The WGSL snippet that defines the variables.
 	 */
 	getVars( shaderStage, global = false ) {

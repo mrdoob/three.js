@@ -178,7 +178,7 @@ class Backend {
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} computePipeline - The compute pipeline.
 	 */
-	compute( /*computeGroup, computeNode, computeBindings, computePipeline*/ ) { }
+	compute( /*computeGroup, computeNode, bindings, computePipeline*/ ) { }
 
 	// program
 

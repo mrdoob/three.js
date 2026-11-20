@@ -668,7 +668,7 @@ class AnimationMixer extends EventDispatcher {
 	 * Advances the global mixer time and updates the animation.
 	 *
 	 * This is usually done in the render loop by passing the delta
-	 * time from {@link Clock} or {@link Timer}.
+	 * time from {@link Timer}.
 	 *
 	 * @param {number} deltaTime - The delta time in seconds.
 	 * @return {AnimationMixer} A reference to this animation mixer.

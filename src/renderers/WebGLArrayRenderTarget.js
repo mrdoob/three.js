@@ -13,7 +13,7 @@ class WebGLArrayRenderTarget extends WebGLRenderTarget {
 	 *
 	 * @param {number} [width=1] - The width of the render target.
 	 * @param {number} [height=1] - The height of the render target.
-	 * @param {number} [depth=1] - The height of the render target.
+	 * @param {number} [depth=1] - The depth of the render target.
 	 * @param {RenderTarget~Options} [options] - The configuration object.
 	 */
 	constructor( width = 1, height = 1, depth = 1, options = {} ) {

@@ -32,7 +32,7 @@ const _camera = /*@__PURE__*/ new Camera();
 class CameraHelper extends LineSegments {
 
 	/**
-	 * Constructs a new arrow helper.
+	 * Constructs a new camera helper.
 	 *
 	 * @param {Camera} camera - The camera to visualize.
 	 */

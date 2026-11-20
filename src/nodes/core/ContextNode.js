@@ -70,17 +70,6 @@ class ContextNode extends Node {
 	}
 
 	/**
-	 * This method is overwritten to ensure it returns the reference to {@link ContextNode#node}.
-	 *
-	 * @return {Node} A reference to {@link ContextNode#node}.
-	 */
-	getScope() {
-
-		return this.node.getScope();
-
-	}
-
-	/**
 	 * This method is overwritten to ensure it returns the type of {@link ContextNode#node}.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.

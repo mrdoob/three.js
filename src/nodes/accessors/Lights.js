@@ -142,11 +142,12 @@ export function lightViewPosition( light ) {
 }
 
 /**
- * TSL function for getting the light target direction for the given light.
+ * TSL function for getting the normalized direction from the light's target toward
+ * the given light, in view space.
  *
  * @tsl
  * @function
  * @param {Light} light -The light source.
- * @returns {Node<vec3>} The light's target direction.
+ * @returns {Node<vec3>} The light's target direction in view space.
  */
 export const lightTargetDirection = ( light ) => cameraViewMatrix.transformDirection( lightPosition( light ).sub( lightTargetPosition( light ) ) );

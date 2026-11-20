@@ -85,10 +85,12 @@ class Frustum {
 	}
 
 	/**
-	 * Sets the frustum planes from the given projection matrix.
+	 * Sets the frustum planes from the given projection matrix. The planes are expressed
+	 * in the space the matrix maps from, so pass `camera.projectionMatrix` multiplied by
+	 * `camera.matrixWorldInverse` to get world space planes.
 	 *
 	 * @param {Matrix4} m - The projection matrix.
-	 * @param {(WebGLCoordinateSystem|WebGPUCoordinateSystem)} coordinateSystem - The coordinate system.
+	 * @param {(WebGLCoordinateSystem|WebGPUCoordinateSystem)} [coordinateSystem=WebGLCoordinateSystem] - The coordinate system.
 	 * @param {boolean} [reversedDepth=false] - Whether to use a reversed depth.
 	 * @return {Frustum} A reference to this frustum.
 	 */

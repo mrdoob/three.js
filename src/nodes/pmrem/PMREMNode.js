@@ -142,8 +142,8 @@ class PMREMNode extends Node {
 	 * Constructs a new PMREM node.
 	 *
 	 * @param {Texture} value - The input texture.
-	 * @param {Node<vec3>} [uvNode=null] - The uv node.
-	 * @param {Node<float>} [levelNode=null] - The level node.
+	 * @param {Node<vec3>} [uvNode=null] - The world space sampling direction.
+	 * @param {Node<float>} [levelNode=null] - The roughness in the `[0, 1]` range, converted to a mip level internally.
 	 */
 	constructor( value, uvNode = null, levelNode = null ) {
 
@@ -167,14 +167,14 @@ class PMREMNode extends Node {
 		this._pmrem = null;
 
 		/**
-		 *  The uv node.
+		 * The world space sampling direction.
 		 *
 		 * @type {Node<vec3>}
 		 */
 		this.uvNode = uvNode;
 
 		/**
-		 *  The level node.
+		 * The roughness in the `[0, 1]` range, converted to a mip level internally.
 		 *
 		 * @type {Node<float>}
 		 */
@@ -384,8 +384,8 @@ function isEquirectangularMapReady( image ) {
  * @tsl
  * @function
  * @param {Texture} value - The input texture.
- * @param {?Node<vec3>} [uvNode=null] - The uv node.
- * @param {?Node<float>} [levelNode=null] - The level node.
+ * @param {?Node<vec3>} [uvNode=null] - The world space sampling direction.
+ * @param {?Node<float>} [levelNode=null] - The roughness in the `[0, 1]` range, converted to a mip level internally.
  * @returns {PMREMNode}
  */
 export const pmremTexture = /*@__PURE__*/ nodeProxy( PMREMNode ).setParameterLength( 1, 3 );

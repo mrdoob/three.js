@@ -80,7 +80,7 @@ class LightingModel {
 	 * @abstract
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	ambientOcclusion( /*input, stack, builder*/ ) { }
+	ambientOcclusion( /*builder*/ ) { }
 
 }
 

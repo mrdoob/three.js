@@ -9,9 +9,13 @@ import { Loader } from './Loader.js';
  * ```js
  * const loader = new THREE.TextureLoader();
  * const texture = await loader.loadAsync( 'textures/land_ocean_ice_cloud_2048.jpg' );
+ * texture.colorSpace = THREE.SRGBColorSpace;
  *
  * const material = new THREE.MeshBasicMaterial( { map:texture } );
  * ```
+ * The loaded texture keeps the default {@link Texture#colorSpace} `NoColorSpace`. For
+ * color textures like `map` or `emissiveMap`, set it to `SRGBColorSpace`.
+ *
  * Please note that `TextureLoader` has dropped support for progress
  * events in `r84`. For a `TextureLoader` that supports progress events, see
  * [this thread](https://github.com/mrdoob/three.js/issues/10439#issuecomment-293260145).
@@ -40,7 +44,7 @@ class TextureLoader extends Loader {
 	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
 	 * @param {function(Texture)} [onLoad] - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} [onProgress] - Unsupported in this loader.
-	 * @param {onErrorCallback} [onError] - Executed when errors occur.
+	 * @param {function(Event)} [onError] - Executed when errors occur. Receives the image's `error` event, not an `Error` instance.
 	 * @return {Texture} The texture.
 	 */
 	load( url, onLoad, onProgress, onError ) {

@@ -74,8 +74,8 @@ class NodeObjectLoader extends ObjectLoader {
 	 * Parses the node objects from the given JSON.
 	 *
 	 * @param {Object} json - The JSON definition
-	 * @param {Function} onLoad - The onLoad callback function.
-	 * @return {Object3D}. The parsed 3D object.
+	 * @param {function(Object3D)} [onLoad] - Executed when all resources (e.g. textures) have been fully loaded.
+	 * @return {Object3D} The parsed 3D object.
 	 */
 	parse( json, onLoad ) {
 
@@ -112,7 +112,7 @@ class NodeObjectLoader extends ObjectLoader {
 	 *
 	 * @param {Object[]} json - The JSON definition
 	 * @param {Object<string,Texture>} textures - The texture library.
-	 * @return {Object<string,Node>}. The parsed nodes.
+	 * @return {Object<string,Node>} The parsed nodes.
 	 */
 	parseNodes( json, textures ) {
 
@@ -135,7 +135,7 @@ class NodeObjectLoader extends ObjectLoader {
 	 *
 	 * @param {Object} json - The JSON definition
 	 * @param {Object<string,Texture>} textures - The texture library.
-	 * @return {Object<string,NodeMaterial>}. The parsed materials.
+	 * @return {Object<string,NodeMaterial>} The parsed materials.
 	 */
 	parseMaterials( json, textures ) {
 

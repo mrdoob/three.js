@@ -29,7 +29,7 @@ class VelocityNode extends Node {
 	}
 
 	/**
-	 * Constructs a new vertex color node.
+	 * Constructs a new velocity node.
 	 */
 	constructor() {
 
@@ -206,7 +206,8 @@ function getData( object ) {
 export default VelocityNode;
 
 /**
- * TSL object that represents the velocity of a render pass.
+ * TSL object that represents the velocity of a render pass. The value is the difference
+ * between the current and previous position in NDC space (`xy`, Y up), not a uv offset.
  *
  * @tsl
  * @type {VelocityNode}

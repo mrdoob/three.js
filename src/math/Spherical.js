@@ -11,7 +11,7 @@ class Spherical {
 	 *
 	 * @param {number} [radius=1] - The radius, or the Euclidean distance (straight-line distance) from the point to the origin.
 	 * @param {number} [phi=0] - The polar angle in radians from the y (up) axis.
-	 * @param {number} [theta=0] - The equator/azimuthal angle in radians around the y (up) axis.
+	 * @param {number} [theta=0] - The equator/azimuthal angle in radians around the y (up) axis, measured from the positive z-axis towards the positive x-axis.
 	 */
 	constructor( radius = 1, phi = 0, theta = 0 ) {
 
@@ -32,7 +32,8 @@ class Spherical {
 		this.phi = phi;
 
 		/**
-		 * The equator/azimuthal angle in radians around the y (up) axis.
+		 * The equator/azimuthal angle in radians around the y (up) axis, measured from
+		 * the positive z-axis towards the positive x-axis.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -76,7 +77,7 @@ class Spherical {
 	}
 
 	/**
-	 * Restricts the polar angle [page:.phi phi] to be between `0.000001` and pi -
+	 * Restricts the polar angle {@link Spherical#phi} to be between `0.000001` and pi -
 	 * `0.000001`.
 	 *
 	 * @return {Spherical} A reference to this spherical.

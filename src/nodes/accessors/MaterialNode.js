@@ -542,7 +542,7 @@ export const materialSpecular = /*@__PURE__*/ nodeImmutable( MaterialNode, Mater
 
 /**
  * TSL object that represents the specular intensity of the current material.
- * The value is composed via `specularIntensity` * `specularMap.a`.
+ * The value is composed via `specularIntensity` * `specularIntensityMap.a`.
  *
  * @tsl
  * @type {Node<float>}
@@ -551,7 +551,7 @@ export const materialSpecularIntensity = /*@__PURE__*/ nodeImmutable( MaterialNo
 
 /**
  * TSL object that represents the specular color of the current material.
- * The value is composed via `specularColor` * `specularMap.rgb`.
+ * The value is composed via `specularColor` * `specularColorMap.rgb`.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -603,8 +603,9 @@ export const materialDiffuseRoughness = /*@__PURE__*/ nodeImmutable( MaterialNod
 export const materialMetalness = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.METALNESS );
 
 /**
- * TSL object that represents the normal of the current material.
- * The value will be either `normalMap` * `normalScale`, `bumpMap` * `bumpScale` or `normalView`.
+ * TSL object that represents the normal of the current material in view space.
+ * The value will be either the normal perturbed by `normalMap` (scaled by `normalScale`),
+ * the normal perturbed by `bumpMap` (scaled by `bumpScale`) or `normalView`.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -622,7 +623,7 @@ export const materialClearcoat = /*@__PURE__*/ nodeImmutable( MaterialNode, Mate
 
 /**
  * TSL object that represents the clearcoat roughness of the current material.
- * The value is composed via `clearcoatRoughness` * `clearcoatRoughnessMap.r`.
+ * The value is composed via `clearcoatRoughness` * `clearcoatRoughnessMap.g`.
  *
  * @tsl
  * @type {Node<float>}
@@ -631,7 +632,8 @@ export const materialClearcoatRoughness = /*@__PURE__*/ nodeImmutable( MaterialN
 
 /**
  * TSL object that represents the clearcoat normal of the current material.
- * The value will be either `clearcoatNormalMap` or `normalView`.
+ * The value will be either the normal perturbed by `clearcoatNormalMap` (scaled by
+ * `clearcoatNormalScale`) or `normalView`.
  *
  * @tsl
  * @type {Node<vec3>}
@@ -813,7 +815,7 @@ export const materialLightMap = /*@__PURE__*/ nodeImmutable( MaterialNode, Mater
 
 /**
  * TSL object that represents the ambient occlusion map of the current material.
- * The value is composed via `aoMap.r` - 1 * `aoMapIntensity` + 1.
+ * The value is composed via ( `aoMap.r` - 1 ) * `aoMapIntensity` + 1.
  *
  * @tsl
  * @type {Node<float>}

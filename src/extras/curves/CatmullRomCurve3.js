@@ -87,7 +87,7 @@ const pz = /*@__PURE__*/ new CubicPoly();
  * A curve representing a Catmull-Rom spline.
  *
  * ```js
- * //Create a closed wavey loop
+ * //Create a wavey curve
  * const curve = new THREE.CatmullRomCurve3( [
  * 	new THREE.Vector3( -10, 0, 10 ),
  * 	new THREE.Vector3( -5, 5, 5 ),
@@ -115,7 +115,7 @@ class CatmullRomCurve3 extends Curve {
 	 * @param {Array<Vector3>} [points] - An array of 3D points defining the curve.
 	 * @param {boolean} [closed=false] - Whether the curve is closed or not.
 	 * @param {('centripetal'|'chordal'|'catmullrom')} [curveType='centripetal'] - The curve type.
-	 * @param {number} [tension=0.5] - Tension of the curve.
+	 * @param {number} [tension=0.5] - Tension of the curve. Only used when `curveType` is `'catmullrom'`.
 	 */
 	constructor( points = [], closed = false, curveType = 'centripetal', tension = 0.5 ) {
 
@@ -156,7 +156,7 @@ class CatmullRomCurve3 extends Curve {
 		this.curveType = curveType;
 
 		/**
-		 * Tension of the curve.
+		 * Tension of the curve. Only used when {@link CatmullRomCurve3#curveType} is `'catmullrom'`.
 		 *
 		 * @type {number}
 		 * @default 0.5

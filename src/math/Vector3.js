@@ -465,7 +465,7 @@ class Vector3 {
 	/**
 	 * Applies the given Quaternion to this vector.
 	 *
-	 * @param {Quaternion} q - The Quaternion.
+	 * @param {Quaternion} q - The Quaternion (assumed to be normalized).
 	 * @return {Vector3} A reference to this vector.
 	 */
 	applyQuaternion( q ) {
@@ -848,10 +848,11 @@ class Vector3 {
 	}
 
 	/**
-	 * Calculates the cross product of the given vector with this instance.
+	 * Calculates the cross product of this vector and the given one (in that order)
+	 * and stores the result in this instance.
 	 *
 	 * @param {Vector3} v - The vector to compute the cross product with.
-	 * @return {Vector3} The result of the cross product.
+	 * @return {Vector3} A reference to this vector.
 	 */
 	cross( v ) {
 
