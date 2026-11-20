@@ -225,13 +225,8 @@
 
 				const types = { 'Scene with Shadow Maps + SSS': 0, 'Scene with Shadow Maps': 1, 'SSS': 2, };
 
-				const gui = renderer.inspector.createParameters( 'SSS settings' );
-				gui.add( params, 'output', types ).onChange( updatePostprocessing );
-				gui.add( sssPass.shadowIntensity, 'value', 0, 1 ).name( 'shadow intensity' );
-				gui.add( sssPass.maxDistance, 'value', 0.01, 1 ).name( 'max ray distance' );
-				gui.add( sssPass.quality, 'value', 0, 1 ).name( 'quality' );
-				gui.add( sssPass.thickness, 'value', 0.01, 0.1 ).name( 'thickness' );
-				gui.add( sssPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );
+				const displayGui = renderer.inspector.createParameters( 'Display' );
+				displayGui.add( params, 'output', types ).onChange( updatePostprocessing );
 
 				const downsampleGui = renderer.inspector.createParameters( 'Downsample' );
 				downsampleGui.add( downsampleParams, 'level', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => {
@@ -241,6 +236,13 @@
 
 				} );
 				const upsamplerControl = downsampleGui.add( downsampleParams, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 ).hide();
+
+				const sssGui = renderer.inspector.createParameters( 'SSS' );
+				sssGui.add( sssPass.shadowIntensity, 'value', 0, 1 ).name( 'shadow intensity' );
+				sssGui.add( sssPass.maxDistance, 'value', 0.01, 1 ).name( 'max ray distance' );
+				sssGui.add( sssPass.quality, 'value', 0, 1 ).name( 'quality' );
+				sssGui.add( sssPass.thickness, 'value', 0.01, 0.1 ).name( 'thickness' );
+				sssGui.add( sssPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );
 
 				function updatePostprocessing() {
 
