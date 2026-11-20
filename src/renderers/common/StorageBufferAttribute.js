@@ -20,7 +20,7 @@ class StorageBufferAttribute extends BufferAttribute {
 	 * Constructs a new storage buffer attribute.
 	 *
 	 * @param {number|TypedArray} count - The item count. It is also valid to pass a typed array as an argument.
-	 * The subsequent parameters are then obsolete.
+	 * `typeClass` is then ignored but `itemSize` is still required.
 	 * @param {number} itemSize - The item size.
 	 * @param {TypedArray.constructor} [typeClass=Float32Array] - A typed array constructor.
 	 */

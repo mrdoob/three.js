@@ -25,7 +25,7 @@ class DirectRenderPipeline extends RenderPipeline {
 	 * Constructs a direct render pipeline.
 	 *
 	 * @param {Renderer} renderer - A reference to the renderer.
-	 * @param {Node<vec4>} outputNode - An optional output node.
+	 * @param {Node<vec4>} [outputNode=output] - An optional output node.
 	 */
 	constructor( renderer, outputNode = output ) {
 

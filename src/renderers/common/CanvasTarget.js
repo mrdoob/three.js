@@ -21,8 +21,6 @@ class CanvasTarget extends EventDispatcher {
 
 		/**
 		 * A reference to the canvas element the renderer is drawing to.
-		 * This value of this property will automatically be created by
-		 * the renderer.
 		 *
 		 * @type {HTMLCanvasElement|OffscreenCanvas}
 		 */
@@ -228,9 +226,9 @@ class CanvasTarget extends EventDispatcher {
 	/**
 	 * Defines the scissor rectangle.
 	 *
-	 * @param {number | Vector4} x - The horizontal coordinate for the lower left corner of the box in logical pixel unit.
+	 * @param {number | Vector4} x - The horizontal coordinate for the upper left corner of the box in logical pixel unit.
 	 * Instead of passing four arguments, the method also works with a single four-dimensional vector.
-	 * @param {number} y - The vertical coordinate for the lower left corner of the box in logical pixel unit.
+	 * @param {number} y - The vertical coordinate for the upper left corner of the box in logical pixel unit.
 	 * @param {number} width - The width of the scissor box in logical pixel unit.
 	 * @param {number} height - The height of the scissor box in logical pixel unit.
 	 */
@@ -287,12 +285,12 @@ class CanvasTarget extends EventDispatcher {
 	/**
 	 * Defines the viewport.
 	 *
-	 * @param {number | Vector4} x - The horizontal coordinate for the lower left corner of the viewport origin in logical pixel unit.
-	 * @param {number} y - The vertical coordinate for the lower left corner of the viewport origin  in logical pixel unit.
+	 * @param {number | Vector4} x - The horizontal coordinate for the upper left corner of the viewport origin in logical pixel unit.
+	 * @param {number} y - The vertical coordinate for the upper left corner of the viewport origin in logical pixel unit.
 	 * @param {number} width - The width of the viewport in logical pixel unit.
 	 * @param {number} height - The height of the viewport in logical pixel unit.
-	 * @param {number} minDepth - The minimum depth value of the viewport. WebGPU only.
-	 * @param {number} maxDepth - The maximum depth value of the viewport. WebGPU only.
+	 * @param {number} [minDepth=0] - The minimum depth value of the viewport. WebGPU only.
+	 * @param {number} [maxDepth=1] - The maximum depth value of the viewport. WebGPU only.
 	 */
 	setViewport( x, y, width, height, minDepth = 0, maxDepth = 1 ) {
 
@@ -328,7 +326,7 @@ class CanvasTarget extends EventDispatcher {
 	 * Frees the GPU-related resources allocated by this instance. Call this
 	 * method whenever this instance is no longer used in your app.
 	 *
-	 * @fires RenderTarget#dispose
+	 * @fires CanvasTarget#dispose
 	 */
 	dispose() {
 

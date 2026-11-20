@@ -317,10 +317,10 @@ class WGSLNodeBuilder extends NodeBuilder {
 		super( object, renderer, new WGSLNodeParser() );
 
 		/**
-		 * A dictionary that holds for each shader stage ('vertex', 'fragment', 'compute')
-		 * another dictionary which manages UBOs per group ('render','frame','object').
+		 * A dictionary that holds the UBO of each uniform group ('render','frame','object')
+		 * by group name. The UBOs are shared by all shader stages.
 		 *
-		 * @type {Object<string,Object<string,NodeUniformsGroup>>}
+		 * @type {Object<string,NodeUniformsGroup>}
 		 */
 		this.uniformGroups = {};
 
@@ -1874,7 +1874,7 @@ ${ flowData.code }
 	/**
 	 * Enables hardware clipping.
 	 *
-	 * @param {string} planeCount - The clipping plane count.
+	 * @param {number} planeCount - The clipping plane count.
 	 */
 	enableHardwareClipping( planeCount ) {
 
@@ -2164,6 +2164,7 @@ ${ flowData.code }
 	 * Returns the variables of the given shader stage as a WGSL string.
 	 *
 	 * @param {string} shaderStage - The shader stage.
+	 * @param {boolean} [global=false] - Whether to declare the variables in module scope (`var<private>`) or not.
 	 * @return {string} The WGSL snippet that defines the variables.
 	 */
 	getVars( shaderStage, global = false ) {
@@ -2827,7 +2828,7 @@ fn main( ${shaderData.attributes} ) -> VaryingsStruct {
 	 *
 	 * @private
 	 * @param {Object} shaderData - The shader data.
-	 * @return {string} The vertex shader.
+	 * @return {string} The fragment shader.
 	 */
 	_getWGSLFragmentCode( shaderData ) {
 
@@ -2866,8 +2867,8 @@ fn main( ${shaderData.varyings} ) -> ${shaderData.returnType} {
 	 *
 	 * @private
 	 * @param {Object} shaderData - The shader data.
-	 * @param {string} workgroupSize - The workgroup size.
-	 * @return {string} The vertex shader.
+	 * @param {Array<number>} workgroupSize - The workgroup size.
+	 * @return {string} The compute shader.
 	 */
 	_getWGSLComputeCode( shaderData, workgroupSize ) {
 

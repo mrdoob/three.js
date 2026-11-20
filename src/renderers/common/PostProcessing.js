@@ -12,7 +12,7 @@ class PostProcessing extends RenderPipeline {
 	 * Constructs a new post processing management module.
 	 *
 	 * @param {Renderer} renderer - A reference to the renderer.
-	 * @param {Node<vec4>} outputNode - An optional output node.
+	 * @param {Node<vec4>} [outputNode] - An optional output node.
 	 * @deprecated since r183. Use {@link RenderPipeline} instead.
 	 */
 	constructor( renderer, outputNode ) {

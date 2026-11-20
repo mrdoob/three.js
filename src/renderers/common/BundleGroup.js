@@ -46,12 +46,13 @@ class BundleGroup extends Group {
 		this.type = 'BundleGroup';
 
 		/**
-		 * Whether the bundle is static or not. When set to `true`, the structure
-		 * is assumed to be static and does not change. E.g. no new objects are
-		 * added to the group.
+		 * Whether the bundle is static or not. When set to `true`, changes to the
+		 * transformation and material properties of the objects in the bundle are
+		 * only applied after setting the `needsUpdate` flag to `true`. Set it to
+		 * `false` for bundles with animated objects.
 		 *
-		 * If a change is required, an update can still be forced by setting the
-		 * `needsUpdate` flag to `true`.
+		 * Adding or removing objects always requires setting the `needsUpdate`
+		 * flag to `true`.
 		 *
 		 * @type {boolean}
 		 * @default true

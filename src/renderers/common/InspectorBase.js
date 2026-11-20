@@ -143,7 +143,7 @@ class InspectorBase extends EventDispatcher {
 	beginRender( /*uid, scene, camera, renderTarget*/ ) { }
 
 	/**
-	 * Called when an animation loop ends.
+	 * Called when a render operation ends.
 	 *
 	 * @param {string} uid - A unique identifier for the render context.
 	 */
