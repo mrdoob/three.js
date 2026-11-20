@@ -136,6 +136,12 @@ export const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
 
 	}
 
+	if ( builder.context.geometryTransforms ) {
+
+		builder.context.geometryTransforms.batchingMatrix = batchingMatrix;
+
+	}
+
 	const bm = mat3( batchingMatrix );
 
 	positionLocal.assign( batchingMatrix.mul( positionLocal ) );

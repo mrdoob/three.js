@@ -131,7 +131,7 @@
 					texture( bumpRoughnessCloudsTexture ).r,
 					cloudsStrength
 				);
-				globeMaterial.normalNode = bumpMap( bumpElevation );
+				globeMaterial.normalNode = bumpMap( bumpElevation, 0.004 );
 
 				const sphereGeometry = new THREE.SphereGeometry( 1, 64, 64 );
 				globe = new THREE.Mesh( sphereGeometry, globeMaterial );
