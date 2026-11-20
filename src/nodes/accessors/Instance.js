@@ -1,7 +1,7 @@
 
-import { vec3, mat3, mat4, Fn } from '../tsl/TSLBase.js';
+import { vec3, mat4, Fn } from '../tsl/TSLBase.js';
 import { OnAfterObjectUpdate } from '../utils/EventNode.js';
-import { normalLocal } from './Normal.js';
+import { normalLocal, transformNormal } from './Normal.js';
 import { positionLocal, positionPrevious } from './Position.js';
 import { varyingProperty } from '../core/PropertyNode.js';
 import { instancedBufferAttribute, instancedDynamicBufferAttribute } from './BufferAttributeNode.js';
@@ -224,6 +224,12 @@ function canReferenceInstanceData( object, builder ) {
  */
 function transformInstance( builder, instanceMatrixNode, previousMatrixNode ) {
 
+	if ( builder.context.geometryTransforms ) {
+
+		builder.context.geometryTransforms.instanceMatrix = instanceMatrixNode;
+
+	}
+
 	// POSITION
 
 	const instancePosition = instanceMatrixNode.mul( positionLocal ).xyz;
@@ -239,8 +245,7 @@ function transformInstance( builder, instanceMatrixNode, previousMatrixNode ) {
 
 	if ( builder.hasGeometryAttribute( 'normal' ) ) {
 
-		// not normalized so the length keeps the instance's scale along the normal, as with batching
-		const instanceNormal = mat3( instanceMatrixNode ).inverse().transpose().mul( normalLocal );
+		const instanceNormal = transformNormal( normalLocal, instanceMatrixNode );
 		normalLocal.assign( instanceNormal );
 
 	}

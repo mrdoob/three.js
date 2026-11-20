@@ -14,7 +14,7 @@ export default /* glsl */`
 
 #ifdef USE_BUMPMAP
 
-	varying float vBumpScale;
+	varying mat3 vBumpMatrix;
 
 #endif
 `;

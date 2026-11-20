@@ -767,6 +767,9 @@ class NodeMaterial extends Material {
 
 		const { object, geometry } = builder;
 
+		// Shared by vertex and fragment contexts when reconstructing local-space data.
+		builder.context.geometryTransforms = {};
+
 		if ( geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color ) {
 
 			morphReference( object );
@@ -776,13 +779,6 @@ class NodeMaterial extends Material {
 		if ( object.isSkinnedMesh === true ) {
 
 			skinning( object );
-
-		}
-
-		// morphs and skinning change the normal's length, which the bump map scale expects to be one
-		if ( ( geometry.morphAttributes.normal || object.isSkinnedMesh === true ) && geometry.hasAttribute( 'normal' ) ) {
-
-			normalLocal.assign( normalLocal.normalize() );
 
 		}
 
