@@ -116,7 +116,7 @@
 			roughness: 0.3,
 
 			ssr: {
-				traceSource: 'Current',
+				traceSource: 'Per Lookup',
 				resolutionScale: 1,
 				quality: 0.25,
 				mirrorBias: 0,
@@ -285,19 +285,6 @@
 				binaryRefine: params.ssr.binaryRefine
 			} ).toInspector( 'SSR' );
 
-			// trace the current frame or the previous frame, reprojected per lookup or into a buffer
-
-			previousFrame = new PreviousFrameSource( scenePass, scenePassDepth, scenePassVelocity, camera );
-
-			const traceSources = { 'Current': scenePassColor, 'Previous (Velocity)': previousFrame.node, 'Previous (Buffer)': previousFrame.bufferNode };
-
-			function updateTraceSource() {
-
-				ssrNode.colorNode = traceSources[ params.ssr.traceSource ];
-				renderPipeline.needsUpdate = true;
-
-			}
-
 			temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
 				mode: 'specular',
 				accumulate: false,
@@ -330,6 +317,24 @@
 			const outputNode = vec4( litColor, 1 );
 			outputNode.toInspector( 'Combined SSR' );
 			combinedOutputNode = outputNode;
+
+			const temporalAA = traa( applyGrading( combinedOutputNode ), scenePassDepth, scenePassVelocity, camera );
+			temporalOutputs.set( combinedOutputNode, temporalAA );
+
+			// trace the previous frame, reprojected per lookup or once per frame into a buffer
+
+			previousFrame = new PreviousFrameSource( scenePass, temporalAA.reprojection );
+
+			const traceSources = { 'Per Lookup': previousFrame.node, 'Buffer': previousFrame.bufferNode };
+
+			function updateTraceSource() {
+
+				ssrNode.colorNode = traceSources[ params.ssr.traceSource ];
+				renderPipeline.needsUpdate = true;
+
+			}
+
+			updateTraceSource();
 
 			renderPipeline.outputNode = applyPostProcessing( combinedOutputNode );
 			renderPipeline.outputColorTransform = false;

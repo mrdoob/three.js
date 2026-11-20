@@ -108,6 +108,14 @@ class Reprojection {
 		 */
 		this.previousCameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse.clone() );
 
+		/**
+		 * Increases on every update. Effects that share a reprojection use it
+		 * to tell whether its owner has already stored the current frame.
+		 *
+		 * @type {number}
+		 */
+		this.version = 0;
+
 	}
 
 	/**
@@ -194,6 +202,8 @@ class Reprojection {
 		this.previousCameraViewMatrix.value.copy( this.camera.matrixWorldInverse );
 		this.previousCameraProjectionMatrix.value.copy( this.camera.projectionMatrix );
 		this.previousCameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
+
+		this.version ++;
 
 	}
 

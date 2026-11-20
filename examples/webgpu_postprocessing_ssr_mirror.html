@@ -46,7 +46,7 @@
 		import * as THREE from 'three/webgpu';
 		import { pass, mrt, output, normalView, metalness, roughness, velocity, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
-		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
+		import { traa } from 'three/addons/tsl/display/TRAANode.js';
 		import { PreviousFrameSource, previousViewZ } from 'three/addons/tsl/utils/PreviousFrameSource.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -56,7 +56,7 @@
 		import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 		const params = {
-			output: 'Beauty', enabled: true, traceSource: 'Current', quality: 0.5, intensity: 1,
+			output: 'Beauty', enabled: true, traceSource: 'Per Lookup', quality: 0.5, intensity: 1,
 			maxDistance: 1, thickness: 0.03, binaryRefine: false,
 			roughness: 1, blur: true, blurQuality: 1
 		};
@@ -187,11 +187,17 @@
 				binaryRefine: params.binaryRefine
 			} ).toInspector( 'SSR' );
 
-			// trace the current frame or the previous frame, reprojected per lookup or into a buffer
+			const raw = passTexture( reflection, reflection.getRenderTarget().texture );
+			const blurred = reflection.getTextureNode();
+			const blurEnabled = uniform( 1 );
+			const combined = scenePassColor.rgb.add( mix( raw.rgb, blurred.rgb, blurEnabled ) );
+			const temporalAA = traa( vec4( combined, 1 ), scenePassDepth, scenePassVelocity, camera );
 
-			previousFrame = new PreviousFrameSource( scenePass, scenePassDepth, scenePassVelocity, camera );
+			// trace the previous frame, reprojected per lookup or once per frame into a buffer
 
-			const traceSources = { 'Current': scenePassColor, 'Previous (Velocity)': previousFrame.node, 'Previous (Buffer)': previousFrame.bufferNode };
+			previousFrame = new PreviousFrameSource( scenePass, temporalAA.reprojection );
+
+			const traceSources = { 'Per Lookup': previousFrame.node, 'Buffer': previousFrame.bufferNode };
 
 			function updateTraceSource() {
 
@@ -200,11 +206,7 @@
 
 			}
 
-			const raw = passTexture( reflection, reflection.getRenderTarget().texture );
-			const blurred = reflection.getTextureNode();
-			const blurEnabled = uniform( 1 );
-			const combined = scenePassColor.rgb.add( mix( raw.rgb, blurred.rgb, blurEnabled ) );
-			const spatialAA = smaa( vec4( combined, 1 ) );
+			updateTraceSource();
 
 			function updateOutput() {
 
@@ -212,7 +214,7 @@
 		
 				switch ( params.output ) {
 
-					case 'Beauty': view = spatialAA; break;
+					case 'Beauty': view = temporalAA; break;
 					case 'SSR': view = vec4( raw.rgb, 1 ); break;
 					case 'SSR DN': view = vec4( blurred.rgb, 1 ); break;
 

@@ -52,7 +52,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const params = {
-				output: 'Beauty', traa: true, traceSource: 'Current',
+				output: 'Beauty', traa: true, traceSource: 'Per Lookup',
 				quality: 0.5, binaryRefine: false, maxDistance: 20, thickness: 0.12,
 				denoise: true, lumaPhi: 0.75,
 				roughness: 0.18, animate: true, orbit: false
@@ -228,19 +228,6 @@
 
 				const ssrTexture = ssrNode.getTextureNode();
 
-				// trace the current frame or the previous frame, reprojected per lookup or into a buffer
-
-				previousFrame = new PreviousFrameSource( scenePass, scenePassDepth, scenePassVelocity, camera );
-
-				const traceSources = { 'Current': scenePassColor, 'Previous (Velocity)': previousFrame.node, 'Previous (Buffer)': previousFrame.bufferNode };
-
-				function updateTraceSource() {
-
-					ssrNode.colorNode = traceSources[ params.traceSource ];
-					renderPipeline.needsUpdate = true;
-
-				}
-
 				// denoise
 
 				const temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
@@ -279,6 +266,21 @@
 
 				const temporalAA = traa( vec4( combined, 1 ), scenePassDepth, scenePassVelocity, camera );
 				const spatialAA = smaa( vec4( combined, 1 ) );
+
+				// trace the previous frame, reprojected per lookup or once per frame into a buffer
+
+				previousFrame = new PreviousFrameSource( scenePass, temporalAA.reprojection );
+
+				const traceSources = { 'Per Lookup': previousFrame.node, 'Buffer': previousFrame.bufferNode };
+
+				function updateTraceSource() {
+
+					ssrNode.colorNode = traceSources[ params.traceSource ];
+					renderPipeline.needsUpdate = true;
+
+				}
+
+				updateTraceSource();
 
 				function updateOutput() {
 

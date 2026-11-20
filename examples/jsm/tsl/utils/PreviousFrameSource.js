@@ -1,6 +1,5 @@
 import { Vector2 } from 'three/webgpu';
 import { Fn, float, getViewPosition, isBackgroundDepth, ivec2, positionPrevious, rtt, sample, textureSize, uniform, uv, vec2, vec3, vec4, velocity } from 'three/tsl';
-import { Reprojection } from '../../utils/Reprojection.js';
 
 /**
  * The view-space depth the surface had in the previous frame. It follows both camera
@@ -24,8 +23,11 @@ export const previousViewZ = /*@__PURE__*/ velocity.previousCameraViewMatrix.mul
  * ```js
  * scenePass.setMRT( mrt( { output, velocity: vec4( velocity, 0, previousViewZ ) } ) );
  *
- * const previousFrame = new PreviousFrameSource( scenePass, scenePassDepth, scenePassVelocity, camera );
- * const reflection = ssr( previousFrame.node, scenePassDepth, sceneNormal, { camera } );
+ * const reflection = ssr( scenePassColor, scenePassDepth, sceneNormal, { camera } );
+ * const traaPass = traa( reflection, scenePassDepth, scenePassVelocity, camera );
+ *
+ * const previousFrame = new PreviousFrameSource( scenePass, traaPass.reprojection );
+ * reflection.colorNode = previousFrame.node;
  *
  * renderPipeline.render();
  * previousFrame.update( renderer );
@@ -41,13 +43,12 @@ class PreviousFrameSource {
 	 * Constructs a new previous frame source.
 	 *
 	 * @param {PassNode} scenePass - The scene pass.
-	 * @param {TextureNode} depthNode - The scene's depth.
-	 * @param {TextureNode} velocityNode - The scene's velocity, with {@link previousViewZ} in its alpha channel.
-	 * @param {Camera} camera - The camera the scene is rendered with.
+	 * @param {Reprojection} reprojection - The previous frame's depth and camera matrices, usually shared
+	 * with the TRAA (`traaPass.reprojection`). Its velocity must hold {@link previousViewZ} in the alpha channel.
 	 */
-	constructor( scenePass, depthNode, velocityNode, camera ) {
+	constructor( scenePass, reprojection ) {
 
-		const reprojection = new Reprojection( depthNode, velocityNode, camera );
+		const { depthNode, velocityNode, camera } = reprojection;
 
 		/**
 		 * Holds the previous frame's depth and camera matrices.
@@ -56,6 +57,14 @@ class PreviousFrameSource {
 		 * @type {Reprojection}
 		 */
 		this._reprojection = reprojection;
+
+		/**
+		 * The version of the reprojection after the last update.
+		 *
+		 * @private
+		 * @type {number}
+		 */
+		this._reprojectionVersion = reprojection.version;
 
 		/**
 		 * The TRAA jitter of the current frame in UV space.
@@ -219,21 +228,25 @@ class PreviousFrameSource {
 	}
 
 	/**
-	 * Stores the scene's depth, the camera matrices and the jitter for the next frame.
-	 * Call it once per frame after rendering. It does nothing while the source is unused.
+	 * Stores the jitter for the next frame. Call it once per frame after rendering.
+	 * It also stores the reprojection when its owner did not render this frame.
 	 *
 	 * @param {Renderer} renderer - The renderer.
 	 */
 	update( renderer ) {
 
+		const reprojection = this._reprojection;
+
 		if ( this._used === true ) {
 
-			this._reprojection.update( renderer );
+			if ( reprojection.version === this._reprojectionVersion ) reprojection.update( renderer );
+
 			this._previousJitter.copy( this._jitter );
 
 		}
 
 		this._hasHistory = this._used;
+		this._reprojectionVersion = reprojection.version;
 		this._used = false;
 
 	}
@@ -244,7 +257,6 @@ class PreviousFrameSource {
 	 */
 	dispose() {
 
-		this._reprojection.dispose();
 		this._buffer.dispose();
 
 	}

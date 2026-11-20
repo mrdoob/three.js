@@ -117,19 +117,6 @@
 				giPass.sliceCount.value = 2;
 				giPass.stepCount.value = 8;
 
-				// trace the current frame or the previous frame, reprojected per lookup or into a buffer
-
-				previousFrame = new PreviousFrameSource( scenePass, scenePassDepth, scenePassVelocity, camera );
-
-				const traceSources = { 'Current': scenePassColor, 'Previous (Velocity)': previousFrame.node, 'Previous (Buffer)': previousFrame.bufferNode };
-
-				function updateTraceSource() {
-
-					giPass.beautyNode = traceSources[ params.traceSource ];
-					renderPipeline.needsUpdate = true;
-
-				}
-
 				// composite
 
 				const ao = giPass.getAONode().toInspector( 'SSGI.AO' );
@@ -142,6 +129,19 @@
 
 				const traaPass = traa( compositePass, scenePassDepth, scenePassVelocity, camera );
 				renderPipeline.outputNode = traaPass;
+
+				// trace the previous frame, reprojected per lookup or once per frame into a buffer
+
+				previousFrame = new PreviousFrameSource( scenePass, traaPass.reprojection );
+
+				const traceSources = { 'Per Lookup': previousFrame.node, 'Buffer': previousFrame.bufferNode };
+
+				function updateTraceSource() {
+
+					giPass.beautyNode = traceSources[ params.traceSource ];
+					renderPipeline.needsUpdate = true;
+
+				}
 
 				// Cornell Box inspired scene
 
@@ -235,8 +235,10 @@
 
 				const params = {
 					output: 0,
-					traceSource: 'Current'
+					traceSource: 'Buffer'
 				};
+
+				updateTraceSource();
 
 				const types = { Combined: 0, Direct: 3, AO: 1, GI: 2 };
 
