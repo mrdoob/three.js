@@ -30,7 +30,7 @@ class MRTNode extends OutputStructNode {
 	}
 
 	/**
-	 * Constructs a new output struct node.
+	 * Constructs a new MRT node.
 	 *
 	 * @param {Object<string, Node>} outputNodes - The MRT outputs.
 	 */

@@ -323,7 +323,8 @@ class ShadowBaseNode extends Node {
 
 /**
  * TSL object that represents the world space position used to look up the shadow map when receiving
- * shadows. Defaults to `positionWorld`, or to `material.receivedShadowPositionNode` if set.
+ * shadows. Defaults to `positionWorld`. It is replaced by `material.receivedShadowPositionNode`
+ * if set, or by the ray sample position when rendering volumetric lighting.
  *
  * @tsl
  * @type {Node<vec3>}

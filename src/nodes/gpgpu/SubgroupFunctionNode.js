@@ -23,7 +23,7 @@ class SubgroupFunctionNode extends Node {
 	}
 
 	/**
-	 * Constructs a new function node.
+	 * Constructs a new subgroup function node.
 	 *
 	 * @param {string} method - The subgroup/wave intrinsic method to construct.
 	 * @param {Node} [aNode=null] - The method's first argument.

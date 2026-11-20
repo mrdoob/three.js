@@ -64,7 +64,7 @@ class Texture3DNode extends TextureNode {
 	 * Constructs a new 3D texture node.
 	 *
 	 * @param {Data3DTexture} value - The 3D texture.
-	 * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
+	 * @param {?Node<vec3>} [uvNode=null] - The uv node.
 	 * @param {?Node<int>} [levelNode=null] - The level node.
 	 */
 	constructor( value, uvNode = null, levelNode = null ) {

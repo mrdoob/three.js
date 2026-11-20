@@ -96,7 +96,7 @@ class PassMultipleTextureNode extends PassTextureNode {
 	}
 
 	/**
-	 * Constructs a new pass texture node.
+	 * Constructs a new pass multiple texture node.
 	 *
 	 * @param {PassNode} passNode - The pass node.
 	 * @param {string} textureName - The output texture name.

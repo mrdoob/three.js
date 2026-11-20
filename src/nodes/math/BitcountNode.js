@@ -18,7 +18,7 @@ class BitcountNode extends MathNode {
 	}
 
 	/**
-	 * Constructs a new math node.
+	 * Constructs a new bitcount node.
 	 *
 	 * @param {'countTrailingZeros'|'countLeadingZeros'|'countOneBits'} method - The method name.
 	 * @param {Node} aNode - The first input.

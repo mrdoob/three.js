@@ -713,7 +713,7 @@ export const acosh = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.ACOSH
  * @tsl
  * @function
  * @param {Node | number} y - The y parameter.
- * @param {?(Node | number)} x - The x parameter.
+ * @param {?(Node | number)} [x] - The x parameter.
  * @returns {Node}
  */
 export const atan = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.ATAN ).setParameterLength( 1, 2 );
@@ -1120,7 +1120,8 @@ export const refract = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.REF
 export const smoothstep = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.SMOOTHSTEP ).setParameterLength( 3 );
 
 /**
- * Returns `N` if `dot( Nref, I ) < 0`, otherwise `-N`, so that `N` faces against the incident vector.
+ * Returns `N` if `dot( Nref, I ) < 0`, otherwise `-N`. With `Nref = N`, the result faces
+ * against the incident vector.
  *
  * @tsl
  * @function

@@ -18,7 +18,7 @@ class IsolateNode extends Node {
 	}
 
 	/**
-	 * Constructs a new cache node.
+	 * Constructs a new isolate node.
 	 *
 	 * @param {Node} node - The node that should be cached.
 	 * @param {boolean} [parent=true] - Whether this node refers to a shared parent cache or not.

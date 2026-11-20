@@ -290,7 +290,7 @@ export default StorageTextureNode;
  * @tsl
  * @function
  * @param {StorageTexture} value - The storage texture.
- * @param {?Node<uvec2|uvec3>} uvNode - The integer texel coordinates (not normalized uvs).
+ * @param {?Node<uvec2|uvec3>} [uvNode=null] - The integer texel coordinates (not normalized uvs).
  * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
  * @returns {StorageTextureNode}
  */
