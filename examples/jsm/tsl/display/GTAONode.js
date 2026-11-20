@@ -480,7 +480,7 @@ class GTAONode extends Node {
 
 					// x
 
-					const sampleScreenPositionX = getScreenPositionFromClip( clipPosition.add( clipOffset ) ).toConst();
+					const sampleScreenPositionX = getScreenPositionFromClip( clipPosition.add( clipOffset ) ).mul( depthSize ).floor().add( 0.5 ).div( depthSize ).toConst();
 					const sampleDepthX = sampleDepth( sampleScreenPositionX ).toConst();
 					const sampleSceneViewPositionX = getViewPosition( sampleScreenPositionX, sampleDepthX, this._cameraProjectionMatrixInverse ).toConst();
 					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition ).toConst();
@@ -504,7 +504,7 @@ class GTAONode extends Node {
 
 					// y
 
-					const sampleScreenPositionY = getScreenPositionFromClip( clipPosition.sub( clipOffset ) ).toConst();
+					const sampleScreenPositionY = getScreenPositionFromClip( clipPosition.sub( clipOffset ) ).mul( depthSize ).floor().add( 0.5 ).div( depthSize ).toConst();
 					const sampleDepthY = sampleDepth( sampleScreenPositionY ).toConst();
 					const sampleSceneViewPositionY = getViewPosition( sampleScreenPositionY, sampleDepthY, this._cameraProjectionMatrixInverse ).toConst();
 					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition ).toConst();
