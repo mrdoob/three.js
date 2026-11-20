@@ -54,6 +54,9 @@ class BundleGroup extends Group {
 		 * Adding or removing objects always requires setting the `needsUpdate`
 		 * flag to `true`.
 		 *
+		 * Only used by the WebGPU backend. With the WebGL 2 backend, the group is
+		 * rendered like a regular group and all changes are applied immediately.
+		 *
 		 * @type {boolean}
 		 * @default true
 		 */

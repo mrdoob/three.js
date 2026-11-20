@@ -883,8 +883,7 @@ class WebGLBackend extends Backend {
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
 	 * @param {?(number|Array<number>|IndirectStorageBufferAttribute)} [count=null] - The count of compute invocations. If `null`, the count is determined by the compute node.
-	 * Workgroup grids and indirect dispatches are not supported: only the first element of an array is used as the count of invocations,
-	 * and an indirect storage buffer attribute falls back to the count of the compute node.
+	 * Workgroup grids and indirect dispatches are not supported: only the first element of an array is used as the count of invocations.
 	 */
 	compute( computeGroup, computeNode, bindings, pipeline, count = null ) {
 

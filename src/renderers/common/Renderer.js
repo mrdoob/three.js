@@ -974,8 +974,7 @@ class Renderer {
 
 	/**
 	 * A reference to the canvas element the renderer is drawing to.
-	 * This value of this property will automatically be created by
-	 * the renderer.
+	 * If no `canvas` is passed to the constructor, the renderer creates one.
 	 *
 	 * @type {HTMLCanvasElement|OffscreenCanvas}
 	 */
@@ -2775,7 +2774,7 @@ class Renderer {
 	 * update or `onBeforeRender()`), otherwise it returns `null`.
 	 *
 	 * @param {Object3D} object - The 3D object to test.
-	 * @return {boolean} Whether the 3D object is fully occluded or not.
+	 * @return {?boolean} Whether the 3D object is fully occluded or not.
 	 */
 	isOccluded( object ) {
 
