@@ -190,8 +190,8 @@ class Path extends CurvePath {
 	 * Adds an arc as an instance of {@link EllipseCurve} to the path, positioned relative
 	 * to the current point.
 	 *
-	 * @param {number} [aX=0] - The x coordinate of the center of the arc offsetted from the previous curve.
-	 * @param {number} [aY=0] - The y coordinate of the center of the arc offsetted from the previous curve.
+	 * @param {number} aX - The x offset of the center of the arc from {@link Path#currentPoint}.
+	 * @param {number} aY - The y offset of the center of the arc from {@link Path#currentPoint}.
 	 * @param {number} [aRadius=1] - The radius of the arc.
 	 * @param {number} [aStartAngle=0] - The start angle in radians.
 	 * @param {number} [aEndAngle=Math.PI*2] - The end angle in radians.
@@ -233,8 +233,8 @@ class Path extends CurvePath {
 	 * Adds an ellipse as an instance of {@link EllipseCurve} to the path, positioned relative
 	 * to the current point
 	 *
-	 * @param {number} [aX=0] - The x coordinate of the center of the ellipse offsetted from the previous curve.
-	 * @param {number} [aY=0] - The y coordinate of the center of the ellipse offsetted from the previous curve.
+	 * @param {number} aX - The x offset of the center of the ellipse from {@link Path#currentPoint}.
+	 * @param {number} aY - The y offset of the center of the ellipse from {@link Path#currentPoint}.
 	 * @param {number} [xRadius=1] - The radius of the ellipse in the x axis.
 	 * @param {number} [yRadius=1] - The radius of the ellipse in the y axis.
 	 * @param {number} [aStartAngle=0] - The start angle in radians.

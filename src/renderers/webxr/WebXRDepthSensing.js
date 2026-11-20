@@ -49,7 +49,8 @@ class WebXRDepthSensing {
 		this.texture = null;
 
 		/**
-		 * A plane mesh for visualizing the depth texture.
+		 * A plane mesh that writes the depth of the user's environment into the
+		 * depth buffer so real-world surfaces occlude virtual objects.
 		 *
 		 * @type {?Mesh}
 		 */
@@ -97,10 +98,11 @@ class WebXRDepthSensing {
 	}
 
 	/**
-	 * Returns a plane mesh that visualizes the depth texture.
+	 * Returns a plane mesh that writes the depth of the user's environment into the
+	 * depth buffer so real-world surfaces occlude virtual objects.
 	 *
 	 * @param {ArrayCamera} cameraXR - The XR camera.
-	 * @return {?Mesh} The plane mesh.
+	 * @return {?Mesh} The plane mesh. Returns `null` if no depth texture is available.
 	 */
 	getMesh( cameraXR ) {
 

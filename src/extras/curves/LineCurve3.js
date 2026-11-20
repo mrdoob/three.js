@@ -39,7 +39,7 @@ class LineCurve3 extends Curve {
 		/**
 		 * The end point.
 		 *
-		 * @type {Vector2}
+		 * @type {Vector3}
 		 */
 		this.v2 = v2;
 

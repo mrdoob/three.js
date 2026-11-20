@@ -80,8 +80,9 @@ function mapLinear( x, a1, a2, b1, b2 ) {
 }
 
 /**
- * Returns the percentage in the closed interval `[0, 1]` of the given value
- * between the start and end point.
+ * Returns the interpolation factor of the given value between the start and
+ * end point. The result is not clamped, so values outside of the range produce
+ * factors outside of the closed interval `[0, 1]`.
  *
  * @param {number} x - The start point
  * @param {number} y - The end point.
@@ -222,7 +223,7 @@ function randFloat( low, high ) {
 }
 
 /**
- * Returns a random integer from `<-range/2, range/2>` interval.
+ * Returns a random float from `<-range/2, range/2>` interval.
  *
  * @param {number} range - Defines the value range.
  * @return {number} A random float.
@@ -514,8 +515,9 @@ const MathUtils = {
 	 */
 	mapLinear: mapLinear,
 	/**
-	 * Returns the percentage in the closed interval `[0, 1]` of the given value
-	 * between the start and end point.
+	 * Returns the interpolation factor of the given value between the start and
+	 * end point. The result is not clamped, so values outside of the range produce
+	 * factors outside of the closed interval `[0, 1]`.
 	 *
 	 * @static
 	 * @method
@@ -610,7 +612,7 @@ const MathUtils = {
 	 */
 	randFloat: randFloat,
 	/**
-	 * Returns a random integer from `<-range/2, range/2>` interval.
+	 * Returns a random float from `<-range/2, range/2>` interval.
 	 *
 	 * @static
 	 * @method

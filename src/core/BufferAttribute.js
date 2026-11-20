@@ -156,7 +156,7 @@ class BufferAttribute extends EventDispatcher {
 	 * Flag to indicate that this attribute has changed and should be re-sent to
 	 * the GPU. Set this to `true` when you modify the value of the array.
 	 *
-	 * @type {number}
+	 * @type {boolean}
 	 * @default false
 	 * @param {boolean} value
 	 */
@@ -181,9 +181,10 @@ class BufferAttribute extends EventDispatcher {
 	}
 
 	/**
-	 * Adds a range of data in the data array to be updated on the GPU.
+	 * Adds a range of data in the data array to be updated on the GPU. The ranges are
+	 * applied with the next upload triggered via `needsUpdate` and cleared afterwards.
 	 *
-	 * @param {number} start - Position at which to start update.
+	 * @param {number} start - The index into the array (in elements, not items) at which to start the update.
 	 * @param {number} count - The number of components to update.
 	 */
 	addUpdateRange( start, count ) {

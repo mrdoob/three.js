@@ -1,7 +1,11 @@
 /**
  * @class
- * @classdesc A simple caching system, used internally by {@link FileLoader}.
- * To enable caching across all loaders that use {@link FileLoader}, add `THREE.Cache.enabled = true.` once in your app.
+ * @classdesc A simple caching system, used internally by {@link FileLoader}, {@link ImageLoader}
+ * and {@link ImageBitmapLoader}. To enable caching across all loaders that use these classes, add
+ * `THREE.Cache.enabled = true.` once in your app.
+ *
+ * Keys are the resolved URLs prefixed with the loader type (`file:`, `image:` or `image-bitmap:`).
+ * Blob URLs are never cached.
  * @hideconstructor
  */
 const Cache = {

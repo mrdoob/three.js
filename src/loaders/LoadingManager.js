@@ -21,8 +21,8 @@ class LoadingManager {
 	 * Constructs a new loading manager.
 	 *
 	 * @param {Function} [onLoad] - Executes when all items have been loaded.
-	 * @param {Function} [onProgress] - Executes when single items have been loaded.
-	 * @param {Function} [onError] - Executes when an error occurs.
+	 * @param {Function} [onProgress] - Executes when single items have been loaded. Receives `( url, itemsLoaded, itemsTotal )`.
+	 * @param {Function} [onError] - Executes when an error occurs. Receives the `url` of the item that failed.
 	 */
 	constructor( onLoad, onProgress, onError ) {
 
@@ -38,7 +38,8 @@ class LoadingManager {
 		// in the constructor
 
 		/**
-		 * Executes when an item starts loading.
+		 * Executes when the first item of a new loading batch starts loading.
+		 * Receives `( url, itemsLoaded, itemsTotal )`.
 		 *
 		 * @type {Function|undefined}
 		 * @default undefined
@@ -55,6 +56,7 @@ class LoadingManager {
 
 		/**
 		 * Executes when single items have been loaded.
+		 * Receives `( url, itemsLoaded, itemsTotal )`.
 		 *
 		 * @type {Function|undefined}
 		 * @default undefined
@@ -62,7 +64,7 @@ class LoadingManager {
 		this.onProgress = onProgress;
 
 		/**
-		 * Executes when an error occurs.
+		 * Executes when an error occurs. Receives the `url` of the item that failed.
 		 *
 		 * @type {Function|undefined}
 		 * @default undefined
@@ -186,7 +188,11 @@ class LoadingManager {
 		 * const objectURLs = [];
 		 * manager.setURLModifier( ( url ) => {
 		 *
-		 * 	url = URL.createObjectURL( blobs[ url ] );
+		 * 	// resources of the glTF asset are requested relative to it, e.g. './diffuse.png'
+		 * 	const blob = blobs[ url.replace( /^\.\//, '' ) ];
+		 * 	if ( blob === undefined ) return url;
+		 *
+		 * 	url = URL.createObjectURL( blob );
 		 * 	objectURLs.push( url );
 		 * 	return url;
 		 *
@@ -223,7 +229,7 @@ class LoadingManager {
 		 * manager.addHandler( /\.tga$/i, new TGALoader() );
 		 * ```
 		 *
-		 * @param {string} regex - A regular expression.
+		 * @param {RegExp} regex - A regular expression.
 		 * @param {Loader} loader - A loader that should handle matched cases.
 		 * @return {LoadingManager} A reference to this loading manager.
 		 */
@@ -238,7 +244,7 @@ class LoadingManager {
 		/**
 		 * Removes the loader for the given regular expression.
 		 *
-		 * @param {string} regex - A regular expression.
+		 * @param {RegExp} regex - The same regular expression instance that was passed to {@link LoadingManager#addHandler}.
 		 * @return {LoadingManager} A reference to this loading manager.
 		 */
 		this.removeHandler = function ( regex ) {
@@ -284,7 +290,8 @@ class LoadingManager {
 
 		/**
 		 * Can be used to abort ongoing loading requests in loaders using this manager.
-		 * The abort only works if the loaders implement {@link Loader#abort} and `AbortSignal.any()`
+		 * The abort only works for loaders that observe {@link LoadingManager#abortController}
+		 * (e.g. {@link FileLoader} and {@link ImageBitmapLoader}) and if `AbortSignal.any()`
 		 * is supported in the browser.
 		 *
 		 * @return {LoadingManager} A reference to this loading manager.

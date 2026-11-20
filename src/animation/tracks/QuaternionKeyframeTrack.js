@@ -14,7 +14,7 @@ class QuaternionKeyframeTrack extends KeyframeTrack {
 	 * @param {string} name - The keyframe track's name.
 	 * @param {Array<number>} times - A list of keyframe times.
 	 * @param {Array<number>} values - A list of keyframe values.
-	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} [interpolation] - The interpolation type.
+	 * @param {(InterpolateLinear|InterpolateDiscrete)} [interpolation] - The interpolation type. `InterpolateSmooth` is not supported for quaternions.
 	 */
 	constructor( name, times, values, interpolation ) {
 

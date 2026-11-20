@@ -272,6 +272,9 @@ class WebGLRenderer {
 		/**
 		 * The tone mapping technique of the renderer.
 		 *
+		 * Tone mapping is only applied when rendering to the screen or into an XR render target.
+		 * When a custom render target is set, the output is not tone mapped.
+		 *
 		 * @type {(NoToneMapping|LinearToneMapping|ReinhardToneMapping|CineonToneMapping|ACESFilmicToneMapping|CustomToneMapping|AgXToneMapping|NeutralToneMapping)}
 		 * @default NoToneMapping
 		 */
@@ -775,10 +778,10 @@ class WebGLRenderer {
 		};
 
 		/**
-		 * Returns the current viewport definition.
+		 * Returns the current viewport definition in physical pixels.
 		 *
-		 * @param {Vector2} target - The method writes the result in this target object.
-		 * @return {Vector2} The current viewport definition.
+		 * @param {Vector4} target - The method writes the result in this target object.
+		 * @return {Vector4} The current viewport definition.
 		 */
 		this.getCurrentViewport = function ( target ) {
 
@@ -900,7 +903,7 @@ class WebGLRenderer {
 		 * Sets a custom transparent sort function for the render lists. Pass `null`
 		 * to use the default `reversePainterSortStable` function.
 		 *
-		 * @param {?Function} method - The opaque sort function.
+		 * @param {?Function} method - The transparent sort function.
 		 */
 		this.setTransparentSort = function ( method ) {
 
@@ -925,7 +928,7 @@ class WebGLRenderer {
 		/**
 		 * Sets the clear color and alpha.
 		 *
-		 * @param {Color} color - The clear color.
+		 * @param {(number|Color|string)} color - The clear color.
 		 * @param {number} [alpha=1] - The clear alpha.
 		 */
 		this.setClearColor = function () {
@@ -3144,7 +3147,8 @@ class WebGLRenderer {
 		}
 
 		/**
-		 * Reads the pixel data from the given render target into the given buffer.
+		 * Reads the pixel data from the given render target into the given buffer. The origin
+		 * of the copy region is relative to the lower left corner of the render target.
 		 *
 		 * @param {WebGLRenderTarget} renderTarget - The render target to read from.
 		 * @param {number} x - The `x` coordinate of the copy region's origin.
@@ -3690,6 +3694,9 @@ class WebGLRenderer {
 	/**
 	 * Defines the output color space of the renderer.
 	 *
+	 * The output color space is only applied when rendering to the screen or into an XR render
+	 * target. When a custom render target is set, the output is in the working color space.
+	 *
 	 * @type {SRGBColorSpace|LinearSRGBColorSpace}
 	 * @default SRGBColorSpace
 	 */
@@ -3745,14 +3752,14 @@ class WebGLRenderer {
  * @property {boolean} logarithmicDepthBuffer - `true` if `logarithmicDepthBuffer` was set to `true` in the constructor
  * and no reversed depth buffer is in use.
  * @property {number} maxAttributes - The number of shader attributes that can be used by the vertex shader.
- * @property {number} maxCubemapSize - Maximum height * width of cube map textures that a shader can use.
- * @property {number} maxFragmentUniforms - The number of uniforms that can be used by a fragment shader.
+ * @property {number} maxCubemapSize - The maximum width or height of a cube map face.
+ * @property {number} maxFragmentUniforms - The number of uniform vectors (vec4) that can be used by a fragment shader.
  * @property {number} maxSamples - Maximum number of samples in context of Multisample anti-aliasing (MSAA).
  * @property {number} maxTextures - The maximum number of textures that can be used by a shader.
- * @property {number} maxTextureSize - Maximum height * width of a texture that a shader use.
+ * @property {number} maxTextureSize - The maximum width or height of a texture.
  * @property {number} maxVaryings - The number of varying vectors that can used by shaders.
  * @property {number} maxVertexTextures - The number of textures that can be used in a vertex shader.
- * @property {number} maxVertexUniforms - The maximum number of uniforms that can be used in a vertex shader.
+ * @property {number} maxVertexUniforms - The maximum number of uniform vectors (vec4) that can be used in a vertex shader.
  * @property {string} precision - The shader precision currently being used by the renderer.
  * @property {boolean} reversedDepthBuffer - `true` if `reversedDepthBuffer` was set to `true` in the constructor
  * and the rendering context supports `EXT_clip_control`.

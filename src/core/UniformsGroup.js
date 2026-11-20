@@ -31,7 +31,7 @@ class UniformsGroup extends EventDispatcher {
 		this.isUniformsGroup = true;
 
 		/**
-		 * The ID of the 3D object.
+		 * The ID of the uniforms group.
 		 *
 		 * @name UniformsGroup#id
 		 * @type {number}
@@ -40,7 +40,8 @@ class UniformsGroup extends EventDispatcher {
 		Object.defineProperty( this, 'id', { value: _id ++ } );
 
 		/**
-		 * The name of the uniforms group.
+		 * The name of the uniforms group. Must match the name of the
+		 * respective uniform block in the shader.
 		 *
 		 * @type {string}
 		 */
@@ -125,7 +126,7 @@ class UniformsGroup extends EventDispatcher {
 	 * Frees the GPU-related resources allocated by this instance. Call this
 	 * method whenever this instance is no longer used in your app.
 	 *
-	 * @fires Texture#dispose
+	 * @fires UniformsGroup#dispose
 	 */
 	dispose() {
 

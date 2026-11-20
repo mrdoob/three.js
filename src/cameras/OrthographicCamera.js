@@ -51,7 +51,7 @@ class OrthographicCamera extends Camera {
 
 		/**
 		 * Represents the frustum window specification. This property should not be edited
-		 * directly but via {@link PerspectiveCamera#setViewOffset} and {@link PerspectiveCamera#clearViewOffset}.
+		 * directly but via {@link OrthographicCamera#setViewOffset} and {@link OrthographicCamera#clearViewOffset}.
 		 *
 		 * @type {?Object}
 		 * @default null
@@ -91,7 +91,7 @@ class OrthographicCamera extends Camera {
 		this.bottom = bottom;
 
 		/**
-		 * The camera's near plane. The valid range is greater than `0`
+		 * The camera's near plane. The valid range is greater than or equal to `0`
 		 * and less than the current value of {@link OrthographicCamera#far}.
 		 *
 		 * Note that, unlike for the {@link PerspectiveCamera}, `0` is a

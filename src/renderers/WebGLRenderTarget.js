@@ -8,7 +8,7 @@ import { RenderTarget } from '../core/RenderTarget.js';
 class WebGLRenderTarget extends RenderTarget {
 
 	/**
-	 * Constructs a new 3D render target.
+	 * Constructs a new render target.
 	 *
 	 * @param {number} [width=1] - The width of the render target.
 	 * @param {number} [height=1] - The height of the render target.

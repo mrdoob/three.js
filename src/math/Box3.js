@@ -296,7 +296,7 @@ class Box3 {
 	 * necessary (unless the precise parameter is set to true).
 	 *
 	 * @param {Object3D} object - The 3D object that should expand the bounding box.
-	 * @param {boolean} precise - If set to `true`, the method expands the bounding box
+	 * @param {boolean} [precise=false] - If set to `true`, the method expands the bounding box
 	 * as little as necessary at the expense of more computation.
 	 * @return {Box3} A reference to this bounding box.
 	 */
@@ -734,7 +734,7 @@ class Box3 {
 	}
 
 	/**
-	 * Returns a serialized structure of the bounding box.
+	 * Sets this bounding box from the given serialized structure.
 	 *
 	 * @param {Object} json - The serialized json to set the box from.
 	 * @return {Box3} A reference to this bounding box.

@@ -140,7 +140,7 @@ class LOD extends Object3D {
 	}
 
 	/**
-	 * Removes an existing level, based on the distance from the camera.
+	 * Removes the level whose distance value equals the given distance.
 	 * Returns `true` when the level has been removed. Otherwise `false`.
 	 *
 	 * @param {number} distance - Distance of the level to remove.
@@ -179,8 +179,9 @@ class LOD extends Object3D {
 	}
 
 	/**
-	 * Returns a reference to the first 3D object that is greater than
-	 * the given distance.
+	 * Returns a reference to the 3D object of the level that is active at the
+	 * given distance, i.e. the last level whose distance is less than or equal
+	 * to the given distance.
 	 *
 	 * @param {number} distance - The LOD distance.
 	 * @return {?Object3D} The found 3D object. `null` if no 3D object has been found.
