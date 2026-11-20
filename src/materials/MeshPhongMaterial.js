@@ -256,10 +256,12 @@ class MeshPhongMaterial extends Material {
 		/**
 		 * The red channel of this texture is used as a scalar strength that affects
 		 * both how much the specular surface highlight contributes and how much of
-		 * the environment map affects the surface.
+		 * the environment map reflection blended in via {@link MeshPhongMaterial#combine}
+		 * affects the surface.
 		 *
-		 * `specularMap` represents non-color data. Any texture assigned must have
-		 * `texture.colorSpace = NoColorSpace` (default).
+		 * `specularMap` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `specularMap` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
 		 *
 		 * @type {?Texture}
 		 * @default null

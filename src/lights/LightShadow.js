@@ -127,7 +127,7 @@ class LightShadow {
 
 		/**
 		 * The type of the shadow map's color texture. The default is `UnsignedByteType`.
-		 * Only supported with `WebGPURenderer`.
+		 * Only supported with `WebGPURenderer`, and not for point light shadows.
 		 *
 		 * @type {number}
 		 * @default UnsignedByteType

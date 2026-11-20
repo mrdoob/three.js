@@ -3,8 +3,7 @@ import { BasicDepthPacking } from '../constants.js';
 
 /**
  * A material for drawing geometry by depth. Depth is based off of the camera
- * near and far plane. White is nearest, black is farthest. When the renderer
- * uses a reversed depth buffer, this is inverted.
+ * near and far plane. White is nearest, black is farthest.
  *
  * @augments Material
  * @demo scenes/material-browser.html#MeshDepthMaterial

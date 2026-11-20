@@ -26,8 +26,8 @@ const _tempVec3 = /*@__PURE__*/ new Vector3();
  *
  * Note: After the initial use of a texture, its dimensions, format, and type
  * cannot be changed. Instead, call {@link Texture#dispose} on the texture and instantiate a new one.
- * Changing sampling or upload parameters like wrap modes, filters, anisotropy, `flipY` or
- * `colorSpace` after the initial use requires setting {@link Texture#needsUpdate} to `true`.
+ * Changing sampling or upload parameters like wrap modes, filters, anisotropy or `flipY`
+ * after the initial use requires setting {@link Texture#needsUpdate} to `true`.
  *
  * @augments EventDispatcher
  */

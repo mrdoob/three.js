@@ -108,8 +108,9 @@ class MeshBasicMaterial extends Material {
 		 * The red channel of this texture is used as a scalar strength that affects
 		 * how much of the environment map affects the surface.
 		 *
-		 * `specularMap` represents non-color data. Any texture assigned must have
-		 * `texture.colorSpace = NoColorSpace` (default).
+		 * `specularMap` represents color data, and the texture must be assigned a
+		 * {@link Texture#colorSpace}. Most `specularMap` textures set
+		 * `texture.colorSpace = SRGBColorSpace`.
 		 *
 		 * @type {?Texture}
 		 * @default null
