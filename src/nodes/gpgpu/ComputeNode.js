@@ -294,9 +294,12 @@ export const computeKernel = ( node, workgroupSize = [ 64 ] ) => {
  * @function
  * @param {Node} node - The TSL logic for the compute shader.
  * @param {number|Array<number>|IndirectStorageBufferAttribute} count - The compute count or dispatch size.
+ * A number defines the total number of invocations. An array [x, y, z] defines the size of the
+ * workgroup grid, so x * y * z * workgroupSize invocations are executed. An `IndirectStorageBufferAttribute`
+ * defines the workgroup grid via its first three values.
  * @param {Array<number>} [workgroupSize=[64]] - The workgroup size.
  * @returns {ComputeNode}
-,  */
+ */
 export const compute = ( node, count, workgroupSize ) => {
 
 	const computeNode = computeKernel( node, workgroupSize );

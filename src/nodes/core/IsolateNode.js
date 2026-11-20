@@ -110,11 +110,12 @@ class IsolateNode extends Node {
 export default IsolateNode;
 
 /**
- * TSL function for creating a cache node.
+ * TSL function for building a node in isolation. Nodes built inside it are not
+ * reused by the rest of the shader, while nodes already built outside it are still shared.
  *
  * @tsl
  * @function
- * @param {Node} node - The node that should be cached.
+ * @param {Node} node - The node to build in isolation.
  * @returns {IsolateNode}
  */
 export const isolate = ( node ) => new IsolateNode( nodeObject( node ) );

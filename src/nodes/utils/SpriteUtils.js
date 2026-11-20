@@ -19,7 +19,7 @@ import { Fn, defined, nodeObject, vec3, vec4 } from '../tsl/TSLBase.js';
  * @param {boolean} [config.horizontal=true] - Whether to follow the camera rotation horizontally or not.
  * @param {boolean} [config.vertical=false] - Whether to follow the camera rotation vertically or not.
  * @param {boolean} [config.horizontalRotation=false] - Whether to rotate around the Y axis to face the camera.
- * @return {Node<vec3>} The updated vertex position in clip space.
+ * @return {Node<vec4>} The updated vertex position in clip space.
  */
 export const billboarding = /*@__PURE__*/ Fn( ( { position = null, horizontal = true, vertical = false, horizontalRotation = false } ) => {
 

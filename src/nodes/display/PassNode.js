@@ -1001,7 +1001,7 @@ class PassNode extends Node {
 	}
 
 	/**
-	 * Sets the size of the pass's render target. Honors the pixel ratio.
+	 * Sets the size of the pass's render target in physical pixels. The size is multiplied by the resolution scale.
 	 *
 	 * @param {number} width - The width to set.
 	 * @param {number} height - The height to set.

@@ -541,7 +541,7 @@ export const subgroupBroadcast = /*@__PURE__*/ nodeProxyAssignable( SubgroupFunc
  *
  * @tsl
  * @method
- * @param {number} v - The value to return from subgroup invocation id^mask.
+ * @param {number} v - The value to return from subgroup invocation id.
  * @param {number} id - The subgroup invocation which returns the value v.
  * @return {number} The broadcast value.
  */
@@ -563,8 +563,8 @@ export const subgroupShuffleXor = /*@__PURE__*/ nodeProxyAssignable( SubgroupFun
  *
  * @tsl
  * @method
- * @param {number} v - The value to return from subgroup invocation id^mask.
- * @param {number} delta - A value that offsets the current in.
+ * @param {number} v - The value to return from subgroup invocation subgroup_invocation_id - delta.
+ * @param {number} delta - A value that offsets the current subgroup invocation.
  * @return {number} The broadcast value.
  */
 export const subgroupShuffleUp = /*@__PURE__*/ nodeProxyAssignable( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_SHUFFLE_UP ).setParameterLength( 2 );
@@ -574,7 +574,7 @@ export const subgroupShuffleUp = /*@__PURE__*/ nodeProxyAssignable( SubgroupFunc
  *
  * @tsl
  * @method
- * @param {number} v - The value to return from subgroup invocation id^mask.
+ * @param {number} v - The value to return from subgroup invocation subgroup_invocation_id + delta.
  * @param {number} delta - A value that offsets the current subgroup invocation.
  * @return {number} The broadcast value.
  */

@@ -462,7 +462,9 @@ export const mul = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '*' ).setPar
 export const div = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '/' ).setParameterLength( 2, Infinity ).setName( 'div' );
 
 /**
- * Computes the remainder of dividing the first node by the second one.
+ * Computes the remainder of dividing the first node by the second one. Float operands
+ * use floored modulo (`a - b * floor( a / b )`, the result has the sign of `b`), integer
+ * operands use the truncated `%` remainder.
  *
  * @tsl
  * @function
@@ -595,8 +597,7 @@ export const bitAnd = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '&' ).set
  *
  * @tsl
  * @function
- * @param {Node} a - The first input.
- * @param {Node} b - The second input.
+ * @param {Node} a - The input value.
  * @returns {OperatorNode}
  */
 export const bitNot = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '~' ).setParameterLength( 1 ).setName( 'bitNot' );

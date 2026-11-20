@@ -6,7 +6,7 @@ import { Fn } from '../tsl/TSLBase.js';
  *
  * @tsl
  * @function
- * @param {Node<vec2>} coord - The uv coordinates.
+ * @param {Node<vec2>} [coord=uv()] - The uv coordinates.
  * @return {Node<float>} The result data.
  */
 export const checker = /*@__PURE__*/ Fn( ( [ coord = uv() ] ) => {

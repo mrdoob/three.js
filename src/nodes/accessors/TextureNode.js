@@ -1127,9 +1127,8 @@ export const uniformTexture = ( value = EmptyTexture ) => {
  * @tsl
  * @function
  * @param {?(Texture|TextureNode)} [value=EmptyTexture] - The texture.
- * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
+ * @param {?Node<ivec2|uvec2>} [uvNode=null] - The integer texel coordinates (not normalized uvs).
  * @param {?Node<int>} [levelNode=null] - The level node.
- * @param {?Node<float>} [biasNode=null] - The bias node.
  * @returns {TextureNode}
  */
 export const textureLoad = ( ...params ) => texture( ...params ).setSampler( false );
