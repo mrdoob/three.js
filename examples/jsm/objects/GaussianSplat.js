@@ -629,16 +629,24 @@ function createGeometry( count ) {
 
 }
 
+/**
+ * Packs two numbers as half floats into one 32-bit word, the first in the low 16 bits.
+ *
+ * @param {number} a - The value to pack into the low 16 bits of the 32-bit word.
+ * @param {number} b - The value to pack into the high 16 bits of the 32-bit word.
+ * @return {number} The U32 value that holds the two packed FP16 values.
+ */
+function packHalfFloatsToUint( a, b ) {
+
+	return ( toHalfFloat( a ) | ( toHalfFloat( b ) << 16 ) ) >>> 0;
+
+}
+
 function createStorageBuffers( count, centers, covariances, colors, sphericalHarmonics ) {
 
 	// Each splat is stored in two vec4 words (32 bytes):
-	//
 	// - center: xyz is the position, w is the scale of the covariance
 	// - splat: xyz holds the six covariance values as half floats, w the RGBA8 color
-	//
-	// To keep the covariance precise, the six values are divided by the largest
-	// absolute value before they are converted. This keeps the half floats in the
-	// [ -1, 1 ] range, where they are most precise.
 
 	const centerData = new Float32Array( count * 4 );
 	const splatData = new Uint32Array( count * 4 );
@@ -665,9 +673,9 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 		centerData[ i4 + 2 ] = centers[ i3 + 2 ];
 		centerData[ i4 + 3 ] = scale;
 
-		splatData[ i4 ] = DataUtils.packHalfFloatsToUint( c00 * invScale, c01 * invScale );
-		splatData[ i4 + 1 ] = DataUtils.packHalfFloatsToUint( c02 * invScale, c11 * invScale );
-		splatData[ i4 + 2 ] = DataUtils.packHalfFloatsToUint( c12 * invScale, c22 * invScale );
+		splatData[ i4 ] = packHalfFloatsToUint( c00 * invScale, c01 * invScale );
+		splatData[ i4 + 1 ] = packHalfFloatsToUint( c02 * invScale, c11 * invScale );
+		splatData[ i4 + 2 ] = packHalfFloatsToUint( c12 * invScale, c22 * invScale );
 
 		splatData[ i4 + 3 ] = ( colors[ i4 ] |
 			colors[ i4 + 1 ] << 8 |
