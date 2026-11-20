@@ -5,6 +5,7 @@ import {
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	Mesh,
+	Node,
 	RedFormat,
 	RepeatWrapping,
 	Vector3,
@@ -13,7 +14,7 @@ import {
 	warnOnce
 } from 'three/webgpu';
 
-import { Fn, float, floor, fract, vec2, vec3, abs, acos, add, mul, clamp, dot, exp, inverseSqrt, max, min, mix, modelViewProjection, normalize, positionWorld, smoothstep, sqrt, sub, varyingProperty, vec4, uniform, cameraPosition, time, If, Loop, rtt, uv, log2 } from 'three/tsl';
+import { Fn, float, floor, fract, vec2, vec3, abs, acos, add, mul, clamp, dot, exp, inverseSqrt, max, min, mix, modelViewProjection, nodeObject, normalize, positionWorld, smoothstep, sqrt, sub, vec4, uniform, cameraPosition, time, If, Loop, rtt, uv, log2 } from 'three/tsl';
 
 // The cloud noise is baked into a texture of NOISE_SIZE texels that tiles over NOISE_CELLS noise cells.
 const NOISE_SIZE = 512;
@@ -66,46 +67,41 @@ const noise = /*@__PURE__*/ Fn( ( [ p ] ) => {
 }, { p: 'vec2', return: 'float' } );
 
 /**
- * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight](https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight)
- * aka The Preetham Model, the de facto standard for analytical skydomes.
- *
- * Note that this class can only be used with {@link WebGPURenderer}.
- * When using {@link WebGLRenderer}, use {@link Sky}.
- *
- * More references:
- *
- * - {@link http://simonwallner.at/project/atmospheric-scattering/}
- * - {@link http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR}
+ * The sky in a given direction, as drawn by {@link SkyMesh}. It can be sampled by direction on its own, for example to
+ * render an environment map.
  *
  * ```js
- * const sky = new SkyMesh();
- * sky.scale.setScalar( 10000 );
- * scene.add( sky );
+ * const skyNode = sky( directionNode );
+ * skyNode.sunPosition.value.copy( sunDirection );
+ * material.colorNode = skyNode;
  * ```
  *
- * It can be useful to hide the sun disc when generating an environment map to avoid artifacts
- *
- * ```js
- * // disable before rendering environment map
- * sky.showSunDisc.value = false;
- * // ...
- * // re-enable before scene sky box rendering
- * sky.showSunDisc.value = true;
- * ```
- *
- * @augments Mesh
- * @three_import import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
+ * @augments Node
+ * @three_import import { sky } from 'three/addons/objects/SkyMesh.js';
  */
-class SkyMesh extends Mesh {
+class SkyNode extends Node {
+
+	static get type() {
+
+		return 'SkyNode';
+
+	}
 
 	/**
-	 * Constructs a new skydome.
+	 * Constructs a new sky node.
+	 *
+	 * @param {Node<vec3>} directionNode - The direction to sample the sky in.
 	 */
-	constructor() {
+	constructor( directionNode ) {
 
-		const material = new NodeMaterial();
+		super( 'vec4' );
 
-		super( new BoxGeometry( 1, 1, 1 ), material );
+		/**
+		 * The direction to sample the sky in.
+		 *
+		 * @type {Node<vec3>}
+		 */
+		this.directionNode = directionNode;
 
 		/**
 		 * The atmospheric turbidity which controls the amount of haze.
@@ -248,35 +244,48 @@ class SkyMesh extends Mesh {
 		 */
 		this.showSunDisc = uniform( 1 );
 
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 * @deprecated Use isSkyMesh instead.
-		 */
-		this.isSky = true; // @deprecated, r182
+		// The clouds read their gradient noise from a tiling, mipmapped texture. It is
+		// rendered once on the GPU, the first time the sky is drawn.
 
 		/**
-		 * This flag can be used for type testing.
+		 * The node holding the baked cloud noise.
 		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
+		 * @private
+		 * @type {RTTNode}
 		 */
-		this.isSkyMesh = true;
+		this._noiseTexture = rtt( noise( uv().mul( NOISE_CELLS ) ), NOISE_SIZE, NOISE_SIZE, {
+			format: RedFormat,
+			depthBuffer: false,
+			generateMipmaps: true,
+			minFilter: LinearMipmapLinearFilter,
+			magFilter: LinearFilter,
+			wrapS: RepeatWrapping,
+			wrapT: RepeatWrapping,
+			autoUpdate: false
+		} );
 
-		// Varyings
+	}
 
-		const vSunDirection = varyingProperty( 'vec3' );
-		const vSunE = varyingProperty( 'vec3' );
-		const vSunFex = varyingProperty( 'vec3' );
-		const vBetaR = varyingProperty( 'vec3' );
-		const vBetaM = varyingProperty( 'vec3' );
-		const vBetaMExt = varyingProperty( 'vec3' );
+	setup() {
 
-		const vertexNode = /*@__PURE__*/ Fn( ( builder ) => {
+		const noiseTexture = this._noiseTexture;
+
+		// the angle covered by one pixel at the centre of the view, and the view direction,
+		// to pick the mipmap level of the cloud noise
+
+		const pixelAngle = uniform( 0.001 ).onRenderUpdate( ( { renderer, camera } ) => {
+
+			const renderTarget = renderer.getRenderTarget();
+			const height = renderTarget !== null ? renderTarget.viewport.w : renderer.getViewport( _viewport ).w * renderer.getPixelRatio();
+
+			return 2 / ( camera.projectionMatrix.elements[ 5 ] * height );
+
+		} );
+
+		const viewDirection = new Vector3( 0, 0, - 1 );
+		const cameraDirection = uniform( viewDirection ).onRenderUpdate( ( { camera } ) => viewDirection.setFromMatrixColumn( camera.matrixWorld, 2 ).negate() );
+
+		const colorNode = /*@__PURE__*/ Fn( () => {
 
 			// wavelength of used primaries, according to preetham
 			// const lambda = vec3( 680E-9, 550E-9, 450E-9 );
@@ -297,12 +306,12 @@ class SkyMesh extends Mesh {
 			const steepness = float( 1.5 );
 			const EE = float( 1000.0 );
 
-			// varying sun position
+			// sun position
 
 			const sunDirection = normalize( this.sunPosition );
-			vSunDirection.assign( sunDirection );
+			const vSunDirection = sunDirection;
 
-			// varying sun intensity
+			// sun intensity
 
 			const angle = sunDirection.y;
 			const zenithAngleCos = clamp( angle, - 1, 1 );
@@ -312,84 +321,36 @@ class SkyMesh extends Mesh {
 			const sunCos = max( 0.0, angle );
 			const sunOzoneAirMass = float( 1.0 ).div( sqrt( sunCos.mul( sunCos ).add( 0.004 ) ) );
 			const ozoneExtinction = this.absorptionColor.mul( this.absorptionScale.mul( 0.016 ) );
-			vSunE.assign( exp( ozoneExtinction.mul( sunOzoneAirMass ).negate() ).mul( sunIntensity ) );
+			const vSunE = exp( ozoneExtinction.mul( sunOzoneAirMass ).negate() ).mul( sunIntensity );
 
 			// sun fade
 
 			const sunfade = float( 1.0 ).sub( clamp( float( 1.0 ).sub( exp( sunDirection.y ) ), 0, 1 ) );
 
-			// varying vBetaR
+			// vBetaR
 
 			const rayleighCoefficient = max( 0.0, this.rayleigh.sub( float( 1.0 ).sub( sunfade ) ) );
 			const betaR = totalRayleigh.mul( rayleighCoefficient );
 
 			// extinction (absorption + out scattering)
 			// rayleigh coefficients
-			vBetaR.assign( betaR );
+			const vBetaR = betaR;
 
-			// varying vBetaM, the aerosols scatter mieAlbedo of the light they extinguish
+			// vBetaM, the aerosols scatter mieAlbedo of the light they extinguish
 
-			const c = float( 0.2 ).mul( this.turbidity ).mul( 10E-18 );
-			const totalMie = float( 0.434 ).mul( c ).mul( MieConst );
+			const concentration = float( 0.2 ).mul( this.turbidity ).mul( 10E-18 );
+			const totalMie = float( 0.434 ).mul( concentration ).mul( MieConst );
 			const betaMExt = totalMie.mul( this.mieCoefficient ).mul( this.mieColor );
 			const betaM = betaMExt.mul( this.mieAlbedo );
 
-			vBetaM.assign( betaM );
-			vBetaMExt.assign( betaMExt );
+			const vBetaM = betaM;
+			const vBetaMExt = betaMExt;
 
 			// sun-path transmittance through lower troposphere to cloud altitude (~2km)
 
 			const sunCloudCos = max( 0.0, angle.add( 0.03 ) );
 			const sunCloudAirMass = float( 2.0 ).div( sunCloudCos.add( sqrt( sunCloudCos.mul( sunCloudCos ).add( 0.012 ) ) ) );
-			vSunFex.assign( exp( betaR.mul( 4600.0 ).add( betaMExt.mul( 190.0 ) ).mul( sunCloudAirMass ).negate() ) );
-
-			// position
-
-			const position = modelViewProjection;
-			position.z.assign( builder.renderer.reversedDepthBuffer === true ? 0 : position.w ); // set z to camera.far
-
-			return position;
-
-		} )();
-
-		// The clouds read their gradient noise from a tiling, mipmapped texture. It is
-		// rendered once on the GPU, the first time the sky is drawn.
-
-		const noiseTexture = rtt( noise( uv().mul( NOISE_CELLS ) ), NOISE_SIZE, NOISE_SIZE, {
-			format: RedFormat,
-			depthBuffer: false,
-			generateMipmaps: true,
-			minFilter: LinearMipmapLinearFilter,
-			magFilter: LinearFilter,
-			wrapS: RepeatWrapping,
-			wrapT: RepeatWrapping,
-			autoUpdate: false
-		} );
-
-		/**
-		 * The node holding the baked cloud noise.
-		 *
-		 * @private
-		 * @type {RTTNode}
-		 */
-		this._noiseTexture = noiseTexture;
-
-		// the angle covered by one pixel at the centre of the view, and the view direction,
-		// to pick the mipmap level of the cloud noise
-
-		const pixelAngle = uniform( 0.001 ).onRenderUpdate( ( { renderer, camera } ) => {
-
-			const renderTarget = renderer.getRenderTarget();
-			const height = renderTarget !== null ? renderTarget.viewport.w : renderer.getViewport( _viewport ).w * renderer.getPixelRatio();
-
-			return 2 / ( camera.projectionMatrix.elements[ 5 ] * height );
-
-		} );
-
-		const viewDirection = new Vector3( 0, 0, - 1 );
-		const cameraDirection = uniform( viewDirection ).onRenderUpdate( ( { camera } ) => viewDirection.setFromMatrixColumn( camera.matrixWorld, 2 ).negate() );
-
-		const colorNode = /*@__PURE__*/ Fn( () => {
+			const vSunFex = exp( betaR.mul( 4600.0 ).add( betaMExt.mul( 190.0 ) ).mul( sunCloudAirMass ).negate() );
 
 			// optical length at zenith for molecules
 			const rayleighZenithLength = float( 8.4E3 );
@@ -404,7 +365,7 @@ class SkyMesh extends Mesh {
 
 			//
 
-			const direction = normalize( positionWorld.sub( cameraPosition ) );
+			const direction = normalize( this.directionNode );
 
 			// optical length (rational Kasten-Young air mass fit, <0.06% error on [0, 1])
 			const cosZenith = max( 0.0, direction.y );
@@ -696,12 +657,125 @@ class SkyMesh extends Mesh {
 
 		} )();
 
+		return colorNode;
+
+	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever the sky is no longer used in your app.
+	 */
+	dispose() {
+
+		this._noiseTexture.dispose();
+
+		super.dispose();
+
+	}
+
+}
+
+/**
+ * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight](https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight)
+ * aka The Preetham Model, the de facto standard for analytical skydomes.
+ *
+ * Note that this class can only be used with {@link WebGPURenderer}.
+ * When using {@link WebGLRenderer}, use {@link Sky}.
+ *
+ * More references:
+ *
+ * - {@link http://simonwallner.at/project/atmospheric-scattering/}
+ * - {@link http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR}
+ *
+ * ```js
+ * const sky = new SkyMesh();
+ * sky.scale.setScalar( 10000 );
+ * scene.add( sky );
+ * ```
+ *
+ * It can be useful to hide the sun disc when generating an environment map to avoid artifacts
+ *
+ * ```js
+ * // disable before rendering environment map
+ * sky.showSunDisc.value = false;
+ * // ...
+ * // re-enable before scene sky box rendering
+ * sky.showSunDisc.value = true;
+ * ```
+ *
+ * @augments Mesh
+ * @three_import import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
+ */
+class SkyMesh extends Mesh {
+
+	/**
+	 * Constructs a new skydome.
+	 */
+	constructor() {
+
+		const material = new NodeMaterial();
+
+		super( new BoxGeometry( 1, 1, 1 ), material );
+
+		/**
+		 * The sky drawn by the skydome, in the view direction. Its uniforms are also available on the skydome.
+		 *
+		 * @type {SkyNode}
+		 */
+		this.skyNode = new SkyNode( positionWorld.sub( cameraPosition ) );
+
+		this.turbidity = this.skyNode.turbidity;
+		this.rayleigh = this.skyNode.rayleigh;
+		this.mieCoefficient = this.skyNode.mieCoefficient;
+		this.mieDirectionalG = this.skyNode.mieDirectionalG;
+		this.mieDirectionalGSpread = this.skyNode.mieDirectionalGSpread;
+		this.mieColor = this.skyNode.mieColor;
+		this.mieAlbedo = this.skyNode.mieAlbedo;
+		this.absorptionScale = this.skyNode.absorptionScale;
+		this.absorptionColor = this.skyNode.absorptionColor;
+		this.sunPosition = this.skyNode.sunPosition;
+		this.sunSize = this.skyNode.sunSize;
+		this.cloudScale = this.skyNode.cloudScale;
+		this.cloudSpeed = this.skyNode.cloudSpeed;
+		this.cloudCoverage = this.skyNode.cloudCoverage;
+		this.cloudDensity = this.skyNode.cloudDensity;
+		this.cloudElevation = this.skyNode.cloudElevation;
+		this.showSunDisc = this.skyNode.showSunDisc;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 * @deprecated Use isSkyMesh instead.
+		 */
+		this.isSky = true; // @deprecated, r182
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isSkyMesh = true;
+
+		const vertexNode = /*@__PURE__*/ Fn( ( builder ) => {
+
+			const position = modelViewProjection;
+			position.z.assign( builder.renderer.reversedDepthBuffer === true ? 0 : position.w ); // set z to camera.far
+
+			return position;
+
+		} )();
+
 		material.side = BackSide;
 		material.depthWrite = false;
 		material.fog = false;
 
 		material.vertexNode = vertexNode;
-		material.colorNode = colorNode;
+		material.colorNode = this.skyNode;
 
 	}
 
@@ -714,10 +788,20 @@ class SkyMesh extends Mesh {
 		this.geometry.dispose();
 		this.material.dispose();
 
-		this._noiseTexture.dispose();
+		this.skyNode.dispose();
 
 	}
 
 }
 
-export { SkyMesh };
+/**
+ * TSL function that creates a sky node, sampling the sky in the given direction.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec3>} directionNode - The direction to sample the sky in.
+ * @returns {SkyNode}
+ */
+const sky = ( directionNode ) => new SkyNode( nodeObject( directionNode ) );
+
+export { SkyMesh, SkyNode, sky };
