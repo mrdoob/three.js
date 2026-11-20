@@ -137,7 +137,7 @@
 				const normalTexture = prePass.getTexture( 'output' );
 				normalTexture.type = THREE.UnsignedByteType;
 
-				// resolution: the AO is computed from downsampled inputs and upsampled afterwards
+				// downsample: the AO is computed from downsampled inputs and upsampled afterwards
 
 				const downsample = depthAwareDownsample( hiZ( prePassDepth, { maxLevel: 2 } ), { normal: prePass.getTextureNode() } );
 				downsample.level = params.downsample;
@@ -561,9 +561,9 @@
 				gui.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters ).debounce( 250 );
 				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
 
-				const resolutionFolder = gui.addFolder( 'Resolution' );
-				const downsampleControl = resolutionFolder.add( params, 'downsample', { '1': 0, '2': 1, '4': 2 } ).onChange( ( value ) => downsample.level = Number( value ) );
-				resolutionFolder.add( params, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 );
+				const downsampleFolder = gui.addFolder( 'Downsample' );
+				const downsampleControl = downsampleFolder.add( params, 'downsample', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => downsample.level = Number( value ) );
+				downsampleFolder.add( params, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 );
 
 				const gtaoControls = [
 					gui.add( params, 'scale', 0.01, 2 ).onChange( updateParameters ),

@@ -157,7 +157,7 @@
 
 				} );
 
-				// resolution: the GI is computed from downsampled inputs and upsampled afterwards
+				// downsample: the GI is computed from downsampled inputs and upsampled afterwards
 
 				const downsample = depthAwareDownsample( hiZ( scenePassDepth, { maxLevel: 2 } ), { normal: scenePassNormal } );
 				downsample.level = 0;
@@ -200,13 +200,13 @@
 				const traaPass = traa( compositePass, scenePassDepth, scenePassVelocity, camera );
 				renderPipeline.outputNode = traaPass;
 
-				// resolution
+				// downsample
 
-				const resolution = { downsample: 0, upsampler: 'Joint bilateral' };
+				const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
 
-				const resolutionGui = renderer.inspector.createParameters( 'Resolution' );
-				resolutionGui.add( resolution, 'downsample', { '1': 0, '2': 1, '4': 2 } ).onChange( ( value ) => downsample.level = Number( value ) );
-				resolutionGui.add( resolution, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 );
+				const downsampleGui = renderer.inspector.createParameters( 'Downsample' );
+				downsampleGui.add( downsampleParams, 'level', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => downsample.level = Number( value ) );
+				downsampleGui.add( downsampleParams, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 );
 
 				// light
 
