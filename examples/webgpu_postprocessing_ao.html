@@ -139,7 +139,7 @@
 
 				// resolution: the AO is computed from downsampled inputs and upsampled afterwards
 
-				const downsample = depthAwareDownsample( hiZ( prePassDepth, { maxLevel: 3 } ), { normal: prePass.getTextureNode() } );
+				const downsample = depthAwareDownsample( hiZ( prePassDepth, { maxLevel: 2 } ), { normal: prePass.getTextureNode() } );
 				downsample.level = params.downsample;
 
 				const downsampleDepth = downsample.getTextureNode( 'depth' );
@@ -562,7 +562,7 @@
 				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
 
 				const resolutionFolder = gui.addFolder( 'Resolution' );
-				const downsampleControl = resolutionFolder.add( params, 'downsample', { '1': 0, '2': 1, '4': 2, '8': 3 } ).onChange( ( value ) => downsample.level = Number( value ) );
+				const downsampleControl = resolutionFolder.add( params, 'downsample', { '1': 0, '2': 1, '4': 2 } ).onChange( ( value ) => downsample.level = Number( value ) );
 				resolutionFolder.add( params, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 );
 
 				const gtaoControls = [

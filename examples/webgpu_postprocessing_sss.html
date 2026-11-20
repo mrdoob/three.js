@@ -40,8 +40,11 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, vec3, vec4, mrt, screenUV, velocity, builtinShadowContext } from 'three/tsl';
+			import { pass, vec3, vec4, mrt, rtt, uniform, screenUV, velocity, builtinShadowContext } from 'three/tsl';
 			import { sss } from 'three/addons/tsl/display/SSSNode.js';
+			import { hiZ } from 'three/addons/tsl/display/HiZNode.js';
+			import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
+			import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -155,13 +158,24 @@
 
 				// sss
 
-				const sssPass = sss( prePassDepth, camera, dirLight );
+				// resolution: the shadows are computed from a downsampled depth and upsampled afterwards
+
+				const downsample = depthAwareDownsample( hiZ( prePassDepth, { maxLevel: 2 } ) );
+				downsample.level = 0;
+
+				const downsampleDepth = downsample.getTextureNode( 'depth' );
+
+				// without depth rejection, the joint bilateral filter is a bilinear filter
+
+				const depthTolerance = uniform( 0.005 );
+
+				const sssPass = sss( downsampleDepth, camera, dirLight );
 				sssPass.maxDistance.value = 0.2;
 				sssPass.useTemporalFiltering = true;
 
 				// scene context
 
-				const sssSample = sssPass.getTextureNode().sample( screenUV ).r;
+				const sssSample = rtt( jointBilateralUpsample( sssPass.getTextureNode(), downsampleDepth, prePassDepth, camera, { depthTolerance } ).sample( screenUV ) ).sample( screenUV ).r;
 				const sssContext = builtinShadowContext( sssSample, dirLight );
 
 				scenePass.contextNode = sssContext;
@@ -196,13 +210,19 @@
 				gui.add( sssPass.thickness, 'value', 0.01, 0.1 ).name( 'thickness' );
 				gui.add( sssPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );
 
+				const resolution = { downsample: 0, upsampler: 'Joint bilateral' };
+
+				const resolutionGui = renderer.inspector.createParameters( 'Resolution' );
+				resolutionGui.add( resolution, 'downsample', { '1': 0, '2': 1, '4': 2 } ).onChange( ( value ) => downsample.level = Number( value ) );
+				resolutionGui.add( resolution, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 );
+
 				function updatePostprocessing() {
 
 					scenePass.contextNode = params.output !== 1 ? sssContext : null;
 
 					if ( params.output === 2 ) {
 
-						renderPipeline.outputNode = vec4( vec3( sssPass.r ), 1 );
+						renderPipeline.outputNode = vec4( vec3( sssSample ), 1 );
 
 					} else {
 
