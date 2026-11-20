@@ -2688,7 +2688,7 @@ class Renderer {
 	/**
 	 * Defines the clear color and optionally the clear alpha.
 	 *
-	 * @param {Color} color - The clear color.
+	 * @param {(number|Color|string)} color - The clear color.
 	 * @param {number} [alpha=1] - The clear alpha.
 	 */
 	setClearColor( color, alpha = 1 ) {
