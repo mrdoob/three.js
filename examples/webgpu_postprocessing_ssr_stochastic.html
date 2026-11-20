@@ -57,8 +57,11 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
+		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation, rtt } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+		import { hiZ } from 'three/addons/tsl/display/HiZNode.js';
+		import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
+		import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 		import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 		import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
@@ -157,7 +160,7 @@
 			},
 		};
 
-		let camera, scene, model, renderer, renderPipeline, ssrNode, temporalReprojectNode, denoiseNode;
+		let camera, scene, model, renderer, renderPipeline, ssrNode, ssrTexture, temporalReprojectNode, denoiseNode;
 		let controls;
 		let combinedOutputNode, scenePassColor, scenePassDepth, scenePassVelocity;
 		let gammaUniform, contrastUniform, saturationUniform;
@@ -272,17 +275,33 @@
 				scenePassVelocity.sample( uv ).z
 			) ).toInspector( 'Metalness/Roughness' );
 
-			ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+			// resolution: the reflections are computed from downsampled inputs and upsampled afterwards
+
+			const downsample = depthAwareDownsample( hiZ( scenePassDepth, { maxLevel: 3 } ), { normal: scenePassNormal, diffuseColor: scenePassDiffuseColor, velocity: scenePassVelocity } );
+			downsample.level = 0;
+
+			const downsampleDepth = downsample.getTextureNode( 'depth' );
+			const downsampleDiffuseColor = downsample.getTextureNode( 'diffuseColor' );
+			const downsampleNormal = sample( ( uv ) => normalDecode( downsample.getTextureNode( 'normal' ).sample( uv ) ) );
+
+			// without depth rejection, the joint bilateral filter is a bilinear filter
+
+			const depthTolerance = uniform( 0.005 );
+			const upsample = ( node ) => rtt( jointBilateralUpsample( node, downsampleDepth, scenePassDepth, camera, { depthTolerance } ).sample( screenUV ) );
+
+			ssrNode = ssr( scenePassColor, downsampleDepth, downsampleNormal, {
 				stochastic: true,
-				diffuseNode: scenePassDiffuseColor,
-				metalnessNode: scenePassDiffuseColor.a,
-				roughnessNode: scenePassVelocity.z,
+				diffuseNode: downsampleDiffuseColor,
+				metalnessNode: downsampleDiffuseColor.a,
+				roughnessNode: downsample.getTextureNode( 'velocity' ).z,
 				environmentNode: hdrTexture,
 				envImportanceSampling: params.ssr.envImportanceSampling,
 				binaryRefine: params.ssr.binaryRefine
 			} ).toInspector( 'SSR' );
 
-			temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
+			ssrTexture = upsample( ssrNode.getTextureNode() );
+
+			temporalReprojectNode = temporalReproject( ssrTexture, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
 				mode: 'specular',
 				accumulate: false,
 				normalDecode: normalDecode
@@ -292,7 +311,7 @@
 			denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
 				depth: scenePassDepth,
 				normal: sceneNormal,
-				raw: ssrNode,
+				raw: ssrTexture,
 				metalRoughness: scenePassMetalRough,
 				mode: 'specular',
 				accumulate: true,
@@ -303,7 +322,7 @@
 			ssrNode.setHistory( denoiseNode, scenePassVelocity );
 			temporalReprojectNode.setHistoryTexture( denoiseNode );
 
-			const denoisePassBlend = vec4( denoiseNode.rgb, ssrNode.a.greaterThan( 0 ).toVar() );
+			const denoisePassBlend = vec4( denoiseNode.rgb, ssrTexture.a.greaterThan( 0 ).toVar() );
 
 			gammaUniform = uniform( params.post.grading.gamma );
 			contrastUniform = uniform( params.post.grading.contrast );
@@ -349,6 +368,12 @@
 				'Ray Length': 7,
 				'Accumulation Speed (Alpha)': 6
 			};
+
+			const resolution = { downsample: 0, upsampler: 'Joint bilateral' };
+
+			const resolutionGui = renderer.inspector.createParameters( 'Resolution' );
+			resolutionGui.add( resolution, 'downsample', { '1': 0, '2': 1, '4': 2, '8': 3 } ).onChange( ( value ) => downsample.level = Number( value ) );
+			resolutionGui.add( resolution, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 );
 
 			const displayGui = renderer.inspector.createParameters( 'Display' );
 			displayGui.add( params, 'output', outputTypes ).name( 'Output' ).onChange( updateOutputNode );
@@ -502,14 +527,14 @@
 			switch ( params.output ) {
 
 				case 0: node = applyPostProcessing( combinedOutputNode ); break; // Beauty
-				case 1: node = applyGrading( vec4( ssrNode.rgb, 1 ) ); break; // SSR
+				case 1: node = applyGrading( vec4( ssrTexture.rgb, 1 ) ); break; // SSR
 				case 4: node = applyGrading( vec4( denoiseNode.rgb, 1 ) ); break; // SSR DN
 				case 6: node = vec4( denoiseNode.aaa, 1 ); break; // Accumulation Speed (Alpha)
-				case 7: node = vec4( ssrNode.aaa, 1 ); break; // Ray Length
+				case 7: node = vec4( ssrTexture.aaa, 1 ); break; // Ray Length
 				case OUTPUT_COMPARE_DENOISE:
 					node = buildCompareNode(
 						applyGrading( vec4( denoiseNode.rgb, 1 ) ),
-						applyGrading( vec4( ssrNode.rgb, 1 ) )
+						applyGrading( vec4( ssrTexture.rgb, 1 ) )
 					);
 					break;
 				case OUTPUT_COMPARE_SSR:

@@ -44,8 +44,11 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking, rtt } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+		import { hiZ } from 'three/addons/tsl/display/HiZNode.js';
+		import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
+		import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -170,22 +173,34 @@
 			const metalRoughTexture = scenePass.getTexture( 'metalrough' );
 			metalRoughTexture.type = THREE.UnsignedByteType;
 
-			const sceneNormal = sample( ( uv ) => {
+			// resolution: the reflections are computed from downsampled inputs and upsampled afterwards
 
-				return unpackOctahedralToNormal( scenePassNormal.sample( uv ).rg );
+			const downsample = depthAwareDownsample( hiZ( scenePassDepth, { maxLevel: 3 } ), { normal: scenePassNormal, metalrough: scenePassMetalRough } );
+			downsample.level = 0;
+
+			const downsampleDepth = downsample.getTextureNode( 'depth' );
+			const downsampleMetalRough = downsample.getTextureNode( 'metalrough' );
+			const downsampleNormal = sample( ( uv ) => {
+
+				return unpackOctahedralToNormal( downsample.getTextureNode( 'normal' ).sample( uv ).rg );
 
 			} );
 
+			// without depth rejection, the joint bilateral filter is a bilinear filter
+
+			const depthTolerance = uniform( 0.005 );
+			const upsample = ( node ) => rtt( jointBilateralUpsample( node, downsampleDepth, scenePassDepth, camera, { depthTolerance } ).sample( screenUV ) );
+
 			//
 
-			const reflection = ssr( scenePassColor, scenePassDepth, sceneNormal, {
-				metalnessNode: scenePassMetalRough.r,
-				roughnessNode: scenePassMetalRough.g,
+			const reflection = ssr( scenePassColor, downsampleDepth, downsampleNormal, {
+				metalnessNode: downsampleMetalRough.r,
+				roughnessNode: downsampleMetalRough.g,
 				binaryRefine: params.binaryRefine
 			} ).toInspector( 'SSR' );
 
-			const raw = passTexture( reflection, reflection.getRenderTarget().texture );
-			const blurred = reflection.getTextureNode();
+			const raw = upsample( passTexture( reflection, reflection.getRenderTarget().texture ) );
+			const blurred = upsample( reflection.getTextureNode() );
 			const blurEnabled = uniform( 1 );
 			const combined = scenePassColor.rgb.add( mix( raw.rgb, blurred.rgb, blurEnabled ) );
 			const spatialAA = smaa( vec4( combined, 1 ) );
@@ -215,6 +230,12 @@
 			window.addEventListener( 'resize', onWindowResize );
 
 			// GUI
+
+			const resolution = { downsample: 0, upsampler: 'Joint bilateral' };
+
+			const resolutionGui = renderer.inspector.createParameters( 'Resolution' );
+			resolutionGui.add( resolution, 'downsample', { '1': 0, '2': 1, '4': 2, '8': 3 } ).onChange( ( value ) => downsample.level = Number( value ) );
+			resolutionGui.add( resolution, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 );
 
 			const displayGui = renderer.inspector.createParameters( 'Display' );
 			displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN' ] ).name( 'Output' ).info( 'DN means denoise; this mirror example uses spatial blur rather than stochastic denoising.' ).onChange( updateOutput );
