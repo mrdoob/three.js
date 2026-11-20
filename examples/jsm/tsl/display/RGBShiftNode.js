@@ -79,6 +79,18 @@ class RGBShiftNode extends Node {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the effect is no longer required.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		if ( this.textureNode.intermediate === true ) this.textureNode.dispose();
+
+	}
+
 }
 
 export default RGBShiftNode;
@@ -93,4 +105,4 @@ export default RGBShiftNode;
  * @param {number|Node<float>} [angle=0] - Defines in which direction colors are shifted.
  * @returns {RGBShiftNode}
  */
-export const rgbShift = ( node, amount, angle ) => new RGBShiftNode( convertToTexture( node ), amount, angle );
+export const rgbShift = ( node, amount, angle ) => new RGBShiftNode( convertToTexture( node, null, null, { intermediate: true } ), amount, angle );

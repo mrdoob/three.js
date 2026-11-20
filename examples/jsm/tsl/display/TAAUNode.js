@@ -594,6 +594,8 @@ class TAAUNode extends Node {
 		this._resolveMaterial.dispose();
 		this._seedMaterial.dispose();
 
+		if ( this.beautyNode.intermediate === true ) this.beautyNode.dispose();
+
 	}
 
 }
@@ -613,4 +615,4 @@ const _haltonOffsets = /*@__PURE__*/ computeHaltonOffsets( 32 );
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {TAAUNode}
  */
-export const taau = ( beautyNode, depthNode, velocityNode, camera ) => new TAAUNode( convertToTexture( beautyNode ), depthNode, velocityNode, camera );
+export const taau = ( beautyNode, depthNode, velocityNode, camera ) => new TAAUNode( convertToTexture( beautyNode, null, null, { intermediate: true } ), depthNode, velocityNode, camera );

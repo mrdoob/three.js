@@ -540,6 +540,8 @@ class TRAANode extends Node {
 
 		this._resolveMaterial.dispose();
 
+		if ( this.beautyNode.intermediate === true ) this.beautyNode.dispose();
+
 	}
 
 }
@@ -559,4 +561,4 @@ const _haltonOffsets = /*@__PURE__*/ computeHaltonOffsets( 32 );
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {TRAANode}
  */
-export const traa = ( beautyNode, depthNode, velocityNode, camera ) => new TRAANode( convertToTexture( beautyNode ), depthNode, velocityNode, camera );
+export const traa = ( beautyNode, depthNode, velocityNode, camera ) => new TRAANode( convertToTexture( beautyNode, null, null, { intermediate: true } ), depthNode, velocityNode, camera );
