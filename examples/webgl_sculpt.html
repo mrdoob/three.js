@@ -190,6 +190,16 @@
 					negative: sculptor.getNegative(),
 					mirrorAxis: sculptor.mirrorAxis,
 					wireframe: false,
+					undo: function () {
+
+						sculptor.undo();
+
+					},
+					redo: function () {
+
+						sculptor.redo();
+
+					},
 					export: exportGLTF
 				};
 
@@ -244,7 +254,29 @@
 
 				} );
 
+				gui.add( params, 'undo' );
+				gui.add( params, 'redo' );
 				gui.add( params, 'export' );
+
+				window.addEventListener( 'keydown', function ( event ) {
+
+					if ( event.ctrlKey === false && event.metaKey === false ) return;
+
+					const key = event.key.toLowerCase();
+
+					if ( key === 'z' ) {
+
+						event.preventDefault();
+						if ( event.shiftKey ) sculptor.redo(); else sculptor.undo();
+
+					} else if ( key === 'y' ) {
+
+						event.preventDefault();
+						sculptor.redo();
+
+					}
+
+				} );
 
 				function updateToolControllers() {
 
