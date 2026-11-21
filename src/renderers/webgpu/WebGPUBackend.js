@@ -2509,8 +2509,43 @@ class WebGPUBackend extends Backend {
 			utils.getCurrentColorSpace( renderContext ), utils.getCurrentColorFormats( renderContext ).join(), utils.getCurrentDepthStencilFormat( renderContext ),
 			utils.getPrimitiveTopology( object, material ), utils.getStripIndexFormat( object, geometry ),
 			this.attributeUtils.getVertexBufferLayoutCacheKey( renderObject ),
-			renderObject.clippingContextCacheKey
+			renderObject.clippingContextCacheKey,
+			this._getMRTBlendingCacheKey( renderContext )
 		].join();
+
+	}
+
+	/**
+	 * Returns a cache key for the MRT blend modes of the given render context.
+	 * The blend state of each color attachment is part of the render pipeline,
+	 * so draws that only differ in an MRT output's blend mode need different pipelines.
+	 *
+	 * @private
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {string} The cache key.
+	 */
+	_getMRTBlendingCacheKey( renderContext ) {
+
+		const { mrt, textures } = renderContext;
+
+		if ( mrt === null || textures === null ) return '';
+
+		const keys = [];
+
+		for ( let i = 0; i < textures.length; i ++ ) {
+
+			const blendMode = mrt.getBlendMode( textures[ i ].name );
+
+			keys.push(
+				blendMode.blending,
+				blendMode.blendSrc, blendMode.blendDst, blendMode.blendEquation,
+				blendMode.blendSrcAlpha, blendMode.blendDstAlpha, blendMode.blendEquationAlpha,
+				blendMode.premultiplyAlpha
+			);
+
+		}
+
+		return keys.join( ':' );
 
 	}
 
