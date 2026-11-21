@@ -70,6 +70,18 @@ class ContextNode extends Node {
 	}
 
 	/**
+	 * This method is overwritten to ensure it returns whether {@link ContextNode#node} is dead code.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether the node is dead code.
+	 */
+	isDeadCode( builder ) {
+
+		return this.node.isDeadCode( builder );
+
+	}
+
+	/**
 	 * This method is overwritten to ensure it returns the type of {@link ContextNode#node}.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.

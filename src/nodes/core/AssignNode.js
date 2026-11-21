@@ -82,6 +82,12 @@ class AssignNode extends Node {
 
 	}
 
+	isDeadCode( builder ) {
+
+		return getScope( this.targetNode ).isDeadCode( builder );
+
+	}
+
 	/**
 	 * Assignments must not be cached in temporary variables.
 	 *
