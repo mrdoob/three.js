@@ -468,7 +468,7 @@ function mergeAttributes( attributes ) {
  */
 function deepCloneAttribute( attribute ) {
 
-	if ( attribute.isInstancedInterleavedBufferAttribute || attribute.isInterleavedBufferAttribute ) {
+	if ( attribute.isInterleavedBufferAttribute ) {
 
 		return deinterleaveAttribute( attribute );
 
@@ -567,9 +567,9 @@ function deinterleaveAttribute( attribute ) {
 
 	const array = new cons( count * itemSize );
 	let newAttribute;
-	if ( attribute.isInstancedInterleavedBufferAttribute ) {
+	if ( attribute.data.isInstancedInterleavedBuffer ) {
 
-		newAttribute = new InstancedBufferAttribute( array, itemSize, normalized, attribute.meshPerAttribute );
+		newAttribute = new InstancedBufferAttribute( array, itemSize, normalized, attribute.data.meshPerAttribute );
 
 	} else {
 
