@@ -2681,14 +2681,14 @@ class VRMLLoader extends Loader {
 
 				spineVector.fromArray( spine, i );
 
-				scaling.x = scale ? scale[ j + 0 ] : 1;
+				scaling.x = scale ? scale[ ( j + 0 ) % scale.length ] : 1;
 				scaling.y = 1;
-				scaling.z = scale ? scale[ j + 1 ] : 1;
+				scaling.z = scale ? scale[ ( j + 1 ) % scale.length ] : 1;
 
-				axis.x = orientation ? orientation[ o + 0 ] : 0;
-				axis.y = orientation ? orientation[ o + 1 ] : 0;
-				axis.z = orientation ? orientation[ o + 2 ] : 1;
-				const angle = orientation ? orientation[ o + 3 ] : 0;
+				axis.x = orientation ? orientation[ ( o + 0 ) % orientation.length ] : 0;
+				axis.y = orientation ? orientation[ ( o + 1 ) % orientation.length ] : 0;
+				axis.z = orientation ? orientation[ ( o + 2 ) % orientation.length ] : 1;
+				const angle = orientation ? orientation[ ( o + 3 ) % orientation.length ] : 0;
 
 				for ( let k = 0, kl = crossSection.length; k < kl; k += 2 ) {
 
