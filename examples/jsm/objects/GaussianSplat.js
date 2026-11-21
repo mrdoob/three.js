@@ -1,6 +1,7 @@
 import {
 	Box3,
 	BufferAttribute,
+	DataUtils,
 	InstancedBufferGeometry,
 	Matrix3,
 	Matrix4,
@@ -36,6 +37,7 @@ import {
 	storage,
 	uint,
 	uniform,
+	unpackHalf2x16,
 	unpackUnorm4x8,
 	varyingProperty,
 	vec2,
@@ -661,12 +663,27 @@ function createGeometry( count ) {
 
 }
 
+/**
+ * Packs two numbers as half floats into one 32-bit word, the first in the low 16 bits.
+ *
+ * @param {number} a - The value to pack into the low 16 bits of the 32-bit word.
+ * @param {number} b - The value to pack into the high 16 bits of the 32-bit word.
+ * @return {number} The U32 value that holds the two packed FP16 values.
+ */
+function packHalfFloatsToUint( a, b ) {
+
+	return ( DataUtils.toHalfFloat( a ) | ( DataUtils.toHalfFloat( b ) << 16 ) ) >>> 0;
+
+}
+
 function createStorageBuffers( count, centers, covariances, colors, sphericalHarmonics ) {
 
+	// Each splat is stored in two vec4 words (32 bytes):
+	// - center: xyz is the position, w is the scale of the covariance
+	// - splat: xyz holds the six covariance values as half floats, w the RGBA8 color
+
 	const centerData = new Float32Array( count * 4 );
-	const covarianceAData = new Float32Array( count * 4 );
-	const covarianceBData = new Float32Array( count * 4 );
-	const colorData = new Uint32Array( count );
+	const splatData = new Uint32Array( count * 4 );
 	const sphericalHarmonicsDegree = sphericalHarmonics.degree;
 
 	for ( let i = 0; i < count; i ++ ) {
@@ -675,19 +692,26 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 		const i4 = i * 4;
 		const i6 = i * 6;
 
+		const c00 = covariances[ i6 ]; // covariance along x
+		const c01 = covariances[ i6 + 1 ]; // covariance from x to y
+		const c02 = covariances[ i6 + 2 ]; // covariance from x to z
+		const c11 = covariances[ i6 + 3 ]; // covariance along y
+		const c12 = covariances[ i6 + 4 ]; // covariance from y to z
+		const c22 = covariances[ i6 + 5 ]; // covariance along z
+
+		const scale = Math.max( Math.abs( c00 ), Math.abs( c01 ), Math.abs( c02 ), Math.abs( c11 ), Math.abs( c12 ), Math.abs( c22 ) );
+		const invScale = scale > 0 ? 1 / scale : 0;
+
 		centerData[ i4 ] = centers[ i3 ];
 		centerData[ i4 + 1 ] = centers[ i3 + 1 ];
 		centerData[ i4 + 2 ] = centers[ i3 + 2 ];
+		centerData[ i4 + 3 ] = scale;
 
-		covarianceAData[ i4 ] = covariances[ i6 ];
-		covarianceAData[ i4 + 1 ] = covariances[ i6 + 1 ];
-		covarianceAData[ i4 + 2 ] = covariances[ i6 + 2 ];
-		covarianceAData[ i4 + 3 ] = covariances[ i6 + 3 ];
+		splatData[ i4 ] = packHalfFloatsToUint( c00 * invScale, c01 * invScale );
+		splatData[ i4 + 1 ] = packHalfFloatsToUint( c02 * invScale, c11 * invScale );
+		splatData[ i4 + 2 ] = packHalfFloatsToUint( c12 * invScale, c22 * invScale );
 
-		covarianceBData[ i4 ] = covariances[ i6 + 4 ];
-		covarianceBData[ i4 + 1 ] = covariances[ i6 + 5 ];
-
-		colorData[ i ] = ( colors[ i4 ] |
+		splatData[ i4 + 3 ] = ( colors[ i4 ] |
 			colors[ i4 + 1 ] << 8 |
 			colors[ i4 + 2 ] << 16 |
 			colors[ i4 + 3 ] << 24 ) >>> 0;
@@ -695,9 +719,7 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 	}
 
 	const centerAttribute = new StorageBufferAttribute( centerData, 4 );
-	const covarianceAAttribute = new StorageBufferAttribute( covarianceAData, 4 );
-	const covarianceBAttribute = new StorageBufferAttribute( covarianceBData, 4 );
-	const colorAttribute = new StorageBufferAttribute( colorData, 1 );
+	const splatAttribute = new StorageBufferAttribute( splatData, 4 );
 
 	const buffers = {
 		count,
@@ -708,9 +730,7 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 		covarianceBAttribute,
 		colorAttribute,
 		centerRead: storage( centerAttribute, 'vec4' ).toReadOnly(),
-		covarianceARead: storage( covarianceAAttribute, 'vec4' ).toReadOnly(),
-		covarianceBRead: storage( covarianceBAttribute, 'vec4' ).toReadOnly(),
-		colorRead: storage( colorAttribute, 'uint' ).toReadOnly()
+		splatRead: storage( splatAttribute, 'uvec4' ).toReadOnly()
 	};
 
 	for ( let degree = 1; degree <= sphericalHarmonicsDegree; degree ++ ) {
@@ -749,9 +769,7 @@ function enableWebGLBuffers( buffers ) {
 	if ( buffers.webGLBuffersEnabled === true ) return;
 
 	buffers.centerRead.setPBO( true );
-	buffers.covarianceARead.setPBO( true );
-	buffers.covarianceBRead.setPBO( true );
-	buffers.colorRead.setPBO( true );
+	buffers.splatRead.setPBO( true );
 
 	for ( let degree = 1; degree <= buffers.sphericalHarmonicsDegree; degree ++ ) {
 
@@ -924,10 +942,11 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 	const createVertexNode = ( usePrecomputedSphericalHarmonics ) => Fn( () => {
 
 		const splatIndex = sort.orderRead.element( instanceIndex ).toVar( 'splatIndex' );
-		const center = buffers.centerRead.element( splatIndex ).xyz.toVar( 'center' );
-		const covA = buffers.covarianceARead.element( splatIndex ).toVar( 'covA' );
-		const covB = buffers.covarianceBRead.element( splatIndex ).toVar( 'covB' );
-		const color = unpackUnorm4x8( buffers.colorRead.element( splatIndex ) ).toVar( 'splatColor' );
+		const centerData = buffers.centerRead.element( splatIndex ).toVar( 'centerData' );
+		const center = centerData.xyz.toVar( 'center' );
+		const covarianceScale = centerData.w.toVar( 'covarianceScale' );
+		const splatData = buffers.splatRead.element( splatIndex ).toVar( 'splatData' );
+		const color = unpackUnorm4x8( splatData.w ).toVar( 'splatColor' );
 		const rgb = color.rgb.toVar( 'splatRgb' );
 
 		if ( buffers.sphericalHarmonicsDegree > 0 ) {
@@ -955,9 +974,16 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 		const r1 = vec3( m[ 0 ].y, m[ 1 ].y, m[ 2 ].y ).toVar( 'r1' );
 		const r2 = vec3( m[ 0 ].z, m[ 1 ].z, m[ 2 ].z ).toVar( 'r2' );
 
-		const cov0 = vec3( covA.x, covA.y, covA.z ).toVar( 'cov0' );
-		const cov1 = vec3( covA.y, covA.w, covB.x ).toVar( 'cov1' );
-		const cov2 = vec3( covA.z, covB.x, covB.y ).toVar( 'cov2' );
+		// Cov X + Cov X-Y
+		const cov00_01 = unpackHalf2x16( splatData.x ).mul( covarianceScale ).toVar( 'cov00_01' );
+		// Cov X-Z + Cov Y
+		const cov02_11 = unpackHalf2x16( splatData.y ).mul( covarianceScale ).toVar( 'cov02_11' );
+		// Cov Y-Z + Cov Z
+		const cov12_22 = unpackHalf2x16( splatData.z ).mul( covarianceScale ).toVar( 'cov12_22' );
+
+		const cov0 = vec3( cov00_01.x, cov00_01.y, cov02_11.x ).toVar( 'cov0' );
+		const cov1 = vec3( cov00_01.y, cov02_11.y, cov12_22.x ).toVar( 'cov1' );
+		const cov2 = vec3( cov02_11.x, cov12_22.x, cov12_22.y ).toVar( 'cov2' );
 
 		const vc0 = vec3( dot( r0, cov0 ), dot( r0, cov1 ), dot( r0, cov2 ) ).toVar( 'vc0' );
 		const vc1 = vec3( dot( r1, cov0 ), dot( r1, cov1 ), dot( r1, cov2 ) ).toVar( 'vc1' );
