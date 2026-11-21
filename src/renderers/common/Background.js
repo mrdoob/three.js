@@ -44,6 +44,16 @@ class Background extends DataMap {
 
 	}
 
+	createData() {
+
+		return {
+			backgroundMeshNode: null,
+			backgroundMesh: null,
+			backgroundCacheKey: - 1
+		};
+
+	}
+
 	/**
 	 * Updates the background for the given scene. Depending on how `Scene.background`
 	 * or `Scene.backgroundNode` are configured, this method might configure a simple clear
@@ -86,7 +96,7 @@ class Background extends DataMap {
 
 			let backgroundMesh = sceneData.backgroundMesh;
 
-			if ( backgroundMesh === undefined ) {
+			if ( backgroundMesh === null ) {
 
 				const backgroundMeshNode = vec4( backgroundNode ).mul( backgroundIntensity ).context( {
 					// @TODO: Add Texture2D support using node context
