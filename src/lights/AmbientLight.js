@@ -3,6 +3,11 @@ import { Light } from './Light.js';
 /**
  * This light globally illuminates all objects in the scene equally.
  *
+ * {@link MeshStandardMaterial} and {@link MeshPhysicalMaterial} also reflect it, as if
+ * the scene were surrounded by a uniform environment of this color, so metals don't
+ * render black without an environment map. It adds to {@link Scene#environment}.
+ * Other materials only receive its diffuse light.
+ *
  * It cannot be used to cast shadows as it does not have a direction.
  *
  * ```js

@@ -6,6 +6,10 @@ import { Object3D } from '../core/Object3D.js';
  * A light source positioned directly above the scene, with color fading from
  * the sky color to the ground color.
  *
+ * {@link MeshStandardMaterial} and {@link MeshPhysicalMaterial} also reflect it, as if
+ * the scene were surrounded by the sky above the horizon and the ground below it.
+ * It adds to {@link Scene#environment}. Other materials only receive its diffuse light.
+ *
  * This light cannot be used to cast shadows.
  *
  * ```js

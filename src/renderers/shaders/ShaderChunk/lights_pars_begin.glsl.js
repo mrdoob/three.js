@@ -187,29 +187,62 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 
 	}
 
+	vec3 getHemisphereLightRadiance( const in HemisphereLight hemiLight, const in vec3 radianceVec, const in vec3 normal, const in float roughness ) {
+
+		// GGX prefiltering of a sharp sky/ground horizon: Student-t marginal at low roughness, cosine irradiance at roughness = 1
+		float alpha = pow2( roughness );
+		float t = 2.0 * alpha / ( 1.0 + alpha );
+		float dotRL = dot( radianceVec, hemiLight.direction );
+
+		// Box filtered over the pixel footprint, so the horizon doesn't alias on smooth surfaces
+		float pixelHalfWidth = 0.5 * length( vec2( dFdx( dotRL ), dFdy( dotRL ) ) );
+		float lobeWidth2 = pow2( t ) * ( 1.0 - pow2( dotRL ) );
+		float skyWeight = saturate( dotRL / max( sqrt( pow2( dotRL + pixelHalfWidth ) + lobeWidth2 ) + sqrt( pow2( dotRL - pixelHalfWidth ) + lobeWidth2 ), 2e-4 ) + 0.5 );
+
+		// The lobe is a cosine lobe stretched by t: remove the sky it reaches behind the surface (Lambert's polygon formula) and renormalize
+		vec3 skyAxis = normalize( t * hemiLight.direction + ( 1.0 - t ) * dotRL * radianceVec );
+		vec3 behindAxis = - normalize( t * normal + ( 1.0 - t ) * dot( radianceVec, normal ) * radianceVec );
+		float a = dot( skyAxis, radianceVec );
+		float b = dot( behindAxis, radianceVec );
+		float ab = dot( skyAxis, behindAxis );
+		float det = max( abs( dot( radianceVec, cross( skyAxis, behindAxis ) ) ), 1e-4 );
+		float skyFraction = 0.5 * a + 0.5;
+		float behindFraction = 0.5 * b + 0.5;
+		float behindSky = ( atan( det, a * b - ab ) + a * atan( det, ab * a - b ) + b * atan( det, ab * b - a ) ) * RECIPROCAL_PI * 0.5;
+
+		// The bounds keep nearly collinear axes exact, like floors, ceilings and roughness = 1
+		behindSky = clamp( behindSky, max( skyFraction + behindFraction - 1.0, 0.0 ), min( skyFraction, behindFraction ) );
+
+		float hemiSpecularWeight = saturate( ( skyWeight - behindSky ) / max( 1.0 - behindFraction, 1e-4 ) );
+
+		return mix( hemiLight.groundColor, hemiLight.skyColor, hemiSpecularWeight ) * RECIPROCAL_PI;
+
+	}
+
 #endif
 
-// Ambient and hemisphere lights stand in for a distant environment, so they reflect their irradiance / PI
-vec3 getIndirectLightRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness ) {
+// Physical materials reflect ambient and hemisphere lights as a distant environment, looked up like getIBLRadiance()
+vec3 getIndirectLightRadiance( const in vec3 lookupVec, const in vec3 lookupNormal, const in vec3 normal, const in float roughness ) {
 
-	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
+	// A uniform environment reflects its irradiance / PI at any roughness
+	vec3 radiance = getAmbientLightIrradiance( ambientLightColor ) * RECIPROCAL_PI;
 
 	#if ( NUM_HEMI_LIGHTS > 0 )
 
-		// Mixing the reflection with the normal is more accurate for rough objects, see getIBLRadiance()
-		vec3 reflectVec = normalize( mix( reflect( - viewDir, normal ), normal, pow4( roughness ) ) );
+		// Mixing the lookup with the normal is more accurate for rough objects, see getIBLRadiance()
+		vec3 radianceVec = normalize( mix( lookupVec, lookupNormal, pow4( roughness ) ) );
 
 		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-			irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], reflectVec );
+			radiance += getHemisphereLightRadiance( hemisphereLights[ i ], radianceVec, normal, roughness );
 
 		}
 		#pragma unroll_loop_end
 
 	#endif
 
-	return irradiance * RECIPROCAL_PI;
+	return radiance;
 
 }
 
