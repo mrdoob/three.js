@@ -1,6 +1,7 @@
 import { GLTFLoader } from '../../../../examples/jsm/loaders/GLTFLoader.js';
 import { GLTFGaussianSplatLoaderExtension } from '../../../../examples/jsm/loaders/GLTFGaussianSplatLoaderExtension.js';
 import { makeClipAdditive } from '../../../../src/animation/AnimationUtils.js';
+import { LoadingManager } from '../../../../src/loaders/LoadingManager.js';
 import { unpackSphericalHarmonicsBand } from '../utils/GaussianSplatTestUtils.js';
 
 const EPS = 1e-6;
@@ -140,6 +141,37 @@ export default QUnit.module( 'Addons', () => {
 	QUnit.module( 'Loaders', () => {
 
 		QUnit.module( 'GLTFLoader', () => {
+
+			QUnit.test( 'load resolves external buffers independently of URL query strings and fragments', async ( assert ) => {
+
+				const json = {
+					asset: { version: '2.0' },
+					buffers: [ { byteLength: 4, uri: 'model.bin' } ]
+				};
+				const modelData = 'data:application/json,' + encodeURIComponent( JSON.stringify( json ) );
+				const bufferData = 'data:application/octet-stream;base64,AQIDBA==';
+
+				for ( const suffix of [ '?token=a/b', '#mesh/0', '?token=a/b#mesh/0' ] ) {
+
+					const url = 'models/model.gltf' + suffix;
+					const requestedURLs = [];
+					const manager = new LoadingManager();
+					manager.setURLModifier( ( requestedURL ) => {
+
+						requestedURLs.push( requestedURL );
+						return requestedURL === url ? modelData : bufferData;
+
+					} );
+
+					const gltf = await new GLTFLoader( manager ).loadAsync( url );
+					const buffer = await gltf.parser.getDependency( 'buffer', 0 );
+
+					assert.deepEqual( requestedURLs, [ url, 'models/model.bin' ], 'Resolves the buffer relative to the model directory: ' + suffix );
+					assert.deepEqual( Array.from( new Uint8Array( buffer ) ), [ 1, 2, 3, 4 ], 'Loads the external buffer' );
+
+				}
+
+			} );
 
 			QUnit.test( 'child credentials', async ( assert ) => {
 

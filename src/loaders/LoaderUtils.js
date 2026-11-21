@@ -4,12 +4,15 @@
 class LoaderUtils {
 
 	/**
-	 * Extracts the base URL from the given URL.
+	 * Extracts the base URL from the given URL, ignoring query parameters and
+	 * fragments.
 	 *
 	 * @param {string} url -The URL to extract the base URL from.
 	 * @return {string} The extracted base URL.
 	 */
 	static extractUrlBase( url ) {
+
+		url = url.split( /[?#]/, 1 )[ 0 ];
 
 		const index = url.lastIndexOf( '/' );
 
