@@ -35,11 +35,21 @@ class XRButton {
 
 				session.addEventListener( 'end', onSessionEnded );
 
-				await renderer.xr.setSession( session );
-
-				button.textContent = 'STOP XR';
-
 				currentSession = session;
+
+				try {
+
+					await renderer.xr.setSession( session );
+
+					button.textContent = 'STOP XR';
+
+				} catch ( error ) {
+
+					console.error( 'XRButton: Unable to set the XR session.', error );
+
+					session.end();
+
+				}
 
 			}
 
@@ -90,7 +100,12 @@ class XRButton {
 				if ( currentSession === null ) {
 
 					navigator.xr.requestSession( mode, sessionOptions )
-						.then( onSessionStarted );
+						.then( onSessionStarted )
+						.catch( ( error ) => {
+
+							console.error( 'XRButton: Unable to start the XR session.', error );
+
+						} );
 
 				} else {
 
