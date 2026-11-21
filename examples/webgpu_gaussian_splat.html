@@ -121,7 +121,8 @@
 			};
 			const sourceNames = Object.values( sources ).map( ( source ) => source.name );
 			const params = {
-				source: sources.lion.name
+				source: sources.lion.name,
+				minPixelSize: 0
 			};
 
 			init();
@@ -154,6 +155,15 @@
 				gui.add( params, 'source', sourceNames ).name( 'Splat' ).onChange( async ( value ) => {
 
 					await loadSplatSource( getSourceKeyByName( value ) );
+
+				} );
+
+				// skips splats drawn smaller than this many pixels. Raise it to trade fine detail for
+				// fewer rasterized splats, and compare the frame times in the inspector
+
+				gui.add( params, 'minPixelSize', 0, 32, 0.5 ).name( 'Min Pixel Size' ).onChange( ( value ) => {
+
+					if ( splats !== undefined ) splats.minPixelSize = value;
 
 				} );
 
@@ -216,7 +226,7 @@
 
 				disposeCurrentSplats();
 
-				splats = new GaussianSplat( splatData, { autoSort: false } );
+				splats = new GaussianSplat( splatData, { autoSort: false, minPixelSize: params.minPixelSize } );
 				splatRoot = splats;
 
 				if ( source.rotation !== undefined ) splatRoot.rotation.copy( source.rotation );
