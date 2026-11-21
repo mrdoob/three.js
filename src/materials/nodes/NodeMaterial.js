@@ -11,8 +11,9 @@ import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.j
 import { positionLocal, positionView } from '../../nodes/accessors/Position.js';
 import { skinning } from '../../nodes/accessors/Skinning.js';
 import { morphReference, morphColor } from '../../nodes/accessors/Morph.js';
-import { fwidth, mix, smoothstep } from '../../nodes/math/MathNode.js';
-import { float, vec3, vec4, bool } from '../../nodes/tsl/TSLBase.js';
+import { dot, fract, fwidth, mix, smoothstep } from '../../nodes/math/MathNode.js';
+import { float, vec2, vec3, vec4, bool } from '../../nodes/tsl/TSLBase.js';
+import { screenCoordinate } from '../../nodes/display/ScreenNode.js';
 import AONode from '../../nodes/lighting/AONode.js';
 import OcclusionAwareIrradianceNode from '../../nodes/lighting/OcclusionAwareIrradianceNode.js';
 import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
@@ -1183,6 +1184,26 @@ class NodeMaterial extends Material {
 	}
 
 	/**
+	 * Setups dithering. The noise is added in the renderer's output color space
+	 * since that is where the color gets quantized and banding appears.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Node<vec4>} outputNode - The existing output node.
+	 * @return {Node<vec4>} The output node.
+	 */
+	setupDithering( builder, outputNode ) {
+
+		const colorSpace = builder.renderer.outputColorSpace;
+
+		// Iestyn's RGB dither from https://alex.vlachos.com/graphics/Alex_Vlachos_Advanced_VR_Rendering_GDC2015.pdf
+
+		const noise = fract( dot( vec2( 171, 231 ), screenCoordinate ).div( vec3( 103, 71, 97 ) ) ).sub( 0.5 ).div( 255 );
+
+		return outputNode.workingToColorSpace( colorSpace ).add( vec4( noise, 0 ) ).colorSpaceToWorking( colorSpace );
+
+	}
+
+	/**
 	 * Setups premultiplied alpha.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -1229,6 +1250,14 @@ class NodeMaterial extends Material {
 		if ( this.fog === true ) {
 
 			outputNode = this.setupFog( builder, outputNode );
+
+		}
+
+		// DITHERING
+
+		if ( this.dithering === true ) {
+
+			outputNode = this.setupDithering( builder, outputNode );
 
 		}
 
