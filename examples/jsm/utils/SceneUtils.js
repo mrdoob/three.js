@@ -223,6 +223,7 @@ function sortInstancedMesh( mesh, compareFn ) {
 
 	const instanceMatrixRef = deepCloneAttribute( mesh.instanceMatrix );
 	const instanceColorRef = mesh.instanceColor ? deepCloneAttribute( mesh.instanceColor ) : null;
+	const morphDataRef = mesh.morphTexture ? mesh.morphTexture.image.data.slice() : null;
 
 	const attributeRefs = new Map();
 
@@ -264,6 +265,19 @@ function sortInstancedMesh( mesh, compareFn ) {
 
 		}
 
+		if ( mesh.morphTexture ) {
+
+			const morphData = mesh.morphTexture.image.data;
+			const len = mesh.morphTexture.image.width;
+
+			for ( let j = 0; j < len; j ++ ) {
+
+				morphData[ i * len + j ] = morphDataRef[ refIndex * len + j ];
+
+			}
+
+		}
+
 		for ( const name in mesh.geometry.attributes ) {
 
 			const attribute = mesh.geometry.attributes[ name ];
@@ -288,6 +302,12 @@ function sortInstancedMesh( mesh, compareFn ) {
 	if ( mesh.instanceColor ) {
 
 		mesh.instanceColor.needsUpdate = true;
+
+	}
+
+	if ( mesh.morphTexture ) {
+
+		mesh.morphTexture.needsUpdate = true;
 
 	}
 
