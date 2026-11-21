@@ -63,7 +63,28 @@ class RenderContexts {
 
 		//
 
-		const mrtState = ( mrt !== null ) ? mrt.id : 'default';
+		let mrtState = 'default';
+
+		if ( mrt !== null ) {
+
+			mrtState = mrt.id;
+
+			// MRT nodes pick the output of each attachment by the texture name at build time,
+			// so render targets with different attachment names must not share render objects
+
+			if ( renderTarget !== null ) {
+
+				const textures = renderTarget.textures;
+
+				for ( let i = 0; i < textures.length; i ++ ) {
+
+					mrtState += ':' + textures[ i ].name;
+
+				}
+
+			}
+
+		}
 
 		//
 
