@@ -724,22 +724,143 @@ class SkyMesh extends Mesh {
 		 */
 		this.skyNode = new SkyNode( positionWorld.sub( cameraPosition ) );
 
+		/**
+		 * The atmospheric turbidity which controls the amount of haze.
+		 * Higher values produce a hazier sky.
+		 *
+		 * @type {UniformNode<float>}
+		 * @deprecated since r188. Multiply {@link SkyMesh#mieCoefficient} by turbidity / 2 instead.
+		 */
 		this.turbidity = this.skyNode.turbidity;
+
+		/**
+		 * The strength of Rayleigh scattering by air molecules
+		 * which is responsible for the blue color of the sky.
+		 * Higher values produce a brighter sky.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.rayleigh = this.skyNode.rayleigh;
+
+		/**
+		 * The strength of Mie scattering by aerosol particles
+		 * which controls the intensity of the glow around the sun.
+		 * Higher values produce a brighter glow.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.mieCoefficient = this.skyNode.mieCoefficient;
+
+		/**
+		 * The directionality of Mie scattering which controls
+		 * the size of the glow around the sun. Values closer to `1`
+		 * produce a smaller and more concentrated halo.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.mieDirectionalG = this.skyNode.mieDirectionalG;
+
+		/**
+		 * How much more directional Mie scattering is for blue than for red.
+		 * Blue uses {@link SkyMesh#mieDirectionalG} plus this value, red uses
+		 * it minus this value. Dust grains like those on Mars scatter blue
+		 * into a tighter halo around the sun, which turns sunsets blue.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.mieDirectionalGSpread = this.skyNode.mieDirectionalGSpread;
+
+		/**
+		 * The color of Mie scattering which defines the spectrum of
+		 * the haze around the sun and along the horizon. The default
+		 * value represents the atmosphere of Earth.
+		 *
+		 * @type {UniformNode<vec3>}
+		 */
 		this.mieColor = this.skyNode.mieColor;
+
+		/**
+		 * The albedo of aerosol particles, the part of the light they scatter
+		 * instead of absorbing. White particles absorb nothing, like the haze
+		 * on Earth. Tinted particles, like the dust on Mars, give the haze
+		 * their color.
+		 *
+		 * @type {UniformNode<vec3>}
+		 */
 		this.mieAlbedo = this.skyNode.mieAlbedo;
+
+		/**
+		 * The strength of atmospheric absorption. Higher values remove
+		 * more of {@link SkyMesh#absorptionColor} from the sunlight and
+		 * tint the sky in the complementary color.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.absorptionScale = this.skyNode.absorptionScale;
+
+		/**
+		 * The wavelengths absorbed by the atmosphere along the path of
+		 * the sunlight. The default value represents the ozone layer
+		 * of Earth.
+		 *
+		 * @type {UniformNode<vec3>}
+		 */
 		this.absorptionColor = this.skyNode.absorptionColor;
+
+		/**
+		 * The sun position uniform.
+		 *
+		 * @type {UniformNode<vec3>}
+		 */
 		this.sunPosition = this.skyNode.sunPosition;
+
+		/**
+		 * The size of the sun disc relative to the sun seen from Earth.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.sunSize = this.skyNode.sunSize;
+
+		/**
+		 * The cloud scale uniform.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.cloudScale = this.skyNode.cloudScale;
+
+		/**
+		 * The cloud speed uniform.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.cloudSpeed = this.skyNode.cloudSpeed;
+
+		/**
+		 * The cloud coverage uniform.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.cloudCoverage = this.skyNode.cloudCoverage;
+
+		/**
+		 * The cloud density uniform.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.cloudDensity = this.skyNode.cloudDensity;
+
+		/**
+		 * The cloud elevation uniform.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.cloudElevation = this.skyNode.cloudElevation;
+
+		/**
+		 * Whether to render the solar disc.
+		 *
+		 * @type {UniformNode<float>}
+		 */
 		this.showSunDisc = this.skyNode.showSunDisc;
 
 		/**
