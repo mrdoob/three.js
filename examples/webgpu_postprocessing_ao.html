@@ -20,7 +20,7 @@
 			</div>
 
 			<small>
-				Ambient Occlusion: switchable between GTAO and SSAO.<br />
+				GTAO or SSAO-style Ambient Occlusion with a Joint Bilateral Upsampler.<br />
 				Tennyson bust from <a href="https://threedscans.com/lincoln/tennyson/" target="_blank" rel="noopener">Three D Scans</a>.
 			</small>
 		</div>
@@ -39,10 +39,11 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { sample, pass, mrt, screenUV, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext } from 'three/tsl';
+			import { sample, pass, mrt, rtt, screenUV, textureSize, normalView, velocity, vec2, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { ssao } from 'three/addons/tsl/display/SSAONode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+			import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -54,13 +55,14 @@
 
 			let camera, scene, renderer, renderPipeline, controls;
 
-			let aoPass, traaPass, transparentMesh;
+			let aoPass, aoNode, upsamplePass, traaPass, transparentMesh;
 
 			const params = {
 				aoType: 'GTAO',
 				samples: 16,
 				radius: 0.4,
 				resolutionScale: 0.5,
+				upsampling: 'Joint bilateral',
 				scale: 1.5, // GTAO
 				thickness: 1, // GTAO
 				temporalFiltering: true, // GTAO
@@ -68,7 +70,7 @@
 				bias: 0.025, // SSAO
 				blurEnabled: true, // SSAO
 				blurSharpness: 2, // SSAO
-				aoOnly: false,
+				output: 'Beauty',
 				transparentOpacity: 0.3
 			};
 
@@ -160,8 +162,15 @@
 
 					scenePass.options.samples = useTRAA ? 0 : 4;
 
-					renderPipeline.outputNode = params.aoOnly ? vec4( vec3( aoPass.getTextureNode().sample( screenUV ).r ), 1 ) : ( useTRAA ? traaPass : scenePass );
-					renderer.toneMapping = params.aoOnly ? THREE.NoToneMapping : THREE.NeutralToneMapping;
+					const beauty = ( params.output === 'Beauty' );
+					const aoTexture = aoPass.getTextureNode();
+					const aoSize = vec2( textureSize( aoTexture ) );
+
+					// raw output samples texel centers to show the AO texels unfiltered
+					const aoOutput = ( params.output === 'AO Raw' ) ? aoTexture.sample( screenUV.mul( aoSize ).floor().add( 0.5 ).div( aoSize ) ).r : aoNode;
+
+					renderPipeline.outputNode = beauty ? ( useTRAA ? traaPass : scenePass ) : vec4( vec3( aoOutput ), 1 );
+					renderer.toneMapping = beauty ? THREE.NeutralToneMapping : THREE.NoToneMapping;
 					renderPipeline.needsUpdate = true;
 
 				}
@@ -176,7 +185,35 @@
 
 					updateParameters();
 
-					scenePass.contextNode = builtinAOContext( aoPass.getTextureNode().sample( screenUV ).r );
+					updateUpsampling();
+
+				}
+
+				function updateUpsampling() {
+
+					if ( upsamplePass ) {
+
+						upsamplePass.dispose();
+						upsamplePass = null;
+
+					}
+
+					const aoTexture = aoPass.getTextureNode();
+
+					if ( params.upsampling === 'Joint bilateral' ) {
+
+						const guideDepth = ( params.aoType === 'GTAO' ) ? aoPass.getDepthNode() : prePassDepth;
+
+						upsamplePass = rtt( jointBilateralUpsample( aoTexture, guideDepth, prePassDepth, camera ).sample( screenUV ) );
+						aoNode = upsamplePass.sample( screenUV ).r;
+
+					} else {
+
+						aoNode = aoTexture.sample( screenUV ).r;
+
+					}
+
+					scenePass.contextNode = builtinAOContext( aoNode );
 					scenePass.needsUpdate = true;
 
 					updateOutput();
@@ -527,7 +564,10 @@
 				// GUI
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
-				gui.add( params, 'aoType', [ 'GTAO', 'SSAO' ] ).name( 'AO type' ).onChange( () => {
+				gui.add( params, 'output', [ 'Beauty', 'AO Raw', 'AO Upsampled' ] ).onChange( updateOutput );
+
+				const aoFolder = gui.addFolder( 'AO' );
+				aoFolder.add( params, 'aoType', [ 'GTAO', 'SSAO' ] ).name( 'AO type' ).onChange( () => {
 
 					// half resolution suffices for GTAO since TRAA smooths it, SSAO looks best at full resolution
 
@@ -537,30 +577,33 @@
 					updateControls();
 
 				} );
-				const resolutionScaleControl = gui.add( params, 'resolutionScale', 0, 1 ).name( 'resolution' ).onChange( updateParameters );
-				gui.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters ).debounce( 250 );
-				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
+				const resolutionScaleControl = aoFolder.add( params, 'resolutionScale', 0, 1 ).name( 'resolution' ).onChange( updateParameters );
+				aoFolder.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters ).debounce( 250 );
+				aoFolder.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
+
+				const filteringFolder = gui.addFolder( 'Filtering' );
+				filteringFolder.add( params, 'upsampling', [ 'Bilinear', 'Joint bilateral' ] ).onChange( updateUpsampling );
 
 				const gtaoControls = [
-					gui.add( params, 'scale', 0.01, 2 ).onChange( updateParameters ),
-					gui.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters ),
-					gui.add( params, 'temporalFiltering' ).name( 'temporal filtering' ).onChange( updateParameters )
+					aoFolder.add( params, 'scale', 0.01, 2 ).onChange( updateParameters ),
+					aoFolder.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters ),
+					filteringFolder.add( params, 'temporalFiltering' ).name( 'temporal' ).onChange( updateParameters )
 				];
 
 				const ssaoControls = [
-					gui.add( params, 'intensity', 0, 4 ).onChange( updateParameters ),
-					gui.add( params, 'bias', 0, 0.2 ).onChange( updateParameters ),
-					gui.add( params, 'blurEnabled' ).name( 'blur' ).onChange( updateParameters ),
-					gui.add( params, 'blurSharpness', 0, 8 ).name( 'blur sharpness' ).onChange( updateParameters )
+					aoFolder.add( params, 'intensity', 0, 4 ).onChange( updateParameters ),
+					aoFolder.add( params, 'bias', 0, 0.2 ).onChange( updateParameters ),
+					filteringFolder.add( params, 'blurEnabled' ).name( 'blur' ).onChange( updateParameters ),
+					filteringFolder.add( params, 'blurSharpness', 0, 8 ).name( 'blur sharpness' ).onChange( updateParameters )
 				];
 
-				gui.add( transparentMesh, 'visible' ).name( 'show transparent mesh' );
-				gui.add( params, 'transparentOpacity', 0, 1, 0.01 ).name( 'mesh opacity' ).onChange( ( value ) => {
+				const debugFolder = gui.addFolder( 'Debug' );
+				debugFolder.add( transparentMesh, 'visible' ).name( 'transparent mesh' ).onChange( ( value ) => value ? opacityControl.show() : opacityControl.hide() );
+				const opacityControl = debugFolder.add( params, 'transparentOpacity', 0, 1, 0.01 ).name( 'mesh opacity' ).onChange( ( value ) => {
 
 					transparentMesh.material.opacity = value;
 
-				} );
-				gui.add( params, 'aoOnly' ).onChange( updateOutput );
+				} ).hide();
 
 				// show only the controls that apply to the active AO type
 

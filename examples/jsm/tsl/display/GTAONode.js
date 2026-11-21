@@ -1,5 +1,5 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
+import { reference, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sample, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -317,6 +317,17 @@ class GTAONode extends Node {
 	}
 
 	/**
+	 * Returns the depth the effect is computed at, e.g. as the guide depth for upsampling it.
+	 *
+	 * @return {SampleNode} The depth, samplable at the texel centers of the effect.
+	 */
+	getDepthNode() {
+
+		return sample( ( uv ) => Fn( ( builder ) => this._resolutionScale.lessThan( 1 ).select( gatherNearestDepth( this.depthNode, uv, builder ).nearest, this.depthNode.sample( uv ).r ) )() );
+
+	}
+
+	/**
 	 * Sets the size of the effect.
 	 *
 	 * @param {number} width - The width of the effect.
@@ -430,22 +441,16 @@ class GTAONode extends Node {
 				// Use the nearest depth texel to avoid banding. At silhouettes (view-space depth difference above 1%), take the
 				// normal from that texel to avoid dark rims. At creases, keep the blended normal to avoid jumpy noise.
 
-				const g = this.depthNode.gather().sample( uvNode ).toConst();
-				const minD = min( min( g.x, g.y ), min( g.z, g.w ) ).toConst();
-				const maxD = max( max( g.x, g.y ), max( g.z, g.w ) ).toConst();
-				const d = builder.renderer.reversedDepthBuffer === true ? maxD : minD;
+				const gathered = gatherNearestDepth( this.depthNode, uvNode, builder );
 
-				depth.assign( projectionDepth( d, this._cameraNear, this._cameraFar ) );
+				depth.assign( projectionDepth( gathered.nearest, this._cameraNear, this._cameraFar ) );
 
-				const minViewZ = depthToViewZ( minD, this._cameraNear, this._cameraFar, this._camera ).toConst();
-				const maxViewZ = depthToViewZ( maxD, this._cameraNear, this._cameraFar, this._camera ).toConst();
+				const nearestViewZ = depthToViewZ( gathered.nearest, this._cameraNear, this._cameraFar, this._camera ).toConst();
+				const farthestViewZ = depthToViewZ( gathered.farthest, this._cameraNear, this._cameraFar, this._camera ).toConst();
 
-				If( minViewZ.div( maxViewZ ).sub( 1 ).abs().greaterThan( 0.01 ), () => {
+				If( nearestViewZ.div( farthestViewZ ).sub( 1 ).abs().greaterThan( 0.01 ), () => {
 
-					const size = vec2( textureSize( this.depthNode, 0 ) ).toConst();
-					const offset = g.w.equal( d ).select( vec2( 0.5, 0.5 ), g.z.equal( d ).select( vec2( 1.5, 0.5 ), g.y.equal( d ).select( vec2( 1.5, 1.5 ), vec2( 0.5, 1.5 ) ) ) ).toConst();
-
-					normalUV.assign( uvNode.mul( size ).sub( 0.5 ).floor().add( offset ).div( size ) );
+					normalUV.assign( gathered.uv );
 
 				} );
 
@@ -636,6 +641,25 @@ class GTAONode extends Node {
 }
 
 export default GTAONode;
+
+// returns the nearest and farthest of the four depths around the uv and the texel center of the nearest
+
+function gatherNearestDepth( depthNode, uv, builder ) {
+
+	const g = depthNode.gather().sample( uv ).toConst();
+	const minDepth = min( min( g.x, g.y ), min( g.z, g.w ) ).toConst();
+	const maxDepth = max( max( g.x, g.y ), max( g.z, g.w ) ).toConst();
+
+	const reversed = builder.renderer.reversedDepthBuffer === true;
+	const nearest = reversed ? maxDepth : minDepth;
+	const farthest = reversed ? minDepth : maxDepth;
+
+	const size = vec2( textureSize( depthNode, 0 ) );
+	const offset = g.w.equal( nearest ).select( vec2( 0.5, 0.5 ), g.z.equal( nearest ).select( vec2( 1.5, 0.5 ), g.y.equal( nearest ).select( vec2( 1.5, 1.5 ), vec2( 0.5, 1.5 ) ) ) );
+
+	return { nearest, farthest, uv: uv.mul( size ).sub( 0.5 ).floor().add( offset ).div( size ) };
+
+}
 
 /**
  * Generates the AO's noise texture for the given size.
