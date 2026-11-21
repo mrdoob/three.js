@@ -249,6 +249,7 @@ import './src/renderers/webgl/WebGLRenderLists.tests.js';
 
 //src/renderers/webgpu
 import './src/renderers/webgpu/WebGPUBackend.tests.js';
+import './src/renderers/webgpu/WebGPUUniformBufferPool.tests.js';
 
 
 //src/scenes
