@@ -125,17 +125,6 @@ export class LUT3dlLoader extends Loader {
 		const gridLines = result[ 0 ].trim().split( /\s+/g ).map( Number );
 		const size = gridLines.length;
 		const sizeSq = size ** 2;
-		const gridStep = ( gridLines[ size - 1 ] - gridLines[ 0 ] ) / ( size - 1 );
-
-		for ( let i = 1; i < size; ++ i ) {
-
-			if ( Math.abs( gridLines[ i ] - gridLines[ 0 ] - i * gridStep ) > 1 ) {
-
-				throw new Error( 'THREE.LUT3dlLoader: Inconsistent grid size' );
-
-			}
-
-		}
 
 		const dataFloat = new Float32Array( size ** 3 * 4 );
 		let maxValue = 0.0;
