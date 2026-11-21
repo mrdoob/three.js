@@ -1046,13 +1046,18 @@ class TextureNode extends UniformNode {
 	 */
 	clone() {
 
-		const newNode = new this.constructor( this.value, this.uvNode, this.levelNode, this.biasNode );
+		const newNode = new this.constructor();
+		newNode.value = this.value;
+		newNode.uvNode = this.uvNode;
+		newNode.levelNode = this.levelNode;
+		newNode.biasNode = this.biasNode;
 		newNode.sampler = this.sampler;
 		newNode.depthNode = this.depthNode;
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
 		newNode.gatherNode = this.gatherNode;
 		newNode.offsetNode = this.offsetNode;
+		newNode.updateMatrix = this.updateMatrix;
 
 		return newNode;
 
