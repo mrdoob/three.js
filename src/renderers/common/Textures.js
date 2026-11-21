@@ -331,9 +331,12 @@ class Textures extends DataMap {
 
 			if ( 'requestPaint' in canvas ) {
 
-				if ( ! canvas.hasAttribute( 'layoutsubtree' ) ) {
+				// HTML-in-Canvas requires content="drawable" on the canvas and the drawable attribute on drawn children.
+				if ( canvas.content !== 'drawable' ) canvas.setAttribute( 'content', 'drawable' );
 
-					canvas.setAttribute( 'layoutsubtree', 'true' );
+				if ( ! texture.image.hasAttribute( 'drawable' ) ) {
+
+					texture.image.setAttribute( 'drawable', '' );
 
 				}
 

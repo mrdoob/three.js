@@ -1318,14 +1318,16 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else if ( texture.isHTMLTexture ) {
 
-				if ( 'texElementImage2D' in _gl ) {
+				if ( typeof _gl.texElementSubImage2D === 'function' ) {
 
 					const canvas = _gl.canvas;
 
-					// Ensure the canvas supports HTML-in-Canvas and the element is a child.
-					if ( ! canvas.hasAttribute( 'layoutsubtree' ) ) {
+					// Ensure the canvas supports HTML-in-Canvas and the element is a drawable child.
+					if ( canvas.content !== 'drawable' ) canvas.setAttribute( 'content', 'drawable' );
 
-						canvas.setAttribute( 'layoutsubtree', 'true' );
+					if ( ! image.hasAttribute( 'drawable' ) ) {
+
+						image.setAttribute( 'drawable', '' );
 
 					}
 
@@ -1357,24 +1359,40 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					}
 
-					if ( _gl.texElementImage2D.length === 3 ) {
+					// The snapshot is copied into an existing texture, so the texture has to be
+					// allocated first with the default size of the element snapshot.
 
-						// Chrome 150+
+					let size;
 
-						_gl.texElementImage2D( _gl.TEXTURE_2D, _gl.RGBA8, image );
+					try {
 
-					} else {
+						size = canvas.getElementImageDefaultSize( image );
 
-						// Chrome 138 - 149
+					} catch ( e ) {
 
-						const level = 0;
-						const internalFormat = _gl.RGBA;
-						const srcFormat = _gl.RGBA;
-						const srcType = _gl.UNSIGNED_BYTE;
-
-						_gl.texElementImage2D( _gl.TEXTURE_2D, level, internalFormat, srcFormat, srcType, image );
+						// No paint record for the element yet. Returning early keeps the
+						// texture marked for upload, so the copy is retried on the next frame.
+						canvas.requestPaint();
+						return;
 
 					}
+
+					// Default sizes are fractional, whereas the copy is rounded up.
+					const width = Math.ceil( size.width );
+					const height = Math.ceil( size.height );
+
+					// Allocate only on first upload or when the size changes; re-allocating resets the contents.
+					if ( allocateMemory || textureProperties.__width !== width || textureProperties.__height !== height ) {
+
+						state.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA8, width, height, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, null );
+						textureProperties.__width = width;
+						textureProperties.__height = height;
+
+					}
+
+					// Pass the destination size. It forces the copy to exactly fill the
+					// allocated texture, independently of how the canvas is sized.
+					_gl.texElementSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, image, { width, height } );
 
 					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR );
 					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
