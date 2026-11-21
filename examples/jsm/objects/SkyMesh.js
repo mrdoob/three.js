@@ -14,7 +14,7 @@ import {
 	warnOnce
 } from 'three/webgpu';
 
-import { Fn, float, floor, fract, vec2, vec3, abs, acos, add, mul, clamp, dot, exp, inverseSqrt, max, min, mix, modelViewProjection, nodeObject, normalize, positionWorld, smoothstep, sqrt, sub, vec4, uniform, cameraPosition, time, If, Loop, rtt, uv, log2 } from 'three/tsl';
+import { Fn, float, floor, fract, vec2, vec3, abs, acos, add, mul, clamp, dot, exp, inverseSqrt, max, min, mix, modelViewProjection, nodeObject, normalize, positionWorld, smoothstep, sqrt, sub, vec4, uniform, cameraPosition, time, If, Loop, rtt, uv, log2, varying } from 'three/tsl';
 
 // The cloud noise is baked into a texture of NOISE_SIZE texels that tiles over NOISE_CELLS noise cells.
 const NOISE_SIZE = 512;
@@ -287,6 +287,10 @@ class SkyNode extends Node {
 
 		const colorNode = /*@__PURE__*/ Fn( () => {
 
+			//
+			// vertex stage
+			//
+
 			// wavelength of used primaries, according to preetham
 			// const lambda = vec3( 680E-9, 550E-9, 450E-9 );
 			// this pre-calculation replaces older TotalRayleigh(vec3 lambda) function:
@@ -306,12 +310,12 @@ class SkyNode extends Node {
 			const steepness = float( 1.5 );
 			const EE = float( 1000.0 );
 
-			// sun position
+			// varying sun position
 
 			const sunDirection = normalize( this.sunPosition );
-			const vSunDirection = sunDirection;
+			const vSunDirection = varying( sunDirection );
 
-			// sun intensity
+			// varying sun intensity
 
 			const angle = sunDirection.y;
 			const zenithAngleCos = clamp( angle, - 1, 1 );
@@ -321,36 +325,40 @@ class SkyNode extends Node {
 			const sunCos = max( 0.0, angle );
 			const sunOzoneAirMass = float( 1.0 ).div( sqrt( sunCos.mul( sunCos ).add( 0.004 ) ) );
 			const ozoneExtinction = this.absorptionColor.mul( this.absorptionScale.mul( 0.016 ) );
-			const vSunE = exp( ozoneExtinction.mul( sunOzoneAirMass ).negate() ).mul( sunIntensity );
+			const vSunE = varying( exp( ozoneExtinction.mul( sunOzoneAirMass ).negate() ).mul( sunIntensity ) );
 
 			// sun fade
 
 			const sunfade = float( 1.0 ).sub( clamp( float( 1.0 ).sub( exp( sunDirection.y ) ), 0, 1 ) );
 
-			// vBetaR
+			// varying vBetaR
 
 			const rayleighCoefficient = max( 0.0, this.rayleigh.sub( float( 1.0 ).sub( sunfade ) ) );
 			const betaR = totalRayleigh.mul( rayleighCoefficient );
 
 			// extinction (absorption + out scattering)
 			// rayleigh coefficients
-			const vBetaR = betaR;
+			const vBetaR = varying( betaR );
 
-			// vBetaM, the aerosols scatter mieAlbedo of the light they extinguish
+			// varying vBetaM, the aerosols scatter mieAlbedo of the light they extinguish
 
 			const concentration = float( 0.2 ).mul( this.turbidity ).mul( 10E-18 );
 			const totalMie = float( 0.434 ).mul( concentration ).mul( MieConst );
 			const betaMExt = totalMie.mul( this.mieCoefficient ).mul( this.mieColor );
 			const betaM = betaMExt.mul( this.mieAlbedo );
 
-			const vBetaM = betaM;
-			const vBetaMExt = betaMExt;
+			const vBetaM = varying( betaM );
+			const vBetaMExt = varying( betaMExt );
 
 			// sun-path transmittance through lower troposphere to cloud altitude (~2km)
 
 			const sunCloudCos = max( 0.0, angle.add( 0.03 ) );
 			const sunCloudAirMass = float( 2.0 ).div( sunCloudCos.add( sqrt( sunCloudCos.mul( sunCloudCos ).add( 0.012 ) ) ) );
-			const vSunFex = exp( betaR.mul( 4600.0 ).add( betaMExt.mul( 190.0 ) ).mul( sunCloudAirMass ).negate() );
+			const vSunFex = varying( exp( betaR.mul( 4600.0 ).add( betaMExt.mul( 190.0 ) ).mul( sunCloudAirMass ).negate() ) );
+
+			//
+			// fragment stage
+			//
 
 			// optical length at zenith for molecules
 			const rayleighZenithLength = float( 8.4E3 );
