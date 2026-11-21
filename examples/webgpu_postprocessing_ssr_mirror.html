@@ -44,9 +44,10 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, velocity, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
+		import { reprojectedBeauty, previousViewZ } from 'three/addons/tsl/display/ReprojectedBeautyNode.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -143,7 +144,8 @@
 			scenePass.setMRT( mrt( {
 				output: output,
 				normal: packNormalToOctahedral( normalView ),
-				metalrough: vec2( metalness, roughness ) // pack metalness and roughness into a single attachment
+				metalrough: vec2( metalness, roughness ), // pack metalness and roughness into a single attachment
+				velocity: vec4( velocity, 0, previousViewZ )
 			} ) );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
@@ -178,7 +180,8 @@
 
 			//
 
-			const reflection = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+			const reflection = ssr( reprojectedBeauty( scenePass ), scenePassDepth, sceneNormal, {
+				camera,
 				metalnessNode: scenePassMetalRough.r,
 				roughnessNode: scenePassMetalRough.g,
 				binaryRefine: params.binaryRefine
