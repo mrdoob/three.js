@@ -2598,8 +2598,8 @@ class VRMLLoader extends Loader {
 
 			let crossSection = [ 1, 1, 1, - 1, - 1, - 1, - 1, 1, 1, 1 ];
 			let spine = [ 0, 0, 0, 0, 1, 0 ];
-			let scale;
-			let orientation;
+			let scale = [ 1, 1 ];
+			let orientation = [ 0, 0, 1, 0 ];
 
 			let beginCap = true;
 			let ccw = true;
@@ -2681,14 +2681,19 @@ class VRMLLoader extends Loader {
 
 				spineVector.fromArray( spine, i );
 
-				scaling.x = scale ? scale[ j + 0 ] : 1;
-				scaling.y = 1;
-				scaling.z = scale ? scale[ j + 1 ] : 1;
+				// a single scale or orientation value is applied at all spine points
 
-				axis.x = orientation ? orientation[ o + 0 ] : 0;
-				axis.y = orientation ? orientation[ o + 1 ] : 0;
-				axis.z = orientation ? orientation[ o + 2 ] : 1;
-				const angle = orientation ? orientation[ o + 3 ] : 0;
+				const s = ( scale.length === 2 ) ? 0 : j;
+				const r = ( orientation.length === 4 ) ? 0 : o;
+
+				scaling.x = scale[ s + 0 ];
+				scaling.y = 1;
+				scaling.z = scale[ s + 1 ];
+
+				axis.x = orientation[ r + 0 ];
+				axis.y = orientation[ r + 1 ];
+				axis.z = orientation[ r + 2 ];
+				const angle = orientation[ r + 3 ];
 
 				for ( let k = 0, kl = crossSection.length; k < kl; k += 2 ) {
 
