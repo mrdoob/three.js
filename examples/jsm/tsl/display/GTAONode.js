@@ -1,8 +1,7 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
+import { reference, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context, isBackgroundDepth, projectionDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
 
 // From Activision GTAO paper: https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
 const _temporalRotations = [ 60, 300, 180, 240, 120, 0 ];
@@ -57,7 +56,7 @@ class GTAONode extends Node {
 	/**
 	 * Constructs a new GTAO node.
 	 *
-	 * @param {Node<float>} depthNode - A node that represents the scene's depth.
+	 * @param {TextureNode} depthNode - A texture node that represents the scene's depth.
 	 * @param {?Node<vec3>} normalNode - A node that represents the scene's normals.
 	 * @param {Camera} camera - The camera the scene is rendered with.
 	 */
@@ -66,9 +65,9 @@ class GTAONode extends Node {
 		super( 'float' );
 
 		/**
-		 * A node that represents the scene's depth.
+		 * A texture node that represents the scene's depth.
 		 *
-		 * @type {Node<float>}
+		 * @type {TextureNode}
 		 */
 		this.depthNode = depthNode;
 
@@ -80,15 +79,6 @@ class GTAONode extends Node {
 		 * @type {?Node<vec3>}
 		 */
 		this.normalNode = normalNode;
-
-		/**
-		 * The resolution scale. By default the effect is rendered in full resolution
-		 * for best quality but a value of `0.5` should be sufficient for most scenes.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.resolutionScale = 1;
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
@@ -173,7 +163,7 @@ class GTAONode extends Node {
 		this.useTemporalFiltering = false;
 
 		/**
-		 * The resolution of the effect. Can be scaled via `resolutionScale`.
+		 * The resolution of the effect, which is the resolution of the depth node.
 		 *
 		 * @private
 		 * @type {UniformNode<vec2>}
@@ -253,14 +243,6 @@ class GTAONode extends Node {
 		this._temporalOffset = uniform( 0 );
 
 		/**
-		 * Resolution scale uniform.
-		 *
-		 * @private
-		 * @type {UniformNode<float>}
-		 */
-		this._resolutionScale = uniform( 0 );
-
-		/**
 		 * The TSL function that computes the AO. Required for rebuild.
 		 *
 		 * @private
@@ -324,10 +306,6 @@ class GTAONode extends Node {
 	 */
 	setSize( width, height ) {
 
-		width = Math.round( this.resolutionScale * width );
-		height = Math.round( this.resolutionScale * height );
-
-		this._resolutionScale.value = this.resolutionScale;
 		this._resolution.value.set( width, height );
 		this._aoRenderTarget.setSize( width, height );
 
@@ -374,8 +352,8 @@ class GTAONode extends Node {
 
 		//
 
-		const size = renderer.getDrawingBufferSize( _size );
-		this.setSize( size.width, size.height );
+		const { width, height } = this.depthNode.value.image;
+		this.setSize( width, height );
 
 		_quadMesh.material = this._material;
 		_quadMesh.name = 'AO';
@@ -403,6 +381,10 @@ class GTAONode extends Node {
 	 */
 	setup( builder ) {
 
+		// the depth node defines the resolution of the effect and must be updated first
+
+		builder.getNodeProperties( this ).depthNode = this.depthNode;
+
 		const uvNode = uv();
 
 		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
@@ -422,38 +404,7 @@ class GTAONode extends Node {
 
 		this._ao = Fn( () => {
 
-			const depth = float( 0 ).toVar();
-			const normalUV = uvNode.toVar();
-
-			If( this._resolutionScale.lessThan( 1 ), () => {
-
-				// Use the nearest depth texel to avoid banding. At silhouettes (view-space depth difference above 1%), take the
-				// normal from that texel to avoid dark rims. At creases, keep the blended normal to avoid jumpy noise.
-
-				const g = this.depthNode.gather().sample( uvNode ).toConst();
-				const minD = min( min( g.x, g.y ), min( g.z, g.w ) ).toConst();
-				const maxD = max( max( g.x, g.y ), max( g.z, g.w ) ).toConst();
-				const d = builder.renderer.reversedDepthBuffer === true ? maxD : minD;
-
-				depth.assign( projectionDepth( d, this._cameraNear, this._cameraFar ) );
-
-				const minViewZ = depthToViewZ( minD, this._cameraNear, this._cameraFar, this._camera ).toConst();
-				const maxViewZ = depthToViewZ( maxD, this._cameraNear, this._cameraFar, this._camera ).toConst();
-
-				If( minViewZ.div( maxViewZ ).sub( 1 ).abs().greaterThan( 0.01 ), () => {
-
-					const size = vec2( textureSize( this.depthNode, 0 ) ).toConst();
-					const offset = g.w.equal( d ).select( vec2( 0.5, 0.5 ), g.z.equal( d ).select( vec2( 1.5, 0.5 ), g.y.equal( d ).select( vec2( 1.5, 1.5 ), vec2( 0.5, 1.5 ) ) ) ).toConst();
-
-					normalUV.assign( uvNode.mul( size ).sub( 0.5 ).floor().add( offset ).div( size ) );
-
-				} );
-
-			} ).Else( () => {
-
-				depth.assign( sampleDepth( uvNode ) );
-
-			} );
+			const depth = sampleDepth( uvNode ).toVar();
 
 			isBackgroundDepth( depth ).discard();
 
@@ -461,7 +412,7 @@ class GTAONode extends Node {
 			const centerTexel = uvNode.mul( depthSize ).floor().toConst();
 
 			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toConst();
-			const viewNormal = sampleNormal( normalUV ).toConst();
+			const viewNormal = sampleNormal( uvNode ).toConst();
 
 			const radius = this.radius;
 			const invRadius = radius.reciprocal().toConst();
@@ -533,7 +484,7 @@ class GTAONode extends Node {
 
 					// x
 
-					const sampleScreenPositionX = getScreenPositionFromClip( clipPosition.add( clipOffset ) ).toConst();
+					const sampleScreenPositionX = getScreenPositionFromClip( clipPosition.add( clipOffset ) ).mul( depthSize ).floor().add( 0.5 ).div( depthSize ).toConst();
 					const sampleDepthX = sampleDepth( sampleScreenPositionX ).toConst();
 					const sampleSceneViewPositionX = getViewPosition( sampleScreenPositionX, sampleDepthX, this._cameraProjectionMatrixInverse ).toConst();
 					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition ).toConst();
@@ -557,7 +508,7 @@ class GTAONode extends Node {
 
 					// y
 
-					const sampleScreenPositionY = getScreenPositionFromClip( clipPosition.sub( clipOffset ) ).toConst();
+					const sampleScreenPositionY = getScreenPositionFromClip( clipPosition.sub( clipOffset ) ).mul( depthSize ).floor().add( 0.5 ).div( depthSize ).toConst();
 					const sampleDepthY = sampleDepth( sampleScreenPositionY ).toConst();
 					const sampleSceneViewPositionY = getViewPosition( sampleScreenPositionY, sampleDepthY, this._cameraProjectionMatrixInverse ).toConst();
 					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition ).toConst();
@@ -738,7 +689,7 @@ function generateMagicSquare( size ) {
  *
  * @tsl
  * @function
- * @param {Node<float>} depthNode - A node that represents the scene's depth.
+ * @param {TextureNode} depthNode - A texture node that represents the scene's depth.
  * @param {?Node<vec3>} normalNode - A node that represents the scene's normals.
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {GTAONode}

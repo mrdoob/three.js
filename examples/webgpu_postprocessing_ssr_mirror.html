@@ -44,8 +44,10 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking, rtt, Fn } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+		import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
+		import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -184,8 +186,50 @@
 				binaryRefine: params.binaryRefine
 			} ).toInspector( 'SSR' );
 
-			const raw = passTexture( reflection, reflection.getRenderTarget().texture );
-			const blurred = reflection.getTextureNode();
+			// downsample: at a ratio above 1, the reflections are computed from downsampled inputs and upsampled afterwards
+
+			const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
+
+			const downsample = depthAwareDownsample( scenePassDepth, { normal: scenePassNormal, metalrough: scenePassMetalRough } );
+			const downsampleDepth = downsample.getTextureNode( 'depth' );
+			const downsampleMetalRough = downsample.getTextureNode( 'metalrough' );
+			const downsampleNormal = sample( ( uv ) => {
+
+				return unpackOctahedralToNormal( downsample.getTextureNode( 'normal' ).sample( uv ).rg );
+
+			} );
+
+			// without depth rejection, the joint bilateral filter is a bilinear filter
+
+			const depthTolerance = uniform( 0.005 );
+
+			const upsample = ( node ) => {
+
+				const upsampled = rtt( jointBilateralUpsample( node, downsampleDepth, scenePassDepth, camera, { depthTolerance } ).sample( screenUV ) ).sample( screenUV );
+
+				return Fn( () => ( downsampleParams.level > 0 ) ? upsampled : node )();
+
+			};
+
+			function updateDownsample() {
+
+				const reduced = downsampleParams.level > 0;
+
+				if ( reduced ) downsample.level = downsampleParams.level;
+
+				reflection.depthNode = reduced ? downsampleDepth : scenePassDepth;
+				reflection.normalNode = reduced ? downsampleNormal : sceneNormal;
+				reflection.metalnessNode = reduced ? downsampleMetalRough.r : scenePassMetalRough.r;
+				reflection.roughnessNode = reduced ? downsampleMetalRough.g : scenePassMetalRough.g;
+
+				renderPipeline.needsUpdate = true;
+
+				reduced ? upsamplerControl.show() : upsamplerControl.hide();
+
+			}
+
+			const raw = upsample( passTexture( reflection, reflection.getRenderTarget().texture ) );
+			const blurred = upsample( reflection.getTextureNode() );
 			const blurEnabled = uniform( 1 );
 			const combined = scenePassColor.rgb.add( mix( raw.rgb, blurred.rgb, blurEnabled ) );
 			const spatialAA = smaa( vec4( combined, 1 ) );
@@ -218,6 +262,15 @@
 
 			const displayGui = renderer.inspector.createParameters( 'Display' );
 			displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN' ] ).name( 'Output' ).info( 'DN means denoise; this mirror example uses spatial blur rather than stochastic denoising.' ).onChange( updateOutput );
+
+			const downsampleGui = renderer.inspector.createParameters( 'Downsample' );
+			downsampleGui.add( downsampleParams, 'level', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => {
+
+				downsampleParams.level = Number( value );
+				updateDownsample();
+
+			} );
+			const upsamplerControl = downsampleGui.add( downsampleParams, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 ).hide();
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
 			ssrGui.add( params, 'enabled' ).name( 'Enabled' ).onChange( updateOutput );

@@ -39,9 +39,11 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { sample, pass, mrt, screenUV, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext } from 'three/tsl';
+			import { sample, pass, mrt, screenUV, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext, rtt, uniform, textureSize, vec2 } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { ssao } from 'three/addons/tsl/display/SSAONode.js';
+			import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
+			import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -54,13 +56,14 @@
 
 			let camera, scene, renderer, renderPipeline, controls;
 
-			let aoPass, traaPass, transparentMesh;
+			let aoPass, aoNode, upsamplePass, traaPass, transparentMesh;
 
 			const params = {
 				aoType: 'GTAO',
 				samples: 16,
 				radius: 0.4,
-				resolutionScale: 0.5,
+				downsample: 1,
+				upsampler: 'Joint bilateral',
 				scale: 1.5, // GTAO
 				thickness: 1, // GTAO
 				temporalFiltering: true, // GTAO
@@ -68,7 +71,7 @@
 				bias: 0.025, // SSAO
 				blurEnabled: true, // SSAO
 				blurSharpness: 2, // SSAO
-				aoOnly: false,
+				output: 'Beauty',
 				transparentOpacity: 0.3
 			};
 
@@ -139,6 +142,20 @@
 				const normalTexture = prePass.getTexture( 'output' );
 				normalTexture.type = THREE.UnsignedByteType;
 
+				// downsample: at a ratio above 1, the AO is computed from downsampled inputs and upsampled afterwards
+
+				const downsample = depthAwareDownsample( prePassDepth, { normal: prePass.getTextureNode() } );
+				const downsampleDepth = downsample.getTextureNode( 'depth' );
+				const downsampleNormal = sample( ( uv ) => {
+
+					return unpackRGBToNormal( downsample.getTextureNode( 'normal' ).sample( uv ) );
+
+				} );
+
+				// without depth rejection, the joint bilateral filter is a bilinear filter
+
+				const depthTolerance = uniform( 0.005 );
+
 				// scene pass
 
 				const scenePass = pass( scene, camera ).toInspector( 'Color' );
@@ -160,8 +177,16 @@
 
 					scenePass.options.samples = useTRAA ? 0 : 4;
 
-					renderPipeline.outputNode = params.aoOnly ? vec4( vec3( aoPass.getTextureNode().sample( screenUV ).r ), 1 ) : ( useTRAA ? traaPass : scenePass );
-					renderer.toneMapping = params.aoOnly ? THREE.NoToneMapping : THREE.NeutralToneMapping;
+					const beauty = ( params.output === 'Beauty' );
+					const aoTexture = aoPass.getTextureNode();
+					const aoSize = vec2( textureSize( aoTexture ) );
+
+					// raw output samples texel centers to show the AO texels unfiltered
+
+					const aoOutput = ( params.output === 'AO Raw' ) ? aoTexture.sample( screenUV.mul( aoSize ).floor().add( 0.5 ).div( aoSize ) ).r : aoNode;
+
+					renderPipeline.outputNode = beauty ? ( useTRAA ? traaPass : scenePass ) : vec4( vec3( aoOutput ), 1 );
+					renderer.toneMapping = beauty ? THREE.NeutralToneMapping : THREE.NoToneMapping;
 					renderPipeline.needsUpdate = true;
 
 				}
@@ -169,14 +194,25 @@
 				function createAO() {
 
 					if ( aoPass ) aoPass.dispose();
+					if ( upsamplePass ) upsamplePass.dispose();
+
+					const reduced = params.downsample > 0;
+
+					if ( reduced ) downsample.level = params.downsample;
+
+					const depth = reduced ? downsampleDepth : prePassDepth;
+					const normal = reduced ? downsampleNormal : prePassNormal;
 
 					aoPass = ( params.aoType === 'SSAO' )
-						? ssao( prePassDepth, prePassNormal, camera ).toInspector( 'SSAO', ( inspectNode ) => inspectNode.r )
-						: ao( prePassDepth, prePassNormal, camera ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
+						? ssao( depth, normal, camera ).toInspector( 'SSAO', ( inspectNode ) => inspectNode.r )
+						: ao( depth, normal, camera ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
+
+					upsamplePass = reduced ? rtt( jointBilateralUpsample( aoPass.getTextureNode(), downsampleDepth, prePassDepth, camera, { depthTolerance } ).sample( screenUV ) ) : null;
+					aoNode = ( reduced ? upsamplePass : aoPass.getTextureNode() ).sample( screenUV ).r;
 
 					updateParameters();
 
-					scenePass.contextNode = builtinAOContext( aoPass.getTextureNode().sample( screenUV ).r );
+					scenePass.contextNode = builtinAOContext( aoNode );
 					scenePass.needsUpdate = true;
 
 					updateOutput();
@@ -527,44 +563,62 @@
 				// GUI
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
-				gui.add( params, 'aoType', [ 'GTAO', 'SSAO' ] ).name( 'AO type' ).onChange( () => {
+				gui.add( params, 'output', [ 'Beauty', 'AO Raw', 'AO Upsampled' ] ).onChange( updateOutput );
+
+				const aoFolder = gui.addFolder( 'AO' );
+				aoFolder.add( params, 'aoType', [ 'GTAO', 'SSAO' ] ).name( 'AO type' ).onChange( () => {
 
 					// half resolution suffices for GTAO since TRAA smooths it, SSAO looks best at full resolution
 
-					resolutionScaleControl.setValue( params.aoType === 'SSAO' ? 1 : 0.5 );
+					downsampleControl.setValue( params.aoType === 'SSAO' ? 0 : 1 );
+					params.downsample = ( params.aoType === 'SSAO' ) ? 0 : 1;
 
 					createAO();
 					updateControls();
 
 				} );
-				const resolutionScaleControl = gui.add( params, 'resolutionScale', 0, 1 ).name( 'resolution' ).onChange( updateParameters );
-				gui.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters ).debounce( 250 );
-				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
+				aoFolder.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters ).debounce( 250 );
+				aoFolder.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
+
+				const downsampleFolder = gui.addFolder( 'Downsample' );
+				const downsampleControl = downsampleFolder.add( params, 'downsample', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => {
+
+					params.downsample = Number( value );
+
+					createAO();
+					updateControls();
+
+				} );
+				const upsamplerControl = downsampleFolder.add( params, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 );
+
+				const filteringFolder = gui.addFolder( 'Filtering' );
 
 				const gtaoControls = [
-					gui.add( params, 'scale', 0.01, 2 ).onChange( updateParameters ),
-					gui.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters ),
-					gui.add( params, 'temporalFiltering' ).name( 'temporal filtering' ).onChange( updateParameters )
+					aoFolder.add( params, 'scale', 0.01, 2 ).onChange( updateParameters ),
+					aoFolder.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters ),
+					filteringFolder.add( params, 'temporalFiltering' ).name( 'temporal' ).onChange( updateParameters )
 				];
 
 				const ssaoControls = [
-					gui.add( params, 'intensity', 0, 4 ).onChange( updateParameters ),
-					gui.add( params, 'bias', 0, 0.2 ).onChange( updateParameters ),
-					gui.add( params, 'blurEnabled' ).name( 'blur' ).onChange( updateParameters ),
-					gui.add( params, 'blurSharpness', 0, 8 ).name( 'blur sharpness' ).onChange( updateParameters )
+					aoFolder.add( params, 'intensity', 0, 4 ).onChange( updateParameters ),
+					aoFolder.add( params, 'bias', 0, 0.2 ).onChange( updateParameters ),
+					filteringFolder.add( params, 'blurEnabled' ).name( 'blur' ).onChange( updateParameters ),
+					filteringFolder.add( params, 'blurSharpness', 0, 8 ).name( 'blur sharpness' ).onChange( updateParameters )
 				];
 
-				gui.add( transparentMesh, 'visible' ).name( 'show transparent mesh' );
-				gui.add( params, 'transparentOpacity', 0, 1, 0.01 ).name( 'mesh opacity' ).onChange( ( value ) => {
+				const debugFolder = gui.addFolder( 'Debug' );
+				debugFolder.add( transparentMesh, 'visible' ).name( 'transparent mesh' ).onChange( ( value ) => value ? opacityControl.show() : opacityControl.hide() );
+				const opacityControl = debugFolder.add( params, 'transparentOpacity', 0, 1, 0.01 ).name( 'mesh opacity' ).onChange( ( value ) => {
 
 					transparentMesh.material.opacity = value;
 
-				} );
-				gui.add( params, 'aoOnly' ).onChange( updateOutput );
+				} ).hide();
 
 				// show only the controls that apply to the active AO type
 
 				function updateControls() {
+
+					params.downsample > 0 ? upsamplerControl.show() : upsamplerControl.hide();
 
 					if ( params.aoType === 'GTAO' ) {
 
@@ -588,7 +642,6 @@
 
 				aoPass.samples.value = params.samples;
 				aoPass.radius.value = params.radius;
-				aoPass.resolutionScale = params.resolutionScale;
 
 				if ( params.aoType === 'SSAO' ) {
 

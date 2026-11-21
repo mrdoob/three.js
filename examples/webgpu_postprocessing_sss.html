@@ -40,8 +40,10 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, vec3, vec4, mrt, screenUV, velocity, builtinShadowContext } from 'three/tsl';
+			import { pass, vec3, vec4, mrt, screenUV, velocity, builtinShadowContext, rtt, uniform, Fn } from 'three/tsl';
 			import { sss } from 'three/addons/tsl/display/SSSNode.js';
+			import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
+			import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -161,7 +163,41 @@
 
 				// scene context
 
-				const sssSample = sssPass.getTextureNode().sample( screenUV ).r;
+				// downsample: at a ratio above 1, the shadows are computed from downsampled inputs and upsampled afterwards
+
+				const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
+
+				const downsample = depthAwareDownsample( prePassDepth );
+				const downsampleDepth = downsample.getTextureNode( 'depth' );
+
+				// without depth rejection, the joint bilateral filter is a bilinear filter
+
+				const depthTolerance = uniform( 0.005 );
+
+				const upsample = ( node ) => {
+
+					const upsampled = rtt( jointBilateralUpsample( node, downsampleDepth, prePassDepth, camera, { depthTolerance } ).sample( screenUV ) ).sample( screenUV );
+
+					return Fn( () => ( downsampleParams.level > 0 ) ? upsampled : node )();
+
+				};
+
+				function updateDownsample() {
+
+					const reduced = downsampleParams.level > 0;
+
+					if ( reduced ) downsample.level = downsampleParams.level;
+
+					sssPass.depthNode = reduced ? downsampleDepth : prePassDepth;
+
+					scenePass.needsUpdate = true;
+					renderPipeline.needsUpdate = true;
+
+					reduced ? upsamplerControl.show() : upsamplerControl.hide();
+
+				}
+
+				const sssSample = upsample( sssPass.getTextureNode().sample( screenUV ) ).r;
 				const sssContext = builtinShadowContext( sssSample, dirLight );
 
 				scenePass.contextNode = sssContext;
@@ -188,13 +224,24 @@
 
 				const types = { 'Scene with Shadow Maps + SSS': 0, 'Scene with Shadow Maps': 1, 'SSS': 2, };
 
-				const gui = renderer.inspector.createParameters( 'SSS settings' );
-				gui.add( params, 'output', types ).onChange( updatePostprocessing );
-				gui.add( sssPass.shadowIntensity, 'value', 0, 1 ).name( 'shadow intensity' );
-				gui.add( sssPass.maxDistance, 'value', 0.01, 1 ).name( 'max ray distance' );
-				gui.add( sssPass.quality, 'value', 0, 1 ).name( 'quality' );
-				gui.add( sssPass.thickness, 'value', 0.01, 0.1 ).name( 'thickness' );
-				gui.add( sssPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );
+				const displayGui = renderer.inspector.createParameters( 'Display' );
+				displayGui.add( params, 'output', types ).onChange( updatePostprocessing );
+
+				const downsampleGui = renderer.inspector.createParameters( 'Downsample' );
+				downsampleGui.add( downsampleParams, 'level', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => {
+
+					downsampleParams.level = Number( value );
+					updateDownsample();
+
+				} );
+				const upsamplerControl = downsampleGui.add( downsampleParams, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 ).hide();
+
+				const sssGui = renderer.inspector.createParameters( 'SSS' );
+				sssGui.add( sssPass.shadowIntensity, 'value', 0, 1 ).name( 'shadow intensity' );
+				sssGui.add( sssPass.maxDistance, 'value', 0.01, 1 ).name( 'max ray distance' );
+				sssGui.add( sssPass.quality, 'value', 0, 1 ).name( 'quality' );
+				sssGui.add( sssPass.thickness, 'value', 0.01, 0.1 ).name( 'thickness' );
+				sssGui.add( sssPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );
 
 				function updatePostprocessing() {
 
@@ -202,7 +249,7 @@
 
 					if ( params.output === 2 ) {
 
-						renderPipeline.outputNode = vec4( vec3( sssPass.r ), 1 );
+						renderPipeline.outputNode = vec4( vec3( sssSample ), 1 );
 
 					} else {
 

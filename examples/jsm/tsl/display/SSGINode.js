@@ -1,8 +1,7 @@
 import { RenderTarget, Vector2, Node, QuadMesh, NodeMaterial, RendererUtils, MathUtils, RGBFormat, RedFormat, UnsignedInt101111Type, UnsignedByteType } from 'three/webgpu';
-import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, outputStruct, context, isBackgroundDepth, min, projectionDepth, textureSize, depthToViewZ } from 'three/tsl';
+import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, outputStruct, context, isBackgroundDepth, projectionDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
 
 // From Activision GTAO paper: https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
 const _temporalRotations = [ 60, 300, 180, 240, 120, 0 ];
@@ -82,16 +81,6 @@ class SSGINode extends Node {
 		 * @type {TextureNode}
 		 */
 		this.normalNode = normalNode;
-
-		/**
-		 * The resolution scale. Values towards `0.5` noticeably increase noise, so it's
-		 * recommended to lower the renderer's pixel ratio first. Use this property only
-		 * for fine-tuning performance.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.resolutionScale = 1;
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
@@ -237,14 +226,6 @@ class SSGINode extends Node {
 		this._temporalOffset = uniform( 0 );
 
 		/**
-		 * Resolution scale uniform.
-		 *
-		 * @private
-		 * @type {UniformNode<float>}
-		 */
-		this._resolutionScale = uniform( 0 );
-
-		/**
 		 * Represents the projection matrix of the scene's camera.
 		 *
 		 * @private
@@ -360,10 +341,6 @@ class SSGINode extends Node {
 	 */
 	setSize( width, height ) {
 
-		width = Math.round( this.resolutionScale * width );
-		height = Math.round( this.resolutionScale * height );
-
-		this._resolutionScale.value = this.resolutionScale;
 		this._resolution.value.set( width, height );
 		this._ssgiRenderTarget.setSize( width, height );
 
@@ -384,8 +361,8 @@ class SSGINode extends Node {
 
 		//
 
-		const size = renderer.getDrawingBufferSize( _size );
-		this.setSize( size.width, size.height );
+		const { width, height } = this.depthNode.value.image;
+		this.setSize( width, height );
 
 		// update temporal uniforms
 
@@ -430,6 +407,10 @@ class SSGINode extends Node {
 	 * @return {PassTextureNode}
 	 */
 	setup( builder ) {
+
+		// the depth node defines the resolution of the effect and must be updated first
+
+		builder.getNodeProperties( this ).depthNode = this.depthNode;
 
 		const renderer = builder.renderer;
 
@@ -553,43 +534,12 @@ class SSGINode extends Node {
 
 		const gi = Fn( () => {
 
-			const depth = float( 0 ).toVar();
-			const normalUV = uvNode.toVar();
-
-			If( this._resolutionScale.lessThan( 1 ), () => {
-
-				// Use the nearest depth texel to avoid banding. At silhouettes (view-space depth difference above 1%), take the
-				// normal from that texel to avoid dark rims. At creases, keep the blended normal to avoid jumpy noise.
-
-				const g = this.depthNode.gather().sample( uvNode ).toConst();
-				const minD = min( min( g.x, g.y ), min( g.z, g.w ) ).toConst();
-				const maxD = max( max( g.x, g.y ), max( g.z, g.w ) ).toConst();
-				const d = builder.renderer.reversedDepthBuffer === true ? maxD : minD;
-
-				depth.assign( projectionDepth( d, this._cameraNear, this._cameraFar ) );
-
-				const minViewZ = depthToViewZ( minD, this._cameraNear, this._cameraFar, this._camera ).toConst();
-				const maxViewZ = depthToViewZ( maxD, this._cameraNear, this._cameraFar, this._camera ).toConst();
-
-				If( minViewZ.div( maxViewZ ).sub( 1 ).abs().greaterThan( 0.01 ), () => {
-
-					const size = vec2( textureSize( this.depthNode, 0 ) ).toConst();
-					const offset = g.w.equal( d ).select( vec2( 0.5, 0.5 ), g.z.equal( d ).select( vec2( 1.5, 0.5 ), g.y.equal( d ).select( vec2( 1.5, 1.5 ), vec2( 0.5, 1.5 ) ) ) ).toConst();
-
-					normalUV.assign( uvNode.mul( size ).sub( 0.5 ).floor().add( offset ).div( size ) );
-
-				} );
-
-			} ).Else( () => {
-
-				depth.assign( sampleDepth( uvNode ) );
-
-			} );
+			const depth = sampleDepth( uvNode ).toVar();
 
 			isBackgroundDepth( depth ).discard();
 
 			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar();
-			const viewNormal = sampleNormal( normalUV ).toVar();
+			const viewNormal = sampleNormal( uvNode ).toVar();
 			const viewDir = normalize( viewPosition.xyz.negate() ).toVar();
 
 			//

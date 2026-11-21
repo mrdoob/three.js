@@ -3,7 +3,6 @@ import { reference, getViewPosition, getScreenPositionFromClip, vogelDiskSample,
 import { depthAwareBlur } from './depthAwareBlur.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
 
 let _rendererState;
 
@@ -40,7 +39,7 @@ class SSAONode extends Node {
 	/**
 	 * Constructs a new SSAO node.
 	 *
-	 * @param {Node<float>} depthNode - A node that represents the scene's depth.
+	 * @param {TextureNode} depthNode - A texture node that represents the scene's depth.
 	 * @param {Node<vec3>} normalNode - A node that represents the scene's normals.
 	 * @param {Camera} camera - The camera the scene is rendered with.
 	 */
@@ -49,9 +48,9 @@ class SSAONode extends Node {
 		super( 'float' );
 
 		/**
-		 * A node that represents the scene's depth.
+		 * A texture node that represents the scene's depth.
 		 *
-		 * @type {Node<float>}
+		 * @type {TextureNode}
 		 */
 		this.depthNode = depthNode;
 
@@ -61,15 +60,6 @@ class SSAONode extends Node {
 		 * @type {Node<vec3>}
 		 */
 		this.normalNode = normalNode;
-
-		/**
-		 * The resolution scale. The effect renders at a fraction of the drawing buffer
-		 * for extra speed; `0.5` is a good default for a low-frequency signal like AO.
-		 *
-		 * @type {number}
-		 * @default 0.5
-		 */
-		this.resolutionScale = 0.5;
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
@@ -126,7 +116,7 @@ class SSAONode extends Node {
 		this.blurSharpness = uniform( 2 );
 
 		/**
-		 * The resolution of the effect. Set from the drawing buffer size and `resolutionScale`.
+		 * The resolution of the effect, which is the resolution of the depth node.
 		 *
 		 * @type {Vector2}
 		 */
@@ -255,9 +245,6 @@ class SSAONode extends Node {
 	 */
 	setSize( width, height ) {
 
-		width = Math.max( 1, Math.round( this.resolutionScale * width ) );
-		height = Math.max( 1, Math.round( this.resolutionScale * height ) );
-
 		this.resolution.set( width, height );
 		this._aoRenderTarget.setSize( width, height );
 		this._blurRenderTarget.setSize( width, height );
@@ -275,8 +262,8 @@ class SSAONode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		const size = renderer.getDrawingBufferSize( _size );
-		this.setSize( size.width, size.height );
+		const { width, height } = this.depthNode.value.image;
+		this.setSize( width, height );
 
 		renderer.setClearColor( 0xffffff, 1 );
 
@@ -317,6 +304,10 @@ class SSAONode extends Node {
 	 * @return {PassTextureNode}
 	 */
 	setup( builder ) {
+
+		// the depth node defines the resolution of the effect and must be updated first
+
+		builder.getNodeProperties( this ).depthNode = this.depthNode;
 
 		const uvNode = uv();
 
@@ -414,7 +405,7 @@ export default SSAONode;
  *
  * @tsl
  * @function
- * @param {Node<float>} depthNode - A node that represents the scene's depth.
+ * @param {TextureNode} depthNode - A texture node that represents the scene's depth.
  * @param {Node<vec3>} normalNode - A node that represents the scene's normals.
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {SSAONode}
