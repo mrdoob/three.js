@@ -282,6 +282,7 @@ import './src/nodes/lighting/EnvironmentNode.tests.js';
 
 //src/nodes/tsl
 import './src/nodes/tsl/TSLCore.tests.js';
+import './src/nodes/tsl/TSLFnLayout.tests.js';
 import './src/nodes/tsl/GPUTest.tests.js';
 import './src/nodes/tsl/TSLConditionalSelect.tests.js';
 import './src/nodes/tsl/GPUAtomicsStorage.tests.js';
