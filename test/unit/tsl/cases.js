@@ -1938,7 +1938,7 @@ export const cases = {
 
 	'storage element of function': () => {
 
-		const colors = storage( new StorageBufferAttribute( new Float32Array( 8 ), 4 ), 'vec4', 2 );
+		const colors = storage( new StorageBufferAttribute( new Float32Array( 8 ), 4 ), 'vec4' );
 		const getColors = Fn( () => colors );
 
 		return getColors().element( uv().x.mul( 2 ).toUint() ).add( colors[ 1 ] );
