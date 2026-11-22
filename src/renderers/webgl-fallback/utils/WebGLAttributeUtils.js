@@ -70,12 +70,30 @@ class WebGLAttributeUtils {
 		this.backend = backend;
 
 		/**
-		 * Maps buffer attributes to their Pixel Buffer Object (PBO) textures
-		 * and the attribute version last uploaded to them.
+		 * Maps buffer attributes to their Pixel Buffer Object (PBO) textures,
+		 * the attribute version last uploaded to them and their `dispose` listeners.
 		 *
-		 * @type {WeakMap<BufferAttribute, {texture: DataTexture, version: number}>}
+		 * @type {WeakMap<BufferAttribute, {texture: DataTexture, version: number, onDispose: Function}>}
 		 */
 		this.pbos = new WeakMap();
+
+		/**
+		 * Stores weak references to the buffer attributes with attached
+		 * `dispose` event listeners.
+		 *
+		 * @private
+		 * @type {Set<WeakRef<BufferAttribute>>}
+		 */
+		this._tracked = new Set();
+
+		/**
+		 * Removes weak references from `_tracked` when their attribute
+		 * has been garbage collected without an explicit `dispose()`.
+		 *
+		 * @private
+		 * @type {FinalizationRegistry}
+		 */
+		this._registry = new FinalizationRegistry( ( ref ) => this._tracked.delete( ref ) );
 
 	}
 
@@ -138,9 +156,16 @@ class WebGLAttributeUtils {
 			texture.isPBOTexture = true;
 
 			// the texture remains usable after disposal, it's recreated on next use
-			attribute.addEventListener( 'dispose', () => texture.dispose() );
+			const onDispose = () => texture.dispose();
 
-			pbo = { texture, version: attribute.version };
+			attribute.addEventListener( 'dispose', onDispose );
+
+			const ref = new WeakRef( attribute );
+
+			this._tracked.add( ref );
+			this._registry.register( attribute, ref );
+
+			pbo = { texture, version: attribute.version, onDispose };
 
 			this.pbos.set( attribute, pbo );
 
@@ -321,6 +346,24 @@ class WebGLAttributeUtils {
 		}
 
 		backend.delete( bufferAttribute );
+
+	}
+
+	/**
+	 * Removes the `dispose` listeners of the PBO attributes. The PBO textures
+	 * themselves are released with the renderer's textures.
+	 */
+	dispose() {
+
+		for ( const ref of this._tracked ) {
+
+			const attribute = ref.deref();
+
+			if ( attribute !== undefined ) attribute.removeEventListener( 'dispose', this.pbos.get( attribute ).onDispose );
+
+		}
+
+		this._tracked.clear();
 
 	}
 

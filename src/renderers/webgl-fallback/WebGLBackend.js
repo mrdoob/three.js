@@ -2818,6 +2818,7 @@ class WebGLBackend extends Backend {
 
 		await super.dispose();
 
+		if ( this.attributeUtils !== null ) this.attributeUtils.dispose();
 		if ( this.vertexArrayUtils !== null ) this.vertexArrayUtils.dispose();
 		if ( this.textureUtils !== null ) this.textureUtils.dispose();
 
