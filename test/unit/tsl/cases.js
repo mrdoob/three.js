@@ -1,8 +1,10 @@
-import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, context, cubeTexture, determinant, float, grayscale, hue, int, inverse, ivec3, mat2, mat3, mat4, mix, mul, overloadingFn, overrideNode, saturation, select, texture, texture3D, time, transpose, uint, uniform, uv, vec2, vec3, vec4, vibrance } from '../../../src/Three.TSL.js';
+import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, context, cubeTexture, determinant, float, grayscale, hue, int, inverse, ivec3, mat2, mat3, mat4, mix, mul, overloadingFn, overrideNode, reference, saturation, select, storage, texture, texture3D, time, transpose, uint, uniform, uniformArray, uv, vec2, vec3, vec4, vibrance } from '../../../src/Three.TSL.js';
 import { Texture } from '../../../src/textures/Texture.js';
 import { CubeTexture } from '../../../src/textures/CubeTexture.js';
 import { Data3DTexture } from '../../../src/textures/Data3DTexture.js';
 import { LinearFilter, NearestFilter } from '../../../src/constants.js';
+import { Color } from '../../../src/math/Color.js';
+import StorageBufferAttribute from '../../../src/renderers/common/StorageBufferAttribute.js';
 
 // Create a fresh graph for every test and backend.
 export const cases = {
@@ -1869,6 +1871,89 @@ export const cases = {
 
 		return sampleMap( texture( map ), uv() );
 
-	}
+	},
+
+	// Texture methods of a function return are resolved in the build, like the methods of the texture itself.
+
+	'deferred texture sample': () => {
+
+		const getMap = Fn( () => texture( new Texture() ) );
+
+		return getMap().sample( uv().mul( 2 ) ).level( 2 );
+
+	},
+
+	'deferred texture with statements': () => {
+
+		const getMap = Fn( () => {
+
+			const coord = uv().toVar();
+			coord.addAssign( 0.25 );
+
+			return texture( new Texture(), coord );
+
+		} );
+
+		const map = getMap();
+
+		return map.sample( uv().mul( 2 ) ).add( map.level( 1 ) ).add( vec4( vec2( map.size() ), 0, 1 ) );
+
+	},
+
+	'deferred texture as parameter': () => {
+
+		const levelOf = Fn( ( [ map ] ) => map.level( 2 ) );
+
+		return levelOf( texture( new Texture() ) );
+
+	},
+
+	// Element access is the same for any array node, including function returns and assignments.
+
+	'uniform array element': () => {
+
+		const colors = uniformArray( [ new Color( 1, 0, 0 ), new Color( 0, 1, 0 ) ], 'color' );
+		const weights = uniformArray( [ 0.25, 0.75 ], 'float' );
+
+		return vec4( colors.element( int( 1 ) ).mul( weights[ 0 ] ), 1 );
+
+	},
+
+	'uniform array element of function': () => {
+
+		const weights = uniformArray( [ 1, 2, 3 ], 'int' );
+		const getWeights = Fn( () => weights );
+
+		return getWeights().element( uv().x.mul( 3 ).toInt() ).toFloat();
+
+	},
+
+	'reference array element': () => {
+
+		const object = { colors: [ new Color( 1, 0, 0 ), new Color( 0, 0, 1 ) ] };
+
+		return reference( 'colors', 'color', object ).element( int( 1 ) );
+
+	},
+
+	'storage element of function': () => {
+
+		const colors = storage( new StorageBufferAttribute( new Float32Array( 8 ), 4 ), 'vec4', 2 );
+		const getColors = Fn( () => colors );
+
+		return getColors().element( uv().x.mul( 2 ).toUint() ).add( colors[ 1 ] );
+
+	},
+
+	'array element assign': () => Fn( () => {
+
+		const values = array( 'vec3', 2 ).toVar();
+
+		values.element( int( 1 ) ).assign( vec3( 1, 0, 0 ) );
+		values.element( int( 1 ) ).y.assign( 0.5 );
+
+		return values.element( int( 1 ) );
+
+	} )()
 
 };

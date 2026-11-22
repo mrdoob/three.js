@@ -1931,3 +1931,58 @@ fn fn0 ( map : texture_2d<f32>, map_sampler : sampler, coord : vec2<f32> ) -> ve
 }
 
 fn0( nodeUniform0, nodeUniform0_sampler, nodeVarying0 )
+
+// deferred texture sample
+
+var nodeVar0 : vec4<f32>;
+
+nodeVar0 = textureSampleLevel( nodeUniform0, nodeUniform0_sampler, ( nodeVarying0 * vec2<f32>( 2.0 ) ), 2.0 );
+
+nodeVar0
+
+// deferred texture with statements
+
+var nodeVar0 : vec2<f32>;
+var nodeVar1 : vec4<f32>;
+var nodeVar2 : vec4<f32>;
+
+nodeVar0 = nodeVarying0;
+nodeVar0 = ( nodeVar0 + vec2<f32>( 0.25 ) );
+nodeVar1 = textureSample( nodeUniform0, nodeUniform0_sampler, ( nodeVarying0 * vec2<f32>( 2.0 ) ) );
+nodeVar2 = textureSampleLevel( nodeUniform0, nodeUniform0_sampler, nodeVar0, 1.0 );
+
+( ( nodeVar1 + nodeVar2 ) + vec4<f32>( vec2<f32>( textureDimensions( nodeUniform0, 0 ) ), 0.0, 1.0 ) )
+
+// deferred texture as parameter
+
+var nodeVar0 : vec4<f32>;
+
+nodeVar0 = textureSampleLevel( nodeUniform0, nodeUniform0_sampler, ( object.nodeUniform1 * vec3<f32>( nodeVarying0, 1.0 ) ).xy, 2.0 );
+
+nodeVar0
+
+// uniform array element
+
+vec4<f32>( ( nodeUniform0.value[ 1 ].xyz * vec3<f32>( nodeUniform1.value[ 0u ].x ) ), 1.0 )
+
+// uniform array element of function
+
+f32( nodeUniform0.value[ i32( ( nodeVarying0.x * 3.0 ) ) ].x )
+
+// reference array element
+
+nodeUniform0.value[ 1 ].xyz
+
+// storage element of function
+
+( nodeUniform0.value[ u32( ( nodeVarying0.x * 2.0 ) ) ] + nodeUniform0.value[ 1u ] )
+
+// array element assign
+
+var nodeVar0 : array< vec3<f32>, 2 >;
+
+nodeVar0 = array< vec3<f32>, 2 >( vec3<f32>( 0.0, 0.0, 0.0 ), vec3<f32>( 0.0, 0.0, 0.0 ) );
+nodeVar0[ 1 ] = vec3<f32>( 1.0, 0.0, 0.0 );
+nodeVar0[ 1 ].y = 0.5;
+
+nodeVar0[ 1 ]
