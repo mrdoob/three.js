@@ -247,7 +247,7 @@ class TextureNode extends UniformNode {
 	 * Overwritten since the uniform hash is defined by the texture's UUID - if mergeable - and the hash of its reference node otherwise.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The uniform hash.
+	 * @return {number|string} The uniform hash.
 	 */
 	getUniformHash( builder ) {
 
