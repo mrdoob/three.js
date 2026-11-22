@@ -658,6 +658,12 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
+	isDeadCode( builder ) {
+
+		return this.getOutputNode( builder ).isDeadCode( builder );
+
+	}
+
 	generate( builder, output ) {
 
 		return this.getOutputNode( builder ).build( builder, output ) || '';
@@ -725,6 +731,17 @@ class ShaderCallNodeInternal extends Node {
 					}
 
 				}
+
+			}
+
+			// a function that is not pure can assign values which are read, so the node of the stack that calls it is not
+			// dead code, see StackNode#isPure(). The body of a block, e.g. a branch of `If()`, has no output
+
+			const stack = builder.getActiveStack();
+
+			if ( stack !== undefined && stack._currentNode !== null && outputNode.outputNode && outputNode.isPure( builder ) === false ) {
+
+				builder.getNodeProperties( stack._currentNode ).callsFunction = true;
 
 			}
 
@@ -908,6 +925,14 @@ class ShaderNodeInternal extends Node {
 	call( rawInputs = null ) {
 
 		return new ShaderCallNodeInternal( this, rawInputs );
+
+	}
+
+	isDeadCode( builder ) {
+
+		const { outputNode } = builder.getNodeProperties( this );
+
+		return outputNode !== null && outputNode.isDeadCode( builder );
 
 	}
 

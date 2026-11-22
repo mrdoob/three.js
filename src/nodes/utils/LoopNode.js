@@ -60,6 +60,14 @@ class LoopNode extends Node {
 
 	}
 
+	isDeadCode( builder ) {
+
+		const { returnsNode, stackNode } = this.getProperties( builder );
+
+		return returnsNode.isDeadCode( builder ) && stackNode.isDeadCode( builder );
+
+	}
+
 	isCacheable( /*builder*/ ) {
 
 		return false;
@@ -99,6 +107,14 @@ class LoopNode extends Node {
 		for ( let i = 0, l = params.length - 1; i < l; i ++ ) {
 
 			const param = params[ i ];
+
+			// the parameters are analyzed before the loop body, so e.g. a variable used as the loop count is read
+
+			for ( const [ key, node ] of Object.entries( param.isNode ? { param } : param ) ) {
+
+				if ( node && node.isNode === true ) properties[ key + i ] = node;
+
+			}
 
 			const name = ( param.isNode !== true && param.name ) || this.getVarName( i );
 			const type = ( param.isNode !== true && param.type ) || 'int';

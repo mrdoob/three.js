@@ -73,6 +73,16 @@ class ConditionalNode extends Node {
 
 	}
 
+	isDeadCode( builder ) {
+
+		// e.g. an `If()` that only assigns values which are never read
+
+		const { ifNode, elseNode } = builder.getNodeProperties( this );
+
+		return ifNode !== undefined && ifNode.isDeadCode( builder ) && ( elseNode === null || elseNode.isDeadCode( builder ) );
+
+	}
+
 	isCacheable( /*builder*/ ) {
 
 		return false;
@@ -214,7 +224,16 @@ class ConditionalNode extends Node {
 
 		}
 
-		builder.addFlowCode( `\n${ builder.tab }if ( ${ nodeSnippet } ) {\n\n` ).addFlowTab();
+		// the branches are dead code, so the condition is only evaluated, since it can have side effects, see StackNode#isPure()
+
+		if ( this.isDeadCode( builder ) ) return '';
+
+		// special case: only the "else" branch is alive, so it is generated as the block of the negated condition,
+		// i.e. `if ( ! cond ) { ... }` instead of `if ( cond ) { } else { ... }`
+
+		const negate = ifNode.isDeadCode( builder );
+
+		builder.addFlowCode( `\n${ builder.tab }if ( ${ negate ? `!( ${ nodeSnippet } )` : nodeSnippet } ) {\n\n` ).addFlowTab();
 
 		// An immutable condition, i.e. a constant, is the guard of the blocks: blocks of the same parent and guard run together.
 		const condData = builder.getDataFromNode( condNode );
@@ -222,9 +241,9 @@ class ConditionalNode extends Node {
 
 		const flowBlock = builder.flowBlock;
 
-		builder.flowBlock = { parent: flowBlock, guard };
+		builder.flowBlock = { parent: flowBlock, guard: negate && guard !== undefined ? '!' + guard : guard };
 
-		let ifSnippet = ifNode.build( builder, type );
+		let ifSnippet = ( negate ? elseNode : ifNode ).build( builder, type );
 
 		builder.flowBlock = flowBlock;
 
@@ -252,7 +271,7 @@ class ConditionalNode extends Node {
 
 		builder.removeFlowTab().addFlowCode( builder.tab + '\t' + ifSnippet + '\n\n' + builder.tab + '}' );
 
-		if ( elseNode !== null ) {
+		if ( negate === false && elseNode !== null && elseNode.isDeadCode( builder ) === false ) {
 
 			builder.addFlowCode( ' else {\n\n' ).addFlowTab();
 

@@ -159,15 +159,17 @@ const _isVectorCache = new Map();
 const _isMatrixCache = new Map();
 const _isIntegerCache = new Map();
 
-const _checkWriteUsage = ( data ) => {
+const _analyzeShaderStages = [ 'fragment', 'vertex', 'compute' ];
 
-	if ( data.writeUsageCount > 0 ) return true;
+const _checkUsage = ( data, usageCount ) => {
+
+	if ( data[ usageCount ] > 0 ) return true;
 
 	if ( data.subBuildsCache !== undefined ) {
 
 		for ( const subBuild in data.subBuildsCache ) {
 
-			if ( _checkWriteUsage( data.subBuildsCache[ subBuild ] ) ) {
+			if ( _checkUsage( data.subBuildsCache[ subBuild ], usageCount ) ) {
 
 				return true;
 
@@ -931,7 +933,7 @@ class NodeBuilder {
 
 			const updateType = node.updateType;
 
-			if ( updateType !== NodeUpdateType.NONE ) {
+			if ( updateType !== NodeUpdateType.NONE && node.isDeadCode( this ) === false ) {
 
 				this.updateNodes.push( node );
 
@@ -940,6 +942,8 @@ class NodeBuilder {
 		}
 
 		for ( const node of this.sequentialNodes ) {
+
+			if ( node.isDeadCode( this ) ) continue;
 
 			const updateBeforeType = node.updateBeforeType;
 			const updateAfterType = node.updateAfterType;
@@ -1413,12 +1417,38 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns whether the given node has been read in any shader stage.
+	 *
+	 * @param {Node} node - The node to check.
+	 * @return {boolean} Whether the node has been read.
+	 */
+	hasReadUsage( node ) {
+
+		return this._hasUsage( node, 'readUsageCount' );
+
+	}
+
+	/**
 	 * Returns whether the given node has been written to in any shader stage.
 	 *
 	 * @param {Node} node - The node to check.
 	 * @return {boolean} Whether the node has been written to.
 	 */
 	hasWriteUsage( node ) {
+
+		return this._hasUsage( node, 'writeUsageCount' );
+
+	}
+
+	/**
+	 * Returns whether the given usage count of the node is greater than zero in any shader stage or sub-build.
+	 *
+	 * @private
+	 * @param {Node} node - The node to check.
+	 * @param {('readUsageCount'|'writeUsageCount')} usageCount - The usage count to check.
+	 * @return {boolean} Whether the node has the usage.
+	 */
+	_hasUsage( node, usageCount ) {
 
 		const refNode = node.getShared( this );
 		const cache = refNode.isGlobal( this ) ? this.globalCache : this.cache;
@@ -1430,7 +1460,7 @@ class NodeBuilder {
 
 				const data = nodeData[ shaderStage ];
 
-				if ( data !== undefined && _checkWriteUsage( data ) ) {
+				if ( data !== undefined && _checkUsage( data, usageCount ) ) {
 
 					return true;
 
@@ -3821,7 +3851,11 @@ class NodeBuilder {
 
 			}
 
-			for ( const shaderStage of shaderStages ) {
+			// the fragment stage is analyzed before the vertex stage, so the vertex code knows which values the varyings read
+
+			const stages = buildStage === 'analyze' ? _analyzeShaderStages : shaderStages;
+
+			for ( const shaderStage of stages ) {
 
 				this.setShaderStage( shaderStage );
 

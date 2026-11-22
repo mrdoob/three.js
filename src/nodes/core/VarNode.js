@@ -92,6 +92,14 @@ class VarNode extends Node {
 
 	}
 
+	isDeadCode( builder ) {
+
+		// the declaration is a write, the variable is dead code if it is never read
+
+		return builder.hasReadUsage( this ) === false;
+
+	}
+
 	isCacheable( /*builder*/ ) {
 
 		return false;

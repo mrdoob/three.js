@@ -78,6 +78,14 @@ class PropertyNode extends Node {
 
 	}
 
+	isDeadCode( builder ) {
+
+		// a varying is read in another shader stage
+
+		return this.varying === false && builder.hasReadUsage( this ) === false;
+
+	}
+
 	isCacheable( /*builder*/ ) {
 
 		return false;

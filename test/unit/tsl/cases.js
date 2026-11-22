@@ -525,6 +525,258 @@ export const cases = {
 
 	} )(),
 
+	// Dead code is code that does not change the result, e.g. an assignment to a variable that is never read.
+	// The dead code is removed:
+	'dead code removes unused variable': () => Fn( () => {
+
+		const unused = float( 1 ).toVar( 'unused' );
+		const result = float( 2 ).toVar( 'result' );
+
+		unused.addAssign( 1 );
+
+		return result;
+
+	} )(),
+
+	// A variable read only by dead code is dead code too.
+	'dead code removes chain of unused variables': () => Fn( () => {
+
+		const a = float( 1 ).toVar( 'a' );
+		const b = a.mul( 2 ).toVar( 'b' );
+		const c = b.add( 3 ).toVar( 'c' );
+
+		c.addAssign( a );
+
+		return float( 0 );
+
+	} )(),
+
+	'dead code removes unused branch': () => Fn( () => {
+
+		const result = float( 0 ).toVar( 'result' );
+		const unused = float( 0 ).toVar( 'unused' );
+
+		If( uv().x.greaterThan( 0.5 ), () => {
+
+			unused.assign( 1 );
+
+		} );
+
+		return result;
+
+	} )(),
+
+	// The branch is kept, but its assignment to an unused variable is removed.
+	'dead code removes assignment in a branch': () => Fn( () => {
+
+		const result = float( 0 ).toVar( 'result' );
+		const unused = float( 0 ).toVar( 'unused' );
+
+		If( uv().x.greaterThan( 0.5 ), () => {
+
+			result.assign( 1 );
+			unused.assign( 2 );
+
+		} ).Else( () => {
+
+			unused.assign( 3 );
+
+		} );
+
+		return result;
+
+	} )(),
+
+	'dead code removes assignment in the if branch': () => Fn( () => {
+
+		const result = float( 0 ).toVar( 'result' );
+		const unused = float( 0 ).toVar( 'unused' );
+
+		If( uv().x.greaterThan( 0.5 ), () => {
+
+			unused.assign( 1 );
+
+		} ).Else( () => {
+
+			result.assign( 2 );
+
+		} );
+
+		return result;
+
+	} )(),
+
+	'dead code removes unused loop': () => Fn( () => {
+
+		const result = float( 0 ).toVar( 'result' );
+		const unused = float( 0 ).toVar( 'unused' );
+
+		Loop( 4, ( { i } ) => {
+
+			unused.addAssign( float( i ) );
+
+		} );
+
+		return result;
+
+	} )(),
+
+	// The loop is kept, but its assignment to an unused variable is removed.
+	'dead code removes assignment in a loop': () => Fn( () => {
+
+		const sum = float( 0 ).toVar( 'sum' );
+		const unused = float( 0 ).toVar( 'unused' );
+
+		Loop( 4, ( { i } ) => {
+
+			sum.addAssign( float( i ) );
+			unused.assign( sum );
+
+		} );
+
+		return sum;
+
+	} )(),
+
+	// A function that only declares variables and computes a value is pure, so its call is dead code if the value is not read.
+	'dead code removes call of pure function': () => Fn( () => {
+
+		const square = Fn( ( [ value ] ) => {
+
+			const local = value.toVar( 'local' );
+
+			return local.mul( local );
+
+		} );
+
+		const unused = float( 0 ).toVar( 'unused' );
+
+		unused.assign( square( uv().x ) );
+
+		return float( 1 );
+
+	} )(),
+
+	// The code that looks like dead code but changes the result is kept:
+
+	'dead code keeps loop bound': () => Fn( () => {
+
+		const count = int( 1 ).toVar( 'count' );
+		const sum = int( 0 ).toVar( 'sum' );
+
+		count.assign( 3 );
+
+		Loop( count, () => {
+
+			sum.addAssign( 1 );
+
+		} );
+
+		return sum;
+
+	} )(),
+
+	'dead code keeps loop condition': () => Fn( () => {
+
+		const done = bool( false ).toVar( 'done' );
+		const sum = int( 0 ).toVar( 'sum' );
+
+		Loop( done.not(), () => {
+
+			sum.addAssign( 1 );
+
+			If( sum.greaterThan( 2 ), () => {
+
+				done.assign( true );
+
+			} );
+
+		} );
+
+		return sum;
+
+	} )(),
+
+	// A value read in the next iteration of the loop, before it is assigned in a branch.
+	'dead code keeps loop carried value in a branch': () => Fn( () => {
+
+		const sum = int( 0 ).toVar( 'sum' );
+		const carried = int( 7 ).toVar( 'carried' );
+		const next = int( 0 ).toVar( 'next' );
+
+		Loop( 3, ( { i } ) => {
+
+			sum.addAssign( carried );
+			next.assign( 2 );
+
+			If( i.lessThan( 2 ), () => {
+
+				carried.assign( next );
+				sum.addAssign( 1 );
+
+			} );
+
+		} );
+
+		return sum;
+
+	} )(),
+
+	// A function that assigns a value which is read is not pure, so its call is kept even if its value is not read.
+	'dead code keeps texture gradient': () => Fn( () => {
+
+		const grad = vec2( 1 ).toVar( 'grad' );
+
+		If( uv().y.greaterThan( 0.5 ), () => {
+
+			grad.assign( 0 );
+
+		} );
+
+		return texture( new Texture(), uv() ).grad( grad, grad );
+
+	} )(),
+
+	'dead code keeps assignment with side effects': () => Fn( () => {
+
+		const result = int( 0 ).toVar( 'result' );
+		const unused = int( 0 ).toVar( 'unused' );
+
+		const source = Fn( () => {
+
+			result.addAssign( 2 );
+			return int( 1 );
+
+		} );
+
+		unused.assign( source() );
+
+		return result;
+
+	} )(),
+
+	'dead code keeps condition with side effects': () => Fn( () => {
+
+		const result = int( 0 ).toVar( 'result' );
+		const unused = int( 0 ).toVar( 'unused' );
+
+		const condition = Fn( () => {
+
+			result.addAssign( 4 );
+			return bool( true );
+
+		} );
+
+		If( condition(), () => {
+
+			unused.assign( 3 );
+
+		} );
+
+		return result;
+
+	} )(),
+
 	'function inline reuse': () => Fn( () => {
 
 		const square = Fn( ( [ value ] ) => value.mul( value ) );

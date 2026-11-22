@@ -72,6 +72,12 @@ class ParameterNode extends PropertyNode {
 
 	}
 
+	isDeadCode() {
+
+		return false; // a parameter belongs to the function
+
+	}
+
 	getInputType( builder ) {
 
 		return this.getNodeType( builder );
