@@ -962,10 +962,11 @@ class WebGLBackend extends Backend {
 		for ( let i = 0; i < transformAttributes.length; i ++ ) {
 
 			const dualAttributeData = this.get( transformAttributes[ i ] );
+			const pbo = this.attributeUtils.pbos.get( transformAttributes[ i ] );
 
-			if ( dualAttributeData.pbo && this.has( dualAttributeData.pbo ) ) {
+			if ( pbo !== undefined && this.has( pbo.texture ) ) {
 
-				this.textureUtils.copyBufferToTexture( dualAttributeData.transformBuffer, dualAttributeData.pbo );
+				this.textureUtils.copyBufferToTexture( dualAttributeData.transformBuffer, pbo.texture );
 
 			}
 
