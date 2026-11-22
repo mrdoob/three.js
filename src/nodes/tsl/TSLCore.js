@@ -17,6 +17,10 @@ const _secureNodeBuilders = new WeakMap();
 
 const NodeElements = new Map();
 
+const NodeChaining = Object.create( Object.getPrototypeOf( Node.prototype ) );
+
+Object.setPrototypeOf( Node.prototype, NodeChaining );
+
 // Extend Node Class for TSL using prototype
 
 export function addMethodChaining( name, nodeElement ) {
@@ -38,7 +42,7 @@ export function addMethodChaining( name, nodeElement ) {
 
 		// Changing Node prototype to add method chaining
 
-		Node.prototype[ name ] = function ( ...params ) {
+		NodeChaining[ name ] = function ( ...params ) {
 
 			return this.isStackNode ? this.addToStack( nodeElement( ...params ) ) : nodeElement( this, ...params );
 
@@ -46,7 +50,7 @@ export function addMethodChaining( name, nodeElement ) {
 
 		// Adding assign method chaining
 
-		Node.prototype[ name + 'Assign' ] = function ( ...params ) {
+		NodeChaining[ name + 'Assign' ] = function ( ...params ) {
 
 			return this.isStackNode ? this.assign( params[ 0 ], nodeElement( ...params ) ) : this.assign( nodeElement( this, ...params ) );
 
@@ -59,7 +63,7 @@ export function addMethodChaining( name, nodeElement ) {
 const parseSwizzle = ( props ) => props.replace( /r|s/g, 'x' ).replace( /g|t/g, 'y' ).replace( /b|p/g, 'z' ).replace( /a|q/g, 'w' );
 const parseSwizzleAndSort = ( props ) => parseSwizzle( props ).split( '' ).sort().join( '' );
 
-Node.prototype.assign = function ( ...params ) {
+NodeChaining.assign = function ( ...params ) {
 
 	if ( this.isStackNode !== true ) {
 
@@ -85,7 +89,7 @@ Node.prototype.assign = function ( ...params ) {
 
 };
 
-Node.prototype.get = function ( value ) {
+NodeChaining.get = function ( value ) {
 
 	return new MemberNode( this, value );
 
@@ -159,7 +163,7 @@ function setProtoSwizzle( property, altA, altB ) {
 
 	// Set methods for swizzle properties
 
-	Node.prototype[ 'set' + propUpper ] = Node.prototype[ 'set' + altAUpper ] = Node.prototype[ 'set' + altBUpper ] = function ( value ) {
+	NodeChaining[ 'set' + propUpper ] = NodeChaining[ 'set' + altAUpper ] = NodeChaining[ 'set' + altBUpper ] = function ( value ) {
 
 		const swizzle = parseSwizzleAndSort( property );
 
@@ -169,7 +173,7 @@ function setProtoSwizzle( property, altA, altB ) {
 
 	// Set methods for flip properties
 
-	Node.prototype[ 'flip' + propUpper ] = Node.prototype[ 'flip' + altAUpper ] = Node.prototype[ 'flip' + altBUpper ] = function () {
+	NodeChaining[ 'flip' + propUpper ] = NodeChaining[ 'flip' + altAUpper ] = NodeChaining[ 'flip' + altBUpper ] = function () {
 
 		const swizzle = parseSwizzleAndSort( property );
 
@@ -301,7 +305,7 @@ setProtoProperty( 'height', 'y' );
 setProtoProperty( 'depth', 'z' );
 */
 
-Object.defineProperties( Node.prototype, proto );
+Object.defineProperties( NodeChaining, proto );
 
 // --- FINISH ---
 
