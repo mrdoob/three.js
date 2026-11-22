@@ -66,6 +66,17 @@ class Attributes extends DataMap {
 
 	}
 
+	createData() {
+
+		return {
+			version: - 1,
+			generation: - 1,
+			onDispose: null,
+			ref: null
+		};
+
+	}
+
 	/**
 	 * Deletes the data for the given attribute.
 	 *
@@ -110,7 +121,7 @@ class Attributes extends DataMap {
 
 		const data = this.get( attribute );
 
-		if ( data.version === undefined ) {
+		if ( data.version === - 1 ) {
 
 			if ( type === AttributeType.VERTEX ) {
 
