@@ -1,10 +1,11 @@
 import LightingNode from './LightingNode.js';
-import { roughness, clearcoatRoughness, retroreflectivity } from '../core/PropertyNode.js';
+import { roughness, clearcoat, clearcoatRoughness, retroreflectivity } from '../core/PropertyNode.js';
 import { cameraWorldMatrix } from '../accessors/Camera.js';
 import { normalView, clearcoatNormalView, normalWorld } from '../accessors/Normal.js';
 import { positionViewDirection } from '../accessors/Position.js';
 import { bentNormalView } from '../accessors/AccessorsUtils.js';
 import { vec4, pow4 } from '../tsl/TSLBase.js';
+import { select } from '../math/ConditionalNode.js';
 
 /**
  * A source of indirect light. It answers a query with a `vec4`: RGB is the light, premultiplied
@@ -17,7 +18,9 @@ import { vec4, pow4 } from '../tsl/TSLBase.js';
  *
  * A source is a function of the query and the builder, which can return `null` to sit a material
  * out. A source that holds one answer per pixel, such as a screen-space pass, can be a `vec4`
- * node. For indirect specular, such a node only answers the base lobe.
+ * node. For indirect specular, such a node only answers the outermost lobe: the clearcoat
+ * where the material is coated and the base lobe elsewhere. It has to be computed from the
+ * normal and the roughness of that lobe.
  *
  * @typedef {(Node<vec4>|function(Object, NodeBuilder): ?Node<vec4>)} IndirectLightSource
  */
@@ -97,7 +100,12 @@ class IndirectLightingNode extends LightingNode {
 		const useAnisotropy = material.useAnisotropy === true || material.anisotropy > 0;
 		const baseNormalView = useAnisotropy ? bentNormalView : normalView;
 
-		const base = this.getRadiance( reflect( baseNormalView, roughness ), roughness, true, builder );
+		// per-pixel sources hold the outermost lobe: the clearcoat where there is one
+
+		const clearcoatRadiance = context.lightingModel.clearcoatRadiance;
+		const isCoated = clearcoatRadiance ? clearcoat.greaterThan( 0 ).toVar() : false;
+
+		const base = this.getRadiance( reflect( baseNormalView, roughness ), roughness, isCoated === false ? true : isCoated.not(), builder );
 
 		if ( base.light !== null && ( material.useRetroreflection === true || material.retroreflectivity > 0 ) ) {
 
@@ -111,11 +119,9 @@ class IndirectLightingNode extends LightingNode {
 
 		add( context.radiance, base );
 
-		const clearcoatRadiance = context.lightingModel.clearcoatRadiance;
-
 		if ( clearcoatRadiance ) {
 
-			add( clearcoatRadiance, this.getRadiance( reflect( clearcoatNormalView, clearcoatRoughness ), clearcoatRoughness, false, builder ) );
+			add( clearcoatRadiance, this.getRadiance( reflect( clearcoatNormalView, clearcoatRoughness ), clearcoatRoughness, isCoated, builder ) );
 
 		}
 
@@ -126,14 +132,14 @@ class IndirectLightingNode extends LightingNode {
 	 *
 	 * @param {Node<vec3>} direction - The direction the lobe looks in, in world space.
 	 * @param {Node<float>} roughness - The roughness of the lobe.
-	 * @param {boolean} isBaseLobe - Whether this is the lobe that per-pixel sources hold the answer for.
+	 * @param {boolean|Node<bool>} perPixel - Whether this is the lobe that per-pixel sources hold the answer for.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {{light: ?Node<vec3>, remaining: ?Node<float>}} The radiance of the sources and the environment and the coverage the sources left open, `null` if nothing answers.
 	 */
-	getRadiance( direction, roughness, isBaseLobe, builder ) {
+	getRadiance( direction, roughness, perPixel, builder ) {
 
 		const query = { direction, roughness };
-		const result = this.resolve( this.specular, query, isBaseLobe, builder );
+		const result = this.resolve( this.specular, query, perPixel, builder );
 
 		if ( this.environmentNode !== null ) {
 
@@ -152,7 +158,7 @@ class IndirectLightingNode extends LightingNode {
 	 *
 	 * @param {Array<IndirectLightSource>} sources - The sources, in order.
 	 * @param {Object} query - The query.
-	 * @param {boolean} perPixel - Whether the sources that are nodes can answer the query.
+	 * @param {boolean|Node<bool>} perPixel - Whether the sources that are nodes can answer the query.
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {{light: ?Node<vec3>, remaining: ?Node<float>}} The light of the sources and the coverage they left open, `null` if no source answers.
 	 */
@@ -165,7 +171,8 @@ class IndirectLightingNode extends LightingNode {
 			let value = null;
 
 			if ( typeof source === 'function' ) value = source( query, builder );
-			else if ( perPixel ) value = source;
+			else if ( perPixel === true ) value = source;
+			else if ( perPixel !== false ) value = select( perPixel, vec4( source ), vec4( 0 ) );
 
 			if ( value === null ) continue;
 
