@@ -121,7 +121,7 @@ class Pipelines extends DataMap {
 
 			// determine compute pipeline
 
-			const cacheKey = this._getComputeCacheKey( computeNode, stageCompute );
+			const cacheKey = this._getComputeCacheKey( computeNode, stageCompute, bindings );
 
 			let pipeline = this.caches.get( cacheKey );
 
@@ -149,6 +149,12 @@ class Pipelines extends DataMap {
 
 			data.version = computeNode.version;
 			data.pipeline = pipeline;
+
+		}
+
+		if ( promises !== null && data.pipeline.compilationPromise !== null ) {
+
+			promises.push( data.pipeline.compilationPromise );
 
 		}
 
@@ -359,7 +365,7 @@ class Pipelines extends DataMap {
 
 		// check for existing pipeline
 
-		cacheKey = cacheKey || this._getComputeCacheKey( computeNode, stageCompute );
+		cacheKey = cacheKey || this._getComputeCacheKey( computeNode, stageCompute, bindings );
 
 		let pipeline = this.caches.get( cacheKey );
 
@@ -371,7 +377,18 @@ class Pipelines extends DataMap {
 
 			this.caches.set( cacheKey, pipeline );
 
-			this.backend.createComputePipeline( pipeline, bindings, promises );
+			const pending = promises === null ? null : [];
+			this.backend.createComputePipeline( pipeline, bindings, pending );
+
+			if ( pending !== null && pending.length > 0 ) {
+
+				pipeline.compilationPromise = Promise.all( pending ).finally( () => {
+
+					pipeline.compilationPromise = null;
+
+				} );
+
+			}
 
 		}
 
@@ -424,11 +441,12 @@ class Pipelines extends DataMap {
 	 * @private
 	 * @param {Node} computeNode - The compute node.
 	 * @param {ProgrammableStage} stageCompute - The programmable stage representing the compute shader.
+	 * @param {Array<BindGroup>} bindings - The ordered bind groups.
 	 * @return {string} The cache key.
 	 */
-	_getComputeCacheKey( computeNode, stageCompute ) {
+	_getComputeCacheKey( computeNode, stageCompute, bindings ) {
 
-		return computeNode.id + ',' + stageCompute.id;
+		return 'compute,' + stageCompute.id + ',' + this.backend.getComputeCacheKey( computeNode, bindings );
 
 	}
 
