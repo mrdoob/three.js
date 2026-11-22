@@ -1,8 +1,9 @@
 
-import { vec3, mat4, Fn } from '../tsl/TSLBase.js';
+import { vec3, mat3, mat4, Fn } from '../tsl/TSLBase.js';
 import { OnAfterObjectUpdate } from '../utils/EventNode.js';
 import { normalLocal, transformNormal } from './Normal.js';
 import { positionLocal, positionPrevious } from './Position.js';
+import { tangentLocal } from './Tangent.js';
 import { varyingProperty } from '../core/PropertyNode.js';
 import { instancedBufferAttribute, instancedDynamicBufferAttribute } from './BufferAttributeNode.js';
 import ReferenceAttributeNode, { referenceAttribute } from './ReferenceAttributeNode.js';
@@ -216,7 +217,7 @@ function canReferenceInstanceData( object, builder ) {
 }
 
 /**
- * Transforms the position, the previous position and the normal with the given instance matrices.
+ * Transforms the position, the previous position, the normal and the tangent with the given instance matrices.
  *
  * @param {NodeBuilder} builder - The current node builder.
  * @param {Node<mat4>} instanceMatrixNode - The instance matrix.
@@ -244,6 +245,15 @@ function transformInstance( builder, instanceMatrixNode, previousMatrixNode ) {
 
 	}
 
+	// TANGENT
+
+	if ( builder.hasGeometryAttribute( 'tangent' ) ) {
+
+		const instanceTangent = mat3( instanceMatrixNode ).mul( tangentLocal );
+		tangentLocal.assign( instanceTangent );
+
+	}
+
 }
 
 /**
@@ -255,7 +265,7 @@ export const instanceColor = /*@__PURE__*/ varyingProperty( 'vec3', 'vInstanceCo
 
 /**
  * TSL function representing the standard instancing vertex shader setup.
- * Transforms positionLocal and normalLocal, and assigns varying color in-place.
+ * Transforms positionLocal, normalLocal and tangentLocal, and assigns varying color in-place.
  *
  * @tsl
  * @function
