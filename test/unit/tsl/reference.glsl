@@ -1930,3 +1930,124 @@ bool nodeVar0;
 nodeVar0 = bool( nodeUniform1 );
 
 fn0( nodeUniform0, nodeVar0, nodeVarying0 )
+
+// deferred texture sample
+
+vec2 nodeVar0;
+vec2 nodeVar1;
+bool nodeVar2;
+vec2 nodeVar3;
+vec4 nodeVar4;
+nodeVar0 = ( nodeVarying0 * vec2( 2.0 ) );
+nodeVar2 = bool( nodeUniform1 );
+
+if ( nodeVar2 ) {
+
+	nodeVar3 = nodeVar0;
+	nodeVar1 = vec2( nodeVar3.x, 1.0 - nodeVar3.y );
+
+} else {
+
+	nodeVar1 = nodeVar0;
+
+}
+
+nodeVar4 = textureLod( nodeUniform0, nodeVar1, 2.0 );
+
+nodeVar4
+
+// deferred texture with statements
+
+vec2 nodeVar0;
+vec2 nodeVar1;
+vec2 nodeVar2;
+bool nodeVar3;
+vec2 nodeVar4;
+vec4 nodeVar5;
+vec2 nodeVar6;
+vec2 nodeVar7;
+vec2 nodeVar8;
+vec4 nodeVar9;
+nodeVar0 = nodeVarying0;
+nodeVar0 = ( nodeVar0 + vec2( 0.25 ) );
+nodeVar1 = ( nodeVarying0 * vec2( 2.0 ) );
+nodeVar3 = bool( nodeUniform1 );
+
+if ( nodeVar3 ) {
+
+	nodeVar4 = nodeVar1;
+	nodeVar2 = vec2( nodeVar4.x, 1.0 - nodeVar4.y );
+
+} else {
+
+	nodeVar2 = nodeVar1;
+
+}
+
+nodeVar5 = texture( nodeUniform0, nodeVar2 );
+nodeVar6 = nodeVar0;
+
+if ( nodeVar3 ) {
+
+	nodeVar8 = nodeVar6;
+	nodeVar7 = vec2( nodeVar8.x, 1.0 - nodeVar8.y );
+
+} else {
+
+	nodeVar7 = nodeVar6;
+
+}
+
+nodeVar9 = textureLod( nodeUniform0, nodeVar7, 1.0 );
+
+( ( nodeVar5 + nodeVar9 ) + vec4( vec2( textureSize( nodeUniform0, 0 ) ), 0.0, 1.0 ) )
+
+// deferred texture as parameter
+
+vec2 nodeVar0;
+vec2 nodeVar1;
+bool nodeVar2;
+vec2 nodeVar3;
+vec4 nodeVar4;
+nodeVar0 = ( nodeUniform1 * vec3( nodeVarying0, 1.0 ) ).xy;
+nodeVar2 = bool( nodeUniform2 );
+
+if ( nodeVar2 ) {
+
+	nodeVar3 = nodeVar0;
+	nodeVar1 = vec2( nodeVar3.x, 1.0 - nodeVar3.y );
+
+} else {
+
+	nodeVar1 = nodeVar0;
+
+}
+
+nodeVar4 = textureLod( nodeUniform0, nodeVar1, 2.0 );
+
+nodeVar4
+
+// uniform array element
+
+vec4( ( nodeUniform0[ 1 ].xyz * vec3( nodeUniform1[ 0u ].x ) ), 1.0 )
+
+// uniform array element of function
+
+float( nodeUniform0[ int( ( nodeVarying0.x * 3.0 ) ) ].x )
+
+// reference array element
+
+nodeUniform0[ 1 ].xyz
+
+// storage element of function
+
+( nodeVarying0 + nodeVarying0 )
+
+// array element assign
+
+vec3[ 2 ] nodeVar0;
+nodeVar0 = vec3[ 2 ]( vec3( 0.0, 0.0, 0.0 ), vec3( 0.0, 0.0, 0.0 ) );
+nodeVar0[ 1 ] = vec3( 1.0, 0.0, 0.0 );
+nodeVar0[ 1 ].y = 0.5;
+
+nodeVar0[ 1 ]

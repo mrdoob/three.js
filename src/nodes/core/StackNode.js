@@ -441,7 +441,9 @@ class StackNode extends Node {
 
 		builder.setActiveStack( this );
 
-		//
+		// the statements are not part of an assignment to the output of the stack
+
+		const isContextAssign = builder.isContextAssign();
 
 		let result;
 
@@ -451,9 +453,15 @@ class StackNode extends Node {
 
 			if ( this.outputNode ) this.outputNode.build( builder, ...params );
 
+			const previousContext = isContextAssign ? builder.addContext( { assign: false } ) : null;
+
 			this._analyzeNodes( builder, removesDeadCode( builder, parentStack ) );
 
+			if ( previousContext !== null ) builder.setContext( previousContext );
+
 		} else {
+
+			const previousContext = isContextAssign ? builder.addContext( { assign: false } ) : null;
 
 			for ( let i = 0; i < this.nodes.length; i ++ ) {
 
@@ -483,6 +491,8 @@ class StackNode extends Node {
 				}
 
 			}
+
+			if ( previousContext !== null ) builder.setContext( previousContext );
 
 			if ( this.outputNode ) {
 

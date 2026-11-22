@@ -4,9 +4,7 @@ import { uniform } from '../core/UniformNode.js';
 import { uniformTexture } from './TextureNode.js';
 import { uniformCubeTexture } from './CubeTextureNode.js';
 import { buffer } from './BufferNode.js';
-import { nodeObject } from '../tsl/TSLBase.js';
 import { uniformArray } from './UniformArrayNode.js';
-import ReferenceElementNode from './ReferenceElementNode.js';
 import { warn } from '../../utils.js';
 
 // TODO: Avoid duplicated code and use only ReferenceBaseNode or ReferenceNode
@@ -123,19 +121,6 @@ class ReferenceNode extends Node {
 	isCacheable( /*builder*/ ) {
 
 		return false;
-
-	}
-
-	/**
-	 * When the referred property is array-like, this method can be used
-	 * to access elements via an index node.
-	 *
-	 * @param {IndexNode} indexNode - indexNode.
-	 * @return {ReferenceElementNode} A reference to an element.
-	 */
-	element( indexNode ) {
-
-		return new ReferenceElementNode( this, nodeObject( indexNode ) );
 
 	}
 
