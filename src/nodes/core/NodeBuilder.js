@@ -2247,6 +2247,54 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Follows the setup output of the given node until a node accepted by `isTarget()` is found
+	 * and returns the result of `callback( target )`. A stack keeps its statements, e.g. the
+	 * statements of a function whose returned node is the target.
+	 *
+	 * @param {?Node} node - The node to resolve.
+	 * @param {function(Node): boolean} isTarget - Whether the given node is the target.
+	 * @param {function(Node): Node} callback - Returns the result for the target.
+	 * @return {?Node} The result, or `null` if no target is found.
+	 */
+	resolveNode( node, isTarget, callback ) {
+
+		if ( node === null || node.isNode !== true ) return null;
+
+		if ( isTarget( node ) ) return callback( node );
+
+		if ( node.isContextNode === true ) {
+
+			// the node inside the context is resolved with the context, which is applied to the result
+
+			const previousContext = this.addContext( node.value );
+
+			const outputNode = this.resolveNode( node.node, isTarget, callback );
+
+			this.setContext( previousContext );
+
+			return outputNode !== null ? outputNode.context( node.value ) : null;
+
+		}
+
+		if ( node.isStackNode === true ) {
+
+			const outputNode = this.resolveNode( node.outputNode, isTarget, callback );
+
+			if ( outputNode === null || node.nodes.length === 0 ) return outputNode;
+
+			const resolvedStack = stack();
+			resolvedStack.nodes = node.nodes;
+			resolvedStack.outputNode = outputNode;
+
+			return resolvedStack;
+
+		}
+
+		return this.resolveNode( node.build( this ), isTarget, callback );
+
+	}
+
+	/**
 	 * The builder maintains (cached) data for each node during the building process. This method
 	 * can be used to get these data for a specific shader stage and cache.
 	 *

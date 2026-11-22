@@ -561,7 +561,7 @@ ${ flowData.code }
 	 * Generates the code that reads the given storage array element from
 	 * the Pixel Buffer Object (PBO) of its storage buffer.
 	 *
-	 * @param {StorageArrayElementNode} storageArrayElementNode - The storage array element node.
+	 * @param {ArrayElementNode} storageArrayElementNode - The element node of the storage buffer.
 	 * @return {string} The name of the variable holding the element.
 	 */
 	generatePBO( storageArrayElementNode ) {

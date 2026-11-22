@@ -4,6 +4,7 @@ import { textureSize } from './TextureSizeNode.js';
 import { colorSpaceToWorking } from '../display/ColorSpaceNode.js';
 import { expression } from '../code/ExpressionNode.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
+import { addDeferredMethod } from '../core/DeferredNode.js';
 import { nodeProxy, vec3, nodeObject, int, Fn } from '../tsl/TSLBase.js';
 import { step } from '../math/MathNode.js';
 import { getTextureType, hash } from '../core/NodeUtils.js';
@@ -1063,6 +1064,14 @@ class TextureNode extends UniformNode {
 }
 
 export default TextureNode;
+
+// Texture methods for nodes that resolve to a texture node, e.g. `getMap().sample( uv() )`
+
+for ( const name of [ 'sample', 'load', 'blur', 'level', 'size', 'bias', 'compare', 'grad', 'gather', 'depth', 'offset' ] ) {
+
+	addDeferredMethod( name );
+
+}
 
 /**
  * TSL function for creating a texture node.

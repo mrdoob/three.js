@@ -1,54 +1,6 @@
-import { nodeObject } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { getValueType } from '../core/NodeUtils.js';
-import ArrayElementNode from '../utils/ArrayElementNode.js';
 import BufferNode from './BufferNode.js';
-
-/**
- * Represents the element access on uniform array nodes.
- *
- * @augments ArrayElementNode
- */
-class UniformArrayElementNode extends ArrayElementNode {
-
-	static get type() {
-
-		return 'UniformArrayElementNode';
-
-	}
-
-	/**
-	 * Constructs a new uniform array element node.
-	 *
-	 * @param {UniformArrayNode} uniformArrayNode - The uniform array node to access.
-	 * @param {IndexNode} indexNode - The index data that define the position of the accessed element in the array.
-	 */
-	constructor( uniformArrayNode, indexNode ) {
-
-		super( uniformArrayNode, indexNode );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isArrayBufferElementNode = true;
-
-	}
-
-	generate( builder ) {
-
-		const snippet = super.generate( builder );
-		const type = this.getNodeType( builder );
-		const paddedType = this.node.getPaddedType( builder );
-
-		return builder.format( snippet, paddedType, type );
-
-	}
-
-}
 
 /**
  * Similar to {@link BufferNode} this module represents array-like data as
@@ -336,19 +288,6 @@ class UniformArrayNode extends BufferNode {
 		this.updateBuffer(); // initialize the buffer values
 
 		return super.setup( builder );
-
-	}
-
-	/**
-	 * Overwrites the default `element()` method to provide element access
-	 * based on {@link UniformArrayNode}.
-	 *
-	 * @param {IndexNode} indexNode - The index node.
-	 * @return {UniformArrayElementNode}
-	 */
-	element( indexNode ) {
-
-		return new UniformArrayElementNode( this, nodeObject( indexNode ) );
 
 	}
 

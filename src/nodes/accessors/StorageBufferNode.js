@@ -1,7 +1,6 @@
 import BufferNode from './BufferNode.js';
 import { bufferAttribute } from './BufferAttributeNode.js';
 import { varying } from '../tsl/TSLBase.js';
-import { storageElement } from '../utils/StorageArrayElementNode.js';
 import { NodeAccess } from '../core/constants.js';
 import { getTypeFromLength } from '../core/NodeUtils.js';
 
@@ -160,18 +159,6 @@ class StorageBufferNode extends BufferNode {
 	getInputType( /*builder*/ ) {
 
 		return this.value.isIndirectStorageBufferAttribute ? 'indirectStorageBuffer' : 'storageBuffer';
-
-	}
-
-	/**
-	 * Enables element access with the given index node.
-	 *
-	 * @param {IndexNode} indexNode - The index node.
-	 * @return {StorageArrayElementNode} A node representing the element access.
-	 */
-	element( indexNode ) {
-
-		return storageElement( this, indexNode );
 
 	}
 

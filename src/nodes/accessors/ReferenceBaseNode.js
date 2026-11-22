@@ -1,8 +1,6 @@
 import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
-import { nodeObject } from '../tsl/TSLCore.js';
-import ReferenceElementNode from './ReferenceElementNode.js';
 
 // TODO: Avoid duplicated code and use only ReferenceBaseNode or ReferenceNode
 
@@ -124,19 +122,6 @@ class ReferenceBaseNode extends Node {
 		this.group = group;
 
 		return this;
-
-	}
-
-	/**
-	 * When the referred property is array-like, this method can be used
-	 * to access elements via an index node.
-	 *
-	 * @param {IndexNode} indexNode - indexNode.
-	 * @return {ReferenceElementNode} A reference to an element.
-	 */
-	element( indexNode ) {
-
-		return new ReferenceElementNode( this, nodeObject( indexNode ) );
 
 	}
 
