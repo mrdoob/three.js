@@ -423,6 +423,13 @@ function getNormalizationScale( array ) {
 
 }
 
+// Float arrays hold unscaled values, so (de)normalization is a no-op for them.
+function isFloatArray( array ) {
+
+	return array instanceof Float32Array || array instanceof Float64Array || ( typeof Float16Array !== 'undefined' && array instanceof Float16Array );
+
+}
+
 /**
  * Denormalizes the given value according to the given typed array.
  *
@@ -432,7 +439,7 @@ function getNormalizationScale( array ) {
  */
 function denormalize( value, array ) {
 
-	if ( array.constructor === Float32Array ) return value;
+	if ( isFloatArray( array ) ) return value;
 
 	const scale = getNormalizationScale( array );
 
@@ -451,7 +458,7 @@ function denormalize( value, array ) {
  */
 function normalize( value, array ) {
 
-	if ( array.constructor === Float32Array ) return value;
+	if ( isFloatArray( array ) ) return value;
 
 	const scale = getNormalizationScale( array );
 

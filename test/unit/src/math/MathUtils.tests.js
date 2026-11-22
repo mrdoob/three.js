@@ -174,6 +174,21 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'normalize/denormalize float arrays', ( assert ) => {
+
+			const arrays = [ new Float32Array( 1 ), new Float64Array( 1 ) ];
+			if ( typeof Float16Array !== 'undefined' ) arrays.push( new Float16Array( 1 ) );
+
+			for ( const array of arrays ) {
+
+				const name = array.constructor.name;
+				assert.strictEqual( MathUtils.normalize( 0.5, array ), 0.5, `normalize passes ${ name } values through` );
+				assert.strictEqual( MathUtils.denormalize( 0.5, array ), 0.5, `denormalize passes ${ name } values through` );
+
+			}
+
+		} );
+
 	} );
 
 } );
