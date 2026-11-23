@@ -88,6 +88,18 @@ class StorageTextureNode extends TextureNode {
 	}
 
 	/**
+	 * Returns `false` to keep the UV matrix from remapping texel coordinates passed to `textureStore()`.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
+	get updateMatrix() {
+
+		return false;
+
+	}
+
+	/**
 	 * Overwrites the default implementation to return a fixed value `'storageTexture'`.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.

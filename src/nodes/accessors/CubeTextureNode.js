@@ -46,6 +46,18 @@ class CubeTextureNode extends TextureNode {
 	}
 
 	/**
+	 * Returns `false` because cube textures are sampled using 3D direction vectors.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
+	get updateMatrix() {
+
+		return false;
+
+	}
+
+	/**
 	 * Overwrites the default implementation to return the appropriate cube texture type.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -89,14 +101,6 @@ class CubeTextureNode extends TextureNode {
 		}
 
 	}
-
-	/**
-	 * Overwritten with an empty implementation since the `updateMatrix` flag is ignored
-	 * for cube textures. The uv transformation matrix is not applied to cube textures.
-	 *
-	 * @param {boolean} value - The update toggle.
-	 */
-	setUpdateMatrix( /*updateMatrix*/ ) { } // Ignore .updateMatrix for CubeTextureNode
 
 	/**
 	 * Setups the uv node. Depending on the backend as well as the texture type, it might be necessary

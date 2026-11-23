@@ -17,6 +17,7 @@ import { warn, warnOnce } from '../../utils.js';
 import NodeError from '../core/NodeError.js';
 
 const EmptyTexture = /*@__PURE__*/ new Texture();
+const _uvMatrices = /*@__PURE__*/ new WeakMap();
 
 /**
  * This type of uniform node represents a 2D texture.
@@ -127,16 +128,6 @@ class TextureNode extends UniformNode {
 		this.sampler = true;
 
 		/**
-		 * Whether the uv transformation matrix should be
-		 * automatically updated or not. Use `setUpdateMatrix()`
-		 * if you want to change the value of the property.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.updateMatrix = false;
-
-		/**
 		 * The reference node.
 		 *
 		 * @type {?Node}
@@ -162,15 +153,6 @@ class TextureNode extends UniformNode {
 		this._value = value;
 
 		/**
-		 * The uniform node that represents the uv transformation matrix.
-		 *
-		 * @private
-		 * @type {?UniformNode<mat3>}
-		 * @default null
-		 */
-		this._matrixUniform = null;
-
-		/**
 		 * The uniform node that represents the y-flip. Only required for WebGL.
 		 *
 		 * @private
@@ -187,8 +169,6 @@ class TextureNode extends UniformNode {
 		 * @default false
 		 */
 		this._samplerComparison = false;
-
-		this.setUpdateMatrix( uvNode === null );
 
 	}
 
@@ -341,60 +321,33 @@ class TextureNode extends UniformNode {
 	 */
 	getTransformedUV( uvNode ) {
 
-		return this._getMatrixUniform().mul( vec3( uvNode, 1 ) ).xy;
+		return textureMatrix( this ).mul( vec3( uvNode, 1 ) ).xy;
 
 	}
 
 	/**
-	 * Transforms the given uv gradient with the linear part of the texture matrix.
+	 * Whether the UV transformation matrix should be applied. By default, it is used with the default UVs.
+	 * Use {@link textureMatrix} to apply the matrix to custom UVs.
 	 *
-	 * @private
-	 * @param {Node<vec2>} gradientNode - The uv gradient.
-	 * @return {Node<vec2>} The transformed gradient.
+	 * @type {boolean}
+	 * @readonly
 	 */
-	_getTransformedGradient( gradientNode ) {
+	get updateMatrix() {
 
-		return this._getMatrixUniform().mul( vec3( gradientNode, 0 ) ).xy;
-
-	}
-
-	/**
-	 * Returns the uniform of the texture matrix shared by all nodes of the same base texture node.
-	 *
-	 * @private
-	 * @return {UniformNode<mat3>} The texture matrix uniform.
-	 */
-	_getMatrixUniform() {
-
-		const baseNode = this.getBase();
-
-		if ( baseNode._matrixUniform === null ) {
-
-			baseNode._matrixUniform = uniform( baseNode.value.matrix ).onObjectUpdate( () => {
-
-				const texture = baseNode.value;
-
-				if ( texture.matrixAutoUpdate === true ) texture.updateMatrix();
-
-				return texture.matrix;
-
-			} );
-
-		}
-
-		return baseNode._matrixUniform;
+		return this.uvNode === null;
 
 	}
 
 	/**
-	 * Defines whether the uv transformation matrix should automatically be updated or not.
+	 * This method has no effect.
 	 *
-	 * @param {boolean} value - The update toggle.
+	 * @deprecated Use {@link textureMatrix} to transform explicit UVs instead.
+	 * @param {boolean} value - The previous UV matrix setting.
 	 * @return {TextureNode} A reference to this node.
 	 */
-	setUpdateMatrix( value ) {
+	setUpdateMatrix( /* value */ ) {
 
-		this.updateMatrix = value;
+		warnOnce( 'TSL: "TextureNode.setUpdateMatrix()" is deprecated and has no effect. Use "textureMatrix()" to transform explicit UVs instead.' ); // @deprecated r188
 
 		return this;
 
@@ -556,7 +509,7 @@ class TextureNode extends UniformNode {
 
 			if ( gradient ) {
 
-				gradNode = this.updateMatrix === true ? gradient.map( ( node ) => this._getTransformedGradient( node ) ) : gradient;
+				gradNode = this.updateMatrix === true ? gradient.map( ( node ) => textureMatrix( this ).mul( vec3( node, 0 ) ).xy ) : gradient;
 
 			}
 
@@ -1028,7 +981,6 @@ class TextureNode extends UniformNode {
 
 		data.value = this.value.toJSON( data.meta ).uuid;
 		data.sampler = this.sampler;
-		data.updateMatrix = this.updateMatrix;
 
 	}
 
@@ -1038,7 +990,6 @@ class TextureNode extends UniformNode {
 
 		this.value = data.meta.textures[ data.value ];
 		this.sampler = data.sampler;
-		this.updateMatrix = data.updateMatrix;
 
 	}
 
@@ -1060,7 +1011,6 @@ class TextureNode extends UniformNode {
 		newNode.gradNode = this.gradNode;
 		newNode.gatherNode = this.gatherNode;
 		newNode.offsetNode = this.offsetNode;
-		newNode.updateMatrix = this.updateMatrix;
 
 		return newNode;
 
@@ -1122,6 +1072,46 @@ export const texture = ( value = EmptyTexture, uvNode = null, levelNode = null, 
 	}
 
 	return textureNode;
+
+};
+
+/**
+ * Returns a uniform node for the texture's UV transformation matrix.
+ *
+ * If a texture node is given, the matrix follows the node's current texture,
+ * e.g. when a material reference swaps the map without rebuilding the shader.
+ *
+ * @tsl
+ * @function
+ * @param {Texture|TextureNode} value - The texture or texture node that provides the matrix.
+ * @return {UniformNode<mat3>} The texture's UV transformation matrix.
+ */
+export const textureMatrix = ( value ) => {
+
+	if ( value?.isTextureNode === true ) value = value.getBase();
+	else if ( value?.isTexture !== true ) throw new TypeError( 'THREE.TSL: "textureMatrix()" expects a Texture or a TextureNode.' );
+
+	let matrix = _uvMatrices.get( value );
+
+	if ( matrix === undefined ) {
+
+		const getTexture = value.isTextureNode === true ? () => value.value : () => value;
+
+		matrix = uniform( getTexture().matrix ).onObjectUpdate( () => {
+
+			const texture = getTexture();
+
+			if ( texture.matrixAutoUpdate === true ) texture.updateMatrix();
+
+			return texture.matrix;
+
+		} );
+
+		_uvMatrices.set( value, matrix );
+
+	}
+
+	return matrix;
 
 };
 

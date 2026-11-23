@@ -50,14 +50,6 @@ class StorageTexture3DNode extends StorageTextureNode {
 	}
 
 	/**
-	 * Overwritten with an empty implementation since the `updateMatrix` flag is ignored
-	 * for 3D textures. The uv transformation matrix is not applied to 3D textures.
-	 *
-	 * @param {boolean} value - The update toggle.
-	 */
-	setUpdateMatrix( /*value*/ ) { } // Ignore .updateMatrix for 3d TextureNode
-
-	/**
 	 * Generates the uv code snippet.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.

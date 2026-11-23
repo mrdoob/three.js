@@ -83,6 +83,18 @@ class Texture3DNode extends TextureNode {
 	}
 
 	/**
+	 * Returns `false` because 3D texture coordinates do not use the 2D UV matrix.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
+	get updateMatrix() {
+
+		return false;
+
+	}
+
+	/**
 	 * Overwrites the default implementation to return a fixed value `'texture3D'`.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -105,14 +117,6 @@ class Texture3DNode extends TextureNode {
 		return vec3( 0.5, 0.5, 0.5 );
 
 	}
-
-	/**
-	 * Overwritten with an empty implementation since the `updateMatrix` flag is ignored
-	 * for 3D textures. The uv transformation matrix is not applied to 3D textures.
-	 *
-	 * @param {boolean} value - The update toggle.
-	 */
-	setUpdateMatrix( /*value*/ ) { } // Ignore .updateMatrix for 3d TextureNode
 
 	/**
 	 * Generates the uv code snippet.
