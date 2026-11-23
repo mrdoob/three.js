@@ -92,7 +92,17 @@ class ReflectorNode extends TextureNode {
 		 */
 		this._depthNode = null;
 
-		this.setUpdateMatrix( false );
+	}
+
+	/**
+	 * Returns `false` because the reflection is sampled using screen-space UVs.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
+	get updateMatrix() {
+
+		return false;
 
 	}
 

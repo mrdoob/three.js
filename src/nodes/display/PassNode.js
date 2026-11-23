@@ -54,7 +54,17 @@ class PassTextureNode extends TextureNode {
 		 */
 		this.isPassTextureNode = true;
 
-		this.setUpdateMatrix( false );
+	}
+
+	/**
+	 * Returns `false` because pass textures are sampled directly in render target UVs.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
+	get updateMatrix() {
+
+		return false;
 
 	}
 
