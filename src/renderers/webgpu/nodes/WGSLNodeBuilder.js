@@ -1220,7 +1220,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		} else {
 
-			error( `WebGPURenderer: THREE.TextureNode.biasNode does not support ${ shaderStage } shader.` );
+			error( `WebGPURenderer: THREE.SamplerNode.biasNode does not support ${ shaderStage } shader.` );
 
 		}
 

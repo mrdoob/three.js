@@ -135,6 +135,15 @@ class RTTNode extends TextureNode {
 		this._rendererState = {};
 
 		/**
+		 * The RTT node whose render target is referenced by this node (used by clones).
+		 *
+		 * @private
+		 * @type {?RTTNode}
+		 * @default null
+		 */
+		this._baseNode = null;
+
+		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
 		 * the texture once per frame in its {@link RTTNode#updateBefore} method.
 		 * Nodes without a node to render (e.g. clones) don't update.
@@ -230,7 +239,7 @@ class RTTNode extends TextureNode {
 	 */
 	set value( value ) {
 
-		const { renderTarget } = this.getBase();
+		const { renderTarget } = this._baseNode || this;
 
 		if ( renderTarget && value !== renderTarget.texture ) {
 
@@ -247,7 +256,7 @@ class RTTNode extends TextureNode {
 	 */
 	get value() {
 
-		const { renderTarget } = this.getBase();
+		const { renderTarget } = this._baseNode || this;
 
 		return renderTarget ? renderTarget.texture : null;
 
@@ -318,7 +327,7 @@ class RTTNode extends TextureNode {
 	clone() {
 
 		const newNode = super.clone();
-		newNode.referenceNode = this.getBase();
+		newNode._baseNode = this._baseNode || this;
 
 		return newNode;
 
@@ -372,7 +381,7 @@ export const rtt = ( node, ...params ) => new RTTNode( nodeObject( node ), ...pa
  */
 export const convertToTexture = ( node, ...params ) => {
 
-	if ( node.isSampleNode || node.isTextureNode ) return node;
+	if ( node.isSampleNode || node.isSampleable ) return node;
 	if ( node.isPassNode ) return node.getTextureNode();
 
 	return rtt( node, ...params );

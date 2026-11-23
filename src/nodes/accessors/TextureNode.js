@@ -1,26 +1,24 @@
 import UniformNode, { uniform } from '../core/UniformNode.js';
+import SamplerNode, { sampleTexture } from './SamplerNode.js';
 import { uv } from './UV.js';
 import { textureSize } from './TextureSizeNode.js';
-import { colorSpaceToWorking } from '../display/ColorSpaceNode.js';
-import { expression } from '../code/ExpressionNode.js';
-import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 import { addDeferredMethod } from '../core/DeferredNode.js';
-import { nodeProxy, vec3, nodeObject, int, Fn } from '../tsl/TSLBase.js';
-import { step } from '../math/MathNode.js';
+import { vec3, int } from '../tsl/TSLBase.js';
 import { getTextureType, hash } from '../core/NodeUtils.js';
 
-import { Compatibility, GreaterCompare, GreaterEqualCompare, IntType, LessCompare, LessEqualCompare, NearestFilter, UnsignedIntType } from '../../constants.js';
-
 import { Texture } from '../../textures/Texture.js';
-import { warn, warnOnce } from '../../utils.js';
 
+import { warnOnce } from '../../utils.js';
 import NodeError from '../core/NodeError.js';
 
 const EmptyTexture = /*@__PURE__*/ new Texture();
 const _uvMatrices = /*@__PURE__*/ new WeakMap();
 
 /**
- * This type of uniform node represents a 2D texture.
+ * This type of uniform node represents a 2D texture. The texture node is the binding of
+ * the texture and is never merged with other texture nodes. The texture is sampled with
+ * a {@link SamplerNode}, e.g. via `textureNode.sample( uvNode )`. When the texture node
+ * is used as a value, it is sampled with its own sample parameters, e.g. its uv node.
  *
  * @augments UniformNode
  */
@@ -54,7 +52,17 @@ class TextureNode extends UniformNode {
 		this.isTextureNode = true;
 
 		/**
-		 * Represents the texture coordinates.
+		 * Whether the node is a texture that can be sampled, e.g. via `sample()`. Shared by
+		 * texture nodes and sampler nodes, which both provide the texture via `value`.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isSampleable = true;
+
+		/**
+		 * Represents the texture coordinates of the sample when the node is used as a value.
 		 *
 		 * @type {?Node<vec2|vec3>}
 		 * @default null
@@ -128,31 +136,6 @@ class TextureNode extends UniformNode {
 		this.sampler = true;
 
 		/**
-		 * The reference node.
-		 *
-		 * @type {?Node}
-		 * @default null
-		 */
-		this.referenceNode = null;
-
-		/**
-		 * The mergeable value is stored in a private property.
-		 *
-		 * @private
-		 * @type {boolean}
-		 * @default true
-		 */
-		this._mergeable = true;
-
-		/**
-		 * The texture value is stored in a private property.
-		 *
-		 * @private
-		 * @type {Texture}
-		 */
-		this._value = value;
-
-		/**
 		 * The uniform node that represents the y-flip. Only required for WebGL.
 		 *
 		 * @private
@@ -170,80 +153,28 @@ class TextureNode extends UniformNode {
 		 */
 		this._samplerComparison = false;
 
-	}
-
-	set mergeable( value ) {
-
-		if ( this.referenceNode ) {
-
-			this.referenceNode.mergeable = value;
-
-		} else {
-
-			this._mergeable = value;
-
-		}
+		/**
+		 * The sampler node used when the texture node is used as a value.
+		 *
+		 * @private
+		 * @type {?SamplerNode}
+		 * @default null
+		 */
+		this._samplerNode = null;
 
 	}
 
 	/**
-	 * Whether the uniform may be merged with other uniforms at compile-time.
-	 *
-	 * @type {boolean}
-	 * @default true
-	 */
-	get mergeable() {
-
-		return this.referenceNode ? this.referenceNode.mergeable : this._mergeable;
-
-	}
-
-	set value( value ) {
-
-		if ( this.referenceNode ) {
-
-			this.referenceNode.value = value;
-
-		} else {
-
-			this._value = value;
-
-		}
-
-	}
-
-	/**
-	 * The texture value.
-	 *
-	 * @type {Texture}
-	 */
-	get value() {
-
-		return this.referenceNode ? this.referenceNode.value : this._value;
-
-	}
-
-	/**
-	 * Overwritten since the uniform hash is defined by the texture's UUID - if mergeable - and the hash of its reference node otherwise.
+	 * Overwritten since texture nodes are never merged. The hash is unique per node
+	 * but differs from {@link Node#getHash} so the uniform can be replaced without
+	 * replacing the node, e.g. by the parameter of a function with layout.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {number|string} The uniform hash.
+	 * @return {string} The uniform hash.
 	 */
-	getUniformHash( builder ) {
+	getUniformHash( /*builder*/ ) {
 
-		if ( this.referenceNode && ! this.referenceNode.mergeable ) {
-
-			return this.referenceNode.getHash( builder );
-
-		}
-
-		if ( ! this._mergeable ) {
-
-			return this.getHash( builder );
-
-		}
-
-		return this.value.uuid;
+		return 'texture' + this.id;
 
 	}
 
@@ -354,14 +285,15 @@ class TextureNode extends UniformNode {
 	}
 
 	/**
-	 * Setups the uv node. Depending on the backend as well as texture's image and type, it might be necessary
-	 * to modify the uv node for correct sampling.
+	 * Setups the uv node of a sample. Depending on the backend as well as texture's image and type,
+	 * it might be necessary to modify the uv node for correct sampling.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {Node} uvNode - The uv node to setup.
+	 * @param {SamplerNode} samplerNode - The sampler node.
 	 * @return {Node} The updated uv node.
 	 */
-	setupUV( builder, uvNode ) {
+	setupUV( builder, uvNode, samplerNode ) {
 
 		if ( builder.isFlipY() ) {
 
@@ -369,13 +301,13 @@ class TextureNode extends UniformNode {
 
 			uvNode = uvNode.toVar();
 
-			if ( this.sampler ) {
+			if ( samplerNode.sampler ) {
 
 				uvNode = flipYUniform.select( uvNode.flipY(), uvNode );
 
 			} else {
 
-				uvNode = flipYUniform.select( uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( int( uvNode.y ) ).sub( 1 ) ), uvNode );
+				uvNode = flipYUniform.select( uvNode.setY( int( textureSize( this, samplerNode.levelNode ).y ).sub( int( uvNode.y ) ).sub( 1 ) ), uvNode );
 
 			}
 
@@ -394,13 +326,11 @@ class TextureNode extends UniformNode {
 	 */
 	_getFlipYUniform() {
 
-		const baseNode = this.getBase();
+		if ( this._flipYUniform === null ) {
 
-		if ( baseNode._flipYUniform === null ) {
+			this._flipYUniform = uniform( false ).onObjectUpdate( () => {
 
-			baseNode._flipYUniform = uniform( false ).onObjectUpdate( () => {
-
-				const texture = baseNode.value;
+				const texture = this.value;
 
 				return ( texture.image instanceof ImageBitmap && texture.flipY === true ) || texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true || texture.isDepthTexture === true;
 
@@ -408,21 +338,46 @@ class TextureNode extends UniformNode {
 
 		}
 
-		return baseNode._flipYUniform;
+		return this._flipYUniform;
 
 	}
 
 	/**
-	 * Setups texture node by preparing the internal nodes for code generation.
+	 * Returns the sampler node used when the texture node is used as a value, and whose
+	 * clones are returned by the sample methods. Its parameters are the current sample parameters of this node.
+	 *
+	 * @private
+	 * @return {SamplerNode} The sampler node.
+	 */
+	_getSamplerNode() {
+
+		if ( this._samplerNode === null ) {
+
+			this._samplerNode = new SamplerNode( this );
+
+		}
+
+		const samplerNode = this._samplerNode;
+		samplerNode.uvNode = this.uvNode;
+		samplerNode.levelNode = this.levelNode;
+		samplerNode.biasNode = this.biasNode;
+		samplerNode.sampler = this.sampler;
+		samplerNode.depthNode = this.depthNode;
+		samplerNode.compareNode = this.compareNode;
+		samplerNode.gradNode = this.gradNode;
+		samplerNode.gatherNode = this.gatherNode;
+		samplerNode.offsetNode = this.offsetNode;
+
+		return samplerNode;
+
+	}
+
+	/**
+	 * Validates the texture of the node.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
-	setup( builder ) {
-
-		const properties = builder.getNodeProperties( this );
-		properties.referenceNode = this.referenceNode;
-
-		//
+	setup( /*builder*/ ) {
 
 		const texture = this.value;
 
@@ -432,124 +387,24 @@ class TextureNode extends UniformNode {
 
 		}
 
-		//
-
-		const uvNode = Fn( () => {
-
-			let uvNode = this.uvNode;
-
-			if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
-
-				uvNode = builder.context.getUV( this, builder );
-
-			}
-
-			if ( ! uvNode ) uvNode = this.getDefaultUV();
-
-			if ( this.updateMatrix === true ) {
-
-				uvNode = this.getTransformedUV( uvNode );
-
-			}
-
-			uvNode = this.setupUV( builder, uvNode );
-
-			return uvNode;
-
-		} )();
-
-		//
-
-		let levelNode = this.levelNode;
-
-		if ( levelNode === null && builder.context.getTextureLevel ) {
-
-			levelNode = builder.context.getTextureLevel( this );
-
-		}
-
-		//
-
-		let compareNode = null;
-		let compareStepNode = null;
-
-		if ( this.compareNode !== null ) {
-
-			if ( builder.renderer.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
-
-				compareNode = this.compareNode;
-
-			} else {
-
-				const compareFunction = texture.compareFunction;
-
-				if ( compareFunction === null || compareFunction === LessCompare || compareFunction === LessEqualCompare || compareFunction === GreaterCompare || compareFunction === GreaterEqualCompare ) {
-
-					compareStepNode = this.compareNode;
-
-				} else {
-
-					compareNode = this.compareNode;
-
-					warnOnce( 'TSL: Only "LessCompare", "LessEqualCompare", "GreaterCompare" and "GreaterEqualCompare" are supported for depth texture comparison fallback.' );
-
-				}
-
-			}
-
-		}
-
-		// the context can provide analytic gradients of the default uv, e.g. if the uv is reconstructed per fragment
-
-		let gradNode = this.gradNode;
-
-		if ( gradNode === null && this.uvNode === null && levelNode === null && this.biasNode === null && this.sampler === true && builder.context.getTextureGradient ) {
-
-			const gradient = builder.context.getTextureGradient( this, builder );
-
-			if ( gradient ) {
-
-				gradNode = this.updateMatrix === true ? gradient.map( ( node ) => textureMatrix( this ).mul( vec3( node, 0 ) ).xy ) : gradient;
-
-			}
-
-		}
-
-		if ( this.gatherNode !== null ) {
-
-			builder.addSamplerNode( this );
-
-		}
-
-		properties.uvNode = uvNode;
-		properties.levelNode = levelNode;
-		properties.biasNode = this.biasNode;
-		properties.compareNode = compareNode;
-		properties.compareStepNode = compareStepNode;
-		// the gradients are properties of their own, so they are analyzed as the other inputs
-		properties.gradNodeX = gradNode !== null ? gradNode[ 0 ] : null;
-		properties.gradNodeY = gradNode !== null ? gradNode[ 1 ] : null;
-		properties.gatherNode = this.gatherNode;
-		properties.depthNode = this.depthNode;
-		properties.offsetNode = this.offsetNode;
-
 	}
 
 	/**
-	 * Generates the uv code snippet.
+	 * Generates the uv code snippet of a sample.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {Node} uvNode - The uv node to generate code for.
+	 * @param {SamplerNode} samplerNode - The sampler node.
 	 * @return {string} The generated code snippet.
 	 */
-	generateUV( builder, uvNode ) {
+	generateUV( builder, uvNode, samplerNode ) {
 
-		return uvNode.build( builder, this.sampler === true ? 'vec2' : 'ivec2' );
+		return uvNode.build( builder, samplerNode.sampler === true ? 'vec2' : 'ivec2' );
 
 	}
 
 	/**
-	 * Generates the offset code snippet.
+	 * Generates the offset code snippet of a sample.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {Node} offsetNode - The offset node to generate code for.
@@ -575,9 +430,10 @@ class TextureNode extends UniformNode {
 	 * @param {?string} gatherSnippet - The gather snippet.
 	 * @param {?string} offsetSnippet - The offset snippet.
 	 * @param {?string} flipYSnippet - The y-flip snippet. Only used for WebGL.
+	 * @param {SamplerNode} samplerNode - The sampler node.
 	 * @return {string} The generated code snippet.
 	 */
-	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, gatherSnippet, offsetSnippet, flipYSnippet ) {
+	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, gatherSnippet, offsetSnippet, flipYSnippet, samplerNode ) {
 
 		const texture = this.value;
 
@@ -607,7 +463,7 @@ class TextureNode extends UniformNode {
 
 			snippet = builder.generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet );
 
-		} else if ( this.sampler === false ) {
+		} else if ( samplerNode.sampler === false ) {
 
 			snippet = builder.generateTextureLoad( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, offsetSnippet );
 
@@ -626,7 +482,8 @@ class TextureNode extends UniformNode {
 	}
 
 	/**
-	 * Generates the code snippet of the texture node.
+	 * Generates the code snippet of the texture node. References return the binding of the
+	 * texture, other outputs sample the texture with the sample parameters of this node.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {string} output - The current output.
@@ -634,114 +491,19 @@ class TextureNode extends UniformNode {
 	 */
 	generate( builder, output ) {
 
-		const texture = this.value;
-
-		const properties = builder.getNodeProperties( this );
-		const textureProperty = super.generate( builder, 'property' );
-
-		if ( output === 'samplerComparison' || properties.compareNode !== null ) {
+		if ( /^sampler/.test( output ) || builder.isReference( output ) ) {
 
 			// make sure the texture node creates a binding with a comparison sampler if necessary
 
-			this.getSharedNode( builder )._samplerComparison = true;
+			if ( output === 'samplerComparison' ) this._samplerComparison = true;
+
+			const textureProperty = super.generate( builder, 'property' );
+
+			return /^sampler/.test( output ) ? textureProperty + '_sampler' : textureProperty;
 
 		}
 
-		if ( /^sampler/.test( output ) ) {
-
-			return textureProperty + '_sampler';
-
-		} else if ( builder.isReference( output ) ) {
-
-			return textureProperty;
-
-		} else {
-
-			const nodeData = builder.getDataFromNode( this );
-
-			const nodeType = this.getNodeType( builder );
-
-			let propertyName = nodeData.propertyName;
-
-			if ( propertyName === undefined ) {
-
-				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNodeX, gradNodeY, gatherNode, offsetNode } = properties;
-
-				const uvSnippet = this.generateUV( builder, uvNode );
-				const levelSnippet = levelNode ? levelNode.build( builder, 'float' ) : null;
-				const biasSnippet = biasNode ? biasNode.build( builder, 'float' ) : null;
-				const depthSnippet = depthNode ? depthNode.build( builder, 'int' ) : null;
-				const compareSnippet = compareNode ? compareNode.build( builder, 'float' ) : null;
-				const compareStepSnippet = compareStepNode ? compareStepNode.build( builder, 'float' ) : null;
-				const gradSnippet = gradNodeX ? [ gradNodeX.build( builder, 'vec2' ), gradNodeY.build( builder, 'vec2' ) ] : null;
-				const gatherSnippet = gatherNode ? gatherNode.build( builder, 'int' ) : null;
-				const offsetSnippet = offsetNode ? this.generateOffset( builder, offsetNode ) : null;
-
-				const flipYUniform = this.getBase()._flipYUniform;
-				const flipYSnippet = flipYUniform ? flipYUniform.build( builder, 'bool' ) : null;
-
-				let finalDepthSnippet = depthSnippet;
-
-				if ( finalDepthSnippet === null && texture.isArrayTexture && this.isTexture3DNode !== true ) {
-
-					finalDepthSnippet = '0';
-
-				}
-
-				const nodeVar = builder.getVarFromNode( this );
-
-				propertyName = builder.getPropertyName( nodeVar );
-
-				let snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, finalDepthSnippet, compareSnippet, gradSnippet, gatherSnippet, offsetSnippet, flipYSnippet );
-
-				let snippetType;
-
-				if ( texture.isDepthTexture === true && gatherSnippet === null ) {
-
-					snippetType = 'float';
-
-				} else {
-
-					snippetType = texture.type === UnsignedIntType ? 'uvec4' : ( texture.type === IntType ? 'ivec4' : 'vec4' );
-
-				}
-
-				snippet = builder.format( snippet, snippetType, nodeType );
-
-				if ( compareStepSnippet !== null ) {
-
-					const compareFunction = texture.compareFunction;
-
-					if ( compareFunction === GreaterCompare || compareFunction === GreaterEqualCompare ) {
-
-						snippet = step( expression( snippet, nodeType ), expression( compareStepSnippet, 'float' ) ).build( builder, nodeType );
-
-					} else {
-
-						snippet = step( expression( compareStepSnippet, 'float' ), expression( snippet, nodeType ) ).build( builder, nodeType );
-
-					}
-
-				}
-
-				builder.addLineFlowCode( `${propertyName} = ${snippet}`, this );
-
-				nodeData.snippet = snippet;
-				nodeData.propertyName = propertyName;
-
-			}
-
-			let snippet = propertyName;
-
-			if ( builder.needsToWorkingColorSpace( texture ) ) {
-
-				snippet = colorSpaceToWorking( expression( snippet, nodeType ), texture.colorSpace ).setup( builder ).build( builder, nodeType );
-
-			}
-
-			return builder.format( snippet, nodeType, output );
-
-		}
+		return this._getSamplerNode().build( builder, output );
 
 	}
 
@@ -770,33 +532,27 @@ class TextureNode extends UniformNode {
 
 	}
 
-	// @TODO: Move to TSL
-
 	/**
 	 * Samples the texture with the given uv node.
 	 *
 	 * @param {Node} uvNode - The uv node.
-	 * @return {TextureNode} A texture node representing the texture sample.
+	 * @return {SamplerNode} A sampler node representing the texture sample.
 	 */
 	sample( uvNode ) {
 
-		const textureNode = this.clone();
-		textureNode.uvNode = nodeObject( uvNode );
-		textureNode.referenceNode = this.getBase();
-
-		return textureNode;
+		return this._getSamplerNode().sample( uvNode );
 
 	}
 
 	/**
-	 * TSL function for creating a texture node that fetches/loads texels without interpolation.
+	 * Fetches/loads texels without interpolation.
 	 *
 	 * @param {Node<uvec2>} uvNode - The integer texel coordinates (not normalized uvs).
-	 * @returns {TextureNode} A texture node representing the texture load.
+	 * @returns {SamplerNode} A sampler node representing the texture load.
 	 */
 	load( uvNode ) {
 
-		return this.sample( uvNode ).setSampler( false );
+		return this._getSamplerNode().load( uvNode );
 
 	}
 
@@ -804,25 +560,11 @@ class TextureNode extends UniformNode {
 	 * Samples a blurred version of the texture by defining an internal bias.
 	 *
 	 * @param {Node<float>} amountNode - How blurred the texture should be.
-	 * @return {TextureNode} A texture node representing the texture sample.
+	 * @return {SamplerNode} A sampler node representing the texture sample.
 	 */
 	blur( amountNode ) {
 
-		const textureNode = this.clone();
-		textureNode.biasNode = nodeObject( amountNode ).mul( maxMipLevel( textureNode ) );
-		textureNode.referenceNode = this.getBase();
-
-		const map = textureNode.value;
-
-		if ( textureNode.generateMipmaps === false && ( map && map.generateMipmaps === false || map.minFilter === NearestFilter || map.magFilter === NearestFilter ) ) {
-
-			warn( 'TSL: texture().blur() requires mipmaps and sampling. Use .generateMipmaps=true and .minFilter/.magFilter=THREE.LinearFilter in the Texture.' );
-
-			textureNode.biasNode = null;
-
-		}
-
-		return textureNode;
+		return this._getSamplerNode().blur( amountNode );
 
 	}
 
@@ -830,15 +572,11 @@ class TextureNode extends UniformNode {
 	 * Samples a specific mip of the texture.
 	 *
 	 * @param {Node<int>} levelNode - The mip level to sample.
-	 * @return {TextureNode} A texture node representing the texture sample.
+	 * @return {SamplerNode} A sampler node representing the texture sample.
 	 */
 	level( levelNode ) {
 
-		const textureNode = this.clone();
-		textureNode.levelNode = nodeObject( levelNode );
-		textureNode.referenceNode = this.getBase();
-
-		return textureNode;
+		return this._getSamplerNode().level( levelNode );
 
 	}
 
@@ -858,25 +596,11 @@ class TextureNode extends UniformNode {
 	 * Samples the texture with the given bias.
 	 *
 	 * @param {Node<float>} biasNode - The bias node.
-	 * @return {TextureNode} A texture node representing the texture sample.
+	 * @return {SamplerNode} A sampler node representing the texture sample.
 	 */
 	bias( biasNode ) {
 
-		const textureNode = this.clone();
-		textureNode.biasNode = nodeObject( biasNode );
-		textureNode.referenceNode = this.getBase();
-
-		return textureNode;
-
-	}
-
-	/**
-	 * Returns the base texture of this node.
-	 * @return {TextureNode} The base texture node.
-	 */
-	getBase() {
-
-		return this.referenceNode ? this.referenceNode.getBase() : this;
+		return this._getSamplerNode().bias( biasNode );
 
 	}
 
@@ -884,15 +608,11 @@ class TextureNode extends UniformNode {
 	 * Samples the texture by executing a compare operation.
 	 *
 	 * @param {Node<float>} compareNode - The node that defines the compare value.
-	 * @return {TextureNode} A texture node representing the texture sample.
+	 * @return {SamplerNode} A sampler node representing the texture sample.
 	 */
 	compare( compareNode ) {
 
-		const textureNode = this.clone();
-		textureNode.compareNode = nodeObject( compareNode );
-		textureNode.referenceNode = this.getBase();
-
-		return textureNode;
+		return this._getSamplerNode().compare( compareNode );
 
 	}
 
@@ -901,15 +621,11 @@ class TextureNode extends UniformNode {
 	 *
 	 * @param {Node<vec2>} gradNodeX - The gradX node.
 	 * @param {Node<vec2>} gradNodeY - The gradY node.
-	 * @return {TextureNode} A texture node representing the texture sample.
+	 * @return {SamplerNode} A sampler node representing the texture sample.
 	 */
 	grad( gradNodeX, gradNodeY ) {
 
-		const textureNode = this.clone();
-		textureNode.gradNode = [ nodeObject( gradNodeX ), nodeObject( gradNodeY ) ];
-		textureNode.referenceNode = this.getBase();
-
-		return textureNode;
+		return this._getSamplerNode().grad( gradNodeX, gradNodeY );
 
 	}
 
@@ -917,15 +633,11 @@ class TextureNode extends UniformNode {
 	 * Gathers four texels from the texture.
 	 *
 	 * @param {Node<int>} gatherNode - The index of the channel to read. This must be in range [0, 3] and a compile-time constant.
-	 * @return {TextureNode} A texture node representing the texture sample.
+	 * @return {SamplerNode} A sampler node representing the texture sample.
 	 */
 	gather( gatherNode = 0 ) {
 
-		const textureNode = this.clone();
-		textureNode.gatherNode = nodeObject( gatherNode );
-		textureNode.referenceNode = this.getBase();
-
-		return textureNode;
+		return this._getSamplerNode().gather( gatherNode );
 
 	}
 
@@ -945,15 +657,11 @@ class TextureNode extends UniformNode {
 	 * Samples the texture by defining a depth node.
 	 *
 	 * @param {Node<int>} depthNode - The depth node.
-	 * @return {TextureNode} A texture node representing the texture sample.
+	 * @return {SamplerNode} A sampler node representing the texture sample.
 	 */
 	depth( depthNode ) {
 
-		const textureNode = this.clone();
-		textureNode.depthNode = nodeObject( depthNode );
-		textureNode.referenceNode = this.getBase();
-
-		return textureNode;
+		return this._getSamplerNode().depth( depthNode );
 
 	}
 
@@ -961,15 +669,11 @@ class TextureNode extends UniformNode {
 	 * Samples the texture by defining an offset node.
 	 *
 	 * @param {Node<ivec2>} offsetNode - The offset node.
-	 * @return {TextureNode} A texture node representing the texture sample.
+	 * @return {SamplerNode} A sampler node representing the texture sample.
 	 */
 	offset( offsetNode ) {
 
-		const textureNode = this.clone();
-		textureNode.offsetNode = nodeObject( offsetNode );
-		textureNode.referenceNode = this.getBase();
-
-		return textureNode;
+		return this._getSamplerNode().offset( offsetNode );
 
 	}
 
@@ -994,7 +698,7 @@ class TextureNode extends UniformNode {
 	}
 
 	/**
-	 * Clones the texture node.
+	 * Clones the texture node. The clone is a new binding of the same texture.
 	 *
 	 * @return {TextureNode} The cloned texture node.
 	 */
@@ -1029,67 +733,35 @@ for ( const name of [ 'sample', 'load', 'blur', 'level', 'size', 'bias', 'compar
 }
 
 /**
- * TSL function for creating a texture node.
+ * TSL function for sampling a texture, a texture node or a sampler node. The samples of
+ * a texture share a single binding with the other samples of the same texture.
  *
  * @tsl
  * @function
- * @param {?Texture} value - The texture.
+ * @param {?(Texture|TextureNode|SamplerNode)} [value=EmptyTexture] - The texture.
  * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
  * @param {?Node<int>} [levelNode=null] - The level node.
  * @param {?Node<float>} [biasNode=null] - The bias node.
- * @returns {TextureNode}
+ * @returns {SamplerNode}
  */
-const textureBase = /*@__PURE__*/ nodeProxy( TextureNode ).setParameterLength( 1, 4 ).setName( 'texture' );
-
-/**
- * TSL function for creating a texture node or sample a texture node already existing.
- *
- * @tsl
- * @function
- * @param {?(Texture|TextureNode)} [value=EmptyTexture] - The texture.
- * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
- * @param {?Node<int>} [levelNode=null] - The level node.
- * @param {?Node<float>} [biasNode=null] - The bias node.
- * @returns {TextureNode}
- */
-export const texture = ( value = EmptyTexture, uvNode = null, levelNode = null, biasNode = null ) => {
-
-	let textureNode;
-
-	if ( value && value.isTextureNode === true ) {
-
-		textureNode = value.clone();
-		textureNode.referenceNode = value.getBase(); // Ensure the reference is set to the original node
-
-		if ( uvNode !== null ) textureNode.uvNode = nodeObject( uvNode );
-		if ( levelNode !== null ) textureNode.levelNode = nodeObject( levelNode );
-		if ( biasNode !== null ) textureNode.biasNode = nodeObject( biasNode );
-
-	} else {
-
-		textureNode = textureBase( value, uvNode, levelNode, biasNode );
-
-	}
-
-	return textureNode;
-
-};
+export const texture = ( value = EmptyTexture, uvNode = null, levelNode = null, biasNode = null ) => sampleTexture( SamplerNode, value, uvNode, levelNode, biasNode );
 
 /**
  * Returns a uniform node for the texture's UV transformation matrix.
  *
- * If a texture node is given, the matrix follows the node's current texture,
+ * If a texture node or a sampler node is given, the matrix follows the node's current texture,
  * e.g. when a material reference swaps the map without rebuilding the shader.
  *
  * @tsl
  * @function
- * @param {Texture|TextureNode} value - The texture or texture node that provides the matrix.
+ * @param {Texture|TextureNode|SamplerNode} value - The texture, texture node or sampler node that provides the matrix.
  * @return {UniformNode<mat3>} The texture's UV transformation matrix.
  */
 export const textureMatrix = ( value ) => {
 
-	if ( value?.isTextureNode === true ) value = value.getBase();
-	else if ( value?.isTexture !== true ) throw new TypeError( 'THREE.TSL: "textureMatrix()" expects a Texture or a TextureNode.' );
+	if ( value?.isSamplerNode === true ) value = value._getTextureNode();
+
+	if ( value?.isTextureNode !== true && value?.isTexture !== true ) throw new TypeError( 'THREE.TSL: "textureMatrix()" expects a Texture, a TextureNode or a SamplerNode.' );
 
 	let matrix = _uvMatrices.get( value );
 
@@ -1116,32 +788,25 @@ export const textureMatrix = ( value ) => {
 };
 
 /**
- * TSL function for creating a non-mergeable uniform texture node.
+ * TSL function for creating a uniform texture node: the binding of a texture, never merged
+ * with other texture nodes.
  *
  * @tsl
  * @function
  * @param {?Texture} [value=EmptyTexture] - The texture.
  * @returns {TextureNode}
  */
-export const uniformTexture = ( value = EmptyTexture ) => {
-
-	const textureNode = texture( value );
-
-	textureNode.mergeable = false;
-
-	return textureNode;
-
-};
+export const uniformTexture = ( value = EmptyTexture ) => new TextureNode( value );
 
 /**
  * TSL function for creating a texture node that fetches/loads texels without interpolation.
  *
  * @tsl
  * @function
- * @param {?(Texture|TextureNode)} [value=EmptyTexture] - The texture.
+ * @param {?(Texture|TextureNode|SamplerNode)} [value=EmptyTexture] - The texture.
  * @param {?Node<ivec2|uvec2>} [uvNode=null] - The integer texel coordinates (not normalized uvs).
  * @param {?Node<int>} [levelNode=null] - The level node.
- * @returns {TextureNode}
+ * @returns {SamplerNode}
  */
 export const textureLoad = ( ...params ) => texture( ...params ).setSampler( false );
 
@@ -1152,7 +817,7 @@ export const textureLevel = ( value, uv, level ) => texture( value, uv ).level( 
  *
  * @tsl
  * @function
- * @param {TextureNode|Texture} value - The texture or texture node to convert.
+ * @param {TextureNode|SamplerNode|Texture} value - The texture or texture node to convert.
  * @returns {Node}
  */
 export const sampler = ( value ) => ( value.isNode === true ? value : texture( value ) ).convert( 'sampler' );
@@ -1162,7 +827,7 @@ export const sampler = ( value ) => ( value.isNode === true ? value : texture( v
  *
  * @tsl
  * @function
- * @param {TextureNode|Texture} value - The texture or texture node to convert.
+ * @param {TextureNode|SamplerNode|Texture} value - The texture or texture node to convert.
  * @returns {Node}
  */
 export const samplerComparison = ( value ) => ( value.isNode === true ? value : texture( value ) ).convert( 'samplerComparison' );

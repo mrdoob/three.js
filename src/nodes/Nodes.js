@@ -65,6 +65,7 @@ export { default as StorageTexture3DNode } from './accessors/StorageTexture3DNod
 export { default as StorageTextureNode } from './accessors/StorageTextureNode.js';
 export { default as Texture3DNode } from './accessors/Texture3DNode.js';
 export { default as TextureNode } from './accessors/TextureNode.js';
+export { default as SamplerNode } from './accessors/SamplerNode.js';
 export { default as TextureSizeNode } from './accessors/TextureSizeNode.js';
 export { default as UniformArrayNode } from './accessors/UniformArrayNode.js';
 export { default as UserDataNode } from './accessors/UserDataNode.js';

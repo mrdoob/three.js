@@ -33,8 +33,8 @@ import { warn, error } from '../../utils.js';
 import { Texture } from '../../textures/Texture.js';
 import { CubeTexture } from '../../textures/CubeTexture.js';
 import { Data3DTexture } from '../../textures/Data3DTexture.js';
-import { texture } from '../accessors/TextureNode.js';
-import { cubeTexture } from '../accessors/CubeTextureNode.js';
+import TextureNode from '../accessors/TextureNode.js';
+import CubeTextureNode from '../accessors/CubeTextureNode.js';
 import { texture3D } from '../accessors/Texture3DNode.js';
 import { uv } from '../accessors/UV.js';
 import { vec3 } from '../tsl/TSLCore.js';
@@ -53,8 +53,8 @@ const _layoutDefaultsCache = new WeakMap();
 // The texture nodes of the texture inputs of a function layout. Their textures only define the code
 // of the function, each call passes its own texture.
 const _layoutTextureNodes = {
-	texture: () => texture( new Texture(), uv() ), // with a uv node, so the samples don't use the texture matrix
-	cubeTexture: () => cubeTexture( new CubeTexture(), vec3( 0, 0, 1 ) ), // with a direction, so the setup doesn't build the default reflect vector
+	texture: () => new TextureNode( new Texture(), uv() ), // with a uv node, so the samples don't use the texture matrix
+	cubeTexture: () => new CubeTextureNode( new CubeTexture(), vec3( 0, 0, 1 ) ), // with a direction, so the samples don't build the default reflect vector
 	texture3D: () => texture3D( Object.assign( new Data3DTexture(), { minFilter: LinearFilter, magFilter: LinearFilter } ) ) // filterable, so the samples use a sampler
 };
 
@@ -2498,7 +2498,9 @@ class NodeBuilder {
 
 			const index = this.uniforms.index ++;
 
-			nodeUniform = new NodeUniform( name || ( 'nodeUniform' + index ), type, node );
+			// names can be labels, e.g. 'Scene Depth', so they are converted to valid identifiers
+
+			nodeUniform = new NodeUniform( name ? name.replace( /[^a-zA-Z0-9_]+/g, '_' ) : ( 'nodeUniform' + index ), type, node );
 
 			this.uniforms[ shaderStage ].push( nodeUniform );
 
@@ -2976,7 +2978,7 @@ class NodeBuilder {
 
 					if ( parameterNode.isUniformNode === true ) {
 
-						// the clones of the uniform resolve to the parameter, see UniformNode#getSharedNode()
+						// the uniform resolves to the parameter, see UniformNode#getSharedNode()
 
 						this.setHashNode( new ParameterNode( type, name ), parameterNode.getUniformHash( this ) );
 
@@ -3057,13 +3059,15 @@ class NodeBuilder {
 
 			const node = Array.isArray( inputs ) ? inputs[ i ] : inputs[ input.name ];
 
+			const textureNode = node && node.isSamplerNode === true ? node.getTextureNode( this ) : node; // a sample passes its texture
+
 			if ( _layoutTextureNodes[ input.type ] === undefined ) {
 
 				parameters.push( node );
 
-			} else if ( node && node.isTextureNode === true && node.getInputType( this ) === input.type ) {
+			} else if ( textureNode && textureNode.isTextureNode === true && textureNode.getInputType( this ) === input.type ) {
 
-				parameters.push( ...Object.values( this.getTextureParameters( input.name, node ) ) );
+				parameters.push( ...Object.values( this.getTextureParameters( input.name, textureNode ) ) );
 
 			} else {
 

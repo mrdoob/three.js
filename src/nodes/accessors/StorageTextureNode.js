@@ -1,5 +1,6 @@
 import TextureNode from './TextureNode.js';
-import { nodeProxy } from '../tsl/TSLBase.js';
+import SamplerNode from './SamplerNode.js';
+import { nodeObject } from '../tsl/TSLBase.js';
 import { NodeAccess } from '../core/constants.js';
 
 /**
@@ -130,7 +131,9 @@ class StorageTextureNode extends TextureNode {
 		super.setup( builder );
 
 		const properties = builder.getNodeProperties( this );
+		properties.uvNode = this.uvNode;
 		properties.storeNode = this.storeNode;
+		properties.depthNode = this.depthNode;
 
 		return properties;
 
@@ -243,15 +246,11 @@ class StorageTextureNode extends TextureNode {
 	 *
 	 * @param {Node<uvec2|uvec3>} uvNode - The integer texel coordinates (not normalized uvs).
 	 * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
-	 * @return {StorageTextureNode} A storage texture node representing the store operation.
+	 * @return {StorageSamplerNode} A node representing the store operation.
 	 */
 	store( uvNode, storeNode ) {
 
-		const node = this.clone();
-
-		node.referenceNode = this.getBase();
-		node.uvNode = uvNode;
-		node.storeNode = storeNode;
+		const node = new StorageSamplerNode( this, uvNode, storeNode );
 
 		if ( storeNode !== null ) node.toStack();
 
@@ -294,6 +293,157 @@ class StorageTextureNode extends TextureNode {
 
 }
 
+/**
+ * Represents a sample or a store of a storage texture node. Unlike {@link SamplerNode},
+ * the access methods of the storage texture node are available too.
+ *
+ * @augments SamplerNode
+ */
+class StorageSamplerNode extends SamplerNode {
+
+	static get type() {
+
+		return 'StorageSamplerNode';
+
+	}
+
+	/**
+	 * Constructs a new storage sampler node.
+	 *
+	 * @param {StorageTextureNode|StorageTexture} textureNode - The storage texture node or the storage texture.
+	 * @param {?Node<uvec2|uvec3>} [uvNode=null] - The integer texel coordinates (not normalized uvs).
+	 * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
+	 */
+	constructor( textureNode, uvNode = null, storeNode = null ) {
+
+		super( textureNode, uvNode );
+
+		/**
+		 * The value node that should be stored in the texture.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.storeNode = storeNode;
+
+	}
+
+	createTextureNode( texture ) {
+
+		return new StorageTextureNode( texture );
+
+	}
+
+	generateNodeType( builder ) {
+
+		return this.storeNode !== null ? 'void' : super.generateNodeType( builder );
+
+	}
+
+	setup( builder ) {
+
+		if ( this.storeNode === null ) return super.setup( builder );
+
+		const properties = builder.getNodeProperties( this );
+		properties.textureNode = this.getTextureNode( builder );
+		properties.uvNode = this.uvNode;
+		properties.storeNode = this.storeNode;
+		properties.depthNode = this.depthNode;
+
+	}
+
+	generate( builder, output ) {
+
+		if ( this.storeNode === null ) return super.generate( builder, output );
+
+		const { textureNode, uvNode, storeNode, depthNode } = builder.getNodeProperties( this );
+
+		const texture = textureNode.value;
+		const textureProperty = textureNode.build( builder, 'property' );
+
+		const uvSnippet = uvNode.build( builder, texture.is3DTexture === true ? 'uvec3' : 'uvec2' );
+		const storeType = builder.getTypeFromLength( 4, builder.getComponentTypeFromTexture( texture ) );
+		const storeSnippet = storeNode.build( builder, storeType );
+		const depthSnippet = depthNode ? depthNode.build( builder, 'int' ) : null;
+
+		const snippet = builder.generateTextureStore( texture, textureProperty, uvSnippet, depthSnippet, storeSnippet );
+
+		builder.addLineFlowCode( snippet, this );
+
+		return '';
+
+	}
+
+	/**
+	 * Defines the node access of the storage texture node.
+	 *
+	 * @param {string} value - The node access.
+	 * @return {StorageSamplerNode} A reference to this node.
+	 */
+	setAccess( value ) {
+
+		this._getTextureNode().setAccess( value );
+		return this;
+
+	}
+
+	/**
+	 * Sets the mip level of the storage texture node.
+	 *
+	 * @param {number} level - The mip level.
+	 * @return {StorageSamplerNode} A reference to this node.
+	 */
+	setMipLevel( level ) {
+
+		this._getTextureNode().setMipLevel( level );
+		return this;
+
+	}
+
+	/**
+	 * Convenience method for configuring a read/write node access of the storage texture node.
+	 *
+	 * @return {StorageSamplerNode} A reference to this node.
+	 */
+	toReadWrite() {
+
+		return this.setAccess( NodeAccess.READ_WRITE );
+
+	}
+
+	/**
+	 * Convenience method for configuring a read-only node access of the storage texture node.
+	 *
+	 * @return {StorageSamplerNode} A reference to this node.
+	 */
+	toReadOnly() {
+
+		return this.setAccess( NodeAccess.READ_ONLY );
+
+	}
+
+	/**
+	 * Convenience method for configuring a write-only node access of the storage texture node.
+	 *
+	 * @return {StorageSamplerNode} A reference to this node.
+	 */
+	toWriteOnly() {
+
+		return this.setAccess( NodeAccess.WRITE_ONLY );
+
+	}
+
+	clone() {
+
+		const newNode = super.clone();
+		newNode.storeNode = this.storeNode;
+
+		return newNode;
+
+	}
+
+}
+
 export default StorageTextureNode;
 
 /**
@@ -304,9 +454,17 @@ export default StorageTextureNode;
  * @param {StorageTexture} value - The storage texture.
  * @param {?Node<uvec2|uvec3>} [uvNode=null] - The integer texel coordinates (not normalized uvs).
  * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
- * @returns {StorageTextureNode}
+ * @returns {StorageTextureNode|StorageSamplerNode} The storage texture node, or its sample or store if a uv node is given.
  */
-export const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode ).setParameterLength( 1, 3 );
+export const storageTexture = ( value, uvNode = null, storeNode = null ) => {
+
+	if ( uvNode === null && storeNode === null ) return new StorageTextureNode( value );
+
+	// samples and stores of a storage texture share a single binding
+
+	return new StorageSamplerNode( value, nodeObject( uvNode ), storeNode !== null ? nodeObject( storeNode ) : null );
+
+};
 
 
 /**
@@ -320,7 +478,7 @@ export const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode ).setP
  * @param {StorageTexture|StorageTextureNode} value - The storage texture or storage texture node.
  * @param {Node<uvec2|uvec3>} uvNode - The integer texel coordinates (not normalized uvs).
  * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
- * @returns {StorageTextureNode}
+ * @returns {StorageSamplerNode}
  */
 export const textureStore = ( value, uvNode, storeNode ) => {
 
