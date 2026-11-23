@@ -41,21 +41,6 @@ class StorageInstancedBufferAttribute extends InstancedBufferAttribute {
 
 	}
 
-	/**
-	 * Frees the GPU-related resources allocated by this instance. Available only in {@link WebGPURenderer}.
-	 */
-	dispose() {
-
-		if ( this.pbo !== undefined ) {
-
-			this.pbo.dispose();
-
-		}
-
-		super.dispose();
-
-	}
-
 }
 
 export default StorageInstancedBufferAttribute;
