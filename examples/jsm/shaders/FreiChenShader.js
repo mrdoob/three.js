@@ -44,8 +44,6 @@ const FreiChenShader = {
 
 		uniform vec2 aspect;
 
-		vec2 texel = vec2( 1.0 / aspect.x, 1.0 / aspect.y );
-
 
 		mat3 G[9];
 
@@ -74,15 +72,17 @@ const FreiChenShader = {
 			G[7] = g7,
 			G[8] = g8;
 
+			vec2 texel = vec2( 1.0 / aspect.x, 1.0 / aspect.y );
+
 			mat3 I;
 			float cnv[9];
-			vec3 sample;
+			vec3 texelColor;
 
 		/* fetch the 3x3 neighbourhood and use the RGB vector's length as intensity value */
 			for (float i=0.0; i<3.0; i++) {
 				for (float j=0.0; j<3.0; j++) {
-					sample = texture2D(tDiffuse, vUv + texel * vec2(i-1.0,j-1.0) ).rgb;
-					I[int(i)][int(j)] = length(sample);
+					texelColor = texture2D(tDiffuse, vUv + texel * vec2(i-1.0,j-1.0) ).rgb;
+					I[int(i)][int(j)] = length(texelColor);
 				}
 			}
 

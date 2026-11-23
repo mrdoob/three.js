@@ -23,7 +23,7 @@ const TriangleBlurShader = {
 
 	uniforms: {
 
-		'texture': { value: null },
+		'tDiffuse': { value: null },
 		'delta': { value: new Vector2( 1, 1 ) }
 
 	},
@@ -45,7 +45,7 @@ const TriangleBlurShader = {
 
 		#define ITERATIONS 10.0
 
-		uniform sampler2D texture;
+		uniform sampler2D tDiffuse;
 		uniform vec2 delta;
 
 		varying vec2 vUv;
@@ -65,7 +65,7 @@ const TriangleBlurShader = {
 				float percent = ( t + offset - 0.5 ) / ITERATIONS;
 				float weight = 1.0 - abs( percent );
 
-				color += texture2D( texture, vUv + delta * percent ) * weight;
+				color += texture2D( tDiffuse, vUv + delta * percent ) * weight;
 				total += weight;
 
 			}
