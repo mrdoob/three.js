@@ -170,6 +170,8 @@ class GaussianBlurNode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
+		renderer.inspector.beginGroup( 'Gaussian Blur' );
+
 		//
 
 		const map = this.textureNode.value;
@@ -187,7 +189,7 @@ class GaussianBlurNode extends Node {
 
 		renderer.setRenderTarget( this._horizontalRT );
 
-		_quadMesh.name = 'Gaussian Blur [ Horizontal Pass ]';
+		_quadMesh.name = 'Horizontal';
 		_quadMesh.render( renderer );
 
 		// vertical
@@ -196,10 +198,12 @@ class GaussianBlurNode extends Node {
 
 		renderer.setRenderTarget( this._verticalRT );
 
-		_quadMesh.name = 'Gaussian Blur [ Vertical Pass ]';
+		_quadMesh.name = 'Vertical';
 		_quadMesh.render( renderer );
 
 		// restore
+
+		renderer.inspector.finishGroup();
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );
 

@@ -149,6 +149,19 @@ class InspectorBase extends EventDispatcher {
 	finishRender( /*uid*/ ) { }
 
 	/**
+	 * Begins a group. The render and compute calls until {@link InspectorBase#finishGroup} are
+	 * reported as its children, like the passes of an effect or the faces of a cube shadow map.
+	 *
+	 * @param {string} name - The name of the group.
+	 */
+	beginGroup( /*name*/ ) { }
+
+	/**
+	 * Finishes the group begun by {@link InspectorBase#beginGroup}.
+	 */
+	finishGroup() { }
+
+	/**
 	 * Called when a texture copy operation is performed.
 	 *
 	 * @param {Texture} srcTexture - The source texture.

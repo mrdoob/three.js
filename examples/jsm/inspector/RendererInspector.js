@@ -71,6 +71,30 @@ class ComputeStats extends ObjectStats {
 
 }
 
+class GroupStats extends ObjectStats {
+
+	constructor( uid, name ) {
+
+		super( uid, name );
+
+		this.isGroupStats = true;
+
+	}
+
+}
+
+// returns the closest call of the given type the given call is nested in
+
+function findParent( stats, type ) {
+
+	let parent = stats.parent;
+
+	while ( parent && parent[ type ] !== true ) parent = parent.parent;
+
+	return parent || null;
+
+}
+
 // returns true if the frame of the animation loop rendered or computed
 
 function isRenderedFrame( frame ) {
@@ -383,6 +407,46 @@ export class RendererInspector extends InspectorBase {
 
 	}
 
+	beginGroup( name ) {
+
+		const frame = this.getFrame();
+
+		if ( ! frame ) return;
+
+		// a group is identified by its parent, its name and its index among the groups of that name
+
+		const parent = this.getParent();
+		const key = ( parent.cid || '' ) + '/' + name;
+		const index = parent.children.filter( ( stats ) => stats.key === key ).length;
+
+		const group = new GroupStats( `${ key }/${ index }:f${ frame.frameId }`, name );
+		group.key = key;
+		group.timestamp = performance.now();
+		group.parent = parent;
+
+		parent.children.push( group );
+
+		this.currentContext = group;
+
+		this._beginTimer( group );
+
+	}
+
+	finishGroup() {
+
+		const frame = this.getFrame();
+
+		if ( ! frame ) return;
+
+		const group = this.currentContext;
+		group.cpu = performance.now() - group.timestamp;
+
+		this._endTimer( frame, group );
+
+		this.currentContext = group.parent;
+
+	}
+
 	beginCompute( uid, computeNode ) {
 
 		const frame = this.getFrame();
@@ -415,7 +479,7 @@ export class RendererInspector extends InspectorBase {
 		this._endTimer( frame, currentCompute );
 
 		this.currentContext = currentCompute.parent;
-		this.currentCompute = currentCompute.parent && currentCompute.parent.isComputeStats ? currentCompute.parent : null;
+		this.currentCompute = findParent( currentCompute, 'isComputeStats' );
 
 	}
 
@@ -451,7 +515,7 @@ export class RendererInspector extends InspectorBase {
 		this._endTimer( frame, currentRender );
 
 		this.currentContext = currentRender.parent;
-		this.currentRender = currentRender.parent && currentRender.parent.isRenderStats ? currentRender.parent : null;
+		this.currentRender = findParent( currentRender, 'isRenderStats' );
 
 		// draw over each top-level render to the canvas, the frame finishes only at the start of the next one
 

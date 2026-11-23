@@ -772,6 +772,8 @@ class SSRNode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
+		renderer.inspector.beginGroup( 'SSR' );
+
 		const ssrRenderTarget = this._ssrRenderTarget;
 		const blurRenderTarget = this._blurRenderTarget;
 
@@ -792,7 +794,7 @@ class SSRNode extends Node {
 		// ssr
 
 		renderer.setRenderTarget( ssrRenderTarget );
-		_quadMesh.name = 'SSR [ Reflections ]';
+		_quadMesh.name = 'Reflections';
 		_quadMesh.render( renderer );
 
 		// blur (optional)
@@ -807,7 +809,7 @@ class SSRNode extends Node {
 
 				this._blurSpread.value = i;
 				renderer.setRenderTarget( blurRenderTarget, 0, i );
-				_quadMesh.name = 'SSR [ Blur Level ' + i + ' ]';
+				_quadMesh.name = 'Blur [ ' + i + ' ]';
 				_quadMesh.render( renderer );
 
 			}
@@ -815,6 +817,8 @@ class SSRNode extends Node {
 		}
 
 		// restore
+
+		renderer.inspector.finishGroup();
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );
 

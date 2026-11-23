@@ -307,6 +307,8 @@ class PointShadowNode extends ShadowNode {
 		renderer.autoClear = false;
 		renderer.setClearColor( shadow.clearColor, shadow.clearAlpha );
 
+		renderer.inspector.beginGroup( `Point Light Shadow [ ${ light.name || 'ID: ' + light.id } ]` );
+
 		// Render each cube face
 		for ( let face = 0; face < 6; face ++ ) {
 
@@ -343,13 +345,15 @@ class PointShadowNode extends ShadowNode {
 
 			const currentSceneName = scene.name;
 
-			scene.name = `Point Light Shadow [ ${ light.name || 'ID: ' + light.id } ] - Face ${ face + 1 }`;
+			scene.name = `Face ${ face + 1 }`;
 
 			renderer.render( scene, camera );
 
 			scene.name = currentSceneName;
 
 		}
+
+		renderer.inspector.finishGroup();
 
 		//
 
