@@ -213,6 +213,7 @@ class Rhino3dmLoader extends Loader {
 				return new Promise( ( resolve, reject ) => {
 
 					worker._callbacks[ taskID ] = { resolve, reject };
+					worker._taskCosts[ taskID ] = taskCost;
 
 					worker.postMessage( { type: 'decode', id: taskID, buffer, subdivisionLevel: this.subdivisionLevel }, [ buffer ] );
 
