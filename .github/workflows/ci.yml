@@ -1,6 +1,13 @@
 name: CI
 
 on:
+  push:
+    branches:
+      - dev
+    paths-ignore:
+      - 'build/**'
+      - 'docs/**'
+      - 'files/**'
   pull_request:
     paths-ignore:
       - 'build/**'
