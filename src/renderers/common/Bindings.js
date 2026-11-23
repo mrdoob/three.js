@@ -378,6 +378,21 @@ class Bindings extends DataMap {
 
 			if ( groupData.usedTimes === 0 ) {
 
+				// untrack destroyed bind group from all textures it was used with, not just the current ones
+
+				if ( groupData.textures !== undefined ) {
+
+					for ( const texture of groupData.textures ) {
+
+						if ( this.textures.has( texture ) === false ) continue;
+
+						const textureData = this.textures.get( texture );
+						if ( textureData.bindGroups !== undefined ) textureData.bindGroups.delete( bindGroup );
+
+					}
+
+				}
+
 				for ( const binding of bindGroup.bindings ) {
 
 					if ( binding.isUniformBuffer ) {
@@ -394,13 +409,6 @@ class Bindings extends DataMap {
 						if ( binding.isSampledTexture !== true ) {
 
 							this.backend.destroySampler( binding );
-
-						} else if ( binding.texture !== null ) {
-
-							// untrack destroyed bind group from its texture
-
-							const textureData = this.textures.get( binding.texture );
-							if ( textureData.bindGroups !== undefined ) textureData.bindGroups.delete( bindGroup );
 
 						}
 
@@ -536,6 +544,14 @@ class Bindings extends DataMap {
 					// keep track which bind groups refer to the current texture (this is needed for dispose)
 
 					texturesTextureData.bindGroups.add( bindGroup );
+
+					// and which textures the bind group was tracked by, since the texture of a binding can change over time
+
+					const groupData = this.get( bindGroup );
+
+					if ( groupData.textures === undefined ) groupData.textures = new Set();
+
+					groupData.textures.add( texture );
 
 				}
 
