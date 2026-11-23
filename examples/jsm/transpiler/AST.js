@@ -220,7 +220,7 @@ export class FunctionParameter extends ASTNode {
 
 export class FunctionDeclaration extends ASTNode {
 
-	constructor( type, name, params = [], body = [] ) {
+	constructor( type, name, params = [], body = [], arrayCount = null ) {
 
 		super();
 
@@ -228,6 +228,8 @@ export class FunctionDeclaration extends ASTNode {
 		this.name = name;
 		this.params = params;
 		this.body = body;
+
+		this.arrayCount = arrayCount;
 
 		this.isFunctionDeclaration = true;
 

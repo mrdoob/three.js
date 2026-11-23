@@ -910,7 +910,8 @@ ${ bodyStr }
 
 ${ this.tab }}`;
 
-		if ( node.layout !== false && hasPointer === false ) {
+		// Array returns are inlined because a TSL function layout requires a scalar, vector or matrix return type.
+		if ( node.layout !== false && hasPointer === false && node.arrayCount === null ) {
 
 			const inputsStr = inputs.length > 0 ? inputs.join( ', ' ) + ', ' : '';
 			funcStr += ', { ' + inputsStr + 'return: \'' + type + '\' }';
