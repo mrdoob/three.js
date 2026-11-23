@@ -1263,7 +1263,9 @@ class FnNode extends Node {
 export function Fn( jsFunc, layout = null ) {
 
 	// Layout functions are cached across shaders of the same backend. Their bodies
-	// must depend only on explicit inputs and constants, not uniforms or material context.
+	// must depend only on explicit inputs, constants and uniforms, not material context.
+	// A function that reads uniforms or textures is built per shader, since each shader
+	// declares and names its own uniforms.
 	//
 	// Parameters can have default values. A call without some inputs passes the defaults as
 	// arguments, so values like `uv()` are evaluated at the call site. The defaults are resolved
