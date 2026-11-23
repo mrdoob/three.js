@@ -893,7 +893,7 @@ class NodeBuilder {
 	 * This method sets the given node (value) with the given hash (key) into this dictionary.
 	 *
 	 * @param {Node} node - The node to add.
-	 * @param {number} hash - The hash of the node.
+	 * @param {number|string} hash - The hash of the node.
 	 */
 	setHashNode( node, hash ) {
 
@@ -1113,7 +1113,7 @@ class NodeBuilder {
 	/**
 	 * Returns a node for the given hash, see {@link NodeBuilder#setHashNode}.
 	 *
-	 * @param {number} hash - The hash of the node.
+	 * @param {number|string} hash - The hash of the node.
 	 * @return {Node} The found node.
 	 */
 	getNodeFromHash( hash ) {
