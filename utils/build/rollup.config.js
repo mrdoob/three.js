@@ -66,25 +66,6 @@ const builds = [
 	{
 		input: {
 			'three.core.js': 'src/Three.Core.js',
-			'three.webgpu.nodes.js': 'src/Three.WebGPU.Nodes.js',
-		},
-		plugins: [
-			glsl(),
-			header()
-		],
-		preserveEntrySignatures: 'allow-extension',
-		output: [
-			{
-				format: 'esm',
-				dir: 'build',
-				minifyInternalExports: false,
-				entryFileNames: '[name]',
-			}
-		]
-	},
-	{
-		input: {
-			'three.core.js': 'src/Three.Core.js',
 			'three.module.js': 'src/Three.js',
 			'three.nodes.js': 'src/Three.Nodes.js',
 			'three.webgpu.js': 'src/Three.WebGPU.js',
