@@ -63,6 +63,14 @@ class Textures extends DataMap {
 		this.info = info;
 
 		/**
+		 * Renderer component for managing bindings.
+		 *
+		 * @type {?Bindings}
+		 * @default null
+		 */
+		this.bindings = null;
+
+		/**
 		 * A set of HTMLTextures that need paint updates.
 		 *
 		 * @type {Set<HTMLTexture>}
@@ -726,16 +734,18 @@ class Textures extends DataMap {
 
 			// delete cached bind groups so they don't point to destroyed textures
 
-			if ( textureData.bindGroups ) {
+			const bindGroups = textureData.bindGroups;
 
-				for ( const bindGroup of textureData.bindGroups ) {
+			if ( bindGroups ) {
+
+				for ( const bindGroup of bindGroups ) {
 
 					const bindingsData = this.backend.get( bindGroup );
 
 					bindingsData.groups = undefined;
 					bindingsData.versions = undefined;
 
-					// go through all bindings and if one points to the destroyed texture, trigger dispose as well
+					// destroy samplers and reset the bindings that point to the destroyed texture
 
 					for ( const binding of bindGroup.bindings ) {
 
@@ -751,6 +761,15 @@ class Textures extends DataMap {
 							binding.release();
 
 						}
+
+					}
+
+					// untrack the destroyed texture from the bind group
+
+					if ( this.bindings.has( bindGroup ) === true ) {
+
+						const bindGroupData = this.bindings.get( bindGroup );
+						bindGroupData.textures.delete( texture );
 
 					}
 
