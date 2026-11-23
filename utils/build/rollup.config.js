@@ -86,6 +86,7 @@ const builds = [
 		input: {
 			'three.core.js': 'src/Three.Core.js',
 			'three.module.js': 'src/Three.js',
+			'three.nodes.js': 'src/Three.Nodes.js',
 			'three.webgpu.js': 'src/Three.WebGPU.js',
 			'three.tsl.js': 'src/Three.TSL.js',
 		},
