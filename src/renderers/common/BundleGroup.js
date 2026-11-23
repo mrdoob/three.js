@@ -46,12 +46,16 @@ class BundleGroup extends Group {
 		this.type = 'BundleGroup';
 
 		/**
-		 * Whether the bundle is static or not. When set to `true`, the structure
-		 * is assumed to be static and does not change. E.g. no new objects are
-		 * added to the group.
+		 * Whether the bundle is static or not. When set to `true`, the renderer may
+		 * skip updating the transformation and material properties of the objects in
+		 * the bundle until the `needsUpdate` flag is set to `true`. Set it to `false`
+		 * for bundles with animated objects.
 		 *
-		 * If a change is required, an update can still be forced by setting the
-		 * `needsUpdate` flag to `true`.
+		 * Adding or removing objects always requires setting the `needsUpdate`
+		 * flag to `true`.
+		 *
+		 * Only used by the WebGPU backend. With the WebGL 2 backend, the group is
+		 * rendered like a regular group and all changes are applied immediately.
 		 *
 		 * @type {boolean}
 		 * @default true

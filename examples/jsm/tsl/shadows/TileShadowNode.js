@@ -73,7 +73,7 @@ class TileShadowNode extends ShadowBaseNode {
 		this.config = {
 			tilesX: options.tilesX || 2,
 			tilesY: options.tilesY || 2,
-			resolution: options.resolution || light.shadow.mapSize,
+			resolution: options.resolution || this.shadow.mapSize,
 			depthType: options.depthType || UnsignedIntType,
 			debug: options.debug !== undefined ? options.debug : false
 		};
@@ -87,13 +87,11 @@ class TileShadowNode extends ShadowBaseNode {
 		this.initialLightDirection = new Vector3();
 		this.updateLightDirection();
 
-		this._cameraFrameId = new WeakMap();
-
 		this.shadowSize = {
-			top: light.shadow.camera.top,
-			bottom: light.shadow.camera.bottom,
-			left: light.shadow.camera.left,
-			right: light.shadow.camera.right,
+			top: this.shadow.camera.top,
+			bottom: this.shadow.camera.bottom,
+			left: this.shadow.camera.left,
+			right: this.shadow.camera.right,
 		};
 
 		this.lights = [];
@@ -183,15 +181,15 @@ class TileShadowNode extends ShadowBaseNode {
 
 			const lwLight = new LwLight();
 			lwLight.castShadow = true;
-			const lShadow = light.shadow.clone();
+			const lShadow = this.shadow.clone();
 			const tile = this.tiles[ i ];
 			lShadow.camera.left = this.shadowSize.left + width * tile.x[ 0 ];
 			lShadow.camera.right = this.shadowSize.left + width * tile.x[ 1 ];
 			lShadow.camera.top = this.shadowSize.bottom + height * tile.y[ 1 ];
 			lShadow.camera.bottom = this.shadowSize.bottom + height * tile.y[ 0 ];
-			lShadow.bias = light.shadow.bias;
-			lShadow.camera.near = light.shadow.camera.near;
-			lShadow.camera.far = light.shadow.camera.far;
+			lShadow.bias = this.shadow.bias;
+			lShadow.camera.near = this.shadow.camera.near;
+			lShadow.camera.far = this.shadow.camera.far;
 			lShadow.camera.userData.tileIndex = i;
 			lwLight.shadow = lShadow;
 
@@ -230,8 +228,8 @@ class TileShadowNode extends ShadowBaseNode {
 		this.cameraArray = cameraArray;
 
 		// setup() reads depth through this camera.
-		light.shadow.camera.coordinateSystem = builder.renderer.coordinateSystem;
-		light.shadow.camera._reversedDepth = builder.renderer.reversedDepthBuffer;
+		this.shadow.camera.coordinateSystem = builder.renderer.coordinateSystem;
+		this.shadow.camera._reversedDepth = builder.renderer.reversedDepthBuffer;
 
 	}
 
@@ -242,7 +240,7 @@ class TileShadowNode extends ShadowBaseNode {
 
 		const light = this.originalLight;
 
-		const shadowCam = light.shadow.camera;
+		const shadowCam = this.shadow.camera;
 		const lsMin = new Vector2( shadowCam.left, shadowCam.bottom );
 		const lsMax = new Vector2( shadowCam.right, shadowCam.top );
 		const fullWidth = lsMax.x - lsMin.x;
@@ -262,8 +260,8 @@ class TileShadowNode extends ShadowBaseNode {
 			lShadow.camera.right = tileRight;
 			lShadow.camera.bottom = tileBottom;
 			lShadow.camera.top = tileTop;
-			lShadow.camera.near = light.shadow.camera.near;
-			lShadow.camera.far = light.shadow.camera.far;
+			lShadow.camera.near = this.shadow.camera.near;
+			lShadow.camera.far = this.shadow.camera.far;
 			lShadow.camera.updateProjectionMatrix();
 			lShadow.camera.updateWorldMatrix( true, false );
 			lShadow.camera.updateMatrixWorld( true );
@@ -274,7 +272,7 @@ class TileShadowNode extends ShadowBaseNode {
 		// The original light does not render a shadow map, but setup() uses its shadow matrix.
 
 		shadowCam.updateProjectionMatrix();
-		light.shadow.updateMatrices( light );
+		this.shadow.updateMatrices( light );
 
 	}
 
@@ -283,6 +281,8 @@ class TileShadowNode extends ShadowBaseNode {
      * @param {NodeFrame} frame - A reference to the current node frame.
      */
 	updateShadow( frame ) {
+
+		this.update();
 
 		const { shadowMap, light } = this;
 		const { renderer, scene, camera } = frame;
@@ -344,40 +344,6 @@ class TileShadowNode extends ShadowBaseNode {
 		}
 
 		_cameraLayers.length = 0;
-
-	}
-
-	/**
-	 * The implementation performs the update of the shadow map if necessary.
-	 *
-	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 */
-	updateBefore( frame ) {
-
-		const shadow = this.originalLight.shadow;
-
-		let needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
-
-		if ( needsUpdate ) {
-
-			if ( this._cameraFrameId[ frame.camera ] === frame.frameId ) {
-
-				needsUpdate = false;
-
-			}
-
-			this._cameraFrameId[ frame.camera ] = frame.frameId;
-
-		}
-
-		if ( needsUpdate ) {
-
-			this.update();
-			this.updateShadow( frame );
-
-			shadow.needsUpdate = false;
-
-		}
 
 	}
 
@@ -446,7 +412,7 @@ class TileShadowNode extends ShadowBaseNode {
 			const { tilesX, tilesY } = this.config;
 			const tileShadowNode = this._shadowNodes[ 0 ];
 			const tileShadow = this.lights[ 0 ].shadow;
-			const shadow = this.originalLight.shadow;
+			const shadow = this.shadow;
 			const normalBias = reference( 'normalBias', 'float', shadow ).setGroup( renderGroup );
 
 			const shadowPosition = lightShadowMatrix( this.originalLight ).mul( vec4( shadowPositionWorld.add( normalWorld.mul( normalBias ) ), 1 ) );

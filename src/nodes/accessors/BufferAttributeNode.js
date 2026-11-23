@@ -47,7 +47,7 @@ function _getBufferAttribute( value, itemSize ) {
  * const positionAttribute = geometry.getAttribute( 'position' );
  *
  * const colors = [];
- * for ( let i = 0; i < position.count; i ++ ) {
+ * for ( let i = 0; i < positionAttribute.count; i ++ ) {
  * 	colors.push( 1, 0, 0 );
  * }
  *

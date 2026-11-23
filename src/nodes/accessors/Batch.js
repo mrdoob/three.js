@@ -169,7 +169,7 @@ export const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
 
 	if ( builder.hasGeometryAttribute( 'tangent' ) ) {
 
-		tangentLocal.mulAssign( bm );
+		tangentLocal.assign( bm.mul( tangentLocal ) );
 
 	}
 

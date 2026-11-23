@@ -104,7 +104,9 @@ export const modelViewPosition = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNo
 export const modelRadius = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.RADIUS );
 
 /**
- * TSL object that represents the object's normal matrix.
+ * TSL object that represents the normal matrix of the object's world matrix. It transforms
+ * normals from local to world space. Unlike {@link Object3D#normalMatrix}, it does not
+ * include the camera's view matrix.
  *
  * @tsl
  * @type {UniformNode<mat3>}

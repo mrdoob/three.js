@@ -1,4 +1,5 @@
-import { IntType } from '../../../constants.js';
+import { ByteType, ShortType, RGBAIntegerFormat, RGBIntegerFormat, RedIntegerFormat, RGIntegerFormat, UnsignedByteType, UnsignedIntType, UnsignedShortType, RedFormat, RGFormat, IntType, RGBFormat, RGBAFormat, FloatType } from '../../../constants.js';
+import { DataTexture } from '../../../textures/DataTexture.js';
 
 let _id = 0;
 
@@ -67,6 +68,115 @@ class WebGLAttributeUtils {
 		 * @type {WebGLBackend}
 		 */
 		this.backend = backend;
+
+		/**
+		 * Maps buffer attributes to their Pixel Buffer Object (PBO) textures,
+		 * the attribute version last uploaded to them and their `dispose` listeners.
+		 *
+		 * @type {WeakMap<BufferAttribute, {texture: DataTexture, version: number, onDispose: Function}>}
+		 */
+		this.pbos = new WeakMap();
+
+		/**
+		 * Stores weak references to the buffer attributes with attached
+		 * `dispose` event listeners.
+		 *
+		 * @private
+		 * @type {Set<WeakRef<BufferAttribute>>}
+		 */
+		this._tracked = new Set();
+
+		/**
+		 * Removes weak references from `_tracked` when their attribute
+		 * has been garbage collected without an explicit `dispose()`.
+		 *
+		 * @private
+		 * @type {FinalizationRegistry}
+		 */
+		this._registry = new FinalizationRegistry( ( ref ) => this._tracked.delete( ref ) );
+
+	}
+
+	/**
+	 * Returns the Pixel Buffer Object (PBO) texture for the given attribute.
+	 * The attribute's array is padded to fit the dimensions of the texture,
+	 * which is uploaded again whenever the attribute is updated on the CPU.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 * @return {DataTexture} The PBO texture.
+	 */
+	getPBO( attribute ) {
+
+		let pbo = this.pbos.get( attribute );
+
+		if ( pbo === undefined ) {
+
+			const originalArray = attribute.array;
+			const numElements = attribute.count * attribute.itemSize;
+			const { itemSize } = attribute;
+			const isInteger = originalArray.constructor.name.toLowerCase().includes( 'int' );
+
+			let format = isInteger ? RedIntegerFormat : RedFormat;
+
+			if ( itemSize === 2 ) {
+
+				format = isInteger ? RGIntegerFormat : RGFormat;
+
+			} else if ( itemSize === 3 ) {
+
+				format = isInteger ? RGBIntegerFormat : RGBFormat;
+
+			} else if ( itemSize === 4 ) {
+
+				format = isInteger ? RGBAIntegerFormat : RGBAFormat;
+
+			}
+
+			const typeMap = {
+				Float32Array: FloatType,
+				Uint8Array: UnsignedByteType,
+				Uint16Array: UnsignedShortType,
+				Uint32Array: UnsignedIntType,
+				Int8Array: ByteType,
+				Int16Array: ShortType,
+				Int32Array: IntType,
+				Uint8ClampedArray: UnsignedByteType,
+			};
+
+			const width = Math.pow( 2, Math.ceil( Math.log2( Math.sqrt( numElements / itemSize ) ) ) );
+			let height = Math.ceil( ( numElements / itemSize ) / width );
+			if ( width * height * itemSize < numElements ) height ++; // Ensure enough space
+
+			const newArray = new originalArray.constructor( width * height * itemSize );
+			newArray.set( originalArray, 0 );
+			attribute.array = newArray;
+
+			const texture = new DataTexture( newArray, width, height, format, typeMap[ newArray.constructor.name ] || FloatType );
+			texture.needsUpdate = true;
+			texture.isPBOTexture = true;
+
+			// the texture remains usable after disposal, it's recreated on next use
+			const onDispose = () => texture.dispose();
+
+			attribute.addEventListener( 'dispose', onDispose );
+
+			const ref = new WeakRef( attribute );
+
+			this._tracked.add( ref );
+			this._registry.register( attribute, ref );
+
+			pbo = { texture, version: attribute.version, onDispose };
+
+			this.pbos.set( attribute, pbo );
+
+		} else if ( pbo.version !== attribute.version ) {
+
+			pbo.version = attribute.version;
+			pbo.texture.needsUpdate = true;
+
+		}
+
+		return pbo.texture;
 
 	}
 
@@ -143,7 +253,6 @@ class WebGLAttributeUtils {
 			byteLength: array.byteLength,
 			bytesPerElement: array.BYTES_PER_ELEMENT,
 			version: bufferAttribute.version,
-			pbo: attribute.pbo,
 			isInteger: type === gl.INT || type === gl.UNSIGNED_INT || attribute.gpuType === IntType,
 			id: _id ++
 		};
@@ -237,6 +346,24 @@ class WebGLAttributeUtils {
 		}
 
 		backend.delete( bufferAttribute );
+
+	}
+
+	/**
+	 * Removes the `dispose` listeners of the PBO attributes. The PBO textures
+	 * themselves are released with the renderer's textures.
+	 */
+	dispose() {
+
+		for ( const ref of this._tracked ) {
+
+			const attribute = ref.deref();
+
+			if ( attribute !== undefined ) attribute.removeEventListener( 'dispose', this.pbos.get( attribute ).onDispose );
+
+		}
+
+		this._tracked.clear();
 
 	}
 

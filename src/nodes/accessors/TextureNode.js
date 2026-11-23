@@ -4,6 +4,7 @@ import { textureSize } from './TextureSizeNode.js';
 import { colorSpaceToWorking } from '../display/ColorSpaceNode.js';
 import { expression } from '../code/ExpressionNode.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
+import { addDeferredMethod } from '../core/DeferredNode.js';
 import { nodeProxy, vec3, nodeObject, int, Fn } from '../tsl/TSLBase.js';
 import { step } from '../math/MathNode.js';
 import { getTextureType, hash } from '../core/NodeUtils.js';
@@ -561,12 +562,20 @@ class TextureNode extends UniformNode {
 
 		}
 
+		if ( this.gatherNode !== null ) {
+
+			builder.addSamplerNode( this );
+
+		}
+
 		properties.uvNode = uvNode;
 		properties.levelNode = levelNode;
 		properties.biasNode = this.biasNode;
 		properties.compareNode = compareNode;
 		properties.compareStepNode = compareStepNode;
-		properties.gradNode = gradNode;
+		// the gradients are properties of their own, so they are analyzed as the other inputs
+		properties.gradNodeX = gradNode !== null ? gradNode[ 0 ] : null;
+		properties.gradNodeY = gradNode !== null ? gradNode[ 1 ] : null;
 		properties.gatherNode = this.gatherNode;
 		properties.depthNode = this.depthNode;
 		properties.offsetNode = this.offsetNode;
@@ -703,7 +712,7 @@ class TextureNode extends UniformNode {
 
 			if ( propertyName === undefined ) {
 
-				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNode, gatherNode, offsetNode } = properties;
+				const { uvNode, levelNode, biasNode, compareNode, compareStepNode, depthNode, gradNodeX, gradNodeY, gatherNode, offsetNode } = properties;
 
 				const uvSnippet = this.generateUV( builder, uvNode );
 				const levelSnippet = levelNode ? levelNode.build( builder, 'float' ) : null;
@@ -711,7 +720,7 @@ class TextureNode extends UniformNode {
 				const depthSnippet = depthNode ? depthNode.build( builder, 'int' ) : null;
 				const compareSnippet = compareNode ? compareNode.build( builder, 'float' ) : null;
 				const compareStepSnippet = compareStepNode ? compareStepNode.build( builder, 'float' ) : null;
-				const gradSnippet = gradNode ? [ gradNode[ 0 ].build( builder, 'vec2' ), gradNode[ 1 ].build( builder, 'vec2' ) ] : null;
+				const gradSnippet = gradNodeX ? [ gradNodeX.build( builder, 'vec2' ), gradNodeY.build( builder, 'vec2' ) ] : null;
 				const gatherSnippet = gatherNode ? gatherNode.build( builder, 'int' ) : null;
 				const offsetSnippet = offsetNode ? this.generateOffset( builder, offsetNode ) : null;
 
@@ -829,7 +838,7 @@ class TextureNode extends UniformNode {
 	/**
 	 * TSL function for creating a texture node that fetches/loads texels without interpolation.
 	 *
-	 * @param {Node<uvec2>} uvNode - The uv node.
+	 * @param {Node<uvec2>} uvNode - The integer texel coordinates (not normalized uvs).
 	 * @returns {TextureNode} A texture node representing the texture load.
 	 */
 	load( uvNode ) {
@@ -1061,6 +1070,14 @@ class TextureNode extends UniformNode {
 
 export default TextureNode;
 
+// Texture methods for nodes that resolve to a texture node, e.g. `getMap().sample( uv() )`
+
+for ( const name of [ 'sample', 'load', 'blur', 'level', 'size', 'bias', 'compare', 'grad', 'gather', 'depth', 'offset' ] ) {
+
+	addDeferredMethod( name );
+
+}
+
 /**
  * TSL function for creating a texture node.
  *
@@ -1113,7 +1130,7 @@ export const texture = ( value = EmptyTexture, uvNode = null, levelNode = null, 
  *
  * @tsl
  * @function
- * @param {?Texture} value - The texture.
+ * @param {?Texture} [value=EmptyTexture] - The texture.
  * @returns {TextureNode}
  */
 export const uniformTexture = ( value = EmptyTexture ) => {
@@ -1132,9 +1149,8 @@ export const uniformTexture = ( value = EmptyTexture ) => {
  * @tsl
  * @function
  * @param {?(Texture|TextureNode)} [value=EmptyTexture] - The texture.
- * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
+ * @param {?Node<ivec2|uvec2>} [uvNode=null] - The integer texel coordinates (not normalized uvs).
  * @param {?Node<int>} [levelNode=null] - The level node.
- * @param {?Node<float>} [biasNode=null] - The bias node.
  * @returns {TextureNode}
  */
 export const textureLoad = ( ...params ) => texture( ...params ).setSampler( false );

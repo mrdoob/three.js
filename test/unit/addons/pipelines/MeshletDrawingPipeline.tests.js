@@ -1,5 +1,6 @@
-import { PerspectiveCamera } from 'three';
+import { Mesh, MeshStandardMaterial, MeshStandardNodeMaterial, PerspectiveCamera, TorusKnotGeometry } from 'three/webgpu';
 import { MeshletDrawingPipeline } from '../../../../examples/jsm/pipelines/MeshletDrawingPipeline.js';
+import { ready as clusterProcessingReady } from '../../../../examples/jsm/utils/MeshletGeometryUtils.js';
 
 function createFixture() {
 
@@ -78,6 +79,100 @@ export default QUnit.module( 'Addons', () => {
 					f.pipeline.dispose();
 
 				}
+
+			} );
+
+			QUnit.test( 'lodTransition separates opaque and dithered draw queues', async ( assert ) => {
+
+				await clusterProcessingReady;
+
+				const defaultPipeline = new MeshletDrawingPipeline();
+				assert.strictEqual( defaultPipeline.lodTransition, 0, 'transitions are disabled by default' );
+				defaultPipeline.dispose();
+
+				const pipeline = new MeshletDrawingPipeline( { lodTransition: 0.15, occlusionCulling: false } );
+				await Promise.resolve();
+				assert.strictEqual( pipeline.lodTransition, 0.15, 'constructor sets lodTransition' );
+
+				const renderer = {
+					_callDepth: 0,
+					_compilationPromises: [],
+					backend: { isWebGPUBackend: true },
+					library: { getMaterialNodeClass: () => MeshStandardNodeMaterial },
+					shadowMap: { type: 0 },
+					getRenderTarget: () => null,
+					getDrawingBufferSize: ( target ) => target.set( 800, 600 ),
+					getRenderObjectFunction: () => null,
+					contextNode: { getFlowContextData: () => ( {} ) }
+				};
+				pipeline.renderer = renderer;
+
+				const geometry = new TorusKnotGeometry( 1, 0.3, 128, 32 );
+				const material = new MeshStandardMaterial();
+				const mesh = new Mesh( geometry, material );
+				mesh.updateMatrixWorld();
+
+				const camera = new PerspectiveCamera( 50, 800 / 600, 0.1, 100 );
+				camera.position.set( 0, 0, 5 );
+				camera.updateMatrixWorld();
+				camera.updateProjectionMatrix();
+
+				const items = [];
+				const renderList = {
+					begin: () => {},
+					push: ( object ) => items.push( object ),
+					finish: () => {}
+				};
+
+				const clippingContext = { unionPlanes: [], intersectionPlanes: [] };
+
+				for ( let i = 0; i < 2; i ++ ) {
+
+					items.length = 0;
+					pipeline.begin( camera, { frustumArray: null } );
+					pipeline.beginRenderList( renderList );
+					pipeline.pushRenderItem( renderList, mesh, geometry, material, 0, 0, null, clippingContext );
+					pipeline.finishRenderList( renderList );
+
+				}
+
+				assert.strictEqual( items.length, 2, 'submits opaque and dithered meshes when lodTransition > 0' );
+				assert.strictEqual( items[ 0 ].renderOrder, 0, 'opaque queue renders first' );
+				assert.strictEqual( items[ 0 ].material.maskNode, null, 'opaque queue stays unmasked for early-Z' );
+				assert.strictEqual( items[ 1 ].renderOrder, 1, 'dither queue renders after opaque draws' );
+				assert.notStrictEqual( items[ 1 ].material.maskNode, null, 'dither queue carries screen-door mask' );
+
+				pipeline.lodTransition = 0;
+				items.length = 0;
+				pipeline.begin( camera, { frustumArray: null } );
+				pipeline.beginRenderList( renderList );
+				pipeline.pushRenderItem( renderList, mesh, geometry, material, 0, 0, null, clippingContext );
+				pipeline.finishRenderList( renderList );
+
+				assert.strictEqual( items.length, 1, 'skips dithered mesh when lodTransition === 0' );
+				assert.strictEqual( items[ 0 ].renderOrder, 0, 'retains opaque mesh' );
+
+				pipeline.depthPrepass = true;
+				items.length = 0;
+				pipeline.begin( camera, { frustumArray: null } );
+				pipeline.beginRenderList( renderList );
+				pipeline.pushRenderItem( renderList, mesh, geometry, material, 0, 0, null, clippingContext );
+				pipeline.finishRenderList( renderList );
+
+				assert.deepEqual( items.map( ( item ) => item.renderOrder ), [ 0, - 1 ], 'depth prepass skips both dither meshes when lodTransition === 0' );
+
+				pipeline.lodTransition = 0.15;
+				items.length = 0;
+				pipeline.begin( camera, { frustumArray: null } );
+				pipeline.beginRenderList( renderList );
+				pipeline.pushRenderItem( renderList, mesh, geometry, material, 0, 0, null, clippingContext );
+				pipeline.finishRenderList( renderList );
+
+				assert.deepEqual( items.map( ( item ) => item.renderOrder ), [ 0, - 1, 2, 1 ], 'depth prepass orders opaque prepass/shade before dither prepass/shade' );
+
+				pipeline.dispose();
+				geometry.dispose();
+				material.dispose();
 
 			} );
 

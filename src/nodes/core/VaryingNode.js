@@ -166,7 +166,7 @@ class VaryingNode extends Node {
 
 		}
 
-		this.setupVarying( builder );
+		// the varying is created in the analyze stage, so a varying that is only used by dead code is not declared
 
 		builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
 
@@ -242,7 +242,7 @@ export default VaryingNode;
  * @tsl
  * @function
  * @param {Node} node - The node for which a varying should be created.
- * @param {?string} name - The name of the varying in the shader.
+ * @param {?string} [name=null] - The name of the varying in the shader.
  * @returns {VaryingNode}
  */
 export const varying = /*@__PURE__*/ nodeProxy( VaryingNode ).setParameterLength( 1, 2 );

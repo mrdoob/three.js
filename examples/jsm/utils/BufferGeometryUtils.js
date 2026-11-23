@@ -468,7 +468,7 @@ function mergeAttributes( attributes ) {
  */
 function deepCloneAttribute( attribute ) {
 
-	if ( attribute.isInstancedInterleavedBufferAttribute || attribute.isInterleavedBufferAttribute ) {
+	if ( attribute.isInterleavedBufferAttribute ) {
 
 		return deinterleaveAttribute( attribute );
 
@@ -567,9 +567,9 @@ function deinterleaveAttribute( attribute ) {
 
 	const array = new cons( count * itemSize );
 	let newAttribute;
-	if ( attribute.isInstancedInterleavedBufferAttribute ) {
+	if ( attribute.data.isInstancedInterleavedBuffer ) {
 
-		newAttribute = new InstancedBufferAttribute( array, itemSize, normalized, attribute.meshPerAttribute );
+		newAttribute = new InstancedBufferAttribute( array, itemSize, normalized, attribute.data.meshPerAttribute );
 
 	} else {
 
@@ -1036,7 +1036,7 @@ function computeMorphedAttributes( object ) {
 				group = groups[ i ];
 
 				start = Math.max( group.start, drawRange.start );
-				end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
+				end = Math.min( index.count, Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) ) );
 
 				for ( j = start, jl = end; j < jl; j += 3 ) {
 
@@ -1118,7 +1118,7 @@ function computeMorphedAttributes( object ) {
 				group = groups[ i ];
 
 				start = Math.max( group.start, drawRange.start );
-				end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
+				end = Math.min( positionAttribute.count, Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) ) );
 
 				for ( j = start, jl = end; j < jl; j += 3 ) {
 

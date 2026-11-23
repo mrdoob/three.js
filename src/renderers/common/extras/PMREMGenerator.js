@@ -98,7 +98,7 @@ class PMREMGenerator {
 	 * @param {Object} [options={}] - The configuration options.
 	 * @param {number} [options.size=256] - The texture size of the PMREM, rounded down to a power of two and at least 256.
 	 * @param {Vector3} [options.position=origin] - The position of the internal cube camera that renders the scene.
-	 * @param {?CubeRenderTarget} [options.renderTarget=null] - The render target to use.
+	 * @param {?CubeRenderTarget} [options.renderTarget=null] - A PMREM previously returned by this generator to reuse. Its size must match the PMREM being generated.
 	 * @return {CubeRenderTarget} The resulting PMREM.
 	 */
 	fromScene( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
@@ -178,7 +178,7 @@ class PMREMGenerator {
 	 * @param {Object} [options={}] - The configuration options.
 	 * @param {number} [options.size=256] - The texture size of the PMREM, rounded down to a power of two and at least 256.
 	 * @param {Vector3} [options.position=origin] - The position of the internal cube camera that renders the scene.
-	 * @param {?CubeRenderTarget} [options.renderTarget=null] - The render target to use.
+	 * @param {?CubeRenderTarget} [options.renderTarget=null] - A PMREM previously returned by this generator to reuse. Its size must match the PMREM being generated.
 	 * @return {Promise<CubeRenderTarget>} A Promise that resolves with the PMREM.
 	 * @see {@link PMREMGenerator#fromScene}
 	 */
@@ -198,7 +198,7 @@ class PMREMGenerator {
 	 * at least 256.
 	 *
 	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
-	 * @param {?CubeRenderTarget} [renderTarget=null] - The render target to use.
+	 * @param {?CubeRenderTarget} [renderTarget=null] - A PMREM previously returned by this generator to reuse. Its size must match the PMREM being generated.
 	 * @return {CubeRenderTarget} The resulting PMREM.
 	 * @see {@link PMREMGenerator#fromEquirectangularAsync}
 	 */
@@ -219,7 +219,7 @@ class PMREMGenerator {
 	 *
 	 * @deprecated
 	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
-	 * @param {?CubeRenderTarget} [renderTarget=null] - The render target to use.
+	 * @param {?CubeRenderTarget} [renderTarget=null] - A PMREM previously returned by this generator to reuse. Its size must match the PMREM being generated.
 	 * @return {Promise<CubeRenderTarget>} The resulting PMREM.
 	 * @see {@link PMREMGenerator#fromEquirectangular}
 	 */
@@ -238,7 +238,7 @@ class PMREMGenerator {
 	 * the input, rounded down to a power of two and at least 256.
 	 *
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
-	 * @param {?CubeRenderTarget} [renderTarget=null] - The render target to use.
+	 * @param {?CubeRenderTarget} [renderTarget=null] - A PMREM previously returned by this generator to reuse. Its size must match the PMREM being generated.
 	 * @return {CubeRenderTarget} The resulting PMREM.
 	 * @see {@link PMREMGenerator#fromCubemapAsync}
 	 */
@@ -259,7 +259,7 @@ class PMREMGenerator {
 	 *
 	 * @deprecated
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
-	 * @param {?CubeRenderTarget} [renderTarget=null] - The render target to use.
+	 * @param {?CubeRenderTarget} [renderTarget=null] - A PMREM previously returned by this generator to reuse. Its size must match the PMREM being generated.
 	 * @return {Promise<CubeRenderTarget>} The resulting PMREM.
 	 * @see {@link PMREMGenerator#fromCubemap}
 	 */

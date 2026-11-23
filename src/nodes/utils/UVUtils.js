@@ -36,7 +36,7 @@ export function replaceDefaultUV( callback, node = null ) {
  * @function
  * @param {Node<vec2>} uv - The uv coordinates.
  * @param {Node<float>} rotation - The rotation defined in radians.
- * @param {Node<vec2>} center - The center of rotation
+ * @param {Node<vec2>} [center=vec2(0.5)] - The center of rotation
  * @return {Node<vec2>} The rotated uv coordinates.
  */
 export const rotateUV = /*@__PURE__*/ Fn( ( [ uv, rotation, center = vec2( 0.5 ) ] ) => {
@@ -52,7 +52,7 @@ export const rotateUV = /*@__PURE__*/ Fn( ( [ uv, rotation, center = vec2( 0.5 )
  * @function
  * @param {Node<vec2>} uv - The uv coordinates.
  * @param {Node<float>} strength - The strength of the effect.
- * @param {Node<vec2>} center - The center point
+ * @param {Node<vec2>} [center=vec2(0.5)] - The center point
  * @return {Node<vec2>} The updated uv coordinates.
  */
 export const spherizeUV = /*@__PURE__*/ Fn( ( [ uv, strength, center = vec2( 0.5 ) ] ) => {

@@ -10,7 +10,7 @@ import { ClampToEdgeWrapping, NearestFilter } from '../constants.js';
 class Data3DTexture extends Texture {
 
 	/**
-	 * Constructs a new data array texture.
+	 * Constructs a new 3D data texture.
 	 *
 	 * @param {?TypedArray} [data=null] - The buffer data.
 	 * @param {number} [width=1] - The width of the texture.
@@ -100,7 +100,7 @@ class Data3DTexture extends Texture {
 		 *
 		 * Overwritten and set to `1` by default.
 		 *
-		 * @type {boolean}
+		 * @type {number}
 		 * @default 1
 		 */
 		this.unpackAlignment = 1;

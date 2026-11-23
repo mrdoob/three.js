@@ -139,6 +139,20 @@ const renderer = new THREE.WebGLRenderer();
 - Compute shaders
 - Advanced node-based materials
 
+With import maps, WebGPURenderer pages map \`three\` to the WebGPU build and add the \`three/webgpu\` and \`three/tsl\` entries:
+\`\`\`html
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@${version}/build/three.webgpu.js",
+    "three/webgpu": "https://cdn.jsdelivr.net/npm/three@${version}/build/three.webgpu.js",
+    "three/tsl": "https://cdn.jsdelivr.net/npm/three@${version}/build/three.tsl.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@${version}/examples/jsm/"
+  }
+}
+</script>
+\`\`\`
+
 \`\`\`js
 import * as THREE from 'three/webgpu';
 const renderer = new THREE.WebGPURenderer();
@@ -150,6 +164,7 @@ await renderer.init();
 When using WebGPURenderer, use TSL instead of raw GLSL for custom materials:
 
 \`\`\`js
+import * as THREE from 'three/webgpu';
 import { texture, uv, color } from 'three/tsl';
 
 const material = new THREE.MeshStandardNodeMaterial();
@@ -185,7 +200,7 @@ When using TSL, use node-based materials:
 ## Core Concepts
 
 - [TSL Guide](https://threejs.org/tsl/): Three.js Shading Language guide with playground
-- [TSL Reference](https://threejs.org/docs/#TSL): All TSL functions
+- [TSL Reference](https://threejs.org/docs/pages/TSL.html.md): All TSL functions
 - [Animation System](https://threejs.org/manual/#animation-system)
 - [Loading 3D Models](https://threejs.org/manual/#loading-3d-models)
 - [Scene Graph](https://threejs.org/manual/#scenegraph)
@@ -198,56 +213,56 @@ When using TSL, use node-based materials:
 ## Essential API
 
 ### Core
-- [Object3D](https://threejs.org/docs/#api/en/core/Object3D)
-- [BufferGeometry](https://threejs.org/docs/#api/en/core/BufferGeometry)
-- [BufferAttribute](https://threejs.org/docs/#api/en/core/BufferAttribute)
+- [Object3D](https://threejs.org/docs/pages/Object3D.html.md)
+- [BufferGeometry](https://threejs.org/docs/pages/BufferGeometry.html.md)
+- [BufferAttribute](https://threejs.org/docs/pages/BufferAttribute.html.md)
 
 ### Scenes
-- [Scene](https://threejs.org/docs/#api/en/scenes/Scene)
+- [Scene](https://threejs.org/docs/pages/Scene.html.md)
 
 ### Cameras
-- [PerspectiveCamera](https://threejs.org/docs/#api/en/cameras/PerspectiveCamera)
-- [OrthographicCamera](https://threejs.org/docs/#api/en/cameras/OrthographicCamera)
+- [PerspectiveCamera](https://threejs.org/docs/pages/PerspectiveCamera.html.md)
+- [OrthographicCamera](https://threejs.org/docs/pages/OrthographicCamera.html.md)
 
 ### Renderers
-- [WebGLRenderer](https://threejs.org/docs/#api/en/renderers/WebGLRenderer)
-- [WebGPURenderer](https://threejs.org/docs/#api/en/renderers/webgpu/WebGPURenderer)
+- [WebGLRenderer](https://threejs.org/docs/pages/WebGLRenderer.html.md)
+- [WebGPURenderer](https://threejs.org/docs/pages/WebGPURenderer.html.md)
 
 ### Objects
-- [Mesh](https://threejs.org/docs/#api/en/objects/Mesh)
-- [InstancedMesh](https://threejs.org/docs/#api/en/objects/InstancedMesh)
-- [Group](https://threejs.org/docs/#api/en/objects/Group)
+- [Mesh](https://threejs.org/docs/pages/Mesh.html.md)
+- [InstancedMesh](https://threejs.org/docs/pages/InstancedMesh.html.md)
+- [Group](https://threejs.org/docs/pages/Group.html.md)
 
 ### Materials
-- [MeshBasicMaterial](https://threejs.org/docs/#api/en/materials/MeshBasicMaterial)
-- [MeshStandardMaterial](https://threejs.org/docs/#api/en/materials/MeshStandardMaterial)
-- [MeshPhysicalMaterial](https://threejs.org/docs/#api/en/materials/MeshPhysicalMaterial)
+- [MeshBasicMaterial](https://threejs.org/docs/pages/MeshBasicMaterial.html.md)
+- [MeshStandardMaterial](https://threejs.org/docs/pages/MeshStandardMaterial.html.md)
+- [MeshPhysicalMaterial](https://threejs.org/docs/pages/MeshPhysicalMaterial.html.md)
 
 ### Geometries
-- [BoxGeometry](https://threejs.org/docs/#api/en/geometries/BoxGeometry)
-- [SphereGeometry](https://threejs.org/docs/#api/en/geometries/SphereGeometry)
-- [PlaneGeometry](https://threejs.org/docs/#api/en/geometries/PlaneGeometry)
+- [BoxGeometry](https://threejs.org/docs/pages/BoxGeometry.html.md)
+- [SphereGeometry](https://threejs.org/docs/pages/SphereGeometry.html.md)
+- [PlaneGeometry](https://threejs.org/docs/pages/PlaneGeometry.html.md)
 
 ### Lights
-- [AmbientLight](https://threejs.org/docs/#api/en/lights/AmbientLight)
-- [DirectionalLight](https://threejs.org/docs/#api/en/lights/DirectionalLight)
-- [PointLight](https://threejs.org/docs/#api/en/lights/PointLight)
-- [SpotLight](https://threejs.org/docs/#api/en/lights/SpotLight)
+- [AmbientLight](https://threejs.org/docs/pages/AmbientLight.html.md)
+- [DirectionalLight](https://threejs.org/docs/pages/DirectionalLight.html.md)
+- [PointLight](https://threejs.org/docs/pages/PointLight.html.md)
+- [SpotLight](https://threejs.org/docs/pages/SpotLight.html.md)
 
 ### Loaders
-- [TextureLoader](https://threejs.org/docs/#api/en/loaders/TextureLoader)
-- [GLTFLoader](https://threejs.org/docs/#examples/en/loaders/GLTFLoader)
+- [TextureLoader](https://threejs.org/docs/pages/TextureLoader.html.md)
+- [GLTFLoader](https://threejs.org/docs/pages/GLTFLoader.html.md)
 
 ### Controls
-- [OrbitControls](https://threejs.org/docs/#examples/en/controls/OrbitControls)
-- [TransformControls](https://threejs.org/docs/#examples/en/controls/TransformControls)
+- [OrbitControls](https://threejs.org/docs/pages/OrbitControls.html.md)
+- [TransformControls](https://threejs.org/docs/pages/TransformControls.html.md)
 
 ### Math
-- [Vector2](https://threejs.org/docs/#api/en/math/Vector2)
-- [Vector3](https://threejs.org/docs/#api/en/math/Vector3)
-- [Matrix4](https://threejs.org/docs/#api/en/math/Matrix4)
-- [Quaternion](https://threejs.org/docs/#api/en/math/Quaternion)
-- [Color](https://threejs.org/docs/#api/en/math/Color)
+- [Vector2](https://threejs.org/docs/pages/Vector2.html.md)
+- [Vector3](https://threejs.org/docs/pages/Vector3.html.md)
+- [Matrix4](https://threejs.org/docs/pages/Matrix4.html.md)
+- [Quaternion](https://threejs.org/docs/pages/Quaternion.html.md)
+- [Color](https://threejs.org/docs/pages/Color.html.md)
 `;
 
 // Docs llms-full.txt - complete inline documentation
@@ -301,6 +316,20 @@ const renderer = new THREE.WebGLRenderer();
 - Compute shaders
 - Advanced node-based materials
 
+With import maps, WebGPURenderer pages map \`three\` to the WebGPU build and add the \`three/webgpu\` and \`three/tsl\` entries:
+\`\`\`html
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@${version}/build/three.webgpu.js",
+    "three/webgpu": "https://cdn.jsdelivr.net/npm/three@${version}/build/three.webgpu.js",
+    "three/tsl": "https://cdn.jsdelivr.net/npm/three@${version}/build/three.tsl.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@${version}/examples/jsm/"
+  }
+}
+</script>
+\`\`\`
+
 \`\`\`js
 import * as THREE from 'three/webgpu';
 const renderer = new THREE.WebGPURenderer();
@@ -312,6 +341,7 @@ await renderer.init();
 When using WebGPURenderer, use TSL instead of raw GLSL for custom materials:
 
 \`\`\`js
+import * as THREE from 'three/webgpu';
 import { texture, uv, color } from 'three/tsl';
 
 const material = new THREE.MeshStandardNodeMaterial();
@@ -429,13 +459,14 @@ renderer.setAnimationLoop( animate );
 {
   "imports": {
     "three": "https://cdn.jsdelivr.net/npm/three@${version}/build/three.webgpu.js",
+    "three/webgpu": "https://cdn.jsdelivr.net/npm/three@${version}/build/three.webgpu.js",
     "three/tsl": "https://cdn.jsdelivr.net/npm/three@${version}/build/three.tsl.js",
     "three/addons/": "https://cdn.jsdelivr.net/npm/three@${version}/examples/jsm/"
   }
 }
 </script>
 <script type="module">
-import * as THREE from 'three';
+import * as THREE from 'three/webgpu';
 import { color, positionLocal, sin, time } from 'three/tsl';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -509,7 +540,10 @@ loader.load(
     scene.add( gltf.scene );
   },
   ( progress ) => {
-    console.log( ( progress.loaded / progress.total * 100 ) + '% loaded' );
+    // total is 0 when the server sends no Content-Length header
+    if ( progress.lengthComputable ) {
+      console.log( ( progress.loaded / progress.total * 100 ) + '% loaded' );
+    }
   },
   ( error ) => {
     console.error( 'Error loading model:', error );

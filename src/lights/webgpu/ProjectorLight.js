@@ -15,7 +15,7 @@ class ProjectorLight extends SpotLight {
 	 * @param {number} [distance=0] - Maximum range of the light. `0` means no limit.
 	 * @param {number} [angle=Math.PI/3] - Maximum angle of light dispersion from its direction whose upper bound is `Math.PI/2`.
 	 * @param {number} [penumbra=0] - Percent of the spotlight cone that is attenuated due to penumbra. Value range is `[0,1]`.
-	 * @param {number} [decay=2] - The amount the light dims along the distance of the light.
+	 * @param {number} [decay=2] - The exponent of the light's distance falloff.
 	 */
 	constructor( color, intensity, distance, angle, penumbra, decay ) {
 

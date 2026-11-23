@@ -90,8 +90,8 @@ class Cylindrical {
 	 * Sets the cylindrical components from the given Cartesian coordinates.
 	 *
 	 * @param {number} x - The x value.
-	 * @param {number} y - The x value.
-	 * @param {number} z - The x value.
+	 * @param {number} y - The y value.
+	 * @param {number} z - The z value.
 	 * @return {Cylindrical} A reference to this cylindrical.
 	 */
 	setFromCartesianCoords( x, y, z ) {

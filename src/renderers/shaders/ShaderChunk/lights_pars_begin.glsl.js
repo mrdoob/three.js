@@ -2,49 +2,6 @@ export default /* glsl */`
 uniform bool receiveShadow;
 uniform vec3 ambientLightColor;
 
-#if defined( USE_LIGHT_PROBES )
-
-	uniform vec3 lightProbe[ 9 ];
-
-#endif
-
-// get the irradiance (radiance convolved with cosine lobe) at the point 'normal' on the unit sphere
-// source: https://graphics.stanford.edu/papers/envmap/envmap.pdf
-vec3 shGetIrradianceAt( in vec3 normal, in vec3 shCoefficients[ 9 ] ) {
-
-	// normal is assumed to have unit length
-
-	float x = normal.x, y = normal.y, z = normal.z;
-
-	// band 0
-	vec3 result = shCoefficients[ 0 ] * 0.886227;
-
-	// band 1
-	result += shCoefficients[ 1 ] * 2.0 * 0.511664 * y;
-	result += shCoefficients[ 2 ] * 2.0 * 0.511664 * z;
-	result += shCoefficients[ 3 ] * 2.0 * 0.511664 * x;
-
-	// band 2
-	result += shCoefficients[ 4 ] * 2.0 * 0.429043 * x * y;
-	result += shCoefficients[ 5 ] * 2.0 * 0.429043 * y * z;
-	result += shCoefficients[ 6 ] * ( 0.743125 * z * z - 0.247708 );
-	result += shCoefficients[ 7 ] * 2.0 * 0.429043 * x * z;
-	result += shCoefficients[ 8 ] * 0.429043 * ( x * x - y * y );
-
-	return result;
-
-}
-
-vec3 getLightProbeIrradiance( const in vec3 lightProbe[ 9 ], const in vec3 normal ) {
-
-	vec3 worldNormal = transformNormalByInverseViewMatrix( normal, viewMatrix );
-
-	vec3 irradiance = shGetIrradianceAt( worldNormal, lightProbe );
-
-	return irradiance;
-
-}
-
 vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	vec3 irradiance = ambientLightColor;
@@ -231,6 +188,30 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 	}
 
 #endif
+
+// Ambient and hemisphere lights stand in for a distant environment, so they reflect their irradiance / PI
+vec3 getIndirectLightRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness ) {
+
+	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
+
+	#if ( NUM_HEMI_LIGHTS > 0 )
+
+		// Mixing the reflection with the normal is more accurate for rough objects, see getIBLRadiance()
+		vec3 reflectVec = normalize( mix( reflect( - viewDir, normal ), normal, pow4( roughness ) ) );
+
+		#pragma unroll_loop_start
+		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
+
+			irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], reflectVec );
+
+		}
+		#pragma unroll_loop_end
+
+	#endif
+
+	return irradiance * RECIPROCAL_PI;
+
+}
 
 #include <lightprobes_pars_fragment>
 `;

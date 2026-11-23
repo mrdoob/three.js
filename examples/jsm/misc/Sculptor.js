@@ -385,13 +385,14 @@ class Sculptor extends EventDispatcher {
 		this.enabled = true;
 
 		/**
-		 * Whether every stamp is repeated across the mesh's local `YZ` plane (`x = 0`).
-		 * Drag and Scale follow the pointer and are not mirrored.
+		 * The mesh-local axis the mirror plane is perpendicular to. Every stamp is
+		 * repeated across the plane through the mesh's local origin. Use `'none'` to
+		 * disable mirroring. Drag and Scale follow the pointer and are not mirrored.
 		 *
-		 * @type {boolean}
-		 * @default false
+		 * @type {('none'|'x'|'y'|'z')}
+		 * @default 'none'
 		 */
-		this.mirror = false;
+		this.mirrorAxis = 'none';
 
 		this._sculptMesh = new SculptorMesh();
 		this._sculptMesh.initFromGeometry( mesh.geometry );
@@ -1083,13 +1084,15 @@ class Sculptor extends EventDispatcher {
 
 	_applyMirroredStroke() {
 
-		if ( this.mirror === false || this._tool === 'drag' || this._tool === 'scale' ) return;
+		const axis = 'xyz'.indexOf( this.mirrorAxis );
+
+		if ( axis === - 1 || this._tool === 'drag' || this._tool === 'scale' ) return;
 
 		const rayOrigin = this._rayOrigin;
 		const rayDirection = this._rayDirection;
 
-		rayOrigin[ 0 ] = - rayOrigin[ 0 ];
-		rayDirection[ 0 ] = - rayDirection[ 0 ];
+		rayOrigin[ axis ] = - rayOrigin[ axis ];
+		rayDirection[ axis ] = - rayDirection[ axis ];
 
 		if ( this._pickClosestFace( rayOrigin, rayDirection ) ) {
 
@@ -1099,8 +1102,8 @@ class Sculptor extends EventDispatcher {
 		}
 
 		// Restore the pointer's own hit, which the cursor and the next stamp read.
-		rayOrigin[ 0 ] = - rayOrigin[ 0 ];
-		rayDirection[ 0 ] = - rayDirection[ 0 ];
+		rayOrigin[ axis ] = - rayOrigin[ axis ];
+		rayDirection[ axis ] = - rayDirection[ axis ];
 
 		if ( this._pickClosestFace( rayOrigin, rayDirection ) ) this._computePickedNormal();
 

@@ -148,7 +148,7 @@ class Timer {
 	 * once per simulation step and before you perform queries against the timer
 	 * (e.g. via `getDelta()`).
 	 *
-	 * @param {number} timestamp - The current time in milliseconds. Can be obtained
+	 * @param {number} [timestamp] - The current time in milliseconds. Can be obtained
 	 * from the `requestAnimationFrame` callback argument. If not provided, the current
 	 * time will be determined with `performance.now`.
 	 * @return {Timer} A reference to this timer.

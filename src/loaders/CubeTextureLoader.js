@@ -53,7 +53,7 @@ class CubeTextureLoader extends Loader {
 	 * neg-x, pos-y, neg-y, pos-z, neg-z. An array of data URIs are allowed as well.
 	 * @param {function(CubeTexture)} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} onProgress - Unsupported in this loader.
-	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @param {function(Event)} onError - Executed when errors occur. Receives the image's `error` event, not an `Error` instance.
 	 * @return {CubeTexture} The cube texture.
 	 */
 	load( urls, onLoad, onProgress, onError ) {

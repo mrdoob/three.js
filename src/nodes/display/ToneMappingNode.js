@@ -42,7 +42,7 @@ class ToneMappingNode extends Node {
 		 * The tone mapping exposure.
 		 *
 		 * @type {Node}
-		 * @default null
+		 * @default toneMappingExposure
 		 */
 		this.exposureNode = exposureNode;
 
@@ -130,8 +130,8 @@ export default ToneMappingNode;
  * @tsl
  * @function
  * @param {number} mapping - The tone mapping type.
- * @param {Node<float> | number} exposure - The tone mapping exposure.
- * @param {Node<vec3> | Color} color - The color node to process.
+ * @param {Node<float> | number} [exposure=toneMappingExposure] - The tone mapping exposure.
+ * @param {Node<vec3> | Color} [color] - The color node to process. Defaults to the current context color.
  * @returns {ToneMappingNode<vec3>}
  */
 export const toneMapping = ( mapping, exposure, color ) => new ToneMappingNode( mapping, nodeObject( exposure ), nodeObject( color ) );
@@ -140,7 +140,7 @@ export const toneMapping = ( mapping, exposure, color ) => new ToneMappingNode( 
  * TSL object that represents the global tone mapping exposure of the renderer.
  *
  * @tsl
- * @type {RendererReferenceNode<vec3>}
+ * @type {RendererReferenceNode<float>}
  */
 export const toneMappingExposure = /*@__PURE__*/ rendererReference( 'toneMappingExposure', 'float' );
 

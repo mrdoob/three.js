@@ -788,14 +788,17 @@ class VisibilityBufferDrawingPipeline extends MeshletDrawingPipeline {
 	 *
 	 * @param {Object} [parameters] - The configuration parameter.
 	 * @param {number} [parameters.lodThreshold=1] - The projected error in pixels below which a simpler level of detail is selected.
+	 * @param {number} [parameters.lodTransition=0] - The fraction of `lodThreshold` over which adjacent levels of detail crossfade with a screen-door dither mask.
+	 * Only the clusters drawn by the hardware rasterizer crossfade, the levels of the software rasterizer switch at once.
+	 * @param {number} [parameters.transitionScreenRadius=0] - The radius in pixels below which the levels of detail of objects switch without a transition, `0` crossfades all objects.
 	 * @param {number} [parameters.shadowLodThreshold=1] - The projected error in shadow map texels below which a simpler level of detail is selected for shadow casters.
 	 * @param {number} [parameters.maxRasterSize=8] - The maximum screen-space size in pixels of triangles rasterized in software.
 	 * @param {boolean} [parameters.debug=false] - Whether the clusters should be shown with a flat color each instead of the material.
 	 * @param {boolean} [parameters.occlusionCulling=true] - Whether the clusters hidden by other clusters should be culled.
 	 */
-	constructor( { lodThreshold, shadowLodThreshold, maxRasterSize = 8, debug, occlusionCulling } = {} ) {
+	constructor( { lodThreshold, lodTransition, transitionScreenRadius, shadowLodThreshold, maxRasterSize = 8, debug, occlusionCulling } = {} ) {
 
-		super( { lodThreshold, shadowLodThreshold, debug, occlusionCulling } );
+		super( { lodThreshold, lodTransition, transitionScreenRadius, shadowLodThreshold, debug, occlusionCulling } );
 
 		this._hardware = false;
 

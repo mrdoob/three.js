@@ -153,11 +153,12 @@ class WebGLTextureUtils {
 	}
 
 	/**
-	 * Returns the native texture type for the given texture.
+	 * Returns the WebGL internal format for the given format, type and color space.
 	 *
 	 * @param {?string} internalFormatName - The internal format name. When `null`, the internal format is derived from the subsequent parameters.
 	 * @param {GLenum} glFormat - The WebGL format.
 	 * @param {GLenum} glType - The WebGL type.
+	 * @param {boolean} normalized - Whether integer data are normalized or not.
 	 * @param {string} colorSpace - The texture's color space.
 	 * @param {boolean} [forceLinearTransfer=false] - Whether to force a linear transfer or not.
 	 * @return {GLenum} The internal format.

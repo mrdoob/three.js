@@ -70,7 +70,8 @@ class MeshLambertMaterial extends Material {
 		this.map = null;
 
 		/**
-		 * The light map. Requires a second set of UVs.
+		 * The light map. Uses `uv` by default, set {@link Texture#channel} to use
+		 * a different set of UVs.
 		 *
 		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
 		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
@@ -91,8 +92,10 @@ class MeshLambertMaterial extends Material {
 		this.lightMapIntensity = 1.0;
 
 		/**
-		 * The red channel of this texture is used as the ambient occlusion map.
-		 * Requires a second set of UVs.
+		 * The red channel of this texture is used as the ambient occlusion map,
+		 * where `0` fully occludes ambient light and `1` does not occlude it.
+		 * Uses `uv` by default, set {@link Texture#channel} to use a different
+		 * set of UVs.
 		 *
 		 * `aoMap` represents non-color data. Any texture assigned must have
 		 * `texture.colorSpace = NoColorSpace` (default).
@@ -104,8 +107,7 @@ class MeshLambertMaterial extends Material {
 
 		/**
 		 * Intensity of the ambient occlusion effect. Range is `[0,1]`, where `0`
-		 * disables ambient occlusion. Where intensity is `1` and the AO map's
-		 * red channel is also `1`, ambient light is fully occluded on a surface.
+		 * disables ambient occlusion and `1` applies the AO map at full strength.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -237,7 +239,9 @@ class MeshLambertMaterial extends Material {
 		this.displacementBias = 0;
 
 		/**
-		 * Specular map used by the material.
+		 * The red channel of this texture is used as a scalar strength that affects
+		 * how much of the environment map reflection blended in via
+		 * {@link MeshLambertMaterial#combine} affects the surface.
 		 *
 		 * `specularMap` represents color data, and the texture must be assigned a
 		 * {@link Texture#colorSpace}. Most `specularMap` textures set
@@ -280,7 +284,9 @@ class MeshLambertMaterial extends Material {
 		this.envMap = null;
 
 		/**
-		 * The rotation of the environment map in radians.
+		 * The rotation of the environment map in radians. Only applies to
+		 * {@link MeshLambertMaterial#envMap}. When the material is lit by
+		 * {@link Scene#environment}, {@link Scene#environmentRotation} is used instead.
 		 *
 		 * @type {Euler}
 		 * @default (0,0,0)
@@ -290,7 +296,7 @@ class MeshLambertMaterial extends Material {
 		/**
 		 * How to combine the result of the surface's color with the environment map, if any.
 		 *
-		 * When set to `MixOperation`, the {@link MeshBasicMaterial#reflectivity} is used to
+		 * When set to `MixOperation`, the {@link MeshLambertMaterial#reflectivity} is used to
 		 * blend between the two colors.
 		 *
 		 * @type {(MultiplyOperation|MixOperation|AddOperation)}
@@ -308,7 +314,10 @@ class MeshLambertMaterial extends Material {
 		this.reflectivity = 1;
 
 		/**
-		 * Scales the effect of the environment map by multiplying its color.
+		 * Scales the diffuse image-based lighting of the environment map. Only has an effect
+		 * with `WebGLRenderer` when {@link MeshLambertMaterial#envMap} is a PMREM texture. It does not
+		 * affect the reflection blended in via {@link MeshLambertMaterial#combine}. When the material is lit
+		 * by {@link Scene#environment}, {@link Scene#environmentIntensity} is used instead.
 		 *
 		 * @type {number}
 		 * @default 1

@@ -178,7 +178,7 @@ class Backend {
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} computePipeline - The compute pipeline.
 	 */
-	compute( /*computeGroup, computeNode, computeBindings, computePipeline*/ ) { }
+	compute( /*computeGroup, computeNode, bindings, computePipeline*/ ) { }
 
 	// program
 
@@ -593,20 +593,38 @@ class Backend {
 	}
 
 	/**
-	 * Ends the given measurement and returns its GPU time in milliseconds once its queries
-	 * are read back, or `null` when the backend doesn't support timing.
+	 * Ends the given measurement and returns its GPU start and end times and their difference in
+	 * milliseconds once its queries are read back, or `null` when the backend doesn't support timing.
 	 *
 	 * @async
 	 * @param {?Object} timer - The value returned by {@link Backend#beginTimer}.
-	 * @return {Promise<?number>} The GPU time in milliseconds.
+	 * @return {Promise<?{start: ?number, end: ?number, delta: number}>} The GPU times in milliseconds.
 	 */
 	async endTimer( timer ) {
 
 		if ( timer === null ) return null;
 
-		await this.timestampQueryPool.endTimer( timer );
+		const timestampQueryPool = this.timestampQueryPool;
 
-		return this.timestampQueryPool.getDuration( timer );
+		await timestampQueryPool.endTimer( timer );
+
+		const delta = timestampQueryPool.getDuration( timer );
+
+		if ( delta === null ) return null;
+
+		// WebGL only measures the duration
+
+		let start = null;
+		let end = null;
+
+		if ( timer.begin !== null ) {
+
+			start = Number( timer.begin ) / 1e6;
+			end = Number( timer.finish ) / 1e6;
+
+		}
+
+		return { start, end, delta };
 
 	}
 

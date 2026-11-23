@@ -138,8 +138,8 @@ class Renderer {
 	 * @property {boolean} [depth=true] - Whether the default framebuffer should have a depth buffer or not.
 	 * @property {boolean} [stencil=false] - Whether the default framebuffer should have a stencil buffer or not.
 	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
-	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. This parameter can set to any other integer value than 0
-	 * to overwrite the default.
+	 * @property {number} [samples=0] - The number of MSAA samples. When `antialias` is `true`, `4` samples are used by default. A value other than `0`
+	 * overwrites the default and enables MSAA even without `antialias`. The WebGPU backend only supports `4` samples.
 	 * @property {?Function} [getFallback=null] - This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
 	 * @property {number} [outputBufferType=HalfFloatType] - Defines the type of output buffers. The default `HalfFloatType` is recommend for best
 	 * quality. To save memory and bandwidth, `UnsignedByteType` might be used. This will reduce rendering quality though.
@@ -974,8 +974,7 @@ class Renderer {
 
 	/**
 	 * A reference to the canvas element the renderer is drawing to.
-	 * This value of this property will automatically be created by
-	 * the renderer.
+	 * If no `canvas` is passed to the constructor, the renderer creates one.
 	 *
 	 * @type {HTMLCanvasElement|OffscreenCanvas}
 	 */
@@ -1012,7 +1011,7 @@ class Renderer {
 	 * @async
 	 * @param {Object3D} scene - The scene or 3D object to precompile.
 	 * @param {Camera} camera - The camera that is used to render the scene.
-	 * @param {?Scene} targetScene - If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
+	 * @param {?Scene} [targetScene=null] - If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
 	 * @param {onProgressCallback} [onProgress] - Executed while the compilation is in progress.
 	 * @return {Promise} A Promise that resolves when the compile has been finished.
 	 */
@@ -2343,7 +2342,8 @@ class Renderer {
 	}
 
 	/**
-	 * Returns the maximum available anisotropy for texture filtering.
+	 * Returns the maximum available anisotropy for texture filtering. The renderer
+	 * must be initialized via {@link Renderer#init} before.
 	 *
 	 * @return {number} The maximum available anisotropy.
 	 */
@@ -2409,6 +2409,10 @@ class Renderer {
 	/**
 	 * Can be used to transfer buffer data from a storage buffer attribute
 	 * from the GPU to the CPU in context of compute shaders.
+	 *
+	 * When a {@link ReadbackBuffer} is used, the data is available in its `buffer` property
+	 * until {@link ReadbackBuffer#release} is called. The readback buffer must be released
+	 * before it can be used again.
 	 *
 	 * @async
 	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
@@ -2582,7 +2586,8 @@ class Renderer {
 	}
 
 	/**
-	 * Defines the scissor rectangle.
+	 * Defines the scissor rectangle. Only affects rendering to the canvas. When a render
+	 * target is set, its own {@link RenderTarget#scissor} is used.
 	 *
 	 * @param {number | Vector4} x - The horizontal coordinate for the upper left corner of the box in logical pixel unit.
 	 * Instead of passing four arguments, the method also works with a single four-dimensional vector.
@@ -2608,7 +2613,8 @@ class Renderer {
 	}
 
 	/**
-	 * Defines the scissor test.
+	 * Defines the scissor test. For render calls, it only affects rendering to the canvas.
+	 * When a render target is set, its own {@link RenderTarget#scissorTest} is used.
 	 *
 	 * @param {boolean} boolean - Whether the scissor test should be enabled or not.
 	 */
@@ -2651,14 +2657,15 @@ class Renderer {
 	}
 
 	/**
-	 * Defines the viewport.
+	 * Defines the viewport. Only affects rendering to the canvas. When a render
+	 * target is set, its own {@link RenderTarget#viewport} is used.
 	 *
 	 * @param {number | Vector4} x - The horizontal coordinate for the upper left corner of the viewport origin in logical pixel unit.
 	 * @param {number} y - The vertical coordinate for the upper left corner of the viewport origin in logical pixel unit.
 	 * @param {number} width - The width of the viewport in logical pixel unit.
 	 * @param {number} height - The height of the viewport in logical pixel unit.
-	 * @param {number} minDepth - The minimum depth value of the viewport. WebGPU only.
-	 * @param {number} maxDepth - The maximum depth value of the viewport. WebGPU only.
+	 * @param {number} [minDepth=0] - The minimum depth value of the viewport. WebGPU only.
+	 * @param {number} [maxDepth=1] - The maximum depth value of the viewport. WebGPU only.
 	 */
 	setViewport( x, y, width, height, minDepth = 0, maxDepth = 1 ) {
 
@@ -2681,7 +2688,7 @@ class Renderer {
 	/**
 	 * Defines the clear color and optionally the clear alpha.
 	 *
-	 * @param {Color} color - The clear color.
+	 * @param {(number|Color|string)} color - The clear color.
 	 * @param {number} [alpha=1] - The clear alpha.
 	 */
 	setClearColor( color, alpha = 1 ) {
@@ -2714,7 +2721,8 @@ class Renderer {
 	}
 
 	/**
-	 * Returns the clear depth.
+	 * Returns the depth value the depth buffer is cleared with. With a reversed depth
+	 * buffer, this is `1` minus the value defined via {@link Renderer#setClearDepth}.
 	 *
 	 * @return {number} The clear depth.
 	 */
@@ -2725,7 +2733,8 @@ class Renderer {
 	}
 
 	/**
-	 * Defines the clear depth.
+	 * Defines the clear depth in the conventional range where `1` represents the far plane.
+	 * The value is inverted automatically when a reversed depth buffer is in use.
 	 *
 	 * @param {number} depth - The clear depth.
 	 */
@@ -2758,12 +2767,15 @@ class Renderer {
 	}
 
 	/**
-	 * This method performs an occlusion query for the given 3D object.
-	 * It returns `true` if the given 3D object is fully occluded by other
-	 * 3D objects in the scene.
+	 * Returns `true` if the given 3D object was fully occluded by other 3D objects
+	 * in a previous render. The object must have `occlusionTest` set to `true`.
+	 * Occlusion query results are resolved asynchronously so they lag behind by a
+	 * few frames. This method must be called during a render call (e.g. in a node
+	 * update or `onBeforeRender()`), otherwise it returns `null`. It returns `undefined`
+	 * until the first occlusion query results are available.
 	 *
 	 * @param {Object3D} object - The 3D object to test.
-	 * @return {boolean} Whether the 3D object is fully occluded or not.
+	 * @return {(boolean|null|undefined)} Whether the 3D object is fully occluded or not.
 	 */
 	isOccluded( object ) {
 
@@ -3015,6 +3027,9 @@ class Renderer {
 	/**
 	 * Frees all internal resources of the renderer. Call this method if the renderer
 	 * is no longer in use by your app.
+	 *
+	 * @async
+	 * @return {Promise} A Promise that resolves when all resources have been freed.
 	 */
 	async dispose() {
 
@@ -3212,13 +3227,15 @@ class Renderer {
 	 * @param {number|Array<number>|IndirectStorageBufferAttribute} [dispatchSize=null]
 	 * An argument that defines the number of compute invocations executed in a compute call
 	 * and the size of the dispatched workgroup grid in which they are executed.
+	 * It can only be used with compute nodes created via `computeKernel()`. Nodes created
+	 * via `compute()` with a count or dispatch size throw an error.
 	 * Depending on the type of the argument, the dispatch size of a compute call will be determined in different ways.
 	 * - A number will dispatch a workgroup grid sized to fit `dispatchSize` invocations.
 	 * - An array [x, y, z] will directly define the size of the workgroup grid.
-	 *   The compute call will execute x * y * z * workgroupSize invocations.
+	 *   The compute call will execute x * y * z * workgroupSize invocations. WebGPU backend only.
 	 * - A IndirectStorageBufferAttribute will run an indirect compute dispatch.
 	 *   In an indirect dispatch, the [x, y, z] dimensions of the workgroup grid are defined by the first three values
-	 *   stored in the IndirectStorageBufferAttribute.
+	 *   stored in the IndirectStorageBufferAttribute. WebGPU backend only.
 	 * @return {Promise|undefined} A Promise that resolve when the compute has finished. Only returned when the renderer has not been initialized.
 	 */
 	compute( computeNodes, dispatchSize = null ) {
@@ -3343,13 +3360,15 @@ class Renderer {
 	 * @param {number|Array<number>|IndirectStorageBufferAttribute} [dispatchSize=null]
 	 * An argument that defines the number of compute invocations executed in a compute call
 	 * and the size of the dispatched workgroup grid in which they are executed.
+	 * It can only be used with compute nodes created via `computeKernel()`. Nodes created
+	 * via `compute()` with a count or dispatch size throw an error.
 	 * Depending on the type of the argument, the dispatch size of a compute call will be determined in different ways.
 	 * - A number will dispatch a workgroup grid sized to fit `dispatchSize` invocations.
 	 * - An array [x, y, z] will directly define the size of the workgroup grid.
-	 *   The compute call will execute x * y * z * workgroupSize invocations.
+	 *   The compute call will execute x * y * z * workgroupSize invocations. WebGPU backend only.
 	 * - A IndirectStorageBufferAttribute will run an indirect compute dispatch.
 	 *   In an indirect dispatch, the [x, y, z] dimensions of the workgroup grid are defined by the first three values
-	 *   stored in the IndirectStorageBufferAttribute.
+	 *   stored in the IndirectStorageBufferAttribute. WebGPU backend only.
 	 * @return {Promise} A Promise that resolve when the compute has finished.
 	 */
 	async computeAsync( computeNodes, dispatchSize = null ) {
@@ -3392,8 +3411,8 @@ class Renderer {
 	}
 
 	/**
-	 * Checks if the given feature is supported by the selected backend. If the
-	 * renderer has not been initialized, this method always returns `false`.
+	 * Checks if the given feature is supported by the selected backend. The renderer
+	 * must be initialized via {@link Renderer#init} before, otherwise this method throws.
 	 *
 	 * @param {string} name - The feature's name.
 	 * @return {boolean} Whether the feature is supported or not.
@@ -3583,7 +3602,9 @@ class Renderer {
 	 * @async
 	 * @param {RenderTarget} renderTarget - The render target to read from.
 	 * @param {number} x - The `x` coordinate of the copy region's origin.
-	 * @param {number} y - The `y` coordinate of the copy region's origin.
+	 * @param {number} y - The `y` coordinate of the copy region's origin. It is measured from the top
+	 * with the WebGPU backend and from the bottom with the WebGL backend. The row order of the
+	 * returned data follows the same convention.
 	 * @param {number} width - The width of the copy region.
 	 * @param {number} height - The height of the copy region.
 	 * @param {number} [textureIndex=0] - The texture index of a MRT render target.
@@ -4041,7 +4062,8 @@ class Renderer {
 	}
 
 	/**
-	 * Checks if the given compatibility is supported by the selected backend.
+	 * Checks if the given compatibility is supported by the selected backend. The renderer
+	 * must be initialized via {@link Renderer#init} before, otherwise this method throws.
 	 *
 	 * @param {string} name - The compatibility's name.
 	 * @return {boolean} Whether the compatibility is supported or not.
@@ -4204,7 +4226,7 @@ class Renderer {
 	 * @method
 	 * @param {Object3D} scene - The scene or 3D object to precompile.
 	 * @param {Camera} camera - The camera that is used to render the scene.
-	 * @param {Scene} targetScene - If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
+	 * @param {?Scene} [targetScene=null] - If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
 	 * @param {onProgressCallback} [onProgress] - Executed while the compilation is in progress.
 	 * @return {function(Object3D, Camera, ?Scene, ?onProgressCallback): Promise|undefined} A Promise that resolves when the compile has been finished.
 	 */

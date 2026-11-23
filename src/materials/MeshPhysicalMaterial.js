@@ -241,7 +241,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.iridescenceThicknessMap = null;
 
 		/**
-		 * The sheen tint.
+		 * The sheen tint. It is multiplied by {@link MeshPhysicalMaterial#sheen}, so
+		 * it must be set to a non-black color for sheen to be visible.
 		 *
 		 * @type {Color}
 		 * @default (0,0,0)
@@ -544,7 +545,9 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 	}
 
 	/**
-	 * The intensity of the sheen layer, from `0.0` to `1.0`.
+	 * The intensity of the sheen layer, from `0.0` to `1.0`. The sheen color is
+	 * `sheenColor * sheen`, so {@link MeshPhysicalMaterial#sheenColor} (black by
+	 * default) must also be set for sheen to be visible.
 	 *
 	 * @type {number}
 	 * @default 0

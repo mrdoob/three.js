@@ -25,7 +25,7 @@ import { warn } from '../../utils.js';
 class WebXRManager extends EventDispatcher {
 
 	/**
-	 * Constructs a new WebGL renderer.
+	 * Constructs a new XR manager.
 	 *
 	 * @param {WebGLRenderer} renderer - The renderer.
 	 * @param {WebGL2RenderingContext} gl - The rendering context.
@@ -136,8 +136,8 @@ class WebXRManager extends EventDispatcher {
 
 		/**
 		 * Returns a group representing the `grip` space of the XR controller.
-		 * Use this space for visualizing 3D objects that support the user in pointing
-		 * tasks like UI interaction.
+		 * Use this space for visualizing 3D objects held in the user's hand, like
+		 * a model of the controller.
 		 *
 		 * Note: If you want to show something in the user's hand AND offer a
 		 * pointing ray at the same time, you'll want to attached the handheld object
@@ -166,8 +166,8 @@ class WebXRManager extends EventDispatcher {
 
 		/**
 		 * Returns a group representing the `hand` space of the XR controller.
-		 * Use this space for visualizing 3D objects that support the user in pointing
-		 * tasks like UI interaction.
+		 * Use this space for visualizing the user's tracked hand. The group's `joints`
+		 * property holds a group for each hand joint.
 		 *
 		 * @param {number} index - The index of the controller.
 		 * @return {Group} A group representing the `hand` space.
@@ -826,7 +826,7 @@ class WebXRManager extends EventDispatcher {
 		 *
 		 * See {@link WebXRDepthSensing#getMesh}.
 		 *
-		 * @return {Mesh} The depth sensing mesh.
+		 * @return {?Mesh} The depth sensing mesh. Returns `null` if depth sensing is not available.
 		 */
 		this.getDepthSensingMesh = function () {
 
@@ -835,7 +835,7 @@ class WebXRManager extends EventDispatcher {
 		};
 
 		/**
-		 * Retrieves an opaque texture from the view-aligned {@link XRCamera}.
+		 * Retrieves an opaque texture from the view-aligned `XRCamera` (e.g. `view.camera` of an `XRView`).
 		 * Only available during the current animation loop.
 		 *
 		 * @param {XRCamera} xrCamera - The camera to query.

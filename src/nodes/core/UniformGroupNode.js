@@ -134,6 +134,8 @@ export default UniformGroupNode;
  * @tsl
  * @function
  * @param {string} name - The name of the uniform group node.
+ * @param {number} [order=1] - Influences the internal sorting.
+ * @param {string|null} [updateType=null] - The update type of the uniform group node.
  * @returns {UniformGroupNode}
  */
 export const uniformGroup = ( name, order = 1, updateType = null ) => new UniformGroupNode( name, false, order, updateType );
@@ -145,6 +147,7 @@ export const uniformGroup = ( name, order = 1, updateType = null ) => new Unifor
  * @function
  * @param {string} name - The name of the uniform group node.
  * @param {number} [order=0] - Influences the internal sorting.
+ * @param {string|null} [updateType=null] - The update type of the uniform group node.
  * @returns {UniformGroupNode}
  */
 export const sharedUniformGroup = ( name, order = 0, updateType = null ) => new UniformGroupNode( name, true, order, updateType );

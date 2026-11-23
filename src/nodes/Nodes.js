@@ -8,6 +8,7 @@ export { default as AttributeNode } from './core/AttributeNode.js';
 export { default as BypassNode } from './core/BypassNode.js';
 export { default as ConstNode } from './core/ConstNode.js';
 export { default as ContextNode } from './core/ContextNode.js';
+export { default as DeferredNode } from './core/DeferredNode.js';
 export { default as IndexNode } from './core/IndexNode.js';
 export { default as InputNode } from './core/InputNode.js';
 export { default as InspectorNode } from './core/InspectorNode.js';
@@ -56,7 +57,6 @@ export { default as Object3DNode } from './accessors/Object3DNode.js';
 export { default as PointUVNode } from './accessors/PointUVNode.js';
 export { default as ReferenceAttributeNode } from './accessors/ReferenceAttributeNode.js';
 export { default as ReferenceBaseNode } from './accessors/ReferenceBaseNode.js';
-export { default as ReferenceElementNode } from './accessors/ReferenceElementNode.js';
 export { default as ReferenceNode } from './accessors/ReferenceNode.js';
 export { default as RendererReferenceNode } from './accessors/RendererReferenceNode.js';
 export { default as StorageBufferNode } from './accessors/StorageBufferNode.js';
@@ -117,6 +117,7 @@ export { default as LightingContextNode } from './lighting/LightingContextNode.j
 export { default as LightingNode } from './lighting/LightingNode.js';
 export { default as LightProbeNode } from './lighting/LightProbeNode.js';
 export { default as LightsNode } from './lighting/LightsNode.js';
+export { default as OcclusionAwareIrradianceNode } from './lighting/OcclusionAwareIrradianceNode.js';
 export { default as PointLightNode } from './lighting/PointLightNode.js';
 export { default as PointShadowNode } from './lighting/PointShadowNode.js';
 export { default as ProjectorLightNode } from './lighting/ProjectorLightNode.js';
@@ -159,7 +160,6 @@ export { default as RTTNode } from './utils/RTTNode.js';
 export { default as SampleNode } from './utils/SampleNode.js';
 export { default as SetNode } from './utils/SetNode.js';
 export { default as SplitNode } from './utils/SplitNode.js';
-export { default as StorageArrayElementNode } from './utils/StorageArrayElementNode.js';
 
 // lighting models
 export { default as PhongLightingModel } from './functions/PhongLightingModel.js';

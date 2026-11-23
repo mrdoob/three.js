@@ -936,7 +936,7 @@ class WebGLState {
 	 * Configures the WebGL state for the given material.
 	 *
 	 * @param {Material} material - The material to configure the state for.
-	 * @param {number} frontFaceCW - Whether the front faces are counter-clockwise or not.
+	 * @param {boolean} frontFaceCW - Whether the front faces are clockwise (mirrored world matrix) or not.
 	 * @param {number} hardwareClippingPlanes - The number of hardware clipping planes.
 	 */
 	setMaterial( material, frontFaceCW, hardwareClippingPlanes ) {

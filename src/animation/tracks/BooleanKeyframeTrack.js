@@ -37,8 +37,8 @@ BooleanKeyframeTrack.prototype.ValueTypeName = 'bool';
 /**
  * The value buffer type of this keyframe track.
  *
- * @type {TypedArray|Array}
- * @default Array.constructor
+ * @type {(TypedArray.constructor|Array.constructor)}
+ * @default Array
  */
 BooleanKeyframeTrack.prototype.ValueBufferType = Array;
 

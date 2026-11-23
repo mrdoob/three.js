@@ -3,14 +3,13 @@ import { positionViewDirection } from '../accessors/Position.js';
 import { Fn, vec2, vec3 } from '../tsl/TSLBase.js';
 
 /**
- * TSL function for creating a matcap uv node.
+ * TSL object that represents the matcap uv coordinates.
  *
  * Can be used to compute texture coordinates for projecting a
  * matcap onto a mesh. Used by {@link MeshMatcapNodeMaterial}.
  *
  * @tsl
- * @function
- * @returns {Node<vec2>} The matcap UV coordinates.
+ * @type {Node<vec2>}
  */
 export const matcapUV = /*@__PURE__*/ Fn( () => {
 

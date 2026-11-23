@@ -175,9 +175,9 @@ class VRMLLoader extends Loader {
 				'AudioClip', 'DirectionalLight', 'PointLight', 'Script', 'Shape', 'Sound', 'SpotLight', 'WorldInfo', // common nodes
 				'CylinderSensor', 'PlaneSensor', 'ProximitySensor', 'SphereSensor', 'TimeSensor', 'TouchSensor', 'VisibilitySensor', // sensors
 				'Box', 'Cone', 'Cylinder', 'ElevationGrid', 'Extrusion', 'IndexedFaceSet', 'IndexedLineSet', 'PointSet', 'Sphere', // geometries
+				'ColorInterpolator', 'CoordinateInterpolator', 'NormalInterpolator', 'OrientationInterpolator', 'PositionInterpolator', 'ScalarInterpolator', // interpolators
 				'Color', 'Coordinate', 'Normal', 'TextureCoordinate', // geometric properties
 				'Appearance', 'FontStyle', 'ImageTexture', 'Material', 'MovieTexture', 'PixelTexture', 'TextureTransform', // appearance
-				'ColorInterpolator', 'CoordinateInterpolator', 'NormalInterpolator', 'OrientationInterpolator', 'PositionInterpolator', 'ScalarInterpolator', // interpolators
 				'Background', 'Fog', 'NavigationInfo', 'Viewpoint', // bindable nodes
 				'Text' // Text must be placed at the end of the regex so there are no matches for TextureTransform and TextureCoordinate
 			];
@@ -1261,8 +1261,8 @@ class VRMLLoader extends Loader {
 
 				if ( transformData ) {
 
-					material.map.center.copy( transformData.center );
-					material.map.rotation = transformData.rotation;
+					material.map.center.addVectors( transformData.center, transformData.translation ).negate();
+					material.map.rotation = - transformData.rotation;
 					material.map.repeat.copy( transformData.scale );
 					material.map.offset.copy( transformData.translation );
 
@@ -2199,7 +2199,7 @@ class VRMLLoader extends Loader {
 
 			}
 
-			const geometry = new ConeGeometry( radius, height, 16, 1, openEnded );
+			const geometry = new ConeGeometry( radius, height, 16, 1, openEnded, Math.PI / 2 ).rotateY( Math.PI / 2 );
 
 			return geometry;
 
@@ -2247,7 +2247,7 @@ class VRMLLoader extends Loader {
 
 			}
 
-			const geometry = new CylinderGeometry( radius, radius, height, 16, 1 );
+			const geometry = new CylinderGeometry( radius, radius, height, 16, 1, false, Math.PI / 2 ).rotateY( Math.PI / 2 );
 
 			return geometry;
 
@@ -2279,7 +2279,7 @@ class VRMLLoader extends Loader {
 
 			}
 
-			const geometry = new SphereGeometry( radius, 16, 16 );
+			const geometry = new SphereGeometry( radius, 16, 16, - Math.PI / 2 );
 
 			return geometry;
 
@@ -2598,8 +2598,8 @@ class VRMLLoader extends Loader {
 
 			let crossSection = [ 1, 1, 1, - 1, - 1, - 1, - 1, 1, 1, 1 ];
 			let spine = [ 0, 0, 0, 0, 1, 0 ];
-			let scale;
-			let orientation;
+			let scale = [ 1, 1 ];
+			let orientation = [ 0, 0, 1, 0 ];
 
 			let beginCap = true;
 			let ccw = true;
@@ -2681,14 +2681,19 @@ class VRMLLoader extends Loader {
 
 				spineVector.fromArray( spine, i );
 
-				scaling.x = scale ? scale[ j + 0 ] : 1;
-				scaling.y = 1;
-				scaling.z = scale ? scale[ j + 1 ] : 1;
+				// a single scale or orientation value is applied at all spine points
 
-				axis.x = orientation ? orientation[ o + 0 ] : 0;
-				axis.y = orientation ? orientation[ o + 1 ] : 0;
-				axis.z = orientation ? orientation[ o + 2 ] : 1;
-				const angle = orientation ? orientation[ o + 3 ] : 0;
+				const s = ( scale.length === 2 ) ? 0 : j;
+				const r = ( orientation.length === 4 ) ? 0 : o;
+
+				scaling.x = scale[ s + 0 ];
+				scaling.y = 1;
+				scaling.z = scale[ s + 1 ];
+
+				axis.x = orientation[ r + 0 ];
+				axis.y = orientation[ r + 1 ];
+				axis.z = orientation[ r + 2 ];
+				const angle = orientation[ r + 3 ];
 
 				for ( let k = 0, kl = crossSection.length; k < kl; k += 2 ) {
 

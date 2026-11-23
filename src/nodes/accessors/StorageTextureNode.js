@@ -45,7 +45,7 @@ class StorageTextureNode extends TextureNode {
 	 * Constructs a new storage texture node.
 	 *
 	 * @param {StorageTexture} value - The storage texture.
-	 * @param {Node<vec2|vec3>} uvNode - The uv node.
+	 * @param {Node<uvec2|uvec3>} uvNode - The integer texel coordinates (not normalized uvs).
 	 * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
 	 */
 	constructor( value, uvNode, storeNode = null ) {
@@ -229,7 +229,7 @@ class StorageTextureNode extends TextureNode {
 	/**
 	 * Stores a value in this storage texture at the given coordinates.
 	 *
-	 * @param {Node<vec2|vec3>} uvNode - The storage texture coordinates.
+	 * @param {Node<uvec2|uvec3>} uvNode - The integer texel coordinates (not normalized uvs).
 	 * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
 	 * @return {StorageTextureNode} A storage texture node representing the store operation.
 	 */
@@ -290,7 +290,7 @@ export default StorageTextureNode;
  * @tsl
  * @function
  * @param {StorageTexture} value - The storage texture.
- * @param {?Node<vec2|vec3>} uvNode - The uv node.
+ * @param {?Node<uvec2|uvec3>} [uvNode=null] - The integer texel coordinates (not normalized uvs).
  * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
  * @returns {StorageTextureNode}
  */
@@ -306,7 +306,7 @@ export const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode ).setP
  * @tsl
  * @function
  * @param {StorageTexture|StorageTextureNode} value - The storage texture or storage texture node.
- * @param {Node<vec2|vec3>} uvNode - The uv node.
+ * @param {Node<uvec2|uvec3>} uvNode - The integer texel coordinates (not normalized uvs).
  * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
  * @returns {StorageTextureNode}
  */
