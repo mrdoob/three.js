@@ -432,7 +432,7 @@ function getNormalizationScale( array ) {
  */
 function denormalize( value, array ) {
 
-	if ( array.constructor === Float32Array ) return value;
+	if ( array.constructor === Float32Array || ( typeof Float16Array !== 'undefined' && array.constructor === Float16Array ) ) return value;
 
 	const scale = getNormalizationScale( array );
 
@@ -451,7 +451,7 @@ function denormalize( value, array ) {
  */
 function normalize( value, array ) {
 
-	if ( array.constructor === Float32Array ) return value;
+	if ( array.constructor === Float32Array || ( typeof Float16Array !== 'undefined' && array.constructor === Float16Array ) ) return value;
 
 	const scale = getNormalizationScale( array );
 
