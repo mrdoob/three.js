@@ -764,11 +764,11 @@ class Node extends EventDispatcher {
 	 * depending on their implementation.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The hash.
+	 * @return {number|string} The hash.
 	 */
 	getHash( /*builder*/ ) {
 
-		return String( this.id );
+		return this.id;
 
 	}
 

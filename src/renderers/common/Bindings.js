@@ -76,7 +76,10 @@ class Bindings extends DataMap {
 		 */
 		this._sharedBindGroups = new WeakMap();
 
-		this.pipelines.bindings = this; // assign bindings to pipelines
+		// assign bindings to pipelines and textures
+
+		this.pipelines.bindings = this;
+		this.textures.bindings = this;
 
 	}
 
@@ -353,6 +356,7 @@ class Bindings extends DataMap {
 
 				groupData.bindGroup = bindGroup;
 				groupData.usedTimes = 1;
+				groupData.textures = new Set();
 
 			} else {
 
@@ -395,16 +399,22 @@ class Bindings extends DataMap {
 
 							this.backend.destroySampler( binding );
 
-						} else if ( binding.texture !== null ) {
-
-							// untrack destroyed bind group from its texture
-
-							const textureData = this.textures.get( binding.texture );
-							if ( textureData.bindGroups !== undefined ) textureData.bindGroups.delete( bindGroup );
-
 						}
 
 						binding.release();
+
+					}
+
+				}
+
+				// untrack the destroyed bind group from all textures it was used with
+
+				for ( const texture of groupData.textures ) {
+
+					if ( this.textures.has( texture ) === true ) {
+
+						const textureData = this.textures.get( texture );
+						textureData.bindGroups.delete( bindGroup );
 
 					}
 
@@ -515,7 +525,7 @@ class Bindings extends DataMap {
 				// get the texture data after the update, to sync the texture reference from node
 
 				const texture = binding.texture;
-				const texturesTextureData = this.textures.get( texture );
+				const textureData = this.textures.get( texture );
 
 				if ( updated ) {
 
@@ -533,15 +543,16 @@ class Bindings extends DataMap {
 
 					}
 
-					// keep track which bind groups refer to the current texture (this is needed for dispose)
+					// keep track which bind groups refer to the current texture and vice versa (this is needed for dispose)
 
-					texturesTextureData.bindGroups.add( bindGroup );
+					const bindGroupData = this.get( bindGroup );
+
+					textureData.bindGroups.add( bindGroup );
+					bindGroupData.textures.add( texture );
 
 				}
 
-				const textureData = backend.get( texture );
-
-				if ( textureData.externalTexture !== undefined || texturesTextureData.isDefaultTexture ) {
+				if ( backend.get( texture ).externalTexture !== undefined || textureData.isDefaultTexture ) {
 
 					cacheBindings = false;
 
