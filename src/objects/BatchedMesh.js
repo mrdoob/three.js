@@ -286,16 +286,18 @@ class BatchedMesh extends Mesh {
 		this._mergedDrawInstanceCounts = new Int32Array( maxInstanceCount );
 		this._mergedDrawCount = 0;
 
-		// Local matrix per geometry by using data texture
+		// Local matrix and color per geometry by using data texture
 		this._matricesTexture = null;
-		this._indirectTexture = null;
 		this._colorsTexture = null;
+
+		// instance id per draw, written by the per-camera culling and sorting
+		this._indirectTexture = this._createIndirectTexture();
+		this._indirectTextures = []; // indirect textures of nested renders, only needed for WebGPU
 
 		// previous frame matrices for motion vectors, created by the renderer
 		this._previousMatricesTexture = null;
 
 		this._initMatricesTexture();
-		this._initIndirectTexture();
 
 	}
 
@@ -347,6 +349,44 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	/**
+	 * Returns the indirect texture for the given call depth of the renderer. Nested renders
+	 * write their draw order into their own texture since, with the WebGPU backend, the draws
+	 * of the outer render are executed when its pass is submitted.
+	 *
+	 * @private
+	 * @param {number} callDepth - The call depth of the renderer.
+	 * @return {DataTexture} The indirect texture.
+	 */
+	_getIndirectTexture( callDepth ) {
+
+		if ( callDepth === 0 ) return this._indirectTexture;
+
+		const indirectTextures = this._indirectTextures;
+
+		let indirectTexture = indirectTextures[ callDepth - 1 ];
+
+		if ( indirectTexture === undefined ) {
+
+			indirectTexture = this._createIndirectTexture();
+			indirectTextures[ callDepth - 1 ] = indirectTexture;
+
+		}
+
+		return indirectTexture;
+
+	}
+
+	_createIndirectTexture() {
+
+		let size = Math.sqrt( this._maxInstanceCount );
+		size = Math.ceil( size );
+
+		const indirectArray = new Uint32Array( size * size );
+		return new DataTexture( indirectArray, size, size, RedIntegerFormat, UnsignedIntType );
+
+	}
+
 	_initMatricesTexture() {
 
 		// layout (1 matrix = 4 pixels)
@@ -364,18 +404,6 @@ class BatchedMesh extends Mesh {
 		const matricesTexture = new DataTexture( matricesArray, size, size, RGBAFormat, FloatType );
 
 		this._matricesTexture = matricesTexture;
-
-	}
-
-	_initIndirectTexture() {
-
-		let size = Math.sqrt( this._maxInstanceCount );
-		size = Math.ceil( size );
-
-		const indirectArray = new Uint32Array( size * size );
-		const indirectTexture = new DataTexture( indirectArray, size, size, RedIntegerFormat, UnsignedIntType );
-
-		this._indirectTexture = indirectTexture;
 
 	}
 
@@ -1321,8 +1349,10 @@ class BatchedMesh extends Mesh {
 		const colorsTexture = this._colorsTexture;
 
 		indirectTexture.dispose();
-		this._initIndirectTexture();
+		this._indirectTexture = this._createIndirectTexture();
 		copyArrayContents( indirectTexture.image.data, this._indirectTexture.image.data );
+
+		this._disposeIndirectTextures();
 
 		matricesTexture.dispose();
 		this._initMatricesTexture();
@@ -1568,6 +1598,20 @@ class BatchedMesh extends Mesh {
 
 		}
 
+		this._disposeIndirectTextures();
+
+	}
+
+	_disposeIndirectTextures() {
+
+		for ( const texture of this._indirectTextures ) {
+
+			if ( texture !== undefined ) texture.dispose();
+
+		}
+
+		this._indirectTextures = [];
+
 	}
 
 	/**
@@ -1579,8 +1623,9 @@ class BatchedMesh extends Mesh {
 	 * @param {BufferGeometry} geometry - The batch's geometry.
 	 * @param {Material} material - The material of the next draw.
 	 * @param {('multiDraw'|'merged')} [drawFormat='multiDraw'] - The format of the draw parameters.
+	 * @param {DataTexture} [indirectTexture=this._indirectTexture] - The indirect texture of the next draw.
 	 */
-	_updateDrawParameters( camera, geometry, material, drawFormat = 'multiDraw' ) {
+	_updateDrawParameters( camera, geometry, material, drawFormat = 'multiDraw', indirectTexture = this._indirectTexture ) {
 
 		// if visibility has not changed and frustum culling and object sorting is not required
 		// then skip iterating over all items
@@ -1615,7 +1660,6 @@ class BatchedMesh extends Mesh {
 		const mergedDrawInstanceCounts = this._mergedDrawInstanceCounts;
 		const geometryInfoList = this._geometryInfo;
 		const perObjectFrustumCulled = this.perObjectFrustumCulled;
-		const indirectTexture = this._indirectTexture;
 		const indirectArray = indirectTexture.image.data;
 
 		const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
