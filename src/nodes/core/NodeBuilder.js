@@ -43,6 +43,11 @@ let _id = 0;
 
 const _functionNodeCache = new WeakMap();
 const _functionShaderNodes = new WeakMap();
+
+// The function nodes whose code refers to uniforms. The uniforms are declared and named by the
+// builder that builds the code, so these functions can't share their code with other builders.
+const _builderFunctionNodes = new WeakSet();
+
 const _layoutDefaultsCache = new WeakMap();
 
 // The texture nodes of the texture inputs of a function layout. Their textures only define the code
@@ -547,6 +552,15 @@ class NodeBuilder {
 		 * @default null
 		 */
 		this.currentFunctionNode = null;
+
+		/**
+		 * The function nodes built by this builder whose code can't be shared with other builders,
+		 * per shader stage. See {@link NodeBuilder#buildFunctionNode}.
+		 *
+		 * @private
+		 * @type {Object<string,Map<ShaderNodeInternal,FunctionNode>>}
+		 */
+		this._functionNodes = {};
 
 		/**
 		 * The builder's context.
@@ -2474,6 +2488,8 @@ class NodeBuilder {
 
 		if ( node.isParameterNode === true ) return node;
 
+		if ( this.currentFunctionNode !== null ) _builderFunctionNodes.add( this.currentFunctionNode );
+
 		const nodeData = this.getDataFromNode( node, shaderStage, this.globalCache );
 
 		let nodeUniform = nodeData.uniform;
@@ -2865,7 +2881,8 @@ class NodeBuilder {
 	 */
 	buildFunctionNode( shaderNode ) {
 
-		// the code is shared by all builders of a backend, per shader stage since it can differ between stages
+		// the code is shared by all builders of a backend, per shader stage since it can differ between stages.
+		// code that refers to uniforms is built per builder, since the uniforms are declared and named per builder.
 
 		const backend = this.renderer.backend;
 
@@ -2879,8 +2896,13 @@ class NodeBuilder {
 		}
 
 		const cache = stages[ this.shaderStage ] || ( stages[ this.shaderStage ] = new WeakMap() );
+		const builderCache = this._functionNodes[ this.shaderStage ] || ( this._functionNodes[ this.shaderStage ] = new Map() );
 
 		let fn = cache.get( shaderNode );
+
+		const isBuilderFunction = fn !== undefined && _builderFunctionNodes.has( fn );
+
+		if ( isBuilderFunction ) fn = builderCache.get( shaderNode );
 
 		if ( fn === undefined ) {
 
@@ -2894,8 +2916,18 @@ class NodeBuilder {
 
 			this.currentFunctionNode = previous;
 
-			cache.set( shaderNode, fn );
+			if ( isBuilderFunction === false ) cache.set( shaderNode, fn );
+			if ( isBuilderFunction || _builderFunctionNodes.has( fn ) ) builderCache.set( shaderNode, fn );
+
 			_functionShaderNodes.set( fn, shaderNode );
+
+		}
+
+		// a function that calls a function of this builder is a function of this builder as well
+
+		if ( _builderFunctionNodes.has( fn ) && this.currentFunctionNode !== null ) {
+
+			_builderFunctionNodes.add( this.currentFunctionNode );
 
 		}
 

@@ -1936,7 +1936,7 @@ fn0( nodeUniform0, nodeUniform0_sampler, nodeVarying0 )
 
 var nodeVar0 : vec4<f32>;
 
-nodeVar0 = textureSampleLevel( nodeUniform0, nodeUniform0_sampler, ( nodeVarying0 * vec2<f32>( 2.0 ) ), 2.0 );
+nodeVar0 = textureSampleLevel( nodeUniform0, nodeUniform0_sampler, ( object.nodeUniform1 * vec3<f32>( ( nodeVarying0 * vec2<f32>( 2.0 ) ), 1.0 ) ).xy, 2.0 );
 
 nodeVar0
 

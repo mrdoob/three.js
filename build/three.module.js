@@ -2669,7 +2669,7 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 		/**
 		 * Overwritten with a different texture type.
 		 *
-		 * @type {DataArrayTexture}
+		 * @type {CubeTexture}
 		 */
 		this.texture = new CubeTexture( images );
 		this._setTextureOptions( options );
@@ -2945,7 +2945,7 @@ class PMREMGenerator {
 	 * at least 256.
 	 *
 	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
-	 * @param {?WebGLCubeRenderTarget} [renderTarget=null] - The render target to use.
+	 * @param {?WebGLCubeRenderTarget} [renderTarget=null] - A PMREM previously returned by this generator to reuse. Its size must match the PMREM being generated.
 	 * @return {WebGLCubeRenderTarget} The resulting PMREM.
 	 */
 	fromEquirectangular( equirectangular, renderTarget = null ) {
@@ -2959,7 +2959,7 @@ class PMREMGenerator {
 	 * the input, rounded down to a power of two and at least 256.
 	 *
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
-	 * @param {?WebGLCubeRenderTarget} [renderTarget=null] - The render target to use.
+	 * @param {?WebGLCubeRenderTarget} [renderTarget=null] - A PMREM previously returned by this generator to reuse. Its size must match the PMREM being generated.
 	 * @return {WebGLCubeRenderTarget} The resulting PMREM.
 	 */
 	fromCubemap( cubemap, renderTarget = null ) {
@@ -13609,7 +13609,8 @@ class WebXRDepthSensing {
 		this.texture = null;
 
 		/**
-		 * A plane mesh for visualizing the depth texture.
+		 * A plane mesh that writes the depth of the user's environment into the
+		 * depth buffer so real-world surfaces occlude virtual objects.
 		 *
 		 * @type {?Mesh}
 		 */
@@ -13657,10 +13658,11 @@ class WebXRDepthSensing {
 	}
 
 	/**
-	 * Returns a plane mesh that visualizes the depth texture.
+	 * Returns a plane mesh that writes the depth of the user's environment into the
+	 * depth buffer so real-world surfaces occlude virtual objects.
 	 *
 	 * @param {ArrayCamera} cameraXR - The XR camera.
-	 * @return {?Mesh} The plane mesh.
+	 * @return {?Mesh} The plane mesh. Returns `null` if no depth texture is available.
 	 */
 	getMesh( cameraXR ) {
 
@@ -13724,7 +13726,7 @@ class WebXRDepthSensing {
 class WebXRManager extends EventDispatcher {
 
 	/**
-	 * Constructs a new WebGL renderer.
+	 * Constructs a new XR manager.
 	 *
 	 * @param {WebGLRenderer} renderer - The renderer.
 	 * @param {WebGL2RenderingContext} gl - The rendering context.
@@ -13835,8 +13837,8 @@ class WebXRManager extends EventDispatcher {
 
 		/**
 		 * Returns a group representing the `grip` space of the XR controller.
-		 * Use this space for visualizing 3D objects that support the user in pointing
-		 * tasks like UI interaction.
+		 * Use this space for visualizing 3D objects held in the user's hand, like
+		 * a model of the controller.
 		 *
 		 * Note: If you want to show something in the user's hand AND offer a
 		 * pointing ray at the same time, you'll want to attached the handheld object
@@ -13865,8 +13867,8 @@ class WebXRManager extends EventDispatcher {
 
 		/**
 		 * Returns a group representing the `hand` space of the XR controller.
-		 * Use this space for visualizing 3D objects that support the user in pointing
-		 * tasks like UI interaction.
+		 * Use this space for visualizing the user's tracked hand. The group's `joints`
+		 * property holds a group for each hand joint.
 		 *
 		 * @param {number} index - The index of the controller.
 		 * @return {Group} A group representing the `hand` space.
@@ -14525,7 +14527,7 @@ class WebXRManager extends EventDispatcher {
 		 *
 		 * See {@link WebXRDepthSensing#getMesh}.
 		 *
-		 * @return {Mesh} The depth sensing mesh.
+		 * @return {?Mesh} The depth sensing mesh. Returns `null` if depth sensing is not available.
 		 */
 		this.getDepthSensingMesh = function () {
 
@@ -14534,7 +14536,7 @@ class WebXRManager extends EventDispatcher {
 		};
 
 		/**
-		 * Retrieves an opaque texture from the view-aligned {@link XRCamera}.
+		 * Retrieves an opaque texture from the view-aligned `XRCamera` (e.g. `view.camera` of an `XRView`).
 		 * Only available during the current animation loop.
 		 *
 		 * @param {XRCamera} xrCamera - The camera to query.
@@ -16060,6 +16062,9 @@ class WebGLRenderer {
 		/**
 		 * The tone mapping technique of the renderer.
 		 *
+		 * Tone mapping is only applied when rendering to the screen or into an XR render target.
+		 * When a custom render target is set, the output is not tone mapped.
+		 *
 		 * @type {(NoToneMapping|LinearToneMapping|ReinhardToneMapping|CineonToneMapping|ACESFilmicToneMapping|CustomToneMapping|AgXToneMapping|NeutralToneMapping)}
 		 * @default NoToneMapping
 		 */
@@ -16563,10 +16568,10 @@ class WebGLRenderer {
 		};
 
 		/**
-		 * Returns the current viewport definition.
+		 * Returns the current viewport definition in physical pixels.
 		 *
-		 * @param {Vector2} target - The method writes the result in this target object.
-		 * @return {Vector2} The current viewport definition.
+		 * @param {Vector4} target - The method writes the result in this target object.
+		 * @return {Vector4} The current viewport definition.
 		 */
 		this.getCurrentViewport = function ( target ) {
 
@@ -16688,7 +16693,7 @@ class WebGLRenderer {
 		 * Sets a custom transparent sort function for the render lists. Pass `null`
 		 * to use the default `reversePainterSortStable` function.
 		 *
-		 * @param {?Function} method - The opaque sort function.
+		 * @param {?Function} method - The transparent sort function.
 		 */
 		this.setTransparentSort = function ( method ) {
 
@@ -16713,7 +16718,7 @@ class WebGLRenderer {
 		/**
 		 * Sets the clear color and alpha.
 		 *
-		 * @param {Color} color - The clear color.
+		 * @param {(number|Color|string)} color - The clear color.
 		 * @param {number} [alpha=1] - The clear alpha.
 		 */
 		this.setClearColor = function () {
@@ -18932,7 +18937,8 @@ class WebGLRenderer {
 		}
 
 		/**
-		 * Reads the pixel data from the given render target into the given buffer.
+		 * Reads the pixel data from the given render target into the given buffer. The origin
+		 * of the copy region is relative to the lower left corner of the render target.
 		 *
 		 * @param {WebGLRenderTarget} renderTarget - The render target to read from.
 		 * @param {number} x - The `x` coordinate of the copy region's origin.
@@ -19477,6 +19483,9 @@ class WebGLRenderer {
 
 	/**
 	 * Defines the output color space of the renderer.
+	 *
+	 * The output color space is only applied when rendering to the screen or into an XR render
+	 * target. When a custom render target is set, the output is in the working color space.
 	 *
 	 * @type {SRGBColorSpace|LinearSRGBColorSpace}
 	 * @default SRGBColorSpace
