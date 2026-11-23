@@ -72,10 +72,28 @@ class TubeGeometry extends BufferGeometry {
 
 		const frames = path.computeFrenetFrames( tubularSegments, closed );
 
-		// expose internals
-
+		/**
+		 * The tangents of the Frenet frames along the path.
+		 *
+		 * @type {Array<Vector3>}
+		 * @readonly
+		 */
 		this.tangents = frames.tangents;
+
+		/**
+		 * The normals of the Frenet frames along the path.
+		 *
+		 * @type {Array<Vector3>}
+		 * @readonly
+		 */
 		this.normals = frames.normals;
+
+		/**
+		 * The binormals of the Frenet frames along the path.
+		 *
+		 * @type {Array<Vector3>}
+		 * @readonly
+		 */
 		this.binormals = frames.binormals;
 
 		// helper variables
@@ -218,6 +236,10 @@ class TubeGeometry extends BufferGeometry {
 		super.copy( source );
 
 		this.parameters = Object.assign( {}, source.parameters );
+
+		this.tangents = source.tangents;
+		this.normals = source.normals;
+		this.binormals = source.binormals;
 
 		return this;
 
