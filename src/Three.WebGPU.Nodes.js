@@ -30,5 +30,5 @@ export { default as BlendMode } from './renderers/common/BlendMode.js';
 export { default as GPUTimer } from './renderers/common/GPUTimer.js';
 export { ClippingGroup } from './objects/ClippingGroup.js';
 export * from './nodes/Nodes.js';
-import * as TSL from './Three.TSL.js';
+import * as TSL from './Three.Nodes.js';
 export { TSL };
