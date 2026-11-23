@@ -1938,8 +1938,8 @@ vec2 nodeVar1;
 bool nodeVar2;
 vec2 nodeVar3;
 vec4 nodeVar4;
-nodeVar0 = ( nodeUniform1 * vec3( ( nodeVarying0 * vec2( 2.0 ) ), 1.0 ) ).xy;
-nodeVar2 = bool( nodeUniform2 );
+nodeVar0 = ( nodeVarying0 * vec2( 2.0 ) );
+nodeVar2 = bool( nodeUniform1 );
 
 if ( nodeVar2 ) {
 
