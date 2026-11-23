@@ -44,10 +44,9 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking, rtt, Fn } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
-		import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -188,7 +187,7 @@
 
 			// downsample: at a ratio above 1, the reflections are computed from downsampled inputs and upsampled afterwards
 
-			const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
+			const downsampleParams = { level: 0 };
 
 			const downsample = depthAwareDownsample( scenePassDepth, { normal: scenePassNormal, metalrough: scenePassMetalRough } );
 			const downsampleDepth = downsample.getTextureNode( 'depth' );
@@ -198,18 +197,6 @@
 				return unpackOctahedralToNormal( downsample.getTextureNode( 'normal' ).sample( uv ).rg );
 
 			} );
-
-			// without depth rejection, the joint bilateral filter is a bilinear filter
-
-			const depthTolerance = uniform( 0.005 );
-
-			const upsample = ( node ) => {
-
-				const upsampled = rtt( jointBilateralUpsample( node, downsampleDepth, scenePassDepth, camera, { depthTolerance } ).sample( screenUV ) ).sample( screenUV );
-
-				return Fn( () => ( downsampleParams.level > 0 ) ? upsampled : node )();
-
-			};
 
 			function updateDownsample() {
 
@@ -224,12 +211,10 @@
 
 				renderPipeline.needsUpdate = true;
 
-				reduced ? upsamplerControl.show() : upsamplerControl.hide();
-
 			}
 
-			const raw = upsample( passTexture( reflection, reflection.getRenderTarget().texture ) );
-			const blurred = upsample( reflection.getTextureNode() );
+			const raw = passTexture( reflection, reflection.getRenderTarget().texture );
+			const blurred = reflection.getTextureNode();
 			const blurEnabled = uniform( 1 );
 			const combined = scenePassColor.rgb.add( mix( raw.rgb, blurred.rgb, blurEnabled ) );
 			const spatialAA = smaa( vec4( combined, 1 ) );
@@ -270,7 +255,6 @@
 				updateDownsample();
 
 			} );
-			const upsamplerControl = downsampleGui.add( downsampleParams, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 ).hide();
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
 			ssrGui.add( params, 'enabled' ).name( 'Enabled' ).onChange( updateOutput );

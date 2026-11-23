@@ -39,11 +39,10 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { sample, pass, mrt, screenUV, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext, rtt, uniform, textureSize, vec2 } from 'three/tsl';
+			import { sample, pass, mrt, screenUV, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext, textureSize, vec2 } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { ssao } from 'three/addons/tsl/display/SSAONode.js';
 			import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
-			import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -56,14 +55,13 @@
 
 			let camera, scene, renderer, renderPipeline, controls;
 
-			let aoPass, aoNode, upsamplePass, traaPass, transparentMesh;
+			let aoPass, aoNode, traaPass, transparentMesh;
 
 			const params = {
 				aoType: 'GTAO',
 				samples: 16,
 				radius: 0.4,
 				downsample: 1,
-				upsampler: 'Joint bilateral',
 				scale: 1.5, // GTAO
 				thickness: 1, // GTAO
 				temporalFiltering: true, // GTAO
@@ -152,10 +150,6 @@
 
 				} );
 
-				// without depth rejection, the joint bilateral filter is a bilinear filter
-
-				const depthTolerance = uniform( 0.005 );
-
 				// scene pass
 
 				const scenePass = pass( scene, camera ).toInspector( 'Color' );
@@ -194,7 +188,6 @@
 				function createAO() {
 
 					if ( aoPass ) aoPass.dispose();
-					if ( upsamplePass ) upsamplePass.dispose();
 
 					const reduced = params.downsample > 0;
 
@@ -207,8 +200,7 @@
 						? ssao( depth, normal, camera ).toInspector( 'SSAO', ( inspectNode ) => inspectNode.r )
 						: ao( depth, normal, camera ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
 
-					upsamplePass = reduced ? rtt( jointBilateralUpsample( aoPass.getTextureNode(), downsampleDepth, prePassDepth, camera, { depthTolerance } ).sample( screenUV ) ) : null;
-					aoNode = ( reduced ? upsamplePass : aoPass.getTextureNode() ).sample( screenUV ).r;
+					aoNode = aoPass.getTextureNode().sample( screenUV ).r;
 
 					updateParameters();
 
@@ -589,7 +581,6 @@
 					updateControls();
 
 				} );
-				const upsamplerControl = downsampleFolder.add( params, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 );
 
 				const filteringFolder = gui.addFolder( 'Filtering' );
 
@@ -617,8 +608,6 @@
 				// show only the controls that apply to the active AO type
 
 				function updateControls() {
-
-					params.downsample > 0 ? upsamplerControl.show() : upsamplerControl.hide();
 
 					if ( params.aoType === 'GTAO' ) {
 

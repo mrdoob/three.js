@@ -39,10 +39,9 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, velocity, rtt, screenUV, Fn } from 'three/tsl';
+			import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, velocity } from 'three/tsl';
 			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 			import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
-			import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 			import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 			import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
@@ -229,7 +228,7 @@
 
 				// downsample: at a ratio above 1, the reflections are computed and denoised from downsampled inputs and upsampled afterwards
 
-				const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
+				const downsampleParams = { level: 0 };
 
 				const downsample = depthAwareDownsample( scenePassDepth, { normal: scenePassNormal, diffuseColor: scenePassDiffuseColor, velocity: scenePassVelocity } );
 				const downsampleDepth = downsample.getTextureNode( 'depth' );
@@ -238,18 +237,6 @@
 				const downsampleNormal = sample( ( uv ) => normalDecode( downsample.getTextureNode( 'normal' ).sample( uv ) ) );
 				const downsampleRoughness = sample( ( uv ) => downsampleVelocity.sample( uv ).z );
 				const downsampleMetalRough = sample( ( uv ) => vec2( downsampleDiffuseColor.sample( uv ).a, downsampleVelocity.sample( uv ).z ) );
-
-				// without depth rejection, the joint bilateral filter is a bilinear filter
-
-				const depthTolerance = uniform( 0.005 );
-
-				const upsample = ( node ) => {
-
-					const upsampled = rtt( jointBilateralUpsample( node, downsampleDepth, scenePassDepth, camera, { depthTolerance } ).sample( screenUV ) ).sample( screenUV );
-
-					return Fn( () => ( downsampleParams.level > 0 ) ? upsampled : node )();
-
-				};
 
 				function updateDownsample() {
 
@@ -272,8 +259,6 @@
 					denoiseNode.roughnessMetalnessNode = reduced ? downsampleMetalRough : sceneMetalRough;
 
 					renderPipeline.needsUpdate = true;
-
-					reduced ? upsamplerControl.show() : upsamplerControl.hide();
 
 				}
 
@@ -313,10 +298,9 @@
 
 				const denoiseEnabled = uniform( 1 );
 
-				const ssrUpsampled = upsample( ssrTexture );
-				const denoiseUpsampled = upsample( denoiseNode.getTextureNode() );
+				const denoiseTexture = denoiseNode.getTextureNode();
 
-				const combined = scenePassColor.rgb.add( mix( ssrUpsampled.rgb, denoiseUpsampled.rgb, denoiseEnabled ) );
+				const combined = scenePassColor.rgb.add( mix( ssrTexture.rgb, denoiseTexture.rgb, denoiseEnabled ) );
 
 				const temporalAA = traa( vec4( combined, 1 ), scenePassDepth, scenePassVelocity, camera );
 				const spatialAA = smaa( vec4( combined, 1 ) );
@@ -328,8 +312,8 @@
 					switch ( params.output ) {
 
 						case 'Beauty': outputNode = params.traa ? temporalAA : spatialAA; break;
-						case 'SSR': outputNode = vec4( ssrUpsampled.rgb, 1 ); break;
-						case 'SSR DN': outputNode = vec4( denoiseUpsampled.rgb, 1 ); break;
+						case 'SSR': outputNode = vec4( ssrTexture.rgb, 1 ); break;
+						case 'SSR DN': outputNode = vec4( denoiseTexture.rgb, 1 ); break;
 
 					}
 
@@ -363,7 +347,6 @@
 					updateDownsample();
 
 				} );
-				const upsamplerControl = downsampleGui.add( downsampleParams, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 ).hide();
 
 				const ssrGui = renderer.inspector.createParameters( 'SSR' );
 				ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( updateParameters );

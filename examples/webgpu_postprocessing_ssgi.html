@@ -36,10 +36,9 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec3, vec4, packNormalToRGB, unpackRGBToNormal, sample, rtt, uniform, screenUV, Fn } from 'three/tsl';
+			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec3, vec4, packNormalToRGB, unpackRGBToNormal, sample } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
 			import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
-			import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -120,7 +119,7 @@
 
 				// downsample: at a ratio above 1, the GI is computed from downsampled inputs and upsampled afterwards
 
-				const downsampleParams = { level: 0, upsampler: 'Joint bilateral' };
+				const downsampleParams = { level: 0 };
 
 				const downsample = depthAwareDownsample( scenePassDepth, { normal: scenePassNormal } );
 				const downsampleDepth = downsample.getTextureNode( 'depth' );
@@ -129,18 +128,6 @@
 					return unpackRGBToNormal( downsample.getTextureNode( 'normal' ).sample( uv ) );
 
 				} );
-
-				// without depth rejection, the joint bilateral filter is a bilinear filter
-
-				const depthTolerance = uniform( 0.005 );
-
-				const upsample = ( node ) => {
-
-					const upsampled = rtt( jointBilateralUpsample( node, downsampleDepth, scenePassDepth, camera, { depthTolerance } ).sample( screenUV ) ).sample( screenUV );
-
-					return Fn( () => ( downsampleParams.level > 0 ) ? upsampled : node )();
-
-				};
 
 				function updateDownsample() {
 
@@ -153,14 +140,12 @@
 
 					renderPipeline.needsUpdate = true;
 
-					reduced ? upsamplerControl.show() : upsamplerControl.hide();
-
 				}
 
 				// composite
 
-				const ao = upsample( giPass.getAONode().toInspector( 'SSGI.AO' ) ).r;
-				const gi = upsample( giPass.getGINode().toInspector( 'SSGI.GI' ) ).rgb;
+				const ao = giPass.getAONode().toInspector( 'SSGI.AO' );
+				const gi = giPass.getGINode().toInspector( 'SSGI.GI' );
 
 				const compositePass = vec4( add( scenePassColor.rgb.mul( ao ), ( scenePassDiffuse.rgb.mul( gi.rgb ) ) ), scenePassColor.a );
 				compositePass.name = 'Composite';
@@ -276,7 +261,6 @@
 					updateDownsample();
 
 				} );
-				const upsamplerControl = downsampleGui.add( downsampleParams, 'upsampler', [ 'Bilinear', 'Joint bilateral' ] ).onChange( ( value ) => depthTolerance.value = ( value === 'Bilinear' ) ? 1e6 : 0.005 ).hide();
 
 				const giGui = renderer.inspector.createParameters( 'SSGI' );
 				giGui.add( giPass.sliceCount, 'value', 1, 4, 1 ).name( 'slice count' );
