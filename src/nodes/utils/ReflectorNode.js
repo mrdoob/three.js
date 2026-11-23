@@ -60,7 +60,7 @@ class ReflectorNode extends TextureNode {
 	/**
 	 * Constructs a new reflector node.
 	 *
-	 * @param {Object} [parameters={}] - An object holding configuration parameters.
+	 * @param {?Object} [parameters=null] - An object holding configuration parameters.
 	 * @param {Object3D} [parameters.target=new Object3D()] - The 3D object the reflector is linked to.
 	 * @param {number} [parameters.resolutionScale=1] - The resolution scale.
 	 * @param {boolean} [parameters.generateMipmaps=false] - Whether mipmaps should be generated or not.
@@ -70,18 +70,18 @@ class ReflectorNode extends TextureNode {
 	 * @param {Texture} [parameters.defaultTexture] - The default texture.
 	 * @param {ReflectorBaseNode} [parameters.reflector] - The reflector base node.
 	 */
-	constructor( parameters = {} ) {
+	constructor( parameters = null ) {
 
-		super( parameters.defaultTexture || _defaultRT.texture, _defaultUV );
+		super( parameters?.defaultTexture || _defaultRT.texture, _defaultUV );
 
 		/**
 		 * A reference to the internal reflector base node which holds the actual implementation.
 		 *
 		 * @private
-		 * @type {ReflectorBaseNode}
+		 * @type {?ReflectorBaseNode}
 		 * @default ReflectorBaseNode
 		 */
-		this._reflectorBaseNode = parameters.reflector || new ReflectorBaseNode( this, parameters );
+		this._reflectorBaseNode = parameters !== null ? ( parameters.reflector || new ReflectorBaseNode( this, parameters ) ) : null;
 
 		/**
 		 * A reference to the internal depth node.
@@ -649,6 +649,6 @@ class ReflectorBaseNode extends Node {
  * @param {ReflectorBaseNode} [parameters.reflector] - The reflector base node.
  * @returns {ReflectorNode}
  */
-export const reflector = ( parameters ) => new ReflectorNode( parameters );
+export const reflector = ( parameters = {} ) => new ReflectorNode( parameters );
 
 export default ReflectorNode;
