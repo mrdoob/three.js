@@ -51,6 +51,31 @@ export default QUnit.module( 'Geometries', () => {
 
 		} );
 
+		// PUBLIC
+		QUnit.test( 'copy', ( assert ) => {
+
+			const path = new LineCurve3( new Vector3( 0, 0, 0 ), new Vector3( 0, 0, 5 ) );
+			const source = new TubeGeometry( path, 10, 1, 8, false );
+
+			const targets = [
+				[ 'copy()', new TubeGeometry().copy( source ) ],
+				[ 'clone()', source.clone() ]
+			];
+
+			for ( const [ method, target ] of targets ) {
+
+				for ( const key of [ 'tangents', 'normals', 'binormals' ] ) {
+
+					assert.strictEqual( target[ key ].length, source[ key ].length, method + ': ' + key + ' have the length of the source frames.' );
+					assert.ok( target[ key ].every( ( vector, i ) => vector.equals( source[ key ][ i ] ) ), method + ': ' + key + ' are equal to the source frames.' );
+					assert.ok( target[ key ].every( ( vector, i ) => vector !== source[ key ][ i ] ), method + ': ' + key + ' are not shared with the source.' );
+
+				}
+
+			}
+
+		} );
+
 	} );
 
 } );
