@@ -10,9 +10,9 @@ class Performance extends Tab {
 
 		super( 'Performance', options );
 
-		const perfList = new List( 'Name', 'CPU', 'GPU', 'Total' );
-		perfList.setGridStyle( 'minmax(200px, 2fr) 80px 80px 80px' );
-		perfList.domElement.style.minWidth = '600px';
+		const perfList = new List( 'Name', 'CPU', 'GPU' );
+		perfList.setGridStyle( 'minmax(200px, 2fr) 80px 80px' );
+		perfList.domElement.style.minWidth = '520px';
 
 		const scrollWrapper = document.createElement( 'div' );
 		scrollWrapper.className = 'list-scroll-wrapper';
@@ -47,7 +47,7 @@ class Performance extends Tab {
 		*/
 
 		this.graphFpsCounter = createValueSpan();
-		const graphStats = new Item( 'Graph Stats', createValueSpan(), createValueSpan(), this.graphFpsCounter );
+		const graphStats = new Item( 'Graph Stats', createValueSpan(), this.graphFpsCounter );
 		perfList.add( graphStats );
 
 		const graphItem = new Item( graphContainer );
@@ -56,10 +56,11 @@ class Performance extends Tab {
 
 		//
 
-		const frameStats = new Item( 'Frame Stats', createValueSpan(), createValueSpan(), createValueSpan() );
+		const frameStats = new Item( 'Frame Stats', createValueSpan(), createValueSpan() );
+		perfList.domElement.appendChild( perfList.domElement.querySelector( '.list-header' ) ); // move the header below the graph
 		perfList.add( frameStats );
 
-		const miscellaneous = new Item( 'Miscellaneous & Idle', createValueSpan(), createValueSpan(), createValueSpan() );
+		const miscellaneous = new Item( 'Miscellaneous & Idle', createValueSpan(), createValueSpan() );
 		miscellaneous.domElement.firstChild.style.backgroundColor = '#00ff0b1a';
 		miscellaneous.domElement.firstChild.classList.add( 'no-hover' );
 		frameStats.add( miscellaneous );
@@ -80,7 +81,7 @@ class Performance extends Tab {
 
 	}
 
-	resolveStats( inspector, stats, budget = Infinity ) {
+	resolveStats( inspector, stats ) {
 
 		const data = inspector.getStatsData( stats.cid );
 
@@ -88,7 +89,7 @@ class Performance extends Tab {
 
 		if ( item === undefined ) {
 
-			item = new Item( createValueSpan(), createValueSpan(), createValueSpan(), createValueSpan() );
+			item = new Item( createValueSpan(), createValueSpan(), createValueSpan() );
 
 			if ( stats.name ) {
 
@@ -139,15 +140,9 @@ class Performance extends Tab {
 
 		}
 
-		// A row never shows more GPU time than its parent, see updateText()
-
-		const displayGpu = stats.gpuNotAvailable === true ? 0 : Math.min( data.gpu, budget );
-		const displayTotal = data.cpu + displayGpu;
-
 		setText( item.data[ 0 ], name );
 		setText( item.data[ 1 ], data.cpu.toFixed( 2 ) );
-		setText( item.data[ 2 ], stats.gpuNotAvailable === true ? '-' : displayGpu.toFixed( 2 ) );
-		setText( item.data[ 3 ], displayTotal.toFixed( 2 ) );
+		setText( item.data[ 2 ], stats.gpuNotAvailable === true ? '-' : data.gpu.toFixed( 2 ) );
 
 		//
 
@@ -155,11 +150,9 @@ class Performance extends Tab {
 
 		this.currentItem = item;
 
-		const childBudget = stats.gpuNotAvailable === true ? budget : displayGpu;
-
 		for ( const child of stats.children ) {
 
-			this.resolveStats( inspector, child, childBudget );
+			this.resolveStats( inspector, child );
 
 		}
 
@@ -234,18 +227,13 @@ class Performance extends Tab {
 
 		this.frameItems.clear();
 
-		// GPU timestamps can sum to more than the frame time when the GPU overlaps passes, so cap the display at
-		// the frame time, and cap each row at its parent's value
-
 		const hasTimestamp = inspector.getRenderer().backend.hasTimestamp;
-		const gpuBudget = hasTimestamp ? Math.min( frame.gpu, frame.deltaTime ) : 0;
-		const totalDisplay = frame.cpu + gpuBudget;
 
 		this.currentItem = this.frameStats;
 
 		for ( const child of frame.children ) {
 
-			this.resolveStats( inspector, child, gpuBudget );
+			this.resolveStats( inspector, child );
 
 		}
 
@@ -278,14 +266,12 @@ class Performance extends Tab {
 		//
 
 		setText( this.frameStats.data[ 1 ], frame.cpu.toFixed( 2 ) );
-		setText( this.frameStats.data[ 2 ], hasTimestamp ? gpuBudget.toFixed( 2 ) : '-' );
-		setText( this.frameStats.data[ 3 ], totalDisplay.toFixed( 2 ) );
+		setText( this.frameStats.data[ 2 ], hasTimestamp ? frame.gpu.toFixed( 2 ) : '-' );
 
 		//
 
 		setText( this.miscellaneous.data[ 1 ], frame.miscellaneous.toFixed( 2 ) );
 		setText( this.miscellaneous.data[ 2 ], '-' );
-		setText( this.miscellaneous.data[ 3 ], frame.miscellaneous.toFixed( 2 ) );
 
 		//
 

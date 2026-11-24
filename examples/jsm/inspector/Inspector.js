@@ -475,8 +475,6 @@ class Inspector extends RendererInspector {
 
 		}
 
-		data.total = data.cpu + data.gpu;
-
 	}
 
 	getNodes() {
@@ -497,7 +495,7 @@ class Inspector extends RendererInspector {
 			const stats = statsArray[ i ];
 			const value = stats[ property ];
 
-			if ( value > 0 ) {
+			if ( value >= 0 && ( property !== 'gpu' || stats.gpuNotAvailable === false ) ) {
 
 				// ignore invalid values
 
@@ -545,8 +543,6 @@ class Inspector extends RendererInspector {
 		if ( ! previousFrame ) return;
 
 		frame.cpu = 0;
-		frame.gpu = 0;
-		frame.total = 0;
 
 		for ( const stats of frame.children ) {
 
@@ -555,10 +551,13 @@ class Inspector extends RendererInspector {
 			const data = this.getStatsData( stats.cid );
 
 			frame.cpu += data.cpu;
-			frame.gpu += data.gpu;
-			frame.total += data.total;
 
 		}
+
+		const frames = this.frames.filter( ( sample ) => sample.frameId <= frame.frameId && sample.gpuSpanTime !== undefined && sample.children.length > 0 ).slice( - Math.max( Math.ceil( this.fps ), 1 ) );
+
+		frame.gpu = frames.length > 0 ? frames.reduce( ( sum, sample ) => sum + sample.gpuSpanTime, 0 ) / frames.length : 0;
+		frame.total = frame.cpu + frame.gpu;
 
 		// the time since the last frame which rendered, see RendererInspector.finish()
 
