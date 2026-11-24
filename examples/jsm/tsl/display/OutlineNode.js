@@ -545,8 +545,6 @@ class OutlineNode extends Node {
 
 		const currentSceneName = scene.name;
 
-		renderer.inspector.beginGroup( 'Outline', this );
-
 		// 1. Draw non-selected objects in the depth buffer
 
 		renderer.setRenderTarget( this._renderTargetDepthBuffer );
@@ -563,7 +561,7 @@ class OutlineNode extends Node {
 
 		} );
 
-		scene.name = 'Non-Selected Objects';
+		scene.name = 'Outline [ Non-Selected Objects Pass ]';
 		renderer.render( scene, camera );
 
 		// 2. Draw only the selected objects by comparing the depth buffer of non-selected objects
@@ -582,7 +580,7 @@ class OutlineNode extends Node {
 
 		} );
 
-		scene.name = 'Selected Objects';
+		scene.name = 'Outline [ Selected Objects Pass ]';
 		renderer.render( scene, camera );
 
 		//
@@ -596,14 +594,14 @@ class OutlineNode extends Node {
 		// 3. Downsample to (at least) half resolution
 
 		_quadMesh.material = this._materialCopy;
-		_quadMesh.name = 'Downsample';
+		_quadMesh.name = 'Outline [ Downsample ]';
 		renderer.setRenderTarget( this._renderTargetMaskDownSampleBuffer );
 		_quadMesh.render( renderer );
 
 		// 4. Perform edge detection (half resolution)
 
 		_quadMesh.material = this._edgeDetectionMaterial;
-		_quadMesh.name = 'Edge Detection';
+		_quadMesh.name = 'Outline [ Edge Detection ]';
 		renderer.setRenderTarget( this._renderTargetEdgeBuffer1 );
 		_quadMesh.render( renderer );
 
@@ -613,7 +611,7 @@ class OutlineNode extends Node {
 		this._blurDirection.value.copy( _BLUR_DIRECTION_X );
 
 		_quadMesh.material = this._separableBlurMaterial;
-		_quadMesh.name = 'Blur Half Resolution';
+		_quadMesh.name = 'Outline [ Blur Half Resolution ]';
 		renderer.setRenderTarget( this._renderTargetBlurBuffer1 );
 		_quadMesh.render( renderer );
 
@@ -629,7 +627,7 @@ class OutlineNode extends Node {
 		this._blurDirection.value.copy( _BLUR_DIRECTION_X );
 
 		_quadMesh.material = this._separableBlurMaterial2;
-		_quadMesh.name = 'Blur Quarter Resolution';
+		_quadMesh.name = 'Outline [ Blur Quarter Resolution ]';
 		renderer.setRenderTarget( this._renderTargetBlurBuffer2 );
 		_quadMesh.render( renderer );
 
@@ -642,11 +640,9 @@ class OutlineNode extends Node {
 		// 7. Composite
 
 		_quadMesh.material = this._compositeMaterial;
-		_quadMesh.name = 'Composite';
+		_quadMesh.name = 'Outline [ Blur Quarter Resolution ]';
 		renderer.setRenderTarget( this._renderTargetComposite );
 		_quadMesh.render( renderer );
-
-		renderer.inspector.finishGroup();
 
 		// restore
 

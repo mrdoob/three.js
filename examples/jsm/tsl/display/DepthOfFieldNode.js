@@ -287,15 +287,13 @@ class DepthOfFieldNode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		renderer.inspector.beginGroup( 'DoF', this );
-
 		renderer.setClearColor( 0x000000, 0 );
 
 		// coc
 
 		_quadMesh.material = this._CoCMaterial;
 		renderer.setRenderTarget( this._CoCRT );
-		_quadMesh.name = 'CoC';
+		_quadMesh.name = 'DoF [ CoC ]';
 		_quadMesh.render( renderer );
 
 		// blur near field to avoid visible aliased edges when the near field
@@ -305,7 +303,7 @@ class DepthOfFieldNode extends Node {
 
 		_quadMesh.material = this._CoCBlurredMaterial;
 		renderer.setRenderTarget( this._CoCBlurredRT );
-		_quadMesh.name = 'CoC Blur';
+		_quadMesh.name = 'DoF [ CoC Blur ]';
 		_quadMesh.render( renderer );
 
 		// blur64 near
@@ -314,14 +312,14 @@ class DepthOfFieldNode extends Node {
 
 		_quadMesh.material = this._blur64Material;
 		renderer.setRenderTarget( this._blur64RT );
-		_quadMesh.name = 'Blur64 Near';
+		_quadMesh.name = 'DoF [ Blur64 Near ]';
 		_quadMesh.render( renderer );
 
 		// blur16 near
 
 		_quadMesh.material = this._blur16Material;
 		renderer.setRenderTarget( this._blur16NearRT );
-		_quadMesh.name = 'Blur16 Near';
+		_quadMesh.name = 'DoF [ Blur16 Near ]';
 		_quadMesh.render( renderer );
 
 		// blur64 far
@@ -330,26 +328,24 @@ class DepthOfFieldNode extends Node {
 
 		_quadMesh.material = this._blur64Material;
 		renderer.setRenderTarget( this._blur64RT );
-		_quadMesh.name = 'Blur64 Far';
+		_quadMesh.name = 'DoF [ Blur64 Far ]';
 		_quadMesh.render( renderer );
 
 		// blur16 far
 
 		_quadMesh.material = this._blur16Material;
 		renderer.setRenderTarget( this._blur16FarRT );
-		_quadMesh.name = 'Blur16 Far';
+		_quadMesh.name = 'DoF [ Blur16 Far ]';
 		_quadMesh.render( renderer );
 
 		// composite
 
 		_quadMesh.material = this._compositeMaterial;
 		renderer.setRenderTarget( this._compositeRT );
-		_quadMesh.name = 'Composite';
+		_quadMesh.name = 'DoF [ Composite ]';
 		_quadMesh.render( renderer );
 
 		// restore
-
-		renderer.inspector.finishGroup();
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );
 

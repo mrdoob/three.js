@@ -351,8 +351,6 @@ class BloomNode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		renderer.inspector.beginGroup( 'Bloom', this );
-
 		//
 
 		const size = renderer.getDrawingBufferSize( _size );
@@ -362,7 +360,7 @@ class BloomNode extends Node {
 
 		renderer.setRenderTarget( this._renderTargetBright );
 		_quadMesh.material = this._highPassFilterMaterial;
-		_quadMesh.name = 'High Pass';
+		_quadMesh.name = 'Bloom [ High Pass ]';
 		_quadMesh.render( renderer );
 
 		// 2. Blur all the mips progressively
@@ -376,13 +374,13 @@ class BloomNode extends Node {
 			this._separableBlurMaterials[ i ].colorTexture.value = inputRenderTarget.texture;
 			this._separableBlurMaterials[ i ].direction.value = _BlurDirectionX;
 			renderer.setRenderTarget( this._renderTargetsHorizontal[ i ] );
-			_quadMesh.name = `Blur Horizontal [ ${ i } ]`;
+			_quadMesh.name = `Bloom [ Blur Horizontal - ${ i } ]`;
 			_quadMesh.render( renderer );
 
 			this._separableBlurMaterials[ i ].colorTexture.value = this._renderTargetsHorizontal[ i ].texture;
 			this._separableBlurMaterials[ i ].direction.value = _BlurDirectionY;
 			renderer.setRenderTarget( this._renderTargetsVertical[ i ] );
-			_quadMesh.name = `Blur Vertical [ ${ i } ]`;
+			_quadMesh.name = `Bloom [ Blur Vertical - ${ i } ]`;
 			_quadMesh.render( renderer );
 
 			inputRenderTarget = this._renderTargetsVertical[ i ];
@@ -393,12 +391,10 @@ class BloomNode extends Node {
 
 		renderer.setRenderTarget( this._renderTargetsHorizontal[ 0 ] );
 		_quadMesh.material = this._compositeMaterial;
-		_quadMesh.name = 'Composite';
+		_quadMesh.name = 'Bloom [ Composite ]';
 		_quadMesh.render( renderer );
 
 		// restore
-
-		renderer.inspector.finishGroup();
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );
 

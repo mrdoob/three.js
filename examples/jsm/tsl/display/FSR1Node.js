@@ -143,8 +143,6 @@ class FSR1Node extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		renderer.inspector.beginGroup( 'FSR1', this );
-
 		//
 
 		renderer.getDrawingBufferSize( _size );
@@ -155,7 +153,7 @@ class FSR1Node extends Node {
 		renderer.setRenderTarget( this._easuRT );
 
 		_quadMesh.material = this._easuMaterial;
-		_quadMesh.name = 'EASU';
+		_quadMesh.name = 'FSR1 [ EASU Pass ]';
 		_quadMesh.render( renderer );
 
 		// RCAS pass
@@ -163,12 +161,10 @@ class FSR1Node extends Node {
 		renderer.setRenderTarget( this._rcasRT );
 
 		_quadMesh.material = this._rcasMaterial;
-		_quadMesh.name = 'RCAS';
+		_quadMesh.name = 'FSR1 [ RCAS Pass ]';
 		_quadMesh.render( renderer );
 
 		//
-
-		renderer.inspector.finishGroup();
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );
 

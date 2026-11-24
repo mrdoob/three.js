@@ -167,8 +167,6 @@ class BilateralBlurNode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		renderer.inspector.beginGroup( 'Bilateral Blur', this );
-
 		//
 
 		const textureNode = this.textureNode;
@@ -191,7 +189,7 @@ class BilateralBlurNode extends Node {
 
 		this._passDirection.value.set( 1, 0 );
 
-		_quadMesh.name = 'Horizontal';
+		_quadMesh.name = 'Bilateral Blur [ Horizontal Pass ]';
 		_quadMesh.render( renderer );
 
 		// vertical
@@ -201,14 +199,12 @@ class BilateralBlurNode extends Node {
 
 		this._passDirection.value.set( 0, 1 );
 
-		_quadMesh.name = 'Vertical';
+		_quadMesh.name = 'Bilateral Blur [ Vertical Pass ]';
 		_quadMesh.render( renderer );
 
 		// restore
 
 		textureNode.value = currentTexture;
-
-		renderer.inspector.finishGroup();
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );
 

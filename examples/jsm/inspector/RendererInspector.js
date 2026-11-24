@@ -75,18 +75,6 @@ class ComputeStats extends ObjectStats {
 
 }
 
-// returns the closest call of the given type the given call is nested in
-
-function findParent( stats, type ) {
-
-	let parent = stats.parent;
-
-	while ( parent && parent[ type ] !== true ) parent = parent.parent;
-
-	return parent || null;
-
-}
-
 // returns the union of the measured call spans, or the sum of their times without timestamps
 
 function getSpanTime( children ) {
@@ -110,6 +98,96 @@ function getSpanTime( children ) {
 	}
 
 	return duration;
+
+}
+
+// splits call names like "Group [ Pass ]" or "Group [ ID ] - Pass", used by the passes of effects
+
+function parseName( name ) {
+
+	const match = /^(.+?)\s*\[\s*(.+?)\s*\]$/.exec( name ) || /^(.+\])\s*-\s*(.+)$/.exec( name );
+
+	return match !== null ? { group: match[ 1 ], pass: match[ 2 ] } : null;
+
+}
+
+function getGroupName( stats ) {
+
+	const parsed = parseName( stats.name );
+
+	return parsed !== null ? parsed.group : null;
+
+}
+
+// moves two or more consecutive calls of the same group under a call that spans them
+
+function groupStats( parent, frameId ) {
+
+	const calls = parent.children;
+	const children = [];
+	const counts = {};
+
+	for ( let i = 0; i < calls.length; ) {
+
+		const name = getGroupName( calls[ i ] );
+
+		let end = i + 1;
+
+		while ( name !== null && end < calls.length && getGroupName( calls[ end ] ) === name ) end ++;
+
+		if ( end - i < 2 ) {
+
+			children.push( calls[ i ++ ] );
+			continue;
+
+		}
+
+		counts[ name ] = ( counts[ name ] || 0 ) + 1;
+
+		const group = new ObjectStats( `${ parent.cid || '' }/${ name }/${ counts[ name ] }:f${ frameId }`, name );
+		group.parent = parent;
+		group.children = calls.slice( i, end );
+
+		const first = group.children[ 0 ];
+		const last = group.children[ group.children.length - 1 ];
+		const timed = group.children.filter( ( stats ) => stats.gpuStart !== null );
+
+		group.timestamp = first.timestamp;
+		group.cpu = last.timestamp + last.cpu - first.timestamp;
+		group.gpuNotAvailable = group.children.every( ( stats ) => stats.gpuNotAvailable );
+
+		if ( timed.length > 0 ) {
+
+			group.gpuStart = Math.min( ...timed.map( ( stats ) => stats.gpuStart ) );
+			group.gpuEnd = Math.max( ...timed.map( ( stats ) => stats.gpuEnd ) );
+			group.gpu = group.gpuEnd - group.gpuStart;
+
+		} else {
+
+			group.gpu = group.children.reduce( ( sum, stats ) => sum + stats.gpu, 0 );
+
+		}
+
+		for ( const stats of group.children ) {
+
+			stats.name = parseName( stats.name ).pass;
+			stats.parent = group;
+
+		}
+
+		children.push( group );
+
+		i = end;
+
+	}
+
+	parent.children = children;
+
+	// the new groups can be grouped as well, e.g. the lights of "Point Light Shadow [ ID ] - Face"
+
+	if ( children.length < calls.length ) return groupStats( parent, frameId );
+
+	for ( const stats of children ) groupStats( stats, frameId );
 
 }
 
@@ -155,9 +233,6 @@ export class RendererInspector extends InspectorBase {
 		this.frames = [];
 		this.framesLib = {};
 		this.maxFrames = 512;
-
-		this._groupIds = new WeakMap();
-		this._nextGroupId = 0;
 
 		this._lastFinishTime = 0;
 		this._lastRenderedFinishTime = 0;
@@ -394,6 +469,8 @@ export class RendererInspector extends InspectorBase {
 			frame.gpuSpanTime = getSpanTime( frame.children );
 			frame.gpuStart = frame.children.reduce( ( start, stats ) => stats.gpuStart !== null ? Math.min( start, stats.gpuStart ) : start, Infinity );
 
+			groupStats( frame, frame.frameId );
+
 			for ( const stats of frame.children ) resolveFrameTimes( stats, frame );
 
 			this.resolveFrame( frame );
@@ -453,64 +530,9 @@ export class RendererInspector extends InspectorBase {
 
 	}
 
-	beginGroup( name, object = null ) {
-
-		const frame = this.currentFrame;
-
-		if ( ! frame ) return;
-
-		// Object identity keeps equally named groups distinct and survives changes in their order or name.
-
-		let id = name;
-
-		if ( object !== null ) {
-
-			id = this._groupIds.get( object );
-
-			if ( id === undefined ) {
-
-				id = this._nextGroupId ++;
-				this._groupIds.set( object, id );
-
-			}
-
-		}
-
-		const parent = this.getParent();
-		const key = ( parent.cid || '' ) + ( object === null ? '/name:' : '/group:' ) + id;
-		const index = parent.children.filter( ( stats ) => stats.key === key ).length;
-
-		const group = new ObjectStats( `${ key }/${ index }:f${ frame.frameId }`, name );
-		group.key = key;
-		group.timestamp = performance.now();
-		group.parent = parent;
-
-		parent.children.push( group );
-
-		this.currentContext = group;
-
-		this._beginTimer( group );
-
-	}
-
-	finishGroup() {
-
-		const frame = this.currentFrame;
-
-		if ( ! frame ) return;
-
-		const group = this.currentContext;
-		group.cpu = performance.now() - group.timestamp;
-
-		this._endTimer( frame, group );
-
-		this.currentContext = group.parent;
-
-	}
-
 	beginCompute( uid, computeNode ) {
 
-		const frame = this.currentFrame;
+		const frame = this.getFrame();
 
 		if ( ! frame ) return;
 
@@ -530,7 +552,7 @@ export class RendererInspector extends InspectorBase {
 
 	finishCompute() {
 
-		const frame = this.currentFrame;
+		const frame = this.getFrame();
 
 		if ( ! frame ) return;
 
@@ -540,13 +562,13 @@ export class RendererInspector extends InspectorBase {
 		this._endTimer( frame, currentCompute );
 
 		this.currentContext = currentCompute.parent;
-		this.currentCompute = findParent( currentCompute, 'isComputeStats' );
+		this.currentCompute = currentCompute.parent && currentCompute.parent.isComputeStats ? currentCompute.parent : null;
 
 	}
 
 	beginRender( uid, scene, camera, renderTarget ) {
 
-		const frame = this.currentFrame;
+		const frame = this.getFrame();
 
 		if ( ! frame ) return;
 
@@ -566,7 +588,7 @@ export class RendererInspector extends InspectorBase {
 
 	finishRender() {
 
-		const frame = this.currentFrame;
+		const frame = this.getFrame();
 
 		if ( ! frame ) return;
 
@@ -576,11 +598,11 @@ export class RendererInspector extends InspectorBase {
 		this._endTimer( frame, currentRender );
 
 		this.currentContext = currentRender.parent;
-		this.currentRender = findParent( currentRender, 'isRenderStats' );
+		this.currentRender = currentRender.parent && currentRender.parent.isRenderStats ? currentRender.parent : null;
 
-		// Draw over top-level canvas renders. Groups do not change render/compute ancestry.
+		// draw over each top-level render to the canvas, the frame finishes only at the start of the next one
 
-		if ( this.overdraw === true && this._renderingOverdraw === false && this.currentRender === null && this.currentCompute === null && this.getRenderer().getRenderTarget() === null ) {
+		if ( this.overdraw === true && this._renderingOverdraw === false && currentRender.parent === frame && this.getRenderer().getRenderTarget() === null ) {
 
 			this._renderOverdraw();
 

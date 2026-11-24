@@ -1,7 +1,4 @@
 
-//addons/inspector
-import './addons/inspector/RendererInspector.tests.js';
-
 //addons/utils
 import './addons/utils/BufferGeometryUtils.tests.js';
 import './addons/utils/ColorUtils.tests.js';
