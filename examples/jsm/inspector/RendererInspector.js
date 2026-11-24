@@ -75,18 +75,6 @@ class ComputeStats extends ObjectStats {
 
 }
 
-class GroupStats extends ObjectStats {
-
-	constructor( uid, name ) {
-
-		super( uid, name );
-
-		this.isGroupStats = true;
-
-	}
-
-}
-
 // returns the closest call of the given type the given call is nested in
 
 function findParent( stats, type ) {
@@ -474,7 +462,7 @@ export class RendererInspector extends InspectorBase {
 		const key = ( parent.cid || '' ) + '/' + name;
 		const index = parent.children.filter( ( stats ) => stats.key === key ).length;
 
-		const group = new GroupStats( `${ key }/${ index }:f${ frame.frameId }`, name );
+		const group = new ObjectStats( `${ key }/${ index }:f${ frame.frameId }`, name );
 		group.key = key;
 		group.timestamp = performance.now();
 		group.parent = parent;
