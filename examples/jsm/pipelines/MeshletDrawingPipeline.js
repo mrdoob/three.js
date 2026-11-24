@@ -27,7 +27,7 @@ import {
 	Fn, If, Loop, fract, floor, screenCoordinate, vec2, vec3, vec4, uvec4, int, uint, float, max, min, clamp, ceil, log2, select, dot, bool, distance, length, normalize, textureLoad, ivec2, mat4, sqrt,
 	storage, uniform, uniformArray, instanceIndex, vertexIndex, varying, context as contextNode, overrideNodes, Return,
 	modelWorldMatrix, modelWorldMatrixInverse, modelNormalMatrix, modelPosition, modelViewPosition, mat3,
-	positionLocal, positionPrevious, normalLocal, transformNormal, velocity, materialColor,
+	positionLocal, positionPrevious, normalLocal, tangentLocal, transformNormal, velocity, materialColor,
 	cameraViewMatrix, atomicAdd, atomicStore, atomicLoad, workgroupId, localId, floatBitsToUint, workgroupArray, workgroupBarrier, packHalf2x16, unpackHalf2x16
 } from 'three/tsl';
 
@@ -622,11 +622,38 @@ function isSkinnedObject( object, geometry ) {
 const _skinReach = new WeakMap();
 
 /**
+ * Returns `true` if the skinned mesh is bound like the binding a reach was computed for: the same inverse bone
+ * matrices and the same bind matrix. The inverses are compared by identity, which the clones of a mesh share and
+ * which `SkinnedMesh.bind()` and `Skeleton.calculateInverses()` replace; matrices of a binding edited in place are
+ * not detected.
+ *
+ * @private
+ * @param {Object} cached - The cached reach and its binding.
+ * @param {SkinnedMesh} mesh - The skinned mesh.
+ * @return {boolean} Whether the binding is the same.
+ */
+function isSameBinding( cached, mesh ) {
+
+	const boneInverses = mesh.skeleton.boneInverses;
+
+	if ( cached.boneInverses.length !== boneInverses.length || cached.bindMatrix.equals( mesh.bindMatrix ) === false ) return false;
+
+	for ( let k = 0; k < boneInverses.length; k ++ ) {
+
+		if ( cached.boneInverses[ k ] !== boneInverses[ k ] ) return false;
+
+	}
+
+	return true;
+
+}
+
+/**
  * Returns, per bone of a skinned mesh, the largest distance from the bone of a vertex it moves, in the space of the
  * bone at the bind pose (`boneInverse * bindMatrix * position`), and -1 for bones moving no vertex. With normalized
  * weights, every skinned vertex is a weighted average of its positions in the frames of its bones, each within this
  * distance (times the scale of the bone) of that bone, so a sphere holding the spheres around the bones holds the
- * skinned mesh in any pose. Computed once per geometry and skeleton binding.
+ * skinned mesh in any pose. Computed once per geometry and binding: a mesh bound again is measured again.
  *
  * @private
  * @param {SkinnedMesh} mesh - The skinned mesh.
@@ -639,7 +666,7 @@ function getSkinReach( mesh, geometry ) {
 	const boneCount = skeleton.bones.length;
 	const cached = _skinReach.get( geometry );
 
-	if ( cached !== undefined && cached.length === boneCount ) return cached;
+	if ( cached !== undefined && isSameBinding( cached, mesh ) ) return cached.reach;
 
 	const reach = new Float32Array( boneCount ).fill( - 1 );
 	const { position, skinIndex, skinWeight } = geometry.attributes;
@@ -668,7 +695,7 @@ function getSkinReach( mesh, geometry ) {
 
 	}
 
-	_skinReach.set( geometry, reach );
+	_skinReach.set( geometry, { reach, boneInverses: skeleton.boneInverses.slice(), bindMatrix: mesh.bindMatrix.clone() } );
 
 	return reach;
 
@@ -2268,6 +2295,7 @@ class MeshletSkeletonPool {
 		this.attribute = new StorageBufferAttribute( this.array, 4 );
 		this.node = storage( this.attribute, 'vec4', this.array.length / 4 ).toReadOnly();
 		this.offsets = new Map();
+		this.previousOffsets = new Map();
 		this.frame = - 1;
 		this.used = 0;
 		this.retired = [];
@@ -2293,13 +2321,72 @@ class MeshletSkeletonPool {
 
 		skeleton.update();
 
-		const size = skeleton.bones.length * 4;
+		// the matrices of the last frame it was drawn in, for the previous positions of its vertices (see previousOffset())
+
+		const data = this.getData( skeleton );
+		const matrices = skeleton.boneMatrices.subarray( 0, skeleton.bones.length * 16 );
+
+		if ( data.current === null || data.current.length !== matrices.length ) {
+
+			data.current = new Float32Array( matrices.length );
+			data.previous = new Float32Array( matrices.length );
+			data.currentFrame = - 1;
+
+		}
+
+		[ data.previous, data.current ] = [ data.current, data.previous ];
+		data.previousFrame = data.currentFrame;
+		data.current.set( matrices );
+		data.currentFrame = frame;
+
+		offset = this.write( matrices );
+		this.offsets.set( skeleton, offset );
+
+		return offset;
+
+	}
+
+	/**
+	 * Returns the offset in vec4 elements of the bone matrices of the skeleton in the previous frame, for the previous
+	 * positions of the vertices (motion vectors), writing them the first time in the frame. A skeleton that was not
+	 * drawn in the previous frame has no motion: its current matrices are returned.
+	 *
+	 * @param {Skeleton} skeleton - The skeleton.
+	 * @param {number} frame - The current frame.
+	 * @return {number} The offset.
+	 */
+	previousOffset( skeleton, frame ) {
+
+		const current = this.offset( skeleton, frame );
+
+		let offset = this.previousOffsets.get( skeleton );
+
+		if ( offset !== undefined ) return offset;
+
+		const data = this.getData( skeleton );
+
+		offset = data.previousFrame === frame - 1 ? this.write( data.previous ) : current;
+		this.previousOffsets.set( skeleton, offset );
+
+		return offset;
+
+	}
+
+	/**
+	 * Appends matrices to the buffer of the frame and adds them to its update range.
+	 *
+	 * @param {Float32Array} matrices - The matrices.
+	 * @return {number} Their offset in vec4 elements.
+	 */
+	write( matrices ) {
+
+		const size = matrices.length / 4;
 
 		if ( ( this.used + size ) * 4 > this.array.length ) this.grow( ( this.used + size ) * 2 );
 
-		offset = this.used;
+		const offset = this.used;
 
-		this.array.set( skeleton.boneMatrices.subarray( 0, size * 4 ), offset * 4 );
+		this.array.set( matrices, offset * 4 );
 
 		// the skeletons of a frame are written one after the other: one update range holds them, uploaded at once
 
@@ -2318,9 +2405,30 @@ class MeshletSkeletonPool {
 
 		this.attribute.needsUpdate = true;
 		this.used += size;
-		this.offsets.set( skeleton, offset );
 
 		return offset;
+
+	}
+
+	/**
+	 * Returns the data the pool keeps per skeleton: the reach of its bones over its meshes and the sphere they bound,
+	 * see margin(), and its matrices of the last two frames it was drawn in, see previousOffset().
+	 *
+	 * @param {Skeleton} skeleton - The skeleton.
+	 * @return {Object} The data.
+	 */
+	getData( skeleton ) {
+
+		let data = this.skeletons.get( skeleton );
+
+		if ( data === undefined || data.reach.length !== skeleton.bones.length ) {
+
+			data = { reach: new Float32Array( skeleton.bones.length ).fill( - 1 ), merged: new WeakMap(), frame: - 1, sphere: new Float32Array( 4 ), current: null, previous: null, currentFrame: - 1, previousFrame: - 1 };
+			this.skeletons.set( skeleton, data );
+
+		}
+
+		return data;
 
 	}
 
@@ -2336,31 +2444,25 @@ class MeshletSkeletonPool {
 	 */
 	margin( mesh, geometry, frame ) {
 
-		const skeleton = mesh.skeleton;
+		const data = this.getData( mesh.skeleton );
 
-		let data = this.skeletons.get( skeleton );
+		// the reach of each geometry is merged once per binding: a mesh bound again is measured again, and the
+		// skeleton keeps the larger reach, which still holds every vertex
 
-		if ( data === undefined || data.reach.length !== skeleton.bones.length ) {
+		const reach = getSkinReach( mesh, geometry );
 
-			data = { reach: new Float32Array( skeleton.bones.length ).fill( - 1 ), merged: new WeakSet(), frame: - 1, sphere: new Float32Array( 4 ) };
-			this.skeletons.set( skeleton, data );
-
-		}
-
-		if ( data.merged.has( geometry ) === false ) {
-
-			const reach = getSkinReach( mesh, geometry );
+		if ( data.merged.get( geometry ) !== reach ) {
 
 			for ( let k = 0; k < reach.length; k ++ ) data.reach[ k ] = Math.max( data.reach[ k ], reach[ k ] );
 
-			data.merged.add( geometry );
+			data.merged.set( geometry, reach );
 			data.frame = - 1;
 
 		}
 
 		if ( data.frame !== frame ) {
 
-			skinSphere( skeleton.bones, data.reach, data.sphere );
+			skinSphere( mesh.skeleton.bones, data.reach, data.sphere );
 			data.frame = frame;
 
 		}
@@ -2381,6 +2483,7 @@ class MeshletSkeletonPool {
 
 		this.retired.length = 0;
 		this.offsets.clear();
+		this.previousOffsets.clear();
 		this.used = 0;
 		this.frame = frame;
 
@@ -3153,19 +3256,37 @@ class MeshletBatch {
 			// a skinned mesh: its matrices from the y of its instance data, see MeshletBatch.writeSkin()
 
 			const skin = this.skinned === true ? this.skinNodes.node : null;
-			const skinBase = skin !== null ? uint( instanceData.element( instance.mul( stride ) ).y ) : null;
+			const skinData = skin !== null ? instanceData.element( instance.mul( stride ) ) : null;
 
 			positionNode = Fn( ( builder ) => {
 
-				// the vertex is skinned in the space of the mesh before the instance matrix, as SkinnedMesh does
+				// the vertex is skinned in the space of the mesh before the instance matrix, as the skinning of node
+				// materials does: its position, normal and tangent, and its previous position with the bones of the
+				// previous frame
 
 				if ( skin !== null ) {
 
-					const skinned = getSkinMatrix( this.skinNodes, instance, skinBase, attribute( 'skinIndex', vertex ), attribute( 'skinWeight', vertex ) ).toVar();
+					const skinIndex = attribute( 'skinIndex', vertex );
+					const skinWeight = attribute( 'skinWeight', vertex );
+					const skinned = getSkinMatrix( this.skinNodes, instance, uint( skinData.y ), skinIndex, skinWeight ).toVar();
+
+					if ( builder.needsPreviousData() ) {
+
+						const previousSkinned = getSkinMatrix( this.skinNodes, instance, uint( skinData.w ), skinIndex, skinWeight );
+
+						positionPrevious.assign( previousSkinned.mul( vec4( positionPrevious, 1.0 ) ).xyz );
+
+					}
 
 					positionLocal.assign( skinned.mul( vec4( positionLocal, 1.0 ) ).xyz );
 
-					if ( builder.hasGeometryAttribute( 'normal' ) ) normalLocal.assign( normalize( mat3( skinned ).mul( normalLocal ) ) );
+					if ( builder.hasGeometryAttribute( 'normal' ) ) {
+
+						normalLocal.assign( normalize( mat3( skinned ).mul( normalLocal ) ) );
+
+						if ( builder.hasGeometryAttribute( 'tangent' ) ) tangentLocal.assign( mat3( skinned ).mul( tangentLocal ) );
+
+					}
 
 				}
 
@@ -3520,6 +3641,19 @@ class MeshletBatch {
 	}
 
 	/**
+	 * Returns the offset of the bone matrices of the previous frame of the skeleton of a skinned mesh in the pool, for
+	 * the previous positions of its vertices when the batch keeps the previous transforms (motion vectors).
+	 *
+	 * @param {SkinnedMesh} mesh - The skinned mesh.
+	 * @return {number} The offset in vec4 elements.
+	 */
+	writePreviousSkin( mesh ) {
+
+		return this.skeletons.previousOffset( mesh.skeleton, this.renderer.info.frame );
+
+	}
+
+	/**
 	 * Writes the transforms, bounds, levels and instance data of the objects which changed since the last upload
 	 * and adds the update ranges of the written slots, per buffer.
 	 *
@@ -3725,18 +3859,21 @@ class MeshletBatch {
 
 					}
 
-					// a skinned mesh: its bones, the offset of its bones (y) and the margin of its skeleton in world
-					// units (z), see writeSkin() and MeshletSkeletonPool.margin()
+					// a skinned mesh: its bones, the offset of its bones (y), the margin of its skeleton in world
+					// units (z) and, for motion vectors, the offset of its bones in the previous frame (w), see
+					// writeSkin(), writePreviousSkin() and MeshletSkeletonPool.margin()
 
 					if ( this.skinned === true && mesh.isSkinnedMesh === true ) {
 
 						const base = this.writeSkin( mesh, slot );
 						const margin = Math.fround( this.skeletons.margin( mesh, mesh.geometry, this.renderer.info.frame ) );
+						const previousBase = this.history === true ? this.writePreviousSkin( mesh ) : base;
 
-						if ( instanceDataArray[ index + 1 ] !== base || instanceDataArray[ index + 2 ] !== margin ) {
+						if ( instanceDataArray[ index + 1 ] !== base || instanceDataArray[ index + 2 ] !== margin || instanceDataArray[ index + 3 ] !== previousBase ) {
 
 							instanceDataArray[ index + 1 ] = base;
 							instanceDataArray[ index + 2 ] = margin;
+							instanceDataArray[ index + 3 ] = previousBase;
 							dataChanged = true;
 
 						}

@@ -264,6 +264,73 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+			QUnit.test( 'the previous bone matrices of a skeleton are those of the frame before', ( assert ) => {
+
+				const pool = new MeshletSkeletonPool();
+				const { mesh, bones } = createLimb();
+				const matricesAt = ( offset ) => Array.from( pool.array.subarray( offset * 4, offset * 4 + 48 ) );
+
+				const first = pool.previousOffset( mesh.skeleton, 1 );
+				assert.strictEqual( first, pool.offset( mesh.skeleton, 1 ), 'drawn for the first time: no motion, the current matrices' );
+
+				const before = Array.from( mesh.skeleton.boneMatrices );
+				bones[ 1 ].rotation.z = 0.9;
+				mesh.updateMatrixWorld( true );
+
+				const current = pool.offset( mesh.skeleton, 2 );
+				const previous = pool.previousOffset( mesh.skeleton, 2 );
+
+				assert.notStrictEqual( previous, current, 'the next frame keeps both poses' );
+				assert.deepEqual( matricesAt( previous ), before, 'the previous matrices are the last frame\'s' );
+				assert.deepEqual( matricesAt( current ), Array.from( mesh.skeleton.boneMatrices ), 'the current ones are this frame\'s' );
+				assert.strictEqual( pool.previousOffset( mesh.skeleton, 2 ), previous, 'written once a frame' );
+
+				pool.offset( mesh.skeleton, 5 );
+				assert.strictEqual( pool.previousOffset( mesh.skeleton, 5 ), pool.offset( mesh.skeleton, 5 ), 'not drawn in the frame before: no motion' );
+
+				pool.dispose();
+
+			} );
+
+			QUnit.test( 'a skinned mesh bound again is measured again', ( assert ) => {
+
+				const pool = new MeshletSkeletonPool();
+				const { mesh, bones, geometry } = createLimb();
+
+				bones[ 1 ].rotation.z = 1.3;
+				mesh.updateMatrixWorld( true );
+				mesh.skeleton.update();
+				pool.margin( mesh, geometry, 1 );
+
+				// bound again with the joints bunched at the base: the vertices of the upper limb lie far from their bones
+
+				bones[ 1 ].rotation.z = 0;
+				bones[ 1 ].position.y = 0.2;
+				bones[ 2 ].position.y = 0.2;
+				mesh.updateMatrixWorld( true );
+				mesh.skeleton.calculateInverses();
+
+				// then posed: the upper limb swings around the bunched joints
+
+				bones[ 0 ].rotation.z = 1.4;
+				bones[ 1 ].rotation.x = - 1.1;
+				mesh.updateMatrixWorld( true );
+				mesh.skeleton.update();
+
+				const fresh = new MeshletSkeletonPool();
+				const expected = fresh.margin( mesh, geometry, 2 );
+				const margin = pool.margin( mesh, geometry, 2 );
+
+				assert.ok( getOvershoot( mesh, margin ) <= 1e-4, 'no vertex outside the bounds of the new binding' );
+				assert.ok( margin >= expected - 1e-5, 'as wide as a pool that only saw the new binding' );
+				assert.ok( getOvershoot( mesh, 0 ) > 0.1, 'control: this pose needs a margin' );
+
+				fresh.dispose();
+
+				pool.dispose();
+
+			} );
+
 			QUnit.test( 'lodTransition separates opaque and dithered draw queues', async ( assert ) => {
 
 				await clusterProcessingReady;
