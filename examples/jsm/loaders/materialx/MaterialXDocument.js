@@ -738,6 +738,21 @@ class MaterialXNode {
 
 	}
 
+	// the geometric property each nodedef input defaults to by input name, e.g. { normal: 'Nworld' }
+	getInputGeomProps() {
+
+		const geomProps = {};
+		const inputs = this.nodeDef !== null ? this.nodeDef.inputs : {};
+		for ( const name in inputs ) {
+
+			geomProps[ name ] = inputs[ name ].defaultgeomprop;
+
+		}
+
+		return geomProps;
+
+	}
+
 	// nodes without a nodedef (e.g. from a host node resolver) accept any input
 	declaresInput( name ) {
 
@@ -833,7 +848,7 @@ class MaterialXNode {
 		if ( mapper ) {
 
 			const authored = this.getNodes();
-			mapper.apply( material, { ...this.getDefaultInputNodes(), ...authored }, this.materialX.log, this.name, authored, this.getInputTypes() );
+			mapper.apply( material, { ...this.getDefaultInputNodes(), ...authored }, this.materialX.log, this.name, authored, this.getInputTypes(), this.getInputGeomProps() );
 
 		} else {
 

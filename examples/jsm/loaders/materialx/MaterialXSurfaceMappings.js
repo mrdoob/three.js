@@ -1,6 +1,6 @@
 import { AddEquation, CustomBlending, DoubleSide, OneFactor, OneMinusSrcAlphaFactor } from 'three/webgpu';
 import { MaterialXLogCodes } from './MaterialXLog.js';
-import { Fn, float, vec3, mul, sub, dot, clamp, vec2, cos, sin, pow, mix, element, transformNormalToView, positionLocal, normalLocal, tangentLocal, bitangentLocal } from 'three/tsl';
+import { Fn, float, vec3, mul, sub, dot, clamp, vec2, cos, sin, pow, mix, element, transformNormalToView, transformNormalByViewMatrix, cameraViewMatrix, positionLocal, normalLocal, tangentLocal, bitangentLocal } from 'three/tsl';
 
 const mappedStandardSurfaceInputs = new Set( [
 	'base',
@@ -203,8 +203,25 @@ function toAttenuationDistance( distanceNode, hasAttenuationColorInput ) {
 
 }
 
+// Transforms a normal input to view space from the space its nodedef declares it in: an input that
+// defaults to `Nworld` is a world space normal, and an object space normal otherwise.
+function toNormalView( normalNode, geomProp ) {
+
+	if ( geomProp === 'Nworld' ) {
+
+		return transformNormalByViewMatrix( normalNode, cameraViewMatrix );
+
+	} else {
+
+		return transformNormalToView( normalNode );
+
+	}
+
+}
+
 // `inputs` includes the nodedef defaults, `authored` only the inputs present in the document.
-function applyStandardSurface( material, inputs, log, nodeName, authored ) {
+// `geomProps` holds the geometric property each input defaults to.
+function applyStandardSurface( material, inputs, log, nodeName, authored, inputTypes, geomProps = {} ) {
 
 	const coatEnabled = isEnabledWeightNode( inputs.coat );
 	const sheenEnabled = isEnabledWeightNode( inputs.sheen );
@@ -272,11 +289,11 @@ function applyStandardSurface( material, inputs, log, nodeName, authored ) {
 
 		material.clearcoatNode = inputs.coat;
 		material.clearcoatRoughnessNode = inputs.coat_roughness;
-		if ( hasNodeValue( inputs.coat_normal ) ) material.clearcoatNormalNode = transformNormalToView( inputs.coat_normal );
+		if ( hasNodeValue( inputs.coat_normal ) ) material.clearcoatNormalNode = toNormalView( inputs.coat_normal, geomProps.coat_normal );
 
 	}
 
-	if ( hasNodeValue( inputs.normal ) ) material.normalNode = transformNormalToView( inputs.normal );
+	if ( hasNodeValue( inputs.normal ) ) material.normalNode = toNormalView( inputs.normal, geomProps.normal );
 	if ( isEffectivelyZero( inputs.emission ) === false ) material.emissiveNode = mul( inputs.emission, inputs.emission_color );
 
 	setTransmissionFlags( material, inputs.transmission, opacityNode );
@@ -284,7 +301,7 @@ function applyStandardSurface( material, inputs, log, nodeName, authored ) {
 
 }
 
-function applyGltfPbrSurface( material, inputs, log, nodeName, authored ) {
+function applyGltfPbrSurface( material, inputs, log, nodeName, authored, inputTypes, geomProps = {} ) {
 
 	// alpha_mode: 0 = OPAQUE, 1 = MASK, 2 = BLEND. A connected alpha_mode is treated as BLEND.
 	const alphaModeLiteral = getConstNumber( inputs.alpha_mode );
@@ -324,7 +341,7 @@ function applyGltfPbrSurface( material, inputs, log, nodeName, authored ) {
 
 		material.clearcoatNode = inputs.clearcoat;
 		material.clearcoatRoughnessNode = inputs.clearcoat_roughness;
-		if ( hasNodeValue( inputs.clearcoat_normal ) ) material.clearcoatNormalNode = transformNormalToView( inputs.clearcoat_normal );
+		if ( hasNodeValue( inputs.clearcoat_normal ) ) material.clearcoatNormalNode = toNormalView( inputs.clearcoat_normal, geomProps.clearcoat_normal );
 
 	}
 
@@ -358,7 +375,7 @@ function applyGltfPbrSurface( material, inputs, log, nodeName, authored ) {
 
 	setAnisotropy( material, inputs.anisotropy_strength, inputs.anisotropy_rotation );
 
-	if ( hasNodeValue( inputs.normal ) ) material.normalNode = transformNormalToView( inputs.normal );
+	if ( hasNodeValue( inputs.normal ) ) material.normalNode = toNormalView( inputs.normal, geomProps.normal );
 	if ( isEffectivelyZero( inputs.emissive ) === false ) material.emissiveNode = mul( inputs.emissive, inputs.emissive_strength );
 
 	setTransmissionFlags( material, inputs.transmission, opacityNode, isAlphaBlendMode );
@@ -366,7 +383,7 @@ function applyGltfPbrSurface( material, inputs, log, nodeName, authored ) {
 
 }
 
-function applyOpenPbrSurface( material, inputs, log, nodeName, authored ) {
+function applyOpenPbrSurface( material, inputs, log, nodeName, authored, inputTypes, geomProps = {} ) {
 
 	const coatEnabled = isEnabledWeightNode( inputs.coat_weight );
 	const fuzzEnabled = isEnabledWeightNode( inputs.fuzz_weight );
@@ -391,7 +408,7 @@ function applyOpenPbrSurface( material, inputs, log, nodeName, authored ) {
 		const normalizedClearcoatNode = coatF0Node.mul( coatF0Node ).div( float( 0.04 ) );
 		material.clearcoatNode = clamp( inputs.coat_weight.mul( normalizedClearcoatNode ), float( 0 ), float( 1 ) );
 		material.clearcoatRoughnessNode = inputs.coat_roughness;
-		if ( hasNodeValue( inputs.geometry_coat_normal ) ) material.clearcoatNormalNode = transformNormalToView( inputs.geometry_coat_normal );
+		if ( hasNodeValue( inputs.geometry_coat_normal ) ) material.clearcoatNormalNode = toNormalView( inputs.geometry_coat_normal, geomProps.geometry_coat_normal );
 
 	}
 
@@ -430,7 +447,7 @@ function applyOpenPbrSurface( material, inputs, log, nodeName, authored ) {
 	}
 
 	if ( isMeaningfulNode( inputs.geometry_opacity, 1 ) ) material.opacityNode = inputs.geometry_opacity;
-	if ( hasNodeValue( inputs.geometry_normal ) ) material.normalNode = transformNormalToView( inputs.geometry_normal );
+	if ( hasNodeValue( inputs.geometry_normal ) ) material.normalNode = toNormalView( inputs.geometry_normal, geomProps.geometry_normal );
 
 	if ( thinFilmEnabled ) {
 
