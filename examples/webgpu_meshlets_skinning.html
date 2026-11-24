@@ -94,6 +94,23 @@
 
 			let renderer, scene, camera, controls, pipelines, sunLight;
 			let templates = [];
+
+			// mulberry32: a small seeded random
+
+			function createRandom( seed ) {
+
+				return () => {
+
+					seed = ( seed + 0x6D2B79F5 ) | 0;
+					let t = Math.imul( seed ^ ( seed >>> 15 ), 1 | seed );
+					t = ( t + Math.imul( t ^ ( t >>> 7 ), 61 | t ) ) ^ t;
+
+					return ( ( t ^ ( t >>> 14 ) ) >>> 0 ) / 4294967296;
+
+				};
+
+			}
+
 			let crowd = null;
 			let sceneTriangles = 0;
 			const mixers = [];
@@ -256,8 +273,10 @@
 				mixers.length = 0;
 				crowd = new THREE.Group();
 
-				// a square grid around the center, each character with its own skeleton, clip, phase and pace
+				// a square grid around the center, each character with its own skeleton, clip, phase and pace. the
+				// crowd draws from its own seeded random, so it is the same on every load whatever else calls Math.random()
 
+				const random = createRandom( 1 );
 				const count = parameters.characters;
 				const side = Math.ceil( Math.sqrt( count ) );
 
@@ -272,20 +291,20 @@
 					group.add( character );
 					group.scale.setScalar( template.scale );
 					group.position.set(
-						( i % side - ( side - 1 ) / 2 ) * SPACING + ( Math.random() - 0.5 ) * SPACING * 0.3,
+						( i % side - ( side - 1 ) / 2 ) * SPACING + ( random() - 0.5 ) * SPACING * 0.3,
 						template.groundOffset,
-						( Math.floor( i / side ) - ( side - 1 ) / 2 ) * SPACING + ( Math.random() - 0.5 ) * SPACING * 0.3
+						( Math.floor( i / side ) - ( side - 1 ) / 2 ) * SPACING + ( random() - 0.5 ) * SPACING * 0.3
 					);
-					group.rotation.y = Math.random() * Math.PI * 2;
+					group.rotation.y = random() * Math.PI * 2;
 
 					const mixer = new THREE.AnimationMixer( character );
-					const clip = template.clips[ Math.floor( Math.random() * template.clips.length ) ];
+					const clip = template.clips[ Math.floor( random() * template.clips.length ) ];
 
 					if ( clip !== undefined ) {
 
 						const action = mixer.clipAction( clip );
-						action.time = Math.random() * clip.duration;
-						action.timeScale = 0.8 + Math.random() * 0.4;
+						action.time = random() * clip.duration;
+						action.timeScale = 0.8 + random() * 0.4;
 						action.play();
 
 					}
