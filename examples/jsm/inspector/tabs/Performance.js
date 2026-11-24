@@ -187,6 +187,8 @@ class Performance extends Tab {
 
 			item = new Item( createValueSpan(), createValueSpan(), createValueSpan() );
 
+			if ( stats.name !== 'Render Pipeline' ) item.close();
+
 			if ( stats.name ) {
 
 				if ( stats.isComputeStats === true ) {
