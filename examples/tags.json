@@ -139,6 +139,7 @@
 	"webgpu_meshlets_instanced": [ "gpgpu", "nanite", "gpu driven" ],
 	"webgpu_meshlets_materials": [ "gpgpu", "nanite", "gpu driven" ],
 	"webgpu_meshlets_meshes": [ "gpgpu", "nanite", "gpu driven" ],
+	"webgpu_meshlets_skinning": [ "gpgpu", "nanite", "gpu driven", "skinning", "animation", "gltf", "fbx", "collada" ],
 	"webgpu_mirror": [ "reflection" ],
 	"webgpu_multiple_rendertargets": [ "mrt" ],
 	"webgpu_multiple_rendertargets_readback": [ "mrt" ],

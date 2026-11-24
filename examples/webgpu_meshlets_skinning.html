@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - meshlets skinning</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - meshlets skinning">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_meshlets_skinning.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_meshlets_skinning.jpg">
+		<link rel="icon" href="data:,">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Meshlets Skinning</span>
+			</div>
+
+			<small>
+				A crowd of skinned characters from glTF, FBX and Collada files, each with its own skeleton and animation,<br />
+				culled and simplified per cluster on the GPU.<br />
+				<span id="status" role="status">Loading...</span><br />
+				<span id="stats"></span>
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+			import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { MeshletDrawingPipeline } from 'three/addons/pipelines/MeshletDrawingPipeline.js';
+			import { VisibilityBufferDrawingPipeline } from 'three/addons/pipelines/VisibilityBufferDrawingPipeline.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
+
+			// the characters: each file with the loader of its format and the clips it is animated with
+
+			const CHARACTERS = [
+				{ name: 'Soldier', format: 'glTF', url: 'models/gltf/Soldier.glb', clips: [ 'Idle', 'Walk', 'Run' ] },
+				{ name: 'Xbot', format: 'glTF', url: 'models/gltf/Xbot.glb', clips: [ 'idle', 'walk', 'run' ] },
+				{ name: 'Michelle', format: 'glTF', url: 'models/gltf/Michelle.glb', clips: [ 'SambaDance' ] },
+				{ name: 'Robot', format: 'glTF', url: 'models/gltf/RobotExpressive/RobotExpressive.glb', clips: [ 'Idle', 'Walking', 'Running', 'Dance', 'Wave' ] },
+				{ name: 'Samba', format: 'FBX', url: 'models/fbx/Samba Dancing.fbx', clips: null },
+				{ name: 'Stormtrooper', format: 'Collada', url: 'models/collada/stormtrooper/stormtrooper.dae', clips: null }
+			];
+
+			const SPACING = 2.2;
+			const HEIGHT = 1.8;
+
+			const parameters = {
+				pipeline: 'Meshlet',
+				characters: 256,
+				occlusion: true,
+				meshlets: false,
+				lod: 1,
+				lodTransition: 0.5,
+				animate: true,
+				rotate: true
+			};
+
+			const status = document.getElementById( 'status' );
+			const stats = document.getElementById( 'stats' );
+			const timer = new THREE.Timer();
+
+			let renderer, scene, camera, controls, pipelines, sunLight;
+			let templates = [];
+			let crowd = null;
+			let sceneTriangles = 0;
+			const mixers = [];
+
+			init().catch( error => {
+
+				status.textContent = error.message;
+				console.error( error );
+
+			} );
+
+			async function init() {
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				const options = { occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod, lodTransition: parameters.lodTransition, shadowLodThreshold: parameters.lod };
+
+				pipelines = {
+					'Meshlet': new MeshletDrawingPipeline( options ),
+					'Visibility Buffer': new VisibilityBufferDrawingPipeline( options ),
+					'Default (slow)': renderer.drawingPipeline
+				};
+
+				renderer.drawingPipeline = pipelines[ parameters.pipeline ];
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x2e2a33 );
+				scene.fog = new THREE.FogExp2( 0x2e2a33, 0.012 );
+				scene.environment = new THREE.PMREMGenerator( renderer ).fromScene( new RoomEnvironment(), 0.04 ).texture;
+				scene.environmentIntensity = 0.5;
+
+				scene.add( new THREE.HemisphereLight( 0x9fb4d9, 0x4a3b30, 0.8 ) );
+
+				sunLight = new THREE.DirectionalLight( 0xffc58f, 3 );
+				sunLight.position.set( - 30, 40, 20 );
+				sunLight.castShadow = true;
+				sunLight.shadow.mapSize.setScalar( 4096 );
+				sunLight.shadow.normalBias = 0.03;
+				scene.add( sunLight );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 400 );
+				camera.position.set( 14, 9, 22 );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 1, 0 );
+				controls.enableDamping = true;
+				controls.autoRotate = parameters.rotate;
+				controls.autoRotateSpeed = 0.3;
+				controls.minDistance = 2;
+				controls.maxDistance = 150;
+				controls.maxPolarAngle = Math.PI * 0.49;
+				controls.update();
+
+				const ground = new THREE.Mesh( new THREE.CircleGeometry( 300, 64 ), new THREE.MeshStandardNodeMaterial( { color: 0x6b5d50, roughness: 0.9 } ) );
+				ground.rotation.x = - Math.PI / 2;
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+				status.textContent = 'Loading characters...';
+
+				templates = await Promise.all( CHARACTERS.map( loadCharacter ) );
+
+				createCrowd();
+				createGUI();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				await prepare();
+
+			}
+
+			// loads a character with the loader of its format, stands it on the ground with the same height as the others
+
+			async function loadCharacter( character ) {
+
+				let root, animations;
+
+				if ( character.format === 'glTF' ) {
+
+					const gltf = await new GLTFLoader().loadAsync( character.url );
+					root = gltf.scene;
+					animations = gltf.animations;
+
+				} else if ( character.format === 'FBX' ) {
+
+					root = await new FBXLoader().loadAsync( character.url );
+					animations = root.animations;
+
+				} else {
+
+					const collada = await new ColladaLoader().loadAsync( character.url );
+					root = collada.scene;
+					animations = root.animations;
+
+					// the tracks of Collada files target their nodes by uuid, which the clones don't keep: target them by name
+
+					const names = new Map();
+					root.traverse( ( object ) => names.set( object.uuid, object.name ) );
+
+					for ( const clip of animations ) {
+
+						for ( const track of clip.tracks ) {
+
+							const dot = track.name.indexOf( '.' );
+							const name = names.get( track.name.slice( 0, dot ) );
+
+							if ( name ) track.name = name + track.name.slice( dot );
+
+						}
+
+					}
+
+				}
+
+				// the clips by name, or all the clips of the file but the empty ones, like the "Take 001" of some FBX files
+
+				const clips = character.clips !== null ? character.clips.map( ( name ) => THREE.AnimationClip.findByName( animations, name ) ).filter( Boolean ) : animations.filter( ( clip ) => clip.tracks.length > 0 );
+
+				// the height of the bind pose sets the scale. the box includes the transform of the root, like the up axis
+				// conversion of Collada files
+
+				root.updateMatrixWorld( true );
+
+				const box = new THREE.Box3().setFromObject( root );
+				const scale = HEIGHT / box.getSize( new THREE.Vector3() ).y;
+
+				root.traverse( ( object ) => {
+
+					if ( object.isSkinnedMesh ) {
+
+						object.castShadow = true;
+						object.receiveShadow = true;
+
+					}
+
+				} );
+
+				return { ...character, root, clips, scale, groundOffset: - box.min.y * scale };
+
+			}
+
+			function createCrowd() {
+
+				if ( crowd !== null ) {
+
+					scene.remove( crowd );
+
+					for ( const mixer of mixers ) mixer.stopAllAction();
+
+				}
+
+				mixers.length = 0;
+				crowd = new THREE.Group();
+
+				// a square grid around the center, each character with its own skeleton, clip, phase and pace
+
+				const count = parameters.characters;
+				const side = Math.ceil( Math.sqrt( count ) );
+
+				for ( let i = 0; i < count; i ++ ) {
+
+					const template = templates[ i % templates.length ];
+					const character = SkeletonUtils.clone( template.root );
+
+					// the clone keeps the transform of its file, the group places and turns it
+
+					const group = new THREE.Group();
+					group.add( character );
+					group.scale.setScalar( template.scale );
+					group.position.set(
+						( i % side - ( side - 1 ) / 2 ) * SPACING + ( Math.random() - 0.5 ) * SPACING * 0.3,
+						template.groundOffset,
+						( Math.floor( i / side ) - ( side - 1 ) / 2 ) * SPACING + ( Math.random() - 0.5 ) * SPACING * 0.3
+					);
+					group.rotation.y = Math.random() * Math.PI * 2;
+
+					const mixer = new THREE.AnimationMixer( character );
+					const clip = template.clips[ Math.floor( Math.random() * template.clips.length ) ];
+
+					if ( clip !== undefined ) {
+
+						const action = mixer.clipAction( clip );
+						action.time = Math.random() * clip.duration;
+						action.timeScale = 0.8 + Math.random() * 0.4;
+						action.play();
+
+					}
+
+					mixers.push( mixer );
+					crowd.add( group );
+
+				}
+
+				scene.add( crowd );
+
+				sceneTriangles = countTriangles();
+
+				// fit the shadow camera to the crowd
+
+				const extent = side * SPACING / 2 + SPACING;
+				const shadowCamera = sunLight.shadow.camera;
+				shadowCamera.left = shadowCamera.bottom = - extent;
+				shadowCamera.right = shadowCamera.top = extent;
+				shadowCamera.near = 1;
+				shadowCamera.far = sunLight.position.length() + extent * 1.5;
+				shadowCamera.updateProjectionMatrix();
+
+			}
+
+			async function prepare() {
+
+				renderer.setAnimationLoop( null );
+
+				status.textContent = 'Preparing characters...';
+
+				try {
+
+					renderer.drawingPipeline = pipelines[ parameters.pipeline ];
+
+					await renderer.compileAsync( scene, camera );
+
+					status.textContent = '';
+
+				} catch ( error ) {
+
+					status.textContent = error.message;
+					console.error( error );
+
+				} finally {
+
+					renderer.setAnimationLoop( animate );
+
+				}
+
+			}
+
+			function createGUI() {
+
+				// the meshlet drawing pipelines share the settings, the default drawing pipeline ignores them
+
+				const meshletPipelines = [ pipelines[ 'Meshlet' ], pipelines[ 'Visibility Buffer' ] ];
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+
+				gui.add( parameters, 'pipeline', Object.keys( pipelines ) ).name( 'Pipeline' ).onChange( () => {
+
+					updateGUI();
+					prepare();
+
+				} );
+
+				gui.add( parameters, 'characters', { '64': 64, '256': 256, '1,024': 1024 } ).name( 'Characters' ).onChange( () => {
+
+					createCrowd();
+					prepare();
+
+				} );
+
+				gui.add( parameters, 'lod', 1, 8, 0.5 ).name( 'LOD error (px)' ).onChange( value => {
+
+					for ( const pipeline of meshletPipelines ) {
+
+						pipeline.lodThreshold = value;
+						pipeline.shadowLodThreshold = value;
+
+					}
+
+				} );
+
+				const lodTransition = gui.add( parameters, 'lodTransition', 0, 1, 0.05 ).name( 'LOD transition' ).onChange( value => {
+
+					for ( const pipeline of meshletPipelines ) pipeline.lodTransition = value;
+
+				} );
+
+				gui.add( parameters, 'occlusion' ).name( 'Occlusion culling' ).onChange( value => {
+
+					for ( const pipeline of meshletPipelines ) pipeline.occlusionCulling = value;
+
+					prepare();
+
+				} );
+
+				gui.add( parameters, 'meshlets' ).name( 'Show meshlets' ).onChange( value => {
+
+					for ( const pipeline of meshletPipelines ) pipeline.debug = value;
+
+					renderer.toneMapping = value ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping;
+
+					prepare();
+
+				} );
+
+				gui.add( parameters, 'animate' ).name( 'Animate' );
+				gui.add( parameters, 'rotate' ).name( 'Auto rotate' ).onChange( value => controls.autoRotate = value );
+
+				function updateGUI() {
+
+					parameters.pipeline !== 'Default (slow)' ? lodTransition.show() : lodTransition.hide();
+
+				}
+
+				updateGUI();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function formatCount( value ) {
+
+				if ( value >= 1e9 ) return ( value / 1e9 ).toFixed( 1 ) + 'B';
+				if ( value >= 1e6 ) return ( value / 1e6 ).toFixed( 1 ) + 'M';
+				if ( value >= 1e3 ) return ( value / 1e3 ).toFixed( 0 ) + 'k';
+
+				return value.toString();
+
+			}
+
+			function countTriangles() {
+
+				let triangles = 0;
+
+				crowd.traverse( ( object ) => {
+
+					if ( object.isSkinnedMesh ) triangles += ( object.geometry.index !== null ? object.geometry.index.count : object.geometry.attributes.position.count ) / 3;
+
+				} );
+
+				return triangles;
+
+			}
+
+			function animate( time ) {
+
+				timer.update( time );
+
+				const delta = timer.getDelta();
+
+				if ( parameters.animate ) {
+
+					for ( const mixer of mixers ) mixer.update( delta );
+
+				}
+
+				controls.update( delta );
+
+				renderer.render( scene, camera );
+
+				let text = `${ formatCount( sceneTriangles ) } skinned triangles in the scene`;
+
+				if ( renderer.drawingPipeline !== pipelines[ 'Default (slow)' ] ) {
+
+					const info = renderer.drawingPipeline.info;
+
+					text += ` | ${ formatCount( info.triangles ) } drawn in ${ formatCount( info.clusters ) } clusters`;
+
+				}
+
+				stats.textContent = text;
+
+			}
+
+		</script>
+	</body>
+</html>

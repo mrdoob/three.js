@@ -16,6 +16,7 @@ import {
 	Matrix4,
 	FrontSide,
 	BackSide,
+	AttachedBindMode,
 	NoBlending,
 	VSMShadowMap,
 	NodeMaterial,
@@ -109,6 +110,14 @@ const COVERAGE_SHIFT = 25;
 const FLAG_CONE = 1;
 const FLAG_FAR = 2;
 const FLAG_DITHER = 4;
+
+// skinned meshes: their clusters are not culled one by one, the object is culled by the bounds of its skeleton
+
+const FLAG_SKINNED = 8;
+
+// the largest margin a half float stores after rounding up: clusters of skinned meshes are never culled on their own
+
+const UNBOUNDED_HALF_MARGIN = 60000;
 const MAX_UNUSED_PROJECTIONS = 60;
 
 // the shared attribute of the vertex pulling geometries, the number of vertices limits the hardware draws of the visibility buffer drawing pipeline
@@ -556,9 +565,221 @@ function createDeformation( positionNode, instanceMatrix, instance, bounds, { un
  * @param {?Material} farMaterial - The material beyond the switch distance of merged levels.
  * @return {string} The key.
  */
-function getEntryKey( receiveShadow, instanced, instanceColor, farMaterial ) {
+function getEntryKey( receiveShadow, instanced, instanceColor, farMaterial, skinned = false ) {
 
-	return ( receiveShadow ? 1 : 0 ) + ( instanced ? 2 : 0 ) + ( instanceColor ? 4 : 0 ) + ( farMaterial !== null ? ':' + farMaterial.id : '' );
+	return ( receiveShadow ? 1 : 0 ) + ( instanced ? 2 : 0 ) + ( instanceColor ? 4 : 0 ) + ( skinned ? 8 : 0 ) + ( farMaterial !== null ? ':' + farMaterial.id : '' );
+
+}
+
+/**
+ * Returns the matrix skinning a vertex of a skinned mesh of a batch in the space of the mesh: the bind matrix, the
+ * weighted sum of the bone matrices of its skeleton and the inverse bind matrix, like the skinning of node materials.
+ *
+ * @private
+ * @param {Object} skinNodes - The skinning buffers of the batch: the bind matrices of its objects and the skeleton pool.
+ * @param {Node<uint>} slot - The slot of the object in the batch.
+ * @param {Node<uint>} boneBase - The offset of the bone matrices of its skeleton in the skeleton pool, in vec4 elements.
+ * @param {Node<vec4>} skinIndex - The bone indices of the vertex.
+ * @param {Node<vec4>} skinWeight - The bone weights of the vertex.
+ * @return {Node<mat4>} The skinning matrix.
+ */
+function getSkinMatrix( { node, bones }, slot, boneBase, skinIndex, skinWeight ) {
+
+	const matrixIn = ( buffer, first ) => mat4( buffer.element( first ), buffer.element( first.add( 1 ) ), buffer.element( first.add( 2 ) ), buffer.element( first.add( 3 ) ) );
+	const boneAt = ( index ) => matrixIn( bones, boneBase.add( uint( index ).mul( 4 ) ) );
+	const first = uint( slot ).mul( 8 );
+
+	const skinMatrix = boneAt( skinIndex.x ).mul( skinWeight.x )
+		.add( boneAt( skinIndex.y ).mul( skinWeight.y ) )
+		.add( boneAt( skinIndex.z ).mul( skinWeight.z ) )
+		.add( boneAt( skinIndex.w ).mul( skinWeight.w ) );
+
+	return matrixIn( node, first.add( 4 ) ).mul( skinMatrix ).mul( matrixIn( node, first ) );
+
+}
+
+/**
+ * Returns `true` if the object is a skinned mesh the pipeline draws: the bone matrices of its skeleton are
+ * uploaded once a frame per skeleton and the pulled vertices are skinned like the regular skinning of node materials.
+ *
+ * @private
+ * @param {Object3D} object - The 3D object.
+ * @param {BufferGeometry} geometry - The geometry.
+ * @return {boolean} Whether the object is a supported skinned mesh.
+ */
+function isSkinnedObject( object, geometry ) {
+
+	if ( object.isSkinnedMesh !== true ) return false;
+
+	const { skinIndex, skinWeight } = geometry.attributes;
+
+	return object.skeleton !== undefined && object.skeleton !== null && skinIndex !== undefined && skinWeight !== undefined && skinIndex.itemSize === 4 && skinWeight.itemSize === 4;
+
+}
+
+// the reach of the bones of skinned geometries, see getSkinReach()
+
+const _skinReach = new WeakMap();
+
+/**
+ * Returns, per bone of a skinned mesh, the largest distance from the bone of a vertex it moves, in the space of the
+ * bone at the bind pose (`boneInverse * bindMatrix * position`), and -1 for bones moving no vertex. With normalized
+ * weights, every skinned vertex is a weighted average of its positions in the frames of its bones, each within this
+ * distance (times the scale of the bone) of that bone, so a sphere holding the spheres around the bones holds the
+ * skinned mesh in any pose. Computed once per geometry and skeleton binding.
+ *
+ * @private
+ * @param {SkinnedMesh} mesh - The skinned mesh.
+ * @param {BufferGeometry} geometry - The geometry.
+ * @return {Float32Array} The reach of each bone.
+ */
+function getSkinReach( mesh, geometry ) {
+
+	const skeleton = mesh.skeleton;
+	const boneCount = skeleton.bones.length;
+	const cached = _skinReach.get( geometry );
+
+	if ( cached !== undefined && cached.length === boneCount ) return cached;
+
+	const reach = new Float32Array( boneCount ).fill( - 1 );
+	const { position, skinIndex, skinWeight } = geometry.attributes;
+	const vertex = new Vector3();
+	const bindVertex = new Vector3();
+	const toBone = new Matrix4();
+
+	const boneMatrices = skeleton.boneInverses.map( ( inverse ) => new Matrix4().multiplyMatrices( inverse, mesh.bindMatrix ) );
+
+	for ( let i = 0; i < position.count; i ++ ) {
+
+		bindVertex.fromBufferAttribute( position, i );
+
+		for ( let k = 0; k < 4; k ++ ) {
+
+			if ( ! ( skinWeight.getComponent( i, k ) > 0 ) ) continue;
+
+			const bone = skinIndex.getComponent( i, k );
+
+			if ( bone < 0 || bone >= boneCount ) continue;
+
+			toBone.copy( boneMatrices[ bone ] );
+			reach[ bone ] = Math.max( reach[ bone ], vertex.copy( bindVertex ).applyMatrix4( toBone ).length() );
+
+		}
+
+	}
+
+	_skinReach.set( geometry, reach );
+
+	return reach;
+
+}
+
+const _skinPlacement = new Matrix4();
+
+// the largest scale of the columns of a matrix
+
+function matrixScale( e ) {
+
+	return Math.sqrt( Math.max( e[ 0 ] * e[ 0 ] + e[ 1 ] * e[ 1 ] + e[ 2 ] * e[ 2 ], e[ 4 ] * e[ 4 ] + e[ 5 ] * e[ 5 ] + e[ 6 ] * e[ 6 ], e[ 8 ] * e[ 8 ] + e[ 9 ] * e[ 9 ] + e[ 10 ] * e[ 10 ] ) );
+
+}
+
+/**
+ * Writes into `out` the sphere ( x, y, z, radius ) holding the spheres of reach around the bones in the space of
+ * the bones' world matrices. Bones moving no vertex have a reach of -1 and are skipped.
+ *
+ * @private
+ * @param {Array<Bone>} bones - The bones of the skeleton, with their current world matrices.
+ * @param {Float32Array} reach - The reach of each bone, see getSkinReach().
+ * @param {Float32Array} out - The sphere.
+ * @return {Float32Array} The sphere.
+ */
+function skinSphere( bones, reach, out ) {
+
+	let minX = Infinity, minY = Infinity, minZ = Infinity, maxX = - Infinity, maxY = - Infinity, maxZ = - Infinity;
+
+	for ( let k = 0; k < bones.length; k ++ ) {
+
+		if ( reach[ k ] < 0 ) continue;
+
+		const e = bones[ k ].matrixWorld.elements;
+		const r = reach[ k ] * matrixScale( e );
+
+		minX = Math.min( minX, e[ 12 ] - r ); maxX = Math.max( maxX, e[ 12 ] + r );
+		minY = Math.min( minY, e[ 13 ] - r ); maxY = Math.max( maxY, e[ 13 ] + r );
+		minZ = Math.min( minZ, e[ 14 ] - r ); maxZ = Math.max( maxZ, e[ 14 ] + r );
+
+	}
+
+	if ( minX === Infinity ) {
+
+		out.fill( 0 );
+		out[ 3 ] = - 1;
+
+		return out;
+
+	}
+
+	const cx = ( minX + maxX ) / 2, cy = ( minY + maxY ) / 2, cz = ( minZ + maxZ ) / 2;
+
+	let radius = 0;
+
+	for ( let k = 0; k < bones.length; k ++ ) {
+
+		if ( reach[ k ] < 0 ) continue;
+
+		const e = bones[ k ].matrixWorld.elements;
+
+		radius = Math.max( radius, Math.hypot( e[ 12 ] - cx, e[ 13 ] - cy, e[ 14 ] - cz ) + reach[ k ] * matrixScale( e ) );
+
+	}
+
+	out[ 0 ] = cx; out[ 1 ] = cy; out[ 2 ] = cz; out[ 3 ] = radius;
+
+	return out;
+
+}
+
+/**
+ * Returns the margin by which the bounding sphere of the geometry, placed by the world matrix of the mesh, must
+ * grow to hold the sphere of its bones (see skinSphere()), in world units. The skinned vertices in the world are
+ * `matrixWorld * bindMatrixInverse * sum( weight * bone.matrixWorld * reach point )`; in the attached bind mode the
+ * first two cancel out, otherwise the sphere of the bones is placed by them.
+ *
+ * @private
+ * @param {SkinnedMesh} mesh - The skinned mesh.
+ * @param {BufferGeometry} geometry - The geometry.
+ * @param {Float32Array} bones - The sphere of the bones.
+ * @return {number} The margin in world units.
+ */
+function skinMargin( mesh, geometry, bones ) {
+
+	if ( bones[ 3 ] < 0 ) return 0;
+
+	let cx = bones[ 0 ], cy = bones[ 1 ], cz = bones[ 2 ], radius = bones[ 3 ];
+
+	if ( mesh.bindMode !== AttachedBindMode ) {
+
+		const p = _skinPlacement.multiplyMatrices( mesh.matrixWorld, mesh.bindMatrixInverse ).elements;
+		const x = p[ 0 ] * cx + p[ 4 ] * cy + p[ 8 ] * cz + p[ 12 ];
+		const y = p[ 1 ] * cx + p[ 5 ] * cy + p[ 9 ] * cz + p[ 13 ];
+		const z = p[ 2 ] * cx + p[ 6 ] * cy + p[ 10 ] * cz + p[ 14 ];
+
+		cx = x; cy = y; cz = z;
+		radius *= matrixScale( p );
+
+	}
+
+	// the sphere of the geometry in the world, as the culling places it
+
+	const sphere = getBoundingSphere( geometry );
+	const w = mesh.matrixWorld.elements;
+	const sx = sphere.center.x, sy = sphere.center.y, sz = sphere.center.z;
+	const gx = w[ 0 ] * sx + w[ 4 ] * sy + w[ 8 ] * sz + w[ 12 ];
+	const gy = w[ 1 ] * sx + w[ 5 ] * sy + w[ 9 ] * sz + w[ 13 ];
+	const gz = w[ 2 ] * sx + w[ 6 ] * sy + w[ 10 ] * sz + w[ 14 ];
+
+	return Math.max( 0, Math.hypot( cx - gx, cy - gy, cz - gz ) + radius - sphere.radius * matrixScale( w ) );
 
 }
 
@@ -575,7 +796,9 @@ function getEntryKey( receiveShadow, instanced, instanceColor, farMaterial ) {
  */
 function isSupportedObject( object, geometry, group, allowEmpty = false ) {
 
-	if ( object.isMesh !== true || object.isSkinnedMesh === true || object.isBatchedMesh === true ) return false;
+	// skinned meshes are supported, see isSkinnedObject()
+	if ( object.isMesh !== true || object.isBatchedMesh === true ) return false;
+	if ( object.isSkinnedMesh === true && isSkinnedObject( object, geometry ) === false ) return false;
 	if ( object.occlusionTest === true ) return false;
 	if ( Array.isArray( object.material ) && group === null ) return false;
 
@@ -1071,7 +1294,11 @@ class MeshletCulling {
 
 					} );
 
-					scaleBits.assign( packHalf2x16( vec2( bounds.w, bounds.x ).mul( HALF_ROUND_UP ) ) );
+					// the clusters of a skinned mesh are not culled on their own: its margin bounds the object, not each vertex
+
+					const clusterMargin = select( flags.bitAnd( FLAG_SKINNED ).notEqual( uint( 0 ) ), float( UNBOUNDED_HALF_MARGIN ), bounds.x );
+
+					scaleBits.assign( packHalf2x16( vec2( bounds.w, clusterMargin ).mul( HALF_ROUND_UP ) ) );
 
 				} );
 
@@ -1567,7 +1794,7 @@ class MeshletCulling {
 
 		bits.set( [ this.objectEnd, 0, this.queueEnd, queueCapacity ], base );
 		bits.set( [ batch.dataOffset, 0, this.visibilityEnd, maxChunks ], base + 4 );
-		values.set( [ 0, 0, batch.lodCount, ( batch.cone === true ? FLAG_CONE : 0 ) | ( batch.farMaterial !== null ? FLAG_FAR : 0 ) | ( batch.ditherQueue === true ? FLAG_DITHER : 0 ) ], base + 8 );
+		values.set( [ 0, 0, batch.lodCount, ( batch.cone === true ? FLAG_CONE : 0 ) | ( batch.farMaterial !== null ? FLAG_FAR : 0 ) | ( batch.ditherQueue === true ? FLAG_DITHER : 0 ) | ( batch.skinned === true ? FLAG_SKINNED : 0 ) ], base + 8 );
 
 		// the batch of each slot of the range
 
@@ -2025,6 +2252,176 @@ function writeLevel( array, index, level ) {
 }
 
 /**
+ * The bone matrices of the skeletons drawn in a frame, in one storage buffer every batch reads: a skeleton is
+ * updated, written and uploaded once a frame however many of its meshes the batches draw (the skinned meshes of a
+ * character share one skeleton). It also holds, per skeleton, the reach of its bones over all its meshes and the sphere they
+ * bound in the current frame, see getSkinReach(). The buffer grows within a frame by replacing it; the replaced one is
+ * disposed in the next frame, so draws already encoded never read a destroyed buffer.
+ *
+ * @private
+ */
+class MeshletSkeletonPool {
+
+	constructor() {
+
+		this.array = new Float32Array( 4096 * 4 );
+		this.attribute = new StorageBufferAttribute( this.array, 4 );
+		this.node = storage( this.attribute, 'vec4', this.array.length / 4 ).toReadOnly();
+		this.offsets = new Map();
+		this.frame = - 1;
+		this.used = 0;
+		this.retired = [];
+		this.skeletons = new WeakMap();
+
+	}
+
+	/**
+	 * Returns the offset in vec4 elements of the bone matrices of the skeleton in the current frame, updating the
+	 * skeleton and writing its matrices the first time in the frame.
+	 *
+	 * @param {Skeleton} skeleton - The skeleton.
+	 * @param {number} frame - The current frame.
+	 * @return {number} The offset.
+	 */
+	offset( skeleton, frame ) {
+
+		if ( frame !== this.frame ) this.beginFrame( frame );
+
+		let offset = this.offsets.get( skeleton );
+
+		if ( offset !== undefined ) return offset;
+
+		skeleton.update();
+
+		const size = skeleton.bones.length * 4;
+
+		if ( ( this.used + size ) * 4 > this.array.length ) this.grow( ( this.used + size ) * 2 );
+
+		offset = this.used;
+
+		this.array.set( skeleton.boneMatrices.subarray( 0, size * 4 ), offset * 4 );
+
+		// the skeletons of a frame are written one after the other: one update range holds them, uploaded at once
+
+		const ranges = this.attribute.updateRanges;
+		const last = ranges[ ranges.length - 1 ];
+
+		if ( last !== undefined && last.start + last.count === offset * 4 ) {
+
+			last.count += size * 4;
+
+		} else {
+
+			this.attribute.addUpdateRange( offset * 4, size * 4 );
+
+		}
+
+		this.attribute.needsUpdate = true;
+		this.used += size;
+		this.offsets.set( skeleton, offset );
+
+		return offset;
+
+	}
+
+	/**
+	 * Returns the margin by which the bounding sphere of the geometry, placed by the world matrix of the mesh, grows to
+	 * hold the mesh in the current pose of its skeleton, in world units. The sphere of the bones is computed once a
+	 * frame per skeleton, from the reach of its bones over all its meshes seen so far.
+	 *
+	 * @param {SkinnedMesh} mesh - The skinned mesh, its skeleton updated this frame.
+	 * @param {BufferGeometry} geometry - The geometry.
+	 * @param {number} frame - The current frame.
+	 * @return {number} The margin in world units.
+	 */
+	margin( mesh, geometry, frame ) {
+
+		const skeleton = mesh.skeleton;
+
+		let data = this.skeletons.get( skeleton );
+
+		if ( data === undefined || data.reach.length !== skeleton.bones.length ) {
+
+			data = { reach: new Float32Array( skeleton.bones.length ).fill( - 1 ), merged: new WeakSet(), frame: - 1, sphere: new Float32Array( 4 ) };
+			this.skeletons.set( skeleton, data );
+
+		}
+
+		if ( data.merged.has( geometry ) === false ) {
+
+			const reach = getSkinReach( mesh, geometry );
+
+			for ( let k = 0; k < reach.length; k ++ ) data.reach[ k ] = Math.max( data.reach[ k ], reach[ k ] );
+
+			data.merged.add( geometry );
+			data.frame = - 1;
+
+		}
+
+		if ( data.frame !== frame ) {
+
+			skinSphere( skeleton.bones, data.reach, data.sphere );
+			data.frame = frame;
+
+		}
+
+		return skinMargin( mesh, geometry, data.sphere );
+
+	}
+
+	/**
+	 * Starts a frame: the skeletons are written again from the start of the buffer and the buffers replaced in the
+	 * previous frame are disposed.
+	 *
+	 * @param {number} frame - The current frame.
+	 */
+	beginFrame( frame ) {
+
+		for ( const attribute of this.retired ) attribute.dispose();
+
+		this.retired.length = 0;
+		this.offsets.clear();
+		this.used = 0;
+		this.frame = frame;
+
+	}
+
+	/**
+	 * Replaces the buffer by a larger one holding the matrices written so far in the frame. The replaced buffer is
+	 * disposed in the next frame.
+	 *
+	 * @param {number} vec4s - The minimum size of the new buffer in vec4 elements.
+	 */
+	grow( vec4s ) {
+
+		const array = new Float32Array( Math.max( vec4s, this.array.length / 4 * 2 ) * 4 );
+
+		array.set( this.array.subarray( 0, this.used * 4 ) );
+
+		this.retired.push( this.attribute );
+		this.array = array;
+		this.attribute = new StorageBufferAttribute( array, 4 );
+		this.node.value = this.attribute;
+		this.node.bufferCount = this.attribute.count;
+
+	}
+
+	/**
+	 * Disposes the buffers of the pool.
+	 */
+	dispose() {
+
+		this.attribute.dispose();
+
+		for ( const attribute of this.retired ) attribute.dispose();
+
+		this.retired.length = 0;
+
+	}
+
+}
+
+/**
  * The vertices and the triangles of the geometries drawn by the GPU-driven pipeline, in one storage buffer each,
  * so the objects of several geometries sharing a material are drawn by one draw. The vertex data of a geometry
  * is interleaved ( see createMeshlets() ), the triangles store the address of the first element of each vertex.
@@ -2250,7 +2647,7 @@ class MeshletBatch {
 	 * @param {number} [parameters.maxPairChunks=maxChunks] - The maximum clusters of an adjacent crossfaded pair of levels.
 	 * @param {?Object} [parameters.pool=null] - The geometry pool.
 	 */
-	constructor( clusters, material, receiveShadow, capacity, renderer, culling, { debug = false, dither = false, lodCount = MAX_LODS, view = null, depthPrepass = false, instanced = false, instanceColor = false, farMaterial = null, source = null, queueBudget = 0, maxChunks = clusters.maxChunks, maxPairChunks = maxChunks, pool = null } = {} ) {
+	constructor( clusters, material, receiveShadow, capacity, renderer, culling, { debug = false, dither = false, lodCount = MAX_LODS, view = null, depthPrepass = false, instanced = false, instanceColor = false, skinned = false, farMaterial = null, source = null, queueBudget = 0, maxChunks = clusters.maxChunks, maxPairChunks = maxChunks, pool = null, skeletons = null } = {} ) {
 
 		const shadow = culling.shadow;
 
@@ -2258,9 +2655,12 @@ class MeshletBatch {
 		// bounds are computed on the GPU, like the bounds of instanced meshes, see createDeformation()
 
 		const deformed = isDeformedMaterial( material );
-		const gpuTransform = instanced === true || deformed === true;
+		// skinned meshes are placed like instances, their bounds grow by the reach of their skeleton, see MeshletSkeletonPool.margin()
+		const gpuTransform = instanced === true || deformed === true || skinned === true;
 
-		this.source = source !== null && source.added === true && source.culling === culling && source.capacity === capacity && source.gpuTransform === gpuTransform && source.instanceColor === instanceColor ? source : null;
+		this.source = source !== null && source.added === true && source.culling === culling && source.capacity === capacity && source.gpuTransform === gpuTransform && source.instanceColor === instanceColor && source.skinned === skinned ? source : null;
+		this.skinned = skinned;
+		this.renderer = renderer;
 		this.clusters = clusters;
 		this.material = material;
 		this.materialVersion = material.version;
@@ -2285,7 +2685,7 @@ class MeshletBatch {
 		this.count = 0;
 		this.view = view;
 
-		this.cone = shadow === false && deformed === false;
+		this.cone = shadow === false && deformed === false && skinned === false;
 
 		this.attributes = [];
 		this.ownedGeometries = [];
@@ -2483,6 +2883,11 @@ class MeshletBatch {
 					const scaleZ = length( world.mul( vec4( 0, 0, 1, 0 ) ).xyz );
 					const maxScale = max( scaleX, max( scaleY, scaleZ ) ).toVar();
 					const minScale = min( scaleX, min( scaleY, scaleZ ) );
+
+					// a skinned mesh: the margin of its skeleton in world units, written with its bones, see MeshletSkeletonPool.margin()
+
+					if ( skinned === true ) margin = max( margin, instanceDataWrite.element( index.mul( stride ) ).z );
+
 					cullingBounds.element( slot ).assign( vec4( margin, 0, 0, select( maxScale.sub( minScale ).lessThanEqual( maxScale.mul( 1e-4 ) ), maxScale, maxScale.negate() ) ) );
 
 				} );
@@ -2494,6 +2899,27 @@ class MeshletBatch {
 		}
 
 		this.instanceNodes = { objectWorld, instanceLocal, instanceData };
+
+		// skinned meshes: per object its bind matrix and its inverse, four vec4 columns each, written every frame.
+		// the bone matrices of its skeleton are in the skeleton pool shared by all batches, at the offset in the y of
+		// its instance data, see writeSkin()
+
+		this.skinNodes = null;
+		this.skeletons = skeletons;
+
+		if ( skinned === true && this.source !== null ) {
+
+			this.skinNodes = this.source.skinNodes;
+
+		} else if ( skinned === true ) {
+
+			const stride = 8;
+			const array = new Float32Array( capacity * stride * 4 );
+			const attribute = createAttribute( array, 4 );
+
+			this.skinNodes = { array, attribute, stride, node: storage( attribute, 'vec4', array.length / 4 ).toReadOnly(), bones: skeletons.node };
+
+		}
 
 		// the slots written in the last upload, their previous matrices are updated in the next frame
 
@@ -2724,7 +3150,24 @@ class MeshletBatch {
 			previousMatrixWorld = this.history === true ? objectWorld.element( instance.add( capacity ) ) : matrixWorld;
 			instanceIndexNode = uint( instanceData.element( instance.mul( stride ) ).x );
 
+			// a skinned mesh: its matrices from the y of its instance data, see MeshletBatch.writeSkin()
+
+			const skin = this.skinned === true ? this.skinNodes.node : null;
+			const skinBase = skin !== null ? uint( instanceData.element( instance.mul( stride ) ).y ) : null;
+
 			positionNode = Fn( ( builder ) => {
+
+				// the vertex is skinned in the space of the mesh before the instance matrix, as SkinnedMesh does
+
+				if ( skin !== null ) {
+
+					const skinned = getSkinMatrix( this.skinNodes, instance, skinBase, attribute( 'skinIndex', vertex ), attribute( 'skinWeight', vertex ) ).toVar();
+
+					positionLocal.assign( skinned.mul( vec4( positionLocal, 1.0 ) ).xyz );
+
+					if ( builder.hasGeometryAttribute( 'normal' ) ) normalLocal.assign( normalize( mat3( skinned ).mul( normalLocal ) ) );
+
+				}
 
 				positionLocal.assign( instanceMatrix.mul( positionLocal ).xyz );
 
@@ -3057,6 +3500,26 @@ class MeshletBatch {
 	}
 
 	/**
+	 * Writes the bind matrix and its inverse of a skinned mesh into its slot of the batch, and its skeleton into the
+	 * skeleton pool, once a frame per skeleton like the regular skinning of node materials.
+	 *
+	 * @param {SkinnedMesh} mesh - The skinned mesh.
+	 * @param {number} slot - The slot of the mesh in the batch.
+	 * @return {number} The offset of the bone matrices of its skeleton in the pool, in vec4 elements.
+	 */
+	writeSkin( mesh, slot ) {
+
+		const { array, stride } = this.skinNodes;
+		const base = slot * stride;
+
+		array.set( mesh.bindMatrix.elements, base * 4 );
+		array.set( mesh.bindMatrixInverse.elements, ( base + 4 ) * 4 );
+
+		return this.skeletons.offset( mesh.skeleton, this.renderer.info.frame );
+
+	}
+
+	/**
 	 * Writes the transforms, bounds, levels and instance data of the objects which changed since the last upload
 	 * and adds the update ranges of the written slots, per buffer.
 	 *
@@ -3086,6 +3549,7 @@ class MeshletBatch {
 			objectStates.length = Math.min( objectStates.length, objects.length );
 
 			let slot = 0;
+			let skinnedSlots = 0;
 
 			for ( let o = 0; o < objects.length; o ++ ) {
 
@@ -3120,7 +3584,8 @@ class MeshletBatch {
 				const sameAttributes = state.instanceMatrix === instanceMatrix && state.instanceColor === instanceColor &&
 					state.attributes.length === attributes.length && state.attributes.every( ( attribute, i ) => attribute === attributes[ i ] );
 
-				if ( sameWorld === true && sameAttributes === true && state.count === instanceCount && state.version === version && range === null && state.level === null ) {
+				// a skinned mesh moves its vertices every frame: its bones are always written
+				if ( mesh.isSkinnedMesh !== true && sameWorld === true && sameAttributes === true && state.count === instanceCount && state.version === version && range === null && state.level === null ) {
 
 					slot += instanceCount;
 
@@ -3260,6 +3725,26 @@ class MeshletBatch {
 
 					}
 
+					// a skinned mesh: its bones, the offset of its bones (y) and the margin of its skeleton in world
+					// units (z), see writeSkin() and MeshletSkeletonPool.margin()
+
+					if ( this.skinned === true && mesh.isSkinnedMesh === true ) {
+
+						const base = this.writeSkin( mesh, slot );
+						const margin = Math.fround( this.skeletons.margin( mesh, mesh.geometry, this.renderer.info.frame ) );
+
+						if ( instanceDataArray[ index + 1 ] !== base || instanceDataArray[ index + 2 ] !== margin ) {
+
+							instanceDataArray[ index + 1 ] = base;
+							instanceDataArray[ index + 2 ] = margin;
+							dataChanged = true;
+
+						}
+
+						skinnedSlots = slot + 1;
+
+					}
+
 					if ( dataChanged === true ) data.mark( slot );
 
 					// the distance range of the object, shared by its instances
@@ -3267,6 +3752,18 @@ class MeshletBatch {
 					if ( writeLevel( levelArray, offset + slot, range ) === true ) level.mark( slot );
 
 				}
+
+			}
+
+			// the bind matrices of the skinned meshes are uploaded with their bones every frame, the bones are in the skeleton pool
+
+			if ( skinnedSlots > 0 ) {
+
+				const skin = this.skinNodes;
+
+				skin.attribute.clearUpdateRanges();
+				skin.attribute.addUpdateRange( 0, skinnedSlots * skin.stride * 4 );
+				skin.attribute.needsUpdate = true;
 
 			}
 
@@ -3415,6 +3912,11 @@ class MeshletBatch {
  * the regular pipeline. Meshlets of a group are shared by all meshes using the same geometry and range. The
  * batches of the groups of the same objects share the transforms and instance data of the objects, which are
  * uploaded once.
+ *
+ * Skinned meshes are skinned on the pulled vertices with the bone matrices of their skeletons, uploaded once a
+ * frame per skeleton. As their vertices move, their clusters are not culled one by one: a skinned mesh is culled
+ * and its level of detail selected as a whole, with bounds that hold its current pose. Skinned meshes with morph
+ * targets are drawn by the regular pipeline.
  *
  * The transforms of the objects are compared with the last upload, only the objects and instances which changed
  * are uploaded. Objects exceeding {@link MeshletDrawingPipeline#maxInstances} are drawn by the regular pipeline: static
@@ -3591,6 +4093,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		this._geometryStates = new WeakMap();
 		this._checkedGeometries = new WeakSet();
 		this._geometryPool = new MeshletGeometryPool();
+		this._skeletonPool = new MeshletSkeletonPool();
 		this._records = new Set();
 
 		// the meshlets of disposed geometries are removed, they are processed again if the geometry is drawn again
@@ -4021,7 +4524,8 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 				// instances of the render list are drawn by the regular pipeline, see _drawBatches()
 
 				const record = this._getRecord( renderList );
-				const entry = this._getEntry( record, clusters, material, object.receiveShadow, object.isInstancedMesh === true, object.isInstancedMesh === true && object.instanceColor !== null, this._getFarMaterial() );
+				const skinned = object.isSkinnedMesh === true;
+				const entry = this._getEntry( record, clusters, material, object.receiveShadow, object.isInstancedMesh === true, object.isInstancedMesh === true && object.instanceColor !== null, this._getFarMaterial(), skinned );
 
 				if ( entry.objects.length === 0 ) {
 
@@ -4173,7 +4677,8 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 		// objects inside of clipping groups are clipped by the regular pipeline
 
-		if ( clippingContext !== this._capture.clippingContext || this._isMeshlet( object, geometry, material, group ) === false ) return false;
+		// skinned meshes move every frame: never part of a static capture
+		if ( clippingContext !== this._capture.clippingContext || object.isSkinnedMesh === true || this._isMeshlet( object, geometry, material, group ) === false ) return false;
 
 		const clusters = this._getClusters( geometry, group );
 
@@ -4475,12 +4980,14 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 			depthPrepass: this._usesDepthPrepass(),
 			instanced: entry.instanced,
 			instanceColor: entry.instanceColor,
+			skinned: entry.skinned,
 			farMaterial: entry.farMaterial,
 			source: entry.source !== null ? entry.source.batch : null,
 			queueBudget: entry.queueBudget,
 			maxChunks: entry.maxChunks,
 			maxPairChunks: entry.maxPairChunks,
 			pool: this._geometryPool,
+			skeletons: this._skeletonPool,
 			view
 		} );
 
@@ -5414,7 +5921,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 	 * @param {?Material} farMaterial - The material beyond the switch distance of merged levels.
 	 * @return {Object} The entry.
 	 */
-	_getEntry( record, clusters, material, receiveShadow, instanced, instanceColor, farMaterial ) {
+	_getEntry( record, clusters, material, receiveShadow, instanced, instanceColor, farMaterial, skinned = false ) {
 
 		let byClusters = record.lookup.get( material );
 
@@ -5438,7 +5945,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 		}
 
-		const key = getEntryKey( receiveShadow, instanced, instanceColor, farMaterial );
+		const key = getEntryKey( receiveShadow, instanced, instanceColor, farMaterial, skinned );
 
 		let entry = byShadow.get( key );
 
@@ -5452,6 +5959,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 				receiveShadow,
 				instanced,
 				instanceColor,
+				skinned,
 				key,
 				objects: [],
 				objectClusters: [],
@@ -5549,6 +6057,8 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 		this._geometryPool.dispose();
 		this._geometryPool = new MeshletGeometryPool();
+		this._skeletonPool.dispose();
+		this._skeletonPool = new MeshletSkeletonPool();
 
 		super.dispose();
 
@@ -5806,4 +6316,4 @@ function isSameObjects( a, b ) {
 
 }
 
-export { MeshletDrawingPipeline, MeshletBatch, cacheAttributes, createDebugMaterial, createDrawMaterial, createOcclusion };
+export { MeshletDrawingPipeline, MeshletBatch, MeshletSkeletonPool, cacheAttributes, createDebugMaterial, createDrawMaterial, createOcclusion };
