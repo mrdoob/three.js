@@ -1,8 +1,7 @@
-import { Break, Continue, DFGLUT, EnvironmentBRDF_MultiScattering, Fn, If, Loop, abs, bool, cross, distance, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
-import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
+import { Break, Continue, DFGLUT, atan, tan, log2, cos, sin, EnvironmentBRDF_MultiScattering, Fn, If, Loop, abs, bool, cross, distance, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
+import { HalfFloatType, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
-import { boxBlur } from './boxBlur.js';
 import ImportanceSampledEnvironment from './ImportanceSampledEnvironment.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -18,7 +17,7 @@ const MAX_STEPS = 64;
  * @property {Node<float>} [metalnessNode=null] - Per-pixel metalness. Drives GGX reflection sampling and, with `reflectNonMetals=false`, the non-metal early-out.
  * @property {Node<vec3>} [specularNode=null] - Material normal-incidence reflectance (F0), typically an MRT `specularColorBlended` attachment (it already includes IOR, specular intensity and metalness; raw `material.specularColor` reflects too brightly). Defaults to the metalness/base-color approximation.
  * @property {Node<float>} [specularF90Node=null] - Material grazing reflectance, typically an MRT `specularF90` attachment. Defaults to one.
- * @property {Node<float>} [roughnessNode=null] - Per-pixel roughness. Drives GGX sampling and the blur mip selection.
+ * @property {Node<float>} [roughnessNode=null] - Per-pixel roughness. Drives GGX sampling and the blur footprint.
  * @property {boolean} [reflectNonMetals=false] - Only used when `stochastic=false`. When `false`, non-metallic surfaces are discarded for a noticeable performance gain; set `true` to also reflect dielectrics (e.g. marble, polished wood, plastic).
  * @property {Texture} [environmentNode=null] - Equirectangular HDR environment map with CPU-side `image.data` (e.g. from RGBELoader). Not compatible with PMREM / `scene.environment` cubemaps.
  * @property {boolean} [envImportanceSampling=false] - When `true`, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.
@@ -157,8 +156,8 @@ class SSRNode extends Node {
 		this.specularF90Node = specularF90Node;
 
 		/**
-		 * Per-pixel roughness, used to drive the GGX reflection sampling and the blur mip
-		 * selection. When `null`, the shader treats surfaces as fully smooth.
+		 * Per-pixel roughness, used to drive the GGX reflection sampling and the blur
+		 * footprint. When `null`, the shader treats surfaces as fully smooth.
 		 *
 		 * @type {?Node<float>}
 		 */
@@ -285,17 +284,6 @@ class SSRNode extends Node {
 		this.mirrorBias = uniform( 0 );
 
 		/**
-		 * The quality of the blur. Must be an integer in the range `[1,3]`.
-		 *
-		 * Baked into the blur shader as a compile-time constant so the `(size*2+1)²`
-		 * sample loop unrolls; assigning a new value recompiles the blur material.
-		 *
-		 * @type {number}
-		 * @default 2
-		 */
-		this._blurQuality = 2;
-
-		/**
 		 * Enables sub-step binary-search refinement of a detected hit. When on, a coarse
 		 * crossing is bisected toward the exact intersection (sharper hits, less step
 		 * aliasing) at the cost of extra depth samples. Baked into the shader as a
@@ -363,14 +351,6 @@ class SSRNode extends Node {
 		 * @type {Camera}
 		 */
 		this.camera = camera;
-
-		/**
-		 * The spread of the blur. Automatically set when generating mips.
-		 *
-		 * @private
-		 * @type {UniformNode<int>}
-		 */
-		this._blurSpread = uniform( 1 );
 
 		/**
 		 * Represents the projection matrix of the scene's camera.
@@ -447,16 +427,6 @@ class SSRNode extends Node {
 		this._ssrRenderTarget.texture.name = 'SSRNode.SSR';
 
 		/**
-		 * The render target for the blurred SSR reflections.
-		 *
-		 * @private
-		 * @type {RenderTarget}
-		 */
-		this._blurRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, minFilter: LinearMipmapLinearFilter, magFilter: LinearFilter } );
-		this._blurRenderTarget.texture.name = 'SSRNode.Blur';
-		this._blurRenderTarget.texture.mipmaps.push( {}, {}, {}, {}, {} );
-
-		/**
 		 * The material that is used to render the effect.
 		 *
 		 * @private
@@ -476,24 +446,6 @@ class SSRNode extends Node {
 		this._sharedContext = null;
 
 		/**
-		 * The blur material.
-		 *
-		 * @private
-		 * @type {NodeMaterial}
-		 */
-		this._blurMaterial = new NodeMaterial();
-		this._blurMaterial.name = 'SSRNode.Blur';
-
-		/**
-		 * The copy material.
-		 *
-		 * @private
-		 * @type {NodeMaterial}
-		 */
-		this._copyMaterial = new NodeMaterial();
-		this._copyMaterial.name = 'SSRNode.Copy';
-
-		/**
 		 * The result of the effect is represented as a separate texture node.
 		 *
 		 * @private
@@ -505,11 +457,64 @@ class SSRNode extends Node {
 
 		if ( this.stochastic === false && this.roughnessNode !== null ) {
 
-			const mips = this._blurRenderTarget.texture.mipmaps.length - 1;
-			const r = this.roughnessNode;
-			const lod = r.mul( r ).mul( mips ).clamp( 0, mips );
+			// Blurs the mirror reflection over the GGX lobe's footprint, which grows with the hit
+			// distance (the footprint scale is stored in alpha). The taps sit at GGX quantiles and
+			// read prefiltered mips, which approximates the lobe integral on flat surfaces.
 
-			blurredTextureNode = passTexture( this, this._blurRenderTarget.texture ).level( lod );
+			this._ssrRenderTarget.texture.generateMipmaps = true;
+			this._ssrRenderTarget.texture.minFilter = LinearMipmapLinearFilter;
+
+			const ssrTexture = passTexture( this, this._ssrRenderTarget.texture );
+			const TAPS = 16;
+
+			blurredTextureNode = Fn( () => {
+
+				const uvC = uv();
+				const center = ssrTexture.sample( uvC ).level( 0 ).toVar();
+				const alpha = float( this.roughnessNode ).pow2().toVar();
+
+				// the pixel's own footprint, else that of the nearby hits so a reflection's edge blurs too
+				const k = center.a.greaterThan( 0 ).select( center.a, ssrTexture.sample( uvC ).level( 6 ).a ).toVar();
+				const result = vec4( center ).toVar();
+
+				// skip lobes narrower than a pixel
+				If( k.mul( alpha ).greaterThan( 0.25 ), () => {
+
+					const res = vec2( textureSize( ssrTexture ) ).toVar();
+					const sum = vec3( center.rgb ).toVar();
+					const nC = this.normalNode.sample( uvC ).rgb.toVar();
+					const pC = getViewPosition( uvC, this.depthNode.sample( uvC ).r, this._cameraProjectionMatrixInverse ).toVar();
+
+					Loop( TAPS, ( { i } ) => {
+
+						// GGX slope enclosing the fraction u of the lobe; the reflected ray deviates by twice its angle (capped at 80°)
+						const u = float( i ).add( 0.5 ).div( TAPS ).mul( 0.9 );
+						const slope = alpha.mul( u.div( u.oneMinus() ).sqrt() );
+						const radius = k.mul( tan( atan( slope ).mul( 2 ).min( 1.4 ) ) ).toVar();
+						const angle = float( i ).mul( 2.39996323 );
+						const uvK = uvC.add( vec2( cos( angle ), sin( angle ) ).mul( radius ).div( res ) ).toVar();
+
+						// prefilter each tap over its share of the disk
+						const lod = log2( radius.mul( Math.sqrt( Math.PI / TAPS ) ).max( 1 ) );
+
+						// a tap only stands for the lobe where its mirror ray is nearly parallel, i.e. on the same flat surface
+						const nK = this.normalNode.sample( uvK ).rgb;
+						const pK = getViewPosition( uvK, this.depthNode.sample( uvK ).r, this._cameraProjectionMatrixInverse );
+						const planeDistance = abs( dot( pK.sub( pC ), nC ) ).div( pC.z.abs().mul( 0.02 ) );
+						const weight = dot( nC, nK ).max( 0 ).pow( 64 ).mul( planeDistance.negate().exp2() );
+
+						sum.addAssign( ssrTexture.sample( uvK ).level( lod ).rgb.mul( weight ) );
+
+					} );
+
+					// a rejected tap has no screen-space data for its part of the lobe, so that part keeps the environment
+					result.rgb.assign( sum.div( TAPS + 1 ) );
+
+				} );
+
+				return result;
+
+			} )();
 
 		}
 
@@ -549,44 +554,6 @@ class SSRNode extends Node {
 			this._buildSSRMaterial();
 
 		}
-
-	}
-
-	/**
-	 * Blur kernel size (compile-time constant). Assigning a new value recompiles the
-	 * blur material.
-	 *
-	 * @type {number}
-	 */
-	get blurQuality() {
-
-		return this._blurQuality;
-
-	}
-
-	set blurQuality( value ) {
-
-		if ( value !== this._blurQuality ) {
-
-			this._blurQuality = value;
-
-			// The size is baked into the boxBlur node tree, so rebuild it (recompiles the material).
-			if ( this.stochastic === false ) this._buildBlurMaterial();
-
-		}
-
-	}
-
-	/**
-	 * Builds (or rebuilds) the blur material's node graph, baking the current
-	 * {@link SSRNode#blurQuality} as the kernel size so the sample loop unrolls.
-	 *
-	 * @private
-	 */
-	_buildBlurMaterial() {
-
-		this._blurMaterial.fragmentNode = boxBlur( texture( this._ssrRenderTarget.texture ), { size: this._blurQuality, separation: this._blurSpread } );
-		this._blurMaterial.needsUpdate = true;
 
 	}
 
@@ -701,7 +668,6 @@ class SSRNode extends Node {
 
 		this._resolution.value.set( width, height );
 		this._ssrRenderTarget.setSize( width, height );
-		this._blurRenderTarget.setSize( width, height );
 
 	}
 
@@ -795,7 +761,6 @@ class SSRNode extends Node {
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		const ssrRenderTarget = this._ssrRenderTarget;
-		const blurRenderTarget = this._blurRenderTarget;
 
 		const size = renderer.getDrawingBufferSize( _size );
 
@@ -816,25 +781,6 @@ class SSRNode extends Node {
 		renderer.setRenderTarget( ssrRenderTarget );
 		_quadMesh.name = 'SSR [ Reflections ]';
 		_quadMesh.render( renderer );
-
-		// blur (optional)
-
-		if ( this.stochastic === false && this.roughnessNode !== null ) {
-
-			// blur mips but leave the base mip unblurred
-
-			for ( let i = 0; i < blurRenderTarget.texture.mipmaps.length; i ++ ) {
-
-				_quadMesh.material = ( i === 0 ) ? this._copyMaterial : this._blurMaterial;
-
-				this._blurSpread.value = i;
-				renderer.setRenderTarget( blurRenderTarget, 0, i );
-				_quadMesh.name = 'SSR [ Blur Level ' + i + ' ]';
-				_quadMesh.render( renderer );
-
-			}
-
-		}
 
 		// restore
 
@@ -1287,8 +1233,8 @@ class SSRNode extends Node {
 				const uvS = hitUvS;
 				const vP = getViewPosition( uvS, hitD, this._cameraProjectionMatrixInverse ).toVar();
 
-				// In blur mode the ratio² falloff re-grows past maxDistance, so over-range hits fall back
-				// to env. The scatter path bounds reach via ray length, so every hit shades.
+				// Mirror-path hits beyond maxDistance fall back to env. The scatter path bounds reach
+				// via ray length, so every hit shades.
 				const distancePointPlane = this.stochastic === false ? pointPlaneDistance( vP, viewPosition, viewNormal ).toVar() : float( 0 );
 				const withinRange = distancePointPlane.lessThanEqual( this.maxDistance ).toVar();
 
@@ -1318,23 +1264,26 @@ class SSRNode extends Node {
 					if ( this.stochastic === true ) applyHitEdgeFade( reflectColor, uvS, hitBorderWidth );
 
 					let weightedColor = reflectColor.rgb.mul( finalSampleWeight );
+					let alpha = worldDistance;
 
 					if ( this.stochastic === false ) {
-
-						// the mirror path fades hits out toward maxDistance and on rough surfaces
-						const ratio = float( 1 ).sub( distancePointPlane.div( this.maxDistance ) ).toVar();
-						const roughnessFade = roughness.div( this.maxRoughness ).mul( - 2 ).add( 2 ).clamp();
 
 						// replace the indirect specular the beauty pass already contains; blurring the
 						// difference keeps the per-pixel detail of the replaced reflection
 						if ( this.indirectSpecularNode !== null ) weightedColor = weightedColor.sub( this.indirectSpecularNode.sample( uvPos ).rgb );
 
-						weightedColor = weightedColor.mul( ratio.mul( ratio ).mul( roughnessFade ) );
+						weightedColor = weightedColor.mul( roughness.div( this.maxRoughness ).mul( - 2 ).add( 2 ).clamp() );
+
+						// footprint scale for the blur: pixels per unit of reflected-direction tangent at the
+						// hit, seen over the unfolded mirror path
+						const hitDistance = distance( worldPosition, hitWorldPosition );
+						const focalPx = this._resolution.y.mul( this._cameraProjectionMatrix.element( 1 ).y ).mul( 0.5 );
+						alpha = hitDistance.mul( focalPx ).div( viewPosition.length().add( hitDistance ) );
 
 					}
 
 					hit.assign( 1 );
-					output.assign( vec4( weightedColor, worldDistance ) );
+					output.assign( vec4( weightedColor, alpha ) );
 
 				} );
 
@@ -1376,17 +1325,6 @@ class SSRNode extends Node {
 		this._sharedContext = builder.getSharedContext();
 		this._buildSSRMaterial();
 
-		const reflectionBuffer = texture( this._ssrRenderTarget.texture );
-
-		if ( this.stochastic === false ) {
-
-			this._buildBlurMaterial();
-
-		}
-
-		this._copyMaterial.fragmentNode = reflectionBuffer;
-		this._copyMaterial.needsUpdate = true;
-
 		//
 
 		return this.getTextureNode();
@@ -1408,11 +1346,8 @@ class SSRNode extends Node {
 		super.dispose();
 
 		this._ssrRenderTarget.dispose();
-		this._blurRenderTarget.dispose();
 
 		this._ssrMaterial.dispose();
-		this._blurMaterial.dispose();
-		this._copyMaterial.dispose();
 
 		if ( this._importanceEnvironment !== null ) {
 
