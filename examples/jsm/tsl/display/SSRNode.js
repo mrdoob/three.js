@@ -219,16 +219,6 @@ class SSRNode extends Node {
 		this.intensity = uniform( 1 );
 
 		/**
-		 * Only used when `stochastic=false`. Roughness at which reflections are faded out,
-		 * since a single mirror ray can't represent a wide specular lobe. The fade starts at
-		 * half this value, as Unreal Engine's `r.SSR.MaxRoughness`.
-		 *
-		 * @type {UniformNode<float>}
-		 * @default 1
-		 */
-		this.maxRoughness = uniform( 1 );
-
-		/**
 		 * Screen-edge fade width, in UV units. As a screen-space hit approaches a screen
 		 * border, the reflection is faded over this distance — either toward the environment
 		 * reflection ({@link SSRNode#screenEdgeFadeBlack} `false`) or to zero intensity
@@ -1271,8 +1261,6 @@ class SSRNode extends Node {
 						// replace the indirect specular the beauty pass already contains; blurring the
 						// difference keeps the per-pixel detail of the replaced reflection
 						if ( this.indirectSpecularNode !== null ) weightedColor = weightedColor.sub( this.indirectSpecularNode.sample( uvPos ).rgb );
-
-						weightedColor = weightedColor.mul( roughness.div( this.maxRoughness ).mul( - 2 ).add( 2 ).clamp() );
 
 						// footprint scale for the blur: pixels per unit of reflected-direction tangent at the
 						// hit, seen over the unfolded mirror path
