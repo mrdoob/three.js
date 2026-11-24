@@ -118,7 +118,10 @@ class GTAONode extends Node {
 		this.radius = uniform( 0.25 );
 
 		/**
-		 * The thickness of the ambient occlusion.
+		 * The maximum view-space depth difference between the shaded point and a sample
+		 * for the sample to count as an occluder. When larger than `radius`, it also
+		 * stretches the falloff along the view direction so thick objects, whose back
+		 * faces are not visible in the depth buffer, can still occlude nearby surfaces.
 		 *
 		 * @type {UniformNode<float>}
 		 */
@@ -468,6 +471,8 @@ class GTAONode extends Node {
 			const invRadius = radius.reciprocal().toConst();
 			const invThickness = max( radius, this.thickness ).reciprocal().toConst();
 			const viewDir = ( this._camera.isPerspectiveCamera === true ) ? normalize( viewPosition.xyz.negate() ).toConst() : vec3( 0, 0, 1 ).toConst();
+			// Nudge the shaded point toward the camera (proportional to depth) so depth and normal
+			// quantization do not make coplanar neighbors register as occluders on grazing surfaces.
 			const biasedViewPosition = viewPosition.add( viewDir.mul( viewPosition.z.abs().mul( 0.0005 ) ) ).toConst();
 			const clipPosition = this._cameraProjectionMatrix.mul( vec4( viewPosition, 1.0 ) ).toConst();
 
@@ -490,10 +495,11 @@ class GTAONode extends Node {
 
 			const ao = float( 0 ).toVar();
 
-			// Each iteration analyzes one vertical "slice" of the 3D space around the fragment.
-
-			// Per-step phase jitter for spatio-temporal decorrelation.
+			// Per-pixel offset of the ray-march steps in [0, 1), so all steps stay inside the radius.
+			// With temporal filtering, the offset changes every frame to stratify the steps over time.
 			const stepJitter = fract( interleavedGradientNoise( screenCoordinate ).add( this._temporalOffset ) );
+
+			// Each iteration analyzes one vertical "slice" of the 3D space around the fragment.
 
 			Loop( { start: int( 0 ), end: int( DIRECTIONS ), type: 'int', condition: '<' }, ( { i } ) => {
 
@@ -546,9 +552,11 @@ class GTAONode extends Node {
 					// Manual normalize guards against zero-length delta.
 					const sHX = dot( viewDir, viewDeltaX ).div( max( lenX, float( 0.0001 ) ) );
 
-					// Ellipsoidal falloff (radius in XY, max(radius, thickness) in Z) fading quadratically
-					// over the outer half of the sampling boundary.
-					// (Activision GTAO paper, Section 4.3 "Bounding the sampling area")
+					// Falloff: fade the sample toward the tangent-plane horizon (no occlusion) as it nears the
+					// edge of a view-space ellipsoid with semi-axes radius (XY) and max( radius, thickness ) (Z).
+					// The fade is quadratic over the outer half of the ellipsoid. Stretching it along view Z is a
+					// heuristic: the depth buffer only stores front faces, so thick occluders appear farther away
+					// than their hidden back faces. (Similar to XeGTAO's blend toward the low horizon.)
 					const falloffDistX = vec3( viewDeltaX.xy.mul( invRadius ), viewDeltaX.z.mul( invThickness ) ).length();
 					const fX = clamp( falloffDistX.mul( 2 ).sub( 1 ), 0, 1 );
 					const falloffX = fX.mul( fX );
@@ -583,7 +591,8 @@ class GTAONode extends Node {
 
 				// Cosine-weighted inner integral, closed-form (Activision GTAO paper, Eq. 7).
 				// Per horizon h_i:    term_i = −cos( 2 h_i − γ ) + cos( γ ) + 2 h_i sin( γ )
-				// The 0.25 factor is ½ (integral normalization) × ½ (averaging the two horizons).
+				// The 0.25 factor comes from the integral itself: ∫₀ʰ cos( θ − γ ) sin( θ ) dθ = ¼ term( h ).
+				// The two half-slice terms are summed, not averaged.
 				//
 				// In this slice setup `sliceTangent = cross( sliceBitangent, viewDir )` works out
 				// opposite to `sampleDir`, so the +sampleDir samples (cosHorizons.x) live on the
