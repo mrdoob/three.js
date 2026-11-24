@@ -470,8 +470,6 @@ class Inspector extends RendererInspector {
 
 		if ( stats.gpuNotAvailable === false ) average.gpuNotAvailable = false;
 
-		data.total = data.cpu + data.gpu;
-
 		for ( const child of stats.children ) this.resolveStats( child, average, frames );
 
 	}
@@ -514,40 +512,42 @@ class Inspector extends RendererInspector {
 
 		if ( ! previousFrame ) return;
 
-		const frames = this.frames.filter( ( sample ) => sample.frameId <= frame.frameId && sample.gpuSpanTime !== undefined && sample.children.length > 0 ).slice( - this.averageFrameCount );
-
-		frame.average = { children: [] };
-		frame.gpu = 0;
-
-		for ( const sample of frames ) {
-
-			for ( const stats of sample.children ) this.resolveStats( stats, frame.average, frames.length );
-
-			frame.gpu += sample.gpuSpanTime / frames.length;
-
-		}
-
-		frame.cpu = frame.average.children.reduce( ( sum, stats ) => sum + this.getStatsData( stats.cid ).cpu, 0 );
-
-		frame.total = frame.cpu + frame.gpu;
-
-		// the time since the last frame which rendered, see RendererInspector.finish()
-
-		frame.miscellaneous = frame.deltaTime - frame.total;
-
-		if ( frame.miscellaneous < 0 ) {
-
-			// Frame desync, probably due to async GPU timing.
-
-			frame.miscellaneous = 0;
-
-		}
-
-		//
-
 		this.updateCycle( this.displayCycle.text );
 		this.updateCycle( this.displayCycle.graph );
 		this.updateCycle( this.displayCycle.toggleGraph );
+
+		if ( this.displayCycle.text.needsUpdate || this.displayCycle.graph.needsUpdate ) {
+
+			const frames = this.frames.filter( ( sample ) => sample.frameId <= frame.frameId && sample.gpuSpanTime !== undefined && sample.children.length > 0 ).slice( - this.averageFrameCount );
+
+			frame.average = { children: [] };
+			frame.gpu = 0;
+
+			for ( const sample of frames ) {
+
+				for ( const stats of sample.children ) this.resolveStats( stats, frame.average, frames.length );
+
+				frame.gpu += sample.gpuSpanTime / frames.length;
+
+			}
+
+			frame.cpu = frame.average.children.reduce( ( sum, stats ) => sum + this.getStatsData( stats.cid ).cpu, 0 );
+
+			frame.total = frame.cpu + frame.gpu;
+
+			// the time since the last frame which rendered, see RendererInspector.finish()
+
+			frame.miscellaneous = frame.deltaTime - frame.total;
+
+			if ( frame.miscellaneous < 0 ) {
+
+				// Frame desync, probably due to async GPU timing.
+
+				frame.miscellaneous = 0;
+
+			}
+
+		}
 
 		if ( this.displayCycle.text.needsUpdate ) {
 

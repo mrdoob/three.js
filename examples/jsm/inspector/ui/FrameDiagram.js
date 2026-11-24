@@ -72,6 +72,8 @@ export class FrameDiagram {
 		this.tooltip.className = 'info-tooltip frame-diagram-tooltip';
 		this.tooltip.setAttribute( 'role', 'tooltip' );
 		this.hoveredBox = null;
+		this.tooltipSize = { width: 0, height: 0 };
+		this.tooltipViewportWidth = 0;
 
 		this.domElement.addEventListener( 'pointermove', ( event ) => {
 
@@ -88,9 +90,9 @@ export class FrameDiagram {
 			const container = this.domElement.closest( '.three-inspector' ) || this.domElement;
 			if ( this.tooltip.parentNode !== container ) container.appendChild( this.tooltip );
 
-			this.tooltip.textContent = box.dataset.tooltip;
+			this._updateTooltip( box.dataset.tooltip );
 
-			const { width, height } = this.tooltip.getBoundingClientRect();
+			const { width, height } = this.tooltipSize;
 			const view = this.domElement.ownerDocument.defaultView;
 
 			this.tooltip.style.left = Math.max( 8, Math.min( event.clientX + 12, view.innerWidth - width - 8 ) ) + 'px';
@@ -198,6 +200,20 @@ export class FrameDiagram {
 
 	}
 
+	_updateTooltip( text ) {
+
+		const width = this.domElement.ownerDocument.defaultView.innerWidth;
+
+		if ( this.tooltip.textContent !== text || this.tooltipViewportWidth !== width ) {
+
+			this.tooltip.textContent = text;
+			this.tooltipSize = this.tooltip.getBoundingClientRect();
+			this.tooltipViewportWidth = width;
+
+		}
+
+	}
+
 	_updateSpans( spans, parent, start, duration, track, used ) {
 
 		for ( const span of spans ) {
@@ -226,7 +242,7 @@ export class FrameDiagram {
 			const tooltip = `${ span.name }\n${ spanDuration.toFixed( 3 ) } ms`;
 
 			box.dataset.tooltip = tooltip;
-			if ( this.hoveredBox === box ) this.tooltip.textContent = tooltip;
+			if ( this.hoveredBox === box ) this._updateTooltip( tooltip );
 			if ( box.firstChild.nodeValue !== span.name ) box.firstChild.nodeValue = span.name;
 
 			box.classList.toggle( 'frame-diagram-pipeline', span.name === 'Render Pipeline' );
