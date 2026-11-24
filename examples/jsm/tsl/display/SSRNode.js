@@ -1,4 +1,4 @@
-import { Break, Continue, DFGLUT, Fn, If, Loop, abs, bool, cross, distance, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
+import { Break, Continue, DFGLUT, EnvironmentBRDF_MultiScattering, Fn, If, Loop, abs, bool, cross, distance, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
@@ -11,17 +11,6 @@ let _rendererState;
 
 // Maximum ray-march step count; `quality` (0..1) scales it to a fixed per-ray count.
 const MAX_STEPS = 64;
-
-// Fdez-Agüera multiple scattering relative to the single-scattering split-sum term, as
-// PhysicalLightingModel applies it to its environment radiance.
-const multiScatterGain = /*@__PURE__*/ Fn( ( [ f0, dfg ] ) => {
-
-	const Ems = dfg.x.add( dfg.y ).oneMinus();
-	const Favg = f0.add( f0.oneMinus().mul( 0.047619 ) ); // 1/21
-
-	return Favg.mul( Ems ).div( Favg.mul( Ems ).oneMinus() ).add( 1 );
-
-}, { f0: 'vec3', dfg: 'vec2', return: 'vec3' } );
 
 /**
  * @typedef {Object} SSRNodeOptions
@@ -920,13 +909,10 @@ class SSRNode extends Node {
 
 			const V = viewIncidentDir.negate().normalize().toVar();
 
-			// Reflectance and split-sum DFG as the material weights its environment radiance.
 			// The base color only feeds the metalness F0 fallback.
 			const albedo = this.specularNode === null && this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 );
 			const f0 = vec3( this.specularNode ?? mix( vec3( 0.04 ), albedo, metalness ) ).toVar();
 			const f90 = float( this.specularF90Node ?? 1 ).toVar();
-			const dfg = DFGLUT( { roughness, dotNV: dot( viewNormal, V ).clamp() } ).toVar();
-			const multiScatter = multiScatterGain( f0, dfg ).toVar();
 
 			let viewReflectDir, finalSampleWeight, specDominantFactor;
 			let sampleEnvReflection = null;
@@ -934,7 +920,10 @@ class SSRNode extends Node {
 			if ( this.stochastic === false ) {
 
 				viewReflectDir = reflect( viewIncidentDir, viewNormal ).normalize().toVar();
-				finalSampleWeight = f0.mul( dfg.x ).add( f90.mul( dfg.y ) ).mul( multiScatter ).toVar();
+
+				// directional specular albedo, the weight the material gives its environment radiance
+				const dfg = DFGLUT( { roughness, dotNV: dot( viewNormal, V ).clamp() } ).toConst();
+				finalSampleWeight = EnvironmentBRDF_MultiScattering( { specularColor: f0, specularF90: f90, dfg } ).toConst();
 				specDominantFactor = float( 1 );
 
 			} else {
@@ -953,8 +942,7 @@ class SSRNode extends Node {
 				} );
 
 				viewReflectDir = ggxSample.get( 'reflectDir' ).toVar();
-				// the sample weight estimates single scattering
-				finalSampleWeight = ggxSample.get( 'sampleWeight' ).mul( multiScatter ).toVar();
+				finalSampleWeight = ggxSample.get( 'sampleWeight' ).toVar();
 				specDominantFactor = getSpecularDominantFactor( ggxSample.get( 'NdotV' ), roughness ).toVar();
 
 				sampleEnvReflection = () => {
@@ -1329,8 +1317,7 @@ class SSRNode extends Node {
 
 				if ( this.stochastic === true ) {
 
-					// the environment sample estimates single scattering, like the hit weights
-					output.assign( vec4( sampleEnvReflection().mul( multiScatter ).mul( this.environmentIntensity ), float( ENV_RAY_LENGTH ) ) );
+					output.assign( vec4( sampleEnvReflection().mul( this.environmentIntensity ), float( ENV_RAY_LENGTH ) ) );
 
 					// Misses fade by the surface pixel UV (where the reflection is being shaded).
 					if ( this.screenEdgeFadeBlack ) {
