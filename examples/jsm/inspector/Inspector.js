@@ -470,8 +470,6 @@ class Inspector extends RendererInspector {
 
 		if ( stats.gpuNotAvailable === false ) average.gpuNotAvailable = false;
 
-		data.total = data.cpu + data.gpu;
-
 		for ( const child of stats.children ) this.resolveStats( child, average, frames );
 
 	}
