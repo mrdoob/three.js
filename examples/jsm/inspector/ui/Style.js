@@ -1166,8 +1166,12 @@ export class Style {
 		font-weight: 600;
 	}
 
-	.timing-list .list-item-row.collapsible:not(.alert) {
+	.timing-list .list-item-row:not(.alert) {
 		background-color: transparent !important;
+	}
+
+	.timing-list .list-item-row.alternate-row:not(.alert) {
+		background-color: rgba(0,0,0,0.1) !important;
 	}
 
 	.timing-list .list-item-cell:first-child {
