@@ -84,7 +84,6 @@ class Performance extends Tab {
 		setText( miscellaneous.data[ 0 ], 'Miscellaneous & Idle' );
 		miscellaneous.data[ 0 ].classList.add( 'aggregate-timing' );
 		miscellaneous.data[ 1 ].classList.add( 'aggregate-timing' );
-		miscellaneous.domElement.firstChild.style.backgroundColor = '#00ff0b1a';
 		miscellaneous.domElement.firstChild.classList.add( 'no-hover' );
 		frameTimings.add( miscellaneous );
 
