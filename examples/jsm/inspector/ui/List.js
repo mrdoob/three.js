@@ -8,8 +8,6 @@ export class List {
 		this.domElement = document.createElement( 'div' );
 		this.domElement.className = 'list-container';
 		this.domElement.style.padding = '5px 10px 10px 10px';
-		this.id = `list-${Math.random().toString( 36 ).slice( 2, 11 )}`;
-		this.domElement.dataset.listId = this.id;
 
 		const headerRow = document.createElement( 'div' );
 		headerRow.className = 'list-header';
