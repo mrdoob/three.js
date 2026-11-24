@@ -1,5 +1,5 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, fract, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
+import { reference, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, fract, rand, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -495,8 +495,9 @@ class GTAONode extends Node {
 			const ao = float( 0 ).toVar();
 
 			// Per-pixel offset of the ray-march steps in [0, 1), so all steps stay inside the radius.
-			// With temporal filtering, the offset changes every frame to stratify the steps over time.
-			const stepJitter = fract( interleavedGradientNoise( screenCoordinate ).add( this._temporalOffset ) );
+			// The per-frame hash decorrelates the pattern over time, which helps TAA convergence.
+			const noiseJitterIdx = this._temporalDirection.mul( 0.02 );
+			const stepJitter = fract( interleavedGradientNoise( screenCoordinate.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ) ) ) );
 
 			// Each iteration analyzes one vertical "slice" of the 3D space around the fragment.
 
