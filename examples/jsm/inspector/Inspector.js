@@ -475,8 +475,6 @@ class Inspector extends RendererInspector {
 
 		}
 
-		data.total = data.cpu + data.gpu;
-
 	}
 
 	getNodes() {
