@@ -232,6 +232,36 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'setFromRotationMatrix close to gimbal lock', ( assert ) => {
+
+			// index of the middle angle for each order, which locks at +-90 degrees
+			const middle = { XYZ: 'y', YXZ: 'x', ZXY: 'x', ZYX: 'y', YZX: 'z', XZY: 'z' };
+
+			for ( const order in middle ) {
+
+				for ( const angle of [ Math.PI / 2 - 1e-3, Math.PI / 2 - 1e-5, - Math.PI / 2 + 1e-5 ] ) {
+
+					const v = new Euler( 0.3, - 1.1, 0.7, order );
+					v[ middle[ order ] ] = angle;
+					const m = new Matrix4().makeRotationFromEuler( v );
+
+					const v2 = new Euler().setFromRotationMatrix( m, order );
+					const m2 = new Matrix4().makeRotationFromEuler( v2 );
+					assert.ok( matrixEquals4( m, m2, 1e-12 ), order + ' ' + angle );
+
+				}
+
+				// exact gimbal lock still puts the whole turn in one of the outer angles
+				const v = new Euler( 0.3, - 1.1, 0.7, order );
+				v[ middle[ order ] ] = Math.PI / 2;
+				const m = new Matrix4().makeRotationFromEuler( v );
+				const v2 = new Euler().setFromRotationMatrix( m, order );
+				assert.ok( matrixEquals4( m, new Matrix4().makeRotationFromEuler( v2 ), 1e-12 ), order + ' locked' );
+
+			}
+
+		} );
+
 		QUnit.test( 'reorder', ( assert ) => {
 
 			const testValues = [ eulerZero, eulerAxyz, eulerAzyx ];

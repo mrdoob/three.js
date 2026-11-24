@@ -1,6 +1,5 @@
 import { Quaternion } from './Quaternion.js';
 import { Matrix4 } from './Matrix4.js';
-import { clamp } from './MathUtils.js';
 import { warn } from '../utils.js';
 
 const _matrix = /*@__PURE__*/ new Matrix4();
@@ -198,13 +197,19 @@ class Euler {
 		const m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ];
 		const m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ];
 
+		// The middle angle comes from atan2() of its sine and its cosine (the length of two other
+		// elements), which keeps its precision close to +-90 degrees, where asin() of the sine loses it.
+		// Only a cosine too small to tell the outer angles apart is treated as gimbal lock.
+		let cosine;
+
 		switch ( order ) {
 
 			case 'XYZ':
 
-				this._y = Math.asin( clamp( m13, - 1, 1 ) );
+				cosine = Math.hypot( m11, m12 );
+				this._y = Math.atan2( m13, cosine );
 
-				if ( Math.abs( m13 ) < 0.9999999 ) {
+				if ( cosine > 1e-8 ) {
 
 					this._x = Math.atan2( - m23, m33 );
 					this._z = Math.atan2( - m12, m11 );
@@ -220,9 +225,10 @@ class Euler {
 
 			case 'YXZ':
 
-				this._x = Math.asin( - clamp( m23, - 1, 1 ) );
+				cosine = Math.hypot( m13, m33 );
+				this._x = Math.atan2( - m23, cosine );
 
-				if ( Math.abs( m23 ) < 0.9999999 ) {
+				if ( cosine > 1e-8 ) {
 
 					this._y = Math.atan2( m13, m33 );
 					this._z = Math.atan2( m21, m22 );
@@ -238,9 +244,10 @@ class Euler {
 
 			case 'ZXY':
 
-				this._x = Math.asin( clamp( m32, - 1, 1 ) );
+				cosine = Math.hypot( m31, m33 );
+				this._x = Math.atan2( m32, cosine );
 
-				if ( Math.abs( m32 ) < 0.9999999 ) {
+				if ( cosine > 1e-8 ) {
 
 					this._y = Math.atan2( - m31, m33 );
 					this._z = Math.atan2( - m12, m22 );
@@ -256,9 +263,10 @@ class Euler {
 
 			case 'ZYX':
 
-				this._y = Math.asin( - clamp( m31, - 1, 1 ) );
+				cosine = Math.hypot( m32, m33 );
+				this._y = Math.atan2( - m31, cosine );
 
-				if ( Math.abs( m31 ) < 0.9999999 ) {
+				if ( cosine > 1e-8 ) {
 
 					this._x = Math.atan2( m32, m33 );
 					this._z = Math.atan2( m21, m11 );
@@ -274,9 +282,10 @@ class Euler {
 
 			case 'YZX':
 
-				this._z = Math.asin( clamp( m21, - 1, 1 ) );
+				cosine = Math.hypot( m22, m23 );
+				this._z = Math.atan2( m21, cosine );
 
-				if ( Math.abs( m21 ) < 0.9999999 ) {
+				if ( cosine > 1e-8 ) {
 
 					this._x = Math.atan2( - m23, m22 );
 					this._y = Math.atan2( - m31, m11 );
@@ -292,9 +301,10 @@ class Euler {
 
 			case 'XZY':
 
-				this._z = Math.asin( - clamp( m12, - 1, 1 ) );
+				cosine = Math.hypot( m11, m13 );
+				this._z = Math.atan2( - m12, cosine );
 
-				if ( Math.abs( m12 ) < 0.9999999 ) {
+				if ( cosine > 1e-8 ) {
 
 					this._x = Math.atan2( m32, m22 );
 					this._y = Math.atan2( m13, m11 );
