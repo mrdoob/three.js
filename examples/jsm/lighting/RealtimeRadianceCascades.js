@@ -1,4 +1,4 @@
-import { BackSide, Box3, BufferAttribute, BufferGeometry, DepthTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, HalfFloatType, Matrix4, NodeMaterial, QuadMesh, ReadbackBuffer, RenderTarget, Sphere, StorageBufferAttribute, StorageTexture, Vector2, Vector3, Vector4 } from 'three/webgpu';
+import { BackSide, Box3, BufferAttribute, BufferGeometry, DepthTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, GPUTimer, HalfFloatType, Matrix4, NodeMaterial, QuadMesh, ReadbackBuffer, RenderTarget, Sphere, StorageBufferAttribute, StorageTexture, Vector2, Vector3, Vector4 } from 'three/webgpu';
 import { Break, Fn, If, LTC_Evaluate, Loop, abs, atan, atomicAdd, atomicLoad, atomicMax, atomicMin, atomicStore, cameraPosition, ceil, clamp, cos, cross, diffuseColor, dot, equirectUV, exp, exp2, float, floatBitsToUint, floor, fract, getDistanceAttenuation, getViewPosition, hash, instanceIndex, int, isBackgroundDepth, ivec2, ivec3, ivec4, log2, mat3, max, min, mix, mrt, normalWorldGeometry, normalize, output, pmremTexture, positionWorld, screenUV, select, sharedUniformGroup, sin, smoothstep, sqrt, step, storage, texture, textureStore, uint, uintBitsToFloat, uniform, uniformArray, uv, uvec2, uvec3, vec2, vec3, vec4, velocity } from 'three/tsl';
 
 import { MeshBVH, SAH } from 'three-mesh-bvh';
@@ -410,7 +410,10 @@ class RealtimeRadianceCascades {
 		this._shadeTexture.name = 'RealtimeRadianceCascades.irradiance';
 		this._shadeTexture.generateMipmaps = false;
 		this._passes = null;
-		this._timestampUID = null;
+		// the GPU time of the passes is measured on request, see readGPUTime()
+
+		this._gpuTimer = null;
+		this._gpuTimeRequests = [];
 
 		// the uniforms that change from frame to frame are written once per frame, see update(), into a buffer for each
 		// set of them that a shader reads, instead of into a buffer of every pass
@@ -906,9 +909,32 @@ class RealtimeRadianceCascades {
 
 		this._frameUniforms.needsUpdate = true;
 
+		// the passes are timed only for the frames that readGPUTime() asked for
+
+		const requests = this._gpuTimeRequests;
+
+		if ( requests.length > 0 ) {
+
+			if ( this._gpuTimer === null || this._gpuTimer.renderer !== renderer ) this._gpuTimer = new GPUTimer( renderer );
+
+			this._gpuTimeRequests = [];
+			this._gpuTimer.begin();
+
+		}
+
 		renderer.compute( this._passes );
 
-		if ( renderer.backend.trackTimestamp === true ) this._timestampUID = renderer.backend.getTimestampUID( this._passes );
+		if ( requests.length > 0 ) {
+
+			this._gpuTimer.end().then( ( result ) => {
+
+				const time = result === null ? null : result.delta;
+
+				for ( const resolve of requests ) resolve( time );
+
+			} );
+
+		}
 
 		this._readCounters( renderer );
 
@@ -1049,24 +1075,14 @@ class RealtimeRadianceCascades {
 	}
 
 	/**
-	 * Returns the GPU time of the passes of the last frame in milliseconds. The renderer must track timestamps.
+	 * Returns the GPU time of the passes of the next frame of `update()` in milliseconds, measured with a
+	 * {@link GPUTimer}, or null when the renderer has no timestamp queries or the cascades are disposed first.
 	 *
-	 * @param {WebGPURenderer} renderer - The renderer.
-	 * @return {Promise<?number>} The time, or null if it is missing.
+	 * @return {Promise<?number>} The time.
 	 */
-	async readGPUTime( renderer ) {
+	readGPUTime() {
 
-		const uid = this._timestampUID;
-
-		await renderer.resolveTimestampsAsync( 'compute' );
-
-		// other readers of the timestamps, e.g. the inspector, may have taken it
-
-		const pool = renderer.backend.timestampQueryPool.compute;
-
-		if ( uid === null || pool?.hasTimestampQuery( uid ) !== true ) return null;
-
-		return pool.getTimestamp( uid );
+		return new Promise( ( resolve ) => this._gpuTimeRequests.push( resolve ) );
 
 	}
 
@@ -1082,6 +1098,10 @@ class RealtimeRadianceCascades {
 
 		this._disposeKernels();
 		this._disposeBuffers();
+
+		for ( const resolve of this._gpuTimeRequests ) resolve( null );
+
+		this._gpuTimeRequests = [];
 
 	}
 
