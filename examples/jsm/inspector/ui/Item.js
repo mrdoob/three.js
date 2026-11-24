@@ -119,7 +119,11 @@ export class Item {
 
 			}
 
-			this.itemRow.classList.toggle( 'open', this.isOpen );
+			if ( this.isOpen ) {
+
+				this.itemRow.classList.add( 'open' );
+
+			}
 
 		} else if ( toggler ) {
 

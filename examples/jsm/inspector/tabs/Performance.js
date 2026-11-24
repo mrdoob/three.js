@@ -2,7 +2,7 @@ import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
 import { Graph } from '../ui/Graph.js';
 import { Item } from '../ui/Item.js';
-import { createValueSpan, setText, info } from '../ui/utils.js';
+import { createValueSpan, setText } from '../ui/utils.js';
 
 class Performance extends Tab {
 
@@ -10,9 +10,8 @@ class Performance extends Tab {
 
 		super( 'Performance', options );
 
-		const perfList = new List();
-		perfList.domElement.querySelector( '.list-header' ).remove();
-		perfList.setGridStyle( 'minmax(200px, 1fr) 80px' );
+		const perfList = new List( 'Name', 'CPU', 'GPU' );
+		perfList.setGridStyle( 'minmax(200px, 2fr) 80px 80px' );
 		perfList.domElement.style.minWidth = '520px';
 
 		const scrollWrapper = document.createElement( 'div' );
@@ -48,7 +47,7 @@ class Performance extends Tab {
 		*/
 
 		this.graphFpsCounter = createValueSpan();
-		const graphStats = new Item( 'Graph Stats', this.graphFpsCounter );
+		const graphStats = new Item( 'Graph Stats', createValueSpan(), this.graphFpsCounter );
 		perfList.add( graphStats );
 
 		const graphItem = new Item( graphContainer );
@@ -57,43 +56,19 @@ class Performance extends Tab {
 
 		//
 
-		const frameStats = new Item( 'Frame Stats' );
-		info( frameStats.itemRow.firstChild, '**Bold**: real timings.\n<em>Italic</em>: aggregated timings.' );
+		const frameStats = new Item( 'Frame Stats', createValueSpan(), createValueSpan() );
+		perfList.domElement.appendChild( perfList.domElement.querySelector( '.list-header' ) ); // move the header below the graph
 		perfList.add( frameStats );
 
-		const timingList = new List( 'Name', 'CPU', 'GPU' );
-		timingList.domElement.classList.add( 'timing-list' );
-		timingList.domElement.addEventListener( 'click', () => this.updateRowBackgrounds() );
-		timingList.setGridStyle( 'minmax(200px, 2fr) 80px 80px' );
-		timingList.domElement.style.flex = '1';
-		timingList.domElement.style.padding = '5px 0 10px';
-
-		const timingItem = new Item( timingList.domElement );
-		timingItem.itemRow.style.padding = '0';
-		timingItem.itemRow.children[ 0 ].style.gridColumn = '1 / -1';
-		frameStats.add( timingItem );
-		frameStats.childrenContainer.style.paddingLeft = '0';
-
-		const frameTimings = new Item( createValueSpan(), createValueSpan(), createValueSpan() );
-		setText( frameTimings.data[ 0 ], 'Frame' );
-		frameTimings.data[ 0 ].classList.add( 'aggregate-timing' );
-		frameTimings.data[ 1 ].classList.add( 'aggregate-timing' );
-		frameTimings.data[ 2 ].classList.add( 'aggregate-timing' );
-		timingList.add( frameTimings );
-		frameTimings.domElement.classList.remove( 'header-wrapper', 'section-start' );
-
-		const miscellaneous = new Item( createValueSpan(), createValueSpan(), createValueSpan() );
-		setText( miscellaneous.data[ 0 ], 'Miscellaneous & Idle' );
-		miscellaneous.data[ 0 ].classList.add( 'aggregate-timing' );
-		miscellaneous.data[ 1 ].classList.add( 'aggregate-timing' );
+		const miscellaneous = new Item( 'Miscellaneous & Idle', createValueSpan(), createValueSpan() );
+		miscellaneous.domElement.firstChild.style.backgroundColor = '#00ff0b1a';
 		miscellaneous.domElement.firstChild.classList.add( 'no-hover' );
-		frameTimings.add( miscellaneous );
+		frameStats.add( miscellaneous );
 
 		//
 
 		this.notInUse = new Map();
 		this.frameStats = frameStats;
-		this.frameTimings = frameTimings;
 		this.graphStats = graphStats;
 		this.graph = graph;
 		this.miscellaneous = miscellaneous;
@@ -103,31 +78,6 @@ class Performance extends Tab {
 		this.currentRender = null;
 		this.currentItem = null;
 		this.frameItems = new Map();
-		this.updateRowBackgrounds();
-
-	}
-
-	updateRowBackgrounds() {
-
-		let index = 0;
-
-		const update = ( item ) => {
-
-			item.itemRow.classList.toggle( 'alternate-row', index ++ % 2 === 1 );
-
-			if ( item.isOpen ) {
-
-				for ( const child of item.children ) {
-
-					update( child );
-
-				}
-
-			}
-
-		};
-
-		update( this.frameTimings );
 
 	}
 
@@ -193,13 +143,6 @@ class Performance extends Tab {
 		setText( item.data[ 0 ], name );
 		setText( item.data[ 1 ], data.cpu.toFixed( 2 ) );
 		setText( item.data[ 2 ], stats.gpuNotAvailable === true ? '-' : data.gpu.toFixed( 2 ) );
-
-		// Parent timings include nested calls and represent enclosing spans.
-
-		const isSpan = stats.children.length > 0;
-		item.data[ 0 ].classList.toggle( 'aggregate-timing', isSpan );
-		item.data[ 1 ].classList.toggle( 'aggregate-timing', isSpan );
-		item.data[ 2 ].classList.toggle( 'aggregate-timing', isSpan );
 
 		//
 
@@ -286,7 +229,7 @@ class Performance extends Tab {
 
 		const hasTimestamp = inspector.getRenderer().backend.hasTimestamp;
 
-		this.currentItem = this.frameTimings;
+		this.currentItem = this.frameStats;
 
 		for ( const child of frame.children ) {
 
@@ -322,8 +265,8 @@ class Performance extends Tab {
 
 		//
 
-		setText( this.frameTimings.data[ 1 ], frame.cpu.toFixed( 2 ) );
-		setText( this.frameTimings.data[ 2 ], hasTimestamp ? frame.gpu.toFixed( 2 ) : '-' );
+		setText( this.frameStats.data[ 1 ], frame.cpu.toFixed( 2 ) );
+		setText( this.frameStats.data[ 2 ], hasTimestamp ? frame.gpu.toFixed( 2 ) : '-' );
 
 		//
 
@@ -333,7 +276,6 @@ class Performance extends Tab {
 		//
 
 		this.currentItem = null;
-		this.updateRowBackgrounds();
 
 	}
 
