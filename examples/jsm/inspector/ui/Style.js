@@ -1102,7 +1102,8 @@ export class Style {
 		-webkit-user-select: none;
 	}
 
-	.list-item-wrapper:has(> .list-item-row .graph-container) {
+	.list-item-wrapper:has(> .list-item-row .graph-container),
+	.list-item-wrapper:has(> .list-item-row .frame-diagram) {
 		margin-left: -1.5em;
 	}
 
@@ -1166,6 +1167,23 @@ export class Style {
 		font-weight: 600;
 	}
 
+	.timing-list .list-item-row:not(.alert) {
+		background-color: transparent !important;
+	}
+
+	.timing-list .list-item-row.alternate-row:not(.alert) {
+		background-color: rgba(0,0,0,0.1) !important;
+	}
+
+	.timing-list .list-item-cell:first-child {
+		font-weight: 600;
+	}
+
+	.list-item-cell .aggregate-timing {
+		font-style: italic;
+		font-weight: normal;
+	}
+
 	.list-header {
 		display: grid;
 		grid-template-columns: var(--list-grid-template, none);
@@ -1208,11 +1226,11 @@ export class Style {
 		text-align: left;
 	}
 
-	.list-item-row.open .item-toggler::before {
+	.list-item-row.open > .list-item-cell > .item-toggler::before {
 		content: '-';
 	}
 
-	.list-item-row:not(.open) .item-toggler::before {
+	.list-item-row:not(.open) > .list-item-cell > .item-toggler::before {
 		content: '+';
 	}
 
@@ -1239,20 +1257,98 @@ export class Style {
 	.list-container.parameters .list-item-row:not(.collapsible) {
 	}
 
-	.graph-container {
+	.frame-diagram-track {
+		display: flex;
+		align-items: center;
+		margin-bottom: 4px;
+	}
+
+	.frame-diagram-label {
+		width: 36px;
+		flex-shrink: 0;
+		color: var(--text-secondary);
+	}
+
+	.frame-diagram-content {
+		position: relative;
+		flex: 1;
+		overflow: hidden;
+	}
+
+	.frame-diagram-period {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		border-left: 1px dashed var(--text-secondary);
+	}
+
+	.frame-diagram-axis {
+		position: relative;
+		height: 14px;
+		margin-left: 36px;
+		overflow: hidden;
+	}
+
+	.frame-diagram-tick {
+		position: absolute;
+		padding-left: 3px;
+		border-left: 1px solid var(--profiler-border);
+		color: var(--text-secondary);
+		font-size: 10px;
+		line-height: 14px;
+		white-space: nowrap;
+	}
+
+	/* only the hue of the color is used, with a lightness and chroma that suit the dark theme */
+	.frame-diagram-span {
+		position: absolute;
+		box-sizing: border-box;
+		min-width: 1px;
+		overflow: hidden;
+		padding-left: 3px;
+		background-color: oklch(from var(--span-color) 0.36 0.08 h);
+		border: 1px solid oklch(from var(--span-color) 0.7 0.14 h);
+		border-radius: 2px;
+		color: var(--text-primary);
+		font-size: 10px;
+		line-height: 15px;
+		white-space: nowrap;
+	}
+
+	.frame-diagram-tooltip {
+		transform: none;
+		opacity: 1;
+		visibility: visible;
+		transition: none;
+		pointer-events: none;
+		white-space: pre-line;
+		overflow-wrap: anywhere;
+		max-width: min(400px, calc(100vw - 16px));
+	}
+
+	.frame-diagram-pipeline {
+		background-color: transparent;
+		background-image: linear-gradient( color-mix(in srgb, var(--span-color) 40%, transparent), transparent );
+		border-color: var(--span-color);
+	}
+
+	.graph-container, .frame-diagram {
 		width: 100%;
 		box-sizing: border-box;
 		padding: 8px 0;
 		position: relative;
 	}
 
+	.graph-svg, .graph-canvas, .frame-diagram-content {
+		background-color: var(--profiler-header);
+		border: 1px solid var(--profiler-border);
+		border-radius: 4px;
+	}
+
 	.graph-svg, .graph-canvas {
 		width: 0;
 		min-width: 100%;
 		height: 80px;
-		background-color: var(--profiler-header);
-		border: 1px solid var(--profiler-border);
-		border-radius: 4px;
 		display: block;
 	}
 

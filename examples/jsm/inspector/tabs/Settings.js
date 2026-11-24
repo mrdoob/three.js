@@ -53,7 +53,9 @@ function _loadState() {
 		forceWebGL: settings.forceWebGL !== undefined ? settings.forceWebGL : false,
 		captureStackTrace: settings.captureStackTrace !== undefined ? settings.captureStackTrace : false,
 		activeExtensions: settings.activeExtensions !== undefined ? settings.activeExtensions : {},
-		storage: settings.storage !== undefined ? settings.storage : 'url'
+		storage: settings.storage !== undefined ? settings.storage : 'url',
+		averageFrameCount: settings.averageFrameCount !== undefined ? settings.averageFrameCount : 10,
+		performanceUpdateInterval: settings.performanceUpdateInterval !== undefined ? settings.performanceUpdateInterval : .5
 	};
 
 	if ( _state.forceWebGL ) {
@@ -78,7 +80,9 @@ function _saveState() {
 		forceWebGL: _state.forceWebGL,
 		captureStackTrace: _state.captureStackTrace,
 		activeExtensions: _state.activeExtensions,
-		storage: _state.storage
+		storage: _state.storage,
+		averageFrameCount: _state.averageFrameCount,
+		performanceUpdateInterval: _state.performanceUpdateInterval
 	} );
 
 }
@@ -138,6 +142,25 @@ class Settings extends Parameters {
 		const storageGroup = this.createGroup( 'Storage' );
 
 		const currentState = _loadState();
+
+		const performanceGroup = this.createGroup( 'Performance' );
+
+		this.inspector.averageFrameCount = currentState.averageFrameCount;
+		this.inspector.displayCycle.text.duration = currentState.performanceUpdateInterval;
+
+		performanceGroup.add( currentState, 'averageFrameCount', [ 1, 5, 10, 30 ] ).name( 'Frames Averaged' ).onChange( ( value ) => {
+
+			this.inspector.averageFrameCount = value;
+			_saveState();
+
+		} );
+
+		performanceGroup.add( currentState, 'performanceUpdateInterval', [ .5, 1, 2, 5 ] ).name( 'Update Interval (s)' ).onChange( ( value ) => {
+
+			this.inspector.displayCycle.text.duration = value;
+			_saveState();
+
+		} );
 
 		storageGroup.add( currentState, 'storage', { 'URL Session': 'url', 'Keep across Origin': 'origin' } )
 			.name( 'Save Settings' )

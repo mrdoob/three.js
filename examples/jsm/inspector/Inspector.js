@@ -67,6 +67,7 @@ class Inspector extends RendererInspector {
 		}
 
 		this.statsData = new Map();
+		this.averageFrameCount = 10;
 		this.profiler = profiler;
 		this.performance = performance;
 		this.memory = memory;
@@ -82,8 +83,8 @@ class Inspector extends RendererInspector {
 
 		this.displayCycle = {
 			text: {
-				needsUpdate: false,
-				duration: .25,
+				needsUpdate: true, // Show the first completed frame without waiting for the update interval.
+				duration: .5,
 				time: 0
 			},
 			graph: {
@@ -438,77 +439,46 @@ class Inspector extends RendererInspector {
 
 	}
 
-	resolveStats( stats ) {
+	resolveStats( stats, parent, frames ) {
 
 		const data = this.getStatsData( stats.cid );
+		let average = parent.children.find( ( child ) => child.cid === stats.cid );
 
-		if ( data.initialized !== true ) {
+		if ( average === undefined ) {
 
-			data.cpu = stats.cpu;
-			data.gpu = stats.gpu;
-			data.stats = [];
+			average = { ...stats, parent, children: [], gpuNotAvailable: true };
+			parent.children.push( average );
 
-			data.initialized = true;
-
-		}
-
-		// store stats
-
-		if ( data.stats.length > this.maxFrames ) {
-
-			data.stats.shift();
+			data.cpu = 0;
+			data.gpu = 0;
+			data.cpuOffset = 0;
+			data.gpuOffset = 0;
+			data.gpuHasTimestamp = false;
 
 		}
 
-		data.stats.push( stats );
+		data.cpu += stats.cpu / frames;
+		data.gpu += stats.gpu / frames;
+		data.cpuOffset += stats.cpuOffset / frames;
 
-		// compute averages
+		if ( stats.gpuStart !== null ) {
 
-		data.cpu = this.getAverageDeltaTime( data, 'cpu' );
-		data.gpu = this.getAverageDeltaTime( data, 'gpu' );
-
-		// children: the CPU and GPU time of a render or compute call include the calls nested in it
-
-		for ( const child of stats.children ) {
-
-			this.resolveStats( child );
+			data.gpuOffset += stats.gpuOffset / frames;
+			data.gpuHasTimestamp = true;
 
 		}
+
+		if ( stats.gpuNotAvailable === false ) average.gpuNotAvailable = false;
 
 		data.total = data.cpu + data.gpu;
+
+		for ( const child of stats.children ) this.resolveStats( child, average, frames );
 
 	}
 
 	getNodes() {
 
 		return this.currentNodes;
-
-	}
-
-	getAverageDeltaTime( statsData, property, frames = this.fps ) {
-
-		const statsArray = statsData.stats;
-
-		let sum = 0;
-		let count = 0;
-
-		for ( let i = statsArray.length - 1; i >= 0 && count < frames; i -- ) {
-
-			const stats = statsArray[ i ];
-			const value = stats[ property ];
-
-			if ( value > 0 ) {
-
-				// ignore invalid values
-
-				sum += value;
-				count ++;
-
-			}
-
-		}
-
-		return count > 0 ? sum / count : 0;
 
 	}
 
@@ -544,21 +514,22 @@ class Inspector extends RendererInspector {
 
 		if ( ! previousFrame ) return;
 
-		frame.cpu = 0;
+		const frames = this.frames.filter( ( sample ) => sample.frameId <= frame.frameId && sample.gpuSpanTime !== undefined && sample.children.length > 0 ).slice( - this.averageFrameCount );
+
+		frame.average = { children: [] };
 		frame.gpu = 0;
-		frame.total = 0;
 
-		for ( const stats of frame.children ) {
+		for ( const sample of frames ) {
 
-			this.resolveStats( stats );
+			for ( const stats of sample.children ) this.resolveStats( stats, frame.average, frames.length );
 
-			const data = this.getStatsData( stats.cid );
-
-			frame.cpu += data.cpu;
-			frame.gpu += data.gpu;
-			frame.total += data.total;
+			frame.gpu += sample.gpuSpanTime / frames.length;
 
 		}
+
+		frame.cpu = frame.average.children.reduce( ( sum, stats ) => sum + this.getStatsData( stats.cid ).cpu, 0 );
+
+		frame.total = frame.cpu + frame.gpu;
 
 		// the time since the last frame which rendered, see RendererInspector.finish()
 
@@ -615,7 +586,7 @@ class Inspector extends RendererInspector {
 
 		cycle.time += this.nodeFrame.deltaTime;
 
-		if ( cycle.time >= cycle.duration ) {
+		if ( cycle.needsUpdate || cycle.time >= cycle.duration ) {
 
 			cycle.needsUpdate = true;
 			cycle.time = 0;
