@@ -91,7 +91,12 @@ class Performance extends Tab {
 
 		const timingList = new List( 'Name', 'CPU', 'GPU' );
 		timingList.domElement.classList.add( 'timing-list' );
-		timingList.domElement.addEventListener( 'click', () => this.updateRowBackgrounds() );
+		timingList.domElement.addEventListener( 'click', () => {
+
+			this.updateRowBackgrounds();
+			this.refreshFrameDiagram();
+
+		} );
 		timingList.setGridStyle( 'minmax(200px, 2fr) 80px 80px' );
 		timingList.domElement.style.flex = '1';
 		timingList.domElement.style.padding = '5px 0 10px';
@@ -121,6 +126,7 @@ class Performance extends Tab {
 
 		this.notInUse = new Map();
 		this.frameDiagram = frameDiagram;
+		this.frameDiagramData = null;
 		this.frameStats = frameStats;
 		this.frameTimings = frameTimings;
 		this.graphStats = graphStats;
@@ -303,9 +309,32 @@ class Performance extends Tab {
 		const period = inspector.fps > 0 ? 1000 / inspector.fps : 0;
 		const duration = Math.max( period, ...tracks.CPU.map( ( span ) => span.end ), ...tracks.GPU.map( ( span ) => span.end ) );
 
-		this.frameDiagram.update( tracks, duration, period );
+		this.frameDiagramData = { tracks, duration, period };
+		this.refreshFrameDiagram();
 
 		setText( this.frameTimelineDuration, duration.toFixed( 2 ) + ' ms' );
+
+	}
+
+	refreshFrameDiagram() {
+
+		const data = this.frameDiagramData;
+
+		if ( data === null ) return;
+
+		const visibleSpans = ( spans ) => spans.map( ( span ) => {
+
+			const item = this.frameItems.get( span.key );
+
+			return { ...span, children: item && item.isOpen === false ? [] : visibleSpans( span.children ) };
+
+		} );
+
+		const tracks = {};
+
+		for ( const name in data.tracks ) tracks[ name ] = visibleSpans( data.tracks[ name ] );
+
+		this.frameDiagram.update( tracks, data.duration, data.period );
 
 	}
 
