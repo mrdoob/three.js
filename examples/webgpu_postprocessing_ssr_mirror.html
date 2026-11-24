@@ -44,7 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, specularColorBlended, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, specularColorBlended, indirectSpecular, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -144,7 +144,8 @@
 				output: output,
 				normal: packNormalToOctahedral( normalView ),
 				metalrough: vec2( metalness, roughness ), // pack metalness and roughness into a single attachment
-				specular: specularColorBlended // the material's F0, tints reflections on metals
+				specular: specularColorBlended, // the material's F0, tints reflections on metals
+				indirectSpecular: indirectSpecular // the environment reflection SSR replaces
 			} ) );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
@@ -160,6 +161,7 @@
 			} );
 			const scenePassMetalRough = scenePass.getTextureNode( 'metalrough' ).toInspector( 'Metalness-Roughness' );
 			const scenePassSpecular = scenePass.getTextureNode( 'specular' ).toInspector( 'Specular' );
+			const scenePassIndirectSpecular = scenePass.getTextureNode( 'indirectSpecular' ).toInspector( 'Indirect Specular' );
 
 			// octahedral normals can't be filtered across their folds
 
@@ -170,6 +172,7 @@
 			// optional: optimize bandwidth by reducing the texture precision for metal/roughness
 
 			const metalRoughTexture = scenePass.getTexture( 'metalrough' );
+			metalRoughTexture.format = THREE.RGFormat; // keeps the MRT within 32 bytes per sample
 			metalRoughTexture.type = THREE.UnsignedByteType;
 
 			scenePass.getTexture( 'specular' ).type = THREE.UnsignedByteType;
@@ -186,6 +189,7 @@
 				metalnessNode: scenePassMetalRough.r,
 				roughnessNode: scenePassMetalRough.g,
 				specularNode: scenePassSpecular,
+				indirectSpecularNode: scenePassIndirectSpecular,
 				binaryRefine: params.binaryRefine
 			} ).toInspector( 'SSR' );
 

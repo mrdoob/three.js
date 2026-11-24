@@ -23,6 +23,7 @@ const MAX_STEPS = 64;
  * @property {Texture} [environmentNode=null] - Equirectangular HDR environment map with CPU-side `image.data` (e.g. from RGBELoader). Not compatible with PMREM / `scene.environment` cubemaps.
  * @property {boolean} [envImportanceSampling=false] - When `true`, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.
  * @property {Node} [diffuseNode=null] - Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
+ * @property {Node<vec3>} [indirectSpecularNode=null] - Only used when `stochastic=false`. The indirect specular reflection the beauty pass already contains, typically an MRT `indirectSpecular` attachment. When set, a hit replaces it instead of adding to it, so the output is the signed difference and still composites as `beauty + ssr`.
  * @property {boolean} [binaryRefine=false] - Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
  * @property {Camera} [camera=null] - Camera the scene is rendered with. Inferred from the color pass when omitted.
  */
@@ -65,6 +66,7 @@ class SSRNode extends Node {
 			environmentNode = null,
 			envImportanceSampling = false,
 			diffuseNode = null,
+			indirectSpecularNode = null,
 			binaryRefine = false
 		} = options;
 
@@ -101,6 +103,16 @@ class SSRNode extends Node {
 		 * @type {?Node<vec4>}
 		 */
 		this.diffuseNode = diffuseNode !== null ? nodeObject( diffuseNode ) : null;
+
+		/**
+		 * Only used when `stochastic=false`. The indirect specular reflection the beauty pass
+		 * already contains (typically the MRT `indirectSpecular` attachment). When set, a hit
+		 * replaces it instead of adding to it, so the output is the signed difference and
+		 * still composites as `beauty + ssr`.
+		 *
+		 * @type {?Node<vec3>}
+		 */
+		this.indirectSpecularNode = indirectSpecularNode !== null ? nodeObject( indirectSpecularNode ) : null;
 
 		/**
 		 * A node that represents the beauty pass's depth.
@@ -206,6 +218,16 @@ class SSRNode extends Node {
 		 * @default 1
 		 */
 		this.intensity = uniform( 1 );
+
+		/**
+		 * Only used when `stochastic=false`. Roughness at which reflections are faded out,
+		 * since a single mirror ray can't represent a wide specular lobe. The fade starts at
+		 * half this value, as Unreal Engine's `r.SSR.MaxRoughness`.
+		 *
+		 * @type {UniformNode<float>}
+		 * @default 1
+		 */
+		this.maxRoughness = uniform( 1 );
 
 		/**
 		 * Screen-edge fade width, in UV units. As a screen-space hit approaches a screen
@@ -1299,9 +1321,15 @@ class SSRNode extends Node {
 
 					if ( this.stochastic === false ) {
 
-						// the mirror path fades hits out toward maxDistance
+						// the mirror path fades hits out toward maxDistance and on rough surfaces
 						const ratio = float( 1 ).sub( distancePointPlane.div( this.maxDistance ) ).toVar();
-						weightedColor = weightedColor.mul( ratio.mul( ratio ) );
+						const roughnessFade = roughness.div( this.maxRoughness ).mul( - 2 ).add( 2 ).clamp();
+
+						// replace the indirect specular the beauty pass already contains; blurring the
+						// difference keeps the per-pixel detail of the replaced reflection
+						if ( this.indirectSpecularNode !== null ) weightedColor = weightedColor.sub( this.indirectSpecularNode.sample( uvPos ).rgb );
+
+						weightedColor = weightedColor.mul( ratio.mul( ratio ).mul( roughnessFade ) );
 
 					}
 
@@ -1335,6 +1363,9 @@ class SSRNode extends Node {
 
 			// scale the reflection color by the user-controlled intensity
 			output.rgb.mulAssign( this.intensity );
+
+			// a replacement is a signed difference
+			if ( this.stochastic === false && this.indirectSpecularNode !== null ) return output;
 
 			return output.max( 0 );
 

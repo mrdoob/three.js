@@ -8,7 +8,7 @@ import Schlick_to_F0 from './BSDF/Schlick_to_F0.js';
 import BRDF_Sheen from './BSDF/BRDF_Sheen.js';
 import { LTC_Evaluate, LTC_Uv } from './BSDF/LTC.js';
 import LightingModel from '../core/LightingModel.js';
-import { diffuseColor, diffuseContribution, diffuseRoughness, specularColor, specularColorBlended, specularF90, roughness, metalness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor, dispersion, retroreflectivity } from '../core/PropertyNode.js';
+import { diffuseColor, diffuseContribution, diffuseRoughness, specularColor, specularColorBlended, specularF90, roughness, metalness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor, dispersion, retroreflectivity, indirectSpecular } from '../core/PropertyNode.js';
 import { normalView, clearcoatNormalView, normalWorld } from '../accessors/Normal.js';
 import { positionViewDirection, positionView, positionWorld } from '../accessors/Position.js';
 import { Fn, float, vec2, vec3, vec4, mat3, If, pow4 } from '../tsl/TSLBase.js';
@@ -920,7 +920,9 @@ class PhysicalLightingModel extends LightingModel {
 	 */
 	finish( { context } ) {
 
-		const { outgoingLight } = context;
+		const { outgoingLight, reflectedLight } = context;
+
+		let baseIndirectSpecular = reflectedLight.indirectSpecular;
 
 		if ( this.clearcoat === true ) {
 
@@ -932,11 +934,17 @@ class PhysicalLightingModel extends LightingModel {
 				f90: clearcoatF90
 			} );
 
-			const clearcoatLight = outgoingLight.mul( clearcoat.mul( Fcc ).oneMinus() ).add( this.clearcoatSpecularDirect.add( this.clearcoatSpecularIndirect ).mul( clearcoat ) );
+			const baseAttenuation = clearcoat.mul( Fcc ).oneMinus();
+
+			const clearcoatLight = outgoingLight.mul( baseAttenuation ).add( this.clearcoatSpecularDirect.add( this.clearcoatSpecularIndirect ).mul( clearcoat ) );
 
 			outgoingLight.assign( clearcoatLight );
 
+			baseIndirectSpecular = baseIndirectSpecular.mul( baseAttenuation );
+
 		}
+
+		indirectSpecular.assign( baseIndirectSpecular );
 
 		if ( this.sheen === true ) {
 

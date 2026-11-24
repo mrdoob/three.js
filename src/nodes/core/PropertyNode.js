@@ -441,3 +441,15 @@ export const retroreflectivity = /*@__PURE__*/ nodeImmutable( PropertyNode, 'flo
  * @type {PropertyNode<float>}
  */
 export const ambientOcclusion = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'AmbientOcclusion', false, 1 );
+
+/**
+ * TSL object that represents the shader variable `IndirectSpecular`: the specular
+ * reflection of indirect light (environment, light probes, ambient and hemisphere
+ * lights) as it reaches the outgoing light. Screen-space reflections can subtract it
+ * to replace it. If no value is assigned to this property, it defaults to a
+ * placeholder value of `0`.
+ *
+ * @tsl
+ * @type {PropertyNode<vec3>}
+ */
+export const indirectSpecular = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'IndirectSpecular', false, 0 );
