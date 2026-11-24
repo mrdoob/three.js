@@ -83,7 +83,7 @@ class Inspector extends RendererInspector {
 
 		this.displayCycle = {
 			text: {
-				needsUpdate: false,
+				needsUpdate: true, // Show the first completed frame without waiting for the update interval.
 				duration: .5,
 				time: 0
 			},
@@ -586,7 +586,7 @@ class Inspector extends RendererInspector {
 
 		cycle.time += this.nodeFrame.deltaTime;
 
-		if ( cycle.time >= cycle.duration ) {
+		if ( cycle.needsUpdate || cycle.time >= cycle.duration ) {
 
 			cycle.needsUpdate = true;
 			cycle.time = 0;

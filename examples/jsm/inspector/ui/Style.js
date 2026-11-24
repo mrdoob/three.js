@@ -1273,9 +1273,6 @@ export class Style {
 		position: relative;
 		flex: 1;
 		overflow: hidden;
-		background-color: var(--profiler-header);
-		border: 1px solid var(--profiler-border);
-		border-radius: 4px;
 	}
 
 	.frame-diagram-period {
@@ -1318,6 +1315,23 @@ export class Style {
 		white-space: nowrap;
 	}
 
+	.frame-diagram-tooltip {
+		transform: none;
+		opacity: 1;
+		visibility: visible;
+		transition: none;
+		pointer-events: none;
+		white-space: pre-line;
+		overflow-wrap: anywhere;
+		max-width: min(400px, calc(100vw - 16px));
+	}
+
+	.frame-diagram-pipeline {
+		background-color: transparent;
+		background-image: linear-gradient( color-mix(in srgb, var(--span-color) 40%, transparent), transparent );
+		border-color: var(--span-color);
+	}
+
 	.graph-container, .frame-diagram {
 		width: 100%;
 		box-sizing: border-box;
@@ -1325,13 +1339,16 @@ export class Style {
 		position: relative;
 	}
 
+	.graph-svg, .graph-canvas, .frame-diagram-content {
+		background-color: var(--profiler-header);
+		border: 1px solid var(--profiler-border);
+		border-radius: 4px;
+	}
+
 	.graph-svg, .graph-canvas {
 		width: 0;
 		min-width: 100%;
 		height: 80px;
-		background-color: var(--profiler-header);
-		border: 1px solid var(--profiler-border);
-		border-radius: 4px;
 		display: block;
 	}
 

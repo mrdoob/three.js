@@ -11,7 +11,7 @@ const ROW_HEIGHT = 18;
  * @param {Array<{start: number, end: number, children: Array}>} spans - The sibling spans.
  * @return {number} The height of the stack in rows.
  */
-export function stackSpans( spans ) {
+function stackSpans( spans ) {
 
 	const rowEnds = [];
 	const rowHeights = [];
@@ -33,7 +33,14 @@ export function stackSpans( spans ) {
 
 	let height = 0;
 
-	const offsets = rowHeights.map( ( rowHeight ) => ( height += rowHeight ) - rowHeight );
+	const offsets = [];
+
+	for ( const rowHeight of rowHeights ) {
+
+		offsets.push( height );
+		height += rowHeight;
+
+	}
 
 	for ( const span of spans ) span.offset = offsets[ span.row ];
 
@@ -61,16 +68,55 @@ export class FrameDiagram {
 		this.tracks = new Map();
 		this.boxes = new Map();
 
+		this.tooltip = document.createElement( 'div' );
+		this.tooltip.className = 'info-tooltip frame-diagram-tooltip';
+		this.tooltip.setAttribute( 'role', 'tooltip' );
+		this.hoveredBox = null;
+
+		this.domElement.addEventListener( 'pointermove', ( event ) => {
+
+			const box = event.target.closest( '.frame-diagram-span' );
+			this.hoveredBox = box;
+
+			if ( box === null ) {
+
+				this.tooltip.remove();
+				return;
+
+			}
+
+			const container = this.domElement.closest( '.three-inspector' ) || this.domElement;
+			if ( this.tooltip.parentNode !== container ) container.appendChild( this.tooltip );
+
+			this.tooltip.textContent = box.dataset.tooltip;
+
+			const { width, height } = this.tooltip.getBoundingClientRect();
+			const view = this.domElement.ownerDocument.defaultView;
+
+			this.tooltip.style.left = Math.max( 8, Math.min( event.clientX + 12, view.innerWidth - width - 8 ) ) + 'px';
+			this.tooltip.style.top = Math.max( 8, Math.min( event.clientY + 12, view.innerHeight - height - 8 ) ) + 'px';
+
+		} );
+
+		this.domElement.addEventListener( 'pointerleave', () => {
+
+			this.hoveredBox = null;
+			this.tooltip.remove();
+
+		} );
+
 	}
 
 	/**
 	 * Updates the diagram.
 	 *
-	 * @param {Object<string, Array<{key: string, name: string, color: string, start: number, end: number, children: Array}>>} tracks - The spans of each track, by its name. The times are in milliseconds since the start of the track. Only the hue of the color is used.
+	 * @param {Object<string, Array<{key: string, name: string, color: string, start: number, end: number, children: Array}>>} tracks - The spans of each track, by its name. The times are in milliseconds since the start of the track. Only the hue of the color is used, except for Render Pipeline spans.
 	 * @param {number} duration - The time the width of the diagram stands for.
 	 * @param {number} period - The frame period, marked in the tracks.
 	 */
 	update( tracks, duration, period ) {
+
+		duration = Math.max( duration, 1e-6 );
 
 		const used = new Set();
 
@@ -136,8 +182,14 @@ export class FrameDiagram {
 
 			if ( used.has( key ) === false ) {
 
-				box.remove();
+				if ( this.hoveredBox === box ) {
 
+					this.hoveredBox = null;
+					this.tooltip.remove();
+
+				}
+
+				box.remove();
 				this.boxes.delete( key );
 
 			}
@@ -150,7 +202,7 @@ export class FrameDiagram {
 
 		for ( const span of spans ) {
 
-			// the boxes are reused, so the tooltip of a box stays open while it is updated
+			// reuse the boxes so hovering remains stable while the diagram updates
 
 			const key = track + ':' + span.key;
 
@@ -171,11 +223,13 @@ export class FrameDiagram {
 			used.add( key );
 
 			const spanDuration = span.end - span.start;
-			const title = `${ span.name }\n${ span.start.toFixed( 2 ) } - ${ span.end.toFixed( 2 ) } ms ( ${ spanDuration.toFixed( 2 ) } ms )`;
+			const tooltip = `${ span.name }\n${ spanDuration.toFixed( 3 ) } ms`;
 
-			if ( box.title !== title ) box.title = title;
+			box.dataset.tooltip = tooltip;
+			if ( this.hoveredBox === box ) this.tooltip.textContent = tooltip;
 			if ( box.firstChild.nodeValue !== span.name ) box.firstChild.nodeValue = span.name;
 
+			box.classList.toggle( 'frame-diagram-pipeline', span.name === 'Render Pipeline' );
 			box.style.setProperty( '--span-color', span.color );
 			box.style.left = ( ( span.start - start ) / ( duration || 1 ) ) * 100 + '%';
 			box.style.width = ( spanDuration / ( duration || 1 ) ) * 100 + '%';

@@ -1,3 +1,4 @@
+import { NodeUtils } from 'three/webgpu';
 import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
 import { Graph } from '../ui/Graph.js';
@@ -5,25 +6,16 @@ import { FrameDiagram } from '../ui/FrameDiagram.js';
 import { Item } from '../ui/Item.js';
 import { createValueSpan, setText } from '../ui/utils.js';
 
-const HUES = 12;
+// returns a stable hue for the name before the first dash, so calls with the same prefix
+// share a hue, and keep it between frames and runs
 
-// returns one of a set of hues for the name without what follows a bracket or a dash, so the calls which
-// only differ by that share a hue, and keep it between frames and runs
+function getColor( name, type ) {
 
-function getColor( name ) {
+	if ( name === 'Render Pipeline' ) return type === 'cpu' ? 'var(--color-yellow)' : 'var(--color-green)';
 
-	name = name.split( / \[| - / )[ 0 ];
+	name = name.split( '-' )[ 0 ].trim();
 
-	let hash = 0;
-
-	for ( let i = 0; i < name.length; i ++ ) hash = Math.imul( hash ^ name.charCodeAt( i ), 16777619 );
-
-	// mix the bits, names often differ only by their last character
-
-	hash = Math.imul( hash ^ ( hash >>> 16 ), 0x85ebca6b );
-	hash ^= hash >>> 13;
-
-	return `oklch( 0.7 0.15 ${ ( hash >>> 0 ) % HUES * ( 360 / HUES ) } )`;
+	return `oklch( 0.7 0.15 ${ NodeUtils.hashString( name ) % 360 } )`;
 
 }
 
@@ -84,13 +76,13 @@ class Performance extends Tab {
 
 		const frameDiagram = new FrameDiagram();
 
-		this.averageFrameDuration = createValueSpan();
-		const averageFrame = new Item( 'Average Frame', this.averageFrameDuration );
-		perfList.add( averageFrame );
+		this.frameTimelineDuration = createValueSpan();
+		const frameTimeline = new Item( 'Frame Timeline', this.frameTimelineDuration );
+		perfList.add( frameTimeline );
 
 		const frameDiagramItem = new Item( frameDiagram.domElement );
 		frameDiagramItem.itemRow.childNodes[ 0 ].style.gridColumn = '1 / -1';
-		averageFrame.add( frameDiagramItem );
+		frameTimeline.add( frameDiagramItem );
 
 		//
 
@@ -279,7 +271,7 @@ class Performance extends Tab {
 			return {
 				key: stats.cid,
 				name: stats.name,
-				color: getColor( stats.name ),
+				color: getColor( stats.name, type ),
 				start,
 				end: start + data[ type ],
 				children: createSpans( stats.children, type, start )
@@ -313,7 +305,7 @@ class Performance extends Tab {
 
 		this.frameDiagram.update( tracks, duration, period );
 
-		setText( this.averageFrameDuration, duration.toFixed( 2 ) + ' ms' );
+		setText( this.frameTimelineDuration, duration.toFixed( 2 ) + ' ms' );
 
 	}
 
