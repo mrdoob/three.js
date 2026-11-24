@@ -62,6 +62,7 @@ class Performance extends Tab {
 
 		const timingList = new List( 'Name', 'CPU', 'GPU' );
 		timingList.domElement.classList.add( 'timing-list' );
+		timingList.domElement.addEventListener( 'click', () => this.updateRowBackgrounds() );
 		timingList.setGridStyle( 'minmax(200px, 2fr) 80px 80px' );
 		timingList.domElement.style.flex = '1';
 		timingList.domElement.style.padding = '5px 0 10px';
@@ -101,6 +102,31 @@ class Performance extends Tab {
 		this.currentRender = null;
 		this.currentItem = null;
 		this.frameItems = new Map();
+		this.updateRowBackgrounds();
+
+	}
+
+	updateRowBackgrounds() {
+
+		let index = 0;
+
+		const update = ( item ) => {
+
+			item.itemRow.classList.toggle( 'alternate-row', index ++ % 2 === 1 );
+
+			if ( item.isOpen ) {
+
+				for ( const child of item.children ) {
+
+					update( child );
+
+				}
+
+			}
+
+		};
+
+		update( this.frameTimings );
 
 	}
 
@@ -306,6 +332,7 @@ class Performance extends Tab {
 		//
 
 		this.currentItem = null;
+		this.updateRowBackgrounds();
 
 	}
 
