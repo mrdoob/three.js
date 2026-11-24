@@ -88,6 +88,7 @@ class Performance extends Tab {
 		//
 
 		const frameStats = new Item( 'Frame Stats' );
+		info( frameStats.itemRow.firstChild, '**Bold**: real timings.\n<em>Italic</em>: aggregated timings.' );
 		perfList.add( frameStats );
 
 		const timingList = new List( 'Name', 'CPU', 'GPU' );
