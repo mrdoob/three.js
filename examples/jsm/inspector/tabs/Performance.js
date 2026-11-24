@@ -63,10 +63,13 @@ class Performance extends Tab {
 		const timingList = new List( 'Name', 'CPU', 'GPU' );
 		timingList.setGridStyle( 'minmax(200px, 2fr) 80px 80px' );
 		timingList.domElement.style.flex = '1';
+		timingList.domElement.style.padding = '5px 0 10px';
 
 		const timingItem = new Item( timingList.domElement );
+		timingItem.itemRow.style.padding = '0';
 		timingItem.itemRow.children[ 0 ].style.gridColumn = '1 / -1';
 		frameStats.add( timingItem );
+		frameStats.childrenContainer.style.paddingLeft = '0';
 
 		const frameTimings = new Item( 'Frame', createValueSpan(), createValueSpan() );
 		frameTimings.data[ 1 ].classList.add( 'aggregate-timing' );
