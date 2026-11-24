@@ -1166,6 +1166,11 @@ export class Style {
 		font-weight: 600;
 	}
 
+	.list-item-cell .aggregate-timing {
+		font-style: italic;
+		font-weight: normal;
+	}
+
 	.list-header {
 		display: grid;
 		grid-template-columns: var(--list-grid-template, none);
