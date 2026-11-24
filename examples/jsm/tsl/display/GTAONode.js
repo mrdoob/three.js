@@ -1,5 +1,5 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
+import { reference, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, fract, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -466,7 +466,9 @@ class GTAONode extends Node {
 
 			const radius = this.radius;
 			const invRadius = radius.reciprocal().toConst();
+			const invThickness = max( radius, this.thickness ).reciprocal().toConst();
 			const viewDir = ( this._camera.isPerspectiveCamera === true ) ? normalize( viewPosition.xyz.negate() ).toConst() : vec3( 0, 0, 1 ).toConst();
+			const biasedViewPosition = viewPosition.add( viewDir.mul( viewPosition.z.abs().mul( 0.0005 ) ) ).toConst();
 			const clipPosition = this._cameraProjectionMatrix.mul( vec4( viewPosition, 1.0 ) ).toConst();
 
 			const noiseResolution = textureSize( this._noiseNode, 0 );
@@ -491,8 +493,7 @@ class GTAONode extends Node {
 			// Each iteration analyzes one vertical "slice" of the 3D space around the fragment.
 
 			// Per-step phase jitter for spatio-temporal decorrelation.
-			const noiseJitterIdx = this._temporalDirection.mul( 0.02 );
-			const stepJitter = interleavedGradientNoise( screenCoordinate.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) );
+			const stepJitter = fract( interleavedGradientNoise( screenCoordinate ).add( this._temporalOffset ) );
 
 			Loop( { start: int( 0 ), end: int( DIRECTIONS ), type: 'int', condition: '<' }, ( { i } ) => {
 
@@ -528,7 +529,7 @@ class GTAONode extends Node {
 
 					// Quadratic step distribution ( sampleDist = t² ) concentrates samples in the
 					// near-field. (Blender's Eevee adaptation)
-					const t = float( j ).add( 1.0 ).add( stepJitter ).mul( invSteps ).toConst();
+					const t = float( j ).add( stepJitter ).mul( invSteps ).toConst();
 					const sampleDist = t.mul( t );
 					const clipOffset = clipDirRadius.mul( sampleDist ).toConst();
 
@@ -539,22 +540,22 @@ class GTAONode extends Node {
 					const sampleScreenPositionX = getScreenPositionFromClip( clipPosition.add( clipOffset ) ).toConst();
 					const sampleDepthX = sampleDepth( sampleScreenPositionX ).toConst();
 					const sampleSceneViewPositionX = getViewPosition( sampleScreenPositionX, sampleDepthX, this._cameraProjectionMatrixInverse ).toConst();
-					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition ).toConst();
+					const viewDeltaX = sampleSceneViewPositionX.sub( biasedViewPosition ).toConst();
 					const lenX = viewDeltaX.length().toConst();
 
 					// Manual normalize guards against zero-length delta.
 					const sHX = dot( viewDir, viewDeltaX ).div( max( lenX, float( 0.0001 ) ) );
 
-					// Sphere falloff: ( dist / radius )² fades the sample's horizon contribution
-					// back toward the prior horizon as it approaches the radius boundary.
-					// (squared variant of the paper's near-field attenuation;
-					// Activision GTAO paper, Section 4.3 "Bounding the sampling area")
-					const distFacX = min( lenX.mul( invRadius ), 1 );
-					const distFacSqX = distFacX.mul( distFacX );
+					// Ellipsoidal falloff (radius in XY, max(radius, thickness) in Z) fading quadratically
+					// over the outer half of the sampling boundary.
+					// (Activision GTAO paper, Section 4.3 "Bounding the sampling area")
+					const falloffDistX = vec3( viewDeltaX.xy.mul( invRadius ), viewDeltaX.z.mul( invThickness ) ).length();
+					const fX = clamp( falloffDistX.mul( 2 ).sub( 1 ), 0, 1 );
+					const falloffX = fX.mul( fX );
 
 					If( isValidSample( sampleScreenPositionX, centerTexel, depthSize ).and( abs( viewDeltaX.z ).lessThan( this.thickness ) ), () => {
 
-						cosHorizons.x.assign( mix( max( cosHorizons.x, sHX ), cosHorizons.x, distFacSqX ) );
+						cosHorizons.x.assign( max( cosHorizons.x, mix( sHX, cosHorizon, falloffX ) ) );
 
 					} );
 
@@ -563,17 +564,18 @@ class GTAONode extends Node {
 					const sampleScreenPositionY = getScreenPositionFromClip( clipPosition.sub( clipOffset ) ).toConst();
 					const sampleDepthY = sampleDepth( sampleScreenPositionY ).toConst();
 					const sampleSceneViewPositionY = getViewPosition( sampleScreenPositionY, sampleDepthY, this._cameraProjectionMatrixInverse ).toConst();
-					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition ).toConst();
+					const viewDeltaY = sampleSceneViewPositionY.sub( biasedViewPosition ).toConst();
 					const lenY = viewDeltaY.length().toConst();
 
 					const sHY = dot( viewDir, viewDeltaY ).div( max( lenY, float( 0.0001 ) ) );
 
-					const distFacY = min( lenY.mul( invRadius ), 1 );
-					const distFacSqY = distFacY.mul( distFacY );
+					const falloffDistY = vec3( viewDeltaY.xy.mul( invRadius ), viewDeltaY.z.mul( invThickness ) ).length();
+					const fY = clamp( falloffDistY.mul( 2 ).sub( 1 ), 0, 1 );
+					const falloffY = fY.mul( fY );
 
 					If( isValidSample( sampleScreenPositionY, centerTexel, depthSize ).and( abs( viewDeltaY.z ).lessThan( this.thickness ) ), () => {
 
-						cosHorizons.y.assign( mix( max( cosHorizons.y, sHY ), cosHorizons.y, distFacSqY ) );
+						cosHorizons.y.assign( max( cosHorizons.y, mix( sHY, cosHorizon.negate(), falloffY ) ) );
 
 					} );
 
@@ -588,8 +590,8 @@ class GTAONode extends Node {
 				// −T side of the slice and −sampleDir samples (cosHorizons.y) on the +T side.
 				// γ is signed by +T (sliceTangent), so hPos must read from cosHorizons.y.
 
-				const hPos = acos( cosHorizons.y ).toConst();
-				const hNeg = acos( cosHorizons.x ).negate().toConst();
+				const hPos = acos( clamp( cosHorizons.y, - 1, 1 ) ).toConst();
+				const hNeg = acos( clamp( cosHorizons.x, - 1, 1 ) ).negate().toConst();
 
 				const termPos = cos( hPos.mul( 2 ).sub( angleN ) ).negate().add( nCos ).add( hPos.mul( 2 ).mul( nSin ) );
 				const termNeg = cos( hNeg.mul( 2 ).sub( angleN ) ).negate().add( nCos ).add( hNeg.mul( 2 ).mul( nSin ) );
