@@ -61,6 +61,7 @@ class Performance extends Tab {
 		perfList.add( frameStats );
 
 		const timingList = new List( 'Name', 'CPU', 'GPU' );
+		timingList.domElement.classList.add( 'timing-list' );
 		timingList.setGridStyle( 'minmax(200px, 2fr) 80px 80px' );
 		timingList.domElement.style.flex = '1';
 		timingList.domElement.style.padding = '5px 0 10px';
@@ -71,12 +72,17 @@ class Performance extends Tab {
 		frameStats.add( timingItem );
 		frameStats.childrenContainer.style.paddingLeft = '0';
 
-		const frameTimings = new Item( 'Frame', createValueSpan(), createValueSpan() );
+		const frameTimings = new Item( createValueSpan(), createValueSpan(), createValueSpan() );
+		setText( frameTimings.data[ 0 ], 'Frame' );
+		frameTimings.data[ 0 ].classList.add( 'aggregate-timing' );
 		frameTimings.data[ 1 ].classList.add( 'aggregate-timing' );
 		frameTimings.data[ 2 ].classList.add( 'aggregate-timing' );
 		timingList.add( frameTimings );
+		frameTimings.domElement.classList.remove( 'header-wrapper', 'section-start' );
 
-		const miscellaneous = new Item( 'Miscellaneous & Idle', createValueSpan(), createValueSpan() );
+		const miscellaneous = new Item( createValueSpan(), createValueSpan(), createValueSpan() );
+		setText( miscellaneous.data[ 0 ], 'Miscellaneous & Idle' );
+		miscellaneous.data[ 0 ].classList.add( 'aggregate-timing' );
 		miscellaneous.data[ 1 ].classList.add( 'aggregate-timing' );
 		miscellaneous.domElement.firstChild.style.backgroundColor = '#00ff0b1a';
 		miscellaneous.domElement.firstChild.classList.add( 'no-hover' );
@@ -165,6 +171,7 @@ class Performance extends Tab {
 		// Parent timings include nested calls and represent enclosing spans.
 
 		const isSpan = stats.children.length > 0;
+		item.data[ 0 ].classList.toggle( 'aggregate-timing', isSpan );
 		item.data[ 1 ].classList.toggle( 'aggregate-timing', isSpan );
 		item.data[ 2 ].classList.toggle( 'aggregate-timing', isSpan );
 
