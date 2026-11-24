@@ -87,11 +87,9 @@
 
 					if ( object.material ) {
 
-						if ( object.material.name === 'Lense_Casing' ) {
+						// SSR traces opaque geometry only
 
-							object.material.transparent = true;
-
-						}
+						object.material.transparent = false;
 
 						// Avoid overdrawing
 						object.material.side = THREE.FrontSide;
