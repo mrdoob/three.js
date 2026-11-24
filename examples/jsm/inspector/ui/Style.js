@@ -1315,6 +1315,12 @@ export class Style {
 		white-space: nowrap;
 	}
 
+	.frame-diagram-group {
+		cursor: pointer;
+		user-select: none;
+		-webkit-user-select: none;
+	}
+
 	.frame-diagram-tooltip {
 		transform: none;
 		opacity: 1;

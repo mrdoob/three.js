@@ -75,6 +75,17 @@ class Performance extends Tab {
 		// the calls of the average frame over time, the ones the GPU overlaps are stacked
 
 		const frameDiagram = new FrameDiagram();
+		frameDiagram.onToggle = ( key ) => {
+
+			const item = this.frameItems.get( key );
+
+			if ( item === undefined ) return;
+
+			item.toggle();
+			this.updateRowBackgrounds();
+			this.refreshFrameDiagram();
+
+		};
 
 		this.frameTimelineDuration = createValueSpan();
 		const frameTimeline = new Item( 'Frame Timeline', this.frameTimelineDuration );
@@ -325,8 +336,13 @@ class Performance extends Tab {
 		const visibleSpans = ( spans ) => spans.map( ( span ) => {
 
 			const item = this.frameItems.get( span.key );
+			const collapsed = item !== undefined && item.isOpen === false;
 
-			return { ...span, children: item && item.isOpen === false ? [] : visibleSpans( span.children ) };
+			return {
+				...span,
+				collapsed: span.children.length > 0 ? collapsed : undefined,
+				children: collapsed ? [] : visibleSpans( span.children )
+			};
 
 		} );
 

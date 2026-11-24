@@ -67,6 +67,17 @@ export class FrameDiagram {
 
 		this.tracks = new Map();
 		this.boxes = new Map();
+		this.onToggle = null;
+
+		this.domElement.addEventListener( 'click', ( event ) => {
+
+			const box = event.target.closest( '.frame-diagram-span' );
+
+			if ( box === null || box.classList.contains( 'frame-diagram-group' ) === false ) return;
+
+			if ( this.onToggle !== null ) this.onToggle( box.dataset.key );
+
+		} );
 
 		this.tooltip = document.createElement( 'div' );
 		this.tooltip.className = 'info-tooltip frame-diagram-tooltip';
@@ -112,7 +123,7 @@ export class FrameDiagram {
 	/**
 	 * Updates the diagram.
 	 *
-	 * @param {Object<string, Array<{key: string, name: string, color: string, start: number, end: number, children: Array}>>} tracks - The spans of each track, by its name. The times are in milliseconds since the start of the track. Only the hue of the color is used, except for Render Pipeline spans.
+	 * @param {Object<string, Array<{key: string, name: string, color: string, start: number, end: number, collapsed: boolean|undefined, children: Array}>>} tracks - The spans of each track, by its name. The times are in milliseconds since the start of the track. Only the hue of the color is used, except for Render Pipeline spans.
 	 * @param {number} duration - The time the width of the diagram stands for.
 	 * @param {number} period - The frame period, marked in the tracks.
 	 */
@@ -241,10 +252,16 @@ export class FrameDiagram {
 			const spanDuration = span.end - span.start;
 			const tooltip = `${ span.name }\n${ spanDuration.toFixed( 3 ) } ms`;
 
+			let name = span.name;
+
+			if ( span.collapsed !== undefined ) name = ( span.collapsed ? '+ ' : '- ' ) + name;
+
+			box.dataset.key = span.key;
 			box.dataset.tooltip = tooltip;
 			if ( this.hoveredBox === box ) this._updateTooltip( tooltip );
-			if ( box.firstChild.nodeValue !== span.name ) box.firstChild.nodeValue = span.name;
+			if ( box.firstChild.nodeValue !== name ) box.firstChild.nodeValue = name;
 
+			box.classList.toggle( 'frame-diagram-group', span.collapsed !== undefined );
 			box.classList.toggle( 'frame-diagram-pipeline', span.name === 'Render Pipeline' );
 			box.style.setProperty( '--span-color', span.color );
 			box.style.left = ( ( span.start - start ) / ( duration || 1 ) ) * 100 + '%';
