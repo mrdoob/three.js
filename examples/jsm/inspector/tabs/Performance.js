@@ -2,7 +2,7 @@ import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
 import { Graph } from '../ui/Graph.js';
 import { Item } from '../ui/Item.js';
-import { createValueSpan, setText } from '../ui/utils.js';
+import { createValueSpan, setText, info } from '../ui/utils.js';
 
 class Performance extends Tab {
 
@@ -58,6 +58,7 @@ class Performance extends Tab {
 		//
 
 		const frameStats = new Item( 'Frame Stats' );
+		info( frameStats.itemRow.firstChild, '**Bold**: real timings.\n<em>Italic</em>: aggregated timings.' );
 		perfList.add( frameStats );
 
 		const timingList = new List( 'Name', 'CPU', 'GPU' );
