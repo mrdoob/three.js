@@ -10,8 +10,9 @@ class Performance extends Tab {
 
 		super( 'Performance', options );
 
-		const perfList = new List( 'Name', 'CPU', 'GPU' );
-		perfList.setGridStyle( 'minmax(200px, 2fr) 80px 80px' );
+		const perfList = new List();
+		perfList.domElement.querySelector( '.list-header' ).remove();
+		perfList.setGridStyle( 'minmax(200px, 1fr) 80px' );
 		perfList.domElement.style.minWidth = '520px';
 
 		const scrollWrapper = document.createElement( 'div' );
@@ -47,7 +48,7 @@ class Performance extends Tab {
 		*/
 
 		this.graphFpsCounter = createValueSpan();
-		const graphStats = new Item( 'Graph Stats', createValueSpan(), this.graphFpsCounter );
+		const graphStats = new Item( 'Graph Stats', this.graphFpsCounter );
 		perfList.add( graphStats );
 
 		const graphItem = new Item( graphContainer );
@@ -56,22 +57,33 @@ class Performance extends Tab {
 
 		//
 
-		const frameStats = new Item( 'Frame Stats', createValueSpan(), createValueSpan() );
-		frameStats.data[ 1 ].classList.add( 'aggregate-timing' );
-		frameStats.data[ 2 ].classList.add( 'aggregate-timing' );
+		const frameStats = new Item( 'Frame Stats' );
 		perfList.add( frameStats );
+
+		const timingList = new List( 'Name', 'CPU', 'GPU' );
+		timingList.setGridStyle( 'minmax(200px, 2fr) 80px 80px' );
+		timingList.domElement.style.flex = '1';
+
+		const timingItem = new Item( timingList.domElement );
+		timingItem.itemRow.children[ 0 ].style.gridColumn = '1 / -1';
+		frameStats.add( timingItem );
+
+		const frameTimings = new Item( 'Frame', createValueSpan(), createValueSpan() );
+		frameTimings.data[ 1 ].classList.add( 'aggregate-timing' );
+		frameTimings.data[ 2 ].classList.add( 'aggregate-timing' );
+		timingList.add( frameTimings );
 
 		const miscellaneous = new Item( 'Miscellaneous & Idle', createValueSpan(), createValueSpan() );
 		miscellaneous.data[ 1 ].classList.add( 'aggregate-timing' );
 		miscellaneous.domElement.firstChild.style.backgroundColor = '#00ff0b1a';
 		miscellaneous.domElement.firstChild.classList.add( 'no-hover' );
-		frameStats.add( miscellaneous );
-		frameStats.childrenContainer.prepend( perfList.domElement.querySelector( '.list-header' ) );
+		frameTimings.add( miscellaneous );
 
 		//
 
 		this.notInUse = new Map();
 		this.frameStats = frameStats;
+		this.frameTimings = frameTimings;
 		this.graphStats = graphStats;
 		this.graph = graph;
 		this.miscellaneous = miscellaneous;
@@ -238,7 +250,7 @@ class Performance extends Tab {
 
 		const hasTimestamp = inspector.getRenderer().backend.hasTimestamp;
 
-		this.currentItem = this.frameStats;
+		this.currentItem = this.frameTimings;
 
 		for ( const child of frame.children ) {
 
@@ -274,8 +286,8 @@ class Performance extends Tab {
 
 		//
 
-		setText( this.frameStats.data[ 1 ], frame.cpu.toFixed( 2 ) );
-		setText( this.frameStats.data[ 2 ], hasTimestamp ? frame.gpu.toFixed( 2 ) : '-' );
+		setText( this.frameTimings.data[ 1 ], frame.cpu.toFixed( 2 ) );
+		setText( this.frameTimings.data[ 2 ], hasTimestamp ? frame.gpu.toFixed( 2 ) : '-' );
 
 		//
 
