@@ -1179,7 +1179,7 @@ export class Style {
 		font-weight: 600;
 	}
 
-	.list-item-cell .aggregate-timing {
+	.list-item-cell .aggregate-timing, .frame-diagram-span.aggregate-timing {
 		font-style: italic;
 		font-weight: normal;
 	}
@@ -1312,6 +1312,8 @@ export class Style {
 		color: var(--text-primary);
 		font-size: 10px;
 		line-height: 15px;
+		font-style: normal;
+		font-weight: 600;
 		white-space: nowrap;
 	}
 

@@ -4,7 +4,7 @@ import { List } from '../ui/List.js';
 import { Graph } from '../ui/Graph.js';
 import { FrameDiagram } from '../ui/FrameDiagram.js';
 import { Item } from '../ui/Item.js';
-import { createValueSpan, setText } from '../ui/utils.js';
+import { createValueSpan, setText, info } from '../ui/utils.js';
 
 // returns a stable hue for the name before the first dash, so calls with the same prefix
 // share a hue, and keep it between frames and runs
@@ -89,6 +89,7 @@ class Performance extends Tab {
 
 		this.frameTimelineDuration = createValueSpan();
 		const frameTimeline = new Item( 'Frame Timeline', this.frameTimelineDuration );
+		info( frameTimeline.itemRow.firstChild, 'For detailed WebGPU profiling in Chrome, restart with:\n--disable-frame-rate-limit\n--enable-webgpu-developer-features\nRemoves the frame limit and disables GPU timestamp rounding.' );
 		perfList.add( frameTimeline );
 
 		const frameDiagramItem = new Item( frameDiagram.domElement );
@@ -98,6 +99,7 @@ class Performance extends Tab {
 		//
 
 		const frameStats = new Item( 'Frame Stats' );
+		info( frameStats.itemRow.firstChild, '**Bold**: real timings.\n<em>Italic</em>: aggregated timings.' );
 		perfList.add( frameStats );
 
 		const timingList = new List( 'Name', 'CPU', 'GPU' );
@@ -290,6 +292,7 @@ class Performance extends Tab {
 			return {
 				key: stats.cid,
 				name: stats.name,
+				isSpan: stats.children.length > 0,
 				color: getColor( stats.name, type ),
 				start,
 				end: start + data[ type ],
