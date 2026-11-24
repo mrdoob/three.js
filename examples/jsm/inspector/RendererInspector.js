@@ -156,6 +156,9 @@ export class RendererInspector extends InspectorBase {
 		this.framesLib = {};
 		this.maxFrames = 512;
 
+		this._groupIds = new WeakMap();
+		this._nextGroupId = 0;
+
 		this._lastFinishTime = 0;
 		this._lastRenderedFinishTime = 0;
 
@@ -450,16 +453,31 @@ export class RendererInspector extends InspectorBase {
 
 	}
 
-	beginGroup( name ) {
+	beginGroup( name, object = null ) {
 
-		const frame = this.getFrame();
+		const frame = this.currentFrame;
 
 		if ( ! frame ) return;
 
-		// a group is identified by its parent, its name and its index among the groups of that name
+		// Object identity keeps equally named groups distinct and survives changes in their order or name.
+
+		let id = name;
+
+		if ( object !== null ) {
+
+			id = this._groupIds.get( object );
+
+			if ( id === undefined ) {
+
+				id = this._nextGroupId ++;
+				this._groupIds.set( object, id );
+
+			}
+
+		}
 
 		const parent = this.getParent();
-		const key = ( parent.cid || '' ) + '/' + name;
+		const key = ( parent.cid || '' ) + ( object === null ? '/name:' : '/group:' ) + id;
 		const index = parent.children.filter( ( stats ) => stats.key === key ).length;
 
 		const group = new ObjectStats( `${ key }/${ index }:f${ frame.frameId }`, name );
@@ -477,7 +495,7 @@ export class RendererInspector extends InspectorBase {
 
 	finishGroup() {
 
-		const frame = this.getFrame();
+		const frame = this.currentFrame;
 
 		if ( ! frame ) return;
 
@@ -492,7 +510,7 @@ export class RendererInspector extends InspectorBase {
 
 	beginCompute( uid, computeNode ) {
 
-		const frame = this.getFrame();
+		const frame = this.currentFrame;
 
 		if ( ! frame ) return;
 
@@ -512,7 +530,7 @@ export class RendererInspector extends InspectorBase {
 
 	finishCompute() {
 
-		const frame = this.getFrame();
+		const frame = this.currentFrame;
 
 		if ( ! frame ) return;
 
@@ -528,7 +546,7 @@ export class RendererInspector extends InspectorBase {
 
 	beginRender( uid, scene, camera, renderTarget ) {
 
-		const frame = this.getFrame();
+		const frame = this.currentFrame;
 
 		if ( ! frame ) return;
 
@@ -548,7 +566,7 @@ export class RendererInspector extends InspectorBase {
 
 	finishRender() {
 
-		const frame = this.getFrame();
+		const frame = this.currentFrame;
 
 		if ( ! frame ) return;
 
@@ -560,9 +578,9 @@ export class RendererInspector extends InspectorBase {
 		this.currentContext = currentRender.parent;
 		this.currentRender = findParent( currentRender, 'isRenderStats' );
 
-		// draw over each top-level render to the canvas, the frame finishes only at the start of the next one
+		// Draw over top-level canvas renders. Groups do not change render/compute ancestry.
 
-		if ( this.overdraw === true && this._renderingOverdraw === false && currentRender.parent === frame && this.getRenderer().getRenderTarget() === null ) {
+		if ( this.overdraw === true && this._renderingOverdraw === false && this.currentRender === null && this.currentCompute === null && this.getRenderer().getRenderTarget() === null ) {
 
 			this._renderOverdraw();
 

@@ -351,7 +351,7 @@ class BloomNode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		renderer.inspector.beginGroup( 'Bloom' );
+		renderer.inspector.beginGroup( 'Bloom', this );
 
 		//
 

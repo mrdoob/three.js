@@ -772,7 +772,7 @@ class SSRNode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		renderer.inspector.beginGroup( 'SSR' );
+		renderer.inspector.beginGroup( 'SSR', this );
 
 		const ssrRenderTarget = this._ssrRenderTarget;
 		const blurRenderTarget = this._blurRenderTarget;

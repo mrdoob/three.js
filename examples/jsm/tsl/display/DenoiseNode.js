@@ -459,7 +459,7 @@ class DenoiseNode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		renderer.inspector.beginGroup( 'Denoise' );
+		renderer.inspector.beginGroup( 'Denoise', this );
 
 		const { width, height } = this.inputNode.value.image;
 		this._filter( renderer, width, height );

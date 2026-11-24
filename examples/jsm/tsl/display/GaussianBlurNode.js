@@ -170,7 +170,7 @@ class GaussianBlurNode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		renderer.inspector.beginGroup( 'Gaussian Blur' );
+		renderer.inspector.beginGroup( 'Gaussian Blur', this );
 
 		//
 

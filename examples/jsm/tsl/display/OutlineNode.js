@@ -545,7 +545,7 @@ class OutlineNode extends Node {
 
 		const currentSceneName = scene.name;
 
-		renderer.inspector.beginGroup( 'Outline' );
+		renderer.inspector.beginGroup( 'Outline', this );
 
 		// 1. Draw non-selected objects in the depth buffer
 

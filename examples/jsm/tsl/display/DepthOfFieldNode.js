@@ -287,7 +287,7 @@ class DepthOfFieldNode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		renderer.inspector.beginGroup( 'DoF' );
+		renderer.inspector.beginGroup( 'DoF', this );
 
 		renderer.setClearColor( 0x000000, 0 );
 

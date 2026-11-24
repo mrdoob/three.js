@@ -143,7 +143,7 @@ class FSR1Node extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		renderer.inspector.beginGroup( 'FSR1' );
+		renderer.inspector.beginGroup( 'FSR1', this );
 
 		//
 

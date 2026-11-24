@@ -167,7 +167,7 @@ class BilateralBlurNode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		renderer.inspector.beginGroup( 'Bilateral Blur' );
+		renderer.inspector.beginGroup( 'Bilateral Blur', this );
 
 		//
 

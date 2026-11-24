@@ -153,8 +153,9 @@ class InspectorBase extends EventDispatcher {
 	 * reported as its children, like the passes of an effect or the faces of a cube shadow map.
 	 *
 	 * @param {string} name - The name of the group.
+	 * @param {?Object} [object=null] - Optional stable identity, e.g. the effect node. Without it, groups are identified by name and occurrence.
 	 */
-	beginGroup( /*name*/ ) { }
+	beginGroup( /*name, object = null*/ ) { }
 
 	/**
 	 * Finishes the group begun by {@link InspectorBase#beginGroup}.
