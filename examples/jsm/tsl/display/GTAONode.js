@@ -237,7 +237,8 @@ class GTAONode extends Node {
 		this._camera = camera;
 
 		/**
-		 * Temporal direction that influences the rotation angle for each slice.
+		 * Temporal rotation of the slices, as a fraction of the angle between two
+		 * adjacent slices.
 		 *
 		 * @private
 		 * @type {UniformNode<float>}
@@ -495,7 +496,9 @@ class GTAONode extends Node {
 
 			Loop( { start: int( 0 ), end: int( DIRECTIONS ), type: 'int', condition: '<' }, ( { i } ) => {
 
-				const angle = float( i ).div( DIRECTIONS ).mul( PI ).add( this._temporalDirection ).toConst();
+				// Slices are spaced π / DIRECTIONS apart. The temporal rotation is a fraction of that
+				// spacing, so the six rotations cover the gap between two slices evenly over time.
+				const angle = float( i ).add( this._temporalDirection ).div( DIRECTIONS ).mul( PI ).toConst();
 				const sampleDir = kernelMatrix.mul( vec3( cos( angle ), sin( angle ), 0 ) ).toConst();
 				const clipDirRadius = this._cameraProjectionMatrix.mul( vec4( sampleDir, 0.0 ) ).mul( radius ).toConst();
 
