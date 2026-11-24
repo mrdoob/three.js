@@ -60,6 +60,7 @@ const exceptionList = [
 	'webgpu_materials_matcap',
 	'webgpu_meshlets_city',
 	'webgpu_meshlets_materials',
+	'webgpu_meshlets_skinning',
 	'webgpu_morphtargets_face',
 	'webgpu_shadowmap_progressive',
 	'webgpu_lightmap_baking',
