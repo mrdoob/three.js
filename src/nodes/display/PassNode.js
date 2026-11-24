@@ -14,6 +14,7 @@ import { RenderTarget } from '../../core/RenderTarget.js';
 import { warn } from '../../utils.js';
 
 const _size = /*@__PURE__*/ new Vector2();
+const _baseContextNodes = /*@__PURE__*/ new WeakMap();
 
 /**
  * Represents the texture of a pass node.
@@ -949,9 +950,17 @@ class PassNode extends Node {
 
 		}
 
+		// a pass rendered while another pass renders does not inherit the context of that pass
+
+		const baseContextNode = _baseContextNodes.get( currentContextNode ) || currentContextNode;
+
+		renderer.contextNode = baseContextNode;
+
 		if ( this.contextNode !== null ) {
 
 			renderer.contextNode = this._getContextNode( renderer );
+
+			_baseContextNodes.set( renderer.contextNode, baseContextNode );
 
 		}
 

@@ -38,7 +38,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, sample, screenUV, builtinGIContext } from 'three/tsl';
+			import { pass, mrt, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, sample, screenUV, builtinAOContext, builtinIndirectContext } from 'three/tsl';
 			import { vxgi } from 'three/addons/lighting/vxgi/VXGINode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -214,7 +214,7 @@
 				// scene pass: AO and indirect irradiance are injected into the materials' lighting
 
 				const scenePass = pass( scene, camera ).toInspector( 'Color' );
-				const giContext = builtinGIContext( ao.sample( screenUV ).r, gi.sample( screenUV ).rgb );
+				const giContext = builtinAOContext( ao.sample( screenUV ).r, builtinIndirectContext( { diffuse: [ giPass.getDiffuseSource() ] } ) );
 				scenePass.contextNode = giContext;
 
 				// traa ( resolves the temporal noise of the cone tracing )

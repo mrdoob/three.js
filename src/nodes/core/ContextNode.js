@@ -272,38 +272,26 @@ export function builtinAOContext( aoNode, node = null ) {
 }
 
 /**
- * TSL function for defining a built-in global illumination context for a given node. The AO node
- * modulates the indirect lighting of the materials, the GI node is added to their irradiance
- * without being modulated by the AO since it already accounts for occlusion.
+ * TSL function for defining the sources of indirect light of the materials of a given node,
+ * e.g. of a pass. The sources are asked in order, in front of the environment and of what
+ * the lights reflect.
  *
  * @tsl
  * @function
- * @param {Node<float>} aoNode - The ambient occlusion value node to apply.
- * @param {Node<vec3>} giNode - The indirect diffuse irradiance node to add.
+ * @param {Object} sources - The source lists.
+ * @param {Array<IndirectLightSource>} [sources.specular] - The indirect specular sources, in order.
+ * @param {Array<IndirectLightSource>} [sources.diffuse] - The indirect diffuse sources, in order.
  * @param {Node} [node=null] - The node whose context should be modified.
  * @returns {ContextNode}
  */
-export function builtinGIContext( aoNode, giNode, node = null ) {
+export function builtinIndirectContext( { specular, diffuse }, node = null ) {
 
-	return context( node, {
+	const value = {};
 
-		getAO: ( inputNode, { material } ) => {
+	if ( specular !== undefined ) value.indirectSpecular = specular;
+	if ( diffuse !== undefined ) value.indirectDiffuse = diffuse;
 
-			if ( material.transparent === true ) return inputNode;
-
-			return inputNode !== null ? inputNode.mul( aoNode ) : aoNode;
-
-		},
-
-		getGI: ( inputNode, { material } ) => {
-
-			if ( material.transparent === true ) return inputNode;
-
-			return inputNode !== null ? inputNode.add( giNode ) : giNode;
-
-		}
-
-	} );
+	return context( node, value );
 
 }
 
@@ -331,4 +319,4 @@ addMethodChaining( 'uniformFlow', uniformFlow );
 addMethodChaining( 'setName', setName );
 addMethodChaining( 'builtinShadowContext', ( node, shadowNode, light ) => builtinShadowContext( shadowNode, light, node ) );
 addMethodChaining( 'builtinAOContext', ( node, aoValue ) => builtinAOContext( aoValue, node ) );
-addMethodChaining( 'builtinGIContext', ( node, aoValue, giValue ) => builtinGIContext( aoValue, giValue, node ) );
+addMethodChaining( 'builtinIndirectContext', ( node, sources ) => builtinIndirectContext( sources, node ) );

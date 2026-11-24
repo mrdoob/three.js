@@ -1,4 +1,4 @@
-import { RTTNode, Vector2 } from 'three/webgpu';
+import { RTTNode, TextureNode, Vector2 } from 'three/webgpu';
 import { Fn, float, getViewPosition, isBackgroundDepth, ivec2, positionPrevious, textureSize, uniform, uv, vec2, vec3, vec4, velocity } from 'three/tsl';
 import { Reprojection } from '../../utils/Reprojection.js';
 
@@ -17,13 +17,16 @@ export const previousViewZ = /*@__PURE__*/ velocity.previousCameraViewMatrix.mul
  * effects like SSR or SSGI can trace it before the current frame is shaded.
  *
  * The history is validated against the previous depth. RGB holds the radiance and
- * alpha the valid bilinear support, both are zero where the history is missing.
+ * alpha is one where the history is valid, both are zero where it is missing.
  *
  * ```js
  * scenePass.setMRT( mrt( { output, velocity: vec4( velocity, 0, previousViewZ ) } ) );
  *
  * const reflection = ssr( reprojectedBeauty( scenePass ), scenePassDepth, sceneNormal, { camera } );
  * ```
+ *
+ * When the effect is resolved while the beauty is shaded, the geometry comes from a pre-pass
+ * and the beauty pass is passed as the second argument.
  *
  * Note: This node can only be used with `WebGPURenderer`.
  *
@@ -43,13 +46,14 @@ class ReprojectedBeautyNode extends RTTNode {
 	 *
 	 * @param {PassNode} scenePass - The scene pass. Its `velocity` MRT attachment must
 	 * hold {@link previousViewZ} in the alpha channel.
+	 * @param {PassNode} [beautyPass=scenePass] - The pass that holds the beauty.
 	 */
-	constructor( scenePass ) {
+	constructor( scenePass, beautyPass = scenePass ) {
 
 		const velocityNode = scenePass.getTextureNode( 'velocity' );
 		const reprojection = new Reprojection( scenePass.getTextureNode( 'depth' ), velocityNode, scenePass.camera );
 
-		const previousColor = scenePass.getPreviousTextureNode( 'output' );
+		const previousColor = beautyPass.getPreviousTextureNode( 'output' );
 		const previousDepth = reprojection.previousDepthNode;
 		const projectionMatrixInverse = reprojection.previousCameraProjectionMatrixInverse;
 
@@ -107,7 +111,7 @@ class ReprojectedBeautyNode extends RTTNode {
 
 			}
 
-			return vec4( radiance.div( support.max( 1e-6 ) ), support );
+			return vec4( radiance.div( support.max( 1e-6 ) ), support.greaterThan( 0 ).select( 1, 0 ) );
 
 		} );
 
@@ -163,6 +167,21 @@ class ReprojectedBeautyNode extends RTTNode {
 	}
 
 	/**
+	 * Clones sample the reprojected texture, the node itself keeps reprojecting.
+	 *
+	 * @return {TextureNode} The cloned texture node.
+	 */
+	clone() {
+
+		const newNode = new TextureNode( this.value, this.uvNode, this.levelNode );
+		newNode.sampler = this.sampler;
+		newNode.referenceNode = this.getBase();
+
+		return newNode;
+
+	}
+
+	/**
 	 * Frees internal resources. This method should be called
 	 * when the node is no longer required.
 	 */
@@ -185,6 +204,7 @@ export default ReprojectedBeautyNode;
  * @function
  * @param {PassNode} scenePass - The scene pass. Its `velocity` MRT attachment must
  * hold {@link previousViewZ} in the alpha channel.
+ * @param {PassNode} [beautyPass=scenePass] - The pass that holds the beauty.
  * @returns {ReprojectedBeautyNode}
  */
-export const reprojectedBeauty = ( scenePass ) => new ReprojectedBeautyNode( scenePass );
+export const reprojectedBeauty = ( scenePass, beautyPass ) => new ReprojectedBeautyNode( scenePass, beautyPass );
