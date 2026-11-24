@@ -39,7 +39,7 @@ class ImageLoader extends Loader {
 	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
 	 * @param {function(Image)} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} onProgress - Unsupported in this loader.
-	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @param {function(Event)} onError - Executed when errors occur. Receives the image's `error` event, not an `Error` instance.
 	 * @return {Image} The image.
 	 */
 	load( url, onLoad, onProgress, onError ) {

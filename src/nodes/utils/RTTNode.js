@@ -33,7 +33,7 @@ class RTTNode extends TextureNode {
 	/**
 	 * Constructs a new RTT node.
 	 *
-	 * @param {Node} node - The node to render a texture with.
+	 * @param {?Node} [node=null] - The node to render a texture with. If no node is applied, no resources are allocated and the node references the texture of its base node (used by clones).
 	 * @param {?number} [width=null] - The width of the internal render target. If no width is applied, the render target is automatically resized.
 	 * @param {?number} [height=null] - The height of the internal render target.
 	 * @param {Object} [options={}] - The options for the internal render target.
@@ -41,16 +41,16 @@ class RTTNode extends TextureNode {
 	 * @param {boolean} [options.autoUpdate=true] - Whether the texture should automatically be updated or not.
 	 * @param {number} [options.resolutionScale=1] - The resolution scale.
 	 */
-	constructor( node, width = null, height = null, options = {} ) {
+	constructor( node = null, width = null, height = null, options = {} ) {
 
 		const {
 			autoUpdate = true,
 			resolutionScale = 1
 		} = options;
 
-		const renderTarget = new RenderTarget( width ?? 1, height ?? 1, { type: HalfFloatType, ...options } );
+		const renderTarget = node !== null ? new RenderTarget( width ?? 1, height ?? 1, { type: HalfFloatType, ...options } ) : null;
 
-		super( renderTarget.texture, uv() );
+		super( renderTarget !== null ? renderTarget.texture : null, uv() );
 
 		/**
 		 * This flag can be used for type testing.
@@ -64,7 +64,7 @@ class RTTNode extends TextureNode {
 		/**
 		 * The node to render a texture with.
 		 *
-		 * @type {Node}
+		 * @type {?Node}
 		 */
 		this.node = node;
 
@@ -88,7 +88,7 @@ class RTTNode extends TextureNode {
 		/**
 		 * The render target
 		 *
-		 * @type {RenderTarget}
+		 * @type {?RenderTarget}
 		 */
 		this.renderTarget = renderTarget;
 
@@ -121,9 +121,9 @@ class RTTNode extends TextureNode {
 		 * The internal quad mesh for RTT.
 		 *
 		 * @private
-		 * @type {QuadMesh}
+		 * @type {?QuadMesh}
 		 */
-		this._quadMesh = new QuadMesh( new NodeMaterial() );
+		this._quadMesh = node !== null ? new QuadMesh( new NodeMaterial() ) : null;
 
 		/**
 		 * The renderer state saved and restored around the RTT render.
@@ -137,11 +137,12 @@ class RTTNode extends TextureNode {
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates
 		 * the texture once per frame in its {@link RTTNode#updateBefore} method.
+		 * Nodes without a node to render (e.g. clones) don't update.
 		 *
 		 * @type {string}
 		 * @default 'frame'
 		 */
-		this.updateBeforeType = NodeUpdateType.FRAME;
+		this.updateBeforeType = node !== null ? NodeUpdateType.FRAME : NodeUpdateType.NONE;
 
 	}
 
@@ -160,10 +161,14 @@ class RTTNode extends TextureNode {
 
 	setup( builder ) {
 
-		this._quadMesh.material.contextNode = context( builder.getSharedContext() );
-		this._quadMesh.material.fragmentNode = this.node;
-		this._quadMesh.material.name = 'RTT';
-		this._quadMesh.material.needsUpdate = true;
+		if ( this._quadMesh !== null ) {
+
+			this._quadMesh.material.contextNode = context( builder.getSharedContext() );
+			this._quadMesh.material.fragmentNode = this.node;
+			this._quadMesh.material.name = 'RTT';
+			this._quadMesh.material.needsUpdate = true;
+
+		}
 
 		return super.setup( builder );
 
@@ -225,7 +230,9 @@ class RTTNode extends TextureNode {
 	 */
 	set value( value ) {
 
-		if ( this.renderTarget && value !== this.renderTarget.texture ) {
+		const { renderTarget } = this.getBase();
+
+		if ( renderTarget && value !== renderTarget.texture ) {
 
 			error( 'TSL: "rtt()" does not allow overwriting the value.' );
 
@@ -240,7 +247,9 @@ class RTTNode extends TextureNode {
 	 */
 	get value() {
 
-		return this.renderTarget ? this.renderTarget.texture : null;
+		const { renderTarget } = this.getBase();
+
+		return renderTarget ? renderTarget.texture : null;
 
 	}
 
@@ -308,9 +317,8 @@ class RTTNode extends TextureNode {
 
 	clone() {
 
-		const newNode = new TextureNode( this.value, this.uvNode, this.levelNode );
-		newNode.sampler = this.sampler;
-		newNode.referenceNode = this;
+		const newNode = super.clone();
+		newNode.referenceNode = this.getBase();
 
 		return newNode;
 
@@ -321,8 +329,8 @@ class RTTNode extends TextureNode {
 	 */
 	dispose() {
 
-		this.renderTarget.dispose();
-		this._quadMesh.material.dispose();
+		if ( this.renderTarget !== null ) this.renderTarget.dispose();
+		if ( this._quadMesh !== null ) this._quadMesh.material.dispose();
 
 		super.dispose();
 

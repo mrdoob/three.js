@@ -99,7 +99,8 @@ class VertexColorNode extends AttributeNode {
 export default VertexColorNode;
 
 /**
- * TSL function for creating a reference node.
+ * TSL function for creating a vertex color node. If the geometry has no matching
+ * color attribute, the node returns white.
  *
  * @tsl
  * @function

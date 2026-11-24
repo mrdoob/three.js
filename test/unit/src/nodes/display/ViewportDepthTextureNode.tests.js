@@ -1,6 +1,7 @@
 import { viewportDepthTexture } from '../../../../../src/nodes/display/ViewportDepthTextureNode.js';
 import { DepthTexture } from '../../../../../src/textures/DepthTexture.js';
 import { RenderTarget } from '../../../../../src/core/RenderTarget.js';
+import CanvasTarget from '../../../../../src/renderers/common/CanvasTarget.js';
 
 export default QUnit.module( 'Nodes', () => {
 
@@ -28,8 +29,8 @@ export default QUnit.module( 'Nodes', () => {
 					const node = viewportDepthTexture();
 
 					// Create mock canvas targets (simulating different canvases)
-					const canvasTarget1 = { isCanvasTarget: true, id: 1 };
-					const canvasTarget2 = { isCanvasTarget: true, id: 2 };
+					const canvasTarget1 = new CanvasTarget( document.createElement( 'canvas' ) );
+					const canvasTarget2 = new CanvasTarget( document.createElement( 'canvas' ) );
 
 					// Get depth textures for each reference
 					const depthTex1 = node.getTextureForReference( canvasTarget1 );
@@ -67,7 +68,7 @@ export default QUnit.module( 'Nodes', () => {
 
 					const node = viewportDepthTexture();
 
-					const canvasTarget = { isCanvasTarget: true };
+					const canvasTarget = new CanvasTarget( document.createElement( 'canvas' ) );
 
 					// Get texture twice for same reference
 					const depthTex1 = node.getTextureForReference( canvasTarget );
@@ -107,7 +108,7 @@ export default QUnit.module( 'Nodes', () => {
 
 					const node = viewportDepthTexture();
 
-					const canvasTarget = { isCanvasTarget: true };
+					const canvasTarget = new CanvasTarget( document.createElement( 'canvas' ) );
 					const renderTarget = new RenderTarget( 512, 512 );
 
 					const canvasDepthTex = node.getTextureForReference( canvasTarget );

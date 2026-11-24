@@ -77,13 +77,13 @@ class LightProbeGridHelperWebGL extends InstancedMesh {
 					float atlasDepth  = 7.0 * paddedSlices;
 					float uvZBase     = vUVW.z * nz + 1.0;
 
-					vec4 s0 = texture( probesSH, vec3( vUVW.xy, ( uvZBase                       ) / atlasDepth ) );
-					vec4 s1 = texture( probesSH, vec3( vUVW.xy, ( uvZBase +       paddedSlices   ) / atlasDepth ) );
-					vec4 s2 = texture( probesSH, vec3( vUVW.xy, ( uvZBase + 2.0 * paddedSlices   ) / atlasDepth ) );
-					vec4 s3 = texture( probesSH, vec3( vUVW.xy, ( uvZBase + 3.0 * paddedSlices   ) / atlasDepth ) );
-					vec4 s4 = texture( probesSH, vec3( vUVW.xy, ( uvZBase + 4.0 * paddedSlices   ) / atlasDepth ) );
-					vec4 s5 = texture( probesSH, vec3( vUVW.xy, ( uvZBase + 5.0 * paddedSlices   ) / atlasDepth ) );
-					vec4 s6 = texture( probesSH, vec3( vUVW.xy, ( uvZBase + 6.0 * paddedSlices   ) / atlasDepth ) );
+					vec4 s0 = textureLod( probesSH, vec3( vUVW.xy, ( uvZBase                       ) / atlasDepth ), 0.0 );
+					vec4 s1 = textureLod( probesSH, vec3( vUVW.xy, ( uvZBase +       paddedSlices   ) / atlasDepth ), 0.0 );
+					vec4 s2 = textureLod( probesSH, vec3( vUVW.xy, ( uvZBase + 2.0 * paddedSlices   ) / atlasDepth ), 0.0 );
+					vec4 s3 = textureLod( probesSH, vec3( vUVW.xy, ( uvZBase + 3.0 * paddedSlices   ) / atlasDepth ), 0.0 );
+					vec4 s4 = textureLod( probesSH, vec3( vUVW.xy, ( uvZBase + 4.0 * paddedSlices   ) / atlasDepth ), 0.0 );
+					vec4 s5 = textureLod( probesSH, vec3( vUVW.xy, ( uvZBase + 5.0 * paddedSlices   ) / atlasDepth ), 0.0 );
+					vec4 s6 = textureLod( probesSH, vec3( vUVW.xy, ( uvZBase + 6.0 * paddedSlices   ) / atlasDepth ), 0.0 );
 
 					// Unpack 9 vec3 SH L2 coefficients
 

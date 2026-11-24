@@ -74,6 +74,9 @@ class Material extends EventDispatcher {
 		 * {@link Material#blendSrc}, {@link Material#blendDst} or {@link Material#blendEquation}
 		 * should have any effect.
 		 *
+		 * `SubtractiveBlending` and `MultiplyBlending` require {@link Material#premultipliedAlpha}
+		 * to be `true`.
+		 *
 		 * @type {(NoBlending|NormalBlending|AdditiveBlending|SubtractiveBlending|MultiplyBlending|CustomBlending)}
 		 * @default NormalBlending
 		 */
@@ -212,7 +215,9 @@ class Material extends EventDispatcher {
 
 		/**
 		 * Whether to have depth test enabled when rendering this material.
-		 * When the depth test is disabled, the depth write will also be implicitly disabled.
+		 * With `WebGLRenderer`, disabling the depth test also implicitly disables the depth write.
+		 * With the WebGPU backend of `WebGPURenderer`, depth is still written unless
+		 * {@link Material#depthWrite} is set to `false`.
 		 *
 		 * @type {boolean}
 		 * @default true
@@ -305,6 +310,8 @@ class Material extends EventDispatcher {
 		 * (not rendered). This requires {@link WebGLRenderer#localClippingEnabled} to
 		 * be `true`.
 		 *
+		 * Only supported with `WebGLRenderer`. With `WebGPURenderer`, use {@link ClippingGroup}.
+		 *
 		 * @type {?Array<Plane>}
 		 * @default null
 		 */
@@ -312,7 +319,7 @@ class Material extends EventDispatcher {
 
 		/**
 		 * Changes the behavior of clipping planes so that only their intersection is
-		 * clipped, rather than their union.
+		 * clipped, rather than their union. Only supported with `WebGLRenderer`.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -321,7 +328,7 @@ class Material extends EventDispatcher {
 
 		/**
 		 * Defines whether to clip shadows according to the clipping planes specified
-		 * on this material.
+		 * on this material. Only supported with `WebGLRenderer`.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -336,6 +343,8 @@ class Material extends EventDispatcher {
 		 * - When {@link Material#side} is set to `BackSide`, the front side cast shadows.
 		 * - When {@link Material#side} is set to `DoubleSide`, both sides cast shadows.
 		 *
+		 * With `VSMShadowMap`, the side casting shadows matches {@link Material#side} instead.
+		 *
 		 * @type {?(FrontSide|BackSide|DoubleSide)}
 		 * @default null
 		 */
@@ -344,7 +353,7 @@ class Material extends EventDispatcher {
 		/**
 		 * Whether to render the material's color.
 		 *
-		 * This can be used in conjunction with {@link Object3D#renderOder} to create invisible
+		 * This can be used in conjunction with {@link Object3D#renderOrder} to create invisible
 		 * objects that occlude other objects.
 		 *
 		 * @type {boolean}
@@ -483,7 +492,6 @@ class Material extends EventDispatcher {
 	 * will not be rendered if the opacity is lower than this value.
 	 *
 	 * @type {number}
-	 * @readonly
 	 * @default 0
 	 */
 	get alphaTest() {

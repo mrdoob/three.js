@@ -91,10 +91,27 @@ class ViewportTextureNode extends TextureNode {
 		/**
 		 * The framebuffer texture for the current renderer context.
 		 *
-		 * @type {WeakMap<RenderTarget, FramebufferTexture>}
+		 * @type {Map<(RenderTarget|CanvasTarget), FramebufferTexture>}
 		 * @private
 		 */
-		this._cacheTextures = new WeakMap();
+		this._cacheTextures = new Map();
+
+		/**
+		 * Disposes the framebuffer texture of a disposed render target or canvas target.
+		 *
+		 * @type {Function}
+		 * @private
+		 */
+		this._onReferenceDispose = ( event ) => {
+
+			const reference = event.target;
+
+			reference.removeEventListener( 'dispose', this._onReferenceDispose );
+
+			this._cacheTextures.get( reference ).dispose();
+			this._cacheTextures.delete( reference );
+
+		};
 
 	}
 
@@ -109,36 +126,27 @@ class ViewportTextureNode extends TextureNode {
 	 */
 	getTextureForReference( reference = null ) {
 
-		let defaultFramebuffer;
-		let cacheTextures;
-
-		if ( this.referenceNode ) {
-
-			defaultFramebuffer = this.referenceNode.defaultFramebuffer;
-			cacheTextures = this.referenceNode._cacheTextures;
-
-		} else {
-
-			defaultFramebuffer = this.defaultFramebuffer;
-			cacheTextures = this._cacheTextures;
-
-		}
+		const node = this.referenceNode ? this.referenceNode : this;
 
 		if ( reference === null ) {
 
-			return defaultFramebuffer;
+			return node.defaultFramebuffer;
 
 		}
 
-		if ( cacheTextures.has( reference ) === false ) {
+		let framebufferTexture = node._cacheTextures.get( reference );
 
-			const framebufferTexture = defaultFramebuffer.clone();
+		if ( framebufferTexture === undefined ) {
 
-			cacheTextures.set( reference, framebufferTexture );
+			framebufferTexture = node.defaultFramebuffer.clone();
+
+			node._cacheTextures.set( reference, framebufferTexture );
+
+			reference.addEventListener( 'dispose', node._onReferenceDispose );
 
 		}
 
-		return cacheTextures.get( reference );
+		return framebufferTexture;
 
 	}
 
@@ -159,6 +167,11 @@ class ViewportTextureNode extends TextureNode {
 	updateBefore( frame ) {
 
 		const renderer = frame.renderer;
+
+		// do not copy during precompilation
+
+		if ( renderer._precompilationState !== null ) return false;
+
 		const renderTarget = renderer.getRenderTarget();
 		const canvasTarget = renderer.getCanvasTarget();
 
@@ -201,12 +214,32 @@ class ViewportTextureNode extends TextureNode {
 
 	}
 
+	/**
+	 * Frees internal resources. Should be called when the node is no longer in use.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		for ( const [ reference, framebufferTexture ] of this._cacheTextures ) {
+
+			reference.removeEventListener( 'dispose', this._onReferenceDispose );
+
+			framebufferTexture.dispose();
+
+		}
+
+		this._cacheTextures.clear();
+
+	}
+
 	clone() {
 
-		const viewportTextureNode = new this.constructor( this.uvNode, this.levelNode, this.value );
-		viewportTextureNode.generateMipmaps = this.generateMipmaps;
+		const newNode = super.clone();
+		newNode.defaultFramebuffer = this.defaultFramebuffer;
+		newNode.generateMipmaps = this.generateMipmaps;
 
-		return viewportTextureNode;
+		return newNode;
 
 	}
 

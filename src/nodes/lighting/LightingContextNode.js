@@ -69,7 +69,7 @@ class LightingContextNode extends ContextNode {
 	 * @return {{
 	 * radiance: Node<vec3>,
 	 * irradiance: Node<vec3>,
-	 * iblIrradiance: Node<vec3>,
+	 * occlusionAwareIrradiance: Node<vec3>,
 	 * ambientOcclusion: Node<float>,
 	 * reflectedLight: {directDiffuse: Node<vec3>, directSpecular: Node<vec3>, indirectDiffuse: Node<vec3>, indirectSpecular: Node<vec3>},
 	 * backdrop: Node<vec3>,
@@ -95,7 +95,7 @@ class LightingContextNode extends ContextNode {
 		const context = {
 			radiance: vec3().toVar( 'radiance' ),
 			irradiance: vec3().toVar( 'irradiance' ),
-			iblIrradiance: vec3().toVar( 'iblIrradiance' ),
+			occlusionAwareIrradiance: vec3().toVar( 'occlusionAwareIrradiance' ),
 			ambientOcclusion: float( 1 ).toVar( 'ambientOcclusion' ),
 			reflectedLight,
 			materialLightings,

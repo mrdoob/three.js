@@ -29,13 +29,43 @@ import { Color } from '../../math/Color.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
-import { Float16BufferAttribute } from '../../core/BufferAttribute.js';
-import { warn, error, yieldToMain } from '../../utils.js';
+import { warn, error } from '../../utils.js';
+import { Texture } from '../../textures/Texture.js';
+import { CubeTexture } from '../../textures/CubeTexture.js';
+import { Data3DTexture } from '../../textures/Data3DTexture.js';
+import { texture } from '../accessors/TextureNode.js';
+import { cubeTexture } from '../accessors/CubeTextureNode.js';
+import { texture3D } from '../accessors/Texture3DNode.js';
+import { uv } from '../accessors/UV.js';
+import { vec3 } from '../tsl/TSLCore.js';
 
 let _id = 0;
 
 const _functionNodeCache = new WeakMap();
+const _functionShaderNodes = new WeakMap();
+
+// The function nodes whose code refers to uniforms. The uniforms are declared and named by the
+// builder that builds the code, so these functions can't share their code with other builders.
+const _builderFunctionNodes = new WeakSet();
+
 const _layoutDefaultsCache = new WeakMap();
+
+// The texture nodes of the texture inputs of a function layout. Their textures only define the code
+// of the function, each call passes its own texture.
+const _layoutTextureNodes = {
+	texture: () => texture( new Texture(), uv() ), // with a uv node, so the samples don't use the texture matrix
+	cubeTexture: () => cubeTexture( new CubeTexture(), vec3( 0, 0, 1 ) ), // with a direction, so the setup doesn't build the default reflect vector
+	texture3D: () => texture3D( Object.assign( new Data3DTexture(), { minFilter: LinearFilter, magFilter: LinearFilter } ) ) // filterable, so the samples use a sampler
+};
+
+// The node of an input in the code of a function with layout.
+const _createLayoutParameter = ( input ) => {
+
+	const createTextureNode = _layoutTextureNodes[ input.type ];
+
+	return createTextureNode !== undefined ? createTextureNode() : new ParameterNode( input.type, input.name );
+
+};
 
 // Inputs of a layout function call. They can be destructured as an array or as an object.
 const _createLayoutInputs = ( layout, values ) => {
@@ -134,15 +164,17 @@ const _isVectorCache = new Map();
 const _isMatrixCache = new Map();
 const _isIntegerCache = new Map();
 
-const _checkWriteUsage = ( data ) => {
+const _analyzeShaderStages = [ 'fragment', 'vertex', 'compute' ];
 
-	if ( data.writeUsageCount > 0 ) return true;
+const _checkUsage = ( data, usageCount ) => {
+
+	if ( data[ usageCount ] > 0 ) return true;
 
 	if ( data.subBuildsCache !== undefined ) {
 
 		for ( const subBuild in data.subBuildsCache ) {
 
-			if ( _checkWriteUsage( data.subBuildsCache[ subBuild ] ) ) {
+			if ( _checkUsage( data.subBuildsCache[ subBuild ], usageCount ) ) {
 
 				return true;
 
@@ -282,11 +314,11 @@ class NodeBuilder {
 		this.updateAfterNodes = [];
 
 		/**
-		 * A dictionary that assigns each node to a unique hash.
+		 * A map that assigns each node to a unique hash.
 		 *
-		 * @type {Object<number,Node>}
+		 * @type {Map<number,Node>}
 		 */
-		this.hashNodes = {};
+		this.hashNodes = new Map();
 
 		/**
 		 * A reference to a node material observer.
@@ -520,6 +552,15 @@ class NodeBuilder {
 		 * @default null
 		 */
 		this.currentFunctionNode = null;
+
+		/**
+		 * The function nodes built by this builder whose code can't be shared with other builders,
+		 * per shader stage. See {@link NodeBuilder#buildFunctionNode}.
+		 *
+		 * @private
+		 * @type {Object<string,Map<ShaderNodeInternal,FunctionNode>>}
+		 */
+		this._functionNodes = {};
 
 		/**
 		 * The builder's context.
@@ -852,11 +893,11 @@ class NodeBuilder {
 	 * This method sets the given node (value) with the given hash (key) into this dictionary.
 	 *
 	 * @param {Node} node - The node to add.
-	 * @param {number} hash - The hash of the node.
+	 * @param {number|string} hash - The hash of the node.
 	 */
 	setHashNode( node, hash ) {
 
-		this.hashNodes[ hash ] = node;
+		this.hashNodes.set( hash, node );
 
 	}
 
@@ -906,7 +947,7 @@ class NodeBuilder {
 
 			const updateType = node.updateType;
 
-			if ( updateType !== NodeUpdateType.NONE ) {
+			if ( updateType !== NodeUpdateType.NONE && node.isDeadCode( this ) === false ) {
 
 				this.updateNodes.push( node );
 
@@ -915,6 +956,8 @@ class NodeBuilder {
 		}
 
 		for ( const node of this.sequentialNodes ) {
+
+			if ( node.isDeadCode( this ) ) continue;
 
 			const updateBeforeType = node.updateBeforeType;
 			const updateAfterType = node.updateAfterType;
@@ -1070,12 +1113,12 @@ class NodeBuilder {
 	/**
 	 * Returns a node for the given hash, see {@link NodeBuilder#setHashNode}.
 	 *
-	 * @param {number} hash - The hash of the node.
+	 * @param {number|string} hash - The hash of the node.
 	 * @return {Node} The found node.
 	 */
 	getNodeFromHash( hash ) {
 
-		return this.hashNodes[ hash ];
+		return this.hashNodes.get( hash );
 
 	}
 
@@ -1388,12 +1431,38 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns whether the given node has been read in any shader stage.
+	 *
+	 * @param {Node} node - The node to check.
+	 * @return {boolean} Whether the node has been read.
+	 */
+	hasReadUsage( node ) {
+
+		return this._hasUsage( node, 'readUsageCount' );
+
+	}
+
+	/**
 	 * Returns whether the given node has been written to in any shader stage.
 	 *
 	 * @param {Node} node - The node to check.
 	 * @return {boolean} Whether the node has been written to.
 	 */
 	hasWriteUsage( node ) {
+
+		return this._hasUsage( node, 'writeUsageCount' );
+
+	}
+
+	/**
+	 * Returns whether the given usage count of the node is greater than zero in any shader stage or sub-build.
+	 *
+	 * @private
+	 * @param {Node} node - The node to check.
+	 * @param {('readUsageCount'|'writeUsageCount')} usageCount - The usage count to check.
+	 * @return {boolean} Whether the node has the usage.
+	 */
+	_hasUsage( node, usageCount ) {
 
 		const refNode = node.getShared( this );
 		const cache = refNode.isGlobal( this ) ? this.globalCache : this.cache;
@@ -1403,7 +1472,9 @@ class NodeBuilder {
 
 			for ( const shaderStage in nodeData ) {
 
-				if ( _checkWriteUsage( nodeData[ shaderStage ] ) ) {
+				const data = nodeData[ shaderStage ];
+
+				if ( data !== undefined && _checkUsage( data, usageCount ) ) {
 
 					return true;
 
@@ -1908,7 +1979,7 @@ class NodeBuilder {
 
 		let arrayType;
 
-		if ( ! ( attribute instanceof Float16BufferAttribute ) && normalized !== true ) {
+		if ( normalized !== true ) {
 
 			arrayType = this.getTypeFromArray( array );
 
@@ -2190,6 +2261,54 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Follows the setup output of the given node until a node accepted by `isTarget()` is found
+	 * and returns the result of `callback( target )`. A stack keeps its statements, e.g. the
+	 * statements of a function whose returned node is the target.
+	 *
+	 * @param {?Node} node - The node to resolve.
+	 * @param {function(Node): boolean} isTarget - Whether the given node is the target.
+	 * @param {function(Node): Node} callback - Returns the result for the target.
+	 * @return {?Node} The result, or `null` if no target is found.
+	 */
+	resolveNode( node, isTarget, callback ) {
+
+		if ( node === null || node.isNode !== true ) return null;
+
+		if ( isTarget( node ) ) return callback( node );
+
+		if ( node.isContextNode === true ) {
+
+			// the node inside the context is resolved with the context, which is applied to the result
+
+			const previousContext = this.addContext( node.value );
+
+			const outputNode = this.resolveNode( node.node, isTarget, callback );
+
+			this.setContext( previousContext );
+
+			return outputNode !== null ? outputNode.context( node.value ) : null;
+
+		}
+
+		if ( node.isStackNode === true ) {
+
+			const outputNode = this.resolveNode( node.outputNode, isTarget, callback );
+
+			if ( outputNode === null || node.nodes.length === 0 ) return outputNode;
+
+			const resolvedStack = stack();
+			resolvedStack.nodes = node.nodes;
+			resolvedStack.outputNode = outputNode;
+
+			return resolvedStack;
+
+		}
+
+		return this.resolveNode( node.build( this ), isTarget, callback );
+
+	}
+
+	/**
 	 * The builder maintains (cached) data for each node during the building process. This method
 	 * can be used to get these data for a specific shader stage and cache.
 	 *
@@ -2206,7 +2325,7 @@ class NodeBuilder {
 
 		if ( nodeData === undefined ) {
 
-			nodeData = {};
+			nodeData = { vertex: undefined, fragment: undefined, compute: undefined, any: undefined };
 
 			cache.setData( node, nodeData );
 
@@ -2363,9 +2482,13 @@ class NodeBuilder {
 	 * @param {string} type - The uniform type.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
 	 * @param {?string} name - The name of the uniform.
-	 * @return {NodeUniform} The node uniform.
+	 * @return {NodeUniform|ParameterNode} The node uniform, or the parameter that replaces it in the code of a function.
 	 */
 	getUniformFromNode( node, type, shaderStage = this.shaderStage, name = null ) {
+
+		if ( node.isParameterNode === true ) return node;
+
+		if ( this.currentFunctionNode !== null ) _builderFunctionNodes.add( this.currentFunctionNode );
 
 		const nodeData = this.getDataFromNode( node, shaderStage, this.globalCache );
 
@@ -2758,18 +2881,28 @@ class NodeBuilder {
 	 */
 	buildFunctionNode( shaderNode ) {
 
+		// the code is shared by all builders of a backend, per shader stage since it can differ between stages.
+		// code that refers to uniforms is built per builder, since the uniforms are declared and named per builder.
+
 		const backend = this.renderer.backend;
 
-		let cache = _functionNodeCache.get( backend );
+		let stages = _functionNodeCache.get( backend );
 
-		if ( cache === undefined ) {
+		if ( stages === undefined ) {
 
-			cache = new WeakMap();
-			_functionNodeCache.set( backend, cache );
+			stages = {};
+			_functionNodeCache.set( backend, stages );
 
 		}
 
+		const cache = stages[ this.shaderStage ] || ( stages[ this.shaderStage ] = new WeakMap() );
+		const builderCache = this._functionNodes[ this.shaderStage ] || ( this._functionNodes[ this.shaderStage ] = new Map() );
+
 		let fn = cache.get( shaderNode );
+
+		const isBuilderFunction = fn !== undefined && _builderFunctionNodes.has( fn );
+
+		if ( isBuilderFunction ) fn = builderCache.get( shaderNode );
 
 		if ( fn === undefined ) {
 
@@ -2783,7 +2916,18 @@ class NodeBuilder {
 
 			this.currentFunctionNode = previous;
 
-			cache.set( shaderNode, fn );
+			if ( isBuilderFunction === false ) cache.set( shaderNode, fn );
+			if ( isBuilderFunction || _builderFunctionNodes.has( fn ) ) builderCache.set( shaderNode, fn );
+
+			_functionShaderNodes.set( fn, shaderNode );
+
+		}
+
+		// a function that calls a function of this builder is a function of this builder as well
+
+		if ( _builderFunctionNodes.has( fn ) && this.currentFunctionNode !== null ) {
+
+			_builderFunctionNodes.add( this.currentFunctionNode );
 
 		}
 
@@ -2792,7 +2936,24 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Generates a code flow based on a TSL function: Fn().
+	 * Returns the function node to call in the current shader stage. A call of a TSL function
+	 * can be set up in another stage, and the code of TSL functions is built per stage.
+	 *
+	 * @param {FunctionNode} functionNode - The function node of the call.
+	 * @return {FunctionNode} The function node of the current stage.
+	 */
+	getFunctionNode( functionNode ) {
+
+		const shaderNode = _functionShaderNodes.get( functionNode );
+
+		return shaderNode !== undefined ? this.buildFunctionNode( shaderNode ) : functionNode;
+
+	}
+
+	/**
+	 * Generates a code flow based on a TSL function: Fn(). The flow also has the parameters of the
+	 * function code: the inputs of the layout, each texture input with the parameters of
+	 * {@link NodeBuilder#getTextureParameters}.
 	 *
 	 * @param {ShaderNodeInternal} shaderNode - A function code will be generated based on the input.
 	 * @return {Object}
@@ -2801,7 +2962,41 @@ class NodeBuilder {
 
 		const layout = shaderNode.layout;
 
-		const inputs = _createLayoutInputs( layout, layout.inputs.map( input => new ParameterNode( input.type, input.name ) ) );
+		const parameters = [];
+
+		const nodes = layout.inputs.map( ( input ) => {
+
+			const node = _createLayoutParameter( input );
+
+			if ( node.isTextureNode === true ) {
+
+				for ( const [ name, parameterNode ] of Object.entries( this.getTextureParameters( input.name, node ) ) ) {
+
+					const type = parameterNode.getNodeType( this );
+
+					if ( parameterNode.isUniformNode === true ) {
+
+						// the clones of the uniform resolve to the parameter, see UniformNode#getSharedNode()
+
+						this.setHashNode( new ParameterNode( type, name ), parameterNode.getUniformHash( this ) );
+
+					}
+
+					parameters.push( { name, type: parameterNode === node ? input.type : type } ); // the texture has the type of the input, e.g. 'texture'
+
+				}
+
+			} else {
+
+				parameters.push( input );
+
+			}
+
+			return node;
+
+		} );
+
+		const inputs = _createLayoutInputs( layout, nodes );
 
 		//
 
@@ -2812,7 +3007,75 @@ class NodeBuilder {
 
 		shaderNode.layout = layout;
 
+		flowData.parameters = parameters;
+
 		return flowData;
+
+	}
+
+	/**
+	 * Requests a sampler for the binding of the given texture node.
+	 *
+	 * @abstract
+	 * @param {TextureNode} textureNode - The texture node.
+	 */
+	addSamplerNode( /* textureNode */ ) {
+
+		warn( 'Abstract function.' );
+
+	}
+
+	/**
+	 * Returns the parameters that pass a texture to a function: the texture node, and the nodes
+	 * the backend needs to sample it, e.g. its sampler. The parameters are passed in this order,
+	 * with the given names in the code of the function.
+	 *
+	 * @param {string} name - The name of the texture parameter.
+	 * @param {TextureNode} textureNode - The texture node.
+	 * @return {Object<string,Node>} The nodes of the parameters, by name.
+	 */
+	getTextureParameters( name, textureNode ) {
+
+		return { [ name ]: textureNode };
+
+	}
+
+	/**
+	 * Returns the parameters of a call to a TSL function with layout. Each texture input is passed
+	 * with the parameters of {@link NodeBuilder#getTextureParameters}.
+	 *
+	 * @private
+	 * @param {Object} layout - The layout of the function.
+	 * @param {Array<Node>|Object<string,Node>} inputs - The inputs of the call.
+	 * @return {Array<Node>} The parameters of the call.
+	 */
+	_getLayoutCallParameters( layout, inputs ) {
+
+		const parameters = [];
+
+		layout.inputs.forEach( ( input, i ) => {
+
+			const node = Array.isArray( inputs ) ? inputs[ i ] : inputs[ input.name ];
+
+			if ( _layoutTextureNodes[ input.type ] === undefined ) {
+
+				parameters.push( node );
+
+			} else if ( node && node.isTextureNode === true && node.getInputType( this ) === input.type ) {
+
+				parameters.push( ...Object.values( this.getTextureParameters( input.name, node ) ) );
+
+			} else {
+
+				error( `TSL: Input '${ input.name }' of '${ layout.name }()' expects a ${ input.type } node.` );
+
+				parameters.push( node );
+
+			}
+
+		} );
+
+		return parameters;
 
 	}
 
@@ -2891,7 +3154,7 @@ class NodeBuilder {
 	_resolveLayoutDefaults( shaderNode, provided ) {
 
 		const layout = shaderNode.layout;
-		const parameters = layout.inputs.map( input => new ParameterNode( input.type, input.name ) );
+		const parameters = layout.inputs.map( _createLayoutParameter );
 
 		const fullGraph = this._getLayoutCallGraph( shaderNode, _createLayoutInputs( layout, parameters ) );
 		const partialGraph = this._getLayoutCallGraph( shaderNode, _createLayoutInputs( layout, parameters.map( ( parameter, i ) => provided[ i ] ? parameter : undefined ) ) );
@@ -3668,7 +3931,11 @@ class NodeBuilder {
 
 			}
 
-			for ( const shaderStage of shaderStages ) {
+			// the fragment stage is analyzed before the vertex stage, so the vertex code knows which values the varyings read
+
+			const stages = buildStage === 'analyze' ? _analyzeShaderStages : shaderStages;
+
+			for ( const shaderStage of stages ) {
 
 				this.setShaderStage( shaderStage );
 
@@ -3687,70 +3954,6 @@ class NodeBuilder {
 					}
 
 				}
-
-			}
-
-		}
-
-		this.setBuildStage( null );
-		this.setShaderStage( null );
-
-		// stage 4: build code for a specific output
-
-		this.buildCode();
-		this.buildUpdateNodes();
-
-		return this;
-
-	}
-
-	/**
-	 * Async version of build() that yields to main thread between shader stages.
-	 * Use this in compileAsync() to prevent blocking the main thread.
-	 *
-	 * @param {Function} [yieldFn=yieldToMain] - The function used to yield to the main thread.
-	 * @return {Promise<NodeBuilder>} A promise that resolves to this node builder.
-	 */
-	async buildAsync( yieldFn = yieldToMain ) {
-
-		this.prebuild();
-
-		// setup() -> stage 1: create possible new nodes and/or return an output reference node
-		// analyze()   -> stage 2: analyze nodes to possible optimization and validation
-		// generate()  -> stage 3: generate shader
-
-		for ( const buildStage of defaultBuildStages ) {
-
-			this.setBuildStage( buildStage );
-
-			if ( this.context.position && this.context.position.isNode ) {
-
-				this.flowNodeFromShaderStage( 'vertex', this.context.position );
-
-			}
-
-			for ( const shaderStage of shaderStages ) {
-
-				this.setShaderStage( shaderStage );
-
-				const flowNodes = this.flowNodes[ shaderStage ];
-
-				for ( const node of flowNodes ) {
-
-					if ( buildStage === 'generate' ) {
-
-						this.flowNode( node );
-
-					} else {
-
-						node.build( this );
-
-					}
-
-				}
-
-				// Yield to main thread after each shader stage to prevent blocking
-				await yieldFn();
 
 			}
 

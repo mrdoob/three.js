@@ -655,7 +655,7 @@ function _ensureGPUResources( cubemapSize ) {
 								totalWeight += weight;
 
 								vec3 dir = normalize( coord );
-								vec3 cw = textureCube( envMap, coord ).rgb * weight;
+								vec3 cw = textureLod( envMap, coord, 0.0 ).rgb * weight;
 
 								// band 0
 								accum0 += cw * 0.282095;

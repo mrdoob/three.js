@@ -134,7 +134,7 @@ class Line extends Object3D {
 	/**
 	 * Computes an array of distance values which are necessary for rendering dashed lines.
 	 * For each vertex in the geometry, the method calculates the cumulative length from the
-	 * current point to the very beginning of the line.
+	 * current point to the very beginning of the line. Only supported for non-indexed geometries.
 	 *
 	 * @return {Line} A reference to this line.
 	 */
@@ -211,7 +211,7 @@ class Line extends Object3D {
 		_inverseMatrix.copy( matrixWorld ).invert();
 		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
-		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+		const localThreshold = threshold / matrixWorld.getMaxScaleOnAxis();
 		const localThresholdSq = localThreshold * localThreshold;
 
 		const step = this.isLineSegments ? 2 : 1;

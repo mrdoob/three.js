@@ -46,7 +46,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		let depth = shadowPass.sample( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) );
+		let depth = shadowPass.sample( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) ).level( 0 );
 
 		if ( shadowPass.value.isArrayTexture ) {
 
@@ -93,7 +93,7 @@ const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPas
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		let distribution = shadowPass.sample( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) );
+		let distribution = shadowPass.sample( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) ).level( 0 );
 
 		if ( shadowPass.value.isArrayTexture ) {
 
@@ -142,16 +142,7 @@ class ShadowNode extends ShadowBaseNode {
 	 */
 	constructor( light, shadow = null ) {
 
-		super( light );
-
-		/**
-		 * The light shadow which defines the properties light's
-		 * shadow.
-		 *
-		 * @type {?LightShadow}
-		 * @default null
-		 */
-		this.shadow = shadow || light.shadow;
+		super( light, shadow || light.shadow );
 
 		/**
 		 * A reference to the shadow map which is a render target.
@@ -217,13 +208,14 @@ class ShadowNode extends ShadowBaseNode {
 		this._currentShadowType = null;
 
 		/**
-		 * A Weak Map holding the current frame ID per camera. Used
-		 * to control the update of shadow maps.
+		 * Whether the output node of this shadow node was set up
+		 * with transmitted shadows or not.
 		 *
-		 * @type {WeakMap<Camera,number>}
+		 * @type {?boolean}
 		 * @private
+		 * @default null
 		 */
-		this._cameraFrameId = new WeakMap();
+		this._currentTransmitted = null;
 
 		/**
 		 * This flag can be used for type testing.
@@ -601,8 +593,9 @@ class ShadowNode extends ShadowBaseNode {
 		return Fn( () => {
 
 			const currentShadowType = builder.renderer.shadowMap.type;
+			const currentTransmitted = builder.renderer.shadowMap.transmitted;
 
-			if ( this._currentShadowType !== currentShadowType ) {
+			if ( this._currentShadowType !== currentShadowType || this._currentTransmitted !== currentTransmitted ) {
 
 				this._reset();
 				this._node = null;
@@ -617,6 +610,7 @@ class ShadowNode extends ShadowBaseNode {
 
 				this._node = node = this.setupShadow( builder );
 				this._currentShadowType = currentShadowType;
+				this._currentTransmitted = currentTransmitted;
 
 			}
 
@@ -758,6 +752,7 @@ class ShadowNode extends ShadowBaseNode {
 	_reset() {
 
 		this._currentShadowType = null;
+		this._currentTransmitted = null;
 
 		this.disposeShadowMaterial();
 
@@ -785,43 +780,6 @@ class ShadowNode extends ShadowBaseNode {
 
 			this.vsmMaterialHorizontal.dispose();
 			this.vsmMaterialHorizontal = null;
-
-		}
-
-	}
-
-	/**
-	 * The implementation performs the update of the shadow map if necessary.
-	 *
-	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 */
-	updateBefore( frame ) {
-
-		// do not render shadow maps during precompilation
-
-		if ( frame.renderer._precompilationState !== null ) return;
-
-		const { shadow } = this;
-
-		let needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
-
-		if ( needsUpdate ) {
-
-			if ( this._cameraFrameId.get( frame.camera ) === frame.frameId ) {
-
-				needsUpdate = false;
-
-			}
-
-			this._cameraFrameId.set( frame.camera, frame.frameId );
-
-		}
-
-		if ( needsUpdate ) {
-
-			this.updateShadow( frame );
-
-			shadow.needsUpdate = false;
 
 		}
 

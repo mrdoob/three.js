@@ -47,7 +47,7 @@ function _getBufferAttribute( value, itemSize ) {
  * const positionAttribute = geometry.getAttribute( 'position' );
  *
  * const colors = [];
- * for ( let i = 0; i < position.count; i ++ ) {
+ * for ( let i = 0; i < positionAttribute.count; i ++ ) {
  * 	colors.push( 1, 0, 0 );
  * }
  *
@@ -168,7 +168,7 @@ class BufferAttributeNode extends InputNode {
 	 * and thus the hash should be shared as well.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The hash.
+	 * @return {number} The hash.
 	 */
 	getHash( builder ) {
 
@@ -196,7 +196,7 @@ class BufferAttributeNode extends InputNode {
 
 		}
 
-		return String( id );
+		return id;
 
 	}
 

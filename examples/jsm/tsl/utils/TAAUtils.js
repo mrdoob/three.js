@@ -1,4 +1,4 @@
-import { add, float, Fn, If, luminance, max, struct, vec2, vec4, getViewPosition, logarithmicDepthToViewZ, viewZToOrthographicDepth, viewZToPerspectiveDepth } from 'three/tsl';
+import { add, float, Fn, If, luminance, max, struct, vec2, vec4, projectionDepth } from 'three/tsl';
 
 /**
  * Optimized version of AABB clipping.
@@ -84,11 +84,10 @@ export const sampleCurrentDepth = Fn( ( [ depthNode, positionTexel, cameraNearFa
 
 		for ( let y = - 1; y <= 1; ++ y ) {
 
-			const neighbor = positionTexel.add( vec2( x, y ) ).toVar();
+			const neighbor = positionTexel.add( vec2( x, y ) ).toConst();
 			let depth = depthNode.load( neighbor ).r;
 			if ( builder.renderer.reversedDepthBuffer ) depth = depth.oneMinus();
-			if ( builder.renderer.logarithmicDepthBuffer ) depth = logarithmicToPerspectiveDepth( depth, cameraNearFar );
-			depth = depth.toVar();
+			depth = projectionDepth( depth, cameraNearFar.x, cameraNearFar.y ).toConst();
 
 			If( depth.lessThan( closestDepth ), () => {
 
@@ -112,34 +111,6 @@ export const sampleCurrentDepth = Fn( ( [ depthNode, positionTexel, cameraNearFa
 } );
 
 /**
- * Samples the previous depth buffer and reprojects the depth into the current view.
- *
- * @tsl
- * @private
- * @function
- * @param {TextureNode} previousDepthNode - The previous depth buffer.
- * @param {Node<vec2>} uv - The uv coordinates.
- * @param {Node<mat4>} previousCameraProjectionMatrixInverse - The previous camera projection matrix inverse.
- * @param {Node<mat4>} previousCameraWorldMatrix - The previous camera world matrix.
- * @param {Node<mat4>} cameraWorldMatrixInverse - The current camera world matrix inverse.
- * @param {Node<vec2>} cameraNearFar - The camera's near and far.
- * @param {Camera} camera - The camera.
- * @return {Node<float>} The reprojected depth.
- */
-export const samplePreviousDepth = Fn( ( [ previousDepthNode, uv, previousCameraProjectionMatrixInverse, previousCameraWorldMatrix, cameraWorldMatrixInverse, cameraNearFar, camera ], builder ) => {
-
-	let depth = previousDepthNode.sample( uv ).r;
-	if ( builder.renderer.logarithmicDepthBuffer ) depth = logarithmicToPerspectiveDepth( depth, cameraNearFar );
-	const positionView = getViewPosition( uv, depth, previousCameraProjectionMatrixInverse );
-	const positionWorld = previousCameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz;
-	const viewZ = cameraWorldMatrixInverse.mul( vec4( positionWorld, 1 ) ).z;
-	return camera.isOrthographicCamera
-		? viewZToOrthographicDepth( viewZ, cameraNearFar.x, cameraNearFar.y )
-		: viewZToPerspectiveDepth( viewZ, cameraNearFar.x, cameraNearFar.y );
-
-} );
-
-/**
  * Computes a sequence of Halton(2, 3) jitter offsets in the range [0, 1].
  *
  * @private
@@ -158,14 +129,6 @@ const currentDepthStruct = struct( {
 	closestPositionTexel: 'vec2',
 	farthestDepth: 'float'
 } );
-
-const logarithmicToPerspectiveDepth = ( depth, cameraNearFar ) => {
-
-	const { x: near, y: far } = cameraNearFar;
-	const viewZ = logarithmicDepthToViewZ( depth, near, far );
-	return viewZToPerspectiveDepth( viewZ, near, far );
-
-};
 
 function halton( index, base ) {
 

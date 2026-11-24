@@ -21,6 +21,16 @@ import { warn, error } from '../../../utils.js';
 
 import { GPUShaderStage } from '../utils/WebGPUConstants.js';
 
+const textureTypes = new Set( [ 'texture', 'cubeTexture', 'cubeDepthTexture', 'storageTexture', 'texture3D' ] );
+const bufferTypes = new Set( [ 'buffer', 'storageBuffer', 'indirectStorageBuffer' ] );
+
+// The WGSL types of the texture inputs of a function layout.
+const layoutTextureTypes = {
+	texture: 'texture_2d<f32>',
+	cubeTexture: 'texture_cube<f32>',
+	texture3D: 'texture_3d<f32>'
+};
+
 const accessNames = {
 	[ NodeAccess.READ_ONLY ]: 'read',
 	[ NodeAccess.WRITE_ONLY ]: 'write',
@@ -307,10 +317,10 @@ class WGSLNodeBuilder extends NodeBuilder {
 		super( object, renderer, new WGSLNodeParser() );
 
 		/**
-		 * A dictionary that holds for each shader stage ('vertex', 'fragment', 'compute')
-		 * another dictionary which manages UBOs per group ('render','frame','object').
+		 * A dictionary that holds the UBO of each uniform group ('render','frame','object')
+		 * by group name. The UBOs are shared by all shader stages.
 		 *
-		 * @type {Object<string,Object<string,NodeUniformsGroup>>}
+		 * @type {Object<string,NodeUniformsGroup>}
 		 */
 		this.uniformGroups = {};
 
@@ -343,6 +353,14 @@ class WGSLNodeBuilder extends NodeBuilder {
 		 * @type {Map<string,Object>}
 		 */
 		this.scopedArrays = new Map();
+
+		/**
+		 * The texture nodes that need a sampler although their texture is unfilterable,
+		 * e.g. textures with `NearestFilter` passed to a function with layout.
+		 *
+		 * @type {Set<TextureNode>}
+		 */
+		this.samplerNodes = new Set();
 
 		/**
 		 * A flag that indicates that early returns are allowed.
@@ -562,9 +580,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( textureData.dimensionsSnippet === undefined ) textureData.dimensionsSnippet = {};
 
-		let textureDimensionNode = textureData.dimensionsSnippet[ levelSnippet ];
+		const dimensionsKey = textureProperty + ':' + levelSnippet;
 
-		if ( textureData.dimensionsSnippet[ levelSnippet ] === undefined ) {
+		let textureDimensionNode = textureData.dimensionsSnippet[ dimensionsKey ];
+
+		if ( textureDimensionNode === undefined ) {
 
 			let textureDimensionsParams;
 			let dimensionType;
@@ -596,7 +616,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			textureDimensionNode = new VarNode( new ExpressionNode( `textureDimensions( ${ textureDimensionsParams } )`, dimensionType ) );
 
-			textureData.dimensionsSnippet[ levelSnippet ] = textureDimensionNode;
+			textureData.dimensionsSnippet[ dimensionsKey ] = textureDimensionNode;
 
 			if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.is3DTexture || texture.isData3DTexture ) {
 
@@ -856,9 +876,23 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	isUnfilterable( texture ) {
 
+		return this.isUnfilterableFormat( texture ) ||
+			( this.isSampleCompare( texture ) === false && texture.minFilter === NearestFilter && texture.magFilter === NearestFilter );
+
+	}
+
+	/**
+	 * Returns `true` if the format of the given texture can't be sampled with a filtering sampler,
+	 * e.g. an integer texture. Unlike {@link WGSLNodeBuilder#isUnfilterable}, the filters of the
+	 * texture are ignored.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {boolean} Whether the format of the given texture is unfilterable or not.
+	 */
+	isUnfilterableFormat( texture ) {
+
 		return this.getComponentTypeFromTexture( texture ) !== 'float' ||
-			( ! this.isAvailable( 'float32Filterable' ) && texture.type === FloatType ) ||
-			( this.isSampleCompare( texture ) === false && texture.minFilter === NearestFilter && texture.magFilter === NearestFilter ) ||
+			( texture.type === FloatType && ! this.isAvailable( 'float32Filterable' ) ) ||
 			this.renderer.backend.utils.getTextureSampleData( texture ).primarySamples > 1 ||
 			texture.normalized === true && ( texture.type === ShortType || texture.type === UnsignedShortType );
 
@@ -1214,11 +1248,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 			const name = node.name;
 			const type = node.type;
 
-			if ( type === 'texture' || type === 'cubeTexture' || type === 'cubeDepthTexture' || type === 'storageTexture' || type === 'texture3D' ) {
+			if ( textureTypes.has( type ) ) {
 
 				return name;
 
-			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'indirectStorageBuffer' ) {
+			} else if ( bufferTypes.has( type ) ) {
 
 				// storage structs are bound directly rather than wrapped in an array
 				if ( node.node.isStorageStructNode === true ) {
@@ -1384,6 +1418,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 	getUniformFromNode( node, type, shaderStage, name = null ) {
 
 		const uniformNode = super.getUniformFromNode( node, type, shaderStage, name );
+
+		if ( uniformNode.isParameterNode === true ) return uniformNode;
+
 		const nodeData = this.getDataFromNode( node, shaderStage, this.globalCache );
 
 		if ( nodeData.uniformGPU === undefined ) {
@@ -1395,7 +1432,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			const bindings = this.getBindGroupArray( groupName, shaderStage );
 
-			if ( type === 'texture' || type === 'cubeTexture' || type === 'cubeDepthTexture' || type === 'storageTexture' || type === 'texture3D' ) {
+			if ( textureTypes.has( type ) ) {
 
 				let texture = null;
 
@@ -1427,11 +1464,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 				texture.mipLevel = texture.store ? node.mipLevel : 0;
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
-				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-				// Also textureGather always need sampler.
-				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false ) || node.gatherNode !== null;
-
-				if ( needsSampler ) {
+				if ( this._needsSampler( node ) ) {
 
 					const sampler = new NodeSampler( `${ uniformNode.name }_sampler`, uniformNode.node, group );
 					sampler.setVisibility( gpuShaderStageLib[ shaderStage ] );
@@ -1448,7 +1481,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				}
 
-			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'indirectStorageBuffer' ) {
+			} else if ( bufferTypes.has( type ) ) {
 
 				const bufferClass = type === 'buffer' ? NodeUniformBuffer : NodeStorageBuffer;
 
@@ -1561,6 +1594,40 @@ class WGSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Requests a sampler for the binding of the given texture node.
+	 *
+	 * @param {TextureNode} textureNode - The texture node.
+	 */
+	addSamplerNode( textureNode ) {
+
+		this.samplerNodes.add( textureNode.getSharedNode( this ) );
+
+	}
+
+	/**
+	 * Returns the parameters that pass a texture to a function: the texture and its sampler.
+	 *
+	 * @param {string} name - The name of the texture parameter.
+	 * @param {TextureNode} textureNode - The texture node.
+	 * @return {Object<string,Node>} The nodes of the parameters, by name.
+	 */
+	getTextureParameters( name, textureNode ) {
+
+		if ( this.isUnfilterableFormat( textureNode.value ) ) {
+
+			error( `TSL: The texture passed to '${ name }' must have a filterable format, e.g. not an integer or multisampled texture.` );
+
+		}
+
+		// the function samples the texture with a sampler, also if the texture has no filter
+
+		this.addSamplerNode( textureNode );
+
+		return { [ name ]: textureNode, [ name + '_sampler' ]: textureNode.convert( 'sampler' ) };
+
+	}
+
+	/**
 	 * Builds the given shader node.
 	 *
 	 * @param {ShaderNodeInternal} shaderNode - The shader node.
@@ -1573,9 +1640,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		const parameters = [];
 
-		for ( const input of layout.inputs ) {
+		for ( const { name, type } of flowData.parameters ) {
 
-			parameters.push( input.name + ' : ' + this.getType( input.type ) );
+			parameters.push( name + ' : ' + ( layoutTextureTypes[ type ] || this.getType( type ) ) );
 
 		}
 
@@ -1818,7 +1885,7 @@ ${ flowData.code }
 	/**
 	 * Enables hardware clipping.
 	 *
-	 * @param {string} planeCount - The clipping plane count.
+	 * @param {number} planeCount - The clipping plane count.
 	 */
 	enableHardwareClipping( planeCount ) {
 
@@ -2108,6 +2175,7 @@ ${ flowData.code }
 	 * Returns the variables of the given shader stage as a WGSL string.
 	 *
 	 * @param {string} shaderStage - The shader stage.
+	 * @param {boolean} [global=false] - Whether to declare the variables in module scope (`var<private>`) or not.
 	 * @return {string} The WGSL snippet that defines the variables.
 	 */
 	getVars( shaderStage, global = false ) {
@@ -2212,7 +2280,6 @@ ${ flowData.code }
 	 */
 	getUniforms( shaderStage ) {
 
-		const backend = this.renderer.backend;
 		const uniforms = this.uniforms[ shaderStage ];
 
 		const bindingSnippets = [];
@@ -2225,112 +2292,32 @@ ${ flowData.code }
 			const groupName = uniform.groupNode.name;
 			const uniformIndexes = this.bindingsIndexes[ groupName ];
 
-			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'cubeDepthTexture' || uniform.type === 'storageTexture' || uniform.type === 'texture3D' ) {
+			if ( textureTypes.has( uniform.type ) ) {
 
-				const textureNode = uniform.node;
-				const texture = textureNode.value;
+				const { textureType, samplerType } = this._getTextureBindingTypes( uniform.node, shaderStage );
 
-				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-				// Also textureGather always need sampler.
-				const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && textureNode.isStorageTextureNode !== true ) || textureNode.gatherNode !== null;
+				if ( samplerType !== null ) {
 
-				if ( needsSampler ) {
-
-					if ( this.isSampleCompare( texture ) && textureNode.isSampleCompare() ) {
-
-						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler_comparison;` );
-
-					} else {
-
-						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler;` );
-
-					}
-
-				}
-
-				let textureType;
-
-				let multisampled = '';
-
-				const { primarySamples } = backend.utils.getTextureSampleData( texture );
-
-				if ( primarySamples > 1 ) {
-
-					multisampled = '_multisampled';
-
-				}
-
-				if ( texture.isCubeTexture === true && texture.isDepthTexture === true ) {
-
-					textureType = 'texture_depth_cube';
-
-				} else if ( texture.isCubeTexture === true ) {
-
-					textureType = 'texture_cube<f32>';
-
-				} else if ( texture.isDepthTexture === true ) {
-
-					if ( backend.compatibilityMode && texture.compareFunction === null ) {
-
-						textureType = `texture${ multisampled }_2d<f32>`;
-
-					} else {
-
-						textureType = `texture_depth${ multisampled }_2d${ texture.isArrayTexture === true ? '_array' : '' }`;
-
-					}
-
-				} else if ( uniform.node.isStorageTextureNode === true ) {
-
-					const format = getFormat( texture, backend.device );
-					const access = this.getStorageAccess( uniform.node, shaderStage );
-
-					const is3D = uniform.node.value.is3DTexture;
-					const isArrayTexture = uniform.node.value.isArrayTexture;
-
-					const dimension = is3D ? '3d' : `2d${ isArrayTexture ? '_array' : '' }`;
-
-					textureType = `texture_storage_${ dimension }<${ format }, ${ access }>`;
-
-				} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
-
-					const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
-					textureType = `texture_2d_array<${ componentPrefix }32>`;
-
-				} else if ( texture.is3DTexture === true || texture.isData3DTexture === true ) {
-
-					const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
-					textureType = `texture_3d<${ componentPrefix }32>`;
-
-				} else {
-
-					const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
-
-					textureType = `texture${ multisampled }_2d<${ componentPrefix }32>`;
+					bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : ${ samplerType };` );
 
 				}
 
 				bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name } : ${ textureType };` );
 
-			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' || uniform.type === 'indirectStorageBuffer' ) {
+			} else if ( bufferTypes.has( uniform.type ) ) {
 
 				const bufferNode = uniform.node;
-				const bufferType = this.getType( bufferNode.getNodeType( this ) );
-				const bufferCount = bufferNode.bufferCount;
-				const bufferCountSnippet = bufferCount > 0 && uniform.type === 'buffer' ? ', ' + bufferCount : '';
-				const bufferAccessMode = bufferNode.isStorageBufferNode ? `storage, ${ this.getStorageAccess( bufferNode, shaderStage ) }` : 'uniform';
+				const { valueType, access } = this._getBufferBindingTypes( bufferNode, uniform.type, shaderStage );
+				const bufferAccessMode = access !== null ? `storage, ${ access }` : 'uniform';
 
 				if ( bufferNode.isStorageStructNode === true ) {
 
 					// bound as the struct itself so it can end in a runtime-sized array
-					bufferSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } )\nvar<${ bufferAccessMode }> ${ uniform.name } : ${ bufferType };` );
+					bufferSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } )\nvar<${ bufferAccessMode }> ${ uniform.name } : ${ valueType };` );
 
 				} else {
 
-					const bufferTypeSnippet = bufferNode.isAtomic ? `atomic<${ bufferType }>` : `${ bufferType }`;
-					const bufferSnippet = `\tvalue : array< ${ bufferTypeSnippet }${ bufferCountSnippet } >`;
-
-					bufferSnippets.push( this._getWGSLStructBinding( uniform.name, bufferSnippet, bufferAccessMode, uniformIndexes.binding ++, uniformIndexes.group ) );
+					bufferSnippets.push( this._getWGSLStructBinding( uniform.name, `\tvalue : ${ valueType }`, bufferAccessMode, uniformIndexes.binding ++, uniformIndexes.group ) );
 
 				}
 
@@ -2397,6 +2384,137 @@ ${ flowData.code }
 		const code = [ ...bindingSnippets, ...bufferSnippets, ...structSnippets ].join( '\n' );
 
 		return code;
+
+	}
+
+	/**
+	 * Whether the given texture node is bound with a sampler. Cube textures always need samplers
+	 * (they use textureSampleLevel, not textureLoad) and the textures in {@link WGSLNodeBuilder#samplerNodes}.
+	 *
+	 * @private
+	 * @param {TextureNode} textureNode - The texture node.
+	 * @return {boolean} Whether the texture node needs a sampler or not.
+	 */
+	_needsSampler( textureNode ) {
+
+		const texture = textureNode.value;
+
+		return texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && textureNode.isStorageTextureNode !== true ) || this.samplerNodes.has( textureNode );
+
+	}
+
+	/**
+	 * Returns the WGSL types of the binding of a texture node.
+	 *
+	 * @private
+	 * @param {TextureNode} textureNode - The texture node.
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {{textureType: string, samplerType: ?string}} The texture type, and the sampler type if the texture needs a sampler.
+	 */
+	_getTextureBindingTypes( textureNode, shaderStage ) {
+
+		const backend = this.renderer.backend;
+		const texture = textureNode.value;
+
+		let samplerType = null;
+
+		if ( this._needsSampler( textureNode ) ) {
+
+			samplerType = this.isSampleCompare( texture ) && textureNode.isSampleCompare() ? 'sampler_comparison' : 'sampler';
+
+		}
+
+		let textureType;
+
+		let multisampled = '';
+
+		const { primarySamples } = backend.utils.getTextureSampleData( texture );
+
+		if ( primarySamples > 1 ) {
+
+			multisampled = '_multisampled';
+
+		}
+
+		if ( texture.isCubeTexture === true && texture.isDepthTexture === true ) {
+
+			textureType = 'texture_depth_cube';
+
+		} else if ( texture.isCubeTexture === true ) {
+
+			textureType = 'texture_cube<f32>';
+
+		} else if ( texture.isDepthTexture === true ) {
+
+			if ( backend.compatibilityMode && texture.compareFunction === null ) {
+
+				textureType = `texture${ multisampled }_2d<f32>`;
+
+			} else {
+
+				textureType = `texture_depth${ multisampled }_2d${ texture.isArrayTexture === true ? '_array' : '' }`;
+
+			}
+
+		} else if ( textureNode.isStorageTextureNode === true ) {
+
+			const format = getFormat( texture, backend.device );
+			const access = this.getStorageAccess( textureNode, shaderStage );
+
+			const is3D = texture.is3DTexture;
+			const isArrayTexture = texture.isArrayTexture;
+
+			const dimension = is3D ? '3d' : `2d${ isArrayTexture ? '_array' : '' }`;
+
+			textureType = `texture_storage_${ dimension }<${ format }, ${ access }>`;
+
+		} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
+
+			const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
+			textureType = `texture_2d_array<${ componentPrefix }32>`;
+
+		} else if ( texture.is3DTexture === true || texture.isData3DTexture === true ) {
+
+			const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
+			textureType = `texture_3d<${ componentPrefix }32>`;
+
+		} else {
+
+			const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
+
+			textureType = `texture${ multisampled }_2d<${ componentPrefix }32>`;
+
+		}
+
+		return { textureType, samplerType };
+
+	}
+
+	/**
+	 * Returns the WGSL types of the binding of a buffer node.
+	 *
+	 * @private
+	 * @param {BufferNode} bufferNode - The buffer node.
+	 * @param {string} type - The input type of the buffer node.
+	 * @param {string} shaderStage - The shader stage.
+	 * @return {{valueType: string, access: ?string}} The type of the data, and the access if it is a storage buffer.
+	 */
+	_getBufferBindingTypes( bufferNode, type, shaderStage ) {
+
+		const bufferType = this.getType( bufferNode.getNodeType( this ) );
+		const access = bufferNode.isStorageBufferNode ? this.getStorageAccess( bufferNode, shaderStage ) : null;
+
+		if ( bufferNode.isStorageStructNode === true ) {
+
+			return { valueType: bufferType, access };
+
+		}
+
+		const bufferCount = bufferNode.bufferCount;
+		const bufferCountSnippet = bufferCount > 0 && type === 'buffer' ? ', ' + bufferCount : '';
+		const bufferTypeSnippet = bufferNode.isAtomic ? `atomic<${ bufferType }>` : `${ bufferType }`;
+
+		return { valueType: `array< ${ bufferTypeSnippet }${ bufferCountSnippet } >`, access };
 
 	}
 
@@ -2720,7 +2838,7 @@ fn main( ${shaderData.attributes} ) -> VaryingsStruct {
 	 *
 	 * @private
 	 * @param {Object} shaderData - The shader data.
-	 * @return {string} The vertex shader.
+	 * @return {string} The fragment shader.
 	 */
 	_getWGSLFragmentCode( shaderData ) {
 
@@ -2759,8 +2877,8 @@ fn main( ${shaderData.varyings} ) -> ${shaderData.returnType} {
 	 *
 	 * @private
 	 * @param {Object} shaderData - The shader data.
-	 * @param {string} workgroupSize - The workgroup size.
-	 * @return {string} The vertex shader.
+	 * @param {Array<number>} workgroupSize - The workgroup size.
+	 * @return {string} The compute shader.
 	 */
 	_getWGSLComputeCode( shaderData, workgroupSize ) {
 

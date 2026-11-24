@@ -188,6 +188,7 @@
 					strength: sculptor.getStrength(),
 					detail: sculptor.getDetail(),
 					negative: sculptor.getNegative(),
+					mirrorAxis: sculptor.mirrorAxis,
 					wireframe: false,
 					export: exportGLTF
 				};
@@ -228,6 +229,12 @@
 				const negativeController = gui.add( params, 'negative' ).onChange( function ( value ) {
 
 					sculptor.setNegative( value );
+
+				} );
+
+				gui.add( params, 'mirrorAxis', [ 'none', 'x', 'y', 'z' ] ).onChange( function ( value ) {
+
+					sculptor.mirrorAxis = value;
 
 				} );
 

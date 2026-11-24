@@ -213,7 +213,7 @@
 				const floorGeometry = new THREE.PlaneGeometry( 100, 100 );
 				floorGeometry.rotateX( - Math.PI / 2 );
 
-				const plane = new THREE.Mesh( floorGeometry, new THREE.MeshStandardMaterial( {
+				const plane = new THREE.Mesh( floorGeometry, new THREE.MeshStandardNodeMaterial( {
 					color: 0x0c1e1e,
 					roughness: .5,
 					metalness: 0,

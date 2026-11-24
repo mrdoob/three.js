@@ -4077,7 +4077,12 @@ class BinaryParser {
 
 				}
 
-				const data = unzlibSync( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) );
+				const elementSize = ( type === 'b' || type === 'c' ) ? 1 : ( type === 'f' || type === 'i' ) ? 4 : 8;
+
+				const compressed = new Uint8Array( reader.getArrayBuffer( compressedLength ) );
+				const out = new Uint8Array( arrayLength * elementSize );
+
+				const data = unzlibSync( compressed, { out } );
 				const reader2 = new BinaryReader( data.buffer );
 
 				switch ( type ) {

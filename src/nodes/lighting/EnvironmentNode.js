@@ -106,7 +106,7 @@ class EnvironmentNode extends LightingNode {
 
 		builder.context.radiance.addAssign( radiance );
 
-		builder.context.iblIrradiance.addAssign( isolateIrradiance );
+		builder.context.irradiance.addAssign( isolateIrradiance );
 
 		//
 

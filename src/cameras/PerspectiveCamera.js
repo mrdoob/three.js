@@ -25,7 +25,7 @@ class PerspectiveCamera extends Camera {
 	/**
 	 * Constructs a new perspective camera.
 	 *
-	 * @param {number} [fov=50] - The vertical field of view.
+	 * @param {number} [fov=50] - The vertical field of view, in degrees.
 	 * @param {number} [aspect=1] - The aspect ratio.
 	 * @param {number} [near=0.1] - The camera's near plane.
 	 * @param {number} [far=2000] - The camera's far plane.
@@ -211,10 +211,10 @@ class PerspectiveCamera extends Camera {
 	}
 
 	/**
-	 * Returns the height of the image on the film. If {@link PerspectiveCamera#aspect} is greater than or
-	 * equal to one (landscape format), the result equals {@link PerspectiveCamera#filmGauge}.
+	 * Returns the height of the image on the film. If {@link PerspectiveCamera#aspect} is less than or
+	 * equal to one (portrait format), the result equals {@link PerspectiveCamera#filmGauge}.
 	 *
-	 * @return {number} The film width.
+	 * @return {number} The film height.
 	 */
 	getFilmHeight() {
 

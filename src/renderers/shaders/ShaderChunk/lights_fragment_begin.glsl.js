@@ -58,7 +58,7 @@ vec3 geometryClearcoatNormal = vec3( 0.0 );
 
 	float dotNVms = saturate( dot( geometryNormal, geometryViewDir ) );
 
-	material.dfg = texture2D( dfgLUT, vec2( material.roughness, dotNVms ) ).rg;
+	material.dfg = textureLod( dfgLUT, vec2( material.roughness, dotNVms ), 0.0 ).rg;
 
 	#if ( NUM_SUN_LIGHTS > 0 || NUM_DIR_LIGHTS > 0 || NUM_POINT_LIGHTS > 0 || NUM_SPOT_LIGHTS > 0 )
 
@@ -221,15 +221,7 @@ IncidentLight directLight;
 
 #if defined( RE_IndirectDiffuse )
 
-	vec3 iblIrradiance = vec3( 0.0 );
-
 	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
-
-	#if defined( USE_LIGHT_PROBES )
-
-		irradiance += getLightProbeIrradiance( lightProbe, geometryNormal );
-
-	#endif
 
 	#if ( NUM_HEMI_LIGHTS > 0 )
 
@@ -263,7 +255,7 @@ IncidentLight directLight;
 		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_LIGHT_PROBE_GRIDS; i ++ ) {
 
-			if ( probeGrid == UNROLLED_LOOP_INDEX ) irradiance += getLightProbeGridIrradiance( probesSH[ i ], probesMin[ i ], probesMax[ i ], probesResolution[ i ], probeWorldPos, probeWorldNormal );
+			if ( probeGrid == UNROLLED_LOOP_INDEX ) irradiance += getLightProbeGridIrradiance( probesSH[ i ], probesMin[ i ], probesMax[ i ], probesResolution[ i ], probeWorldPos, probeWorldNormal ) * probesIntensity[ i ];
 
 		}
 		#pragma unroll_loop_end
@@ -274,8 +266,14 @@ IncidentLight directLight;
 
 #if defined( RE_IndirectSpecular )
 
-	vec3 radiance = vec3( 0.0 );
+	vec3 radiance = getIndirectLightRadiance( geometryViewDir, geometryNormal, material.roughness );
 	vec3 clearcoatRadiance = vec3( 0.0 );
+
+	#ifdef USE_CLEARCOAT
+
+		clearcoatRadiance += getIndirectLightRadiance( geometryViewDir, geometryClearcoatNormal, material.clearcoatRoughness );
+
+	#endif
 
 #endif
 `;

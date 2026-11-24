@@ -137,8 +137,8 @@ export const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VER
  * In these stages, use `instanceIndex` to modify a mesh based on its instance or to select per-instance data.
  *
  * ```js
- * // instanceIndex will equal the current mesh's instance index between 0-500
- * const material = new THREE.BasicNodeMaterial();
+ * // instanceIndex will equal the current mesh's instance index between 0-499
+ * const material = new THREE.MeshBasicNodeMaterial();
  * material.positionNode = vec3( instanceIndex.mod( 10 ), instanceIndex.div( 10 ), 0 );
  * const mesh = new THREE.InstancedMesh( geometry, material, 500 );
  * ```
@@ -148,11 +148,11 @@ export const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VER
  *
  * ```js
  * // instanceIndex will equal value between 0 - 255
- * const computeFn = Fn() => {
+ * const computeFn = Fn( () => {
  *
  * 	storageBuffer.element( instanceIndex ).assign( instanceIndex );
  *
- * } )().compute( 255 )
+ * } )().compute( 256 )
  * ```
  *
  * @tsl

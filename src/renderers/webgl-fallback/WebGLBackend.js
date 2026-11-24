@@ -14,7 +14,7 @@ import { GLFeatureName } from './utils/WebGLConstants.js';
 import { WebGLBufferRenderer } from './WebGLBufferRenderer.js';
 
 import { isTypedArray, warnOnce, warn, error } from '../../utils.js';
-import { WebGLCoordinateSystem, TimestampQuery, Compatibility } from '../../constants.js';
+import { WebGLCoordinateSystem, Compatibility } from '../../constants.js';
 import WebGLTimestampQueryPool from './utils/WebGLTimestampQueryPool.js';
 
 const _invalidationArray = [];
@@ -43,7 +43,7 @@ class WebGLBackend extends Backend {
 	 */
 
 	/**
-	 * Constructs a new WebGPU backend.
+	 * Constructs a new WebGL 2 backend.
 	 *
 	 * @param {WebGLBackend~Options} [parameters] - The configuration parameter.
 	 */
@@ -408,52 +408,15 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Inits a time stamp query for the given render context.
+	 * Creates the timestamp query pool of the GPU timers.
 	 *
-	 * @param {string} type - The type of the timestamp query.
-	 * @param {string} uid - A unique identifier for the timestamp query.
+	 * @return {WebGLTimestampQueryPool} The timestamp query pool.
 	 */
-	initTimestampQuery( type, uid ) {
+	createTimestampQueryPool() {
 
-		if ( ! this.disjoint || ! this.trackTimestamp ) return;
-
-		if ( ! this.timestampQueryPool[ type ] ) {
-
-			// TODO: Variable maxQueries?
-			this.timestampQueryPool[ type ] = new WebGLTimestampQueryPool( this.gl, type, 2048 );
-
-		}
-
-		const timestampQueryPool = this.timestampQueryPool[ type ];
-
-		const baseOffset = timestampQueryPool.allocateQueriesForContext( uid );
-
-		if ( baseOffset !== null ) {
-
-			timestampQueryPool.beginQuery( uid );
-
-		}
+		return new WebGLTimestampQueryPool( this.gl, this.disjoint );
 
 	}
-
-	// timestamp utils
-
-	/**
-	 * Prepares the timestamp buffer.
-	 *
-	 * @param {string} type - The type of the timestamp query.
-	 * @param {string} uid - A unique identifier for the timestamp query.
-	 */
-	prepareTimestampBuffer( type, uid ) {
-
-		if ( ! this.disjoint || ! this.trackTimestamp ) return;
-
-		const timestampQueryPool = this.timestampQueryPool[ type ];
-
-		timestampQueryPool.endQuery( uid );
-
-	}
-
 
 	/**
 	 * Returns the backend's rendering context.
@@ -504,8 +467,6 @@ class WebGLBackend extends Backend {
 		state.setScissorTest( renderContext.scissor );
 
 		//
-
-		this.initTimestampQuery( TimestampQuery.RENDER, this.getTimestampUID( renderContext ) );
 
 		renderContextData.previousContext = this._currentContext;
 		this._currentContext = renderContext;
@@ -620,15 +581,14 @@ class WebGLBackend extends Backend {
 
 		}
 
-		this.prepareTimestampBuffer( TimestampQuery.RENDER, this.getTimestampUID( renderContext ) );
-
 	}
 
 	/**
 	 * This method processes the result of occlusion queries and writes it
-	 * into the occlusion data of the render context.
+	 * into the occlusion data of the render context. The results are polled
+	 * once per animation frame until all queries are available, so the method
+	 * does not return a Promise.
 	 *
-	 * @async
 	 * @param {RenderContext} renderContext - The render context.
 	 */
 	resolveOccludedAsync( renderContext ) {
@@ -905,14 +865,13 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
 	 */
-	beginCompute( computeGroup ) {
+	beginCompute( /*computeGroup*/ ) {
 
 		const { state, gl } = this;
 
 		//
 
 		state.bindFramebuffer( gl.FRAMEBUFFER, null );
-		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ) );
 
 	}
 
@@ -923,7 +882,8 @@ class WebGLBackend extends Backend {
 	 * @param {Node} computeNode - The compute node.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
-	 * @param {?number} [count=null] - The count of compute invocations. If `null`, the count is determined by the compute node.
+	 * @param {?(number|Array<number>|IndirectStorageBufferAttribute)} [count=null] - The count of compute invocations. If `null`, the count is determined by the compute node.
+	 * Workgroup grids and indirect dispatches are not supported: only the first element of an array is used as the count of invocations.
 	 */
 	compute( computeGroup, computeNode, bindings, pipeline, count = null ) {
 
@@ -1002,10 +962,11 @@ class WebGLBackend extends Backend {
 		for ( let i = 0; i < transformAttributes.length; i ++ ) {
 
 			const dualAttributeData = this.get( transformAttributes[ i ] );
+			const pbo = this.attributeUtils.pbos.get( transformAttributes[ i ] );
 
-			if ( dualAttributeData.pbo && this.has( dualAttributeData.pbo ) ) {
+			if ( pbo !== undefined && this.has( pbo.texture ) ) {
 
-				this.textureUtils.copyBufferToTexture( dualAttributeData.transformBuffer, dualAttributeData.pbo );
+				this.textureUtils.copyBufferToTexture( dualAttributeData.transformBuffer, pbo.texture );
 
 			}
 
@@ -1038,15 +999,13 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {Node|Array<Node>} computeGroup - The compute node(s).
 	 */
-	finishCompute( computeGroup ) {
+	finishCompute( /*computeGroup*/ ) {
 
 		const { state, gl } = this;
 
 		this.discard = false;
 
 		state.disable( gl.RASTERIZER_DISCARD );
-
-		this.prepareTimestampBuffer( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ) );
 
 		if ( this._currentContext ) {
 
@@ -1757,7 +1716,7 @@ class WebGLBackend extends Backend {
 	 *
 	 * @private
 	 * @param {RenderObject} renderObject - The render object.
-	 * @param {RenderPipeline} pipeline - The render pipeline.
+	 * @param {RenderObjectPipeline} pipeline - The render pipeline.
 	 */
 	_completeCompile( renderObject, pipeline ) {
 
@@ -2859,6 +2818,7 @@ class WebGLBackend extends Backend {
 
 		await super.dispose();
 
+		if ( this.attributeUtils !== null ) this.attributeUtils.dispose();
 		if ( this.vertexArrayUtils !== null ) this.vertexArrayUtils.dispose();
 		if ( this.textureUtils !== null ) this.textureUtils.dispose();
 

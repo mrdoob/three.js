@@ -426,7 +426,7 @@ export default MathNode;
 export const EPSILON = /*@__PURE__*/ float( 1e-6 );
 
 /**
- * Represents infinity.
+ * A large finite value (`1e6`) used as a stand-in for infinity.
  *
  * @tsl
  * @type {Node<float>}
@@ -708,12 +708,12 @@ export const acosh = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.ACOSH
 
 /**
  * Returns the arc-tangent of the parameter.
- * If two parameters are provided, the result is `atan2(y/x)`.
+ * If two parameters are provided, the result is `atan2( y, x )`.
  *
  * @tsl
  * @function
  * @param {Node | number} y - The y parameter.
- * @param {?(Node | number)} x - The x parameter.
+ * @param {?(Node | number)} [x] - The x parameter.
  * @returns {Node}
  */
 export const atan = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.ATAN ).setParameterLength( 1, 2 );
@@ -780,6 +780,7 @@ export const oneMinus = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.ON
 
 /**
  * Returns the partial derivative of the parameter with respect to x.
+ * Only available in the fragment stage.
  *
  * @tsl
  * @function
@@ -790,6 +791,7 @@ export const dFdx = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.DFDX )
 
 /**
  * Returns the partial derivative of the parameter with respect to y.
+ * Only available in the fragment stage.
  *
  * @tsl
  * @function
@@ -830,6 +832,7 @@ export const trunc = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.TRUNC
 
 /**
  * Returns the sum of the absolute derivatives in x and y.
+ * Only available in the fragment stage.
  *
  * @tsl
  * @function
@@ -891,12 +894,13 @@ export const min = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.MIN ).s
 export const max = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.MAX ).setParameterLength( 2, Infinity );
 
 /**
- * Generate a step function by comparing two values.
+ * Generate a step function by comparing two values. Returns `0` if `x < edge`,
+ * otherwise `1`. When method chained, the receiver is `x`: `x.step( edge )`.
  *
  * @tsl
  * @function
- * @param {Node | number} x - The y parameter.
- * @param {Node | number} y - The x parameter.
+ * @param {Node | number} edge - The edge value.
+ * @param {Node | number} x - The value to compare.
  * @returns {Node}
  */
 export const step = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.STEP ).setParameterLength( 2 );
@@ -950,9 +954,9 @@ export const dot = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.DOT ).s
  *
  * @tsl
  * @function
- * @param {Node<vec2|vec3>} x - The first vector.
- * @param {Node<vec2|vec3>} y - The second vector.
- * @returns {Node<float|vec3>}
+ * @param {Node<vec3>} x - The first vector.
+ * @param {Node<vec3>} y - The second vector.
+ * @returns {Node<vec3>}
  */
 export const cross = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.CROSS ).setParameterLength( 2 );
 
@@ -1057,7 +1061,8 @@ export const cbrt = ( a ) => mul( sign( a ), pow( abs( a ), 1.0 / 3.0 ) );
 export const lengthSq = ( a ) => dot( a, a );
 
 /**
- * Linearly interpolates between two values.
+ * Linearly interpolates between two values: `a * ( 1 - t ) + b * t`.
+ * When method chained, the receiver is the interpolation value: `t.mix( a, b )`.
  *
  * @tsl
  * @function
@@ -1115,7 +1120,8 @@ export const refract = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.REF
 export const smoothstep = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.SMOOTHSTEP ).setParameterLength( 3 );
 
 /**
- * Returns a vector pointing in the same direction as another.
+ * Returns `N` if `dot( Nref, I ) < 0`, otherwise `-N`. With `Nref = N`, the result faces
+ * against the incident vector.
  *
  * @tsl
  * @function

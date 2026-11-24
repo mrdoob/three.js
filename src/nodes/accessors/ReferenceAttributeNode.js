@@ -83,11 +83,11 @@ class ReferenceBufferAttributeNode extends BufferAttributeNode {
 	/**
 	 * Overwritten since the node has no attribute data of its own.
 	 *
-	 * @return {string} The hash.
+	 * @return {number} The hash.
 	 */
 	getHash() {
 
-		return String( this.id );
+		return this.id;
 
 	}
 

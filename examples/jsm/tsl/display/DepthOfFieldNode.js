@@ -1,5 +1,5 @@
 import { Node, NodeMaterial, NodeUpdateType, RenderTarget, Vector2, HalfFloatType, RedFormat, QuadMesh, RendererUtils } from 'three/webgpu';
-import { convertToTexture, nodeObject, Fn, uniform, smoothstep, step, texture, max, uniformArray, outputStruct, property, vec4, vec3, uv, Loop, min, mix, float, context } from 'three/tsl';
+import { convertToTexture, nodeObject, Fn, uniform, smoothstep, step, texture, max, uniformArray, outputStruct, vec4, vec3, vec2, uv, Loop, min, mix, context } from 'three/tsl';
 import { gaussianBlur } from './GaussianBlurNode.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -365,31 +365,24 @@ class DepthOfFieldNode extends Node {
 
 		// CoC, near and far fields
 
-		const nearField = property( 'float' );
-		const farField = property( 'float' );
-
-		const outputNode = outputStruct( nearField, farField );
-
 		const CoC = Fn( () => {
 
 			const signedDist = this.viewZNode.negate().sub( this.focusDistanceNode );
 			const CoC = smoothstep( 0, this.focalLengthNode, signedDist.abs() );
 
-			nearField.assign( step( signedDist, 0 ).mul( CoC ) );
-			farField.assign( step( 0, signedDist ).mul( CoC ) );
-
-			return float( 0 );
+			return vec2( step( signedDist, 0 ).mul( CoC ), step( 0, signedDist ).mul( CoC ) );
 
 		} );
 
+		const fields = CoC().toConst();
+
 		this._CoCMaterial.contextNode = sharedContext;
-		this._CoCMaterial.colorNode = CoC();
-		this._CoCMaterial.outputNode = outputNode;
+		this._CoCMaterial.fragmentNode = outputStruct( fields.x, fields.y );
 		this._CoCMaterial.needsUpdate = true;
 
 		// blurred CoC for near field
 
-		this._CoCBlurredMaterial.colorNode = this._CoCBlurNode;
+		this._CoCBlurredMaterial.fragmentNode = this._CoCBlurNode;
 		this._CoCBlurredMaterial.needsUpdate = true;
 
 		// bokeh 64 blur pass
@@ -483,6 +476,13 @@ class DepthOfFieldNode extends Node {
 		this._compositeMaterial.fragmentNode = composite();
 		this._compositeMaterial.needsUpdate = true;
 
+		//
+
+		const properties = builder.getNodeProperties( this );
+		properties.textureNode = this.textureNode;
+
+		//
+
 		return this._textureNode;
 
 	}
@@ -564,9 +564,9 @@ export default DepthOfFieldNode;
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Node<float>} viewZNode - Represents the viewZ depth values of the scene.
- * @param {Node<float> | number} focusDistance - Defines the effect's focus which is the distance along the camera's look direction in world units.
- * @param {Node<float> | number} focalLength - How far an object can be from the focal plane before it goes completely out-of-focus in world units.
- * @param {Node<float> | number} bokehScale - A unitless value for artistic purposes to adjust the size of the bokeh.
+ * @param {Node<float> | number} [focusDistance=1] - Defines the effect's focus which is the distance along the camera's look direction in world units.
+ * @param {Node<float> | number} [focalLength=1] - How far an object can be from the focal plane before it goes completely out-of-focus in world units.
+ * @param {Node<float> | number} [bokehScale=1] - A unitless value for artistic purposes to adjust the size of the bokeh.
  * @returns {DepthOfFieldNode}
  */
 export const dof = ( node, viewZNode, focusDistance = 1, focalLength = 1, bokehScale = 1 ) => new DepthOfFieldNode( convertToTexture( node ), nodeObject( viewZNode ), nodeObject( focusDistance ), nodeObject( focalLength ), nodeObject( bokehScale ) );

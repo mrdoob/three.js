@@ -236,7 +236,9 @@ class AnimationAction {
 	}
 
 	/**
-	 * Defines the time when the animation should start.
+	 * Defines the time when the animation should start. The time is compared against
+	 * the global mixer time (see {@link AnimationMixer#time}), so to start after a delay,
+	 * pass `mixer.time + delay`.
 	 *
 	 * @param {number} time - The start time in seconds.
 	 * @return {AnimationAction} A reference to this animation action.
@@ -311,7 +313,8 @@ class AnimationAction {
 
 	/**
 	 * Fades the animation out by decreasing its weight gradually from `1` to `0`,
-	 * within the passed time interval.
+	 * within the passed time interval. When the fade completes, {@link AnimationAction#enabled}
+	 * is set to `false`, so call {@link AnimationAction#reset} before fading the action in again.
 	 *
 	 * @param {number} duration - The duration of the fade.
 	 * @return {AnimationAction} A reference to this animation action.

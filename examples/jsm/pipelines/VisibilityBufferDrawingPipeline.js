@@ -12,7 +12,7 @@ import {
 	storage, uniform, instanceIndex, vertexIndex, screenCoordinate, varyingProperty,
 	positionGeometry, cameraViewMatrix, cameraProjectionMatrix, normalize, context, overrideNodes,
 	positionLocal, positionWorld, positionWorldDirection, positionView, positionViewDirection,
-	normalLocal, normalViewGeometry, normalWorldGeometry, tangentViewFrame, bitangentViewFrame, modelWorldMatrix, modelViewMatrix, modelPosition, atomicMax, atomicAdd, atomicStore, atomicLoad
+	normalLocal, normalViewGeometry, normalWorldGeometry, tangentViewFrame, bitangentViewFrame, modelWorldMatrix, modelViewMatrix, modelPosition, atomicMax, atomicAdd, atomicStore, atomicLoad, atomicExchange
 } from 'three/tsl';
 
 import { MeshletDrawingPipeline, MeshletBatch, cacheAttributes, createDebugMaterial, createDrawMaterial, createOcclusion } from './MeshletDrawingPipeline.js';
@@ -274,12 +274,6 @@ class VisibilityBufferBatch extends MeshletBatch {
 		const hwDrawAttribute = createAttribute( new Uint32Array( 4 ), 4, IndirectStorageBufferAttribute );
 		const hwDrawBuffer = storage( hwDrawAttribute, 'uint' );
 
-		const computeHWReset = Fn( () => {
-
-			atomicStore( hwQueueAtomic.element( 0 ), uint( 0 ) );
-
-		} )().compute( 1 ).setName( 'VisibilityBufferDrawingPipeline Reset' );
-
 		// indirect dispatch arguments, split into 2D if exceeding 65535 workgroups
 
 		const computeDispatch = Fn( () => {
@@ -477,7 +471,7 @@ class VisibilityBufferBatch extends MeshletBatch {
 
 		const computeHWArgs = Fn( () => {
 
-			hwDrawBuffer.element( 0 ).assign( min( atomicLoad( hwQueueAtomic.element( 0 ) ), uint( MAX_HW_TRIANGLES ) ).mul( 3 ) );
+			hwDrawBuffer.element( 0 ).assign( min( atomicExchange( hwQueueAtomic.element( 0 ), uint( 0 ) ), uint( MAX_HW_TRIANGLES ) ).mul( 3 ) );
 			hwDrawBuffer.element( 1 ).assign( uint( 1 ) );
 			hwDrawBuffer.element( 2 ).assign( uint( 0 ) );
 			hwDrawBuffer.element( 3 ).assign( uint( 0 ) );
@@ -485,7 +479,7 @@ class VisibilityBufferBatch extends MeshletBatch {
 		} )().compute( 1 ).setName( 'VisibilityBufferDrawingPipeline HW Args' );
 
 
-		this.computeNodes.push( computeHWReset, computeDispatch, computeRasterize, computeHWArgs );
+		this.computeNodes.push( computeDispatch, computeRasterize, computeHWArgs );
 
 		// hardware path — the large triangles queued by the software rasterizer
 
@@ -794,14 +788,17 @@ class VisibilityBufferDrawingPipeline extends MeshletDrawingPipeline {
 	 *
 	 * @param {Object} [parameters] - The configuration parameter.
 	 * @param {number} [parameters.lodThreshold=1] - The projected error in pixels below which a simpler level of detail is selected.
+	 * @param {number} [parameters.lodTransition=0] - The fraction of `lodThreshold` over which adjacent levels of detail crossfade with a screen-door dither mask.
+	 * Only the clusters drawn by the hardware rasterizer crossfade, the levels of the software rasterizer switch at once.
+	 * @param {number} [parameters.transitionScreenRadius=0] - The radius in pixels below which the levels of detail of objects switch without a transition, `0` crossfades all objects.
 	 * @param {number} [parameters.shadowLodThreshold=1] - The projected error in shadow map texels below which a simpler level of detail is selected for shadow casters.
 	 * @param {number} [parameters.maxRasterSize=8] - The maximum screen-space size in pixels of triangles rasterized in software.
 	 * @param {boolean} [parameters.debug=false] - Whether the clusters should be shown with a flat color each instead of the material.
 	 * @param {boolean} [parameters.occlusionCulling=true] - Whether the clusters hidden by other clusters should be culled.
 	 */
-	constructor( { lodThreshold, shadowLodThreshold, maxRasterSize = 8, debug, occlusionCulling } = {} ) {
+	constructor( { lodThreshold, lodTransition, transitionScreenRadius, shadowLodThreshold, maxRasterSize = 8, debug, occlusionCulling } = {} ) {
 
-		super( { lodThreshold, shadowLodThreshold, debug, occlusionCulling } );
+		super( { lodThreshold, lodTransition, transitionScreenRadius, shadowLodThreshold, debug, occlusionCulling } );
 
 		this._hardware = false;
 

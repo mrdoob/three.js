@@ -448,7 +448,7 @@ float IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float 
 vec3 EnvironmentBRDF( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness ) {
 
 	float dotNV = saturate( dot( normal, viewDir ) );
-	vec2 fab = texture2D( dfgLUT, vec2( roughness, dotNV ) ).rg;
+	vec2 fab = textureLod( dfgLUT, vec2( roughness, dotNV ), 0.0 ).rg;
 
 	return specularColor * fab.x + specularF90 * fab.y;
 
@@ -507,8 +507,8 @@ void computeMultiscattering( const in vec2 fab, const in vec3 specularColor, con
 
 		vec2 uv = LTC_Uv( normal, viewDir, roughness );
 
-		vec4 t1 = texture2D( ltc_1, uv );
-		vec4 t2 = texture2D( ltc_2, uv );
+		vec4 t1 = textureLod( ltc_1, uv, 0.0 );
+		vec4 t2 = textureLod( ltc_2, uv, 0.0 );
 
 		mat3 mInv = mat3(
 			vec3( t1.x, 0, t1.y ),
@@ -530,8 +530,8 @@ void computeMultiscattering( const in vec2 fab, const in vec3 specularColor, con
 
 			vec2 uvClearcoat = LTC_Uv( Ncc, viewDir, material.clearcoatRoughness );
 
-			vec4 t1Clearcoat = texture2D( ltc_1, uvClearcoat );
-			vec4 t2Clearcoat = texture2D( ltc_2, uvClearcoat );
+			vec4 t1Clearcoat = textureLod( ltc_1, uvClearcoat, 0.0 );
+			vec4 t2Clearcoat = textureLod( ltc_2, uvClearcoat, 0.0 );
 
 			mat3 mInvClearcoat = mat3(
 				vec3( t1Clearcoat.x, 0, t1Clearcoat.y ),
@@ -668,7 +668,7 @@ void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geomet
 
 }
 
-void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradiance, const in vec3 clearcoatRadiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight) {
+void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 clearcoatRadiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight) {
 
 	#ifdef USE_CLEARCOAT
 
@@ -676,13 +676,6 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	#endif
 
-	#ifdef USE_SHEEN
-
-		sheenSpecularIndirect += irradiance * material.sheenColor * IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness ) * RECIPROCAL_PI;
-
- 	#endif
-
-	// Both indirect specular and indirect diffuse light accumulate here
 	// Compute multiscattering separately for dielectric and metallic, then mix
 
 	vec3 singleScatteringDielectric = vec3( 0.0 );
@@ -707,25 +700,9 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 	vec3 singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, material.metalness );
 	vec3 multiScattering = mix( multiScatteringDielectric, multiScatteringMetallic, material.metalness );
 
-	// Diffuse energy conservation uses dielectric path
-	vec3 totalScatteringDielectric = singleScatteringDielectric + multiScatteringDielectric;
-	#ifdef USE_DIFFUSE_ROUGHNESS
-
-		float dotNV = saturate( dot( geometryNormal, geometryViewDir ) );
-		vec3 diffuse = EON_DirectionalAlbedo( material.diffuseColor, material.diffuseRoughness, dotNV ) * ( 1.0 - material.metalness ) * ( 1.0 - totalScatteringDielectric );
-
-	#else
-
-		vec3 diffuse = material.diffuseContribution * ( 1.0 - totalScatteringDielectric );
-
-	#endif
-
-	vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
-
-	vec3 indirectSpecular = radiance * singleScattering;
-	indirectSpecular += multiScattering * cosineWeightedIrradiance;
-
-	vec3 indirectDiffuse = diffuse * cosineWeightedIrradiance;
+	// The multiple scattering lobe has the shape of the single scattering lobe, so it scales the radiance, see
+	// Turquin, "Practical multiple scattering compensation for microfacet models"
+	vec3 indirectSpecular = radiance * ( singleScattering + multiScattering );
 
 	#ifdef USE_SHEEN
 
@@ -734,12 +711,10 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 		float sheenEnergyComp = 1.0 - max3( material.sheenColor ) * sheenAlbedo;
 
 		indirectSpecular *= sheenEnergyComp;
-		indirectDiffuse *= sheenEnergyComp;
 
 	#endif
 
 	reflectedLight.indirectSpecular += indirectSpecular;
-	reflectedLight.indirectDiffuse += indirectDiffuse;
 
 }
 
@@ -752,6 +727,18 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 float computeSpecularOcclusion( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {
 
 	return saturate( pow( dotNV + ambientOcclusion, exp2( - 16.0 * roughness - 1.0 ) ) - 1.0 + ambientOcclusion );
+
+}
+
+// Jimenez et al. 2016, "Practical Realtime Strategies for Accurate Indirect Occlusion"
+// Light surfaces bounce light back into their crevices, so they darken less
+vec3 computeMultiBounceOcclusion( const in float visibility, const in vec3 albedo ) {
+
+	vec3 a = 2.0404 * albedo - 0.3324;
+	vec3 b = - 4.7951 * albedo + 0.6417;
+	vec3 c = 2.7552 * albedo + 0.6903;
+
+	return max( vec3( visibility ), ( ( visibility * a + b ) * visibility + c ) * visibility );
 
 }
 `;

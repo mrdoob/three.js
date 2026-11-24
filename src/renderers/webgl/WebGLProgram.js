@@ -550,8 +550,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
 
-			parameters.numLightProbes > 0 ? '#define USE_LIGHT_PROBES' : '',
-
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGARITHMIC_DEPTH_BUFFER' : '',
 			parameters.reversedDepthBuffer ? '#define USE_REVERSED_DEPTH_BUFFER' : '',
 
@@ -716,9 +714,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
 
 			parameters.premultipliedAlpha ? '#define PREMULTIPLIED_ALPHA' : '',
-
-			parameters.numLightProbes > 0 ? '#define USE_LIGHT_PROBES' : '',
-
 
 			parameters.decodeVideoTexture ? '#define DECODE_VIDEO_TEXTURE' : '',
 			parameters.decodeVideoTextureEmissive ? '#define DECODE_VIDEO_TEXTURE_EMISSIVE' : '',

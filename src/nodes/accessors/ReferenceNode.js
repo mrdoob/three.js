@@ -1,12 +1,10 @@
 import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
-import { texture } from './TextureNode.js';
-import { cubeTexture } from './CubeTextureNode.js';
+import { uniformTexture } from './TextureNode.js';
+import { uniformCubeTexture } from './CubeTextureNode.js';
 import { buffer } from './BufferNode.js';
-import { nodeObject } from '../tsl/TSLBase.js';
 import { uniformArray } from './UniformArrayNode.js';
-import ReferenceElementNode from './ReferenceElementNode.js';
 import { warn } from '../../utils.js';
 
 // TODO: Avoid duplicated code and use only ReferenceBaseNode or ReferenceNode
@@ -127,19 +125,6 @@ class ReferenceNode extends Node {
 	}
 
 	/**
-	 * When the referred property is array-like, this method can be used
-	 * to access elements via an index node.
-	 *
-	 * @param {IndexNode} indexNode - indexNode.
-	 * @return {ReferenceElementNode} A reference to an element.
-	 */
-	element( indexNode ) {
-
-		return new ReferenceElementNode( this, nodeObject( indexNode ) );
-
-	}
-
-	/**
 	 * Sets the uniform group for this reference node.
 	 *
 	 * @param {UniformGroupNode} group - The uniform group to set.
@@ -203,11 +188,11 @@ class ReferenceNode extends Node {
 
 		} else if ( uniformType === 'texture' ) {
 
-			node = texture( null );
+			node = uniformTexture( null );
 
 		} else if ( uniformType === 'cubeTexture' ) {
 
-			node = cubeTexture( null );
+			node = uniformCubeTexture( null );
 
 		} else {
 

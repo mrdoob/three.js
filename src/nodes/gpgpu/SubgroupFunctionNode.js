@@ -23,7 +23,7 @@ class SubgroupFunctionNode extends Node {
 	}
 
 	/**
-	 * Constructs a new function node.
+	 * Constructs a new subgroup function node.
 	 *
 	 * @param {string} method - The subgroup/wave intrinsic method to construct.
 	 * @param {Node} [aNode=null] - The method's first argument.
@@ -78,6 +78,10 @@ class SubgroupFunctionNode extends Node {
 
 	setup( builder ) {
 
+		// Subgroup operations must be called from subgroup uniform control flow, so the
+		// compute bounds check cannot be injected as an early return before them.
+		// See https://github.com/mrdoob/three.js/pull/33319
+		builder.allowEarlyReturns = false;
 		builder.enableSubGroups();
 
 		return super.setup( builder );
@@ -541,7 +545,7 @@ export const subgroupBroadcast = /*@__PURE__*/ nodeProxyAssignable( SubgroupFunc
  *
  * @tsl
  * @method
- * @param {number} v - The value to return from subgroup invocation id^mask.
+ * @param {number} v - The value to return from subgroup invocation id.
  * @param {number} id - The subgroup invocation which returns the value v.
  * @return {number} The broadcast value.
  */
@@ -563,8 +567,8 @@ export const subgroupShuffleXor = /*@__PURE__*/ nodeProxyAssignable( SubgroupFun
  *
  * @tsl
  * @method
- * @param {number} v - The value to return from subgroup invocation id^mask.
- * @param {number} delta - A value that offsets the current in.
+ * @param {number} v - The value to return from subgroup invocation subgroup_invocation_id - delta.
+ * @param {number} delta - A value that offsets the current subgroup invocation.
  * @return {number} The broadcast value.
  */
 export const subgroupShuffleUp = /*@__PURE__*/ nodeProxyAssignable( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_SHUFFLE_UP ).setParameterLength( 2 );
@@ -574,7 +578,7 @@ export const subgroupShuffleUp = /*@__PURE__*/ nodeProxyAssignable( SubgroupFunc
  *
  * @tsl
  * @method
- * @param {number} v - The value to return from subgroup invocation id^mask.
+ * @param {number} v - The value to return from subgroup invocation subgroup_invocation_id + delta.
  * @param {number} delta - A value that offsets the current subgroup invocation.
  * @return {number} The broadcast value.
  */

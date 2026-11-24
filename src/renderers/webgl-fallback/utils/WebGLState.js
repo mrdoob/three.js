@@ -936,7 +936,7 @@ class WebGLState {
 	 * Configures the WebGL state for the given material.
 	 *
 	 * @param {Material} material - The material to configure the state for.
-	 * @param {number} frontFaceCW - Whether the front faces are counter-clockwise or not.
+	 * @param {boolean} frontFaceCW - Whether the front faces are clockwise (mirrored world matrix) or not.
 	 * @param {number} hardwareClippingPlanes - The number of hardware clipping planes.
 	 */
 	setMaterial( material, frontFaceCW, hardwareClippingPlanes ) {
@@ -1133,31 +1133,28 @@ class WebGLState {
 
 		const { gl, currentBoundFramebuffers } = this;
 
-		if ( currentBoundFramebuffers[ target ] !== framebuffer ) {
+		if ( target === gl.FRAMEBUFFER ) {
 
-			gl.bindFramebuffer( target, framebuffer );
+			// binding gl.FRAMEBUFFER updates both gl.READ_FRAMEBUFFER and gl.DRAW_FRAMEBUFFER
 
-			currentBoundFramebuffers[ target ] = framebuffer;
+			if ( currentBoundFramebuffers[ gl.DRAW_FRAMEBUFFER ] === framebuffer && currentBoundFramebuffers[ gl.READ_FRAMEBUFFER ] === framebuffer ) return false;
 
-			// gl.DRAW_FRAMEBUFFER is equivalent to gl.FRAMEBUFFER
+			gl.bindFramebuffer( gl.FRAMEBUFFER, framebuffer );
 
-			if ( target === gl.DRAW_FRAMEBUFFER ) {
-
-				currentBoundFramebuffers[ gl.FRAMEBUFFER ] = framebuffer;
-
-			}
-
-			if ( target === gl.FRAMEBUFFER ) {
-
-				currentBoundFramebuffers[ gl.DRAW_FRAMEBUFFER ] = framebuffer;
-
-			}
+			currentBoundFramebuffers[ gl.DRAW_FRAMEBUFFER ] = framebuffer;
+			currentBoundFramebuffers[ gl.READ_FRAMEBUFFER ] = framebuffer;
 
 			return true;
 
 		}
 
-		return false;
+		if ( currentBoundFramebuffers[ target ] === framebuffer ) return false;
+
+		gl.bindFramebuffer( target, framebuffer );
+
+		currentBoundFramebuffers[ target ] = framebuffer;
+
+		return true;
 
 	}
 

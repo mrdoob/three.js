@@ -6,7 +6,8 @@ import {
 	packSnorm4x8, unpackSnorm4x8,
 	packUnorm4x8, unpackUnorm4x8,
 	packNormalToRGB, unpackRGBToNormal, unpackNormal,
-	length
+	packNormalToOctahedral, unpackOctahedralToNormal,
+	length, normalize
 } from 'three/tsl';
 import { toHalfFloat } from '../../../../../src/extras/DataUtils.js';
 import { gpuTest, gpuFuzzTest } from './gpu-test-utils.js';
@@ -93,6 +94,29 @@ export default QUnit.module( 'Nodes', () => {
 
 				const n = vec3( 0.6, - 0.8, 0.0 ); // a unit vector (0.6^2 + 0.8^2 == 1)
 				assert.closeAbs( unpackRGBToNormal( packNormalToRGB( n ) ), n, 1e-5, 'round trip recovers the original direction' );
+
+			} );
+
+			gpuTest( 'packNormalToOctahedral <-> unpackOctahedralToNormal known values', ( { assert } ) => {
+
+				assert.closeAbs( packNormalToOctahedral( vec3( 0, 0, 1 ) ), vec2( 0, 0 ), 1e-6, '+Z is the center' );
+				assert.closeAbs( packNormalToOctahedral( vec3( 3, - 4, 0 ) ), vec2( 3 / 7, - 4 / 7 ), 1e-6, 'unnormalized equator' );
+				assert.closeAbs( packNormalToOctahedral( vec3( 0, 0, - 1 ) ), vec2( 1, 1 ), 1e-6, '-Z is a corner' );
+				assert.closeAbs( packNormalToOctahedral( vec3( 0, 0.6, - 0.8 ) ), vec2( 4 / 7, 1 ), 1e-6, 'lower hemisphere fold with x == 0' );
+
+				assert.closeAbs( unpackOctahedralToNormal( vec2( 0, 0 ) ), vec3( 0, 0, 1 ), 1e-6, 'center is +Z' );
+				assert.closeAbs( unpackOctahedralToNormal( vec2( 3 / 7, - 4 / 7 ) ), vec3( 0.6, - 0.8, 0 ), 1e-6, 'equator' );
+				assert.closeAbs( unpackOctahedralToNormal( vec2( - 1, 1 ) ), vec3( 0, 0, - 1 ), 1e-6, 'corner is -Z' );
+				assert.closeAbs( unpackOctahedralToNormal( vec2( 4 / 7, 1 ) ), vec3( 0, 0.6, - 0.8 ), 1e-6, 'lower hemisphere edge' );
+
+			} );
+
+			gpuFuzzTest( 'packNormalToOctahedral <-> unpackOctahedralToNormal round trip', 1024, ( { instanceIndex, assert } ) => {
+
+				const seed = instanceIndex.toFloat();
+				const direction = vec3( hash( seed.add( 1 ) ), hash( seed.add( 5000 ) ), hash( seed.add( 9000 ) ) ).sub( 0.5 );
+
+				assert.closeAbs( unpackOctahedralToNormal( packNormalToOctahedral( direction.mul( 10 ) ) ), normalize( direction ), 1e-5, 'recovers the normalized direction' );
 
 			} );
 

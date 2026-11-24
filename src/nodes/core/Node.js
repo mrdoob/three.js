@@ -190,6 +190,20 @@ class Node extends EventDispatcher {
 	}
 
 	/**
+	 * Whether this node is dead code, e.g. an assignment to a variable that is never read,
+	 * or a shadow that is never used. Dead code is not analyzed, generated nor updated.
+	 * Nodes are not dead code by default, since they can have side effects.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether this node is dead code.
+	 */
+	isDeadCode( /*builder*/ ) {
+
+		return false;
+
+	}
+
+	/**
 	 * Makes this node assignable and adds it to the current stack,
 	 * so it can be declared where it was created if it is assigned later.
 	 * Only use it with nodes that are not shared, see {@link Node#assignable}.
@@ -745,27 +759,16 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * Returns the references to this node which is by default `this`.
-	 *
-	 * @return {Node} A reference to this node.
-	 */
-	getScope() {
-
-		return this;
-
-	}
-
-	/**
 	 * Returns the hash of the node which is used to identify the node. By default it's
 	 * the {@link Node#uuid} however derived node classes might have to overwrite this method
 	 * depending on their implementation.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The hash.
+	 * @return {number|string} The hash.
 	 */
 	getHash( /*builder*/ ) {
 
-		return String( this.id );
+		return this.id;
 
 	}
 

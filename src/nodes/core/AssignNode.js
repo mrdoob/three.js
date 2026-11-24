@@ -3,6 +3,48 @@ import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 import { vectorComponents } from '../core/constants.js';
 
 /**
+ * Returns the node whose value is changed by an assignment to the given target node,
+ * e.g. the variable of `value.x`, `struct.get( 'member' )` or `array.element( index )`.
+ * The node is marked as assigned, so it is declared as a variable.
+ *
+ * @private
+ * @param {NodeBuilder} builder - The current node builder.
+ * @param {Node} node - The target node of the assignment.
+ * @return {Node} The scope of the assignment.
+ */
+function getScope( builder, node ) {
+
+	while ( true ) {
+
+		if ( node.isContextNode === true || node.isSplitNode === true ) {
+
+			node = node.node;
+
+		} else if ( node.isMemberNode === true ) {
+
+			node = node.structNode;
+
+		} else if ( node.isStackNode === true ) {
+
+			node = node.outputNode;
+
+		} else if ( node.isArrayElementNode === true ) {
+
+			// an element redirected to a buffer, e.g. a storage buffer returned by a function
+
+			node = node.getOutputNode( builder ) || node.node;
+
+		} else {
+
+			return node;
+
+		}
+
+	}
+
+}
+
+/**
  * These node represents an assign operation. Meaning a node is assigned
  * to another node.
  *
@@ -48,6 +90,12 @@ class AssignNode extends Node {
 		 * @default true
 		 */
 		this.isAssignNode = true;
+
+	}
+
+	isDeadCode( builder ) {
+
+		return getScope( builder, this.targetNode ).isDeadCode( builder );
 
 	}
 
@@ -97,7 +145,7 @@ class AssignNode extends Node {
 
 		const { targetNode, sourceNode } = this;
 
-		const scope = targetNode.getScope();
+		const scope = getScope( builder, targetNode );
 
 		const scopeData = builder.getDataFromNode( scope );
 		scopeData.assign = true;

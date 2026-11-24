@@ -4,7 +4,7 @@ import { NodeUpdateType } from '../core/constants.js';
 import { context } from '../tsl/TSLBase.js';
 import { mergeContext } from '../core/NodeUtils.js';
 import { uniform } from '../core/UniformNode.js';
-import { viewZToOrthographicDepth, perspectiveDepthToViewZ } from './ViewportDepthNode.js';
+import { viewZToOrthographicDepth, depthToViewZ } from './ViewportDepthNode.js';
 
 import { HalfFloatType, FloatType, DepthStencilFormat, UnsignedInt248Type } from '../../constants.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -54,7 +54,17 @@ class PassTextureNode extends TextureNode {
 		 */
 		this.isPassTextureNode = true;
 
-		this.setUpdateMatrix( false );
+	}
+
+	/**
+	 * Returns `false` because pass textures are sampled directly in render target UVs.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
+	get updateMatrix() {
+
+		return false;
 
 	}
 
@@ -75,7 +85,10 @@ class PassTextureNode extends TextureNode {
 
 	clone() {
 
-		return new this.constructor( this.passNode, this.value );
+		const newNode = super.clone();
+		newNode.passNode = this.passNode;
+
+		return newNode;
 
 	}
 
@@ -96,7 +109,7 @@ class PassMultipleTextureNode extends PassTextureNode {
 	}
 
 	/**
-	 * Constructs a new pass texture node.
+	 * Constructs a new pass multiple texture node.
 	 *
 	 * @param {PassNode} passNode - The pass node.
 	 * @param {string} textureName - The output texture name.
@@ -154,16 +167,9 @@ class PassMultipleTextureNode extends PassTextureNode {
 
 	clone() {
 
-		const newNode = new this.constructor( this.passNode, this.textureName, this.previousTexture );
-		newNode.uvNode = this.uvNode;
-		newNode.levelNode = this.levelNode;
-		newNode.biasNode = this.biasNode;
-		newNode.sampler = this.sampler;
-		newNode.depthNode = this.depthNode;
-		newNode.compareNode = this.compareNode;
-		newNode.gradNode = this.gradNode;
-		newNode.gatherNode = this.gatherNode;
-		newNode.offsetNode = this.offsetNode;
+		const newNode = super.clone();
+		newNode.textureName = this.textureName;
+		newNode.previousTexture = this.previousTexture;
 
 		return newNode;
 
@@ -772,7 +778,7 @@ class PassNode extends Node {
 			const cameraNear = this._cameraNear;
 			const cameraFar = this._cameraFar;
 
-			this._viewZNodes[ name ] = viewZNode = perspectiveDepthToViewZ( this.getTextureNode( name ), cameraNear, cameraFar );
+			this._viewZNodes[ name ] = viewZNode = depthToViewZ( this.getTextureNode( name ), cameraNear, cameraFar, this.camera );
 
 		}
 
@@ -826,7 +832,7 @@ class PassNode extends Node {
 
 		// the render target is configured like in setup() and updateBefore(), so the pipelines match the ones of the render
 
-		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
+		this.renderTarget.samples = this.options.samples !== undefined ? this.options.samples : renderer.samples;
 
 		renderer.getDrawingBufferSize( _size );
 		this.setSize( _size.width, _size.height );
@@ -836,19 +842,20 @@ class PassNode extends Node {
 
 		if ( this.contextNode !== null ) renderer.contextNode = this._getContextNode( renderer );
 
-		await renderer.compileAsync( this.scene, this.camera );
+		const promise = renderer.compileAsync( this.scene, this.camera );
 
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
 		renderer.contextNode = currentContextNode;
 
+		await promise;
+
 	}
 
 	setup( { renderer } ) {
 
-		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
-
-		this.renderTarget.texture.type = renderer.getOutputBufferType();
+		this.renderTarget.samples = this.options.samples !== undefined ? this.options.samples : renderer.samples;
+		this.renderTarget.texture.type = this.options.type !== undefined ? this.options.type : renderer.getOutputBufferType();
 
 		if ( renderer.reversedDepthBuffer === true && this.renderTarget.depthTexture !== null ) {
 
@@ -1000,7 +1007,7 @@ class PassNode extends Node {
 	}
 
 	/**
-	 * Sets the size of the pass's render target. Honors the pixel ratio.
+	 * Sets the size of the pass's render target in physical pixels. The size is multiplied by the resolution scale.
 	 *
 	 * @param {number} width - The width to set.
 	 * @param {number} height - The height to set.
@@ -1043,9 +1050,9 @@ class PassNode extends Node {
 	 * in sync with the pass's dimensions. To reverse the process and use auto-sizing again, call the method
 	 * with `null` as the single argument.
 	 *
-	 * @param {?(number | Vector4)} x - The horizontal coordinate for the lower left corner of the box in logical pixel unit.
+	 * @param {?(number | Vector4)} x - The horizontal coordinate for the upper left corner of the box in logical pixel unit.
 	 * Instead of passing four arguments, the method also works with a single four-dimensional vector.
-	 * @param {number} y - The vertical coordinate for the lower left corner of the box in logical pixel unit.
+	 * @param {number} y - The vertical coordinate for the upper left corner of the box in logical pixel unit.
 	 * @param {number} width - The width of the scissor box in logical pixel unit.
 	 * @param {number} height - The height of the scissor box in logical pixel unit.
 	 */
@@ -1078,8 +1085,8 @@ class PassNode extends Node {
 	 * with the pass's dimensions. To reverse the process and use auto-sizing again, call the method
 	 * with `null` as the single argument.
 	 *
-	 * @param {number | Vector4} x - The horizontal coordinate for the lower left corner of the viewport origin in logical pixel unit.
-	 * @param {number} y - The vertical coordinate for the lower left corner of the viewport origin  in logical pixel unit.
+	 * @param {number | Vector4} x - The horizontal coordinate for the upper left corner of the viewport origin in logical pixel unit.
+	 * @param {number} y - The vertical coordinate for the upper left corner of the viewport origin in logical pixel unit.
 	 * @param {number} width - The width of the viewport in logical pixel unit.
 	 * @param {number} height - The height of the viewport in logical pixel unit.
 	 */

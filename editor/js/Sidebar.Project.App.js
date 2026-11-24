@@ -175,6 +175,11 @@ function SidebarProjectApp( editor ) {
 				toZip[ 'js/three.webgpu.js' ] = strToU8( content );
 
 			} );
+			loader.load( '../build/three.nodes.js', function ( content ) {
+
+				toZip[ 'js/three.nodes.js' ] = strToU8( content );
+
+			} );
 
 		} else {
 

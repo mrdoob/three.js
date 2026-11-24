@@ -106,17 +106,6 @@ class SplitNode extends Node {
 
 	}
 
-	/**
-	 * Returns the scope of the node.
-	 *
-	 * @return {Node} The scope of the node.
-	 */
-	getScope() {
-
-		return this.node.getScope();
-
-	}
-
 	generate( builder, output ) {
 
 		const node = this.node;
@@ -155,8 +144,9 @@ class SplitNode extends Node {
 		} else {
 
 			// ignore .components if .node returns float/integer
+			// but keep the snippet's type equal to the declared node type
 
-			snippet = node.build( builder, output );
+			snippet = node.build( builder, output || this.getNodeType( builder ) );
 
 		}
 

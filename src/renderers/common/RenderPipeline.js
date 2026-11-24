@@ -25,7 +25,7 @@ class RenderPipeline {
 	 * Constructs a new render pipeline management module.
 	 *
 	 * @param {Renderer} renderer - A reference to the renderer.
-	 * @param {Node<vec4>} outputNode - An optional output node.
+	 * @param {Node<vec4>} [outputNode=vec4(0,0,1,1)] - An optional output node.
 	 */
 	constructor( renderer, outputNode = vec4( 0, 0, 1, 1 ) ) {
 
@@ -71,13 +71,16 @@ class RenderPipeline {
 		 * ```
 		 *
 		 * @type {boolean}
+		 * @default true
 		 */
 		this.outputColorTransform = true;
 
 		/**
-		 * Must be set to `true` when the output node changes.
+		 * Must be set to `true` when the output node or
+		 * {@link RenderPipeline#outputColorTransform} changes.
 		 *
-		 * @type {Node<vec4>}
+		 * @type {boolean}
+		 * @default true
 		 */
 		this.needsUpdate = true;
 

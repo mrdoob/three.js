@@ -6,14 +6,18 @@ import RenderPipeline from './RenderPipeline.js';
 /**
  * An alternative render pipeline that applies output processing directly in
  * material shaders. This avoids the intermediate framebuffer and output pass
- * used by {@link Renderer}, but changes blending and is not compatible with
- * materials that sample the framebuffer, such as transmissive materials.
- * With the WebGL backend, `antialias` has no effect.
+ * used by {@link Renderer}.
  *
  * ```js
  * const renderPipeline = new DirectRenderPipeline( renderer );
  * renderPipeline.render( scene, camera );
  * ```
+ *
+ * Limitations:
+ * - Blending of transparent materials is incorrect since it happens after output processing.
+ * - Materials that sample the framebuffer, such as transmissive materials, are not supported.
+ * - With the WebGL backend, `antialias` has no effect.
+ * - {@link Renderer#compileAsync} does not compile the pipelines used by this module.
  *
  * Note: This module can only be used with `WebGPURenderer`.
  *
@@ -25,7 +29,7 @@ class DirectRenderPipeline extends RenderPipeline {
 	 * Constructs a direct render pipeline.
 	 *
 	 * @param {Renderer} renderer - A reference to the renderer.
-	 * @param {Node<vec4>} outputNode - An optional output node.
+	 * @param {Node<vec4>} [outputNode=output] - An optional output node.
 	 */
 	constructor( renderer, outputNode = output ) {
 

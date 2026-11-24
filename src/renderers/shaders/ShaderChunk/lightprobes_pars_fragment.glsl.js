@@ -11,11 +11,15 @@ uniform highp sampler3D probesSH[ NUM_LIGHT_PROBE_GRIDS ];
 uniform vec3 probesMin[ NUM_LIGHT_PROBE_GRIDS ];
 uniform vec3 probesMax[ NUM_LIGHT_PROBE_GRIDS ];
 uniform vec3 probesResolution[ NUM_LIGHT_PROBE_GRIDS ];
+uniform float probesIntensity[ NUM_LIGHT_PROBE_GRIDS ];
 
 bool isInsideLightProbeGrid( vec3 worldPos, vec3 worldNormal, vec3 probesMin, vec3 probesMax, vec3 probesResolution ) {
 
 	vec3 spacing = ( probesMax - probesMin ) / probesResolution;
-	vec3 samplePos = worldPos + worldNormal * spacing * 0.5;
+
+	// An axis with a single probe isn't offset along the normal, since that offset would span the whole grid.
+
+	vec3 samplePos = worldPos + worldNormal * spacing * 0.5 * step( 1.5, probesResolution );
 
 	// Grow the bounds by 1% of a cell, so fragments on the bounds aren't left out by
 	// precision errors or samples outside of the triangle.
@@ -52,13 +56,13 @@ vec3 getLightProbeGridIrradiance( highp sampler3D probesSH, vec3 probesMin, vec3
 	float atlasDepth  = 7.0 * paddedSlices;
 	float uvZBase     = uvw.z * nz + 1.0;
 
-	vec4 s0 = texture( probesSH, vec3( uvw.xy, ( uvZBase                       ) / atlasDepth ) );
-	vec4 s1 = texture( probesSH, vec3( uvw.xy, ( uvZBase +       paddedSlices   ) / atlasDepth ) );
-	vec4 s2 = texture( probesSH, vec3( uvw.xy, ( uvZBase + 2.0 * paddedSlices   ) / atlasDepth ) );
-	vec4 s3 = texture( probesSH, vec3( uvw.xy, ( uvZBase + 3.0 * paddedSlices   ) / atlasDepth ) );
-	vec4 s4 = texture( probesSH, vec3( uvw.xy, ( uvZBase + 4.0 * paddedSlices   ) / atlasDepth ) );
-	vec4 s5 = texture( probesSH, vec3( uvw.xy, ( uvZBase + 5.0 * paddedSlices   ) / atlasDepth ) );
-	vec4 s6 = texture( probesSH, vec3( uvw.xy, ( uvZBase + 6.0 * paddedSlices   ) / atlasDepth ) );
+	vec4 s0 = textureLod( probesSH, vec3( uvw.xy, ( uvZBase                       ) / atlasDepth ), 0.0 );
+	vec4 s1 = textureLod( probesSH, vec3( uvw.xy, ( uvZBase +       paddedSlices   ) / atlasDepth ), 0.0 );
+	vec4 s2 = textureLod( probesSH, vec3( uvw.xy, ( uvZBase + 2.0 * paddedSlices   ) / atlasDepth ), 0.0 );
+	vec4 s3 = textureLod( probesSH, vec3( uvw.xy, ( uvZBase + 3.0 * paddedSlices   ) / atlasDepth ), 0.0 );
+	vec4 s4 = textureLod( probesSH, vec3( uvw.xy, ( uvZBase + 4.0 * paddedSlices   ) / atlasDepth ), 0.0 );
+	vec4 s5 = textureLod( probesSH, vec3( uvw.xy, ( uvZBase + 5.0 * paddedSlices   ) / atlasDepth ), 0.0 );
+	vec4 s6 = textureLod( probesSH, vec3( uvw.xy, ( uvZBase + 6.0 * paddedSlices   ) / atlasDepth ), 0.0 );
 
 	// Unpack 9 vec3 SH L2 coefficients
 	vec3 c0 = s0.xyz;

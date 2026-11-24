@@ -3,7 +3,7 @@ import { Material } from './Material.js';
 import { Vector2 } from '../math/Vector2.js';
 
 /**
- * A material that maps the normal vectors to RGB colors.
+ * A material that maps view-space normal vectors to RGB colors.
  *
  * @augments Material
  * @demo scenes/material-browser.html#MeshNormalMaterial
@@ -82,6 +82,7 @@ class MeshNormalMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)

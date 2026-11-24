@@ -26,6 +26,8 @@ const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 /**
  * Fires when the object has been added to its parent object.
  *
+ * Adding 3D objects inside a listener of this event is not supported.
+ *
  * @event Object3D#added
  * @type {Object}
  */
@@ -33,6 +35,8 @@ const _addedEvent = { type: 'added' };
 
 /**
  * Fires when the object has been removed from its parent object.
+ *
+ * Removing 3D objects inside a listener of this event is not supported.
  *
  * @event Object3D#removed
  * @type {Object}
@@ -42,6 +46,8 @@ const _removedEvent = { type: 'removed' };
 /**
  * Fires when a new child object has been added.
  *
+ * Adding 3D objects inside a listener of this event is not supported.
+ *
  * @event Object3D#childadded
  * @type {Object}
  */
@@ -49,6 +55,8 @@ const _childaddedEvent = { type: 'childadded', child: null };
 
 /**
  * Fires when a child object has been removed.
+ *
+ * Removing 3D objects inside a listener of this event is not supported.
  *
  * @event Object3D#childremoved
  * @type {Object}
@@ -317,7 +325,7 @@ class Object3D extends EventDispatcher {
 		/**
 		 * This value allows the default rendering order of scene graph objects to be
 		 * overridden although opaque and transparent objects remain sorted independently.
-		 * When this property is set for an instance of {@link Group},all descendants
+		 * When this property is set for an instance of {@link Group}, all descendants
 		 * objects will be sorted and rendered together. Sorting is from lowest to highest
 		 * render order.
 		 *
@@ -335,7 +343,7 @@ class Object3D extends EventDispatcher {
 
 		/**
 		 * Custom depth material to be used when rendering to the depth map. Can only be used
-		 * in context of meshes. When shadow-casting with a {@link DirectionalLight} or {@link SpotLight},
+		 * in context of meshes, lines and points. When shadow-casting with a {@link DirectionalLight} or {@link SpotLight},
 		 * if you are modifying vertex positions in the vertex shader you must specify a custom depth
 		 * material for proper shadows.
 		 *
@@ -417,6 +425,8 @@ class Object3D extends EventDispatcher {
 
 	/**
 	 * A callback that is executed immediately before a 3D object is rendered.
+	 * Only invoked for renderable 3D objects like meshes, lines, points or sprites, and for
+	 * the scene passed to `render()` (with different arguments).
 	 *
 	 * @param {Renderer|WebGLRenderer} renderer - The renderer.
 	 * @param {Object3D} scene - The scene.
@@ -429,6 +439,8 @@ class Object3D extends EventDispatcher {
 
 	/**
 	 * A callback that is executed immediately after a 3D object is rendered.
+	 * Only invoked for renderable 3D objects like meshes, lines, points or sprites, and for
+	 * the scene passed to `render()` (with different arguments).
 	 *
 	 * @param {Renderer|WebGLRenderer} renderer - The renderer.
 	 * @param {Object3D} scene - The scene.
@@ -549,7 +561,9 @@ class Object3D extends EventDispatcher {
 	}
 
 	/**
-	 * Rotates the 3D object along an axis in world space.
+	 * Rotates the 3D object along an axis in world space. The method assumes the
+	 * 3D object has no rotated parent; otherwise the axis is interpreted in the
+	 * parent's space.
 	 *
 	 * @param {Vector3} axis - The (normalized) axis vector.
 	 * @param {number} angle - The angle in radians.
@@ -663,6 +677,7 @@ class Object3D extends EventDispatcher {
 
 	/**
 	 * Converts the given vector from this 3D object's local space to world space.
+	 * The vector is interpreted as a position, so the translation is applied as well.
 	 *
 	 * @param {Vector3} vector - The vector to convert.
 	 * @return {Vector3} The converted vector.
@@ -676,7 +691,8 @@ class Object3D extends EventDispatcher {
 	}
 
 	/**
-	 * Converts the given vector from this 3D object's world space to local space.
+	 * Converts the given vector from world space to this 3D object's local space.
+	 * The vector is interpreted as a position, so the translation is applied as well.
 	 *
 	 * @param {Vector3} vector - The vector to convert.
 	 * @return {Vector3} The converted vector.
@@ -975,7 +991,7 @@ class Object3D extends EventDispatcher {
 	 *
 	 * @param {string} name - The name of the property.
 	 * @param {any} value - The value.
-	 * @param {Array<Object3D>} result - The method stores the result in this array.
+	 * @param {Array<Object3D>} [result=[]] - The method stores the result in this array.
 	 * @return {Array<Object3D>} The found 3D objects.
 	 */
 	getObjectsByProperty( name, value, result = [] ) {
@@ -1009,7 +1025,7 @@ class Object3D extends EventDispatcher {
 	}
 
 	/**
-	 * Returns a Quaternion representing the position of the 3D object in world space.
+	 * Returns a Quaternion representing the rotation of the 3D object in world space.
 	 *
 	 * @param {Quaternion} target - The target Quaternion the result is stored to.
 	 * @return {Quaternion} The 3D object's rotation in world space.
@@ -1231,6 +1247,7 @@ class Object3D extends EventDispatcher {
 	 * @param {boolean} [updateChildren=false] Whether descendant nodes should be updated or not.
 	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
 	 * when {@link Object3D#matrixWorldNeedsUpdate} is `false`.
+	 * @return {boolean} Whether the world matrix has changed or not.
 	 */
 	updateWorldMatrix( updateParents, updateChildren, force = false ) {
 
@@ -1238,7 +1255,7 @@ class Object3D extends EventDispatcher {
 
 		if ( updateParents === true && parent !== null ) {
 
-			parent.updateWorldMatrix( true, false );
+			if ( parent.updateWorldMatrix( true, false ) === true ) force = true;
 
 		}
 
@@ -1281,6 +1298,8 @@ class Object3D extends EventDispatcher {
 			}
 
 		}
+
+		return force;
 
 	}
 

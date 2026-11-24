@@ -33,7 +33,7 @@ class DirectionalLightHelper extends Object3D {
 	 * Constructs a new directional light helper.
 	 *
 	 * @param {DirectionalLight} light - The light to be visualized.
-	 * @param {number} [size=1] - The dimensions of the plane.
+	 * @param {number} [size=1] - Half the side length of the plane.
 	 * @param {number|Color|string} [color] - The helper's color. If not set, the helper will take
 	 * the color of the light.
 	 */

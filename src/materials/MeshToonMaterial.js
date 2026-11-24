@@ -73,7 +73,8 @@ class MeshToonMaterial extends Material {
 		this.gradientMap = null;
 
 		/**
-		 * The light map. Requires a second set of UVs.
+		 * The light map. Uses `uv` by default, set {@link Texture#channel} to use
+		 * a different set of UVs.
 		 *
 		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
 		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
@@ -94,8 +95,10 @@ class MeshToonMaterial extends Material {
 		this.lightMapIntensity = 1.0;
 
 		/**
-		 * The red channel of this texture is used as the ambient occlusion map.
-		 * Requires a second set of UVs.
+		 * The red channel of this texture is used as the ambient occlusion map,
+		 * where `0` fully occludes ambient light and `1` does not occlude it.
+		 * Uses `uv` by default, set {@link Texture#channel} to use a different
+		 * set of UVs.
 		 *
 		 * `aoMap` represents non-color data. Any texture assigned must have
 		 * `texture.colorSpace = NoColorSpace` (default).
@@ -107,8 +110,7 @@ class MeshToonMaterial extends Material {
 
 		/**
 		 * Intensity of the ambient occlusion effect. Range is `[0,1]`, where `0`
-		 * disables ambient occlusion. Where intensity is `1` and the AO map's
-		 * red channel is also `1`, ambient light is fully occluded on a surface.
+		 * disables ambient occlusion and `1` applies the AO map at full strength.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -194,6 +196,7 @@ class MeshToonMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)

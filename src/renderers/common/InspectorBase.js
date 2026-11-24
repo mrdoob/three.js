@@ -112,7 +112,7 @@ class InspectorBase extends EventDispatcher {
 	 * When a compute operation is performed.
 	 *
 	 * @param {ComputeNode} computeNode - The compute node being executed.
-	 * @param {number|Array<number>} dispatchSizeOrCount - The dispatch size or count.
+	 * @param {number|Array<number>|IndirectStorageBufferAttribute} dispatchSizeOrCount - The dispatch size or count.
 	 */
 	computeAsync( /*computeNode, dispatchSizeOrCount*/ ) { }
 
@@ -128,7 +128,6 @@ class InspectorBase extends EventDispatcher {
 	 * Called when a compute operation ends.
 	 *
 	 * @param {string} uid - A unique identifier for the render context.
-	 * @param {ComputeNode} computeNode - The compute node being executed.
 	 */
 	finishCompute( /*uid*/ ) { }
 
@@ -143,7 +142,7 @@ class InspectorBase extends EventDispatcher {
 	beginRender( /*uid, scene, camera, renderTarget*/ ) { }
 
 	/**
-	 * Called when an animation loop ends.
+	 * Called when a render operation ends.
 	 *
 	 * @param {string} uid - A unique identifier for the render context.
 	 */

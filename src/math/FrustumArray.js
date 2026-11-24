@@ -17,7 +17,8 @@ class FrustumArray {
 	constructor() {
 
 		/**
-		 * The coordinate system to use.
+		 * The coordinate system. Note that it is not used by the culling tests: each frustum
+		 * uses the coordinate system of its sub camera, see {@link FrustumArray#setFromArrayCamera}.
 		 *
 		 * @type {WebGLCoordinateSystem|WebGPUCoordinateSystem}
 		 * @default WebGLCoordinateSystem

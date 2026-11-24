@@ -11,10 +11,10 @@ import LightingModel from '../core/LightingModel.js';
 import { diffuseColor, diffuseContribution, diffuseRoughness, specularColor, specularColorBlended, specularF90, roughness, metalness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor, dispersion, retroreflectivity } from '../core/PropertyNode.js';
 import { normalView, clearcoatNormalView, normalWorld } from '../accessors/Normal.js';
 import { positionViewDirection, positionView, positionWorld } from '../accessors/Position.js';
-import { Fn, float, vec2, vec3, vec4, mat3, If } from '../tsl/TSLBase.js';
+import { Fn, float, vec2, vec3, vec4, mat3, If, pow4 } from '../tsl/TSLBase.js';
 import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep } from '../math/MathNode.js';
 import { div } from '../math/OperatorNode.js';
-import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix, cameraViewport } from '../accessors/Camera.js';
+import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix, cameraViewport, cameraWorldMatrix } from '../accessors/Camera.js';
 import { modelWorldMatrix } from '../accessors/ModelNode.js';
 import { screenSize } from '../display/ScreenNode.js';
 import { viewportMipTexture, viewportOpaqueMipTexture } from '../display/ViewportTextureNode.js';
@@ -306,6 +306,22 @@ const IBLSheenBRDF = /*@__PURE__*/ Fn( ( { normal, viewDir, roughness } ) => {
 	return DG.saturate();
 
 }, { normal: 'vec3', viewDir: 'vec3', roughness: 'float', return: 'float' } );
+
+//
+//	Ambient occlusion
+//
+
+// Jimenez et al. 2016, "Practical Realtime Strategies for Accurate Indirect Occlusion"
+// Light surfaces bounce light back into their crevices, so they darken less
+const multiBounceOcclusion = /*@__PURE__*/ Fn( ( [ visibility, albedo ] ) => {
+
+	const a = albedo.mul( 2.0404 ).sub( 0.3324 );
+	const b = albedo.mul( - 4.7951 ).add( 0.6417 );
+	const c = albedo.mul( 2.7552 ).add( 0.6903 );
+
+	return visibility.mul( a ).add( b ).mul( visibility ).add( c ).mul( visibility ).max( visibility );
+
+} );
 
 const clearcoatF0 = vec3( 0.04 );
 const clearcoatF90 = float( 1 );
@@ -724,8 +740,8 @@ class PhysicalLightingModel extends LightingModel {
 
 		const uv = LTC_Uv( { N, V, roughness } );
 
-		const t1 = ltc_1.sample( uv ).toVar();
-		const t2 = ltc_2.sample( uv ).toVar();
+		const t1 = ltc_1.sample( uv ).level( 0 ).toVar();
+		const t2 = ltc_2.sample( uv ).level( 0 ).toVar();
 
 		const mInv = mat3(
 			vec3( t1.x, 0, t1.y ),
@@ -747,8 +763,8 @@ class PhysicalLightingModel extends LightingModel {
 
 			const uvClearcoat = LTC_Uv( { N: Ncc, V, roughness: clearcoatRoughness } );
 
-			const t1Clearcoat = ltc_1.sample( uvClearcoat );
-			const t2Clearcoat = ltc_2.sample( uvClearcoat );
+			const t1Clearcoat = ltc_1.sample( uvClearcoat ).level( 0 );
+			const t2Clearcoat = ltc_2.sample( uvClearcoat ).level( 0 );
 
 			const mInvClearcoat = mat3(
 				vec3( t1Clearcoat.x, 0, t1Clearcoat.y ),
@@ -779,13 +795,42 @@ class PhysicalLightingModel extends LightingModel {
 	}
 
 	/**
+	 * Reflects ambient and hemisphere lights, which stand in for a distant
+	 * environment that reflects its irradiance / PI.
+	 *
+	 * @param {function(Node<vec3>):Node<vec3>} irradianceAt - Returns the light's irradiance for a world space direction.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	indirectRadiance( irradianceAt, builder ) {
+
+		const radianceAt = ( normal, roughness ) => {
+
+			// Mixing the reflection with the normal is more accurate for rough objects, see EnvironmentNode
+			const reflectVec = positionViewDirection.negate().reflect( normal );
+			const direction = pow4( roughness ).mix( reflectVec, normal ).normalize().transformDirection( cameraWorldMatrix );
+
+			return irradianceAt( direction ).div( Math.PI );
+
+		};
+
+		builder.context.radiance.addAssign( radianceAt( normalView, roughness ) );
+
+		if ( this.clearcoat === true ) {
+
+			this.clearcoatRadiance.addAssign( radianceAt( clearcoatNormalView, clearcoatRoughness ) );
+
+		}
+
+	}
+
+	/**
 	 * Implements the indirect diffuse term.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */
 	indirectDiffuse( builder ) {
 
-		const { irradiance, reflectedLight } = builder.context;
+		const { ambientOcclusion, irradiance, occlusionAwareIrradiance, reflectedLight } = builder.context;
 
 		// Energy reflected by the specular lobe is not available to the diffuse layer
 		const singleScattering = this.singleScatteringDielectric;
@@ -795,13 +840,15 @@ class PhysicalLightingModel extends LightingModel {
 			? this.eonDirectionalAlbedo.mul( metalness.oneMinus(), 1 / Math.PI )
 			: BRDF_Lambert( { diffuseColor: diffuseContribution } );
 
-		const diffuse = irradiance.mul( diffuseBRDF ).mul( singleScattering.add( multiScattering ).oneMinus() ).toVar();
+		const diffuseIrradiance = irradiance.mul( multiBounceOcclusion( ambientOcclusion, diffuseContribution ) ).add( occlusionAwareIrradiance );
+
+		const diffuse = diffuseIrradiance.mul( diffuseBRDF ).mul( singleScattering.add( multiScattering ).oneMinus() ).toVar();
 
 		if ( this.sheen === true ) {
 
 			const sheenAlbedo = IBLSheenBRDF( { normal: normalView, viewDir: positionViewDirection, roughness: sheenRoughness } );
 
-			this.sheenSpecularIndirect.addAssign( irradiance.mul( sheen, sheenAlbedo, 1 / Math.PI ) );
+			this.sheenSpecularIndirect.addAssign( irradiance.mul( ambientOcclusion ).add( occlusionAwareIrradiance ).mul( sheen, sheenAlbedo, 1 / Math.PI ) );
 
 			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( sheenAlbedo ).oneMinus();
 
@@ -820,21 +867,7 @@ class PhysicalLightingModel extends LightingModel {
 	 */
 	indirectSpecular( builder ) {
 
-		const { radiance, iblIrradiance, reflectedLight } = builder.context;
-
-		if ( this.sheen === true ) {
-
-			this.sheenSpecularIndirect.addAssign( iblIrradiance.mul(
-				sheen,
-				IBLSheenBRDF( {
-					normal: normalView,
-					viewDir: positionViewDirection,
-					roughness: sheenRoughness
-				} ),
-				1 / Math.PI
-			) );
-
-		}
+		const { radiance, reflectedLight } = builder.context;
 
 		if ( this.clearcoat === true ) {
 
@@ -851,7 +884,6 @@ class PhysicalLightingModel extends LightingModel {
 
 		}
 
-		// Both indirect specular and indirect diffuse light accumulate here
 		// Compute multiscattering separately for dielectric and metallic, then mix
 
 		const singleScatteringDielectric = this.singleScatteringDielectric;
@@ -865,19 +897,9 @@ class PhysicalLightingModel extends LightingModel {
 		const singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, metalness );
 		const multiScattering = mix( multiScatteringDielectric, multiScatteringMetallic, metalness );
 
-		// Diffuse energy conservation uses dielectric path
-		const totalScatteringDielectric = singleScatteringDielectric.add( multiScatteringDielectric );
-
-		const diffuseAlbedo = this.diffuseRoughness
-			? this.eonDirectionalAlbedo.mul( metalness.oneMinus() )
-			: diffuseContribution;
-
-		const diffuse = diffuseAlbedo.mul( totalScatteringDielectric.oneMinus() );
-
-		const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI );
-
-		const indirectSpecular = radiance.mul( singleScattering ).add( multiScattering.mul( cosineWeightedIrradiance ) ).toVar();
-		const indirectDiffuse = diffuse.mul( cosineWeightedIrradiance ).toVar();
+		// The multiple scattering lobe has the shape of the single scattering lobe, so it scales the radiance, see
+		// Turquin, "Practical multiple scattering compensation for microfacet models"
+		const indirectSpecular = radiance.mul( singleScattering.add( multiScattering ) ).toVar();
 
 		if ( this.sheen === true ) {
 
@@ -886,13 +908,10 @@ class PhysicalLightingModel extends LightingModel {
 			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( sheenAlbedo ).oneMinus();
 
 			indirectSpecular.mulAssign( sheenEnergyComp );
-			indirectDiffuse.mulAssign( sheenEnergyComp );
 
 		}
 
 		reflectedLight.indirectSpecular.addAssign( indirectSpecular );
-
-		reflectedLight.indirectDiffuse.addAssign( indirectDiffuse );
 
 	}
 
@@ -905,27 +924,25 @@ class PhysicalLightingModel extends LightingModel {
 
 		const { ambientOcclusion, reflectedLight } = builder.context;
 
-		const dotNV = normalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
+		const computeSpecularOcclusion = ( normal, roughness ) => {
 
-		const aoNV = dotNV.add( ambientOcclusion );
-		const aoExp = roughness.mul( - 16.0 ).oneMinus().negate().exp2();
+			const dotNV = normal.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
 
-		const aoNode = ambientOcclusion.sub( aoNV.pow( aoExp ).oneMinus() ).clamp();
+			const aoNV = dotNV.add( ambientOcclusion );
+			const aoExp = roughness.mul( - 16.0 ).oneMinus().negate().exp2();
+
+			return ambientOcclusion.sub( aoNV.pow( aoExp ).oneMinus() ).clamp();
+
+		};
 
 		if ( this.clearcoat === true ) {
 
-			this.clearcoatSpecularIndirect.mulAssign( ambientOcclusion );
+			this.clearcoatSpecularIndirect.mulAssign( computeSpecularOcclusion( clearcoatNormalView, clearcoatRoughness ) );
 
 		}
 
-		if ( this.sheen === true ) {
-
-			this.sheenSpecularIndirect.mulAssign( ambientOcclusion );
-
-		}
-
-		reflectedLight.indirectDiffuse.mulAssign( ambientOcclusion );
-		reflectedLight.indirectSpecular.mulAssign( aoNode );
+		const soNode = computeSpecularOcclusion( normalView, roughness );
+		reflectedLight.indirectSpecular.mulAssign( multiBounceOcclusion( soNode, specularColorBlended ) );
 
 	}
 

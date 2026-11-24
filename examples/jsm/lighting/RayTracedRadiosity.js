@@ -60,6 +60,7 @@ const LIGHT_STRIDE = 4;
  * instanced and batched meshes are ignored.
  *
  * This class can only be used with {@link WebGPURenderer} and a WebGPU backend.
+ * Requires `three-mesh-bvh` 0.9.18 or later.
  *
  * @three_import import { RayTracedRadiosity, rayTracedRadiosityIrradiance } from 'three/addons/lighting/RayTracedRadiosity.js';
  */
@@ -77,7 +78,8 @@ class RayTracedRadiosity {
 	constructor( { rays = 8, bounces = 16, cacheSamples = 32, cacheSize = 256 } = {} ) {
 
 		/**
-		 * The number of rays cast per point and sample.
+		 * The number of rays cast per point and sample. It can change between samples, e.g. to keep the
+		 * frame rate of a progressive bake: the samples continue the same sequences of rays.
 		 *
 		 * @type {number}
 		 * @default 8
@@ -136,10 +138,19 @@ class RayTracedRadiosity {
 		this._environmentRotation = uniform( new Matrix4() );
 		this._environmentInverseRotation = uniform( new Matrix4() );
 
-		// the sample sequences continue with every render call of the gathering materials
+		// the sample sequences continue with every render call of the gathering materials, after the
+		// rays of the call before. They start after the rays of one sample, like they did with a constant
+		// number of rays
 
-		this._pass = 0;
-		this._passNode = uniform( 0, 'uint' ).onRenderUpdate( () => ++ this._pass );
+		this._firstRay = rays;
+		this._firstRayNode = uniform( 0, 'uint' ).onRenderUpdate( () => {
+
+			const first = this._firstRay;
+			this._firstRay += this.rays;
+			return first;
+
+		} );
+		this._raysNode = uniform( rays, 'uint' ).onRenderUpdate( () => this.rays );
 		this._biasNode = uniform( this.bias ).onRenderUpdate( () => this.bias );
 
 	}
@@ -537,7 +548,7 @@ class RayTracedRadiosity {
 	 */
 	_createTrace() {
 
-		const { raycastFirstHit, sampleTrianglePoint } = this._bvh.fns;
+		const { raycastFirstHit, raycastAnyHit, sampleTrianglePoint } = this._bvh.fns;
 
 		// traces a ray and returns the barycentric coordinates of the closest hit and its triangle plus
 		// one, negated for back faces, or zeros if nothing is hit
@@ -578,7 +589,7 @@ class RayTracedRadiosity {
 			}
 		`;
 
-		// whether a shadow ray reaches a distance, zero means unbounded
+		// shadow rays only need any blocker, not the closest hit; zero distance means unbounded
 
 		this._visibility = wgslTagFn/* wgsl */`
 			// fn
@@ -589,9 +600,7 @@ class RayTracedRadiosity {
 				ray.direction = direction;
 				ray.maxDist = maxDist;
 
-				var hit: ${ rayIntersectionResultStruct };
-
-				return select( 1.0, 0.0, ${ raycastFirstHit }( ray, &hit ) );
+				return select( 1.0, 0.0, ${ raycastAnyHit }( ray ) );
 
 			}
 		`;
@@ -641,7 +650,7 @@ class RayTracedRadiosity {
 
 		return Fn( () => {
 
-			const rays = this.rays;
+			const rays = this._raysNode;
 			const trace = this._trace;
 			const visibility = this._visibility;
 			const materials = this._materials;
@@ -729,9 +738,9 @@ class RayTracedRadiosity {
 
 			const gathered = vec3( 0 ).toVar();
 
-			Loop( rays, ( { i } ) => {
+			Loop( { start: uint( 0 ), end: rays, type: 'uint', condition: '<' }, ( { i } ) => {
 
-				const n = this._passNode.mul( rays ).add( uint( i ) ).toVar();
+				const n = this._firstRayNode.add( i ).toVar();
 
 				// cosine-distributed gathering ray
 
@@ -869,7 +878,7 @@ class RayTracedRadiosity {
 
 			} );
 
-			const irradiance = gathered.div( rays ).toVar();
+			const irradiance = gathered.div( float( rays ) ).toVar();
 
 			// direct light of the directional, point and spot lights with a shadow ray to each one: the
 			// distance attenuation of point and spot lights, see getDistanceAttenuation(), and the cone of

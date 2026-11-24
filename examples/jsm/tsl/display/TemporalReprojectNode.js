@@ -1,5 +1,6 @@
 import { EPSILON, Fn, If, abs, convertToTexture, dFdx, dFdy, dot, exp, float, floor, fwidth, getViewPosition, ivec2, luminance, max, min, mix, nodeObject, normalize, passTexture, screenCoordinate, select, smoothstep, sqrt, struct, texture, textureLoad, uniform, unpackRGBToNormal, uv, vec2, vec3, vec4, velocity, context, OnBeforeRenderPipeline, OnAfterRenderPipeline, isBackgroundDepth } from 'three/tsl';
-import { DepthTexture, HalfFloatType, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
+import { HalfFloatType, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2 } from 'three/webgpu';
+import { Reprojection } from '../../utils/Reprojection.js';
 import { ENV_RAY_LENGTH, ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
 
 // Reprojection helpers
@@ -214,7 +215,7 @@ const historyResultStruct = struct( { color: 'vec4', tapConfidence: 'float', min
  *
  * @tsl
  */
-const sampleBilinearTap = Fn( ( [
+const createSampleBilinearTap = ( normalDecode ) => Fn( ( [
 	historyTexture,
 	previousDepthNode,
 	previousNormalNode,
@@ -232,7 +233,7 @@ const sampleBilinearTap = Fn( ( [
 	const reprojDepth = textureLoad( previousDepthNode, tapCoord ).r;
 	const reprojViewPos = getViewPosition( vec2( tapCoord ).add( 0.5 ).div( resolution ), reprojDepth, previousProjectionMatrixInverse );
 	const reprojWorldPos = previousCameraWorldMatrix.mul( vec4( reprojViewPos, 1.0 ) ).xyz;
-	const reprojWorldNorm = unpackRGBToNormal( textureLoad( previousNormalNode, tapCoord ).rgb ).transformNormalByInverseViewMatrix( previousCameraViewMatrix );
+	const reprojWorldNorm = normalDecode( textureLoad( previousNormalNode, tapCoord ) ).transformNormalByInverseViewMatrix( previousCameraViewMatrix );
 
 	const planeDiff = abs( dot( reprojWorldPos.sub( worldPosition ), worldNormal ) ).toVar();
 	planeDiff.divAssign( abs( reprojViewPos.z ) );
@@ -251,7 +252,7 @@ const sampleBilinearTap = Fn( ( [
  */
 function bilinearHistoryTap( ctx, tapOffset, bilinearWeight ) {
 
-	return sampleBilinearTap(
+	return ctx.sampleBilinearTap(
 		ctx.historyTexture,
 		ctx.previousDepthNode,
 		ctx.previousNormalNode,
@@ -272,7 +273,7 @@ function bilinearHistoryTap( ctx, tapOffset, bilinearWeight ) {
  *
  * @tsl
  */
-const sampleHistory4Tap = Fn( ( [
+const createSampleHistory4Tap = ( normalDecode ) => Fn( ( [
 	historyTexture,
 	previousDepthNode,
 	previousNormalNode,
@@ -286,6 +287,8 @@ const sampleHistory4Tap = Fn( ( [
 	inputColor
 ] ) => {
 
+	const sampleBilinearTap = createSampleBilinearTap( normalDecode );
+
 	const reprojPixelCoord = reprojUV.mul( resolution ).sub( 0.5 ).toVar();
 	const reprojICoord = ivec2( floor( reprojPixelCoord ) );
 	const fCoord = reprojPixelCoord.fract();
@@ -298,6 +301,7 @@ const sampleHistory4Tap = Fn( ( [
 	const f11 = fx.mul( fy );
 
 	const tapCtx = {
+		sampleBilinearTap,
 		historyTexture,
 		previousDepthNode,
 		previousNormalNode,
@@ -394,68 +398,6 @@ const reprojectHitPoint = Fn( ( [
 	return: 'vec2'
 } );
 
-/**
- * Converts screen-space velocity (NDC derivative) to a UV reprojection offset.
- *
- * @tsl
- */
-const velocityToUVOffset = Fn( ( [ velocity ] ) => {
-
-	return velocity.mul( vec2( 0.5, - 0.5 ) );
-
-}, { velocity: 'vec2', return: 'vec2' } );
-
-/**
- * Current and previous-frame camera matrices for temporal reprojection passes.
- *
- * @param {Camera} camera
- */
-function bindTemporalCameraUniforms( camera ) {
-
-	const worldMatrix = uniform( new Matrix4().copy( camera.matrixWorld ) );
-	const viewMatrix = uniform( new Matrix4().copy( camera.matrixWorldInverse ) );
-	const projectionMatrix = uniform( new Matrix4().copy( camera.projectionMatrix ) );
-	const projectionMatrixInverse = uniform( new Matrix4().copy( camera.projectionMatrixInverse ) );
-	const worldPosition = uniform( new Vector3().copy( camera.position ) );
-
-	const previousWorldMatrix = uniform( new Matrix4().copy( camera.matrixWorld ) );
-	const previousViewMatrix = uniform( new Matrix4().copy( camera.matrixWorldInverse ) );
-	const previousProjectionMatrix = uniform( new Matrix4().copy( camera.projectionMatrix ) );
-	const previousProjectionMatrixInverse = uniform( new Matrix4().copy( camera.projectionMatrixInverse ) );
-
-	/**
-	 * @param {Camera} cam
-	 */
-	function updateFromCamera( cam ) {
-
-		previousWorldMatrix.value.copy( worldMatrix.value );
-		previousViewMatrix.value.copy( viewMatrix.value );
-		previousProjectionMatrix.value.copy( projectionMatrix.value );
-		previousProjectionMatrixInverse.value.copy( projectionMatrixInverse.value );
-
-		worldMatrix.value.copy( cam.matrixWorld );
-		viewMatrix.value.copy( cam.matrixWorldInverse );
-		projectionMatrix.value.copy( cam.projectionMatrix );
-		projectionMatrixInverse.value.copy( cam.projectionMatrixInverse );
-		worldPosition.value.copy( cam.position );
-
-	}
-
-	return {
-		worldMatrix,
-		viewMatrix,
-		projectionMatrix,
-		projectionMatrixInverse,
-		worldPosition,
-		previousWorldMatrix,
-		previousViewMatrix,
-		previousProjectionMatrix,
-		previousProjectionMatrixInverse,
-		updateFromCamera
-	};
-
-}
-
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -475,6 +417,7 @@ const VARIANCE_GAMMA_MAX = 1;
  * @property {boolean} [hitPointReprojection] - Parallax hit-point reprojection (specular mode only). Defaults to `true` in specular mode.
  * @property {boolean} [accumulate=false] - When `true`, history is stored in this pass (classic temporal resolve). When `false`,
  * use {@link TemporalReprojectNode#setHistoryTexture} to read history from another pass (e.g. denoise output).
+ * @property {Function} [normalDecode] - Decodes a sample of the normal texture into a unit view-space normal. Defaults to {@link unpackRGBToNormal}.
  */
 
 /**
@@ -518,7 +461,8 @@ class TemporalReprojectNode extends Node {
 		const {
 			mode = 'diffuse',
 			hitPointReprojection = mode === 'specular',
-			accumulate = false
+			accumulate = false,
+			normalDecode = ( value ) => unpackRGBToNormal( value.rgb )
 		} = options;
 
 		if ( mode !== 'specular' && mode !== 'diffuse' ) {
@@ -533,6 +477,7 @@ class TemporalReprojectNode extends Node {
 		this.beautyNode = beautyNode;
 		this.depthNode = depthNode;
 		this.normalNode = normalNode;
+		this.normalDecode = normalDecode;
 		this.velocityNode = velocityNode;
 		this.camera = camera;
 
@@ -553,14 +498,15 @@ class TemporalReprojectNode extends Node {
 
 		this._resolution = uniform( new Vector2() );
 
-		this._cameraUniforms = bindTemporalCameraUniforms( camera );
+		this._reprojection = new Reprojection( depthNode, velocityNode, camera );
+		this._reprojection.previousDepthNode.value.name = 'TemporalReprojectNode.previousDepth';
 
 		this.maxFrames = uniform( 32 );
 		this.hitPointReprojection = uniform( hitPointReprojection, 'bool' );
 		this.clampIntensity = uniform( 1 );
 		this.flickerSuppression = uniform( 1 );
 
-		this._historyRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, depthTexture: new DepthTexture() } );
+		this._historyRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._historyRenderTarget.texture.name = 'TemporalReprojectNode.history';
 		this._historyTextureNode = texture( this._historyRenderTarget.texture );
 
@@ -577,8 +523,6 @@ class TemporalReprojectNode extends Node {
 
 		this._originalProjectionMatrix = new Matrix4();
 
-		this._placeholderPreviousDepthTexture = new DepthTexture( 1, 1 );
-		this._previousDepthNode = texture( this._placeholderPreviousDepthTexture );
 		this._previousNormalTexture = normalNode.value.clone();
 		this._previousNormalNode = texture( this._previousNormalTexture );
 
@@ -623,8 +567,6 @@ class TemporalReprojectNode extends Node {
 
 		const { renderer } = frame;
 
-		this._cameraUniforms.updateFromCamera( this.camera );
-
 		const drawingBufferSize = renderer.getDrawingBufferSize( _size );
 		const width = drawingBufferSize.width;
 		const height = drawingBufferSize.height;
@@ -638,23 +580,8 @@ class TemporalReprojectNode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		const currentDepth = this.depthNode.value;
-		const historyDepth = this._historyRenderTarget.depthTexture;
-
-		const depthFormatChanged = historyDepth.format !== currentDepth.format || historyDepth.type !== currentDepth.type;
-
-		// The texture copy requires matching formats, e.g. float depth with reversed depth or depth/stencil.
-		// Checked here since updateBefore() can run before setup() when driven by another node.
-
-		if ( depthFormatChanged === true ) {
-
-			historyDepth.format = currentDepth.format;
-			historyDepth.type = currentDepth.type;
-			historyDepth.needsUpdate = true;
-
-		}
-
-		const needsRestart = depthFormatChanged === true || this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
+		const needsRestart = this._reprojection.needsHistoryReset() ||
+			this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
 		this.setSize( width, height );
 
 		let historySwappedForRestart = false;
@@ -665,7 +592,7 @@ class TemporalReprojectNode extends Node {
 			this._previousNormalTexture = this.normalNode.value.clone();
 			this._previousNormalNode.value = this._previousNormalTexture;
 
-			// External history (e.g. denoise feedback) is stale at the old resolution — use
+			// External history (e.g. denoise feedback) is incompatible after a restart — use
 			// freshly seeded internal history for this frame instead.
 			if ( this.accumulate === false && this._externalHistoryTexture !== null ) {
 
@@ -699,17 +626,10 @@ class TemporalReprojectNode extends Node {
 
 		}
 
-		const srcW = currentDepth.image !== null && currentDepth.image !== undefined ? currentDepth.image.width : 0;
-		const srcH = currentDepth.image !== null && currentDepth.image !== undefined ? currentDepth.image.height : 0;
+		// store the depth, camera matrices and normals for the next frame
 
-		if ( srcW > 0 && srcH > 0 ) {
-
-			renderer.copyTextureToTexture( currentDepth, historyDepth );
-			renderer.copyTextureToTexture( this.normalNode.value, this._previousNormalTexture );
-
-			this._previousDepthNode.value = historyDepth;
-
-		}
+		this._reprojection.update( renderer );
+		renderer.copyTextureToTexture( this.normalNode.value, this._previousNormalTexture );
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );
 
@@ -774,7 +694,8 @@ class TemporalReprojectNode extends Node {
 	_buildResolve() {
 
 		const isSpecular = this.mode === 'specular';
-		const cameraUniforms = this._cameraUniforms;
+		const reprojection = this._reprojection;
+		const sampleHistory4Tap = createSampleHistory4Tap( this.normalDecode );
 
 		const resolve = Fn( () => {
 
@@ -788,23 +709,23 @@ class TemporalReprojectNode extends Node {
 			const beautyTexel = beautyTexelFromScreen( screenTexel, beautySize, this._resolution );
 
 			const inputColor = textureLoad( this.beautyNode, beautyTexel ).max( 0 ).toVar();
-			const viewNormal = unpackRGBToNormal( textureLoad( this.normalNode, screenTexel ).rgb ).toVar();
+			const viewNormal = this.normalDecode( textureLoad( this.normalNode, screenTexel ) ).toVar();
 
 			// Shared 3×3 beauty fetch: feeds both the variance-clip box and the SSR ray-length stats.
 			const neighborhood = collectNeighborhood( this.beautyNode, beautyTexel, inputColor, this.flickerSuppression );
-			const worldNormal = viewNormal.transformNormalByInverseViewMatrix( cameraUniforms.viewMatrix ).toVar();
+			const worldNormal = viewNormal.transformNormalByInverseViewMatrix( reprojection.cameraViewMatrix ).toVar();
 
-			const viewPosition = getViewPosition( uvNode, depth, cameraUniforms.projectionMatrixInverse ).toVar();
-			const worldPosition = cameraUniforms.worldMatrix.mul( vec4( viewPosition, 1.0 ) ).xyz.toVar();
+			const viewPosition = getViewPosition( uvNode, depth, reprojection.cameraProjectionMatrixInverse ).toVar();
+			const worldPosition = reprojection.cameraWorldMatrix.mul( vec4( viewPosition, 1.0 ) ).xyz.toVar();
 
 			const sampleHistory = ( reprojUV ) => sampleHistory4Tap(
 				this._historyTextureNode,
-				this._previousDepthNode,
+				reprojection.previousDepthNode,
 				this._previousNormalNode,
 				this._resolution,
-				cameraUniforms.previousProjectionMatrixInverse,
-				cameraUniforms.previousWorldMatrix,
-				cameraUniforms.previousViewMatrix,
+				reprojection.previousCameraProjectionMatrixInverse,
+				reprojection.previousCameraWorldMatrix,
+				reprojection.previousCameraViewMatrix,
 				reprojUV,
 				worldPosition,
 				worldNormal,
@@ -813,10 +734,9 @@ class TemporalReprojectNode extends Node {
 
 			// Surface-velocity reprojection — the base history for both modes. `historyUV` is
 			// reused below for the stretch guard, so it is computed once here.
-			const velocityOff = velocityToUVOffset( textureLoad( this.velocityNode, screenTexel ).xy ).toVar();
-			const motionFactor = velocityOff.mul( this._resolution ).length().div( float( this.maxVelocityLength ) ).saturate();
+			const historyUV = reprojection.getHistoryUV( uvNode, screenTexel ).toVar();
+			const motionFactor = uvNode.sub( historyUV ).mul( this._resolution ).length().div( float( this.maxVelocityLength ) ).saturate();
 
-			const historyUV = uvNode.sub( velocityOff ).toVar();
 			const surf = sampleHistory( historyUV );
 
 			const historyColor = surf.get( 'color' ).toVar();
@@ -833,9 +753,9 @@ class TemporalReprojectNode extends Node {
 				const historyUV_hit = reprojectHitPoint(
 					worldPosition,
 					neighborhood.get( 'rayLength' ),
-					cameraUniforms.worldPosition,
-					cameraUniforms.previousViewMatrix,
-					cameraUniforms.previousProjectionMatrix
+					reprojection.cameraWorldMatrix.element( 3 ).xyz,
+					reprojection.previousCameraViewMatrix,
+					reprojection.previousCameraProjectionMatrix
 				).toVar();
 
 				const hitValid = historyUV_hit.x.greaterThanEqual( 0 ).and( historyUV_hit.x.lessThanEqual( 1 ) )
@@ -981,18 +901,7 @@ class TemporalReprojectNode extends Node {
 
 		this._previousNormalTexture.dispose();
 
-		if ( this._previousDepthNode.value !== this._historyRenderTarget.depthTexture ) {
-
-			this._previousDepthNode.value.dispose();
-
-		}
-
-		if ( this._placeholderPreviousDepthTexture !== this._historyRenderTarget.depthTexture ) {
-
-			this._placeholderPreviousDepthTexture.dispose();
-
-		}
-
+		this._reprojection.dispose();
 		this._historyRenderTarget.dispose();
 		this._resolveRenderTarget.dispose();
 		this._resolveMaterial.dispose();

@@ -484,6 +484,10 @@ class TransformControls extends Controls {
 
 			if ( pointer !== null ) _raycaster.setFromCamera( pointer, this.camera );
 
+			// the plane is only updated during rendering but pointerHover() might have just changed the axis (see #31280)
+
+			this._plane.updateMatrixWorld();
+
 			const planeIntersect = intersectObjectWithRay( this._plane, _raycaster, true );
 
 			if ( planeIntersect ) {

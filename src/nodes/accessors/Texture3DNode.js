@@ -35,9 +35,9 @@ const normal = /*@__PURE__*/ Fn( ( { texture, uv } ) => {
 
 		const step = 0.01;
 
-		const x = texture.sample( uv.add( vec3( - step, 0.0, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( step, 0.0, 0.0 ) ) ).r );
-		const y = texture.sample( uv.add( vec3( 0.0, - step, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, step, 0.0 ) ) ).r );
-		const z = texture.sample( uv.add( vec3( 0.0, 0.0, - step ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, 0.0, step ) ) ).r );
+		const x = texture.sample( uv.add( vec3( - step, 0.0, 0.0 ) ) ).level( 0 ).r.sub( texture.sample( uv.add( vec3( step, 0.0, 0.0 ) ) ).level( 0 ).r );
+		const y = texture.sample( uv.add( vec3( 0.0, - step, 0.0 ) ) ).level( 0 ).r.sub( texture.sample( uv.add( vec3( 0.0, step, 0.0 ) ) ).level( 0 ).r );
+		const z = texture.sample( uv.add( vec3( 0.0, 0.0, - step ) ) ).level( 0 ).r.sub( texture.sample( uv.add( vec3( 0.0, 0.0, step ) ) ).level( 0 ).r );
 
 		ret.assign( vec3( x, y, z ) );
 
@@ -64,7 +64,7 @@ class Texture3DNode extends TextureNode {
 	 * Constructs a new 3D texture node.
 	 *
 	 * @param {Data3DTexture} value - The 3D texture.
-	 * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
+	 * @param {?Node<vec3>} [uvNode=null] - The uv node.
 	 * @param {?Node<int>} [levelNode=null] - The level node.
 	 */
 	constructor( value, uvNode = null, levelNode = null ) {
@@ -79,6 +79,18 @@ class Texture3DNode extends TextureNode {
 		 * @default true
 		 */
 		this.isTexture3DNode = true;
+
+	}
+
+	/**
+	 * Returns `false` because 3D texture coordinates do not use the 2D UV matrix.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
+	get updateMatrix() {
+
+		return false;
 
 	}
 
@@ -105,14 +117,6 @@ class Texture3DNode extends TextureNode {
 		return vec3( 0.5, 0.5, 0.5 );
 
 	}
-
-	/**
-	 * Overwritten with an empty implementation since the `updateMatrix` flag is ignored
-	 * for 3D textures. The uv transformation matrix is not applied to 3D textures.
-	 *
-	 * @param {boolean} value - The update toggle.
-	 */
-	setUpdateMatrix( /*value*/ ) { } // Ignore .updateMatrix for 3d TextureNode
 
 	/**
 	 * Generates the uv code snippet.
@@ -175,22 +179,21 @@ export const texture3D = /*@__PURE__*/ nodeProxy( Texture3DNode ).setParameterLe
  *
  * @tsl
  * @function
- * @param {?(Texture|TextureNode)} [value=EmptyTexture] - The texture.
- * @param {?Node<vec3>} [uvNode=null] - The uv node.
+ * @param {Data3DTexture} value - The 3D texture.
+ * @param {?Node<ivec3|uvec3>} [uvNode=null] - The integer texel coordinates (not normalized uvs).
  * @param {?Node<int>} [levelNode=null] - The level node.
- * @param {?Node<float>} [biasNode=null] - The bias node.
- * @returns {TextureNode}
+ * @returns {Texture3DNode}
  */
 export const texture3DLoad = ( ...params ) => texture3D( ...params ).setSampler( false );
 
 /**
- * TSL function for creating a texture node that fetches/loads texels without interpolation.
+ * TSL function for creating a 3D texture node that samples a specific mip level.
  *
  * @tsl
  * @function
- * @param {?(Texture|TextureNode)} [value=EmptyTexture] - The texture.
- * @param {?Node<vec3>} [uvNode=null] - The uv node.
- * @param {?Node<int>} [levelNode=null] - The level node.
- * @returns {TextureNode}
+ * @param {Data3DTexture} value - The 3D texture.
+ * @param {Node<vec3>} uvNode - The uv node.
+ * @param {Node<int>} levelNode - The level node.
+ * @returns {Texture3DNode}
  */
 export const texture3DLevel = ( value, uvNode, levelNode ) => texture3D( value, uvNode ).level( levelNode );

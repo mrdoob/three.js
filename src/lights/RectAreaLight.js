@@ -31,7 +31,7 @@ class RectAreaLight extends Light {
 	 * Constructs a new area light.
 	 *
 	 * @param {(number|Color|string)} [color=0xffffff] - The light's color.
-	 * @param {number} [intensity=1] - The light's strength/intensity.
+	 * @param {number} [intensity=1] - The light's strength/intensity measured in nits (cd/m²).
 	 * @param {number} [width=10] - The width of the light.
 	 * @param {number} [height=10] - The height of the light.
 	 */

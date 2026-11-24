@@ -50,7 +50,6 @@ export * from './utils/RTTNode.js';
 export * from './utils/PostProcessingUtils.js';
 export * from './utils/SampleNode.js';
 export * from './utils/EventNode.js';
-export * from './utils/StorageArrayElementNode.js';
 
 // three.js shading language
 export * from './tsl/TSLBase.js';

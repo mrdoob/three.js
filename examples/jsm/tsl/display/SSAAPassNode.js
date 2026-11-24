@@ -1,5 +1,5 @@
 import { AdditiveBlending, Color, Vector2, PassNode, QuadMesh, NodeMaterial } from 'three/webgpu';
-import { uniform, mrt, texture, getTextureIndex, unpremultiplyAlpha } from 'three/tsl';
+import { uniform, mrt, texture, unpremultiplyAlpha } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 const _clearColor = /*@__PURE__*/ new Color();
@@ -242,15 +242,9 @@ class SSAAPassNode extends PassNode {
 
 			const outputs = {};
 
-			for ( const name in passMRT.outputNodes ) {
+			for ( const sampleTarget of this._sampleRenderTarget.textures ) {
 
-				const index = getTextureIndex( this._sampleRenderTarget.textures, name );
-
-				if ( index >= 0 ) {
-
-					outputs[ name ] = texture( this._sampleRenderTarget.textures[ index ] ).mul( this.sampleWeight );
-
-				}
+				outputs[ sampleTarget.name ] = texture( sampleTarget ).mul( this.sampleWeight );
 
 			}
 

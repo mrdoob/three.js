@@ -32,7 +32,7 @@ class Loader {
 		this.crossOrigin = 'anonymous';
 
 		/**
-		 * Whether the XMLHttpRequest uses credentials.
+		 * Whether cross-origin `fetch()` requests include credentials.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -141,10 +141,12 @@ class Loader {
 	}
 
 	/**
-	 * Whether the XMLHttpRequest uses credentials such as cookies, authorization
-	 * headers or TLS client certificates, see [XMLHttpRequest.withCredentials](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials).
+	 * Whether `fetch()` requests include credentials such as cookies, authorization
+	 * headers or TLS client certificates on cross-origin requests, see [Request.credentials](https://developer.mozilla.org/en-US/docs/Web/API/Request/credentials).
 	 *
 	 * Note: This setting has no effect if you are loading files locally or from the same domain.
+	 * Loaders using `HTMLImageElement` (e.g. {@link ImageLoader} or {@link TextureLoader}) ignore it,
+	 * use {@link Loader#setCrossOrigin} with `'use-credentials'` instead.
 	 *
 	 * @param {boolean} value - The `withCredentials` value.
 	 * @return {Loader} A reference to this instance.

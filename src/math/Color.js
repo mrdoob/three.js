@@ -237,7 +237,7 @@ class Color {
 	}
 
 	/**
-	 * Sets this color from RGB values.
+	 * Sets this color from HSL values.
 	 *
 	 * @param {number} h - Hue value between `0.0` and `1.0`.
 	 * @param {number} s - Saturation value between `0.0` and `1.0`.
@@ -720,6 +720,7 @@ class Color {
 
 	/**
 	 * Subtracts the RGB values of the given color from the RGB values of this color.
+	 * The resulting components are clamped to a minimum of `0`.
 	 *
 	 * @param {Color} color - The color to subtract.
 	 * @return {Color} A reference to this color.
@@ -820,6 +821,11 @@ class Color {
 
 		this.getHSL( _hslA );
 		color.getHSL( _hslB );
+
+		// grays have no hue, so use the hue of the other color
+
+		if ( _hslA.s === 0 ) _hslA.h = _hslB.h;
+		if ( _hslB.s === 0 ) _hslB.h = _hslA.h;
 
 		const h = lerp( _hslA.h, _hslB.h, alpha );
 		const s = lerp( _hslA.s, _hslB.s, alpha );

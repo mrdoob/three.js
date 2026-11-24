@@ -99,7 +99,7 @@ class CubeMapNode extends Node {
 
 					if ( _cache.has( texture ) ) {
 
-						const cubeMap = _cache.get( texture );
+						const cubeMap = _cache.get( texture ).texture;
 
 						mapTextureMapping( cubeMap, texture.mapping );
 						this._cubeTexture = cubeMap;
@@ -118,7 +118,7 @@ class CubeMapNode extends Node {
 							mapTextureMapping( renderTarget.texture, texture.mapping );
 							this._cubeTexture = renderTarget.texture;
 
-							_cache.set( texture, renderTarget.texture );
+							_cache.set( texture, renderTarget );
 
 							texture.addEventListener( 'dispose', onTextureDispose );
 

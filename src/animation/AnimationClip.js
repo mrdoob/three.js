@@ -24,7 +24,7 @@ class AnimationClip {
 	 * @param {string} [name=''] - The clip's name.
 	 * @param {number} [duration=-1] - The clip's duration in seconds. If a negative value is passed,
 	 * the duration will be calculated from the passed keyframes.
-	 * @param {Array<KeyframeTrack>} tracks - An array of keyframe tracks.
+	 * @param {Array<KeyframeTrack>} [tracks=[]] - An array of keyframe tracks.
 	 * @param {(NormalAnimationBlendMode|AdditiveAnimationBlendMode)} [blendMode=NormalAnimationBlendMode] - Defines how the animation
 	 * is blended/combined when two or more animations are simultaneously played.
 	 */

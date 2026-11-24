@@ -213,7 +213,7 @@ export default /* glsl */`
 
 			if ( frustumTest ) {
 
-				vec2 distribution = texture2D( shadowMap, shadowCoord.xy ).rg;
+				vec2 distribution = textureLod( shadowMap, shadowCoord.xy, 0.0 ).rg;
 
 				float mean = distribution.x;
 				float variance = distribution.y * distribution.y;
@@ -280,7 +280,7 @@ export default /* glsl */`
 
 			if ( frustumTest ) {
 
-				float depth = texture2D( shadowMap, shadowCoord.xy ).r;
+				float depth = textureLod( shadowMap, shadowCoord.xy, 0.0 ).r;
 
 				#ifdef USE_REVERSED_DEPTH_BUFFER
 
@@ -450,7 +450,7 @@ export default /* glsl */`
 			// Direction from light to fragment
 			vec3 bd3D = normalize( lightToPosition );
 
-			float depth = textureCube( shadowMap, bd3D ).r;
+			float depth = textureLod( shadowMap, bd3D, 0.0 ).r;
 
 			#ifdef USE_REVERSED_DEPTH_BUFFER
 

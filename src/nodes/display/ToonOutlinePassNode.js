@@ -247,7 +247,7 @@ export default ToonOutlinePassNode;
  * @function
  * @param {Scene} scene - A reference to the scene.
  * @param {Camera} camera - A reference to the camera.
- * @param {Color} color - Defines the outline's color.
+ * @param {Color} [color=new Color( 0, 0, 0 )] - Defines the outline's color.
  * @param {number} [thickness=0.003] - Defines the outline's thickness.
  * @param {number} [alpha=1] - Defines the outline's alpha.
  * @returns {ToonOutlinePassNode}

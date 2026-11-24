@@ -355,7 +355,7 @@ class Ray {
 	 * does not intersect with the plane.
 	 *
 	 * @param {Plane} plane - The plane to compute the distance to.
-	 * @return {?number} Whether this ray intersects with the given sphere or not.
+	 * @return {?number} The distance from the ray's origin to the plane, or `null` if there is no intersection.
 	 */
 	distanceToPlane( plane ) {
 

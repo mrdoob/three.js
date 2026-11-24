@@ -1212,6 +1212,67 @@ class USDComposer {
 	}
 
 	/**
+	 * Apply primvars:displayColor and primvars:displayOpacity to a material (or an array of materials)
+	 * that has no color or opacity of its own.
+	 */
+	_applyDisplayPrimvars( material, attrs, applyOpacity = true ) {
+
+		const displayColor = attrs[ 'primvars:displayColor' ];
+		if ( displayColor && displayColor.length >= 3 ) {
+
+			const applyDisplayColor = ( mat ) => {
+
+				if ( mat.color && mat.color.r === 1 && mat.color.g === 1 && mat.color.b === 1 && ! mat.map ) {
+
+					mat.color.setRGB( displayColor[ 0 ], displayColor[ 1 ], displayColor[ 2 ], LinearSRGBColorSpace );
+
+				}
+
+			};
+
+			if ( Array.isArray( material ) ) {
+
+				material.forEach( applyDisplayColor );
+
+			} else {
+
+				applyDisplayColor( material );
+
+			}
+
+		}
+
+		const displayOpacity = attrs[ 'primvars:displayOpacity' ];
+		if ( displayOpacity && displayOpacity.length === 1 && applyOpacity ) {
+
+			const opacity = displayOpacity[ 0 ];
+
+			const applyDisplayOpacity = ( mat ) => {
+
+				if ( opacity < 1 && mat.opacity === 1 && mat.transparent === false ) {
+
+					mat.opacity = opacity;
+					mat.transparent = true;
+
+				}
+
+			};
+
+			if ( Array.isArray( material ) ) {
+
+				material.forEach( applyDisplayOpacity );
+
+			} else {
+
+				applyDisplayOpacity( material );
+
+			}
+
+		}
+
+	}
+
+	/**
 	 * Build a mesh from a USD geometric primitive (Cube, Sphere, Cylinder, Cone, Capsule).
 	 */
 	_buildGeomPrimitive( path, spec, typeName ) {
@@ -1282,6 +1343,8 @@ class USDComposer {
 		}
 
 		const material = this._buildMaterial( path, spec.fields );
+		this._applyDisplayPrimvars( material, attrs );
+
 		const mesh = new Mesh( geometry, material );
 		mesh.name = name;
 
@@ -1329,58 +1392,7 @@ class USDComposer {
 
 		}
 
-		const displayColor = attrs[ 'primvars:displayColor' ];
-		if ( displayColor && displayColor.length >= 3 ) {
-
-			const applyDisplayColor = ( mat ) => {
-
-				if ( mat.color && mat.color.r === 1 && mat.color.g === 1 && mat.color.b === 1 && ! mat.map ) {
-
-					mat.color.setRGB( displayColor[ 0 ], displayColor[ 1 ], displayColor[ 2 ], LinearSRGBColorSpace );
-
-				}
-
-			};
-
-			if ( Array.isArray( material ) ) {
-
-				material.forEach( applyDisplayColor );
-
-			} else {
-
-				applyDisplayColor( material );
-
-			}
-
-		}
-
-		const displayOpacity = attrs[ 'primvars:displayOpacity' ];
-		if ( displayOpacity && displayOpacity.length === 1 && geomSubsets.length === 0 ) {
-
-			const opacity = displayOpacity[ 0 ];
-
-			const applyDisplayOpacity = ( mat ) => {
-
-				if ( opacity < 1 && mat.opacity === 1 && mat.transparent === false ) {
-
-					mat.opacity = opacity;
-					mat.transparent = true;
-
-				}
-
-			};
-
-			if ( Array.isArray( material ) ) {
-
-				material.forEach( applyDisplayOpacity );
-
-			} else {
-
-				applyDisplayOpacity( material );
-
-			}
-
-		}
+		this._applyDisplayPrimvars( material, attrs, geomSubsets.length === 0 );
 
 		let mesh;
 
@@ -1546,17 +1558,21 @@ class USDComposer {
 
 			case 'DistantLight':
 				light = new DirectionalLight( color, intensity );
+				light.target.position.set( 0, 0, - 1 );
+				light.add( light.target );
 				break;
 
 			case 'SphereLight': {
 
-				const coneAngle = this._parseNumber( attrs[ 'shaping:cone:angle' ], 0 );
+				const coneAngle = this._parseNumber( attrs[ 'inputs:shaping:cone:angle' ], 0 );
 
 				if ( coneAngle > 0 ) {
 
 					const angle = coneAngle * Math.PI / 180;
-					const softness = this._parseNumber( attrs[ 'shaping:cone:softness' ], 0 );
+					const softness = this._parseNumber( attrs[ 'inputs:shaping:cone:softness' ], 0 );
 					light = new SpotLight( color, intensity, 0, angle, softness );
+					light.target.position.set( 0, 0, - 1 );
+					light.add( light.target );
 
 				} else {
 
@@ -1587,6 +1603,8 @@ class USDComposer {
 			}
 
 		}
+
+		light.position.set( 0, 0, 0 );
 
 		return light;
 

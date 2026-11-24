@@ -85,7 +85,8 @@ class MeshPhongMaterial extends Material {
 		this.map = null;
 
 		/**
-		 * The light map. Requires a second set of UVs.
+		 * The light map. Uses `uv` by default, set {@link Texture#channel} to use
+		 * a different set of UVs.
 		 *
 		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
 		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
@@ -106,8 +107,10 @@ class MeshPhongMaterial extends Material {
 		this.lightMapIntensity = 1.0;
 
 		/**
-		 * The red channel of this texture is used as the ambient occlusion map.
-		 * Requires a second set of UVs.
+		 * The red channel of this texture is used as the ambient occlusion map,
+		 * where `0` fully occludes ambient light and `1` does not occlude it.
+		 * Uses `uv` by default, set {@link Texture#channel} to use a different
+		 * set of UVs.
 		 *
 		 * `aoMap` represents non-color data. Any texture assigned must have
 		 * `texture.colorSpace = NoColorSpace` (default).
@@ -119,8 +122,7 @@ class MeshPhongMaterial extends Material {
 
 		/**
 		 * Intensity of the ambient occlusion effect. Range is `[0,1]`, where `0`
-		 * disables ambient occlusion. Where intensity is `1` and the AO map's
-		 * red channel is also `1`, ambient light is fully occluded on a surface.
+		 * disables ambient occlusion and `1` applies the AO map at full strength.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -206,6 +208,7 @@ class MeshPhongMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -251,9 +254,10 @@ class MeshPhongMaterial extends Material {
 		this.displacementBias = 0;
 
 		/**
-		 * The specular map value affects both how much the specular surface
-		 * highlight contributes and how much of the environment map affects the
-		 * surface.
+		 * The red channel of this texture is used as a scalar strength that affects
+		 * both how much the specular surface highlight contributes and how much of
+		 * the environment map reflection blended in via {@link MeshPhongMaterial#combine}
+		 * affects the surface.
 		 *
 		 * `specularMap` represents color data, and the texture must be assigned a
 		 * {@link Texture#colorSpace}. Most `specularMap` textures set
@@ -296,7 +300,9 @@ class MeshPhongMaterial extends Material {
 		this.envMap = null;
 
 		/**
-		 * The rotation of the environment map in radians.
+		 * The rotation of the environment map in radians. Only applies to
+		 * {@link MeshPhongMaterial#envMap}. When the material is lit by
+		 * {@link Scene#environment}, {@link Scene#environmentRotation} is used instead.
 		 *
 		 * @type {Euler}
 		 * @default (0,0,0)
@@ -306,7 +312,7 @@ class MeshPhongMaterial extends Material {
 		/**
 		 * How to combine the result of the surface's color with the environment map, if any.
 		 *
-		 * When set to `MixOperation`, the {@link MeshBasicMaterial#reflectivity} is used to
+		 * When set to `MixOperation`, the {@link MeshPhongMaterial#reflectivity} is used to
 		 * blend between the two colors.
 		 *
 		 * @type {(MultiplyOperation|MixOperation|AddOperation)}
@@ -324,7 +330,10 @@ class MeshPhongMaterial extends Material {
 		this.reflectivity = 1;
 
 		/**
-		 * Scales the effect of the environment map by multiplying its color.
+		 * Scales the diffuse image-based lighting of the environment map. Only has an effect
+		 * with `WebGLRenderer` when {@link MeshPhongMaterial#envMap} is a PMREM texture. It does not
+		 * affect the reflection blended in via {@link MeshPhongMaterial#combine}. When the material is lit
+		 * by {@link Scene#environment}, {@link Scene#environmentIntensity} is used instead.
 		 *
 		 * @type {number}
 		 * @default 1

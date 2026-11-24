@@ -49,7 +49,7 @@ export const saturation = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ), 
 /**
  * Selectively enhance the intensity of less saturated RGB colors. Can result
  * in a more natural and visually appealing image with enhanced color depth
- * compared to {@link ColorAdjustment#saturation}.
+ * compared to {@link saturation}.
  *
  * @tsl
  * @function
@@ -69,7 +69,8 @@ export const vibrance = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 0 ) ] )
 }, { color: 'vec3', adjustment: 'float', return: 'vec3' } );
 
 /**
- * Updates the hue component of the given RGB color while preserving its luminance and saturation.
+ * Rotates the hue of the given RGB color around the gray axis. The perceived luminance
+ * is not preserved.
  *
  * @tsl
  * @function

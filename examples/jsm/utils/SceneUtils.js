@@ -195,11 +195,7 @@ function reduceVertices( object, func, initialValue ) {
 
 					}
 
-					if ( ! child.isSkinnedMesh ) {
-
-						vertex.applyMatrix4( child.matrixWorld );
-
-					}
+					vertex.applyMatrix4( child.matrixWorld );
 
 					value = func( value, vertex );
 
@@ -227,6 +223,7 @@ function sortInstancedMesh( mesh, compareFn ) {
 
 	const instanceMatrixRef = deepCloneAttribute( mesh.instanceMatrix );
 	const instanceColorRef = mesh.instanceColor ? deepCloneAttribute( mesh.instanceColor ) : null;
+	const morphDataRef = mesh.morphTexture ? mesh.morphTexture.image.data.slice() : null;
 
 	const attributeRefs = new Map();
 
@@ -268,6 +265,19 @@ function sortInstancedMesh( mesh, compareFn ) {
 
 		}
 
+		if ( mesh.morphTexture ) {
+
+			const morphData = mesh.morphTexture.image.data;
+			const len = mesh.morphTexture.image.width;
+
+			for ( let j = 0; j < len; j ++ ) {
+
+				morphData[ i * len + j ] = morphDataRef[ refIndex * len + j ];
+
+			}
+
+		}
+
 		for ( const name in mesh.geometry.attributes ) {
 
 			const attribute = mesh.geometry.attributes[ name ];
@@ -282,6 +292,32 @@ function sortInstancedMesh( mesh, compareFn ) {
 				if ( attribute.itemSize > 3 ) attribute.setW( i, attributeRef.getW( refIndex ) );
 
 			}
+
+		}
+
+	}
+
+	mesh.instanceMatrix.needsUpdate = true;
+
+	if ( mesh.instanceColor ) {
+
+		mesh.instanceColor.needsUpdate = true;
+
+	}
+
+	if ( mesh.morphTexture ) {
+
+		mesh.morphTexture.needsUpdate = true;
+
+	}
+
+	for ( const name in mesh.geometry.attributes ) {
+
+		const attribute = mesh.geometry.attributes[ name ];
+
+		if ( attribute.isInstancedBufferAttribute ) {
+
+			attribute.needsUpdate = true;
 
 		}
 

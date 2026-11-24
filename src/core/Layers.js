@@ -1,7 +1,7 @@
 /**
  * A layers object assigns an 3D object to 1 or more of 32
  * layers numbered `0` to `31` - internally the layers are stored as a
- * bit mask], and by default all 3D objects are a member of layer `0`.
+ * bit mask, and by default all 3D objects are a member of layer `0`.
  *
  * This can be used to control visibility - an object must share a layer with
  * a camera to be visible when that camera's view is

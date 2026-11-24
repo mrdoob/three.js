@@ -70,13 +70,14 @@ class ContextNode extends Node {
 	}
 
 	/**
-	 * This method is overwritten to ensure it returns the reference to {@link ContextNode#node}.
+	 * This method is overwritten to ensure it returns whether {@link ContextNode#node} is dead code.
 	 *
-	 * @return {Node} A reference to {@link ContextNode#node}.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether the node is dead code.
 	 */
-	getScope() {
+	isDeadCode( builder ) {
 
-		return this.node.getScope();
+		return this.node.isDeadCode( builder );
 
 	}
 
@@ -284,19 +285,13 @@ export function builtinAOContext( aoNode, node = null ) {
  */
 export function builtinGIContext( aoNode, giNode, node = null ) {
 
-	// the lighting models multiply the whole indirect diffuse term by the AO, which would occlude
-	// the GI a second time. Dividing the GI by the AO cancels that out so only the environment
-	// lighting is modulated.
-
-	const ao = aoNode.max( 1e-3 );
-
 	return context( node, {
 
 		getAO: ( inputNode, { material } ) => {
 
 			if ( material.transparent === true ) return inputNode;
 
-			return inputNode !== null ? inputNode.mul( ao ) : ao;
+			return inputNode !== null ? inputNode.mul( aoNode ) : aoNode;
 
 		},
 
@@ -304,9 +299,7 @@ export function builtinGIContext( aoNode, giNode, node = null ) {
 
 			if ( material.transparent === true ) return inputNode;
 
-			const gi = giNode.div( ao );
-
-			return inputNode !== null ? inputNode.add( gi ) : gi;
+			return inputNode !== null ? inputNode.add( giNode ) : giNode;
 
 		}
 

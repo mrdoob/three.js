@@ -22,10 +22,11 @@ class Info {
 	constructor() {
 
 		/**
-		 * Whether frame related metrics should automatically
-		 * be resetted or not. This property should be set to `false`
-		 * by apps which manage their own animation loop. They must
-		 * then call `renderer.info.reset()` once per frame manually.
+		 * Whether frame related metrics should automatically be reset at the
+		 * start of each animation frame or not. The renderer runs its internal
+		 * animation loop once `render()` or `compute()` has been called, even
+		 * when the app manages its own animation loop. When set to `false`, the
+		 * app must call `renderer.info.reset()` manually.
 		 *
 		 * @type {boolean}
 		 * @default true
@@ -43,7 +44,7 @@ class Info {
 		this.frame = 0;
 
 		/**
-		 * The number of render calls since the
+		 * The number of render and compute calls since the
 		 * app has been started.
 		 *
 		 * @type {number}
@@ -63,7 +64,6 @@ class Info {
 		 * @property {number} triangles - The number of rendered triangle primitives of the current frame.
 		 * @property {number} points - The number of rendered point primitives of the current frame.
 		 * @property {number} lines - The number of rendered line primitives of the current frame.
-		 * @property {number} timestamp - The timestamp of the frame.
 		 */
 		this.render = {
 			calls: 0,
@@ -71,8 +71,7 @@ class Info {
 			drawCalls: 0,
 			triangles: 0,
 			points: 0,
-			lines: 0,
-			timestamp: 0,
+			lines: 0
 		};
 
 		/**
@@ -82,12 +81,10 @@ class Info {
 		 * @readonly
 		 * @property {number} calls - The number of compute calls since the app has been started.
 		 * @property {number} frameCalls - The number of compute calls of the current frame.
-		 * @property {number} timestamp - The timestamp of the frame when using `renderer.computeAsync()`.
 		 */
 		this.compute = {
 			calls: 0,
-			frameCalls: 0,
-			timestamp: 0
+			frameCalls: 0
 		};
 
 		/**
@@ -209,9 +206,6 @@ class Info {
 
 		this.render.calls = 0;
 		this.compute.calls = 0;
-
-		this.render.timestamp = 0;
-		this.compute.timestamp = 0;
 
 		for ( const prop in this.memory ) {
 

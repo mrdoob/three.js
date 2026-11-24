@@ -247,7 +247,7 @@ class SkinnedMesh extends Mesh {
 	}
 
 	/**
-	 * This method sets the skinned mesh in the rest pose).
+	 * This method sets the skinned mesh in the rest pose.
 	 */
 	pose() {
 

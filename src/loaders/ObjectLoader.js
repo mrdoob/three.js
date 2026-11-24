@@ -204,7 +204,7 @@ class ObjectLoader extends Loader {
 	 * but can also be used directly to parse a previously loaded JSON structure.
 	 *
 	 * @param {Object} json - The serialized 3D object.
-	 * @param {onLoad} onLoad - Executed when all resources (e.g. textures) have been fully loaded.
+	 * @param {function(Object3D)} [onLoad] - Executed when all resources (e.g. textures) have been fully loaded.
 	 * @return {Object3D} The parsed 3D object.
 	 */
 	parse( json, onLoad ) {
@@ -286,7 +286,7 @@ class ObjectLoader extends Loader {
 	 *
 	 * @static
 	 * @param {string} type - The geometry type.
-	 * @param {BufferGeometry.constructor} geometryClass - The geometry class.
+	 * @param {BufferGeometry.constructor} geometryClass - The geometry class. It must implement a static `fromJSON( data, shapes )` method.
 	 */
 	static registerGeometry( type, geometryClass ) {
 
@@ -912,6 +912,8 @@ class ObjectLoader extends Loader {
 				if ( data.filmOffset !== undefined ) object.filmOffset = data.filmOffset;
 				if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
 
+				object.updateProjectionMatrix();
+
 				break;
 
 			case 'OrthographicCamera':
@@ -920,6 +922,8 @@ class ObjectLoader extends Loader {
 
 				if ( data.zoom !== undefined ) object.zoom = data.zoom;
 				if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
+
+				object.updateProjectionMatrix();
 
 				break;
 
@@ -1044,8 +1048,9 @@ class ObjectLoader extends Loader {
 				} );
 				object._instanceInfo = data.instanceInfo;
 
-				object._availableInstanceIds = data.availableInstanceIds;
-				object._availableGeometryIds = data.availableGeometryIds;
+				// sorted so the lists are valid min-heaps
+				object._availableInstanceIds = data.availableInstanceIds.slice().sort( ( a, b ) => a - b );
+				object._availableGeometryIds = data.availableGeometryIds.slice().sort( ( a, b ) => a - b );
 
 				object._nextIndexStart = data.nextIndexStart;
 				object._nextVertexStart = data.nextVertexStart;

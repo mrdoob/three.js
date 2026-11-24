@@ -3,7 +3,7 @@
  * Copyright 2010-2026 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '187';
+const REVISION = '188dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -1672,7 +1672,7 @@ const TimestampQuery = {
 };
 
 /**
- * Represents mouse buttons and interaction types in context of controls.
+ * Represents the different interpolation sampling types.
  *
  * @type {ConstantsInterpolationSamplingType}
  * @constant
@@ -1723,8 +1723,8 @@ const RenderObjectRefreshType = {
  * This type represents mouse buttons and interaction types in context of controls.
  *
  * @typedef {Object} ConstantsMouse
- * @property {number} MIDDLE - The left mouse button.
- * @property {number} LEFT - The middle mouse button.
+ * @property {number} LEFT - The left mouse button.
+ * @property {number} MIDDLE - The middle mouse button.
  * @property {number} RIGHT - The right mouse button.
  * @property {number} ROTATE - A rotate interaction.
  * @property {number} DOLLY - A dolly interaction.
@@ -1805,6 +1805,66 @@ function arrayNeedsUint32( array ) {
 }
 
 /**
+ * Adds a value to an array that is used as a binary min-heap.
+ *
+ * @private
+ * @param {Array<number>} heap - The min-heap.
+ * @param {number} value - The value to add.
+ */
+function minHeapPush( heap, value ) {
+
+	let i = heap.length;
+	heap.push( value );
+
+	while ( i > 0 ) {
+
+		const parent = ( i - 1 ) >> 1;
+		if ( heap[ parent ] <= value ) break;
+
+		heap[ i ] = heap[ parent ];
+		i = parent;
+
+	}
+
+	heap[ i ] = value;
+
+}
+
+/**
+ * Removes and returns the smallest value of an array that is used as a binary min-heap.
+ *
+ * @private
+ * @param {Array<number>} heap - The min-heap.
+ * @return {number|undefined} The smallest value, or `undefined` if the heap is empty.
+ */
+function minHeapPop( heap ) {
+
+	const smallest = heap[ 0 ];
+	const last = heap.pop();
+	const length = heap.length;
+
+	if ( length === 0 ) return smallest;
+
+	let i = 0;
+	let child;
+
+	while ( ( child = 2 * i + 1 ) < length ) {
+
+		if ( child + 1 < length && heap[ child + 1 ] < heap[ child ] ) child ++;
+		if ( heap[ child ] >= last ) break;
+
+		heap[ i ] = heap[ child ];
+		i = child;
+
+	}
+
+	heap[ i ] = last;
+
+	return smallest;
+
+}
+
+/**
  * Map of typed array constructor names to their constructors.
  * This mapping enables dynamic creation of typed arrays based on string type names.
  *
@@ -1823,6 +1883,8 @@ const TYPED_ARRAYS = {
 	Float32Array: Float32Array,
 	Float64Array: Float64Array
 };
+
+if ( typeof Float16Array !== 'undefined' ) TYPED_ARRAYS.Float16Array = Float16Array;
 
 /**
  * Creates a typed array of the specified type from the given buffer.
@@ -2372,8 +2434,9 @@ function mapLinear( x, a1, a2, b1, b2 ) {
 }
 
 /**
- * Returns the percentage in the closed interval `[0, 1]` of the given value
- * between the start and end point.
+ * Returns the interpolation factor of the given value between the start and
+ * end point. The result is not clamped, so values outside of the range produce
+ * factors outside of the closed interval `[0, 1]`.
  *
  * @param {number} x - The start point
  * @param {number} y - The end point.
@@ -2514,7 +2577,7 @@ function randFloat( low, high ) {
 }
 
 /**
- * Returns a random integer from `<-range/2, range/2>` interval.
+ * Returns a random float from `<-range/2, range/2>` interval.
  *
  * @param {number} range - Defines the value range.
  * @return {number} A random float.
@@ -2806,8 +2869,9 @@ const MathUtils = {
 	 */
 	mapLinear: mapLinear,
 	/**
-	 * Returns the percentage in the closed interval `[0, 1]` of the given value
-	 * between the start and end point.
+	 * Returns the interpolation factor of the given value between the start and
+	 * end point. The result is not clamped, so values outside of the range produce
+	 * factors outside of the closed interval `[0, 1]`.
 	 *
 	 * @static
 	 * @method
@@ -2902,7 +2966,7 @@ const MathUtils = {
 	 */
 	randFloat: randFloat,
 	/**
-	 * Returns a random integer from `<-range/2, range/2>` interval.
+	 * Returns a random float from `<-range/2, range/2>` interval.
 	 *
 	 * @static
 	 * @method
@@ -3582,7 +3646,7 @@ class Vector2 {
 	}
 
 	/**
-	 * Calculates the cross product of the given vector with this instance.
+	 * Calculates the cross product of this vector and the given one (in that order).
 	 *
 	 * @param {Vector2} v - The vector to compute the cross product with.
 	 * @return {number} The result of the cross product.
@@ -5237,7 +5301,7 @@ class Vector3 {
 	/**
 	 * Applies the given Quaternion to this vector.
 	 *
-	 * @param {Quaternion} q - The Quaternion.
+	 * @param {Quaternion} q - The Quaternion (assumed to be normalized).
 	 * @return {Vector3} A reference to this vector.
 	 */
 	applyQuaternion( q ) {
@@ -5620,10 +5684,11 @@ class Vector3 {
 	}
 
 	/**
-	 * Calculates the cross product of the given vector with this instance.
+	 * Calculates the cross product of this vector and the given one (in that order)
+	 * and stores the result in this instance.
 	 *
 	 * @param {Vector3} v - The vector to compute the cross product with.
-	 * @return {Vector3} The result of the cross product.
+	 * @return {Vector3} A reference to this vector.
 	 */
 	cross( v ) {
 
@@ -6042,7 +6107,7 @@ const _quaternion$5 = /*@__PURE__*/ new Quaternion();
  * order, while internally they are stored in the {@link Matrix3#elements} array in column-major order.
  * This means that calling:
  * ```js
- * const m = new THREE.Matrix();
+ * const m = new THREE.Matrix3();
  * m.set( 11, 12, 13,
  *        21, 22, 23,
  *        31, 32, 33 );
@@ -7249,6 +7314,8 @@ const _tempVec3 = /*@__PURE__*/ new Vector3();
  *
  * Note: After the initial use of a texture, its dimensions, format, and type
  * cannot be changed. Instead, call {@link Texture#dispose} on the texture and instantiate a new one.
+ * Changing sampling or upload parameters like wrap modes, filters, anisotropy or `flipY`
+ * after the initial use requires setting {@link Texture#needsUpdate} to `true`.
  *
  * @augments EventDispatcher
  */
@@ -7350,7 +7417,7 @@ class Texture extends EventDispatcher {
 		this.wrapS = wrapS;
 
 		/**
-		 * This defines how the texture is wrapped horizontally and corresponds to
+		 * This defines how the texture is wrapped vertically and corresponds to
 		 * *V* in UV mapping.
 		 *
 		 * @type {(RepeatWrapping|ClampToEdgeWrapping|MirroredRepeatWrapping)}
@@ -7494,8 +7561,9 @@ class Texture extends EventDispatcher {
 		 * If set to `true`, the alpha channel, if present, is multiplied into the
 		 * color channels when the texture is uploaded to the GPU.
 		 *
-		 * Note that this property has no effect when using `ImageBitmap`. You need to
-		 * configure premultiply alpha on bitmap creation instead.
+		 * Note that with `WebGLRenderer` and the WebGL backend of `WebGPURenderer` this property
+		 * has no effect when using `ImageBitmap`. You need to configure premultiply alpha on bitmap
+		 * creation instead. The WebGPU backend applies this property to `ImageBitmap` as well.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -7506,8 +7574,9 @@ class Texture extends EventDispatcher {
 		 * If set to `true`, the texture is flipped along the vertical axis when
 		 * uploaded to the GPU.
 		 *
-		 * Note that this property has no effect when using `ImageBitmap`. You need to
-		 * configure the flip on bitmap creation instead.
+		 * Note that with `WebGLRenderer` and the WebGL backend of `WebGPURenderer` this property
+		 * has no effect when using `ImageBitmap`. You need to configure the flip on bitmap
+		 * creation instead. The WebGPU backend applies this property to `ImageBitmap` as well.
 		 *
 		 * @type {boolean}
 		 * @default true
@@ -7541,8 +7610,8 @@ class Texture extends EventDispatcher {
 		this.userData = {};
 
 		/**
-		 * This can be used to only update a subregion or specific rows of the texture (for example, just the
-		 * first 3 rows). Use the `addUpdateRange()` function to add ranges to this array.
+		 * This can be used to only update parts of a data texture (for example, just a few rows).
+		 * Use the `addUpdateRange()` function to add ranges to this array.
 		 *
 		 * @type {Array<Object>}
 		 */
@@ -7593,8 +7662,8 @@ class Texture extends EventDispatcher {
 		this.isArrayTexture = image && image.depth && image.depth > 1 ? true : false;
 
 		/**
-		 * Indicates whether this texture should be processed by `PMREMGenerator` or not
-		 * (only relevant for render target textures).
+		 * Counts how many times {@link Texture#needsPMREMUpdate} was set to `true`. Used
+		 * by the renderer to detect when the PMREM of this texture must be regenerated.
 		 *
 		 * @type {number}
 		 * @readonly
@@ -7624,7 +7693,8 @@ class Texture extends EventDispatcher {
 	}
 
 	/**
-	 * The width of the texture in pixels.
+	 * The width of the texture in pixels. Returns `0` for cube textures (whose
+	 * `image` is an array) and when no image is set.
 	 */
 	get width() {
 
@@ -7633,7 +7703,8 @@ class Texture extends EventDispatcher {
 	}
 
 	/**
-	 * The height of the texture in pixels.
+	 * The height of the texture in pixels. Returns `0` for cube textures (whose
+	 * `image` is an array) and when no image is set.
 	 */
 	get height() {
 
@@ -7642,7 +7713,8 @@ class Texture extends EventDispatcher {
 	}
 
 	/**
-	 * The depth of the texture in pixels.
+	 * The depth of the texture in pixels, read from `image.depth`. Returns `0` if the
+	 * image has no depth, e.g. for cube textures and image, canvas or video sources.
 	 */
 	get depth() {
 
@@ -7680,8 +7752,12 @@ class Texture extends EventDispatcher {
 	/**
 	 * Adds a range of data in the data texture to be updated on the GPU.
 	 *
-	 * @param {number} start - Position at which to start update.
-	 * @param {number} count - The number of components to update.
+	 * Update ranges assume four components per texel, so they currently only work with `RGBAFormat`.
+	 * Each range must stay within a single row of the texture. To update several rows, add one
+	 * range per row. Update ranges are only supported in `WebGLRenderer`.
+	 *
+	 * @param {number} start - Index of the first array element to update.
+	 * @param {number} count - The number of array elements to update.
 	 */
 	addUpdateRange( start, count ) {
 
@@ -8015,7 +8091,8 @@ class Texture extends EventDispatcher {
 
 	/**
 	 * Setting this property to `true` indicates the engine the PMREM
-	 * must be regenerated.
+	 * must be regenerated. Note that `WebGLRenderer` only honors this
+	 * property for render target textures.
 	 *
 	 * @type {boolean}
 	 * @default false
@@ -8555,9 +8632,11 @@ class Vector4 {
 
 		// q is assumed to be normalized
 
-		this.w = 2 * Math.acos( q.w );
+		const qw = clamp( q.w, -1, 1 );
 
-		const s = Math.sqrt( 1 - q.w * q.w );
+		this.w = 2 * Math.acos( qw );
+
+		const s = Math.sqrt( 1 - qw * qw );
 
 		if ( s < 0.0001 ) {
 
@@ -9378,7 +9457,7 @@ class RenderTarget extends EventDispatcher {
 		this.samples = options.samples;
 
 		/**
-		 * Whether to this target is used in multiview rendering.
+		 * Whether this target is used in multiview rendering.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -9487,17 +9566,20 @@ class RenderTarget extends EventDispatcher {
 
 			for ( let i = 0, il = this.textures.length; i < il; i ++ ) {
 
-				this.textures[ i ].image.width = width;
-				this.textures[ i ].image.height = height;
-				this.textures[ i ].image.depth = depth;
+				const texture = this.textures[ i ];
+				const image = texture.images ? texture.images[ 0 ] : texture.image;
 
-				if ( this.textures[ i ].isData3DTexture !== true ) { // Fix for #31693
+				image.width = width;
+				image.height = height;
+				image.depth = depth;
+
+				if ( texture.isData3DTexture !== true ) { // Fix for #31693
 
 					// TODO: Reconsider setting isArrayTexture flag here and in the ctor of Texture.
 					// Maybe a method `isArrayTexture()` or just a getter could replace a flag since
 					// both are evaluated on each call?
 
-					this.textures[ i ].isArrayTexture = this.textures[ i ].image.depth > 1;
+					texture.isArrayTexture = image.depth > 1;
 
 				}
 
@@ -9622,7 +9704,7 @@ class RenderTarget extends EventDispatcher {
 class WebGLRenderTarget extends RenderTarget {
 
 	/**
-	 * Constructs a new 3D render target.
+	 * Constructs a new render target.
 	 *
 	 * @param {number} [width=1] - The width of the render target.
 	 * @param {number} [height=1] - The height of the render target.
@@ -9735,7 +9817,7 @@ class DataArrayTexture extends Texture {
 		 *
 		 * Overwritten and set to `1` by default.
 		 *
-		 * @type {boolean}
+		 * @type {number}
 		 * @default 1
 		 */
 		this.unpackAlignment = 1;
@@ -9803,7 +9885,7 @@ class WebGLArrayRenderTarget extends WebGLRenderTarget {
 	 *
 	 * @param {number} [width=1] - The width of the render target.
 	 * @param {number} [height=1] - The height of the render target.
-	 * @param {number} [depth=1] - The height of the render target.
+	 * @param {number} [depth=1] - The depth of the render target.
 	 * @param {RenderTarget~Options} [options] - The configuration object.
 	 */
 	constructor( width = 1, height = 1, depth = 1, options = {} ) {
@@ -9844,7 +9926,7 @@ class WebGLArrayRenderTarget extends WebGLRenderTarget {
 class Data3DTexture extends Texture {
 
 	/**
-	 * Constructs a new data array texture.
+	 * Constructs a new 3D data texture.
 	 *
 	 * @param {?TypedArray} [data=null] - The buffer data.
 	 * @param {number} [width=1] - The width of the texture.
@@ -9934,7 +10016,7 @@ class Data3DTexture extends Texture {
 		 *
 		 * Overwritten and set to `1` by default.
 		 *
-		 * @type {boolean}
+		 * @type {number}
 		 * @default 1
 		 */
 		this.unpackAlignment = 1;
@@ -9971,7 +10053,7 @@ class WebGL3DRenderTarget extends WebGLRenderTarget {
 	 *
 	 * @param {number} [width=1] - The width of the render target.
 	 * @param {number} [height=1] - The height of the render target.
-	 * @param {number} [depth=1] - The height of the render target.
+	 * @param {number} [depth=1] - The depth of the render target.
 	 * @param {RenderTarget~Options} [options] - The configuration object.
 	 */
 	constructor( width = 1, height = 1, depth = 1, options = {} ) {
@@ -10016,9 +10098,9 @@ class WebGL3DRenderTarget extends WebGLRenderTarget {
  *
  * A Note on Row-Major and Column-Major Ordering:
  *
- * The constructor and {@link Matrix3#set} method take arguments in
+ * The constructor and {@link Matrix4#set} method take arguments in
  * [row-major](https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order)
- * order, while internally they are stored in the {@link Matrix3#elements} array in column-major order.
+ * order, while internally they are stored in the {@link Matrix4#elements} array in column-major order.
  * This means that calling:
  * ```js
  * const m = new THREE.Matrix4();
@@ -10208,7 +10290,8 @@ class Matrix4 {
 	}
 
 	/**
-	 * Set the upper 3x3 elements of this matrix to the values of given 3x3 matrix.
+	 * Sets the upper-left 3x3 elements of this matrix to the values of the given 3x3 matrix
+	 * and the remaining elements to the identity (the translation is reset).
 	 *
 	 * @param {Matrix3} m - The 3x3 matrix.
 	 * @return {Matrix4} A reference to this matrix.
@@ -10475,7 +10558,8 @@ class Matrix4 {
 
 	/**
 	 * Sets the rotation component of the transformation matrix, looking from `eye` towards
-	 * `target`, and oriented by the up-direction.
+	 * `target`, and oriented by the up-direction. Following the camera convention, the
+	 * negative z-axis of the result points towards `target`. The translation is not modified.
 	 *
 	 * @param {Vector3} eye - The eye vector.
 	 * @param {Vector3} target - The target vector.
@@ -11438,6 +11522,11 @@ class Euler {
 	/**
 	 * A string representing the order that the rotations are applied.
 	 *
+	 * three.js uses intrinsic rotations, meaning each rotation is performed around
+	 * the local axes of the already rotated object. For `'XYZ'`, the object is rotated
+	 * around its local X axis first, then its local Y axis and finally its local Z axis,
+	 * which equals the rotation matrix `Rx * Ry * Rz`.
+	 *
 	 * @type {string}
 	 * @default 'XYZ'
 	 */
@@ -11777,7 +11866,7 @@ Euler.DEFAULT_ORDER = 'XYZ';
 /**
  * A layers object assigns an 3D object to 1 or more of 32
  * layers numbered `0` to `31` - internally the layers are stored as a
- * bit mask], and by default all 3D objects are a member of layer `0`.
+ * bit mask, and by default all 3D objects are a member of layer `0`.
  *
  * This can be used to control visibility - an object must share a layer with
  * a camera to be visible when that camera's view is
@@ -11911,6 +12000,8 @@ const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 /**
  * Fires when the object has been added to its parent object.
  *
+ * Adding 3D objects inside a listener of this event is not supported.
+ *
  * @event Object3D#added
  * @type {Object}
  */
@@ -11918,6 +12009,8 @@ const _addedEvent = { type: 'added' };
 
 /**
  * Fires when the object has been removed from its parent object.
+ *
+ * Removing 3D objects inside a listener of this event is not supported.
  *
  * @event Object3D#removed
  * @type {Object}
@@ -11927,6 +12020,8 @@ const _removedEvent = { type: 'removed' };
 /**
  * Fires when a new child object has been added.
  *
+ * Adding 3D objects inside a listener of this event is not supported.
+ *
  * @event Object3D#childadded
  * @type {Object}
  */
@@ -11934,6 +12029,8 @@ const _childaddedEvent = { type: 'childadded', child: null };
 
 /**
  * Fires when a child object has been removed.
+ *
+ * Removing 3D objects inside a listener of this event is not supported.
  *
  * @event Object3D#childremoved
  * @type {Object}
@@ -12202,7 +12299,7 @@ class Object3D extends EventDispatcher {
 		/**
 		 * This value allows the default rendering order of scene graph objects to be
 		 * overridden although opaque and transparent objects remain sorted independently.
-		 * When this property is set for an instance of {@link Group},all descendants
+		 * When this property is set for an instance of {@link Group}, all descendants
 		 * objects will be sorted and rendered together. Sorting is from lowest to highest
 		 * render order.
 		 *
@@ -12220,7 +12317,7 @@ class Object3D extends EventDispatcher {
 
 		/**
 		 * Custom depth material to be used when rendering to the depth map. Can only be used
-		 * in context of meshes. When shadow-casting with a {@link DirectionalLight} or {@link SpotLight},
+		 * in context of meshes, lines and points. When shadow-casting with a {@link DirectionalLight} or {@link SpotLight},
 		 * if you are modifying vertex positions in the vertex shader you must specify a custom depth
 		 * material for proper shadows.
 		 *
@@ -12302,6 +12399,8 @@ class Object3D extends EventDispatcher {
 
 	/**
 	 * A callback that is executed immediately before a 3D object is rendered.
+	 * Only invoked for renderable 3D objects like meshes, lines, points or sprites, and for
+	 * the scene passed to `render()` (with different arguments).
 	 *
 	 * @param {Renderer|WebGLRenderer} renderer - The renderer.
 	 * @param {Object3D} scene - The scene.
@@ -12314,6 +12413,8 @@ class Object3D extends EventDispatcher {
 
 	/**
 	 * A callback that is executed immediately after a 3D object is rendered.
+	 * Only invoked for renderable 3D objects like meshes, lines, points or sprites, and for
+	 * the scene passed to `render()` (with different arguments).
 	 *
 	 * @param {Renderer|WebGLRenderer} renderer - The renderer.
 	 * @param {Object3D} scene - The scene.
@@ -12434,7 +12535,9 @@ class Object3D extends EventDispatcher {
 	}
 
 	/**
-	 * Rotates the 3D object along an axis in world space.
+	 * Rotates the 3D object along an axis in world space. The method assumes the
+	 * 3D object has no rotated parent; otherwise the axis is interpreted in the
+	 * parent's space.
 	 *
 	 * @param {Vector3} axis - The (normalized) axis vector.
 	 * @param {number} angle - The angle in radians.
@@ -12548,6 +12651,7 @@ class Object3D extends EventDispatcher {
 
 	/**
 	 * Converts the given vector from this 3D object's local space to world space.
+	 * The vector is interpreted as a position, so the translation is applied as well.
 	 *
 	 * @param {Vector3} vector - The vector to convert.
 	 * @return {Vector3} The converted vector.
@@ -12561,7 +12665,8 @@ class Object3D extends EventDispatcher {
 	}
 
 	/**
-	 * Converts the given vector from this 3D object's world space to local space.
+	 * Converts the given vector from world space to this 3D object's local space.
+	 * The vector is interpreted as a position, so the translation is applied as well.
 	 *
 	 * @param {Vector3} vector - The vector to convert.
 	 * @return {Vector3} The converted vector.
@@ -12860,7 +12965,7 @@ class Object3D extends EventDispatcher {
 	 *
 	 * @param {string} name - The name of the property.
 	 * @param {any} value - The value.
-	 * @param {Array<Object3D>} result - The method stores the result in this array.
+	 * @param {Array<Object3D>} [result=[]] - The method stores the result in this array.
 	 * @return {Array<Object3D>} The found 3D objects.
 	 */
 	getObjectsByProperty( name, value, result = [] ) {
@@ -12894,7 +12999,7 @@ class Object3D extends EventDispatcher {
 	}
 
 	/**
-	 * Returns a Quaternion representing the position of the 3D object in world space.
+	 * Returns a Quaternion representing the rotation of the 3D object in world space.
 	 *
 	 * @param {Quaternion} target - The target Quaternion the result is stored to.
 	 * @return {Quaternion} The 3D object's rotation in world space.
@@ -13116,6 +13221,7 @@ class Object3D extends EventDispatcher {
 	 * @param {boolean} [updateChildren=false] Whether descendant nodes should be updated or not.
 	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
 	 * when {@link Object3D#matrixWorldNeedsUpdate} is `false`.
+	 * @return {boolean} Whether the world matrix has changed or not.
 	 */
 	updateWorldMatrix( updateParents, updateChildren, force = false ) {
 
@@ -13123,7 +13229,7 @@ class Object3D extends EventDispatcher {
 
 		if ( updateParents === true && parent !== null ) {
 
-			parent.updateWorldMatrix( true, false );
+			if ( parent.updateWorldMatrix( true, false ) === true ) force = true;
 
 		}
 
@@ -13166,6 +13272,8 @@ class Object3D extends EventDispatcher {
 			}
 
 		}
+
+		return force;
 
 	}
 
@@ -14308,7 +14416,7 @@ class Color {
 	}
 
 	/**
-	 * Sets this color from RGB values.
+	 * Sets this color from HSL values.
 	 *
 	 * @param {number} h - Hue value between `0.0` and `1.0`.
 	 * @param {number} s - Saturation value between `0.0` and `1.0`.
@@ -14791,6 +14899,7 @@ class Color {
 
 	/**
 	 * Subtracts the RGB values of the given color from the RGB values of this color.
+	 * The resulting components are clamped to a minimum of `0`.
 	 *
 	 * @param {Color} color - The color to subtract.
 	 * @return {Color} A reference to this color.
@@ -14891,6 +15000,11 @@ class Color {
 
 		this.getHSL( _hslA );
 		color.getHSL( _hslB );
+
+		// grays have no hue, so use the hue of the other color
+
+		if ( _hslA.s === 0 ) _hslA.h = _hslB.h;
+		if ( _hslB.s === 0 ) _hslB.h = _hslA.h;
 
 		const h = lerp( _hslA.h, _hslB.h, alpha );
 		const s = lerp( _hslA.s, _hslB.s, alpha );
@@ -15119,8 +15233,9 @@ class FogExp2 {
 }
 
 /**
- * This class can be used to define a linear fog that grows linearly denser
- * with the distance.
+ * This class can be used to define a range fog that smoothly grows denser
+ * from no fog at `near` to full fog at `far`. The distance is measured as
+ * depth along the camera's view direction.
  *
  * ```js
  * const scene = new THREE.Scene();
@@ -15134,7 +15249,7 @@ class Fog {
 	 *
 	 * @param {number|Color} color - The fog's color.
 	 * @param {number} [near=1] - The minimum distance to start applying fog.
-	 * @param {number} [far=1000] - The maximum distance at which fog stops being calculated and applied.
+	 * @param {number} [far=1000] - The distance at which fog reaches full density.
 	 */
 	constructor( color, near = 1, far = 1000 ) {
 
@@ -15171,9 +15286,9 @@ class Fog {
 		this.near = near;
 
 		/**
-		 * The maximum distance at which fog stops being calculated and applied.
-		 * Objects that are more than `far` units away from the active camera won't
-		 * be affected by fog.
+		 * The distance at which fog reaches full density. Objects that are more
+		 * than `far` units away from the active camera are rendered entirely in
+		 * the fog color.
 		 *
 		 * @type {number}
 		 * @default 1000
@@ -15244,7 +15359,8 @@ class Scene extends Object3D {
 		 *
 		 * - A color for defining a uniform colored background.
 		 * - A texture for defining a (flat) textured background.
-		 * - Cube textures or equirectangular textures for defining a skybox.
+		 * - Cube textures, or equirectangular textures with `mapping` set to
+		 * `EquirectangularReflectionMapping`, for defining a skybox.
 		 *
 		 * @type {?(Color|Texture)}
 		 * @default null
@@ -15252,9 +15368,10 @@ class Scene extends Object3D {
 		this.background = null;
 
 		/**
-		 * Sets the environment map for all physical materials in the scene. However,
-		 * it's not possible to overwrite an existing texture assigned to the `envMap`
-		 * material property.
+		 * Sets the environment map used for image-based lighting of {@link MeshStandardMaterial}
+		 * and {@link MeshPhysicalMaterial} (with `WebGLRenderer` also {@link MeshLambertMaterial}
+		 * and {@link MeshPhongMaterial}). However, it's not possible to overwrite an existing
+		 * texture assigned to the `envMap` material property.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -15299,7 +15416,9 @@ class Scene extends Object3D {
 
 		/**
 		 * Attenuates the color of the environment. Only influences environment maps
-		 * assigned to {@link Scene#environment}.
+		 * assigned to {@link Scene#environment}. Materials lit by the scene environment
+		 * use this value instead of their own `envMapIntensity`, which only applies to
+		 * a material's own `envMap`.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -15307,8 +15426,9 @@ class Scene extends Object3D {
 		this.environmentIntensity = 1;
 
 		/**
-		 * The rotation of the environment map in radians. Only influences physical materials
-		 * in the scene when {@link Scene#environment} is used.
+		 * The rotation of the environment map in radians. Only influences materials
+		 * lit by {@link Scene#environment}, which use this value instead of their own
+		 * `envMapRotation`.
 		 *
 		 * @type {Euler}
 		 * @default (0,0,0)
@@ -15527,11 +15647,11 @@ class Triangle {
 	 * @param {Vector3} p1 - The first corner of the triangle.
 	 * @param {Vector3} p2 - The second corner of the triangle.
 	 * @param {Vector3} p3 - The third corner of the triangle.
-	 * @param {Vector3} v1 - Value to interpolate of first vertex.
-	 * @param {Vector3} v2 - Value to interpolate of second vertex.
-	 * @param {Vector3} v3 - Value to interpolate of third vertex.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {?Vector3} The interpolated value.
+	 * @param {(Vector2|Vector3|Vector4)} v1 - Value to interpolate of first vertex.
+	 * @param {(Vector2|Vector3|Vector4)} v2 - Value to interpolate of second vertex.
+	 * @param {(Vector2|Vector3|Vector4)} v3 - Value to interpolate of third vertex.
+	 * @param {(Vector2|Vector3|Vector4)} target - The target vector that is used to store the method's result.
+	 * @return {?(Vector2|Vector3|Vector4)} The interpolated value.
 	 */
 	static getInterpolation( point, p1, p2, p3, v1, v2, v3, target ) {
 
@@ -15562,8 +15682,8 @@ class Triangle {
 	 * @param {number} i2 - Index of second vertex.
 	 * @param {number} i3 - Index of third vertex.
 	 * @param {Vector3} barycoord - The barycoordinate value to use to interpolate.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3} The interpolated attribute value.
+	 * @param {(Vector2|Vector3|Vector4)} target - The target vector that is used to store the method's result.
+	 * @return {(Vector2|Vector3|Vector4)} The interpolated attribute value.
 	 */
 	static getInterpolatedAttribute( attr, i1, i2, i3, barycoord, target ) {
 
@@ -15585,13 +15705,14 @@ class Triangle {
 	}
 
 	/**
-	 * Returns `true` if the triangle is oriented towards the given direction.
+	 * Returns `true` if the triangle is front facing when viewed along the given
+	 * direction, that is, its normal points against `direction`.
 	 *
 	 * @param {Vector3} a - The first corner of the triangle.
 	 * @param {Vector3} b - The second corner of the triangle.
 	 * @param {Vector3} c - The third corner of the triangle.
 	 * @param {Vector3} direction - The (normalized) direction vector.
-	 * @return {boolean} Whether the triangle is oriented towards the given direction or not.
+	 * @return {boolean} Whether the triangle is front facing when viewed along the given direction or not.
 	 */
 	static isFrontFacing( a, b, c, direction ) {
 
@@ -15755,11 +15876,11 @@ class Triangle {
 	 * triangle. Returns `null` if the triangle is degenerate.
 	 *
 	 * @param {Vector3} point - Position of interpolated point.
-	 * @param {Vector3} v1 - Value to interpolate of first vertex.
-	 * @param {Vector3} v2 - Value to interpolate of second vertex.
-	 * @param {Vector3} v3 - Value to interpolate of third vertex.
-	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {?Vector3} The interpolated value.
+	 * @param {(Vector2|Vector3|Vector4)} v1 - Value to interpolate of first vertex.
+	 * @param {(Vector2|Vector3|Vector4)} v2 - Value to interpolate of second vertex.
+	 * @param {(Vector2|Vector3|Vector4)} v3 - Value to interpolate of third vertex.
+	 * @param {(Vector2|Vector3|Vector4)} target - The target vector that is used to store the method's result.
+	 * @return {?(Vector2|Vector3|Vector4)} The interpolated value.
 	 */
 	getInterpolation( point, v1, v2, v3, target ) {
 
@@ -15782,10 +15903,11 @@ class Triangle {
 	}
 
 	/**
-	 * Returns `true` if the triangle is oriented towards the given direction.
+	 * Returns `true` if the triangle is front facing when viewed along the given
+	 * direction, that is, its normal points against `direction`.
 	 *
 	 * @param {Vector3} direction - The (normalized) direction vector.
-	 * @return {boolean} Whether the triangle is oriented towards the given direction or not.
+	 * @return {boolean} Whether the triangle is front facing when viewed along the given direction or not.
 	 */
 	isFrontFacing( direction ) {
 
@@ -16204,7 +16326,7 @@ class Box3 {
 	 * necessary (unless the precise parameter is set to true).
 	 *
 	 * @param {Object3D} object - The 3D object that should expand the bounding box.
-	 * @param {boolean} precise - If set to `true`, the method expands the bounding box
+	 * @param {boolean} [precise=false] - If set to `true`, the method expands the bounding box
 	 * as little as necessary at the expense of more computation.
 	 * @return {Box3} A reference to this bounding box.
 	 */
@@ -16642,7 +16764,7 @@ class Box3 {
 	}
 
 	/**
-	 * Returns a serialized structure of the bounding box.
+	 * Sets this bounding box from the given serialized structure.
 	 *
 	 * @param {Object} json - The serialized json to set the box from.
 	 * @return {Box3} A reference to this bounding box.
@@ -16712,215 +16834,6 @@ function satForAxes( axes, v0, v1, v2, extents ) {
 	}
 
 	return true;
-
-}
-
-// Fast Half Float Conversions, http://www.fox-toolkit.org/ftp/fasthalffloatconversion.pdf
-
-const _tables = /*@__PURE__*/ _generateTables();
-
-function _generateTables() {
-
-	// float32 to float16 helpers
-
-	const buffer = new ArrayBuffer( 4 );
-	const floatView = new Float32Array( buffer );
-	const uint32View = new Uint32Array( buffer );
-
-	const baseTable = new Uint32Array( 512 );
-	const shiftTable = new Uint32Array( 512 );
-
-	for ( let i = 0; i < 256; ++ i ) {
-
-		const e = i - 127;
-
-		// very small number (0, -0)
-
-		if ( e < -27 ) {
-
-			baseTable[ i ] = 0x0000;
-			baseTable[ i | 0x100 ] = 0x8000;
-			shiftTable[ i ] = 24;
-			shiftTable[ i | 0x100 ] = 24;
-
-			// small number (denorm)
-
-		} else if ( e < -14 ) {
-
-			baseTable[ i ] = 0x0400 >> ( - e - 14 );
-			baseTable[ i | 0x100 ] = ( 0x0400 >> ( - e - 14 ) ) | 0x8000;
-			shiftTable[ i ] = - e - 1;
-			shiftTable[ i | 0x100 ] = - e - 1;
-
-			// normal number
-
-		} else if ( e <= 15 ) {
-
-			baseTable[ i ] = ( e + 15 ) << 10;
-			baseTable[ i | 0x100 ] = ( ( e + 15 ) << 10 ) | 0x8000;
-			shiftTable[ i ] = 13;
-			shiftTable[ i | 0x100 ] = 13;
-
-			// large number (Infinity, -Infinity)
-
-		} else if ( e < 128 ) {
-
-			baseTable[ i ] = 0x7c00;
-			baseTable[ i | 0x100 ] = 0xfc00;
-			shiftTable[ i ] = 24;
-			shiftTable[ i | 0x100 ] = 24;
-
-			// stay (NaN, Infinity, -Infinity)
-
-		} else {
-
-			baseTable[ i ] = 0x7c00;
-			baseTable[ i | 0x100 ] = 0xfc00;
-			shiftTable[ i ] = 13;
-			shiftTable[ i | 0x100 ] = 13;
-
-		}
-
-	}
-
-	// float16 to float32 helpers
-
-	const mantissaTable = new Uint32Array( 2048 );
-	const exponentTable = new Uint32Array( 64 );
-	const offsetTable = new Uint32Array( 64 );
-
-	for ( let i = 1; i < 1024; ++ i ) {
-
-		let m = i << 13; // zero pad mantissa bits
-		let e = 0; // zero exponent
-
-		// normalized
-		while ( ( m & 0x00800000 ) === 0 ) {
-
-			m <<= 1;
-			e -= 0x00800000; // decrement exponent
-
-		}
-
-		m &= -8388609; // clear leading 1 bit
-		e += 0x38800000; // adjust bias
-
-		mantissaTable[ i ] = m | e;
-
-	}
-
-	for ( let i = 1024; i < 2048; ++ i ) {
-
-		mantissaTable[ i ] = 0x38000000 + ( ( i - 1024 ) << 13 );
-
-	}
-
-	for ( let i = 1; i < 31; ++ i ) {
-
-		exponentTable[ i ] = i << 23;
-
-	}
-
-	exponentTable[ 31 ] = 0x47800000;
-	exponentTable[ 32 ] = 0x80000000;
-
-	for ( let i = 33; i < 63; ++ i ) {
-
-		exponentTable[ i ] = 0x80000000 + ( ( i - 32 ) << 23 );
-
-	}
-
-	exponentTable[ 63 ] = 0xc7800000;
-
-	for ( let i = 1; i < 64; ++ i ) {
-
-		if ( i !== 32 ) {
-
-			offsetTable[ i ] = 1024;
-
-		}
-
-	}
-
-	return {
-		floatView: floatView,
-		uint32View: uint32View,
-		baseTable: baseTable,
-		shiftTable: shiftTable,
-		mantissaTable: mantissaTable,
-		exponentTable: exponentTable,
-		offsetTable: offsetTable
-	};
-
-}
-
-/**
- * Returns a half precision floating point value (FP16) from the given single
- * precision floating point value (FP32).
- *
- * @param {number} val - A single precision floating point value.
- * @return {number} The FP16 value.
- */
-function toHalfFloat( val ) {
-
-	if ( Math.abs( val ) > 65504 ) warn( 'DataUtils.toHalfFloat(): Value out of range.' );
-
-	val = clamp( val, -65504, 65504 );
-
-	_tables.floatView[ 0 ] = val;
-	const f = _tables.uint32View[ 0 ];
-	const e = ( f >> 23 ) & 0x1ff;
-	return _tables.baseTable[ e ] + ( ( f & 0x007fffff ) >> _tables.shiftTable[ e ] );
-
-}
-
-/**
- * Returns a single precision floating point value (FP32) from the given half
- * precision floating point value (FP16).
- *
- * @param {number} val - A half precision floating point value.
- * @return {number} The FP32 value.
- */
-function fromHalfFloat( val ) {
-
-	const m = val >> 10;
-	_tables.uint32View[ 0 ] = _tables.mantissaTable[ _tables.offsetTable[ m ] + ( val & 0x3ff ) ] + _tables.exponentTable[ m ];
-	return _tables.floatView[ 0 ];
-
-}
-
-/**
- * A class containing utility functions for data.
- *
- * @hideconstructor
- */
-class DataUtils {
-
-	/**
-	 * Returns a half precision floating point value (FP16) from the given single
-	 * precision floating point value (FP32).
-	 *
-	 * @param {number} val - A single precision floating point value.
-	 * @return {number} The FP16 value.
-	 */
-	static toHalfFloat( val ) {
-
-		return toHalfFloat( val );
-
-	}
-
-	/**
-	 * Returns a single precision floating point value (FP32) from the given half
-	 * precision floating point value (FP16).
-	 *
-	 * @param {number} val - A half precision floating point value.
-	 * @return {number} The FP32 value.
-	 */
-	static fromHalfFloat( val ) {
-
-		return fromHalfFloat( val );
-
-	}
 
 }
 
@@ -17075,7 +16988,7 @@ class BufferAttribute extends EventDispatcher {
 	 * Flag to indicate that this attribute has changed and should be re-sent to
 	 * the GPU. Set this to `true` when you modify the value of the array.
 	 *
-	 * @type {number}
+	 * @type {boolean}
 	 * @default false
 	 * @param {boolean} value
 	 */
@@ -17100,9 +17013,10 @@ class BufferAttribute extends EventDispatcher {
 	}
 
 	/**
-	 * Adds a range of data in the data array to be updated on the GPU.
+	 * Adds a range of data in the data array to be updated on the GPU. The ranges are
+	 * applied with the next upload triggered via `needsUpdate` and cleared afterwards.
 	 *
-	 * @param {number} start - Position at which to start update.
+	 * @param {number} start - The index into the array (in elements, not items) at which to start the update.
 	 * @param {number} count - The number of components to update.
 	 */
 	addUpdateRange( start, count ) {
@@ -17809,8 +17723,8 @@ class Uint32BufferAttribute extends BufferAttribute {
  * Convenient class that can be used when creating a `Float16` buffer attribute with
  * a plain `Array` instance.
  *
- * This class automatically converts to and from FP16 via `Uint16Array` since `Float16Array`
- * browser support is still problematic.
+ * The attribute data are stored in a `Float16Array`. If `Float16Array` is not supported,
+ * the class falls back to `Float32Array`.
  *
  * @augments BufferAttribute
  */
@@ -17819,155 +17733,25 @@ class Float16BufferAttribute extends BufferAttribute {
 	/**
 	 * Constructs a new buffer attribute.
 	 *
-	 * @param {(Array<number>|Uint16Array)} array - The array holding the attribute data.
+	 * @param {(Array<number>|Float16Array)} array - The array holding the attribute data.
 	 * @param {number} itemSize - The item size.
 	 * @param {boolean} [normalized=false] - Whether the data are normalized or not.
 	 */
 	constructor( array, itemSize, normalized ) {
 
-		super( new Uint16Array( array ), itemSize, normalized );
+		if ( typeof Float16Array !== 'undefined' ) {
+
+			super( new Float16Array( array ), itemSize, normalized );
+
+		} else {
+
+			warnOnce( 'Float16BufferAttribute: Float16Array is not supported. Falling back to Float32Array.' );
+
+			super( new Float32Array( array ), itemSize, normalized );
+
+		}
 
 		this.isFloat16BufferAttribute = true;
-
-	}
-
-	getX( index ) {
-
-		let x = fromHalfFloat( this.array[ index * this.itemSize ] );
-
-		if ( this.normalized ) x = denormalize( x, this.array );
-
-		return x;
-
-	}
-
-	setX( index, x ) {
-
-		if ( this.normalized ) x = normalize( x, this.array );
-
-		this.array[ index * this.itemSize ] = toHalfFloat( x );
-
-		return this;
-
-	}
-
-	getY( index ) {
-
-		let y = fromHalfFloat( this.array[ index * this.itemSize + 1 ] );
-
-		if ( this.normalized ) y = denormalize( y, this.array );
-
-		return y;
-
-	}
-
-	setY( index, y ) {
-
-		if ( this.normalized ) y = normalize( y, this.array );
-
-		this.array[ index * this.itemSize + 1 ] = toHalfFloat( y );
-
-		return this;
-
-	}
-
-	getZ( index ) {
-
-		let z = fromHalfFloat( this.array[ index * this.itemSize + 2 ] );
-
-		if ( this.normalized ) z = denormalize( z, this.array );
-
-		return z;
-
-	}
-
-	setZ( index, z ) {
-
-		if ( this.normalized ) z = normalize( z, this.array );
-
-		this.array[ index * this.itemSize + 2 ] = toHalfFloat( z );
-
-		return this;
-
-	}
-
-	getW( index ) {
-
-		let w = fromHalfFloat( this.array[ index * this.itemSize + 3 ] );
-
-		if ( this.normalized ) w = denormalize( w, this.array );
-
-		return w;
-
-	}
-
-	setW( index, w ) {
-
-		if ( this.normalized ) w = normalize( w, this.array );
-
-		this.array[ index * this.itemSize + 3 ] = toHalfFloat( w );
-
-		return this;
-
-	}
-
-	setXY( index, x, y ) {
-
-		index *= this.itemSize;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-
-		}
-
-		this.array[ index + 0 ] = toHalfFloat( x );
-		this.array[ index + 1 ] = toHalfFloat( y );
-
-		return this;
-
-	}
-
-	setXYZ( index, x, y, z ) {
-
-		index *= this.itemSize;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-			z = normalize( z, this.array );
-
-		}
-
-		this.array[ index + 0 ] = toHalfFloat( x );
-		this.array[ index + 1 ] = toHalfFloat( y );
-		this.array[ index + 2 ] = toHalfFloat( z );
-
-		return this;
-
-	}
-
-	setXYZW( index, x, y, z, w ) {
-
-		index *= this.itemSize;
-
-		if ( this.normalized ) {
-
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-			z = normalize( z, this.array );
-			w = normalize( w, this.array );
-
-		}
-
-		this.array[ index + 0 ] = toHalfFloat( x );
-		this.array[ index + 1 ] = toHalfFloat( y );
-		this.array[ index + 2 ] = toHalfFloat( z );
-		this.array[ index + 3 ] = toHalfFloat( w );
-
-		return this;
 
 	}
 
@@ -18056,10 +17840,12 @@ class Sphere {
 	}
 
 	/**
-	 * Computes the minimum bounding sphere for list of points.
+	 * Computes a bounding sphere for the given list of points.
 	 * If the optional center point is given, it is used as the sphere's
 	 * center. Otherwise, the center of the axis-aligned bounding box
-	 * encompassing the points is calculated.
+	 * encompassing the points is calculated. The radius is the distance
+	 * to the farthest point, so the result is not necessarily the minimal
+	 * bounding sphere.
 	 *
 	 * @param {Array<Vector3>} points - A list of points in 3D space.
 	 * @param {Vector3} [optionalCenter] - The center of the sphere.
@@ -18206,7 +17992,7 @@ class Sphere {
 	 * will clamp it to the closest point on the edge of the sphere. Points
 	 * already inside the sphere will not be affected.
 	 *
-	 * @param {Vector3} point - The plane to clamp.
+	 * @param {Vector3} point - The point to clamp.
 	 * @param {Vector3} target - The target vector that is used to store the method's result.
 	 * @return {Vector3} The clamped point.
 	 */
@@ -18397,7 +18183,7 @@ class Sphere {
 	}
 
 	/**
-	 * Returns a serialized structure of the bounding sphere.
+	 * Sets this bounding sphere from the given serialized structure.
 	 *
 	 * @param {Object} json - The serialized json to set the sphere from.
 	 * @return {Sphere} A reference to this bounding sphere.
@@ -18420,6 +18206,8 @@ const _offset = /*@__PURE__*/ new Vector3();
 const _box$2 = /*@__PURE__*/ new Box3();
 const _boxMorphTargets = /*@__PURE__*/ new Box3();
 const _vector$9 = /*@__PURE__*/ new Vector3();
+const _min = /*@__PURE__*/ new Vector3();
+const _max = /*@__PURE__*/ new Vector3();
 
 /**
  * A representation of mesh, line, or point geometry. Includes vertex
@@ -18558,8 +18346,9 @@ class BufferGeometry extends EventDispatcher {
 		 *
 		 * Use `addGroup()` and `clearGroups()` to edit groups, rather than modifying this array directly.
 		 *
-		 * Every vertex and index must belong to exactly one group — groups must not share vertices or
-		 * indices, and must not leave vertices or indices unused.
+		 * Groups are only used when the 3D object has an array of materials. Groups should not overlap,
+		 * since overlapping ranges are rendered (and raycast) more than once. Vertices or indices that are
+		 * not part of any group are not rendered.
 		 *
 		 * @type {Array<Object>}
 		 */
@@ -18677,7 +18466,7 @@ class BufferGeometry extends EventDispatcher {
 	 *
 	 * @param {string} name - The attribute name.
 	 * @return {BufferAttribute|InterleavedBufferAttribute|undefined} The buffer attribute.
-	 * Returns `undefined` if not attribute has been found.
+	 * Returns `undefined` if no attribute has been found.
 	 */
 	getAttribute( name ) {
 
@@ -18730,7 +18519,7 @@ class BufferGeometry extends EventDispatcher {
 	 * Adds a group to this geometry.
 	 *
 	 * @param {number} start - The first element in this draw call. That is the first
-	 * vertex for non-indexed geometry, otherwise the first triangle index.
+	 * vertex for non-indexed geometry, otherwise the offset (in indices) into the index buffer.
 	 * @param {number} count - Specifies how many vertices (or indices) are part of this group.
 	 * @param {number} [materialIndex=0] - The material array index to use.
 	 */
@@ -18758,7 +18547,7 @@ class BufferGeometry extends EventDispatcher {
 	/**
 	 * Sets the draw range for this geometry.
 	 *
-	 * @param {number} start - The first vertex for non-indexed geometry, otherwise the first triangle index.
+	 * @param {number} start - The first vertex for non-indexed geometry, otherwise the offset (in indices) into the index buffer.
 	 * @param {number} count - For non-indexed BufferGeometry, `count` is the number of vertices to render.
 	 * For indexed BufferGeometry, `count` is the number of indices to render.
 	 */
@@ -18906,7 +18695,7 @@ class BufferGeometry extends EventDispatcher {
 	/**
 	 * Translates the geometry. This is typically done as a one time
 	 * operation, and not during a loop. Use {@link Object3D#position} for typical
-	 * real-time mesh rotation.
+	 * real-time mesh translation.
 	 *
 	 * @param {number} x - The x offset.
 	 * @param {number} y - The y offset.
@@ -18928,7 +18717,7 @@ class BufferGeometry extends EventDispatcher {
 	/**
 	 * Scales the geometry. This is typically done as a one time
 	 * operation, and not during a loop. Use {@link Object3D#scale} for typical
-	 * real-time mesh rotation.
+	 * real-time mesh scaling.
 	 *
 	 * @param {number} x - The x scale.
 	 * @param {number} y - The y scale.
@@ -19081,11 +18870,11 @@ class BufferGeometry extends EventDispatcher {
 
 					if ( this.morphTargetsRelative ) {
 
-						_vector$9.addVectors( this.boundingBox.min, _box$2.min );
-						this.boundingBox.expandByPoint( _vector$9 );
+						_min.addVectors( this.boundingBox.min, _box$2.min );
+						_max.addVectors( this.boundingBox.max, _box$2.max );
 
-						_vector$9.addVectors( this.boundingBox.max, _box$2.max );
-						this.boundingBox.expandByPoint( _vector$9 );
+						this.boundingBox.expandByPoint( _min );
+						this.boundingBox.expandByPoint( _max );
 
 					} else {
 
@@ -19157,11 +18946,11 @@ class BufferGeometry extends EventDispatcher {
 
 					if ( this.morphTargetsRelative ) {
 
-						_vector$9.addVectors( _box$2.min, _boxMorphTargets.min );
-						_box$2.expandByPoint( _vector$9 );
+						_min.addVectors( _box$2.min, _boxMorphTargets.min );
+						_max.addVectors( _box$2.max, _boxMorphTargets.max );
 
-						_vector$9.addVectors( _box$2.max, _boxMorphTargets.max );
-						_box$2.expandByPoint( _vector$9 );
+						_box$2.expandByPoint( _min );
+						_box$2.expandByPoint( _max );
 
 					} else {
 
@@ -19234,7 +19023,7 @@ class BufferGeometry extends EventDispatcher {
 	 *
 	 * The computation is only supported for indexed geometries and if position, normal, and uv attributes
 	 * are defined. When using a tangent space normal map, prefer the MikkTSpace algorithm provided by
-	 * {@link BufferGeometryUtils#computeMikkTSpaceTangents} instead.
+	 * {@link module:BufferGeometryUtils~computeMikkTSpaceTangents | BufferGeometryUtils.computeMikkTSpaceTangents()} instead.
 	 */
 	computeTangents() {
 
@@ -19343,7 +19132,7 @@ class BufferGeometry extends EventDispatcher {
 			const start = group.start;
 			const count = group.count;
 
-			for ( let j = start, jl = start + count; j < jl; j += 3 ) {
+			for ( let j = start, jl = Math.min( index.count, start + count ); j < jl; j += 3 ) {
 
 				handleTriangle(
 					index.getX( j + 0 ),
@@ -19369,6 +19158,24 @@ class BufferGeometry extends EventDispatcher {
 
 			tmp.copy( t );
 			tmp.sub( n.multiplyScalar( n.dot( t ) ) ).normalize();
+
+			// Degenerate uvs give no tangent direction, so use any direction perpendicular to the normal
+
+			if ( tmp.lengthSq() === 0 ) {
+
+				if ( Math.abs( n2.x ) < 0.9 ) {
+
+					tmp.set( 1, 0, 0 );
+
+				} else {
+
+					tmp.set( 0, 1, 0 );
+
+				}
+
+				tmp.crossVectors( n2, tmp ).normalize();
+
+			}
 
 			// Calculate handedness
 
@@ -19510,7 +19317,7 @@ class BufferGeometry extends EventDispatcher {
 
 	/**
 	 * Return a new non-index version of this indexed geometry. If the geometry
-	 * is already non-indexed, the method is a NOOP.
+	 * is already non-indexed, the method is a NOOP and returns this instance.
 	 *
 	 * @return {BufferGeometry} The non-indexed version of this indexed geometry.
 	 */
@@ -19911,7 +19718,8 @@ class InterleavedBuffer {
 		this.stride = stride;
 
 		/**
-		 * The total number of elements in the array
+		 * The number of items (vertices) stored in the buffer, computed by dividing
+		 * the `array` length by the `stride`.
 		 *
 		 * @type {number}
 		 * @readonly
@@ -19964,7 +19772,7 @@ class InterleavedBuffer {
 	 * Flag to indicate that this attribute has changed and should be re-sent to
 	 * the GPU. Set this to `true` when you modify the value of the array.
 	 *
-	 * @type {number}
+	 * @type {boolean}
 	 * @default false
 	 * @param {boolean} value
 	 */
@@ -19989,9 +19797,10 @@ class InterleavedBuffer {
 	}
 
 	/**
-	 * Adds a range of data in the data array to be updated on the GPU.
+	 * Adds a range of data in the data array to be updated on the GPU. The ranges are
+	 * applied with the next upload triggered via `needsUpdate` and cleared afterwards.
 	 *
-	 * @param {number} start - Position at which to start update.
+	 * @param {number} start - The index into the array (in elements, not items) at which to start the update.
 	 * @param {number} count - The number of components to update.
 	 */
 	addUpdateRange( start, count ) {
@@ -20069,7 +19878,7 @@ class InterleavedBuffer {
 	/**
 	 * Returns a new interleaved buffer with copied values from this instance.
 	 *
-	 * @param {Object} [data] - An object with shared array buffers that allows to retain shared structures.
+	 * @param {Object} data - An object with shared array buffers that allows to retain shared structures.
 	 * @return {InterleavedBuffer} A clone of this instance.
 	 */
 	clone( data ) {
@@ -20116,7 +19925,7 @@ class InterleavedBuffer {
 	/**
 	 * Serializes the interleaved buffer into JSON.
 	 *
-	 * @param {Object} [data] - An optional value holding meta information about the serialization.
+	 * @param {Object} data - An object holding meta information about the serialization.
 	 * @return {Object} A JSON object representing the serialized interleaved buffer.
 	 */
 	toJSON( data ) {
@@ -20231,7 +20040,8 @@ class InterleavedBufferAttribute {
 		/**
 		 * Whether the data are normalized or not, see {@link BufferAttribute#normalized}
 		 *
-		 * @type {InterleavedBuffer}
+		 * @type {boolean}
+		 * @default false
 		 */
 		this.normalized = normalized;
 
@@ -20272,7 +20082,7 @@ class InterleavedBufferAttribute {
 	 * Flag to indicate that this attribute has changed and should be re-sent to
 	 * the GPU. Set this to `true` when you modify the value of the array.
 	 *
-	 * @type {number}
+	 * @type {boolean}
 	 * @default false
 	 * @param {boolean} value
 	 */
@@ -20658,7 +20468,7 @@ class InterleavedBufferAttribute {
 	/**
 	 * Serializes the buffer attribute into JSON.
 	 *
-	 * If no parameter is provided, cloning an interleaved buffer attribute will de-interleave buffer data.
+	 * If no parameter is provided, serializing an interleaved buffer attribute will de-interleave buffer data.
 	 *
 	 * @param {Object} [data] - An optional value holding meta information about the serialization.
 	 * @return {Object} A JSON object representing the serialized buffer attribute.
@@ -20763,7 +20573,7 @@ class Plane {
 	 * Constructs a new plane.
 	 *
 	 * @param {Vector3} [normal=(1,0,0)] - A unit length vector defining the normal of the plane.
-	 * @param {number} [constant=0] - The signed distance from the origin to the plane.
+	 * @param {number} [constant=0] - The signed distance from the plane to the origin.
 	 */
 	constructor( normal = new Vector3( 1, 0, 0 ), constant = 0 ) {
 
@@ -20784,7 +20594,9 @@ class Plane {
 		this.normal = normal;
 
 		/**
-		 * The signed distance from the origin to the plane.
+		 * The signed distance from the plane to the origin. The plane is the set of
+		 * points `p` for which `normal.dot( p ) + constant = 0`, so the point on the
+		 * plane closest to the origin is `normal * - constant`.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -20914,7 +20726,8 @@ class Plane {
 	}
 
 	/**
-	 * Returns the signed distance from the given point to this plane.
+	 * Returns the signed distance from the given point to this plane. The distance is
+	 * positive if the point lies on the side of the plane the normal points to.
 	 *
 	 * @param {Vector3} point - The point to compute the distance for.
 	 * @return {number} The signed distance.
@@ -21055,7 +20868,7 @@ class Plane {
 	 * ```
 	 *
 	 * @param {Matrix4} matrix - The transformation matrix.
-	 * @param {Matrix4} [optionalNormalMatrix] - A pre-computed normal matrix.
+	 * @param {Matrix3} [optionalNormalMatrix] - A pre-computed normal matrix.
 	 * @return {Plane} A reference to this plane.
 	 */
 	applyMatrix4( matrix, optionalNormalMatrix ) {
@@ -21209,6 +21022,9 @@ class Material extends EventDispatcher {
 		 * {@link Material#blendSrc}, {@link Material#blendDst} or {@link Material#blendEquation}
 		 * should have any effect.
 		 *
+		 * `SubtractiveBlending` and `MultiplyBlending` require {@link Material#premultipliedAlpha}
+		 * to be `true`.
+		 *
 		 * @type {(NoBlending|NormalBlending|AdditiveBlending|SubtractiveBlending|MultiplyBlending|CustomBlending)}
 		 * @default NormalBlending
 		 */
@@ -21347,7 +21163,9 @@ class Material extends EventDispatcher {
 
 		/**
 		 * Whether to have depth test enabled when rendering this material.
-		 * When the depth test is disabled, the depth write will also be implicitly disabled.
+		 * With `WebGLRenderer`, disabling the depth test also implicitly disables the depth write.
+		 * With the WebGPU backend of `WebGPURenderer`, depth is still written unless
+		 * {@link Material#depthWrite} is set to `false`.
 		 *
 		 * @type {boolean}
 		 * @default true
@@ -21440,6 +21258,8 @@ class Material extends EventDispatcher {
 		 * (not rendered). This requires {@link WebGLRenderer#localClippingEnabled} to
 		 * be `true`.
 		 *
+		 * Only supported with `WebGLRenderer`. With `WebGPURenderer`, use {@link ClippingGroup}.
+		 *
 		 * @type {?Array<Plane>}
 		 * @default null
 		 */
@@ -21447,7 +21267,7 @@ class Material extends EventDispatcher {
 
 		/**
 		 * Changes the behavior of clipping planes so that only their intersection is
-		 * clipped, rather than their union.
+		 * clipped, rather than their union. Only supported with `WebGLRenderer`.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -21456,7 +21276,7 @@ class Material extends EventDispatcher {
 
 		/**
 		 * Defines whether to clip shadows according to the clipping planes specified
-		 * on this material.
+		 * on this material. Only supported with `WebGLRenderer`.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -21471,6 +21291,8 @@ class Material extends EventDispatcher {
 		 * - When {@link Material#side} is set to `BackSide`, the front side cast shadows.
 		 * - When {@link Material#side} is set to `DoubleSide`, both sides cast shadows.
 		 *
+		 * With `VSMShadowMap`, the side casting shadows matches {@link Material#side} instead.
+		 *
 		 * @type {?(FrontSide|BackSide|DoubleSide)}
 		 * @default null
 		 */
@@ -21479,7 +21301,7 @@ class Material extends EventDispatcher {
 		/**
 		 * Whether to render the material's color.
 		 *
-		 * This can be used in conjunction with {@link Object3D#renderOder} to create invisible
+		 * This can be used in conjunction with {@link Object3D#renderOrder} to create invisible
 		 * objects that occlude other objects.
 		 *
 		 * @type {boolean}
@@ -21618,7 +21440,6 @@ class Material extends EventDispatcher {
 	 * will not be rendered if the opacity is lower than this value.
 	 *
 	 * @type {number}
-	 * @readonly
 	 * @default 0
 	 */
 	get alphaTest() {
@@ -22737,6 +22558,8 @@ class Sprite extends Object3D {
 
 		this.material = source.material;
 
+		this.count = source.count;
+
 		return this;
 
 	}
@@ -22919,7 +22742,7 @@ class LOD extends Object3D {
 	}
 
 	/**
-	 * Removes an existing level, based on the distance from the camera.
+	 * Removes the level whose distance value equals the given distance.
 	 * Returns `true` when the level has been removed. Otherwise `false`.
 	 *
 	 * @param {number} distance - Distance of the level to remove.
@@ -22958,11 +22781,13 @@ class LOD extends Object3D {
 	}
 
 	/**
-	 * Returns a reference to the first 3D object that is greater than
-	 * the given distance.
+	 * Returns a reference to the 3D object of the level that is active at the
+	 * given distance, i.e. the last level whose distance (reduced by `distance * hysteresis`
+	 * if its object is visible) is less than or equal to the given distance, or the
+	 * first level if there is none.
 	 *
 	 * @param {number} distance - The LOD distance.
-	 * @return {?Object3D} The found 3D object. `null` if no 3D object has been found.
+	 * @return {?Object3D} The found 3D object. `null` if no levels are defined.
 	 */
 	getObjectForDistance( distance ) {
 
@@ -23459,7 +23284,7 @@ class Ray {
 	 * does not intersect with the plane.
 	 *
 	 * @param {Plane} plane - The plane to compute the distance to.
-	 * @return {?number} Whether this ray intersects with the given sphere or not.
+	 * @return {?number} The distance from the ray's origin to the plane, or `null` if there is no intersection.
 	 */
 	distanceToPlane( plane ) {
 
@@ -23863,7 +23688,8 @@ class MeshBasicMaterial extends Material {
 		this.map = null;
 
 		/**
-		 * The light map. Requires a second set of UVs.
+		 * The light map. Uses `uv` by default, set {@link Texture#channel} to use
+		 * a different set of UVs.
 		 *
 		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
 		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
@@ -23884,8 +23710,10 @@ class MeshBasicMaterial extends Material {
 		this.lightMapIntensity = 1.0;
 
 		/**
-		 * The red channel of this texture is used as the ambient occlusion map.
-		 * Requires a second set of UVs.
+		 * The red channel of this texture is used as the ambient occlusion map,
+		 * where `0` fully occludes ambient light and `1` does not occlude it.
+		 * Uses `uv` by default, set {@link Texture#channel} to use a different
+		 * set of UVs.
 		 *
 		 * `aoMap` represents non-color data. Any texture assigned must have
 		 * `texture.colorSpace = NoColorSpace` (default).
@@ -23897,8 +23725,7 @@ class MeshBasicMaterial extends Material {
 
 		/**
 		 * Intensity of the ambient occlusion effect. Range is `[0,1]`, where `0`
-		 * disables ambient occlusion. Where intensity is `1` and the AO map's
-		 * red channel is also `1`, ambient light is fully occluded on a surface.
+		 * disables ambient occlusion and `1` applies the AO map at full strength.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -23906,7 +23733,8 @@ class MeshBasicMaterial extends Material {
 		this.aoMapIntensity = 1.0;
 
 		/**
-		 * Specular map used by the material.
+		 * The red channel of this texture is used as a scalar strength that affects
+		 * how much of the environment map affects the surface.
 		 *
 		 * `specularMap` represents color data, and the texture must be assigned a
 		 * {@link Texture#colorSpace}. Most `specularMap` textures set
@@ -24199,6 +24027,8 @@ class Mesh extends Object3D {
 		this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 		this.geometry = source.geometry;
 
+		this.count = source.count;
+
 		return this;
 
 	}
@@ -24303,7 +24133,7 @@ class Mesh extends Object3D {
 	}
 
 	/**
-	 * Computes intersection points between a casted ray and this line.
+	 * Computes intersection points between a casted ray and this mesh.
 	 *
 	 * @param {Raycaster} raycaster - The raycaster.
 	 * @param {Array<Object>} intersects - The target array that holds the intersection points.
@@ -24817,7 +24647,7 @@ class SkinnedMesh extends Mesh {
 	}
 
 	/**
-	 * This method sets the skinned mesh in the rest pose).
+	 * This method sets the skinned mesh in the rest pose.
 	 */
 	pose() {
 
@@ -25049,7 +24879,7 @@ class DataTexture extends Texture {
 		 *
 		 * Overwritten and set to `1` by default.
 		 *
-		 * @type {boolean}
+		 * @type {number}
 		 * @default 1
 		 */
 		this.unpackAlignment = 1;
@@ -25194,6 +25024,9 @@ class Skeleton {
 	/**
 	 * Computes the bone inverse matrices. This method resets {@link Skeleton#boneInverses}
 	 * and fills it with new matrices.
+	 *
+	 * The matrices are computed from the current world matrices of the bones. Make sure
+	 * they are up to date before calling this method, e.g. via {@link Object3D#updateMatrixWorld}.
 	 */
 	calculateInverses() {
 
@@ -25262,7 +25095,9 @@ class Skeleton {
 	}
 
 	/**
-	 * Resets the skeleton to the base pose.
+	 * Updates the bone matrices from the current world matrices of the bones and
+	 * the bone inverse matrices, and flags the bone texture for upload. This method
+	 * is automatically called by the renderer.
 	 */
 	update() {
 
@@ -25387,7 +25222,7 @@ class Skeleton {
 	 * Setups the skeleton by the given JSON and bones.
 	 *
 	 * @param {Object} json - The skeleton as serialized JSON.
-	 * @param {Object<string, Bone>} bones - An array of bones.
+	 * @param {Object<string, Bone>} bones - A dictionary of bones, keyed by their UUID.
 	 * @return {Skeleton} A reference of this instance.
 	 */
 	fromJSON( json, bones ) {
@@ -25592,7 +25427,8 @@ class InstancedMesh extends Mesh {
 		this.morphTexture = null;
 
 		/**
-		 * The number of instances.
+		 * The number of instances to render. It can be lowered at runtime but must not
+		 * exceed the instance count passed to the constructor.
 		 *
 		 * @type {number}
 		 */
@@ -26012,10 +25848,12 @@ class Frustum {
 	}
 
 	/**
-	 * Sets the frustum planes from the given projection matrix.
+	 * Sets the frustum planes from the given projection matrix. The planes are expressed
+	 * in the space the matrix maps from, so pass `camera.projectionMatrix` multiplied by
+	 * `camera.matrixWorldInverse` to get world space planes.
 	 *
 	 * @param {Matrix4} m - The projection matrix.
-	 * @param {(WebGLCoordinateSystem|WebGPUCoordinateSystem)} coordinateSystem - The coordinate system.
+	 * @param {(WebGLCoordinateSystem|WebGPUCoordinateSystem)} [coordinateSystem=WebGLCoordinateSystem] - The coordinate system.
 	 * @param {boolean} [reversedDepth=false] - Whether to use a reversed depth.
 	 * @return {Frustum} A reference to this frustum.
 	 */
@@ -26232,7 +26070,8 @@ class FrustumArray {
 	constructor() {
 
 		/**
-		 * The coordinate system to use.
+		 * The coordinate system. Note that it is not used by the culling tests: each frustum
+		 * uses the coordinate system of its sub camera, see {@link FrustumArray#setFromArrayCamera}.
 		 *
 		 * @type {WebGLCoordinateSystem|WebGPUCoordinateSystem}
 		 * @default WebGLCoordinateSystem
@@ -26648,7 +26487,7 @@ class BatchedMesh extends Mesh {
 		this.isBatchedMesh = true;
 
 		/**
-		 * When set ot `true`, the individual objects of a batch are frustum culled.
+		 * When set to `true`, the individual objects of a batch are frustum culled.
 		 *
 		 * @type {boolean}
 		 * @default true
@@ -26695,7 +26534,7 @@ class BatchedMesh extends Mesh {
 		this._instanceInfo = [];
 		this._geometryInfo = [];
 
-		// instance, geometry ids that have been set as inactive, and are available to be overwritten
+		// instance, geometry ids that have been set as inactive, and are available to be overwritten (stored as min-heaps)
 		this._availableInstanceIds = [];
 		this._availableGeometryIds = [];
 
@@ -27034,9 +26873,7 @@ class BatchedMesh extends Mesh {
 		// Prioritize using previously freed instance ids
 		if ( this._availableInstanceIds.length > 0 ) {
 
-			this._availableInstanceIds.sort( ascIdSort );
-
-			drawId = this._availableInstanceIds.shift();
+			drawId = minHeapPop( this._availableInstanceIds );
 			this._instanceInfo[ drawId ] = instanceInfo;
 
 		} else {
@@ -27131,9 +26968,7 @@ class BatchedMesh extends Mesh {
 		let geometryId;
 		if ( this._availableGeometryIds.length > 0 ) {
 
-			this._availableGeometryIds.sort( ascIdSort );
-
-			geometryId = this._availableGeometryIds.shift();
+			geometryId = minHeapPop( this._availableGeometryIds );
 			geometryInfoList[ geometryId ] = geometryInfo;
 
 
@@ -27299,7 +27134,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		geometryInfoList[ geometryId ].active = false;
-		this._availableGeometryIds.push( geometryId );
+		minHeapPush( this._availableGeometryIds, geometryId );
 		this._visibilityChanged = true;
 
 		return this;
@@ -27317,7 +27152,7 @@ class BatchedMesh extends Mesh {
 		this.validateInstanceId( instanceId );
 
 		this._instanceInfo[ instanceId ].active = false;
-		this._availableInstanceIds.push( instanceId );
+		minHeapPush( this._availableInstanceIds, instanceId );
 		this._visibilityChanged = true;
 
 		return this;
@@ -27719,7 +27554,7 @@ class BatchedMesh extends Mesh {
 	*/
 	setInstanceCount( maxInstanceCount ) {
 
-		// shrink the available instances as much as possible
+		// shrink the available instances as much as possible. a sorted array is still a valid min-heap
 		const availableInstanceIds = this._availableInstanceIds;
 		const instanceInfo = this._instanceInfo;
 		availableInstanceIds.sort( ascIdSort );
@@ -27917,15 +27752,16 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.geometry = source.geometry.clone();
 		this.perObjectFrustumCulled = source.perObjectFrustumCulled;
 		this.sortObjects = source.sortObjects;
 		this.boundingBox = source.boundingBox !== null ? source.boundingBox.clone() : null;
 		this.boundingSphere = source.boundingSphere !== null ? source.boundingSphere.clone() : null;
+		this.customSort = source.customSort;
 
 		this._geometryInfo = source._geometryInfo.map( info => ( {
 			...info,
@@ -27942,6 +27778,8 @@ class BatchedMesh extends Mesh {
 		this._nextVertexStart = source._nextVertexStart;
 		this._geometryCount = source._geometryCount;
 
+		this._visibilityChanged = true;
+
 		this._maxInstanceCount = source._maxInstanceCount;
 		this._maxVertexCount = source._maxVertexCount;
 		this._maxIndexCount = source._maxIndexCount;
@@ -27953,6 +27791,8 @@ class BatchedMesh extends Mesh {
 		this._mergedDrawCounts = source._mergedDrawCounts.slice();
 		this._mergedDrawStarts = source._mergedDrawStarts.slice();
 		this._mergedDrawInstanceCounts = source._mergedDrawInstanceCounts.slice();
+		this._multiDrawCount = source._multiDrawCount;
+		this._mergedDrawCount = source._mergedDrawCount;
 
 		this._indirectTexture = source._indirectTexture.clone();
 		this._indirectTexture.image.data = this._indirectTexture.image.data.slice();
@@ -28512,7 +28352,7 @@ class Line extends Object3D {
 	/**
 	 * Computes an array of distance values which are necessary for rendering dashed lines.
 	 * For each vertex in the geometry, the method calculates the cumulative length from the
-	 * current point to the very beginning of the line.
+	 * current point to the very beginning of the line. Only supported for non-indexed geometries.
 	 *
 	 * @return {Line} A reference to this line.
 	 */
@@ -28589,7 +28429,7 @@ class Line extends Object3D {
 		_inverseMatrix$1.copy( matrixWorld ).invert();
 		_ray$1.copy( raycaster.ray ).applyMatrix4( _inverseMatrix$1 );
 
-		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+		const localThreshold = threshold / matrixWorld.getMaxScaleOnAxis();
 		const localThresholdSq = localThreshold * localThreshold;
 
 		const step = this.isLineSegments ? 2 : 1;
@@ -28930,9 +28770,11 @@ class PointsMaterial extends Material {
 		this.alphaMap = null;
 
 		/**
-		 * Defines the size of the points in pixels.
+		 * Defines the size of the points in pixels. When {@link PointsMaterial#sizeAttenuation}
+		 * is `true` and a perspective camera is used, the size is additionally scaled by
+		 * `( 0.5 * canvasHeight ) / viewDepth`.
 		 *
-		 * Might be capped if the value exceeds hardware dependent parameters like [gl.ALIASED_POINT_SIZE_RANGE](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParamete).
+		 * Might be capped if the value exceeds hardware dependent parameters like [gl.ALIASED_POINT_SIZE_RANGE](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParameter).
 		 *
 		 * @type {number}
 		 * @default 1
@@ -29021,7 +28863,7 @@ class Points extends Object3D {
 		this.geometry = geometry;
 
 		/**
-		 * The line material.
+		 * The points material.
 		 *
 		 * @type {Material|Array<Material>}
 		 * @default PointsMaterial
@@ -29123,7 +28965,7 @@ class Points extends Object3D {
 		_inverseMatrix.copy( matrixWorld ).invert();
 		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
-		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+		const localThreshold = threshold / matrixWorld.getMaxScaleOnAxis();
 		const localThresholdSq = localThreshold * localThreshold;
 
 		const index = geometry.index;
@@ -29614,8 +29456,8 @@ class CompressedArrayTexture extends CompressedTexture {
 	 * @param {number} width - The width of the texture.
 	 * @param {number} height - The height of the texture.
 	 * @param {number} depth - The depth of the texture.
-	 * @param {number} [format=RGBAFormat] - The min filter value.
-	 * @param {number} [type=UnsignedByteType] - The min filter value.
+	 * @param {number} [format=RGBAFormat] - The texture format.
+	 * @param {number} [type=UnsignedByteType] - The texture type.
 	 */
 	constructor( mipmaps, width, height, depth, format, type ) {
 
@@ -32499,7 +32341,7 @@ class ArcCurve extends EllipseCurve {
 	 *
 	 * @param {number} [aX=0] - The X center of the ellipse.
 	 * @param {number} [aY=0] - The Y center of the ellipse.
-	 * @param {number} [aRadius=1] - The radius of the ellipse in the x direction.
+	 * @param {number} [aRadius=1] - The radius of the arc.
 	 * @param {number} [aStartAngle=0] - The start angle of the curve in radians starting from the positive X axis.
 	 * @param {number} [aEndAngle=Math.PI*2] - The end angle of the curve in radians starting from the positive X axis.
 	 * @param {boolean} [aClockwise=false] - Whether the ellipse is drawn clockwise or not.
@@ -32609,7 +32451,7 @@ const pz = /*@__PURE__*/ new CubicPoly();
  * A curve representing a Catmull-Rom spline.
  *
  * ```js
- * //Create a closed wavey loop
+ * //Create a wavey curve
  * const curve = new THREE.CatmullRomCurve3( [
  * 	new THREE.Vector3( -10, 0, 10 ),
  * 	new THREE.Vector3( -5, 5, 5 ),
@@ -32637,7 +32479,7 @@ class CatmullRomCurve3 extends Curve {
 	 * @param {Array<Vector3>} [points] - An array of 3D points defining the curve.
 	 * @param {boolean} [closed=false] - Whether the curve is closed or not.
 	 * @param {('centripetal'|'chordal'|'catmullrom')} [curveType='centripetal'] - The curve type.
-	 * @param {number} [tension=0.5] - Tension of the curve.
+	 * @param {number} [tension=0.5] - Tension of the curve. Only used when `curveType` is `'catmullrom'`.
 	 */
 	constructor( points = [], closed = false, curveType = 'centripetal', tension = 0.5 ) {
 
@@ -32678,7 +32520,7 @@ class CatmullRomCurve3 extends Curve {
 		this.curveType = curveType;
 
 		/**
-		 * Tension of the curve.
+		 * Tension of the curve. Only used when {@link CatmullRomCurve3#curveType} is `'catmullrom'`.
 		 *
 		 * @type {number}
 		 * @default 0.5
@@ -33382,7 +33224,7 @@ class LineCurve3 extends Curve {
 		/**
 		 * The end point.
 		 *
-		 * @type {Vector2}
+		 * @type {Vector3}
 		 */
 		this.v2 = v2;
 
@@ -34047,6 +33889,14 @@ class CurvePath extends Curve {
 
 	}
 
+	/**
+	 * This method samples the curve path via {@link CurvePath#getPoint} and returns an array of
+	 * equi-spaced points across the entire path. If {@link CurvePath#autoClose} is `true`, the
+	 * first point is appended at the end.
+	 *
+	 * @param {number} [divisions=40] - The number of divisions.
+	 * @return {Array<(Vector2|Vector3)>} An array holding the sampled curve values.
+	 */
 	getSpacedPoints( divisions = 40 ) {
 
 		const points = [];
@@ -34067,6 +33917,16 @@ class CurvePath extends Curve {
 
 	}
 
+	/**
+	 * This method samples each curve of the path and returns an array of points representing
+	 * the path shape. Consecutive duplicate points are removed. If {@link CurvePath#autoClose}
+	 * is `true`, the first point is appended at the end if necessary.
+	 *
+	 * @param {number} [divisions=12] - The number of divisions per curve. Line curves always use
+	 * one division, ellipse curves twice this value and {@link SplineCurve} instances this value times their
+	 * point count. All other curves use this value.
+	 * @return {Array<(Vector2|Vector3)>} An array holding the sampled curve values.
+	 */
 	getPoints( divisions = 12 ) {
 
 		const points = [];
@@ -34351,8 +34211,8 @@ class Path extends CurvePath {
 	 * Adds an arc as an instance of {@link EllipseCurve} to the path, positioned relative
 	 * to the current point.
 	 *
-	 * @param {number} [aX=0] - The x coordinate of the center of the arc offsetted from the previous curve.
-	 * @param {number} [aY=0] - The y coordinate of the center of the arc offsetted from the previous curve.
+	 * @param {number} aX - The x offset of the center of the arc from {@link Path#currentPoint}.
+	 * @param {number} aY - The y offset of the center of the arc from {@link Path#currentPoint}.
 	 * @param {number} [aRadius=1] - The radius of the arc.
 	 * @param {number} [aStartAngle=0] - The start angle in radians.
 	 * @param {number} [aEndAngle=Math.PI*2] - The end angle in radians.
@@ -34394,8 +34254,8 @@ class Path extends CurvePath {
 	 * Adds an ellipse as an instance of {@link EllipseCurve} to the path, positioned relative
 	 * to the current point
 	 *
-	 * @param {number} [aX=0] - The x coordinate of the center of the ellipse offsetted from the previous curve.
-	 * @param {number} [aY=0] - The y coordinate of the center of the ellipse offsetted from the previous curve.
+	 * @param {number} aX - The x offset of the center of the ellipse from {@link Path#currentPoint}.
+	 * @param {number} aY - The y offset of the center of the ellipse from {@link Path#currentPoint}.
 	 * @param {number} [xRadius=1] - The radius of the ellipse in the x axis.
 	 * @param {number} [yRadius=1] - The radius of the ellipse in the y axis.
 	 * @param {number} [aStartAngle=0] - The start angle in radians.
@@ -35315,10 +35175,11 @@ class Earcut {
 class ShapeUtils {
 
 	/**
-	 * Calculate area of a ( 2D ) contour polygon.
+	 * Calculate the signed area of a ( 2D ) contour polygon. The result is
+	 * negative for a clockwise winding order.
 	 *
 	 * @param {Array<Vector2>} contour - An array of 2D points.
-	 * @return {number} The area.
+	 * @return {number} The signed area.
 	 */
 	static area( contour ) {
 
@@ -36974,7 +36835,9 @@ class ShapeGeometry extends BufferGeometry {
 	 * Constructs a new shape geometry.
 	 *
 	 * @param {Shape|Array<Shape>} [shapes] - A shape or an array of shapes.
-	 * @param {number} [curveSegments=12] - Number of segments per shape.
+	 * @param {number} [curveSegments=12] - Number of segments per curve of the shape. Line curves are never
+	 * subdivided, ellipse curves use twice this value and spline curves this value times their point count,
+	 * see {@link CurvePath#getPoints}.
 	 */
 	constructor( shapes = new Shape( [ new Vector2( 0, 0.5 ), new Vector2( -0.5, -0.5 ), new Vector2( 0.5, -0.5 ) ] ), curveSegments = 12 ) {
 
@@ -37439,8 +37302,9 @@ class TorusGeometry extends BufferGeometry {
 	 * @param {number} [radialSegments=12] - The number of radial segments.
 	 * @param {number} [tubularSegments=48] - The number of tubular segments.
 	 * @param {number} [arc=Math.PI*2] - Central angle in radians.
-	 * @param {number} [thetaStart=0] - Start of the tubular sweep in radians.
-	 * @param {number} [thetaLength=Math.PI*2] - Length of the tubular sweep in radians.
+	 * @param {number} [thetaStart=0] - Start angle of the sweep around the tube's cross-section, in radians.
+	 * @param {number} [thetaLength=Math.PI*2] - Central angle of the sweep around the tube's cross-section, in radians.
+	 * The default value results in a closed tube.
 	 */
 	constructor( radius = 1, tube = 0.4, radialSegments = 12, tubularSegments = 48, arc = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
@@ -37779,13 +37643,20 @@ class TorusKnotGeometry extends BufferGeometry {
  * ```js
  * class CustomSinCurve extends THREE.Curve {
  *
+ * 	constructor( scale = 1 ) {
+ *
+ * 		super();
+ * 		this.scale = scale;
+ *
+ * 	}
+ *
  * 	getPoint( t, optionalTarget = new THREE.Vector3() ) {
  *
  * 		const tx = t * 3 - 1.5;
  * 		const ty = Math.sin( 2 * Math.PI * t );
  * 		const tz = 0;
  *
- * 		return optionalTarget.set( tx, ty, tz );
+ * 		return optionalTarget.set( tx, ty, tz ).multiplyScalar( this.scale );
  * 	}
  *
  * }
@@ -38097,7 +37968,7 @@ class WireframeGeometry extends BufferGeometry {
 					const groupStart = group.start;
 					const groupCount = group.count;
 
-					for ( let i = groupStart, l = ( groupStart + groupCount ); i < l; i += 3 ) {
+					for ( let i = groupStart, l = Math.min( indices.count, ( groupStart + groupCount ) ); i < l; i += 3 ) {
 
 						for ( let j = 0; j < 3; j ++ ) {
 
@@ -38620,7 +38491,7 @@ class ShaderMaterial extends Material {
 		 *
 		 * ```js
 		 * const material = new ShaderMaterial( {
-		 *     uniforms: UniformsUtils.merge( [ UniformsLib[ 'fog' ], shaderUniforms ] );
+		 *     uniforms: UniformsUtils.merge( [ UniformsLib[ 'fog' ], shaderUniforms ] ),
 		 *     vertexShader: vertexShader,
 		 *     fragmentShader: fragmentShader,
 		 *     fog: true
@@ -38733,6 +38604,8 @@ class ShaderMaterial extends Material {
 		this.uniformsGroups = cloneUniformsGroups( source.uniformsGroups );
 
 		this.defines = Object.assign( {}, source.defines );
+
+		this.linewidth = source.linewidth;
 
 		this.wireframe = source.wireframe;
 		this.wireframeLinewidth = source.wireframeLinewidth;
@@ -39077,7 +38950,8 @@ class MeshStandardMaterial extends Material {
 		this.map = null;
 
 		/**
-		 * The light map. Requires a second set of UVs.
+		 * The light map. Uses `uv` by default, set {@link Texture#channel} to use
+		 * a different set of UVs.
 		 *
 		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
 		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
@@ -39098,8 +38972,10 @@ class MeshStandardMaterial extends Material {
 		this.lightMapIntensity = 1.0;
 
 		/**
-		 * The red channel of this texture is used as the ambient occlusion map.
-		 * Requires a second set of UVs.
+		 * The red channel of this texture is used as the ambient occlusion map,
+		 * where `0` fully occludes ambient light and `1` does not occlude it.
+		 * Uses `uv` by default, set {@link Texture#channel} to use a different
+		 * set of UVs.
 		 *
 		 * `aoMap` represents non-color data. Any texture assigned must have
 		 * `texture.colorSpace = NoColorSpace` (default).
@@ -39111,8 +38987,7 @@ class MeshStandardMaterial extends Material {
 
 		/**
 		 * Intensity of the ambient occlusion effect. Range is `[0,1]`, where `0`
-		 * disables ambient occlusion. Where intensity is `1` and the AO map's
-		 * red channel is also `1`, ambient light is fully occluded on a surface.
+		 * disables ambient occlusion and `1` applies the AO map at full strength.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -39198,6 +39073,7 @@ class MeshStandardMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -39299,7 +39175,9 @@ class MeshStandardMaterial extends Material {
 		this.envMap = null;
 
 		/**
-		 * The rotation of the environment map in radians.
+		 * The rotation of the environment map in radians. Only applies to
+		 * {@link MeshStandardMaterial#envMap}. When the material is lit by
+		 * {@link Scene#environment}, {@link Scene#environmentRotation} is used instead.
 		 *
 		 * @type {Euler}
 		 * @default (0,0,0)
@@ -39307,7 +39185,9 @@ class MeshStandardMaterial extends Material {
 		this.envMapRotation = new Euler();
 
 		/**
-		 * Scales the effect of the environment map by multiplying its color.
+		 * Scales the effect of the environment map by multiplying its color. Only applies to
+		 * {@link MeshStandardMaterial#envMap}. When the material is lit by
+		 * {@link Scene#environment}, {@link Scene#environmentIntensity} is used instead.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -39667,7 +39547,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.iridescenceThicknessMap = null;
 
 		/**
-		 * The sheen tint.
+		 * The sheen tint. It is multiplied by {@link MeshPhysicalMaterial#sheen}, so
+		 * it must be set to a non-black color for sheen to be visible.
 		 *
 		 * @type {Color}
 		 * @default (0,0,0)
@@ -39970,7 +39851,9 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 	}
 
 	/**
-	 * The intensity of the sheen layer, from `0.0` to `1.0`.
+	 * The intensity of the sheen layer, from `0.0` to `1.0`. The sheen color is
+	 * `sheenColor * sheen`, so {@link MeshPhysicalMaterial#sheenColor} (black by
+	 * default) must also be set for sheen to be visible.
 	 *
 	 * @type {number}
 	 * @default 0
@@ -40189,7 +40072,8 @@ class MeshPhongMaterial extends Material {
 		this.map = null;
 
 		/**
-		 * The light map. Requires a second set of UVs.
+		 * The light map. Uses `uv` by default, set {@link Texture#channel} to use
+		 * a different set of UVs.
 		 *
 		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
 		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
@@ -40210,8 +40094,10 @@ class MeshPhongMaterial extends Material {
 		this.lightMapIntensity = 1.0;
 
 		/**
-		 * The red channel of this texture is used as the ambient occlusion map.
-		 * Requires a second set of UVs.
+		 * The red channel of this texture is used as the ambient occlusion map,
+		 * where `0` fully occludes ambient light and `1` does not occlude it.
+		 * Uses `uv` by default, set {@link Texture#channel} to use a different
+		 * set of UVs.
 		 *
 		 * `aoMap` represents non-color data. Any texture assigned must have
 		 * `texture.colorSpace = NoColorSpace` (default).
@@ -40223,8 +40109,7 @@ class MeshPhongMaterial extends Material {
 
 		/**
 		 * Intensity of the ambient occlusion effect. Range is `[0,1]`, where `0`
-		 * disables ambient occlusion. Where intensity is `1` and the AO map's
-		 * red channel is also `1`, ambient light is fully occluded on a surface.
+		 * disables ambient occlusion and `1` applies the AO map at full strength.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -40310,6 +40195,7 @@ class MeshPhongMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -40355,9 +40241,10 @@ class MeshPhongMaterial extends Material {
 		this.displacementBias = 0;
 
 		/**
-		 * The specular map value affects both how much the specular surface
-		 * highlight contributes and how much of the environment map affects the
-		 * surface.
+		 * The red channel of this texture is used as a scalar strength that affects
+		 * both how much the specular surface highlight contributes and how much of
+		 * the environment map reflection blended in via {@link MeshPhongMaterial#combine}
+		 * affects the surface.
 		 *
 		 * `specularMap` represents color data, and the texture must be assigned a
 		 * {@link Texture#colorSpace}. Most `specularMap` textures set
@@ -40400,7 +40287,9 @@ class MeshPhongMaterial extends Material {
 		this.envMap = null;
 
 		/**
-		 * The rotation of the environment map in radians.
+		 * The rotation of the environment map in radians. Only applies to
+		 * {@link MeshPhongMaterial#envMap}. When the material is lit by
+		 * {@link Scene#environment}, {@link Scene#environmentRotation} is used instead.
 		 *
 		 * @type {Euler}
 		 * @default (0,0,0)
@@ -40410,7 +40299,7 @@ class MeshPhongMaterial extends Material {
 		/**
 		 * How to combine the result of the surface's color with the environment map, if any.
 		 *
-		 * When set to `MixOperation`, the {@link MeshBasicMaterial#reflectivity} is used to
+		 * When set to `MixOperation`, the {@link MeshPhongMaterial#reflectivity} is used to
 		 * blend between the two colors.
 		 *
 		 * @type {(MultiplyOperation|MixOperation|AddOperation)}
@@ -40428,7 +40317,10 @@ class MeshPhongMaterial extends Material {
 		this.reflectivity = 1;
 
 		/**
-		 * Scales the effect of the environment map by multiplying its color.
+		 * Scales the diffuse image-based lighting of the environment map. Only has an effect
+		 * with `WebGLRenderer` when {@link MeshPhongMaterial#envMap} is a PMREM texture. It does not
+		 * affect the reflection blended in via {@link MeshPhongMaterial#combine}. When the material is lit
+		 * by {@link Scene#environment}, {@link Scene#environmentIntensity} is used instead.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -40631,7 +40523,8 @@ class MeshToonMaterial extends Material {
 		this.gradientMap = null;
 
 		/**
-		 * The light map. Requires a second set of UVs.
+		 * The light map. Uses `uv` by default, set {@link Texture#channel} to use
+		 * a different set of UVs.
 		 *
 		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
 		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
@@ -40652,8 +40545,10 @@ class MeshToonMaterial extends Material {
 		this.lightMapIntensity = 1.0;
 
 		/**
-		 * The red channel of this texture is used as the ambient occlusion map.
-		 * Requires a second set of UVs.
+		 * The red channel of this texture is used as the ambient occlusion map,
+		 * where `0` fully occludes ambient light and `1` does not occlude it.
+		 * Uses `uv` by default, set {@link Texture#channel} to use a different
+		 * set of UVs.
 		 *
 		 * `aoMap` represents non-color data. Any texture assigned must have
 		 * `texture.colorSpace = NoColorSpace` (default).
@@ -40665,8 +40560,7 @@ class MeshToonMaterial extends Material {
 
 		/**
 		 * Intensity of the ambient occlusion effect. Range is `[0,1]`, where `0`
-		 * disables ambient occlusion. Where intensity is `1` and the AO map's
-		 * red channel is also `1`, ambient light is fully occluded on a surface.
+		 * disables ambient occlusion and `1` applies the AO map at full strength.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -40752,6 +40646,7 @@ class MeshToonMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -40910,7 +40805,7 @@ class MeshToonMaterial extends Material {
 }
 
 /**
- * A material that maps the normal vectors to RGB colors.
+ * A material that maps view-space normal vectors to RGB colors.
  *
  * @augments Material
  * @demo scenes/material-browser.html#MeshNormalMaterial
@@ -40989,6 +40884,7 @@ class MeshNormalMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -41153,7 +41049,8 @@ class MeshLambertMaterial extends Material {
 		this.map = null;
 
 		/**
-		 * The light map. Requires a second set of UVs.
+		 * The light map. Uses `uv` by default, set {@link Texture#channel} to use
+		 * a different set of UVs.
 		 *
 		 * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
 		 * a {@link Texture#colorSpace}. Most `lightMap` textures set
@@ -41174,8 +41071,10 @@ class MeshLambertMaterial extends Material {
 		this.lightMapIntensity = 1.0;
 
 		/**
-		 * The red channel of this texture is used as the ambient occlusion map.
-		 * Requires a second set of UVs.
+		 * The red channel of this texture is used as the ambient occlusion map,
+		 * where `0` fully occludes ambient light and `1` does not occlude it.
+		 * Uses `uv` by default, set {@link Texture#channel} to use a different
+		 * set of UVs.
 		 *
 		 * `aoMap` represents non-color data. Any texture assigned must have
 		 * `texture.colorSpace = NoColorSpace` (default).
@@ -41187,8 +41086,7 @@ class MeshLambertMaterial extends Material {
 
 		/**
 		 * Intensity of the ambient occlusion effect. Range is `[0,1]`, where `0`
-		 * disables ambient occlusion. Where intensity is `1` and the AO map's
-		 * red channel is also `1`, ambient light is fully occluded on a surface.
+		 * disables ambient occlusion and `1` applies the AO map at full strength.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -41274,6 +41172,7 @@ class MeshLambertMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -41319,7 +41218,9 @@ class MeshLambertMaterial extends Material {
 		this.displacementBias = 0;
 
 		/**
-		 * Specular map used by the material.
+		 * The red channel of this texture is used as a scalar strength that affects
+		 * how much of the environment map reflection blended in via
+		 * {@link MeshLambertMaterial#combine} affects the surface.
 		 *
 		 * `specularMap` represents color data, and the texture must be assigned a
 		 * {@link Texture#colorSpace}. Most `specularMap` textures set
@@ -41362,7 +41263,9 @@ class MeshLambertMaterial extends Material {
 		this.envMap = null;
 
 		/**
-		 * The rotation of the environment map in radians.
+		 * The rotation of the environment map in radians. Only applies to
+		 * {@link MeshLambertMaterial#envMap}. When the material is lit by
+		 * {@link Scene#environment}, {@link Scene#environmentRotation} is used instead.
 		 *
 		 * @type {Euler}
 		 * @default (0,0,0)
@@ -41372,7 +41275,7 @@ class MeshLambertMaterial extends Material {
 		/**
 		 * How to combine the result of the surface's color with the environment map, if any.
 		 *
-		 * When set to `MixOperation`, the {@link MeshBasicMaterial#reflectivity} is used to
+		 * When set to `MixOperation`, the {@link MeshLambertMaterial#reflectivity} is used to
 		 * blend between the two colors.
 		 *
 		 * @type {(MultiplyOperation|MixOperation|AddOperation)}
@@ -41390,7 +41293,10 @@ class MeshLambertMaterial extends Material {
 		this.reflectivity = 1;
 
 		/**
-		 * Scales the effect of the environment map by multiplying its color.
+		 * Scales the diffuse image-based lighting of the environment map. Only has an effect
+		 * with `WebGLRenderer` when {@link MeshLambertMaterial#envMap} is a PMREM texture. It does not
+		 * affect the reflection blended in via {@link MeshLambertMaterial#combine}. When the material is lit
+		 * by {@link Scene#environment}, {@link Scene#environmentIntensity} is used instead.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -41681,8 +41587,8 @@ class MeshDepthMaterial extends Material {
  *
  * Can also be used to customize the shadow casting of an object by assigning
  * an instance of `MeshDistanceMaterial` to {@link Object3D#customDistanceMaterial}.
- * The following examples demonstrates this approach in order to ensure
- * transparent parts of objects do not cast shadows.
+ * This approach can be used to ensure transparent parts of objects do not
+ * cast shadows.
  *
  * @augments Material
  */
@@ -41925,6 +41831,7 @@ class MeshMatcapMaterial extends Material {
 
 		/**
 		 * How much the normal map affects the material. Typical value range is `[0,1]`.
+		 * Only affects tangent space normal maps.
 		 *
 		 * @type {Vector2}
 		 * @default (1,1)
@@ -42065,9 +41972,12 @@ class MeshMatcapMaterial extends Material {
 }
 
 /**
- * A material for rendering line primitives.
+ * A material for rendering dashed line primitives.
  *
  * Materials define the appearance of renderable 3D objects.
+ *
+ * The material requires the `lineDistance` attribute, so call
+ * {@link Line#computeLineDistances} on the line. Otherwise, it renders solid.
  *
  * ```js
  * const material = new THREE.LineDashedMaterial( {
@@ -42076,6 +41986,9 @@ class MeshMatcapMaterial extends Material {
  * 	dashSize: 3,
  * 	gapSize: 1,
  * } );
+ *
+ * const line = new THREE.Line( geometry, material );
+ * line.computeLineDistances();
  * ```
  *
  * @augments LineBasicMaterial
@@ -42106,7 +42019,8 @@ class LineDashedMaterial extends LineBasicMaterial {
 		this.type = 'LineDashedMaterial';
 
 		/**
-		 * The scale of the dashed part of a line.
+		 * Scales the line distances before dashing. Values greater than `1`
+		 * make dashes and gaps shorter.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -42114,7 +42028,7 @@ class LineDashedMaterial extends LineBasicMaterial {
 		this.scale = 1;
 
 		/**
-		 * The size of the dash. This is both the gap with the stroke.
+		 * The length of each dash.
 		 *
 		 * @type {number}
 		 * @default 3
@@ -42318,10 +42232,10 @@ function flattenJSON( jsonKeys, times, values, valuePropertyName ) {
 /**
  * Creates a new clip, containing only the segment of the original clip between the given frames.
  *
- * @param {AnimationClip} sourceClip - The values to sort.
+ * @param {AnimationClip} sourceClip - The source clip.
  * @param {string} name - The name of the clip.
  * @param {number} startFrame - The start frame.
- * @param {number} endFrame - The end frame.
+ * @param {number} endFrame - The end frame (exclusive).
  * @param {number} [fps=30] - The FPS.
  * @return {AnimationClip} The new sub clip.
  */
@@ -42445,6 +42359,10 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 
 		if ( targetTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
 
+			// Cubic spline tracks store an in-tangent, the value and an out-tangent per keyframe.
+			// Subtracting a constant does not change the tangents of numeric tracks, but removing
+			// a rotation from quaternion tracks has to rotate the tangents as well.
+
 			targetOffset = targetValueSize / 3;
 
 		}
@@ -42489,25 +42407,28 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 		const numTimes = targetTrack.times.length;
 		for ( let j = 0; j < numTimes; ++ j ) {
 
-			const valueStart = j * targetValueSize + targetOffset;
-
 			if ( referenceTrackType === 'quaternion' ) {
 
-				// Multiply the conjugate for quaternion track types
-				Quaternion.multiplyQuaternionsFlat(
-					targetTrack.values,
-					valueStart,
-					referenceValue,
-					0,
-					targetTrack.values,
-					valueStart
-				);
+				for ( let k = 0; k < targetValueSize; k += 4 ) {
+
+					const offset = j * targetValueSize + k;
+
+					Quaternion.multiplyQuaternionsFlat(
+						targetTrack.values,
+						offset,
+						referenceValue,
+						0,
+						targetTrack.values,
+						offset
+					);
+
+				}
 
 			} else {
 
+				const valueStart = j * targetValueSize + targetOffset;
 				const valueEnd = targetValueSize - targetOffset * 2;
 
-				// Subtract each value for all other numeric track types
 				for ( let k = 0; k < valueEnd; ++ k ) {
 
 					targetTrack.values[ valueStart + k ] -= referenceValue[ k ];
@@ -42620,10 +42541,10 @@ class AnimationUtils {
 	 * Creates a new clip, containing only the segment of the original clip between the given frames.
 	 *
 	 * @static
-	 * @param {AnimationClip} sourceClip - The values to sort.
+	 * @param {AnimationClip} sourceClip - The source clip.
 	 * @param {string} name - The name of the clip.
 	 * @param {number} startFrame - The start frame.
-	 * @param {number} endFrame - The end frame.
+	 * @param {number} endFrame - The end frame (exclusive).
 	 * @param {number} [fps=30] - The FPS.
 	 * @return {AnimationClip} The new sub clip.
 	 */
@@ -42675,7 +42596,7 @@ class Interpolant {
 	/**
 	 * Constructs a new interpolant.
 	 *
-	 * @param {TypedArray} parameterPositions - The parameter positions hold the interpolation factors.
+	 * @param {TypedArray} parameterPositions - The ascending parameter positions of the samples, e.g. keyframe times.
 	 * @param {TypedArray} sampleValues - The sample values.
 	 * @param {number} sampleSize - The sample size
 	 * @param {TypedArray} [resultBuffer] - The result buffer.
@@ -42715,7 +42636,7 @@ class Interpolant {
 		/**
 		 * The value size.
 		 *
-		 * @type {TypedArray}
+		 * @type {number}
 		 */
 		this.valueSize = sampleSize;
 
@@ -42739,7 +42660,7 @@ class Interpolant {
 	/**
 	 * Evaluate the interpolant at position `t`.
 	 *
-	 * @param {number} t - The interpolation factor.
+	 * @param {number} t - The parameter position (e.g. time) at which to evaluate.
 	 * @return {TypedArray} The result buffer.
 	 */
 	evaluate( t ) {
@@ -42939,13 +42860,14 @@ class Interpolant {
 	}
 
 	/**
-	 * Copies a sample value to the result buffer.
+	 * Interpolates between the samples at `i1 - 1` and `i1` and writes the result
+	 * to the result buffer.
 	 *
 	 * @abstract
 	 * @param {number} i1 - An index into the sample value buffer.
-	 * @param {number} t0 - The previous interpolation factor.
-	 * @param {number} t - The current interpolation factor.
-	 * @param {number} t1 - The next interpolation factor.
+	 * @param {number} t0 - The previous parameter position.
+	 * @param {number} t - The current parameter position.
+	 * @param {number} t1 - The next parameter position.
 	 * @return {TypedArray} The result buffer.
 	 */
 	interpolate_( /* i1, t0, t, t1 */ ) {
@@ -42959,8 +42881,8 @@ class Interpolant {
 	 * Optional method that is executed when the interval has changed.
 	 *
 	 * @param {number} i1 - An index into the sample value buffer.
-	 * @param {number} t0 - The previous interpolation factor.
-	 * @param {number} t1 - The next interpolation factor.
+	 * @param {number} t0 - The previous parameter position.
+	 * @param {number} t1 - The next parameter position.
 	 */
 	intervalChanged_( /* i1, t0, t1 */ ) {
 
@@ -42984,7 +42906,7 @@ class CubicInterpolant extends Interpolant {
 	/**
 	 * Constructs a new cubic interpolant.
 	 *
-	 * @param {TypedArray} parameterPositions - The parameter positions hold the interpolation factors.
+	 * @param {TypedArray} parameterPositions - The ascending parameter positions of the samples, e.g. keyframe times.
 	 * @param {TypedArray} sampleValues - The sample values.
 	 * @param {number} sampleSize - The sample size
 	 * @param {TypedArray} [resultBuffer] - The result buffer.
@@ -43135,7 +43057,7 @@ class LinearInterpolant extends Interpolant {
 	/**
 	 * Constructs a new linear interpolant.
 	 *
-	 * @param {TypedArray} parameterPositions - The parameter positions hold the interpolation factors.
+	 * @param {TypedArray} parameterPositions - The ascending parameter positions of the samples, e.g. keyframe times.
 	 * @param {TypedArray} sampleValues - The sample values.
 	 * @param {number} sampleSize - The sample size
 	 * @param {TypedArray} [resultBuffer] - The result buffer.
@@ -43183,7 +43105,7 @@ class DiscreteInterpolant extends Interpolant {
 	/**
 	 * Constructs a new discrete interpolant.
 	 *
-	 * @param {TypedArray} parameterPositions - The parameter positions hold the interpolation factors.
+	 * @param {TypedArray} parameterPositions - The ascending parameter positions of the samples, e.g. keyframe times.
 	 * @param {TypedArray} sampleValues - The sample values.
 	 * @param {number} sampleSize - The sample size
 	 * @param {TypedArray} [resultBuffer] - The result buffer.
@@ -43975,16 +43897,16 @@ KeyframeTrack.prototype.ValueTypeName = '';
 /**
  * The time buffer type of this keyframe track.
  *
- * @type {TypedArray|Array}
- * @default Float32Array.constructor
+ * @type {(TypedArray.constructor|Array.constructor)}
+ * @default Float32Array
  */
 KeyframeTrack.prototype.TimeBufferType = Float32Array;
 
 /**
  * The value buffer type of this keyframe track.
  *
- * @type {TypedArray|Array}
- * @default Float32Array.constructor
+ * @type {(TypedArray.constructor|Array.constructor)}
+ * @default Float32Array
  */
 KeyframeTrack.prototype.ValueBufferType = Float32Array;
 
@@ -44032,8 +43954,8 @@ BooleanKeyframeTrack.prototype.ValueTypeName = 'bool';
 /**
  * The value buffer type of this keyframe track.
  *
- * @type {TypedArray|Array}
- * @default Array.constructor
+ * @type {(TypedArray.constructor|Array.constructor)}
+ * @default Array
  */
 BooleanKeyframeTrack.prototype.ValueBufferType = Array;
 
@@ -44060,7 +43982,7 @@ class ColorKeyframeTrack extends KeyframeTrack {
 	 * @param {string} name - The keyframe track's name.
 	 * @param {Array<number>} times - A list of keyframe times.
 	 * @param {Array<number>} values - A list of keyframe values.
-	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} [interpolation] - The interpolation type.
+	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)} [interpolation] - The interpolation type.
 	 */
 	constructor( name, times, values, interpolation ) {
 
@@ -44091,7 +44013,7 @@ class NumberKeyframeTrack extends KeyframeTrack {
 	 * @param {string} name - The keyframe track's name.
 	 * @param {Array<number>} times - A list of keyframe times.
 	 * @param {Array<number>} values - A list of keyframe values.
-	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} [interpolation] - The interpolation type.
+	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)} [interpolation] - The interpolation type.
 	 */
 	constructor( name, times, values, interpolation ) {
 
@@ -44119,7 +44041,7 @@ class QuaternionLinearInterpolant extends Interpolant {
 	/**
 	 * Constructs a new SLERP interpolant.
 	 *
-	 * @param {TypedArray} parameterPositions - The parameter positions hold the interpolation factors.
+	 * @param {TypedArray} parameterPositions - The ascending parameter positions of the samples, e.g. keyframe times.
 	 * @param {TypedArray} sampleValues - The sample values.
 	 * @param {number} sampleSize - The sample size
 	 * @param {TypedArray} [resultBuffer] - The result buffer.
@@ -44165,7 +44087,7 @@ class QuaternionKeyframeTrack extends KeyframeTrack {
 	 * @param {string} name - The keyframe track's name.
 	 * @param {Array<number>} times - A list of keyframe times.
 	 * @param {Array<number>} values - A list of keyframe values.
-	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} [interpolation] - The interpolation type.
+	 * @param {(InterpolateLinear|InterpolateDiscrete)} [interpolation] - The interpolation type. `InterpolateSmooth` is not supported for quaternions.
 	 */
 	constructor( name, times, values, interpolation ) {
 
@@ -44235,8 +44157,8 @@ StringKeyframeTrack.prototype.ValueTypeName = 'string';
 /**
  * The value buffer type of this keyframe track.
  *
- * @type {TypedArray|Array}
- * @default Array.constructor
+ * @type {(TypedArray.constructor|Array.constructor)}
+ * @default Array
  */
 StringKeyframeTrack.prototype.ValueBufferType = Array;
 
@@ -44263,7 +44185,7 @@ class VectorKeyframeTrack extends KeyframeTrack {
 	 * @param {string} name - The keyframe track's name.
 	 * @param {Array<number>} times - A list of keyframe times.
 	 * @param {Array<number>} values - A list of keyframe values.
-	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} [interpolation] - The interpolation type.
+	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)} [interpolation] - The interpolation type.
 	 */
 	constructor( name, times, values, interpolation ) {
 
@@ -44296,7 +44218,7 @@ class AnimationClip {
 	 * @param {string} [name=''] - The clip's name.
 	 * @param {number} [duration=-1] - The clip's duration in seconds. If a negative value is passed,
 	 * the duration will be calculated from the passed keyframes.
-	 * @param {Array<KeyframeTrack>} tracks - An array of keyframe tracks.
+	 * @param {Array<KeyframeTrack>} [tracks=[]] - An array of keyframe tracks.
 	 * @param {(NormalAnimationBlendMode|AdditiveAnimationBlendMode)} [blendMode=NormalAnimationBlendMode] - Defines how the animation
 	 * is blended/combined when two or more animations are simultaneously played.
 	 */
@@ -44773,8 +44695,12 @@ function parseKeyframeTrack( json ) {
 
 /**
  * @class
- * @classdesc A simple caching system, used internally by {@link FileLoader}.
- * To enable caching across all loaders that use {@link FileLoader}, add `THREE.Cache.enabled = true.` once in your app.
+ * @classdesc A simple caching system, used internally by {@link FileLoader}, {@link ImageLoader}
+ * and {@link ImageBitmapLoader}. To enable caching across all loaders that use these classes, add
+ * `THREE.Cache.enabled = true.` once in your app.
+ *
+ * Keys are the resolved URLs prefixed with the loader type (`file:`, `image:` or `image-bitmap:`).
+ * Blob URLs are never cached.
  * @hideconstructor
  */
 const Cache = {
@@ -44908,8 +44834,8 @@ class LoadingManager {
 	 * Constructs a new loading manager.
 	 *
 	 * @param {Function} [onLoad] - Executes when all items have been loaded.
-	 * @param {Function} [onProgress] - Executes when single items have been loaded.
-	 * @param {Function} [onError] - Executes when an error occurs.
+	 * @param {Function} [onProgress] - Executes when single items have been loaded. Receives `( url, itemsLoaded, itemsTotal )`.
+	 * @param {Function} [onError] - Executes when an error occurs. Receives the `url` of the item that failed.
 	 */
 	constructor( onLoad, onProgress, onError ) {
 
@@ -44925,7 +44851,8 @@ class LoadingManager {
 		// in the constructor
 
 		/**
-		 * Executes when an item starts loading.
+		 * Executes when the first item of a new loading batch starts loading.
+		 * Receives `( url, itemsLoaded, itemsTotal )`.
 		 *
 		 * @type {Function|undefined}
 		 * @default undefined
@@ -44942,6 +44869,7 @@ class LoadingManager {
 
 		/**
 		 * Executes when single items have been loaded.
+		 * Receives `( url, itemsLoaded, itemsTotal )`.
 		 *
 		 * @type {Function|undefined}
 		 * @default undefined
@@ -44949,7 +44877,7 @@ class LoadingManager {
 		this.onProgress = onProgress;
 
 		/**
-		 * Executes when an error occurs.
+		 * Executes when an error occurs. Receives the `url` of the item that failed.
 		 *
 		 * @type {Function|undefined}
 		 * @default undefined
@@ -45073,7 +45001,11 @@ class LoadingManager {
 		 * const objectURLs = [];
 		 * manager.setURLModifier( ( url ) => {
 		 *
-		 * 	url = URL.createObjectURL( blobs[ url ] );
+		 * 	// resources of the glTF asset are requested relative to it, e.g. './diffuse.png'
+		 * 	const blob = blobs[ url.replace( /^\.\//, '' ) ];
+		 * 	if ( blob === undefined ) return url;
+		 *
+		 * 	url = URL.createObjectURL( blob );
 		 * 	objectURLs.push( url );
 		 * 	return url;
 		 *
@@ -45110,7 +45042,7 @@ class LoadingManager {
 		 * manager.addHandler( /\.tga$/i, new TGALoader() );
 		 * ```
 		 *
-		 * @param {string} regex - A regular expression.
+		 * @param {RegExp} regex - A regular expression.
 		 * @param {Loader} loader - A loader that should handle matched cases.
 		 * @return {LoadingManager} A reference to this loading manager.
 		 */
@@ -45125,7 +45057,7 @@ class LoadingManager {
 		/**
 		 * Removes the loader for the given regular expression.
 		 *
-		 * @param {string} regex - A regular expression.
+		 * @param {RegExp} regex - The same regular expression instance that was passed to {@link LoadingManager#addHandler}.
 		 * @return {LoadingManager} A reference to this loading manager.
 		 */
 		this.removeHandler = function ( regex ) {
@@ -45171,7 +45103,8 @@ class LoadingManager {
 
 		/**
 		 * Can be used to abort ongoing loading requests in loaders using this manager.
-		 * The abort only works if the loaders implement {@link Loader#abort} and `AbortSignal.any()`
+		 * The abort only works for loaders that observe {@link LoadingManager#abortController}
+		 * (e.g. {@link FileLoader} and {@link ImageBitmapLoader}) and if `AbortSignal.any()`
 		 * is supported in the browser.
 		 *
 		 * @return {LoadingManager} A reference to this loading manager.
@@ -45250,7 +45183,7 @@ class Loader {
 		this.crossOrigin = 'anonymous';
 
 		/**
-		 * Whether the XMLHttpRequest uses credentials.
+		 * Whether cross-origin `fetch()` requests include credentials.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -45359,10 +45292,12 @@ class Loader {
 	}
 
 	/**
-	 * Whether the XMLHttpRequest uses credentials such as cookies, authorization
-	 * headers or TLS client certificates, see [XMLHttpRequest.withCredentials](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials).
+	 * Whether `fetch()` requests include credentials such as cookies, authorization
+	 * headers or TLS client certificates on cross-origin requests, see [Request.credentials](https://developer.mozilla.org/en-US/docs/Web/API/Request/credentials).
 	 *
 	 * Note: This setting has no effect if you are loading files locally or from the same domain.
+	 * Loaders using `HTMLImageElement` (e.g. {@link ImageLoader} or {@link TextureLoader}) ignore it,
+	 * use {@link Loader#setCrossOrigin} with `'use-credentials'` instead.
 	 *
 	 * @param {boolean} value - The `withCredentials` value.
 	 * @return {Loader} A reference to this instance.
@@ -45969,7 +45904,8 @@ class CompressedTextureLoader extends Loader {
 	 * directly be used for material creation. If you do it this way, the texture
 	 * may pop up in your scene once the respective loading process is finished.
 	 *
-	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {string|Array<string>} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * Alternatively, an array of six URLs (one per cube face) to load a compressed cube texture.
 	 * @param {function(CompressedTexture)} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
 	 * @param {onErrorCallback} onError - Executed when errors occur.
@@ -46127,7 +46063,7 @@ class ImageLoader extends Loader {
 	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
 	 * @param {function(Image)} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} onProgress - Unsupported in this loader.
-	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @param {function(Event)} onError - Executed when errors occur. Receives the image's `error` event, not an `Error` instance.
 	 * @return {Image} The image.
 	 */
 	load( url, onLoad, onProgress, onError ) {
@@ -46303,7 +46239,7 @@ class CubeTextureLoader extends Loader {
 	 * neg-x, pos-y, neg-y, pos-z, neg-z. An array of data URIs are allowed as well.
 	 * @param {function(CubeTexture)} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} onProgress - Unsupported in this loader.
-	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @param {function(Event)} onError - Executed when errors occur. Receives the image's `error` event, not an `Error` instance.
 	 * @return {CubeTexture} The cube texture.
 	 */
 	load( urls, onLoad, onProgress, onError ) {
@@ -46537,9 +46473,13 @@ class DataTextureLoader extends Loader {
  * ```js
  * const loader = new THREE.TextureLoader();
  * const texture = await loader.loadAsync( 'textures/land_ocean_ice_cloud_2048.jpg' );
+ * texture.colorSpace = THREE.SRGBColorSpace;
  *
  * const material = new THREE.MeshBasicMaterial( { map:texture } );
  * ```
+ * The loaded texture keeps the default {@link Texture#colorSpace} `NoColorSpace`. For
+ * color textures like `map` or `emissiveMap`, set it to `SRGBColorSpace`.
+ *
  * Please note that `TextureLoader` has dropped support for progress
  * events in `r84`. For a `TextureLoader` that supports progress events, see
  * [this thread](https://github.com/mrdoob/three.js/issues/10439#issuecomment-293260145).
@@ -46568,7 +46508,7 @@ class TextureLoader extends Loader {
 	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
 	 * @param {function(Texture)} [onLoad] - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} [onProgress] - Unsupported in this loader.
-	 * @param {onErrorCallback} [onError] - Executed when errors occur.
+	 * @param {function(Event)} [onError] - Executed when errors occur. Receives the image's `error` event, not an `Error` instance.
 	 * @return {Texture} The texture.
 	 */
 	load( url, onLoad, onProgress, onError ) {
@@ -46811,6 +46751,28 @@ class LightShadow {
 		this.biasNode = null;
 
 		/**
+		 * A custom shadow filter function. Only supported with `WebGPURenderer`.
+		 *
+		 * If a filter node is defined, it replaces the filter selected by the
+		 * renderer's shadow map type.
+		 *
+		 * @type {?Function}
+		 * @default null
+		 */
+		this.filterNode = null;
+
+		/**
+		 * A custom shadow node that replaces the default shadow node of the light.
+		 * Only supported with `WebGPURenderer`.
+		 *
+		 * The node is bound to its light, so `copy()` and `clone()` do not transfer it.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.shadowNode = null;
+
+		/**
 		 * Defines how much the position used to query the shadow map is offset along
 		 * the object normal. The default is `0`. Increasing this value can be used to
 		 * reduce shadow acne especially in large scenes where light shines onto
@@ -46844,7 +46806,7 @@ class LightShadow {
 
 		/**
 		 * Defines the width and height of the shadow map. Higher values give better quality
-		 * shadows at the cost of computation time. Values must be powers of two.
+		 * shadows at the cost of computation time. Point light shadows only use the width.
 		 *
 		 * @type {Vector2}
 		 * @default (512,512)
@@ -46852,7 +46814,8 @@ class LightShadow {
 		this.mapSize = new Vector2( 512, 512 );
 
 		/**
-		 * The type of shadow texture. The default is `UnsignedByteType`.
+		 * The type of the shadow map's color texture. The default is `UnsignedByteType`.
+		 * Only supported with `WebGPURenderer`, and not for point light shadows.
 		 *
 		 * @type {number}
 		 * @default UnsignedByteType
@@ -47082,6 +47045,7 @@ class LightShadow {
 		this.mapType = source.mapType;
 
 		this.biasNode = source.biasNode;
+		this.filterNode = source.filterNode;
 
 		return this;
 
@@ -47252,7 +47216,7 @@ class Camera extends Object3D {
 
 	updateWorldMatrix( updateParents, updateChildren, force = false ) {
 
-		super.updateWorldMatrix( updateParents, updateChildren, force );
+		const updated = super.updateWorldMatrix( updateParents, updateChildren, force );
 
 		// exclude scale from view matrix to be glTF conform
 
@@ -47267,6 +47231,8 @@ class Camera extends Object3D {
 			this.matrixWorldInverse.compose( _position$2, _quaternion$2, _scale$2.set( 1, 1, 1 ) ).invert();
 
 		}
+
+		return updated;
 
 	}
 
@@ -47300,7 +47266,7 @@ class PerspectiveCamera extends Camera {
 	/**
 	 * Constructs a new perspective camera.
 	 *
-	 * @param {number} [fov=50] - The vertical field of view.
+	 * @param {number} [fov=50] - The vertical field of view, in degrees.
 	 * @param {number} [aspect=1] - The aspect ratio.
 	 * @param {number} [near=0.1] - The camera's near plane.
 	 * @param {number} [far=2000] - The camera's far plane.
@@ -47486,10 +47452,10 @@ class PerspectiveCamera extends Camera {
 	}
 
 	/**
-	 * Returns the height of the image on the film. If {@link PerspectiveCamera#aspect} is greater than or
-	 * equal to one (landscape format), the result equals {@link PerspectiveCamera#filmGauge}.
+	 * Returns the height of the image on the film. If {@link PerspectiveCamera#aspect} is less than or
+	 * equal to one (portrait format), the result equals {@link PerspectiveCamera#filmGauge}.
 	 *
-	 * @return {number} The film width.
+	 * @return {number} The film height.
 	 */
 	getFilmHeight() {
 
@@ -47680,7 +47646,7 @@ class PerspectiveCamera extends Camera {
 }
 
 /**
- * Represents the shadow configuration of directional lights.
+ * Represents the shadow configuration of spot lights.
  *
  * @augments LightShadow
  */
@@ -47789,7 +47755,6 @@ class SpotLightShadow extends LightShadow {
  * spotLight.shadow.mapSize.height = 1024;
  * spotLight.shadow.camera.near = 500;
  * spotLight.shadow.camera.far = 4000;
- * spotLight.shadow.camera.fov = 30;s
  * ```
  *
  * @augments Light
@@ -47804,7 +47769,7 @@ class SpotLight extends Light {
 	 * @param {number} [distance=0] - Maximum range of the light. `0` means no limit.
 	 * @param {number} [angle=Math.PI/3] - Maximum angle of light dispersion from its direction whose upper bound is `Math.PI/2`.
 	 * @param {number} [penumbra=0] - Percent of the spotlight cone that is attenuated due to penumbra. Value range is `[0,1]`.
-	 * @param {number} [decay=2] - The amount the light dims along the distance of the light.
+	 * @param {number} [decay=2] - The exponent of the light's distance falloff.
 	 */
 	constructor( color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 2 ) {
 
@@ -47864,8 +47829,9 @@ class SpotLight extends Light {
 		this.penumbra = penumbra;
 
 		/**
-		 * The amount the light dims along the distance of the light. In context of
-		 * physically-correct rendering the default value should not be changed.
+		 * The exponent of the light's distance falloff (`1 / distance^decay`). The
+		 * default `2` gives physically correct inverse-square falloff and should not
+		 * be changed in context of physically-correct rendering.
 		 *
 		 * @type {number}
 		 * @default 2
@@ -47873,12 +47839,10 @@ class SpotLight extends Light {
 		this.decay = decay;
 
 		/**
-		 * A texture used to modulate the color of the light. The spot light
-		 * color is mixed with the RGB value of this texture, with a ratio
-		 * corresponding to its alpha value. The cookie-like masking effect is
-		 * reproduced using pixel values (0, 0, 0, 1-cookie_value).
-		 *
-		 * *Warning*: This property is disabled if {@link Object3D#castShadow} is set to `false`.
+		 * A texture projected from the light that modulates its color. The spot light
+		 * color is multiplied by the RGB value of this texture. The projection uses the
+		 * frustum of the shadow camera (see {@link SpotLightShadow#focus}) and works
+		 * whether or not {@link Object3D#castShadow} is enabled.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -48011,7 +47975,7 @@ class PointLight extends Light {
 	 * @param {(number|Color|string)} [color=0xffffff] - The light's color.
 	 * @param {number} [intensity=1] - The light's strength/intensity measured in candela (cd).
 	 * @param {number} [distance=0] - Maximum range of the light. `0` means no limit.
-	 * @param {number} [decay=2] - The amount the light dims along the distance of the light.
+	 * @param {number} [decay=2] - The exponent of the light's distance falloff.
 	 */
 	constructor( color, intensity, distance = 0, decay = 2 ) {
 
@@ -48041,8 +48005,9 @@ class PointLight extends Light {
 		this.distance = distance;
 
 		/**
-		 * The amount the light dims along the distance of the light. In context of
-		 * physically-correct rendering the default value should not be changed.
+		 * The exponent of the light's distance falloff (`1 / distance^decay`). The
+		 * default `2` gives physically correct inverse-square falloff and should not
+		 * be changed in context of physically-correct rendering.
 		 *
 		 * @type {number}
 		 * @default 2
@@ -48166,7 +48131,7 @@ class OrthographicCamera extends Camera {
 
 		/**
 		 * Represents the frustum window specification. This property should not be edited
-		 * directly but via {@link PerspectiveCamera#setViewOffset} and {@link PerspectiveCamera#clearViewOffset}.
+		 * directly but via {@link OrthographicCamera#setViewOffset} and {@link OrthographicCamera#clearViewOffset}.
 		 *
 		 * @type {?Object}
 		 * @default null
@@ -48206,11 +48171,11 @@ class OrthographicCamera extends Camera {
 		this.bottom = bottom;
 
 		/**
-		 * The camera's near plane. The valid range is greater than `0`
-		 * and less than the current value of {@link OrthographicCamera#far}.
+		 * The camera's near plane. The value must be less than the current value of
+		 * {@link OrthographicCamera#far}.
 		 *
-		 * Note that, unlike for the {@link PerspectiveCamera}, `0` is a
-		 * valid value for an orthographic camera's near plane.
+		 * Note that, unlike for the {@link PerspectiveCamera}, `0` and negative values
+		 * are valid for an orthographic camera's near plane.
 		 *
 		 * @type {number}
 		 * @default 0.1
@@ -48468,9 +48433,9 @@ class DirectionalLight extends Light {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.target = source.target.clone();
 		this.shadow = source.shadow.clone();
@@ -48562,7 +48527,7 @@ class RectAreaLight extends Light {
 	 * Constructs a new area light.
 	 *
 	 * @param {(number|Color|string)} [color=0xffffff] - The light's color.
-	 * @param {number} [intensity=1] - The light's strength/intensity.
+	 * @param {number} [intensity=1] - The light's strength/intensity measured in nits (cd/m²).
 	 * @param {number} [width=10] - The width of the light.
 	 * @param {number} [height=10] - The height of the light.
 	 */
@@ -48619,9 +48584,9 @@ class RectAreaLight extends Light {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.width = source.width;
 		this.height = source.height;
@@ -48912,7 +48877,7 @@ class SphericalHarmonics3 {
 	 *
 	 * @param {Array<number>} array - An array holding the SH coefficients.
 	 * @param {number} [offset=0] - The array offset where to start copying.
-	 * @return {SphericalHarmonics3} A clone of this instance.
+	 * @return {SphericalHarmonics3} A reference to this spherical harmonics.
 	 */
 	fromArray( array, offset = 0 ) {
 
@@ -48985,19 +48950,13 @@ class SphericalHarmonics3 {
  * Light probes are an alternative way of adding light to a 3D scene. Unlike
  * classical light sources (e.g. directional, point or spot lights), light
  * probes do not emit light. Instead they store information about light
- * passing through 3D space. During rendering, the light that hits a 3D
- * object is approximated by using the data from the light probe.
+ * passing through 3D space.
  *
- * Light probes are usually created from (radiance) environment maps. The
- * class {@link LightProbeGenerator} can be used to create light probes from
- * cube textures or render targets. However, light estimation data could also
- * be provided in other forms e.g. by WebXR. This enables the rendering of
- * augmented reality content that reacts to real world lighting.
+ * Note: Light probes are no longer evaluated by `WebGLRenderer` or `WebGPURenderer`,
+ * so adding one to a scene has no effect. Use {@link LightProbeGrid} or
+ * {@link Scene#environment} instead.
  *
- * The current probe implementation in three.js supports so-called diffuse
- * light probes. This type of light probe is functionally equivalent to an
- * irradiance environment map.
- *
+ * @deprecated since r188.
  * @augments Light
  */
 class LightProbe extends Light {
@@ -49005,12 +48964,15 @@ class LightProbe extends Light {
 	/**
 	 * Constructs a new light probe.
 	 *
-	 * @param {SphericalHarmonics3} sh - The spherical harmonics which represents encoded lighting information.
+	 * @deprecated since r188.
+	 * @param {SphericalHarmonics3} [sh] - The spherical harmonics which represents encoded lighting information.
 	 * @param {number} [intensity=1] - The light's strength/intensity.
 	 */
 	constructor( sh = new SphericalHarmonics3(), intensity = 1 ) {
 
 		super( undefined, intensity );
+
+		warnOnce( 'LightProbe: "LightProbe" has been removed. Use "LightProbeGrid" or "Scene.environment" instead.' ); // @deprecated r188
 
 		/**
 		 * This flag can be used for type testing.
@@ -49032,9 +48994,9 @@ class LightProbe extends Light {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.sh.copy( source.sh );
 
@@ -49152,7 +49114,7 @@ class MaterialLoader extends Loader {
 	 * Textures are not embedded in the material JSON so they have
 	 * to be injected before the loading process starts.
 	 *
-	 * @param {Object} value - A dictionary holding textures for material properties.
+	 * @param {Object<string,Texture>} value - A dictionary holding textures for material properties, keyed by texture UUID.
 	 * @return {MaterialLoader} A reference to this material loader.
 	 */
 	setTextures( value ) {
@@ -49356,6 +49318,77 @@ class InstancedBufferGeometry extends BufferGeometry {
 }
 
 /**
+ * An instanced version of an interleaved buffer.
+ *
+ * @augments InterleavedBuffer
+ */
+class InstancedInterleavedBuffer extends InterleavedBuffer {
+
+	/**
+	 * Constructs a new instanced interleaved buffer.
+	 *
+	 * @param {TypedArray} array - A typed array with a shared buffer storing attribute data.
+	 * @param {number} stride - The number of typed-array elements per vertex.
+	 * @param {number} [meshPerAttribute=1] - Defines how often a value of this interleaved buffer should be repeated.
+	 */
+	constructor( array, stride, meshPerAttribute = 1 ) {
+
+		super( array, stride );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isInstancedInterleavedBuffer = true;
+
+		/**
+		 * Defines how often a value of this buffer attribute should be repeated,
+		 * see {@link InstancedBufferAttribute#meshPerAttribute}.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.meshPerAttribute = meshPerAttribute;
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.meshPerAttribute = source.meshPerAttribute;
+
+		return this;
+
+	}
+
+	clone( data ) {
+
+		const ib = super.clone( data );
+
+		ib.meshPerAttribute = this.meshPerAttribute;
+
+		return ib;
+
+	}
+
+	toJSON( data ) {
+
+		const json = super.toJSON( data );
+
+		json.isInstancedInterleavedBuffer = true;
+		json.meshPerAttribute = this.meshPerAttribute;
+
+		return json;
+
+	}
+
+}
+
+/**
  * Class for loading geometries. The files are internally
  * loaded via {@link FileLoader}.
  *
@@ -49448,7 +49481,19 @@ class BufferGeometryLoader extends Loader {
 			const buffer = getArrayBuffer( json, interleavedBuffer.buffer );
 
 			const array = getTypedArray( interleavedBuffer.type, buffer );
-			const ib = new InterleavedBuffer( array, interleavedBuffer.stride );
+
+			let ib;
+
+			if ( interleavedBuffer.isInstancedInterleavedBuffer ) {
+
+				ib = new InstancedInterleavedBuffer( array, interleavedBuffer.stride, interleavedBuffer.meshPerAttribute );
+
+			} else {
+
+				ib = new InterleavedBuffer( array, interleavedBuffer.stride );
+
+			}
+
 			ib.uuid = interleavedBuffer.uuid;
 
 			if ( interleavedBuffer.usage !== undefined ) ib.setUsage( interleavedBuffer.usage );
@@ -49476,6 +49521,14 @@ class BufferGeometryLoader extends Loader {
 
 		const geometry = json.isInstancedBufferGeometry ? new InstancedBufferGeometry() : new BufferGeometry();
 
+		// the default instance count is Infinity which is serialized as null
+
+		if ( json.isInstancedBufferGeometry && typeof json.instanceCount === 'number' ) {
+
+			geometry.instanceCount = json.instanceCount;
+
+		}
+
 		const index = json.data.index;
 
 		if ( index !== undefined ) {
@@ -49500,8 +49553,16 @@ class BufferGeometryLoader extends Loader {
 			} else {
 
 				const typedArray = getTypedArray( attribute.type, attribute.array );
-				const bufferAttributeConstr = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
-				bufferAttribute = new bufferAttributeConstr( typedArray, attribute.itemSize, attribute.normalized );
+
+				if ( attribute.isInstancedBufferAttribute ) {
+
+					bufferAttribute = new InstancedBufferAttribute( typedArray, attribute.itemSize, attribute.normalized, attribute.meshPerAttribute );
+
+				} else {
+
+					bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+
+				}
 
 			}
 
@@ -49732,7 +49793,7 @@ class ObjectLoader extends Loader {
 	 * but can also be used directly to parse a previously loaded JSON structure.
 	 *
 	 * @param {Object} json - The serialized 3D object.
-	 * @param {onLoad} onLoad - Executed when all resources (e.g. textures) have been fully loaded.
+	 * @param {function(Object3D)} [onLoad] - Executed when all resources (e.g. textures) have been fully loaded.
 	 * @return {Object3D} The parsed 3D object.
 	 */
 	parse( json, onLoad ) {
@@ -49814,7 +49875,7 @@ class ObjectLoader extends Loader {
 	 *
 	 * @static
 	 * @param {string} type - The geometry type.
-	 * @param {BufferGeometry.constructor} geometryClass - The geometry class.
+	 * @param {BufferGeometry.constructor} geometryClass - The geometry class. It must implement a static `fromJSON( data, shapes )` method.
 	 */
 	static registerGeometry( type, geometryClass ) {
 
@@ -50440,6 +50501,8 @@ class ObjectLoader extends Loader {
 				if ( data.filmOffset !== undefined ) object.filmOffset = data.filmOffset;
 				if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
 
+				object.updateProjectionMatrix();
+
 				break;
 
 			case 'OrthographicCamera':
@@ -50448,6 +50511,8 @@ class ObjectLoader extends Loader {
 
 				if ( data.zoom !== undefined ) object.zoom = data.zoom;
 				if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
+
+				object.updateProjectionMatrix();
 
 				break;
 
@@ -50572,8 +50637,9 @@ class ObjectLoader extends Loader {
 				} );
 				object._instanceInfo = data.instanceInfo;
 
-				object._availableInstanceIds = data.availableInstanceIds;
-				object._availableGeometryIds = data.availableGeometryIds;
+				// sorted so the lists are valid min-heaps
+				object._availableInstanceIds = data.availableInstanceIds.slice().sort( ( a, b ) => a - b );
+				object._availableGeometryIds = data.availableGeometryIds.slice().sort( ( a, b ) => a - b );
 
 				object._nextIndexStart = data.nextIndexStart;
 				object._nextVertexStart = data.nextVertexStart;
@@ -50874,7 +50940,7 @@ const _errorMap = new WeakMap();
  *
  * ```js
  * const loader = new THREE.ImageBitmapLoader();
- * loader.setOptions( { imageOrientation: 'flipY' } ); // set options if needed
+ * loader.setOptions( { imageOrientation: 'flipY', premultiplyAlpha: 'none' } ); // set options if needed
  * const imageBitmap = await loader.loadAsync( 'image.png' );
  *
  * const texture = new THREE.Texture( imageBitmap );
@@ -50936,6 +51002,8 @@ class ImageBitmapLoader extends Loader {
 	/**
 	 * Sets the given loader options. The structure of the object must match the `options` parameter of
 	 * [createImageBitmap](https://developer.mozilla.org/en-US/docs/Web/API/Window/createImageBitmap).
+	 * The given object replaces the current options (including the default `premultiplyAlpha: 'none'`),
+	 * it is not merged. `colorSpaceConversion` is always set to `'none'`.
 	 *
 	 * Note: When caching is enabled, the cache key is based on the URL only. Loading the same URL with
 	 * different options will return the cached result of the first request.
@@ -51261,8 +51329,8 @@ class StereoCamera {
 		this.eyeSep = 0.064;
 
 		/**
-		 * The camera representing the left eye. This is added to layer `1` so objects to be
-		 * rendered by the left camera must also be added to this layer.
+		 * The camera representing the left eye. It has layer `1` enabled in addition to the
+		 * default layer `0`, so objects only on layer `1` are rendered by the left camera only.
 		 *
 		 * @type {PerspectiveCamera}
 		 */
@@ -51271,8 +51339,8 @@ class StereoCamera {
 		this.cameraL.matrixAutoUpdate = false;
 
 		/**
-		 * The camera representing the right eye. This is added to layer `2` so objects to be
-		 * rendered by the right camera must also be added to this layer.
+		 * The camera representing the right eye. It has layer `2` enabled in addition to the
+		 * default layer `0`, so objects only on layer `2` are rendered by the right camera only.
 		 *
 		 * @type {PerspectiveCamera}
 		 */
@@ -51401,7 +51469,7 @@ class CubeCamera extends Object3D {
 	 *
 	 * @param {number} near - The camera's near plane.
 	 * @param {number} far - The camera's far plane.
-	 * @param {WebGLCubeRenderTarget} renderTarget - The cube render target.
+	 * @param {(WebGLCubeRenderTarget|CubeRenderTarget)} renderTarget - The cube render target.
 	 */
 	constructor( near, far, renderTarget ) {
 
@@ -51412,7 +51480,7 @@ class CubeCamera extends Object3D {
 		/**
 		 * A reference to the cube render target.
 		 *
-		 * @type {WebGLCubeRenderTarget}
+		 * @type {(WebGLCubeRenderTarget|CubeRenderTarget)}
 		 */
 		this.renderTarget = renderTarget;
 
@@ -51828,7 +51896,7 @@ class Timer {
 	 * once per simulation step and before you perform queries against the timer
 	 * (e.g. via `getDelta()`).
 	 *
-	 * @param {number} timestamp - The current time in milliseconds. Can be obtained
+	 * @param {number} [timestamp] - The current time in milliseconds. Can be obtained
 	 * from the `requestAnimationFrame` callback argument. If not provided, the current
 	 * time will be determined with `performance.now`.
 	 * @return {Timer} A reference to this timer.
@@ -52239,8 +52307,8 @@ class Audio extends Object3D {
 		 * Indicates whether the audio playback can be controlled
 		 * with method like {@link Audio#play} or {@link Audio#pause}.
 		 *
-		 * This flag will be automatically set when audio sources are
-		 * defined.
+		 * This flag is set to `false` by {@link Audio#setNodeSource},
+		 * {@link Audio#setMediaElementSource} and {@link Audio#setMediaStreamSource}.
 		 *
 		 * @type {boolean}
 		 * @readonly
@@ -52358,7 +52426,7 @@ class Audio extends Object3D {
 	/**
 	 * Sets the given audio buffer as the source of this instance.
 	 *
-	 * {@link Audio#sourceType} is set to `buffer` and {@link Audio#hasPlaybackControl} to `true`.
+	 * {@link Audio#sourceType} is set to `buffer`.
 	 *
 	 * @param {AudioBuffer} audioBuffer - The audio buffer.
 	 * @return {Audio} A reference to this instance.
@@ -52754,7 +52822,8 @@ class Audio extends Object3D {
 
 	/**
 	 * Sets the loop start value which defines where in the audio buffer the replay should
-	 * start, in seconds.
+	 * start, in seconds. Only used when {@link Audio#loop} is `true` and {@link Audio#loopEnd}
+	 * is greater than this value, and applied on the next call of {@link Audio#play}.
 	 *
 	 * @param {number} value - The loop start value.
 	 * @return {Audio} A reference to this instance.
@@ -52769,7 +52838,9 @@ class Audio extends Object3D {
 
 	/**
 	 * Sets the loop end value which defines where in the audio buffer the replay should
-	 * stop, in seconds.
+	 * stop, in seconds. A value of `0` (the default) loops the whole buffer and also ignores
+	 * {@link Audio#loopStart}. Only used when {@link Audio#loop} is `true` and applied on the
+	 * next call of {@link Audio#play}.
 	 *
 	 * @param {number} value - The loop end value.
 	 * @return {Audio} A reference to this instance.
@@ -53041,11 +53112,12 @@ class PositionalAudio extends Audio {
 	}
 
 	/**
-	 * Sets the directional cone in which the audio can be listened.
+	 * Sets the directional cone in which the audio can be listened. The cone points
+	 * along the object's local positive Z axis.
 	 *
 	 * @param {number} coneInnerAngle - An angle, in degrees, of a cone inside of which there will be no volume reduction.
 	 * @param {number} coneOuterAngle - An angle, in degrees, of a cone outside of which the volume will be reduced by a constant value, defined by the `coneOuterGain` parameter.
-	 * @param {number} coneOuterGain - The amount of volume reduction outside the cone defined by the `coneOuterAngle`. When set to `0`, no sound can be heard.
+	 * @param {number} coneOuterGain - The gain (linear, `[0, 1]`) applied outside the cone defined by the `coneOuterAngle`. `1` means no volume reduction, `0` means no sound can be heard.
 	 * @return {PositionalAudio} A reference to this instance.
 	 */
 	setDirectionalCone( coneInnerAngle, coneOuterAngle, coneOuterGain ) {
@@ -53117,7 +53189,7 @@ class PositionalAudio extends Audio {
  * // create an AudioAnalyser, passing in the sound and desired fftSize
  * const analyser = new THREE.AudioAnalyser( sound, 32 );
  *
- * // get the average frequency of the sound
+ * // get the average magnitude of the frequency data
  * const data = analyser.getAverageFrequency();
  * ```
  */
@@ -53132,7 +53204,7 @@ class AudioAnalyser {
 	constructor( audio, fftSize = 2048 ) {
 
 		/**
-		 * The global audio listener.
+		 * The native analyser node used to compute the frequency data.
 		 *
 		 * @type {AnalyserNode}
 		 */
@@ -53153,10 +53225,10 @@ class AudioAnalyser {
 	/**
 	 * Returns an array with frequency data of the audio.
 	 *
-	 * Each item in the array represents the decibel value for a specific frequency.
-	 * The frequencies are spread linearly from 0 to 1/2 of the sample rate.
-	 * For example, for 48000 sample rate, the last item of the array will represent
-	 * the decibel value for 24000 Hz.
+	 * Each item in the array is an unsigned byte in the range `[0, 255]`, linearly
+	 * mapped from `analyser.minDecibels` to `analyser.maxDecibels`. Item `k` represents
+	 * the frequency `k * sampleRate / fftSize`, so the frequencies are spread linearly
+	 * from `0` up to just below half the sample rate.
 	 *
 	 * @return {Uint8Array} The frequency data.
 	 */
@@ -53169,9 +53241,10 @@ class AudioAnalyser {
 	}
 
 	/**
-	 * Returns the average of the frequencies returned by {@link AudioAnalyser#getFrequencyData}.
+	 * Returns the average of the frequency data returned by {@link AudioAnalyser#getFrequencyData},
+	 * i.e. the mean magnitude across all frequency bins.
 	 *
-	 * @return {number} The average frequency.
+	 * @return {number} The average magnitude in the range `[0, 255]`.
 	 */
 	getAverageFrequency() {
 
@@ -53771,7 +53844,7 @@ class PropertyBinding {
 	 * - uuid.objectName[objectIndex].propertyName[propertyIndex]
 	 * - parentName/nodeName.property
 	 * - parentName/parentName/nodeName.property[index]
-	 * - .bone[Armature.DEF_cog].position
+	 * - .bones[Armature.DEF_cog].position
 	 * - scene:helium_balloon_model:helium_balloon_model.position
 	 *
 	 * @static
@@ -55016,7 +55089,9 @@ class AnimationAction {
 	}
 
 	/**
-	 * Defines the time when the animation should start.
+	 * Defines the time when the animation should start. The time is compared against
+	 * the global mixer time (see {@link AnimationMixer#time}), so to start after a delay,
+	 * pass `mixer.time + delay`.
 	 *
 	 * @param {number} time - The start time in seconds.
 	 * @return {AnimationAction} A reference to this animation action.
@@ -55091,7 +55166,8 @@ class AnimationAction {
 
 	/**
 	 * Fades the animation out by decreasing its weight gradually from `1` to `0`,
-	 * within the passed time interval.
+	 * within the passed time interval. When the fade completes, {@link AnimationAction#enabled}
+	 * is set to `false`, so call {@link AnimationAction#reset} before fading the action in again.
 	 *
 	 * @param {number} duration - The duration of the fade.
 	 * @return {AnimationAction} A reference to this animation action.
@@ -56384,7 +56460,7 @@ class AnimationMixer extends EventDispatcher {
 	 * Advances the global mixer time and updates the animation.
 	 *
 	 * This is usually done in the render loop by passing the delta
-	 * time from {@link Clock} or {@link Timer}.
+	 * time from {@link Timer}.
 	 *
 	 * @param {number} deltaTime - The delta time in seconds.
 	 * @return {AnimationMixer} A reference to this animation mixer.
@@ -56585,7 +56661,7 @@ class RenderTarget3D extends RenderTarget {
 	 *
 	 * @param {number} [width=1] - The width of the render target.
 	 * @param {number} [height=1] - The height of the render target.
-	 * @param {number} [depth=1] - The height of the render target.
+	 * @param {number} [depth=1] - The depth of the render target.
 	 * @param {RenderTarget~Options} [options] - The configuration object.
 	 */
 	constructor( width = 1, height = 1, depth = 1, options = {} ) {
@@ -56696,7 +56772,7 @@ class UniformsGroup extends EventDispatcher {
 		this.isUniformsGroup = true;
 
 		/**
-		 * The ID of the 3D object.
+		 * The ID of the uniforms group.
 		 *
 		 * @name UniformsGroup#id
 		 * @type {number}
@@ -56705,7 +56781,8 @@ class UniformsGroup extends EventDispatcher {
 		Object.defineProperty( this, 'id', { value: _id ++ } );
 
 		/**
-		 * The name of the uniforms group.
+		 * The name of the uniforms group. Must match the name of the
+		 * respective uniform block in the shader.
 		 *
 		 * @type {string}
 		 */
@@ -56790,7 +56867,7 @@ class UniformsGroup extends EventDispatcher {
 	 * Frees the GPU-related resources allocated by this instance. Call this
 	 * method whenever this instance is no longer used in your app.
 	 *
-	 * @fires Texture#dispose
+	 * @fires UniformsGroup#dispose
 	 */
 	dispose() {
 
@@ -56841,77 +56918,6 @@ class UniformsGroup extends EventDispatcher {
 	clone() {
 
 		return new this.constructor().copy( this );
-
-	}
-
-}
-
-/**
- * An instanced version of an interleaved buffer.
- *
- * @augments InterleavedBuffer
- */
-class InstancedInterleavedBuffer extends InterleavedBuffer {
-
-	/**
-	 * Constructs a new instanced interleaved buffer.
-	 *
-	 * @param {TypedArray} array - A typed array with a shared buffer storing attribute data.
-	 * @param {number} stride - The number of typed-array elements per vertex.
-	 * @param {number} [meshPerAttribute=1] - Defines how often a value of this interleaved buffer should be repeated.
-	 */
-	constructor( array, stride, meshPerAttribute = 1 ) {
-
-		super( array, stride );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isInstancedInterleavedBuffer = true;
-
-		/**
-		 * Defines how often a value of this buffer attribute should be repeated,
-		 * see {@link InstancedBufferAttribute#meshPerAttribute}.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.meshPerAttribute = meshPerAttribute;
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.meshPerAttribute = source.meshPerAttribute;
-
-		return this;
-
-	}
-
-	clone( data ) {
-
-		const ib = super.clone( data );
-
-		ib.meshPerAttribute = this.meshPerAttribute;
-
-		return ib;
-
-	}
-
-	toJSON( data ) {
-
-		const json = super.toJSON( data );
-
-		json.isInstancedInterleavedBuffer = true;
-		json.meshPerAttribute = this.meshPerAttribute;
-
-		return json;
 
 	}
 
@@ -57014,10 +57020,10 @@ class GLBufferAttribute {
 	}
 
 	/**
-	 * Flag to indicate that this attribute has changed and should be re-sent to
-	 * the GPU. Set this to `true` when you modify the value of the array.
+	 * Flag to indicate that this attribute has changed. Setting it to `true` increments
+	 * {@link GLBufferAttribute#version}.
 	 *
-	 * @type {number}
+	 * @type {boolean}
 	 * @default false
 	 * @param {boolean} value
 	 */
@@ -57031,7 +57037,7 @@ class GLBufferAttribute {
 	 * Sets the given native WebGL buffer.
 	 *
 	 * @param {WebGLBuffer} buffer - The buffer to set.
-	 * @return {BufferAttribute} A reference to this instance.
+	 * @return {GLBufferAttribute} A reference to this instance.
 	 */
 	setBuffer( buffer ) {
 
@@ -57046,7 +57052,7 @@ class GLBufferAttribute {
 	 *
 	 * @param {number} type - The native data type (e.g. `gl.FLOAT`).
 	 * @param {number} elementSize - The corresponding size (in bytes) for the given `type` parameter.
-	 * @return {BufferAttribute} A reference to this instance.
+	 * @return {GLBufferAttribute} A reference to this instance.
 	 */
 	setType( type, elementSize ) {
 
@@ -57061,7 +57067,7 @@ class GLBufferAttribute {
 	 * Sets the item size.
 	 *
 	 * @param {number} itemSize - The item size.
-	 * @return {BufferAttribute} A reference to this instance.
+	 * @return {GLBufferAttribute} A reference to this instance.
 	 */
 	setItemSize( itemSize ) {
 
@@ -57075,7 +57081,7 @@ class GLBufferAttribute {
 	 * Sets the count (the expected number of vertices in VBO).
 	 *
 	 * @param {number} count - The count.
-	 * @return {BufferAttribute} A reference to this instance.
+	 * @return {GLBufferAttribute} A reference to this instance.
 	 */
 	setCount( count ) {
 
@@ -57225,7 +57231,9 @@ class Raycaster {
 	/**
 	 * Uses the given WebXR controller to compute a new origin and direction for the internal ray.
 	 *
-	 * @param {WebXRController} controller - The controller to copy the position and direction from.
+	 * @param {Group} controller - The target ray space of the controller, as returned by {@link WebXRManager#getController}
+	 * or {@link XRManager#getController}.
+	 * The ray's origin and direction are copied from its world matrix.
 	 * @return {Raycaster} A reference to this raycaster.
 	 */
 	setFromXRController( controller ) {
@@ -57246,12 +57254,14 @@ class Raycaster {
 	 * @property {number} distanceToRay -  Some 3D objects e.g. {@link Points} provide the distance of the
 	 * intersection to the nearest point on the ray. For other objects it will be `undefined`.
 	 * @property {Vector3} point - The intersection point, in world coordinates.
-	 * @property {Object} face - The face that has been intersected.
+	 * @property {?Object} face - The face that has been intersected. Its `normal` is defined in the local space
+	 * of the intersected geometry. `null` for 3D objects without faces like points, lines or sprites.
 	 * @property {number} faceIndex - The face index.
 	 * @property {Object3D} object - The 3D object that has been intersected.
 	 * @property {Vector2} uv - U,V coordinates at point of intersection.
 	 * @property {Vector2} uv1 - Second set of U,V coordinates at point of intersection.
-	 * @property {Vector3} normal - Interpolated normal vector at point of intersection.
+	 * @property {Vector3} normal - Interpolated normal vector at point of intersection, in the local space of the
+	 * intersected geometry (not in world space). The normal is flipped so it faces against the ray's direction.
 	 * @property {number} instanceId - The index number of the instance where the ray
 	 * intersects the {@link InstancedMesh}.
 	 * @property {number} batchId - The index number of the instance where the ray
@@ -57492,7 +57502,7 @@ class Spherical {
 	 *
 	 * @param {number} [radius=1] - The radius, or the Euclidean distance (straight-line distance) from the point to the origin.
 	 * @param {number} [phi=0] - The polar angle in radians from the y (up) axis.
-	 * @param {number} [theta=0] - The equator/azimuthal angle in radians around the y (up) axis.
+	 * @param {number} [theta=0] - The equator/azimuthal angle in radians around the y (up) axis, measured from the positive z-axis towards the positive x-axis.
 	 */
 	constructor( radius = 1, phi = 0, theta = 0 ) {
 
@@ -57513,7 +57523,8 @@ class Spherical {
 		this.phi = phi;
 
 		/**
-		 * The equator/azimuthal angle in radians around the y (up) axis.
+		 * The equator/azimuthal angle in radians around the y (up) axis, measured from
+		 * the positive z-axis towards the positive x-axis.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -57557,7 +57568,7 @@ class Spherical {
 	}
 
 	/**
-	 * Restricts the polar angle [page:.phi phi] to be between `0.000001` and pi -
+	 * Restricts the polar angle {@link Spherical#phi} to be between `0.000001` and pi -
 	 * `0.000001`.
 	 *
 	 * @return {Spherical} A reference to this spherical.
@@ -57717,8 +57728,8 @@ class Cylindrical {
 	 * Sets the cylindrical components from the given Cartesian coordinates.
 	 *
 	 * @param {number} x - The x value.
-	 * @param {number} y - The x value.
-	 * @param {number} z - The x value.
+	 * @param {number} y - The y value.
+	 * @param {number} z - The z value.
 	 * @return {Cylindrical} A reference to this cylindrical.
 	 */
 	setFromCartesianCoords( x, y, z ) {
@@ -58606,7 +58617,7 @@ class SpotLightHelper extends Object3D {
 	/**
 	 * Constructs a new spot light helper.
 	 *
-	 * @param {HemisphereLight} light - The light to be visualized.
+	 * @param {SpotLight} light - The light to be visualized.
 	 * @param {number|Color|string} [color] - The helper's color. If not set, the helper will take
 	 * the color of the light.
 	 */
@@ -59372,7 +59383,7 @@ class DirectionalLightHelper extends Object3D {
 	 * Constructs a new directional light helper.
 	 *
 	 * @param {DirectionalLight} light - The light to be visualized.
-	 * @param {number} [size=1] - The dimensions of the plane.
+	 * @param {number} [size=1] - Half the side length of the plane.
 	 * @param {number|Color|string} [color] - The helper's color. If not set, the helper will take
 	 * the color of the light.
 	 */
@@ -59512,7 +59523,7 @@ const _camera = /*@__PURE__*/ new Camera();
 class CameraHelper extends LineSegments {
 
 	/**
-	 * Constructs a new arrow helper.
+	 * Constructs a new camera helper.
 	 *
 	 * @param {Camera} camera - The camera to visualize.
 	 */
@@ -59836,7 +59847,7 @@ const _box = /*@__PURE__*/ new Box3();
  *
  * ```js
  * const sphere = new THREE.SphereGeometry();
- * const object = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( 0xff0000 ) );
+ * const object = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0000 } ) );
  * const box = new THREE.BoxHelper( object, 0xffff00 );
  * scene.add( box );
  * ```
@@ -60050,7 +60061,7 @@ class Box3Helper extends LineSegments {
  * A helper object to visualize an instance of {@link Plane}.
  *
  * ```js
- * const plane = new THREE.Plane( new THREE.Vector3( 1, 1, 0.2 ), 3 );
+ * const plane = new THREE.Plane( new THREE.Vector3( 1, 1, 0.2 ).normalize(), 3 );
  * const helper = new THREE.PlaneHelper( plane, 1, 0xffff00 );
  * scene.add( helper );
  * ```
@@ -60120,8 +60131,8 @@ class PlaneHelper extends Line {
 	}
 
 	/**
-	 * Updates the helper to match the position and direction of the
-	 * light being visualized.
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
 	 */
 	dispose() {
 
@@ -60843,13 +60854,226 @@ class Controls extends EventDispatcher {
 
 }
 
+// Fast Half Float Conversions, http://www.fox-toolkit.org/ftp/fasthalffloatconversion.pdf
+
+const _tables = /*@__PURE__*/ _generateTables();
+
+function _generateTables() {
+
+	// float32 to float16 helpers
+
+	const buffer = new ArrayBuffer( 4 );
+	const floatView = new Float32Array( buffer );
+	const uint32View = new Uint32Array( buffer );
+
+	const baseTable = new Uint32Array( 512 );
+	const shiftTable = new Uint32Array( 512 );
+
+	for ( let i = 0; i < 256; ++ i ) {
+
+		const e = i - 127;
+
+		// very small number (0, -0)
+
+		if ( e < -27 ) {
+
+			baseTable[ i ] = 0x0000;
+			baseTable[ i | 0x100 ] = 0x8000;
+			shiftTable[ i ] = 24;
+			shiftTable[ i | 0x100 ] = 24;
+
+			// small number (denorm)
+
+		} else if ( e < -14 ) {
+
+			baseTable[ i ] = 0x0400 >> ( - e - 14 );
+			baseTable[ i | 0x100 ] = ( 0x0400 >> ( - e - 14 ) ) | 0x8000;
+			shiftTable[ i ] = - e - 1;
+			shiftTable[ i | 0x100 ] = - e - 1;
+
+			// normal number
+
+		} else if ( e <= 15 ) {
+
+			baseTable[ i ] = ( e + 15 ) << 10;
+			baseTable[ i | 0x100 ] = ( ( e + 15 ) << 10 ) | 0x8000;
+			shiftTable[ i ] = 13;
+			shiftTable[ i | 0x100 ] = 13;
+
+			// large number (Infinity, -Infinity)
+
+		} else if ( e < 128 ) {
+
+			baseTable[ i ] = 0x7c00;
+			baseTable[ i | 0x100 ] = 0xfc00;
+			shiftTable[ i ] = 24;
+			shiftTable[ i | 0x100 ] = 24;
+
+			// stay (NaN, Infinity, -Infinity)
+
+		} else {
+
+			baseTable[ i ] = 0x7c00;
+			baseTable[ i | 0x100 ] = 0xfc00;
+			shiftTable[ i ] = 13;
+			shiftTable[ i | 0x100 ] = 13;
+
+		}
+
+	}
+
+	// float16 to float32 helpers
+
+	const mantissaTable = new Uint32Array( 2048 );
+	const exponentTable = new Uint32Array( 64 );
+	const offsetTable = new Uint32Array( 64 );
+
+	for ( let i = 1; i < 1024; ++ i ) {
+
+		let m = i << 13; // zero pad mantissa bits
+		let e = 0; // zero exponent
+
+		// normalized
+		while ( ( m & 0x00800000 ) === 0 ) {
+
+			m <<= 1;
+			e -= 0x00800000; // decrement exponent
+
+		}
+
+		m &= -8388609; // clear leading 1 bit
+		e += 0x38800000; // adjust bias
+
+		mantissaTable[ i ] = m | e;
+
+	}
+
+	for ( let i = 1024; i < 2048; ++ i ) {
+
+		mantissaTable[ i ] = 0x38000000 + ( ( i - 1024 ) << 13 );
+
+	}
+
+	for ( let i = 1; i < 31; ++ i ) {
+
+		exponentTable[ i ] = i << 23;
+
+	}
+
+	exponentTable[ 31 ] = 0x47800000;
+	exponentTable[ 32 ] = 0x80000000;
+
+	for ( let i = 33; i < 63; ++ i ) {
+
+		exponentTable[ i ] = 0x80000000 + ( ( i - 32 ) << 23 );
+
+	}
+
+	exponentTable[ 63 ] = 0xc7800000;
+
+	for ( let i = 1; i < 64; ++ i ) {
+
+		if ( i !== 32 ) {
+
+			offsetTable[ i ] = 1024;
+
+		}
+
+	}
+
+	return {
+		floatView: floatView,
+		uint32View: uint32View,
+		baseTable: baseTable,
+		shiftTable: shiftTable,
+		mantissaTable: mantissaTable,
+		exponentTable: exponentTable,
+		offsetTable: offsetTable
+	};
+
+}
+
+/**
+ * Returns a half precision floating point value (FP16) from the given single
+ * precision floating point value (FP32). The result is the FP16 bit pattern as
+ * an integer in the range `[0, 65535]`, e.g. for a `Uint16Array` used with
+ * `HalfFloatType`. Values are clamped to `[-65504, 65504]`.
+ *
+ * @param {number} val - A single precision floating point value.
+ * @return {number} The FP16 bit pattern.
+ */
+function toHalfFloat( val ) {
+
+	if ( Math.abs( val ) > 65504 ) warn( 'DataUtils.toHalfFloat(): Value out of range.' );
+
+	val = clamp( val, -65504, 65504 );
+
+	_tables.floatView[ 0 ] = val;
+	const f = _tables.uint32View[ 0 ];
+	const e = ( f >> 23 ) & 0x1ff;
+	return _tables.baseTable[ e ] + ( ( f & 0x007fffff ) >> _tables.shiftTable[ e ] );
+
+}
+
+/**
+ * Returns a single precision floating point value (FP32) from the given half
+ * precision floating point value (FP16).
+ *
+ * @param {number} val - A FP16 bit pattern, e.g. an element of a `Uint16Array`.
+ * @return {number} The FP32 value.
+ */
+function fromHalfFloat( val ) {
+
+	const m = val >> 10;
+	_tables.uint32View[ 0 ] = _tables.mantissaTable[ _tables.offsetTable[ m ] + ( val & 0x3ff ) ] + _tables.exponentTable[ m ];
+	return _tables.floatView[ 0 ];
+
+}
+
+/**
+ * A class containing utility functions for data.
+ *
+ * @hideconstructor
+ */
+class DataUtils {
+
+	/**
+	 * Returns a half precision floating point value (FP16) from the given single
+	 * precision floating point value (FP32). The result is the FP16 bit pattern as
+	 * an integer in the range `[0, 65535]`, e.g. for a `Uint16Array` used with
+	 * `HalfFloatType`. Values are clamped to `[-65504, 65504]`.
+	 *
+	 * @param {number} val - A single precision floating point value.
+	 * @return {number} The FP16 bit pattern.
+	 */
+	static toHalfFloat( val ) {
+
+		return toHalfFloat( val );
+
+	}
+
+	/**
+	 * Returns a single precision floating point value (FP32) from the given half
+	 * precision floating point value (FP16).
+	 *
+	 * @param {number} val - A FP16 bit pattern, e.g. an element of a `Uint16Array`.
+	 * @return {number} The FP32 value.
+	 */
+	static fromHalfFloat( val ) {
+
+		return fromHalfFloat( val );
+
+	}
+
+}
+
 /**
  * Scales the texture as large as possible within its surface without cropping
  * or stretching the texture. The method preserves the original aspect ratio of
  * the texture. Akin to CSS `object-fit: contain`
  *
  * @param {Texture} texture - The texture.
- * @param {number} aspect - The texture's aspect ratio.
+ * @param {number} aspect - The aspect ratio (width / height) of the surface the texture is displayed on.
  * @return {Texture} The updated texture.
  */
 function contain( texture, aspect ) {
@@ -60884,7 +61108,7 @@ function contain( texture, aspect ) {
  * Akin to CSS `object-fit: cover`.
  *
  * @param {Texture} texture - The texture.
- * @param {number} aspect - The texture's aspect ratio.
+ * @param {number} aspect - The aspect ratio (width / height) of the surface the texture is displayed on.
  * @return {Texture} The updated texture.
  */
 function cover( texture, aspect ) {
@@ -61084,7 +61308,7 @@ class TextureUtils {
 	 * the texture. Akin to CSS `object-fit: contain`
 	 *
 	 * @param {Texture} texture - The texture.
-	 * @param {number} aspect - The texture's aspect ratio.
+	 * @param {number} aspect - The aspect ratio (width / height) of the surface the texture is displayed on.
 	 * @return {Texture} The updated texture.
 	 */
 	static contain( texture, aspect ) {
@@ -61099,7 +61323,7 @@ class TextureUtils {
 	 * Akin to CSS `object-fit: cover`.
 	 *
 	 * @param {Texture} texture - The texture.
-	 * @param {number} aspect - The texture's aspect ratio.
+	 * @param {number} aspect - The aspect ratio (width / height) of the surface the texture is displayed on.
 	 * @return {Texture} The updated texture.
 	 */
 	static cover( texture, aspect ) {
