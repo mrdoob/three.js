@@ -272,6 +272,9 @@ import './src/textures/TextureSource.tests.js';
 import './src/textures/VideoTexture.tests.js';
 
 
+//src/nodes/accessors
+import './src/nodes/accessors/UniformArrayNode.tests.js';
+
 //src/nodes/display
 import './src/nodes/display/PassNode.tests.js';
 import './src/nodes/display/ViewportTextureNode.tests.js';

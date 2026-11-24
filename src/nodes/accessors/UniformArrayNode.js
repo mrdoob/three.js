@@ -298,10 +298,57 @@ export default UniformArrayNode;
 /**
  * TSL function for creating an uniform array node.
  *
+ * Like with {@link uniform}, constant nodes like `color( 0xff0000 )` can be used
+ * as array elements. They are replaced with their values.
+ *
  * @tsl
  * @function
  * @param {Array<any>} values - Array-like data.
  * @param {?string} [nodeType] - The data type of the array elements.
  * @returns {UniformArrayNode}
  */
-export const uniformArray = ( values, nodeType ) => new UniformArrayNode( values, nodeType );
+export const uniformArray = ( values, nodeType ) => {
+
+	// keep the given array if possible since it can be updated later
+
+	if ( Array.isArray( values ) && values.some( value => value && value.isNode === true ) ) {
+
+		values = values.map( getConstValue );
+
+	}
+
+	return new UniformArrayNode( values, nodeType );
+
+};
+
+/**
+ * Returns the value of the constant node found in the given node, like `uniform()` does.
+ * Values that are not nodes are returned as they are.
+ *
+ * @private
+ * @param {any} value - The value or node.
+ * @returns {any} The value.
+ */
+function getConstValue( value ) {
+
+	if ( value && value.isNode === true ) {
+
+		let v = value.value;
+
+		value.traverse( n => {
+
+			if ( n.isConstNode === true ) {
+
+				v = n.value;
+
+			}
+
+		} );
+
+		return v;
+
+	}
+
+	return value;
+
+}
