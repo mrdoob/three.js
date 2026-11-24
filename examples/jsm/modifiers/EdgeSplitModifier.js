@@ -78,17 +78,11 @@ class EdgeSplitModifier {
 
 		function mapPositionsToIndexes() {
 
-			pointToIndexMap = Array( positions.length / 3 );
+			pointToIndexMap = Array.from( { length: positions.length / 3 }, () => [] );
 
 			for ( let i = 0; i < indexes.length; i ++ ) {
 
 				const index = indexes[ i ];
-
-				if ( pointToIndexMap[ index ] == null ) {
-
-					pointToIndexMap[ index ] = [];
-
-				}
 
 				pointToIndexMap[ index ].push( i );
 
