@@ -271,6 +271,7 @@ class Performance extends Tab {
 			return {
 				key: stats.cid,
 				name: stats.name,
+				isSpan: stats.children.length > 0,
 				color: getColor( stats.name, type ),
 				start,
 				end: start + data[ type ],

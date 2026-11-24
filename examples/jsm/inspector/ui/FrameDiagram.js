@@ -112,7 +112,7 @@ export class FrameDiagram {
 	/**
 	 * Updates the diagram.
 	 *
-	 * @param {Object<string, Array<{key: string, name: string, color: string, start: number, end: number, children: Array}>>} tracks - The spans of each track, by its name. The times are in milliseconds since the start of the track. Only the hue of the color is used, except for Render Pipeline spans.
+	 * @param {Object<string, Array<{key: string, name: string, isSpan: boolean, color: string, start: number, end: number, children: Array}>>} tracks - The spans of each track, by its name. The times are in milliseconds since the start of the track. Only the hue of the color is used, except for Render Pipeline spans.
 	 * @param {number} duration - The time the width of the diagram stands for.
 	 * @param {number} period - The frame period, marked in the tracks.
 	 */
@@ -246,6 +246,7 @@ export class FrameDiagram {
 			if ( box.firstChild.nodeValue !== span.name ) box.firstChild.nodeValue = span.name;
 
 			box.classList.toggle( 'frame-diagram-pipeline', span.name === 'Render Pipeline' );
+			box.classList.toggle( 'aggregate-timing', span.isSpan );
 			box.style.setProperty( '--span-color', span.color );
 			box.style.left = ( ( span.start - start ) / ( duration || 1 ) ) * 100 + '%';
 			box.style.width = ( spanDuration / ( duration || 1 ) ) * 100 + '%';
