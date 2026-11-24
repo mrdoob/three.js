@@ -49,6 +49,7 @@
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 		import { reprojectedBeauty, previousViewZ } from 'three/addons/tsl/display/ReprojectedBeautyNode.js';
+		import { opaqueFragment, opaqueFragmentSource } from 'three/addons/tsl/utils/OpaqueFragment.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -59,7 +60,7 @@
 		const params = {
 			output: 'Beauty', enabled: true, quality: 0.5, intensity: 1,
 			maxDistance: 2, thickness: 0.1, binaryRefine: false,
-			roughness: 1, blur: true
+			roughness: 1, blur: true, alphaThreshold: 1
 		};
 
 		let camera, scene, model, renderer, renderPipeline;
@@ -87,9 +88,11 @@
 
 					if ( object.material ) {
 
-						// SSR traces opaque geometry only
+						if ( object.material.name === 'Lense_Casing' ) {
 
-						object.material.transparent = false;
+							object.material.transparent = true;
+
+						}
 
 						// Avoid overdrawing
 						object.material.side = THREE.FrontSide;
@@ -139,15 +142,20 @@
 
 			renderPipeline = new THREE.RenderPipeline( renderer );
 
-			// the pre-pass renders the opaque geometry SSR traces, without shading it
+			// the pre-pass renders the opaque fragments SSR traces, without shading them
+
+			const alphaThreshold = uniform( params.alphaThreshold );
 
 			const scenePass = pass( scene, camera );
-			scenePass.transparent = false;
 			scenePass.setMRT( mrt( {
-				output: packNormalToOctahedral( normalView ),
+				output: opaqueFragment( packNormalToOctahedral( normalView ), alphaThreshold ),
 				metalrough: vec2( metalness, roughness ), // pack metalness and roughness into a single attachment
 				velocity: vec4( velocity, 0, previousViewZ )
 			} ) );
+
+			// the attachments hold data, so the blending of transparent materials does not apply
+
+			scenePass.getMRT().setBlendMode( 'output', new THREE.BlendMode( THREE.NoBlending ) );
 
 			const scenePassNormal = scenePass.getTextureNode( 'output' ).toInspector( 'Normal', ( node ) => {
 
@@ -202,7 +210,9 @@
 
 			// the materials reflect SSR through their BRDF, and the environment where SSR has no coverage
 
-			beautyPass.contextNode = builtinIndirectContext( { specular: [ mix( raw.sample( screenUV ), reflection.getSpecularSource(), blurEnabled ) ] } );
+			beautyPass.contextNode = builtinIndirectContext( {
+				specular: [ opaqueFragmentSource( mix( raw.sample( screenUV ), reflection.getSpecularSource(), blurEnabled ), alphaThreshold ) ]
+			} );
 
 			const spatialAA = smaa( beautyPass );
 
@@ -256,6 +266,7 @@
 			blurGui.add( params, 'blur' ).name( 'Enabled' ).onChange( value => blurEnabled.value = Number( value ) );
 
 			const sceneGui = renderer.inspector.createParameters( 'Scene' );
+			sceneGui.add( params, 'alphaThreshold', 0, 1, 0.01 ).name( 'Alpha threshold' ).info( 'Fragments of transparent materials below this alpha are not traced and reflect the environment.' ).onChange( value => alphaThreshold.value = value );
 			sceneGui.add( params, 'roughness', 0, 1 ).name( 'Roughness' ).onChange( value => {
 
 				model?.traverse( object => {
