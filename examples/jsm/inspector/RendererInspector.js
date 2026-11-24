@@ -16,6 +16,8 @@ class ObjectStats {
 		this.gpuStart = null; // GPU timestamps, only comparable with each other and null in WebGL
 		this.gpuEnd = null;
 		this.gpuNotAvailable = false;
+		this.cpuOffset = 0; // relative to the parent
+		this.gpuOffset = null;
 		this.fps = 0;
 
 		this.children = [];
@@ -96,6 +98,24 @@ function getSpanTime( children ) {
 	}
 
 	return duration;
+
+}
+
+// stores each call's offset relative to its parent, using separate CPU and GPU origins
+
+function resolveFrameTimes( stats, frame ) {
+
+	const parent = stats.parent;
+
+	stats.cpuOffset = stats.timestamp - ( parent === frame ? frame.children[ 0 ].timestamp : parent.timestamp );
+
+	if ( stats.gpuStart !== null ) {
+
+		stats.gpuOffset = stats.gpuStart - parent.gpuStart;
+
+	}
+
+	for ( const child of stats.children ) resolveFrameTimes( child, frame );
 
 }
 
@@ -357,6 +377,9 @@ export class RendererInspector extends InspectorBase {
 		if ( frame.finished === true && frame.pendingTimers === 0 && this.framesLib[ frame.frameId ] === frame ) {
 
 			frame.gpuSpanTime = getSpanTime( frame.children );
+			frame.gpuStart = frame.children.reduce( ( start, stats ) => stats.gpuStart !== null ? Math.min( start, stats.gpuStart ) : start, Infinity );
+
+			for ( const stats of frame.children ) resolveFrameTimes( stats, frame );
 
 			this.resolveFrame( frame );
 

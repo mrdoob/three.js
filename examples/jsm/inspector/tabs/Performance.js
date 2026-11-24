@@ -1,8 +1,31 @@
 import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
 import { Graph } from '../ui/Graph.js';
+import { FrameDiagram } from '../ui/FrameDiagram.js';
 import { Item } from '../ui/Item.js';
 import { createValueSpan, setText } from '../ui/utils.js';
+
+const HUES = 12;
+
+// returns one of a set of hues for the name without what follows a bracket or a dash, so the calls which
+// only differ by that share a hue, and keep it between frames and runs
+
+function getColor( name ) {
+
+	name = name.split( / \[| - / )[ 0 ];
+
+	let hash = 0;
+
+	for ( let i = 0; i < name.length; i ++ ) hash = Math.imul( hash ^ name.charCodeAt( i ), 16777619 );
+
+	// mix the bits, names often differ only by their last character
+
+	hash = Math.imul( hash ^ ( hash >>> 16 ), 0x85ebca6b );
+	hash ^= hash >>> 13;
+
+	return `oklch( 0.7 0.15 ${ ( hash >>> 0 ) % HUES * ( 360 / HUES ) } )`;
+
+}
 
 class Performance extends Tab {
 
@@ -56,6 +79,20 @@ class Performance extends Tab {
 
 		//
 
+		// the calls of the average frame over time, the ones the GPU overlaps are stacked
+
+		const frameDiagram = new FrameDiagram();
+
+		this.averageFrameDuration = createValueSpan();
+		const averageFrame = new Item( 'Average Frame', createValueSpan(), createValueSpan(), this.averageFrameDuration );
+		perfList.add( averageFrame );
+
+		const frameDiagramItem = new Item( frameDiagram.domElement );
+		frameDiagramItem.itemRow.childNodes[ 0 ].style.gridColumn = '1 / -1';
+		averageFrame.add( frameDiagramItem );
+
+		//
+
 		const frameStats = new Item( 'Frame Stats', createValueSpan(), createValueSpan(), createValueSpan() );
 		perfList.add( frameStats );
 
@@ -67,6 +104,7 @@ class Performance extends Tab {
 		//
 
 		this.notInUse = new Map();
+		this.frameDiagram = frameDiagram;
 		this.frameStats = frameStats;
 		this.graphStats = graphStats;
 		this.graph = graph;
@@ -162,6 +200,67 @@ class Performance extends Tab {
 
 	}
 
+	updateFrameDiagram( inspector, frame ) {
+
+		const cpuStarts = new Map();
+		let gpuOffset = 0;
+
+		const createSpans = ( children, type, parentStart = 0 ) => children.filter( ( stats ) => type === 'cpu' || inspector.getStatsData( stats.cid ).gpuHasTimestamp ).map( ( stats ) => {
+
+			const data = inspector.getStatsData( stats.cid );
+			const start = parentStart + data[ type + 'Offset' ];
+
+			if ( type === 'cpu' ) {
+
+				cpuStarts.set( stats.cid, start );
+
+			} else {
+
+				gpuOffset = Math.max( gpuOffset, cpuStarts.get( stats.cid ) - start );
+
+			}
+
+			return {
+				key: stats.cid,
+				name: stats.name,
+				color: getColor( stats.name ),
+				start,
+				end: start + data[ type ],
+				children: createSpans( stats.children, type, start )
+			};
+
+		} );
+
+		const tracks = { CPU: createSpans( frame.average.children, 'cpu' ), GPU: createSpans( frame.average.children, 'gpu' ) };
+
+		// align matching call starts without changing the spacing of the GPU spans
+
+		const shiftSpans = ( spans ) => {
+
+			for ( const span of spans ) {
+
+				span.start += gpuOffset;
+				span.end += gpuOffset;
+
+				shiftSpans( span.children );
+
+			}
+
+		};
+
+		shiftSpans( tracks.GPU );
+
+		// the diagram shows a frame period, or more if the frame takes longer on the GPU
+
+		const period = inspector.fps > 0 ? 1000 / inspector.fps : 0;
+		const duration = Math.max( period, ...tracks.CPU.map( ( span ) => span.end ), ...tracks.GPU.map( ( span ) => span.end ) );
+
+		this.frameDiagram.update( tracks, duration, period );
+
+		setText( this.averageFrameDuration, duration.toFixed( 2 ) + ' ms' );
+
+	}
+
 	updateGraph( inspector, frame ) {
 
 		const fps = inspector.fps;
@@ -231,11 +330,13 @@ class Performance extends Tab {
 
 		this.currentItem = this.frameStats;
 
-		for ( const child of frame.children ) {
+		for ( const child of frame.average.children ) {
 
 			this.resolveStats( inspector, child );
 
 		}
+
+		this.updateFrameDiagram( inspector, frame );
 
 		// remove unused frame items
 
