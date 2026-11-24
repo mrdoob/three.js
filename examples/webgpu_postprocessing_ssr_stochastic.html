@@ -63,6 +63,7 @@
 		import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
 		import { traa } from 'three/addons/tsl/display/TRAANode.js';
+		import { reprojectedBeauty, previousViewZ } from 'three/addons/tsl/display/ReprojectedBeautyNode.js';
 
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -242,7 +243,7 @@
 				diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
 				normal: packNormalToOctahedral( normalView ),
 				// Pack roughness into the spare velocity channel to save MRT bandwidth
-				velocity: vec4( velocity, materialRoughness, 0 )
+				velocity: vec4( velocity, materialRoughness, previousViewZ )
 			} ) );
 
 			scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
@@ -273,7 +274,8 @@
 				scenePassVelocity.sample( uv ).z
 			) ).toInspector( 'Metalness/Roughness' );
 
-			ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+			ssrNode = ssr( reprojectedBeauty( scenePass ), scenePassDepth, sceneNormal, {
+				camera,
 				stochastic: true,
 				diffuseNode: scenePassDiffuseColor,
 				metalnessNode: scenePassDiffuseColor.a,

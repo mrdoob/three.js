@@ -45,6 +45,7 @@
 			import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { smaa } from 'three/addons/tsl/display/SMAANode.js';
+			import { reprojectedBeauty, previousViewZ } from 'three/addons/tsl/display/ReprojectedBeautyNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -187,7 +188,7 @@
 					output: output,
 					diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
 					normal: packNormalToOctahedral( normalView ),
-					velocity: vec4( velocity, materialRoughness, 0 )
+					velocity: vec4( velocity, materialRoughness, previousViewZ )
 				} ) );
 
 				// octahedral normals can't be filtered across their folds
@@ -217,7 +218,8 @@
 
 				// ssr
 
-				const ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+				const ssrNode = ssr( reprojectedBeauty( scenePass ), scenePassDepth, sceneNormal, {
+					camera,
 					stochastic: true,
 					diffuseNode: scenePassDiffuseColor,
 					metalnessNode: scenePassDiffuseColor.a,
