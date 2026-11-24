@@ -41,6 +41,7 @@
 			import * as THREE from 'three/webgpu';
 			import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, velocity } from 'three/tsl';
 			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+			import { depthAwareDownsample } from 'three/addons/tsl/display/DepthAwareDownsampleNode.js';
 			import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 			import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
@@ -225,11 +226,47 @@
 					binaryRefine: params.binaryRefine
 				} ).toInspector( 'SSR' );
 
+				// downsample: at a ratio above 1, the reflections are computed and denoised from downsampled inputs and upsampled afterwards
+
+				const downsampleParams = { level: 0 };
+
+				const downsample = depthAwareDownsample( scenePassDepth, { normal: scenePassNormal, diffuseColor: scenePassDiffuseColor, velocity: scenePassVelocity } );
+				const downsampleDepth = downsample.getTextureNode( 'depth' );
+				const downsampleDiffuseColor = downsample.getTextureNode( 'diffuseColor' );
+				const downsampleVelocity = downsample.getTextureNode( 'velocity' );
+				const downsampleNormal = sample( ( uv ) => normalDecode( downsample.getTextureNode( 'normal' ).sample( uv ) ) );
+				const downsampleRoughness = sample( ( uv ) => downsampleVelocity.sample( uv ).z );
+				const downsampleMetalRough = sample( ( uv ) => vec2( downsampleDiffuseColor.sample( uv ).a, downsampleVelocity.sample( uv ).z ) );
+
+				function updateDownsample() {
+
+					const reduced = downsampleParams.level > 0;
+
+					if ( reduced ) downsample.level = downsampleParams.level;
+
+					ssrNode.depthNode = reduced ? downsampleDepth : scenePassDepth;
+					ssrNode.normalNode = reduced ? downsampleNormal : sceneNormal;
+					ssrNode.diffuseNode = reduced ? downsampleDiffuseColor : scenePassDiffuseColor;
+					ssrNode.metalnessNode = reduced ? downsampleDiffuseColor.a : scenePassDiffuseColor.a;
+					ssrNode.roughnessNode = reduced ? downsampleRoughness : sceneRoughness;
+
+					temporalReprojectNode.depthNode = ssrNode.depthNode;
+					temporalReprojectNode.normalNode = reduced ? downsample.getTextureNode( 'normal' ) : scenePassNormal;
+					temporalReprojectNode.velocityNode = reduced ? downsampleVelocity : scenePassVelocity;
+
+					denoiseNode.depthNode = ssrNode.depthNode;
+					denoiseNode.normalNode = ssrNode.normalNode;
+					denoiseNode.roughnessMetalnessNode = reduced ? downsampleMetalRough : sceneMetalRough;
+
+					renderPipeline.needsUpdate = true;
+
+				}
+
 				const ssrTexture = ssrNode.getTextureNode();
 
 				// denoise
 
-				const temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
+				const temporalReprojectNode = temporalReproject( ssrTexture, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
 					mode: 'specular',
 					accumulate: false,
 					normalDecode: normalDecode
@@ -240,7 +277,7 @@
 				const denoiseNode = recurrentDenoise( temporalReprojectNode, camera, {
 					depth: scenePassDepth,
 					normal: sceneNormal,
-					raw: ssrNode,
+					raw: ssrTexture,
 					metalRoughness: sceneMetalRough,
 					mode: 'specular',
 					accumulate: true
@@ -261,7 +298,9 @@
 
 				const denoiseEnabled = uniform( 1 );
 
-				const combined = scenePassColor.rgb.add( mix( ssrTexture.rgb, denoiseNode.rgb, denoiseEnabled ) );
+				const denoiseTexture = denoiseNode.getTextureNode();
+
+				const combined = scenePassColor.rgb.add( mix( ssrTexture.rgb, denoiseTexture.rgb, denoiseEnabled ) );
 
 				const temporalAA = traa( vec4( combined, 1 ), scenePassDepth, scenePassVelocity, camera );
 				const spatialAA = smaa( vec4( combined, 1 ) );
@@ -274,7 +313,7 @@
 
 						case 'Beauty': outputNode = params.traa ? temporalAA : spatialAA; break;
 						case 'SSR': outputNode = vec4( ssrTexture.rgb, 1 ); break;
-						case 'SSR DN': outputNode = vec4( denoiseNode.rgb, 1 ); break;
+						case 'SSR DN': outputNode = vec4( denoiseTexture.rgb, 1 ); break;
 
 					}
 
@@ -300,6 +339,14 @@
 				const displayGui = renderer.inspector.createParameters( 'Display' );
 				displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN' ] ).name( 'Output' ).onChange( updateOutput );
 				displayGui.add( params, 'traa' ).name( 'TRAA' ).onChange( updateOutput );
+
+				const downsampleGui = renderer.inspector.createParameters( 'Downsample' );
+				downsampleGui.add( downsampleParams, 'level', { '1': 0, '2': 1, '4': 2 } ).name( 'ratio' ).onChange( ( value ) => {
+
+					downsampleParams.level = Number( value );
+					updateDownsample();
+
+				} );
 
 				const ssrGui = renderer.inspector.createParameters( 'SSR' );
 				ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( updateParameters );

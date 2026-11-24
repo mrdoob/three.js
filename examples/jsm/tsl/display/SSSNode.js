@@ -2,7 +2,6 @@ import { RedFormat, RenderTarget, Vector2, RendererUtils, QuadMesh, Node, NodeMa
 import { reference, getScreenPosition, getViewPosition, float, Break, Loop, int, max, abs, If, interleavedGradientNoise, screenCoordinate, Fn, passTexture, uv, uniform, depthToViewZ, vec2, lightPosition, lightTargetPosition, fract, rand, mix, context, isBackgroundDepth, projectionDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
 
 const _spatialOffsets = [ 0, 0.5, 0.25, 0.75 ];
 
@@ -107,17 +106,6 @@ class SSSNode extends Node {
 		 * @default 0.5
 		 */
 		this.quality = uniform( 0.5 );
-
-		/**
-		 * The resolution scale. Valid values are in the range
-		 * `[0,1]`. `1` means best quality but also results in
-		 * more computational overhead. Setting to `0.5` means
-		 * the effect is computed in half-resolution.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.resolutionScale = 1;
 
 		/**
 		 * Whether to use temporal filtering or not. Setting this property to
@@ -269,9 +257,6 @@ class SSSNode extends Node {
 	 */
 	setSize( width, height ) {
 
-		width = Math.round( this.resolutionScale * width );
-		height = Math.round( this.resolutionScale * height );
-
 		this._resolution.value.set( width, height );
 		this._sssRenderTarget.setSize( width, height );
 
@@ -290,8 +275,8 @@ class SSSNode extends Node {
 
 		//
 
-		const size = renderer.getDrawingBufferSize( _size );
-		this.setSize( size.width, size.height );
+		const { width, height } = this.depthNode.value.image;
+		this.setSize( width, height );
 
 		// update temporal uniforms
 
@@ -336,6 +321,10 @@ class SSSNode extends Node {
 	 * @return {PassTextureNode}
 	 */
 	setup( builder ) {
+
+		// the depth node defines the resolution of the effect and must be updated first
+
+		builder.getNodeProperties( this ).depthNode = this.depthNode;
 
 		const uvNode = uv();
 

@@ -1,4 +1,8 @@
 import { DepthTexture, RenderTarget } from 'three/webgpu';
+
+const _createPreviousDepthRenderTarget = ( isDepthTexture ) => isDepthTexture
+	? new RenderTarget( 1, 1, { depthBuffer: false, depthTexture: new DepthTexture(), count: 0 } )
+	: new RenderTarget( 1, 1, { depthBuffer: false } );
 import { getViewPosition, projectionDepth, texture, uniform, vec2, vec4, viewZToOrthographicDepth, viewZToPerspectiveDepth } from 'three/tsl';
 
 /**
@@ -111,6 +115,35 @@ class Reprojection {
 	}
 
 	/**
+	 * Sets the scene's depth and velocity, e.g. to switch to downsampled inputs. A
+	 * downsampled depth is a color texture, so the previous depth is recreated to match.
+	 * Call it before the effect is built.
+	 *
+	 * @param {TextureNode} depthNode - The scene's depth.
+	 * @param {TextureNode} velocityNode - The scene's velocity.
+	 */
+	setInputs( depthNode, velocityNode ) {
+
+		this.depthNode = depthNode;
+		this.velocityNode = velocityNode;
+
+		const isDepthTexture = depthNode.value.isDepthTexture === true;
+
+		if ( isDepthTexture !== ( this.previousDepthNode.value.isDepthTexture === true ) ) {
+
+			const name = this.previousDepthNode.value.name;
+
+			this._previousDepthRenderTarget.dispose();
+			this._previousDepthRenderTarget = _createPreviousDepthRenderTarget( isDepthTexture );
+
+			this.previousDepthNode.value = isDepthTexture ? this._previousDepthRenderTarget.depthTexture : this._previousDepthRenderTarget.texture;
+			this.previousDepthNode.value.name = name;
+
+		}
+
+	}
+
+	/**
 	 * Returns the UV the surface at the given UV had in the previous frame.
 	 *
 	 * @param {Node<vec2>} uvNode - The UV in the current frame.
@@ -174,7 +207,7 @@ class Reprojection {
 	update( renderer ) {
 
 		const depth = this.depthNode.value;
-		const previousDepth = this._previousDepthRenderTarget.depthTexture;
+		const previousDepth = this.previousDepthNode.value;
 
 		const { width, height } = depth.image;
 
