@@ -119,9 +119,9 @@ class GTAONode extends Node {
 
 		/**
 		 * The maximum view-space depth difference between the shaded point and a sample
-		 * for the sample to count as an occluder. When larger than `radius`, it also
-		 * stretches the falloff along the view direction so thick objects, whose back
-		 * faces are not visible in the depth buffer, can still occlude nearby surfaces.
+		 * for the sample to count as an occluder. Lower values keep thin foreground objects
+		 * from darkening the background behind them. Samples farther away than `radius` are
+		 * always ignored, so this only has an effect when it is smaller than `radius`.
 		 *
 		 * @type {UniformNode<float>}
 		 */
@@ -469,10 +469,9 @@ class GTAONode extends Node {
 
 			const radius = this.radius;
 			const invRadius = radius.reciprocal().toConst();
-			const invThickness = max( radius, this.thickness ).reciprocal().toConst();
 			const viewDir = ( this._camera.isPerspectiveCamera === true ) ? normalize( viewPosition.xyz.negate() ).toConst() : vec3( 0, 0, 1 ).toConst();
 			// Nudge the shaded point toward the camera (proportional to depth) so depth and normal
-			// quantization do not make coplanar neighbors register as occluders on grazing surfaces.
+			// quantization do not make coplanar neighbors register as occluders on grazing surfaces. (XeGTAO)
 			const biasedViewPosition = viewPosition.add( viewDir.mul( viewPosition.z.abs().mul( 0.0005 ) ) ).toConst();
 			const clipPosition = this._cameraProjectionMatrix.mul( vec4( viewPosition, 1.0 ) ).toConst();
 
@@ -552,13 +551,10 @@ class GTAONode extends Node {
 					// Manual normalize guards against zero-length delta.
 					const sHX = dot( viewDir, viewDeltaX ).div( max( lenX, float( 0.0001 ) ) );
 
-					// Falloff: fade the sample toward the tangent-plane horizon (no occlusion) as it nears the
-					// edge of a view-space ellipsoid with semi-axes radius (XY) and max( radius, thickness ) (Z).
-					// The fade is quadratic over the outer half of the ellipsoid. Stretching it along view Z is a
-					// heuristic: the depth buffer only stores front faces, so thick occluders appear farther away
-					// than their hidden back faces. (Similar to XeGTAO's blend toward the low horizon.)
-					const falloffDistX = vec3( viewDeltaX.xy.mul( invRadius ), viewDeltaX.z.mul( invThickness ) ).length();
-					const fX = clamp( falloffDistX.mul( 2 ).sub( 1 ), 0, 1 );
+					// Falloff: over the outer half of the radius, fade the sample toward the tangent-plane
+					// horizon (no occlusion) before taking the max, so occluders near the radius boundary
+					// phase out smoothly. (XeGTAO's blend toward the low horizon, with a quadratic fade.)
+					const fX = clamp( lenX.mul( invRadius ).mul( 2 ).sub( 1 ), 0, 1 );
 					const falloffX = fX.mul( fX );
 
 					If( isValidSample( sampleScreenPositionX, centerTexel, depthSize ).and( abs( viewDeltaX.z ).lessThan( this.thickness ) ), () => {
@@ -577,8 +573,7 @@ class GTAONode extends Node {
 
 					const sHY = dot( viewDir, viewDeltaY ).div( max( lenY, float( 0.0001 ) ) );
 
-					const falloffDistY = vec3( viewDeltaY.xy.mul( invRadius ), viewDeltaY.z.mul( invThickness ) ).length();
-					const fY = clamp( falloffDistY.mul( 2 ).sub( 1 ), 0, 1 );
+					const fY = clamp( lenY.mul( invRadius ).mul( 2 ).sub( 1 ), 0, 1 );
 					const falloffY = fY.mul( fY );
 
 					If( isValidSample( sampleScreenPositionY, centerTexel, depthSize ).and( abs( viewDeltaY.z ).lessThan( this.thickness ) ), () => {
