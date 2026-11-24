@@ -370,6 +370,8 @@ class Object3D extends EventDispatcher {
 		 * world transform, geometry, and material settings. A static 3D object can be processed
 		 * by the renderer slightly faster since certain state checks can be bypassed.
 		 *
+		 * The flag is not implicitly applied to children.
+		 *
 		 * Only relevant in context of {@link WebGPURenderer}.
 		 *
 		 * @type {boolean}
