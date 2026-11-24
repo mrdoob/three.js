@@ -1167,19 +1167,7 @@ export class Style {
 		font-weight: 600;
 	}
 
-	.timing-list .list-item-row:not(.alert) {
-		background-color: transparent !important;
-	}
-
-	.timing-list .list-item-row.alternate-row:not(.alert) {
-		background-color: rgba(0,0,0,0.1) !important;
-	}
-
-	.timing-list .list-item-cell:first-child {
-		font-weight: 600;
-	}
-
-	.list-item-cell .aggregate-timing, .frame-diagram-span.aggregate-timing {
+	.frame-diagram-span.aggregate-timing {
 		font-style: italic;
 		font-weight: normal;
 	}
@@ -1226,11 +1214,11 @@ export class Style {
 		text-align: left;
 	}
 
-	.list-item-row.open > .list-item-cell > .item-toggler::before {
+	.list-item-row.open .item-toggler::before {
 		content: '-';
 	}
 
-	.list-item-row:not(.open) > .list-item-cell > .item-toggler::before {
+	.list-item-row:not(.open) .item-toggler::before {
 		content: '+';
 	}
 
