@@ -56,7 +56,7 @@
 
 		const params = {
 			output: 'Beauty', enabled: true, quality: 0.5, intensity: 1,
-			maxDistance: 1, thickness: 0.03, binaryRefine: false,
+			maxDistance: 2, maxRoughness: 0.6, thickness: 0.03, binaryRefine: false,
 			roughness: 1, blur: true, blurQuality: 1
 		};
 
@@ -233,7 +233,8 @@
 			ssrGui.add( params, 'intensity', 0, 1 ).name( 'Intensity' ).onChange( updateParameters );
 			ssrGui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( updateParameters );
 			ssrGui.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( updateParameters );
-			ssrGui.add( params, 'maxDistance', 0, 1 ).name( 'Max distance' ).onChange( updateParameters );
+			ssrGui.add( params, 'maxDistance', 0, 2 ).name( 'Max distance' ).onChange( updateParameters );
+			ssrGui.add( params, 'maxRoughness', 0, 1 ).name( 'Max roughness' ).onChange( updateParameters );
 			ssrGui.add( params, 'thickness', 0, 0.05 ).name( 'Thickness' ).onChange( updateParameters );
 
 			const blurGui = renderer.inspector.createParameters( 'Blur' );
@@ -260,6 +261,7 @@
 				reflection.intensity.value = params.intensity;
 				reflection.binaryRefine = params.binaryRefine;
 				reflection.maxDistance.value = params.maxDistance;
+				reflection.maxRoughness.value = params.maxRoughness;
 				reflection.thickness.value = params.thickness;
 				reflection.blurQuality = params.blurQuality;
 
