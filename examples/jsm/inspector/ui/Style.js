@@ -1315,12 +1315,11 @@ export class Style {
 		background-color: var(--color-yellow);
 	}
 
-	.frame-timeline > div:last-child {
+	.frame-timeline > .gpu {
 		top: calc(50% + 1px);
 		background-color: var(--color-green);
 	}
 
-	.header-wrapper > .list-item-row .frame-timeline > div,
 	.list-item-row.alert .frame-timeline > div {
 		display: none;
 	}

@@ -4,13 +4,20 @@ import { Graph } from '../ui/Graph.js';
 import { Item } from '../ui/Item.js';
 import { createValueSpan, setText } from '../ui/utils.js';
 
-// creates the cell of a row in the timeline, with a CPU and a GPU bar
+// creates the cell of a row in the timeline, with a bar for each type
 
-function createTimelineCell() {
+function createTimelineCell( ...types ) {
 
 	const cell = document.createElement( 'div' );
 	cell.className = 'frame-timeline';
-	cell.append( document.createElement( 'div' ), document.createElement( 'div' ) );
+
+	for ( const type of types ) {
+
+		const bar = document.createElement( 'div' );
+		bar.className = type;
+		cell.appendChild( bar );
+
+	}
 
 	return cell;
 
@@ -117,7 +124,7 @@ class Performance extends Tab {
 
 		if ( item === undefined ) {
 
-			item = new Item( createValueSpan(), createValueSpan(), createValueSpan(), createTimelineCell() );
+			item = new Item( createValueSpan(), createValueSpan(), createValueSpan(), createTimelineCell( 'cpu', 'gpu' ) );
 
 			if ( stats.isGroupStats === true ) {
 
@@ -197,7 +204,7 @@ class Performance extends Tab {
 
 	}
 
-	updateTimeline( inspector ) {
+	updateTimeline( inspector, frame ) {
 
 		const period = inspector.fps > 0 ? 1000 / inspector.fps : 0;
 		const calls = [];
@@ -237,6 +244,12 @@ class Performance extends Tab {
 			if ( data.gpuOffset !== null ) setBar( bars[ 1 ], gpuDelay + data.gpuOffset, data.gpu );
 
 		}
+
+		// the frame has the bars of its calls
+
+		const getBars = ( stats ) => Array.from( this.frameItems.get( stats.cid ).data[ 3 ].children );
+
+		this.frameStats.data[ 3 ].replaceChildren( ...frame.children.flatMap( getBars ).map( ( bar ) => bar.cloneNode() ) );
 
 		// the labels of the ruler are at a multiple of 1, 2 or 5, at least 80 pixels apart
 
@@ -335,7 +348,7 @@ class Performance extends Tab {
 
 		}
 
-		this.updateTimeline( inspector );
+		this.updateTimeline( inspector, frame );
 
 		// remove unused frame items
 
