@@ -1130,7 +1130,7 @@ class XRManager extends EventDispatcher {
 
 						getOutput: ( outputNode, builder ) => {
 
-							const renderOutputNode = renderOutput( outputNode, renderer.toneMapping, renderer.outputColorSpace );
+							const renderOutputNode = renderOutput( outputNode, renderer.toneMapping, renderer.outputColorSpace, renderer.dithering );
 							renderOutputNode.premultipliedAlpha = builder.material.premultipliedAlpha;
 
 							return renderOutputNode;
