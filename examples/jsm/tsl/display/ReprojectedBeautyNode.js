@@ -1,5 +1,6 @@
-import { Matrix4, Node, Vector2 } from 'three/webgpu';
+import { Node, Vector2 } from 'three/webgpu';
 import { Fn, float, getViewPosition, isBackgroundDepth, ivec2, positionPrevious, projectionDepth, reference, textureSize, uniform, uv, vec2, vec3, vec4, velocity } from 'three/tsl';
+import { Reprojection } from '../../utils/Reprojection.js';
 
 /**
  * The view-space depth the surface had in the previous frame. It follows both camera
@@ -71,12 +72,12 @@ class ReprojectedBeautyNode extends Node {
 		this.scenePass = scenePass;
 
 		/**
-		 * The previous frame's camera projection matrix inverse.
+		 * Holds the previous frame's depth and camera matrices.
 		 *
 		 * @private
-		 * @type {UniformNode<mat4>}
+		 * @type {Reprojection}
 		 */
-		this._previousProjectionMatrixInverse = uniform( new Matrix4() );
+		this._reprojection = new Reprojection( scenePass.getTextureNode( 'depth' ), scenePass.getTextureNode( 'velocity' ), scenePass.camera, scenePass.getPreviousTextureNode( 'depth' ) );
 
 		/**
 		 * The TRAA jitter of the previous frame relative to the current one, in UV space.
@@ -95,16 +96,6 @@ class ReprojectedBeautyNode extends Node {
 		 */
 		this._historyValid = uniform( false ).onFrameUpdate( () => this._updateHistory() );
 
-		/**
-		 * The current frame's projection matrix inverse, jitter and size. They become
-		 * the previous ones in the next frame.
-		 *
-		 * @private
-		 */
-		this._projectionMatrixInverse = new Matrix4();
-		this._jitter = new Vector2();
-		this._size = new Vector2();
-
 	}
 
 	/**
@@ -119,6 +110,18 @@ class ReprojectedBeautyNode extends Node {
 	}
 
 	/**
+	 * Frees internal resources. This method should be called
+	 * when the node is no longer required.
+	 */
+	dispose() {
+
+		this._reprojection.dispose();
+
+		super.dispose();
+
+	}
+
+	/**
 	 * Advances the history state by one frame.
 	 *
 	 * @private
@@ -126,22 +129,17 @@ class ReprojectedBeautyNode extends Node {
 	 */
 	_updateHistory() {
 
-		const camera = this.scenePass.camera;
-		const { width, height } = this.scenePass.renderTarget;
+		const reprojection = this._reprojection;
+		const valid = reprojection.needsHistoryReset() === false;
+
+		reprojection.advance();
 
 		// the scene buffers carry TRAA jitter, the velocity does not
 
-		const projection = camera.projectionMatrix.elements;
+		const current = reprojection.camera.projectionMatrix.elements;
+		const previous = reprojection.previousCameraProjectionMatrix.value.elements;
 
-		this._jitterDelta.value.set( projection[ 8 ] - this._jitter.x, this._jitter.y - projection[ 9 ] ).multiplyScalar( 0.5 );
-		this._jitter.set( projection[ 8 ], projection[ 9 ] );
-
-		this._previousProjectionMatrixInverse.value.copy( this._projectionMatrixInverse );
-		this._projectionMatrixInverse.copy( camera.projectionMatrixInverse );
-
-		const valid = this._size.x === width && this._size.y === height;
-
-		this._size.set( width, height );
+		this._jitterDelta.value.set( current[ 8 ] - previous[ 8 ], previous[ 9 ] - current[ 9 ] ).multiplyScalar( 0.5 );
 
 		return valid;
 
@@ -156,23 +154,20 @@ class ReprojectedBeautyNode extends Node {
 	sample( uvNode ) {
 
 		const { scenePass } = this;
+		const reprojection = this._reprojection;
 
-		const velocityNode = scenePass.getTextureNode( 'velocity' );
+		const velocityNode = reprojection.velocityNode;
 		const previousColor = scenePass.getPreviousTextureNode( 'output' );
-		const previousDepth = scenePass.getPreviousTextureNode( 'depth' );
+		const previousDepth = reprojection.previousDepthNode;
+		const projectionMatrixInverse = reprojection.previousCameraProjectionMatrixInverse;
 
 		const cameraNear = reference( 'near', 'float', scenePass.camera );
 		const cameraFar = reference( 'far', 'float', scenePass.camera );
-		const projectionMatrixInverse = this._previousProjectionMatrixInverse;
 
 		const size = vec2( textureSize( velocityNode ) ).toConst();
 		const texel = ivec2( uvNode.mul( size ) ).toConst();
-		const motion = velocityNode.load( texel ).toConst();
-		const expectedZ = motion.w;
-
-		// convert the NDC offset to UV offset
-
-		const historyUV = uvNode.sub( motion.xy.mul( vec2( 0.5, - 0.5 ) ) ).add( this._jitterDelta ).toConst();
+		const historyUV = reprojection.getHistoryUV( uvNode, texel ).add( this._jitterDelta ).toConst();
+		const expectedZ = velocityNode.load( texel ).w.toConst();
 
 		// the depth slope per pixel, taken from the flatter side so it does not cross silhouettes
 
