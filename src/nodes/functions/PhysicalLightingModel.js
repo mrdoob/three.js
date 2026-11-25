@@ -824,6 +824,18 @@ class PhysicalLightingModel extends LightingModel {
 	}
 
 	/**
+	 * Returns how much of the indirect diffuse light the ambient occlusion lets through.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node<vec3>} The occlusion.
+	 */
+	getIndirectDiffuseOcclusion( builder ) {
+
+		return multiBounceOcclusion( builder.context.ambientOcclusion, diffuseContribution );
+
+	}
+
+	/**
 	 * Implements the indirect diffuse term.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -840,7 +852,7 @@ class PhysicalLightingModel extends LightingModel {
 			? this.eonDirectionalAlbedo.mul( metalness.oneMinus(), 1 / Math.PI )
 			: BRDF_Lambert( { diffuseColor: diffuseContribution } );
 
-		const diffuseIrradiance = irradiance.mul( multiBounceOcclusion( ambientOcclusion, diffuseContribution ) ).add( occlusionAwareIrradiance );
+		const diffuseIrradiance = irradiance.mul( this.getIndirectDiffuseOcclusion( builder ) ).add( occlusionAwareIrradiance );
 
 		const diffuse = diffuseIrradiance.mul( diffuseBRDF ).mul( singleScattering.add( multiScattering ).oneMinus() ).toVar();
 

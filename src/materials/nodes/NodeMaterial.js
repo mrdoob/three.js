@@ -1047,8 +1047,8 @@ class NodeMaterial extends Material {
 	}
 
 	/**
-	 * Setups the lighting nodes of the environment and of the indirect light
-	 * sources of the context, see {@link builtinIndirectContext}.
+	 * Setups the lighting nodes of the environment and of the indirect diffuse
+	 * provider of the context, see {@link builtinIndirectContext}.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {Array<LightingNode>} The lighting nodes.
@@ -1069,7 +1069,7 @@ class NodeMaterial extends Material {
 
 		if ( diffuse !== undefined ) {
 
-			materialLightsNode.push( new IndirectLightingNode( [], diffuse ) );
+			materialLightsNode.push( new IndirectLightingNode( null, diffuse ) );
 
 		}
 

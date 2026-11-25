@@ -45,7 +45,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, Fn, builtinIndirectContext, normalView, metalness, roughness, velocity, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, Fn, builtinIndirectContext, defaultIndirectSpecular, normalView, metalness, roughness, velocity, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 		import { reprojectedBeauty, previousViewZ } from 'three/addons/tsl/display/ReprojectedBeautyNode.js';
@@ -56,6 +56,7 @@
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 		import { Inspector } from 'three/addons/inspector/Inspector.js';
+		import { coverageCascade } from 'three/addons/tsl/lighting/CoverageCascade.js';
 
 		const params = {
 			output: 'Beauty', enabled: true, quality: 0.5, intensity: 1,
@@ -211,7 +212,7 @@
 			// the materials reflect SSR through their BRDF, and the environment where SSR has no coverage
 
 			beautyPass.contextNode = builtinIndirectContext( {
-				specular: [ opaqueFragmentSource( mix( raw.sample( screenUV ), reflection.getSpecularSource(), blurEnabled ), alphaThreshold ) ]
+				specular: coverageCascade( [ opaqueFragmentSource( mix( raw.sample( screenUV ), reflection.getSpecularSource(), blurEnabled ), alphaThreshold ) ], defaultIndirectSpecular )
 			} );
 
 			const spatialAA = smaa( beautyPass );

@@ -31,13 +31,15 @@ export const opaqueFragment = ( node, alphaThreshold = 1 ) => Fn( ( { material }
 } )();
 
 /**
- * Limits a per-pixel source of indirect light, like SSR, to the fragments its pre-pass
+ * Limits a per-pixel source of a coverage cascade, like SSR, to the fragments its pre-pass
  * kept with {@link opaqueFragment}. A fragment the pre-pass discarded would read what was
  * traced for the surface behind it, so it gets no light and no coverage and the next
  * source, usually the environment, answers instead.
  *
  * ```js
- * beautyPass.contextNode = builtinIndirectContext( { specular: [ opaqueFragmentSource( ssrNode.getSpecularSource() ) ] } );
+ * beautyPass.contextNode = builtinIndirectContext( {
+ * 	specular: coverageCascade( [ opaqueFragmentSource( ssrNode.getSpecularSource() ) ], defaultIndirectSpecular )
+ * } );
  * ```
  *
  * @tsl

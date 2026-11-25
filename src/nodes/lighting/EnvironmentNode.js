@@ -12,8 +12,8 @@ const _rendererCache = new WeakMap();
  * is defined by an equirectangular or cube texture.
  * `EnvironmentNode` is intended for PBR materials like {@link MeshStandardNodeMaterial}.
  *
- * It is a source of indirect specular and indirect diffuse light, and the last one
- * {@link IndirectLightingNode} asks.
+ * It answers queries for indirect specular and indirect diffuse light, which the default
+ * providers of {@link IndirectLightingNode} ask.
  *
  * @augments LightingNode
  */
@@ -65,8 +65,7 @@ class EnvironmentNode extends LightingNode {
 
 	/**
 	 * Resolves the environment. A texture is converted to PMREM here. The node contributes
-	 * no light by itself: {@link IndirectLightingNode} queries it as the last source of
-	 * indirect specular and indirect diffuse light.
+	 * no light by itself: the default providers of {@link IndirectLightingNode} query it.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 */

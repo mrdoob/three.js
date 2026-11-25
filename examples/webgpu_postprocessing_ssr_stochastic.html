@@ -57,7 +57,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, velocity, diffuseColor, vec4, uniform, mix, step, abs, float, renderOutput, saturation, Fn, builtinIndirectContext } from 'three/tsl';
+		import { pass, mrt, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, velocity, diffuseColor, vec4, uniform, mix, step, abs, float, renderOutput, saturation, Fn, builtinIndirectContext, defaultIndirectSpecular } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 		import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
@@ -69,6 +69,7 @@
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { Inspector } from 'three/addons/inspector/Inspector.js';
 		import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+		import { coverageCascade } from 'three/addons/tsl/lighting/CoverageCascade.js';
 
 		const OUTPUT_COMPARE_DENOISE = 8;
 		const compareHint = document.getElementById( 'compare-hint' );
@@ -284,7 +285,7 @@
 			// the materials reflect SSR through their BRDF, and the environment where SSR has no coverage
 
 			beautyPass.contextNode = builtinIndirectContext( {
-				specular: [ ssrNode.getSpecularSource( denoiseNode.getTextureNode().sample( screenUV ) ) ]
+				specular: coverageCascade( [ ssrNode.getSpecularSource( denoiseNode.getTextureNode().sample( screenUV ) ) ], defaultIndirectSpecular )
 			} );
 
 			gammaUniform = uniform( params.post.grading.gamma );

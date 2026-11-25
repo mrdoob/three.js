@@ -272,15 +272,22 @@ export function builtinAOContext( aoNode, node = null ) {
 }
 
 /**
- * TSL function for defining the sources of indirect light of the materials of a given node,
- * e.g. of a pass. The sources are asked in order, in front of the environment and of what
- * the lights reflect.
+ * TSL function for defining the providers of indirect light of the materials of a given node,
+ * e.g. of a pass. A provider replaces the default one, {@link defaultIndirectSpecular} or
+ * {@link defaultIndirectDiffuse}, and what it returns goes through the BRDF of the material.
+ *
+ * ```js
+ * // add a GI buffer to the default indirect diffuse light
+ * scenePass.contextNode = builtinIndirectContext( {
+ * 	diffuse: ( query, builder ) => defaultIndirectDiffuse( query, builder ).add( gi )
+ * } );
+ * ```
  *
  * @tsl
  * @function
- * @param {Object} sources - The source lists.
- * @param {Array<IndirectLightSource>} [sources.specular] - The indirect specular sources, in order.
- * @param {Array<IndirectLightSource>} [sources.diffuse] - The indirect diffuse sources, in order.
+ * @param {Object} providers - The providers.
+ * @param {IndirectSpecularProvider} [providers.specular] - The provider of indirect specular light.
+ * @param {IndirectDiffuseProvider} [providers.diffuse] - The provider of indirect diffuse light.
  * @param {Node} [node=null] - The node whose context should be modified.
  * @returns {ContextNode}
  */
@@ -319,4 +326,4 @@ addMethodChaining( 'uniformFlow', uniformFlow );
 addMethodChaining( 'setName', setName );
 addMethodChaining( 'builtinShadowContext', ( node, shadowNode, light ) => builtinShadowContext( shadowNode, light, node ) );
 addMethodChaining( 'builtinAOContext', ( node, aoValue ) => builtinAOContext( aoValue, node ) );
-addMethodChaining( 'builtinIndirectContext', ( node, sources ) => builtinIndirectContext( sources, node ) );
+addMethodChaining( 'builtinIndirectContext', ( node, providers ) => builtinIndirectContext( providers, node ) );

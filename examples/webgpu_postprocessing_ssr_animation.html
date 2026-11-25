@@ -39,7 +39,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, velocity, Fn, builtinIndirectContext, screenUV } from 'three/tsl';
+			import { pass, mrt, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, velocity, Fn, builtinIndirectContext, defaultIndirectSpecular, screenUV } from 'three/tsl';
 			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 			import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 			import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
@@ -50,6 +50,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { coverageCascade } from 'three/addons/tsl/lighting/CoverageCascade.js';
 
 			const params = {
 				output: 'Beauty', traa: true,
@@ -267,7 +268,7 @@
 				const denoiseEnabled = uniform( 1 );
 
 				beautyPass.contextNode = builtinIndirectContext( {
-					specular: [ ssrNode.getSpecularSource( mix( ssrTexture.sample( screenUV ), denoiseNode.getTextureNode().sample( screenUV ), denoiseEnabled ) ) ]
+					specular: coverageCascade( [ ssrNode.getSpecularSource( mix( ssrTexture.sample( screenUV ), denoiseNode.getTextureNode().sample( screenUV ), denoiseEnabled ) ) ], defaultIndirectSpecular )
 				} );
 
 				const temporalAA = traa( beautyPass, scenePassDepth, scenePassVelocity, camera );

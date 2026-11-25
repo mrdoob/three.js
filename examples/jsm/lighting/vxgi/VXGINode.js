@@ -336,7 +336,7 @@ class VXGINode extends Node {
 	}
 
 	/**
-	 * Returns the GI as an indirect diffuse source for `builtinIndirectContext()`.
+	 * Returns the GI as an indirect diffuse source for `coverageCascade()`.
 	 * It adds to the sources behind it.
 	 *
 	 * @return {Node<vec4>} The irradiance, with a coverage of zero.
