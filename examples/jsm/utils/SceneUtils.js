@@ -212,6 +212,21 @@ function reduceVertices( object, func, initialValue ) {
 }
 
 /**
+ * Returns `true` if the given attribute holds per-instance data. Besides instanced
+ * buffer attributes, this also covers interleaved buffer attributes whose data is
+ * stored in an instanced interleaved buffer.
+ *
+ * @param {BufferAttribute|InterleavedBufferAttribute} attribute - The attribute to test.
+ * @return {boolean} Whether the attribute holds per-instance data.
+ */
+function isInstancedAttribute( attribute ) {
+
+	return attribute.isInstancedBufferAttribute === true ||
+		( attribute.isInterleavedBufferAttribute === true && attribute.data.isInstancedInterleavedBuffer === true );
+
+}
+
+/**
  * Sorts the instances of the given instanced mesh.
  *
  * @param {InstancedMesh} mesh - The instanced mesh to sort.
@@ -231,7 +246,7 @@ function sortInstancedMesh( mesh, compareFn ) {
 
 		const attribute = mesh.geometry.attributes[ name ];
 
-		if ( attribute.isInstancedBufferAttribute ) {
+		if ( isInstancedAttribute( attribute ) ) {
 
 			attributeRefs.set( attribute, deepCloneAttribute( attribute ) );
 
@@ -282,7 +297,7 @@ function sortInstancedMesh( mesh, compareFn ) {
 
 			const attribute = mesh.geometry.attributes[ name ];
 
-			if ( attribute.isInstancedBufferAttribute ) {
+			if ( isInstancedAttribute( attribute ) ) {
 
 				const attributeRef = attributeRefs.get( attribute );
 
@@ -315,7 +330,7 @@ function sortInstancedMesh( mesh, compareFn ) {
 
 		const attribute = mesh.geometry.attributes[ name ];
 
-		if ( attribute.isInstancedBufferAttribute ) {
+		if ( isInstancedAttribute( attribute ) ) {
 
 			attribute.needsUpdate = true;
 
