@@ -137,6 +137,27 @@ function getSpanTime( children ) {
 
 }
 
+// tile-based GPUs can run the vertex stage of a call while the previous ones are still shading, so its time
+// includes the wait. Each call starts after the end of the previous ones, and the sum is the union of the spans
+
+function sequenceCalls( children, end = - Infinity ) {
+
+	const calls = children.filter( ( stats ) => stats.gpuStart !== null ).sort( ( a, b ) => a.gpuStart - b.gpuStart );
+
+	for ( const stats of calls ) {
+
+		stats.gpuStart = Math.max( stats.gpuStart, end );
+		stats.gpuEnd = Math.max( stats.gpuEnd, stats.gpuStart );
+		stats.gpu = stats.gpuEnd - stats.gpuStart;
+
+		sequenceCalls( stats.children, stats.gpuStart );
+
+		end = stats.gpuEnd;
+
+	}
+
+}
+
 // stores the offsets of the calls in the frame, the CPU and GPU clocks have separate origins
 
 function resolveOffsets( frame ) {
@@ -470,6 +491,7 @@ export class RendererInspector extends InspectorBase {
 
 			frame.gpuSpanTime = getSpanTime( frame.children );
 
+			sequenceCalls( frame.children );
 			resolveOffsets( frame );
 			groupCalls( frame, frame.frameId );
 
