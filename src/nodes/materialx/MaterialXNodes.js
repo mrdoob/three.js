@@ -20,16 +20,13 @@ import { overloadingFn } from '../utils/FunctionOverloadingNode.js';
 import { uv } from '../accessors/UV.js';
 import { frameId, time } from '../utils/Timer.js';
 
-export const mx_aastep = ( threshold, value ) => {
-
-	threshold = float( threshold );
-	value = float( value );
+export const mx_aastep = /*@__PURE__*/ Fn( ( [ threshold, value ] ) => {
 
 	const afwidth = vec2( value.dFdx(), value.dFdy() ).length().mul( 0.70710678118654757 );
 
 	return smoothstep( threshold.sub( afwidth ), threshold.add( afwidth ), value );
 
-};
+}, { threshold: 'float', value: 'float', return: 'float' } );
 
 const _ramp = ( a, b, uv, p ) => mix( a, b, uv[ p ].clamp() );
 export const mx_ramplr = ( valuel, valuer, texcoord = uv() ) => _ramp( valuel, valuer, texcoord, 'x' );
@@ -166,14 +163,12 @@ export const mx_place2d = (
 
 };
 
-export const mx_heighttonormal = ( input, scale = 1, texcoord = uv() ) => {
+export const mx_heighttonormal = /*@__PURE__*/ Fn( ( [ height, scale = 1, texcoord = uv() ] ) => {
 
 	const sobelScale = float( 1.0 / 16.0 );
-	const height = float( input );
-	const uvNode = vec2( texcoord );
-	const dHdS = vec2( height.dFdx(), height.dFdy() ).mul( float( scale ) ).mul( sobelScale );
-	const dUdS = vec2( uvNode.x.dFdx(), uvNode.x.dFdy() );
-	const dVdS = vec2( uvNode.y.dFdx(), uvNode.y.dFdy() );
+	const dHdS = vec2( height.dFdx(), height.dFdy() ).mul( scale ).mul( sobelScale );
+	const dUdS = vec2( texcoord.x.dFdx(), texcoord.x.dFdy() );
+	const dVdS = vec2( texcoord.y.dFdx(), texcoord.y.dFdy() );
 	const tangent = vec3( dUdS.x, dVdS.x, dHdS.x );
 	const bitangent = vec3( dUdS.y, dVdS.y, dHdS.y );
 	let n = cross( tangent, bitangent );
@@ -183,4 +178,4 @@ export const mx_heighttonormal = ( input, scale = 1, texcoord = uv() ) => {
 	n = mirrored.mix( n, n.mul( - 1 ) );
 	return normalize( n ).mul( 0.5 ).add( 0.5 );
 
-};
+}, { height: 'float', scale: 'float', texcoord: 'vec2', return: 'vec3' } );
