@@ -1,6 +1,6 @@
-import { float, vec2, vec3, add, sub, mul, sin, cos, normalize } from '../tsl/TSLBase.js';
+import { Fn, float, vec2, vec3, add, sub, mul, sin, cos, normalize } from '../tsl/TSLBase.js';
 
-export const mx_rotate2d = ( input, amount = 0 ) => {
+export const mx_rotate2d = /*@__PURE__*/ Fn( ( [ input, amount = 0 ] ) => {
 
 	input = vec2( input );
 	amount = float( amount );
@@ -13,9 +13,9 @@ export const mx_rotate2d = ( input, amount = 0 ) => {
 
 	return vec2( add( mul( ca, x ), mul( sa, y ) ), sub( mul( ca, y ), mul( sa, x ) ) );
 
-};
+} );
 
-export const mx_rotate3d = ( input, amount = 0, axis = vec3( 0, 1, 0 ) ) => {
+export const mx_rotate3d = /*@__PURE__*/ Fn( ( [ input, amount = 0, axis = vec3( 0, 1, 0 ) ] ) => {
 
 	input = vec3( input );
 	amount = float( amount );
@@ -34,4 +34,4 @@ export const mx_rotate3d = ( input, amount = 0, axis = vec3( 0, 1, 0 ) ) => {
 		.add( input.cross( normalizedAxis ).mul( s ) )
 		.add( normalizedAxis.mul( normalizedAxis.dot( input ).mul( oc ) ) );
 
-};
+} );

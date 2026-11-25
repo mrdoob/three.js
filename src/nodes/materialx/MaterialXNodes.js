@@ -22,20 +22,23 @@ import { frameId, time } from '../utils/Timer.js';
 
 export const mx_aastep = /*@__PURE__*/ Fn( ( [ threshold, value ] ) => {
 
+	threshold = float( threshold );
+	value = float( value );
+
 	const afwidth = vec2( value.dFdx(), value.dFdy() ).length().mul( 0.70710678118654757 );
 
 	return smoothstep( threshold.sub( afwidth ), threshold.add( afwidth ), value );
 
-}, { threshold: 'float', value: 'float', return: 'float' } );
+} );
 
 const _ramp = ( a, b, uv, p ) => mix( a, b, uv[ p ].clamp() );
-export const mx_ramplr = ( valuel, valuer, texcoord = uv() ) => _ramp( valuel, valuer, texcoord, 'x' );
-export const mx_ramptb = ( valueb, valuet, texcoord = uv() ) => _ramp( valueb, valuet, texcoord, 'y' );
+export const mx_ramplr = /*@__PURE__*/ Fn( ( [ valuel, valuer, texcoord = uv() ] ) => _ramp( valuel, valuer, texcoord, 'x' ) );
+export const mx_ramptb = /*@__PURE__*/ Fn( ( [ valueb, valuet, texcoord = uv() ] ) => _ramp( valueb, valuet, texcoord, 'y' ) );
 
 // Bilinear ramp: interpolate between four corners (tl, tr, bl, br) using texcoord.x and texcoord.y
-export const mx_ramp4 = (
+export const mx_ramp4 = /*@__PURE__*/ Fn( ( [
 	valuetl, valuetr, valuebl, valuebr, texcoord = uv()
-) => {
+] ) => {
 
 	const u = texcoord.x.clamp();
 	const v = texcoord.y.clamp();
@@ -43,34 +46,34 @@ export const mx_ramp4 = (
 	const bottom = mix( valuebl, valuebr, u );
 	return mix( bottom, top, v );
 
-};
+} );
 
 const _split = ( a, b, center, uv, p ) => mix( a, b, mx_aastep( center, uv[ p ] ) );
-export const mx_splitlr = ( valuel, valuer, center, texcoord = uv() ) => _split( valuel, valuer, center, texcoord, 'x' );
-export const mx_splittb = ( valueb, valuet, center, texcoord = uv() ) => _split( valueb, valuet, center, texcoord, 'y' );
+export const mx_splitlr = /*@__PURE__*/ Fn( ( [ valuel, valuer, center, texcoord = uv() ] ) => _split( valuel, valuer, center, texcoord, 'x' ) );
+export const mx_splittb = /*@__PURE__*/ Fn( ( [ valueb, valuet, center, texcoord = uv() ] ) => _split( valueb, valuet, center, texcoord, 'y' ) );
 
-export const mx_transform_uv = ( uv_scale = 1, uv_offset = 0, uv_geo = uv() ) => uv_geo.mul( uv_scale ).add( uv_offset );
+export const mx_transform_uv = /*@__PURE__*/ Fn( ( [ uv_scale = 1, uv_offset = 0, uv_geo = uv() ] ) => uv_geo.mul( uv_scale ).add( uv_offset ) );
 
-export const mx_safepower = ( in1, in2 = 1 ) => {
+export const mx_safepower = /*@__PURE__*/ Fn( ( [ in1, in2 = 1 ] ) => {
 
 	in1 = float( in1 );
 
 	return in1.abs().pow( in2 ).mul( in1.sign() );
 
-};
+} );
 
-export const mx_contrast = ( input, amount = 1, pivot = .5 ) => float( input ).sub( pivot ).mul( amount ).add( pivot );
+export const mx_contrast = /*@__PURE__*/ Fn( ( [ input, amount = 1, pivot = .5 ] ) => float( input ).sub( pivot ).mul( amount ).add( pivot ) );
 
-export const mx_noise_float = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => mx_perlin_noise_float( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot );
+export const mx_noise_float = /*@__PURE__*/ Fn( ( [ texcoord = uv(), amplitude = 1, pivot = 0 ] ) => mx_perlin_noise_float( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot ) );
 //export const mx_noise_vec2 = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => mx_perlin_noise_vec3( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot );
-export const mx_noise_vec3 = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => mx_perlin_noise_vec3( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot );
+export const mx_noise_vec3 = /*@__PURE__*/ Fn( ( [ texcoord = uv(), amplitude = 1, pivot = 0 ] ) => mx_perlin_noise_vec3( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot ) );
 const mx_perlin_noise_vec4_0 = /*@__PURE__*/ Fn( ( [ p ] ) => vec4( mx_perlin_noise_vec3( p ), mx_perlin_noise_float( p.add( vec2( 19, 73 ) ) ) ), { p: 'vec2', return: 'vec4' } );
 const mx_perlin_noise_vec4_1 = /*@__PURE__*/ Fn( ( [ p ] ) => vec4( mx_perlin_noise_vec3( p ), mx_perlin_noise_float( p.add( vec3( 19, 73, 29 ) ) ) ), { p: 'vec3', return: 'vec4' } );
 const mx_perlin_noise_vec4 = /*@__PURE__*/ overloadingFn( [ mx_perlin_noise_vec4_0, mx_perlin_noise_vec4_1 ] );
 
-export const mx_noise_vec4 = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => mx_perlin_noise_vec4( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot );
+export const mx_noise_vec4 = /*@__PURE__*/ Fn( ( [ texcoord = uv(), amplitude = 1, pivot = 0 ] ) => mx_perlin_noise_vec4( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot ) );
 
-export const mx_smoothstep = ( inNode, low = 0, high = 1 ) => {
+export const mx_smoothstep = /*@__PURE__*/ Fn( ( [ inNode, low = 0, high = 1 ] ) => {
 
 	const range = sub( high, low );
 	const safeRange = max( abs( range ), float( EPSILON ) );
@@ -80,26 +83,26 @@ export const mx_smoothstep = ( inNode, low = 0, high = 1 ) => {
 	const useFallback = step( high, low );
 	return mix( hermite, fallback, useFallback );
 
-};
+} );
 
-export const mx_cell_noise_vec3 = ( texcoord = uv() ) => cell_noise_vec3( texcoord.convert( 'vec2|vec3' ) );
-export const mx_worley_noise_float_2d = ( texcoord = uv(), jitter = 1, style = 0 ) => worley_noise_float_2d( texcoord, jitter, style );
-export const mx_worley_noise_float_3d = ( texcoord = uv(), jitter = 1, style = 0 ) => worley_noise_float_3d( texcoord, jitter, style );
-export const mx_unifiednoise2d = ( noiseType, texcoord = uv(), freq = vec2( 1, 1 ), offset = vec2( 0, 0 ), jitter = 1, outmin = 0, outmax = 1, clampoutput = false, octaves = 1, lacunarity = 2, diminish = .5, style = 0 ) => unifiednoise2d( noiseType, texcoord, freq, offset, jitter, outmin, outmax, clampoutput, octaves, lacunarity, diminish, style );
-export const mx_unifiednoise3d = ( noiseType, texcoord = uv(), freq = vec3( 1, 1, 1 ), offset = vec3( 0, 0, 0 ), jitter = 1, outmin = 0, outmax = 1, clampoutput = false, octaves = 1, lacunarity = 2, diminish = .5, style = 0 ) => unifiednoise3d( noiseType, texcoord, freq, offset, jitter, outmin, outmax, clampoutput, octaves, lacunarity, diminish, style );
+export const mx_cell_noise_vec3 = /*@__PURE__*/ Fn( ( [ texcoord = uv() ] ) => cell_noise_vec3( texcoord.convert( 'vec2|vec3' ) ) );
+export const mx_worley_noise_float_2d = /*@__PURE__*/ Fn( ( [ texcoord = uv(), jitter = 1, style = 0 ] ) => worley_noise_float_2d( texcoord, jitter, style ) );
+export const mx_worley_noise_float_3d = /*@__PURE__*/ Fn( ( [ texcoord = uv(), jitter = 1, style = 0 ] ) => worley_noise_float_3d( texcoord, jitter, style ) );
+export const mx_unifiednoise2d = /*@__PURE__*/ Fn( ( [ noiseType, texcoord = uv(), freq = vec2( 1, 1 ), offset = vec2( 0, 0 ), jitter = 1, outmin = 0, outmax = 1, clampoutput = false, octaves = 1, lacunarity = 2, diminish = .5, style = 0 ] ) => unifiednoise2d( noiseType, texcoord, freq, offset, jitter, outmin, outmax, clampoutput, octaves, lacunarity, diminish, style ) );
+export const mx_unifiednoise3d = /*@__PURE__*/ Fn( ( [ noiseType, texcoord = uv(), freq = vec3( 1, 1, 1 ), offset = vec3( 0, 0, 0 ), jitter = 1, outmin = 0, outmax = 1, clampoutput = false, octaves = 1, lacunarity = 2, diminish = .5, style = 0 ] ) => unifiednoise3d( noiseType, texcoord, freq, offset, jitter, outmin, outmax, clampoutput, octaves, lacunarity, diminish, style ) );
 
-export const mx_worley_noise_float = ( texcoord = uv(), jitter = 1, style = 0 ) => mx_worley_noise_float_3d( texcoord.convert( 'vec2|vec3' ), jitter, style );
-export const mx_worley_noise_vec2 = ( texcoord = uv(), jitter = 1 ) => worley_noise_vec2( texcoord.convert( 'vec2|vec3' ), jitter, int( 1 ) );
-export const mx_worley_noise_vec3 = ( texcoord = uv(), jitter = 1, metric = 1 ) => worley_noise_vec3( texcoord.convert( 'vec2|vec3' ), jitter, int( metric ) );
-export const mx_worley_noise_vec3_style = ( texcoord = uv(), jitter = 1, style = 0, metric = 0 ) => worley_noise_vec3_style( texcoord.convert( 'vec2|vec3' ), jitter, int( style ), int( metric ) );
+export const mx_worley_noise_float = /*@__PURE__*/ Fn( ( [ texcoord = uv(), jitter = 1, style = 0 ] ) => mx_worley_noise_float_3d( texcoord.convert( 'vec2|vec3' ), jitter, style ) );
+export const mx_worley_noise_vec2 = /*@__PURE__*/ Fn( ( [ texcoord = uv(), jitter = 1 ] ) => worley_noise_vec2( texcoord.convert( 'vec2|vec3' ), jitter, int( 1 ) ) );
+export const mx_worley_noise_vec3 = /*@__PURE__*/ Fn( ( [ texcoord = uv(), jitter = 1, metric = 1 ] ) => worley_noise_vec3( texcoord.convert( 'vec2|vec3' ), jitter, int( metric ) ) );
+export const mx_worley_noise_vec3_style = /*@__PURE__*/ Fn( ( [ texcoord = uv(), jitter = 1, style = 0, metric = 0 ] ) => worley_noise_vec3_style( texcoord.convert( 'vec2|vec3' ), jitter, int( style ), int( metric ) ) );
 
-export const mx_cell_noise_float = ( texcoord = uv() ) => cell_noise_float( texcoord.convert( 'vec2|vec3' ) );
+export const mx_cell_noise_float = /*@__PURE__*/ Fn( ( [ texcoord = uv() ] ) => cell_noise_float( texcoord.convert( 'vec2|vec3' ) ) );
 
-export const mx_fractal_noise_float_2d = ( texcoord = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => fractal_noise_float_2d( texcoord, int( octaves ), lacunarity, diminish ).mul( amplitude );
-export const mx_fractal_noise_float = ( position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => fractal_noise_float( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
-export const mx_fractal_noise_vec2 = ( position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => fractal_noise_vec2( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
-export const mx_fractal_noise_vec3 = ( position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => fractal_noise_vec3( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
-export const mx_fractal_noise_vec4 = ( position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => fractal_noise_vec4( position, int( octaves ), lacunarity, diminish ).mul( amplitude );
+export const mx_fractal_noise_float_2d = /*@__PURE__*/ Fn( ( [ texcoord = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ] ) => fractal_noise_float_2d( texcoord, int( octaves ), lacunarity, diminish ).mul( amplitude ) );
+export const mx_fractal_noise_float = /*@__PURE__*/ Fn( ( [ position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ] ) => fractal_noise_float( position, int( octaves ), lacunarity, diminish ).mul( amplitude ) );
+export const mx_fractal_noise_vec2 = /*@__PURE__*/ Fn( ( [ position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ] ) => fractal_noise_vec2( position, int( octaves ), lacunarity, diminish ).mul( amplitude ) );
+export const mx_fractal_noise_vec3 = /*@__PURE__*/ Fn( ( [ position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ] ) => fractal_noise_vec3( position, int( octaves ), lacunarity, diminish ).mul( amplitude ) );
+export const mx_fractal_noise_vec4 = /*@__PURE__*/ Fn( ( [ position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ] ) => fractal_noise_vec4( position, int( octaves ), lacunarity, diminish ).mul( amplitude ) );
 
 export { mx_rotate2d, mx_rotate3d };
 export { mx_hsvtorgb, mx_rgbtohsv, mx_srgb_texture_to_lin_rec709 };
@@ -107,22 +110,22 @@ export { mx_hsvtorgb, mx_rgbtohsv, mx_srgb_texture_to_lin_rec709 };
 // === Moved from MaterialXLoader.js ===
 
 // Math ops
-export const mx_add = ( in1, in2 = float( 0 ) ) => add( in1, in2 );
-export const mx_subtract = ( in1, in2 = float( 0 ) ) => sub( in1, in2 );
-export const mx_multiply = ( in1, in2 = float( 1 ) ) => mul( in1, in2 );
-export const mx_divide = ( in1, in2 = float( 1 ) ) => div( in1, in2 );
-export const mx_modulo = ( in1, in2 = float( 1 ) ) => sub( in1, mul( in2, floor( div( in1, in2 ) ) ) );
-export const mx_power = ( in1, in2 = float( 1 ) ) => pow( in1, in2 );
-export const mx_atan2 = ( in1 = float( 0 ), in2 = float( 1 ) ) => atan( in1, in2 );
-export const mx_timer = () => time;
-export const mx_frame = () => frameId;
-export const mx_invert = ( in1, amount = float( 1 ) ) => sub( amount, in1 );
-export const mx_ifgreater = ( value1, value2, in1, in2 ) => value1.greaterThan( value2 ).mix( in2, in1 );
-export const mx_ifgreatereq = ( value1, value2, in1, in2 ) => value1.greaterThanEqual( value2 ).mix( in2, in1 );
-export const mx_ifequal = ( value1, value2, in1, in2 ) => value1.equal( value2 ).mix( in2, in1 );
+export const mx_add = /*@__PURE__*/ Fn( ( [ in1, in2 = float( 0 ) ] ) => add( in1, in2 ) );
+export const mx_subtract = /*@__PURE__*/ Fn( ( [ in1, in2 = float( 0 ) ] ) => sub( in1, in2 ) );
+export const mx_multiply = /*@__PURE__*/ Fn( ( [ in1, in2 = float( 1 ) ] ) => mul( in1, in2 ) );
+export const mx_divide = /*@__PURE__*/ Fn( ( [ in1, in2 = float( 1 ) ] ) => div( in1, in2 ) );
+export const mx_modulo = /*@__PURE__*/ Fn( ( [ in1, in2 = float( 1 ) ] ) => sub( in1, mul( in2, floor( div( in1, in2 ) ) ) ) );
+export const mx_power = /*@__PURE__*/ Fn( ( [ in1, in2 = float( 1 ) ] ) => pow( in1, in2 ) );
+export const mx_atan2 = /*@__PURE__*/ Fn( ( [ in1 = float( 0 ), in2 = float( 1 ) ] ) => atan( in1, in2 ) );
+export const mx_timer = /*@__PURE__*/ Fn( () => time );
+export const mx_frame = /*@__PURE__*/ Fn( () => frameId );
+export const mx_invert = /*@__PURE__*/ Fn( ( [ in1, amount = float( 1 ) ] ) => sub( amount, in1 ) );
+export const mx_ifgreater = /*@__PURE__*/ Fn( ( [ value1, value2, in1, in2 ] ) => value1.greaterThan( value2 ).mix( in2, in1 ) );
+export const mx_ifgreatereq = /*@__PURE__*/ Fn( ( [ value1, value2, in1, in2 ] ) => value1.greaterThanEqual( value2 ).mix( in2, in1 ) );
+export const mx_ifequal = /*@__PURE__*/ Fn( ( [ value1, value2, in1, in2 ] ) => value1.equal( value2 ).mix( in2, in1 ) );
 
 // Enhanced separate node to support multi-output referencing (outx, outy, outz, outw)
-export const mx_separate = ( in1, channelOrOut = null ) => {
+export const mx_separate = /*@__PURE__*/ Fn( ( [ in1, channelOrOut = null ] ) => {
 
 	if ( typeof channelOrOut === 'string' ) {
 
@@ -132,7 +135,7 @@ export const mx_separate = ( in1, channelOrOut = null ) => {
 
 	}
 
-	if ( typeof channelOrOut === 'number' ) {
+	if ( channelOrOut && channelOrOut.isNode ) {
 
 		return in1.element( channelOrOut );
 
@@ -147,28 +150,30 @@ export const mx_separate = ( in1, channelOrOut = null ) => {
 
 	return in1;
 
-};
+} );
 
-export const mx_place2d = (
+export const mx_place2d = /*@__PURE__*/ Fn( ( [
 	texcoord, pivot = vec2( 0, 0 ), scale = vec2( 1, 1 ), rotate = float( 0 ), offset = vec2( 0, 0 ), operationorder = int( 0 )
-) => {
+] ) => {
 
 	const centered = sub( texcoord, pivot );
 	const srt = add( sub( mx_rotate2d( div( centered, scale ), rotate ), offset ), pivot );
 	const trs = add( div( mx_rotate2d( sub( centered, offset ), rotate ), scale ), pivot );
 
-	if ( typeof operationorder === 'number' ) return Math.abs( operationorder ) > Number.EPSILON ? trs : srt;
+	if ( operationorder.isConstNode ) return Math.abs( operationorder.value ) > Number.EPSILON ? trs : srt;
 
 	return mix( srt, trs, step( 0.5, float( operationorder ) ) );
 
-};
+} );
 
-export const mx_heighttonormal = /*@__PURE__*/ Fn( ( [ height, scale = 1, texcoord = uv() ] ) => {
+export const mx_heighttonormal = /*@__PURE__*/ Fn( ( [ input, scale = 1, texcoord = uv() ] ) => {
 
 	const sobelScale = float( 1.0 / 16.0 );
-	const dHdS = vec2( height.dFdx(), height.dFdy() ).mul( scale ).mul( sobelScale );
-	const dUdS = vec2( texcoord.x.dFdx(), texcoord.x.dFdy() );
-	const dVdS = vec2( texcoord.y.dFdx(), texcoord.y.dFdy() );
+	const height = float( input );
+	const uvNode = vec2( texcoord );
+	const dHdS = vec2( height.dFdx(), height.dFdy() ).mul( float( scale ) ).mul( sobelScale );
+	const dUdS = vec2( uvNode.x.dFdx(), uvNode.x.dFdy() );
+	const dVdS = vec2( uvNode.y.dFdx(), uvNode.y.dFdy() );
 	const tangent = vec3( dUdS.x, dVdS.x, dHdS.x );
 	const bitangent = vec3( dUdS.y, dVdS.y, dHdS.y );
 	let n = cross( tangent, bitangent );
@@ -178,4 +183,4 @@ export const mx_heighttonormal = /*@__PURE__*/ Fn( ( [ height, scale = 1, texcoo
 	n = mirrored.mix( n, n.mul( - 1 ) );
 	return normalize( n ).mul( 0.5 ).add( 0.5 );
 
-}, { height: 'float', scale: 'float', texcoord: 'vec2', return: 'vec3' } );
+} );
