@@ -1,8 +1,10 @@
-import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, context, cubeTexture, determinant, float, grayscale, hue, int, inverse, ivec3, mat2, mat3, mat4, mix, mul, overloadingFn, overrideNode, saturation, select, texture, texture3D, time, transpose, uint, uniform, uv, vec2, vec3, vec4, vibrance } from '../../../src/Three.TSL.js';
+import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, context, cubeTexture, determinant, float, grayscale, hue, int, inverse, ivec3, mat2, mat3, mat4, mix, mul, overloadingFn, overrideNode, reference, saturation, select, storage, texture, texture3D, time, transpose, uint, uniform, uniformArray, uv, vec2, vec3, vec4, vibrance } from '../../../src/Three.TSL.js';
 import { Texture } from '../../../src/textures/Texture.js';
 import { CubeTexture } from '../../../src/textures/CubeTexture.js';
 import { Data3DTexture } from '../../../src/textures/Data3DTexture.js';
 import { LinearFilter, NearestFilter } from '../../../src/constants.js';
+import { Color } from '../../../src/math/Color.js';
+import StorageBufferAttribute from '../../../src/renderers/common/StorageBufferAttribute.js';
 
 // Create a fresh graph for every test and backend.
 export const cases = {
@@ -522,6 +524,258 @@ export const cases = {
 		} );
 
 		return value;
+
+	} )(),
+
+	// Dead code is code that does not change the result, e.g. an assignment to a variable that is never read.
+	// The dead code is removed:
+	'dead code removes unused variable': () => Fn( () => {
+
+		const unused = float( 1 ).toVar( 'unused' );
+		const result = float( 2 ).toVar( 'result' );
+
+		unused.addAssign( 1 );
+
+		return result;
+
+	} )(),
+
+	// A variable read only by dead code is dead code too.
+	'dead code removes chain of unused variables': () => Fn( () => {
+
+		const a = float( 1 ).toVar( 'a' );
+		const b = a.mul( 2 ).toVar( 'b' );
+		const c = b.add( 3 ).toVar( 'c' );
+
+		c.addAssign( a );
+
+		return float( 0 );
+
+	} )(),
+
+	'dead code removes unused branch': () => Fn( () => {
+
+		const result = float( 0 ).toVar( 'result' );
+		const unused = float( 0 ).toVar( 'unused' );
+
+		If( uv().x.greaterThan( 0.5 ), () => {
+
+			unused.assign( 1 );
+
+		} );
+
+		return result;
+
+	} )(),
+
+	// The branch is kept, but its assignment to an unused variable is removed.
+	'dead code removes assignment in a branch': () => Fn( () => {
+
+		const result = float( 0 ).toVar( 'result' );
+		const unused = float( 0 ).toVar( 'unused' );
+
+		If( uv().x.greaterThan( 0.5 ), () => {
+
+			result.assign( 1 );
+			unused.assign( 2 );
+
+		} ).Else( () => {
+
+			unused.assign( 3 );
+
+		} );
+
+		return result;
+
+	} )(),
+
+	'dead code removes assignment in the if branch': () => Fn( () => {
+
+		const result = float( 0 ).toVar( 'result' );
+		const unused = float( 0 ).toVar( 'unused' );
+
+		If( uv().x.greaterThan( 0.5 ), () => {
+
+			unused.assign( 1 );
+
+		} ).Else( () => {
+
+			result.assign( 2 );
+
+		} );
+
+		return result;
+
+	} )(),
+
+	'dead code removes unused loop': () => Fn( () => {
+
+		const result = float( 0 ).toVar( 'result' );
+		const unused = float( 0 ).toVar( 'unused' );
+
+		Loop( 4, ( { i } ) => {
+
+			unused.addAssign( float( i ) );
+
+		} );
+
+		return result;
+
+	} )(),
+
+	// The loop is kept, but its assignment to an unused variable is removed.
+	'dead code removes assignment in a loop': () => Fn( () => {
+
+		const sum = float( 0 ).toVar( 'sum' );
+		const unused = float( 0 ).toVar( 'unused' );
+
+		Loop( 4, ( { i } ) => {
+
+			sum.addAssign( float( i ) );
+			unused.assign( sum );
+
+		} );
+
+		return sum;
+
+	} )(),
+
+	// A function that only declares variables and computes a value is pure, so its call is dead code if the value is not read.
+	'dead code removes call of pure function': () => Fn( () => {
+
+		const square = Fn( ( [ value ] ) => {
+
+			const local = value.toVar( 'local' );
+
+			return local.mul( local );
+
+		} );
+
+		const unused = float( 0 ).toVar( 'unused' );
+
+		unused.assign( square( uv().x ) );
+
+		return float( 1 );
+
+	} )(),
+
+	// The code that looks like dead code but changes the result is kept:
+
+	'dead code keeps loop bound': () => Fn( () => {
+
+		const count = int( 1 ).toVar( 'count' );
+		const sum = int( 0 ).toVar( 'sum' );
+
+		count.assign( 3 );
+
+		Loop( count, () => {
+
+			sum.addAssign( 1 );
+
+		} );
+
+		return sum;
+
+	} )(),
+
+	'dead code keeps loop condition': () => Fn( () => {
+
+		const done = bool( false ).toVar( 'done' );
+		const sum = int( 0 ).toVar( 'sum' );
+
+		Loop( done.not(), () => {
+
+			sum.addAssign( 1 );
+
+			If( sum.greaterThan( 2 ), () => {
+
+				done.assign( true );
+
+			} );
+
+		} );
+
+		return sum;
+
+	} )(),
+
+	// A value read in the next iteration of the loop, before it is assigned in a branch.
+	'dead code keeps loop carried value in a branch': () => Fn( () => {
+
+		const sum = int( 0 ).toVar( 'sum' );
+		const carried = int( 7 ).toVar( 'carried' );
+		const next = int( 0 ).toVar( 'next' );
+
+		Loop( 3, ( { i } ) => {
+
+			sum.addAssign( carried );
+			next.assign( 2 );
+
+			If( i.lessThan( 2 ), () => {
+
+				carried.assign( next );
+				sum.addAssign( 1 );
+
+			} );
+
+		} );
+
+		return sum;
+
+	} )(),
+
+	// A function that assigns a value which is read is not pure, so its call is kept even if its value is not read.
+	'dead code keeps texture gradient': () => Fn( () => {
+
+		const grad = vec2( 1 ).toVar( 'grad' );
+
+		If( uv().y.greaterThan( 0.5 ), () => {
+
+			grad.assign( 0 );
+
+		} );
+
+		return texture( new Texture(), uv() ).grad( grad, grad );
+
+	} )(),
+
+	'dead code keeps assignment with side effects': () => Fn( () => {
+
+		const result = int( 0 ).toVar( 'result' );
+		const unused = int( 0 ).toVar( 'unused' );
+
+		const source = Fn( () => {
+
+			result.addAssign( 2 );
+			return int( 1 );
+
+		} );
+
+		unused.assign( source() );
+
+		return result;
+
+	} )(),
+
+	'dead code keeps condition with side effects': () => Fn( () => {
+
+		const result = int( 0 ).toVar( 'result' );
+		const unused = int( 0 ).toVar( 'unused' );
+
+		const condition = Fn( () => {
+
+			result.addAssign( 4 );
+			return bool( true );
+
+		} );
+
+		If( condition(), () => {
+
+			unused.assign( 3 );
+
+		} );
+
+		return result;
 
 	} )(),
 
@@ -1617,6 +1871,89 @@ export const cases = {
 
 		return sampleMap( texture( map ), uv() );
 
-	}
+	},
+
+	// Texture methods of a function return are resolved in the build, like the methods of the texture itself.
+
+	'deferred texture sample': () => {
+
+		const getMap = Fn( () => texture( new Texture() ) );
+
+		return getMap().sample( uv().mul( 2 ) ).level( 2 );
+
+	},
+
+	'deferred texture with statements': () => {
+
+		const getMap = Fn( () => {
+
+			const coord = uv().toVar();
+			coord.addAssign( 0.25 );
+
+			return texture( new Texture(), coord );
+
+		} );
+
+		const map = getMap();
+
+		return map.sample( uv().mul( 2 ) ).add( map.level( 1 ) ).add( vec4( vec2( map.size() ), 0, 1 ) );
+
+	},
+
+	'deferred texture as parameter': () => {
+
+		const levelOf = Fn( ( [ map ] ) => map.level( 2 ) );
+
+		return levelOf( texture( new Texture() ) );
+
+	},
+
+	// Element access is the same for any array node, including function returns and assignments.
+
+	'uniform array element': () => {
+
+		const colors = uniformArray( [ new Color( 1, 0, 0 ), new Color( 0, 1, 0 ) ], 'color' );
+		const weights = uniformArray( [ 0.25, 0.75 ], 'float' );
+
+		return vec4( colors.element( int( 1 ) ).mul( weights[ 0 ] ), 1 );
+
+	},
+
+	'uniform array element of function': () => {
+
+		const weights = uniformArray( [ 1, 2, 3 ], 'int' );
+		const getWeights = Fn( () => weights );
+
+		return getWeights().element( uv().x.mul( 3 ).toInt() ).toFloat();
+
+	},
+
+	'reference array element': () => {
+
+		const object = { colors: [ new Color( 1, 0, 0 ), new Color( 0, 0, 1 ) ] };
+
+		return reference( 'colors', 'color', object ).element( int( 1 ) );
+
+	},
+
+	'storage element of function': () => {
+
+		const colors = storage( new StorageBufferAttribute( new Float32Array( 8 ), 4 ), 'vec4' );
+		const getColors = Fn( () => colors );
+
+		return getColors().element( uv().x.mul( 2 ).toUint() ).add( colors[ 1 ] );
+
+	},
+
+	'array element assign': () => Fn( () => {
+
+		const values = array( 'vec3', 2 ).toVar();
+
+		values.element( int( 1 ) ).assign( vec3( 1, 0, 0 ) );
+		values.element( int( 1 ) ).y.assign( 0.5 );
+
+		return values.element( int( 1 ) );
+
+	} )()
 
 };

@@ -243,18 +243,19 @@ class USDComposer {
 
 					}
 
-				} else if ( opName === 'xformOp:rotateXYZ' ) {
+				} else if ( /^xformOp:rotate(XYZ|XZY|YXZ|YZX|ZXY|ZYX)$/.test( opName ) ) {
 
-					const r = data[ 'xformOp:rotateXYZ' ];
+					const r = data[ opName ];
 					if ( r ) {
 
 						// USD rotateXYZ: matrix = Rx * Ry * Rz
 						// Three.js Euler 'ZYX' order produces same result
+						const order = opName.slice( - 3 ).split( '' ).reverse().join( '' );
 						const euler = new Euler(
 							r[ 0 ] * Math.PI / 180,
 							r[ 1 ] * Math.PI / 180,
 							r[ 2 ] * Math.PI / 180,
-							'ZYX'
+							order
 						);
 						tempMatrix.makeRotationFromEuler( euler );
 						if ( isInverse ) tempMatrix.invert();

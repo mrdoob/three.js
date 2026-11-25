@@ -79,20 +79,6 @@ export default [
 		]
 	},
 	{
-		input: 'src/Three.WebGPU.Nodes.js',
-		plugins: [
-			resolve(),
-			terser(),
-			filesize()
-		],
-		output: [
-			{
-				format: 'esm',
-				file: 'test/treeshake/three.webgpu.nodes.bundle.min.js'
-			}
-		]
-	},
-	{
 		input: 'test/treeshake/index.js',
 		plugins: [
 			resolve()
@@ -141,32 +127,6 @@ export default [
 			{
 				format: 'esm',
 				file: 'test/treeshake/index.webgpu.bundle.min.js'
-			}
-		]
-	},
-	{
-		input: 'test/treeshake/index.webgpu.nodes.js',
-		plugins: [
-			resolve()
-		],
-		output: [
-			{
-				format: 'esm',
-				file: 'test/treeshake/index.webgpu.nodes.bundle.js'
-			}
-		]
-	},
-	{
-		input: 'test/treeshake/index.webgpu.nodes.js',
-		plugins: [
-			resolve(),
-			terser(),
-			filesize()
-		],
-		output: [
-			{
-				format: 'esm',
-				file: 'test/treeshake/index.webgpu.nodes.bundle.min.js'
 			}
 		]
 	},

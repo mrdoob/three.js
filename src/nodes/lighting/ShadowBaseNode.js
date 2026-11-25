@@ -195,6 +195,14 @@ class ShadowBaseNode extends Node {
 
 	}
 
+	isDeadCode( builder ) {
+
+		// the shadow map is not rendered if the shadow is never used, e.g. if `outputNode` replaces the lighting
+
+		return builder.hasReadUsage( this ) === false;
+
+	}
+
 	/**
 	 * Retrieves or creates a shadow material for the shadow casting light source.
 	 *

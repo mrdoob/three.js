@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
+import { Break, Continue, DFGLUT, EnvironmentBRDF_MultiScattering, Fn, If, Loop, abs, bool, cross, distance, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
@@ -16,8 +16,8 @@ const MAX_STEPS = 64;
  * @typedef {Object} SSRNodeOptions
  * @property {boolean} [stochastic=false] - When `false`, traces a single mirror reflection and softens roughness with a blur pass (first-generation SSR). When `true`, varies the reflection direction per pixel with stochastic GGX rays (second-generation SSR); higher quality on rough/glossy surfaces but noisier, so it expects a temporal/spatial denoiser downstream.
  * @property {Node<float>} [metalnessNode=null] - Per-pixel metalness. Drives GGX reflection sampling and, with `reflectNonMetals=false`, the non-metal early-out.
- * @property {Node<vec3>} [specularNode=null] - Stochastic mode only: material normal-incidence reflectance (F0), typically an MRT `specularColorBlended` attachment (it already includes IOR, specular intensity and metalness; raw `material.specularColor` reflects too brightly). Defaults to the metalness/base-color approximation.
- * @property {Node<float>} [specularF90Node=null] - Stochastic mode only: material grazing reflectance, typically an MRT `specularF90` attachment. Defaults to one.
+ * @property {Node<vec3>} [specularNode=null] - Material normal-incidence reflectance (F0), typically an MRT `specularColorBlended` attachment (it already includes IOR, specular intensity and metalness; raw `material.specularColor` reflects too brightly). Defaults to the metalness/base-color approximation.
+ * @property {Node<float>} [specularF90Node=null] - Material grazing reflectance, typically an MRT `specularF90` attachment. Defaults to one.
  * @property {Node<float>} [roughnessNode=null] - Per-pixel roughness. Drives GGX sampling and the blur mip selection.
  * @property {boolean} [reflectNonMetals=false] - Only used when `stochastic=false`. When `false`, non-metallic surfaces are discarded for a noticeable performance gain; set `true` to also reflect dielectrics (e.g. marble, polished wood, plastic).
  * @property {Texture} [environmentNode=null] - Equirectangular HDR environment map with CPU-side `image.data` (e.g. from RGBELoader). Not compatible with PMREM / `scene.environment` cubemaps.
@@ -125,7 +125,7 @@ class SSRNode extends Node {
 		this.metalnessNode = metalnessNode;
 
 		/**
-		 * Stochastic mode only: per-pixel normal-incidence reflectance (F0), typically an MRT
+		 * Per-pixel normal-incidence reflectance (F0), typically an MRT
 		 * `specularColorBlended` attachment, which already includes IOR, specular intensity and
 		 * metalness (raw `material.specularColor` reflects too brightly). When `null`, F0 is
 		 * derived from metalness and the diffuse color.
@@ -136,7 +136,7 @@ class SSRNode extends Node {
 		this.specularNode = specularNode;
 
 		/**
-		 * Stochastic mode only: per-pixel grazing reflectance (F90), typically an MRT
+		 * Per-pixel grazing reflectance (F90), typically an MRT
 		 * `specularF90` attachment. When `null`, the shader uses `1`.
 		 *
 		 * @type {?Node<float>}
@@ -909,13 +909,21 @@ class SSRNode extends Node {
 
 			const V = viewIncidentDir.negate().normalize().toVar();
 
+			// The base color only feeds the metalness F0 fallback.
+			const albedo = this.specularNode === null && this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 );
+			const f0 = vec3( this.specularNode ?? mix( vec3( 0.04 ), albedo, metalness ) ).toVar();
+			const f90 = float( this.specularF90Node ?? 1 ).toVar();
+
 			let viewReflectDir, finalSampleWeight, specDominantFactor;
 			let sampleEnvReflection = null;
 
 			if ( this.stochastic === false ) {
 
 				viewReflectDir = reflect( viewIncidentDir, viewNormal ).normalize().toVar();
-				finalSampleWeight = vec3( metalness );
+
+				// directional specular albedo, the weight the material gives its environment radiance
+				const dfg = DFGLUT( { roughness, dotNV: dot( viewNormal, V ).clamp() } ).toConst();
+				finalSampleWeight = EnvironmentBRDF_MultiScattering( { specularColor: f0, specularF90: f90, dfg } ).toConst();
 				specDominantFactor = float( 1 );
 
 			} else {
@@ -924,14 +932,12 @@ class SSRNode extends Node {
 				// mirror bias trades the unbiased GGX lobe for lower variance
 				Xi.y.assign( mix( Xi.y, 0.0, this.mirrorBias.mul( Xi.w.sqrt() ) ) );
 
-				// The base color only feeds the metalness F0 fallback.
-				const albedo = ( this.specularNode === null && this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ).toVar();
-				const ggxSample = ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi, this.specularNode, this.specularF90Node ?? 1 ).toVar();
+				const ggxSample = ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi, f0, f90 ).toVar();
 
 				// Sometimes the GGX sample is facing away from the surface, so we need to re-sample.
 				If( ggxSample.get( 'reflectDir' ).dot( viewNormal ).lessThan( 0 ), () => {
 
-					ggxSample.assign( ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi.add( Xi.mul( 7 ) ).fract(), this.specularNode, this.specularF90Node ?? 1 ) );
+					ggxSample.assign( ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi.add( Xi.mul( 7 ) ).fract(), f0, f90 ) );
 
 				} );
 
@@ -1289,17 +1295,13 @@ class SSRNode extends Node {
 
 					if ( this.stochastic === true ) applyHitEdgeFade( reflectColor, uvS, hitBorderWidth );
 
-					// The scatter (GGX) path bakes distance/grazing response into finalSampleWeight.
-					// The mirror/blur path is a plain reflection, so reapply upstream's squared
-					// distance attenuation and grazing Fresnel here to match its falloff.
 					let weightedColor = reflectColor.rgb.mul( finalSampleWeight );
 
 					if ( this.stochastic === false ) {
 
+						// the mirror path fades hits out toward maxDistance
 						const ratio = float( 1 ).sub( distancePointPlane.div( this.maxDistance ) ).toVar();
-						const attenuation = ratio.mul( ratio ).toVar();
-						const fresnelCoe = div( dot( viewIncidentDir, viewReflectDir ).add( 1 ), 2 ).toVar();
-						weightedColor = weightedColor.mul( attenuation.mul( fresnelCoe ) );
+						weightedColor = weightedColor.mul( ratio.mul( ratio ) );
 
 					}
 

@@ -17,6 +17,10 @@ const _secureNodeBuilders = new WeakMap();
 
 const NodeElements = new Map();
 
+const NodeChaining = Object.create( Object.getPrototypeOf( Node.prototype ) );
+
+Object.setPrototypeOf( Node.prototype, NodeChaining );
+
 // Extend Node Class for TSL using prototype
 
 export function addMethodChaining( name, nodeElement ) {
@@ -38,7 +42,7 @@ export function addMethodChaining( name, nodeElement ) {
 
 		// Changing Node prototype to add method chaining
 
-		Node.prototype[ name ] = function ( ...params ) {
+		NodeChaining[ name ] = function ( ...params ) {
 
 			return this.isStackNode ? this.addToStack( nodeElement( ...params ) ) : nodeElement( this, ...params );
 
@@ -46,7 +50,7 @@ export function addMethodChaining( name, nodeElement ) {
 
 		// Adding assign method chaining
 
-		Node.prototype[ name + 'Assign' ] = function ( ...params ) {
+		NodeChaining[ name + 'Assign' ] = function ( ...params ) {
 
 			return this.isStackNode ? this.assign( params[ 0 ], nodeElement( ...params ) ) : this.assign( nodeElement( this, ...params ) );
 
@@ -59,7 +63,7 @@ export function addMethodChaining( name, nodeElement ) {
 const parseSwizzle = ( props ) => props.replace( /r|s/g, 'x' ).replace( /g|t/g, 'y' ).replace( /b|p/g, 'z' ).replace( /a|q/g, 'w' );
 const parseSwizzleAndSort = ( props ) => parseSwizzle( props ).split( '' ).sort().join( '' );
 
-Node.prototype.assign = function ( ...params ) {
+NodeChaining.assign = function ( ...params ) {
 
 	if ( this.isStackNode !== true ) {
 
@@ -85,7 +89,7 @@ Node.prototype.assign = function ( ...params ) {
 
 };
 
-Node.prototype.get = function ( value ) {
+NodeChaining.get = function ( value ) {
 
 	return new MemberNode( this, value );
 
@@ -159,7 +163,7 @@ function setProtoSwizzle( property, altA, altB ) {
 
 	// Set methods for swizzle properties
 
-	Node.prototype[ 'set' + propUpper ] = Node.prototype[ 'set' + altAUpper ] = Node.prototype[ 'set' + altBUpper ] = function ( value ) {
+	NodeChaining[ 'set' + propUpper ] = NodeChaining[ 'set' + altAUpper ] = NodeChaining[ 'set' + altBUpper ] = function ( value ) {
 
 		const swizzle = parseSwizzleAndSort( property );
 
@@ -169,7 +173,7 @@ function setProtoSwizzle( property, altA, altB ) {
 
 	// Set methods for flip properties
 
-	Node.prototype[ 'flip' + propUpper ] = Node.prototype[ 'flip' + altAUpper ] = Node.prototype[ 'flip' + altBUpper ] = function () {
+	NodeChaining[ 'flip' + propUpper ] = NodeChaining[ 'flip' + altAUpper ] = NodeChaining[ 'flip' + altBUpper ] = function () {
 
 		const swizzle = parseSwizzleAndSort( property );
 
@@ -301,7 +305,7 @@ setProtoProperty( 'height', 'y' );
 setProtoProperty( 'depth', 'z' );
 */
 
-Object.defineProperties( Node.prototype, proto );
+Object.defineProperties( NodeChaining, proto );
 
 // --- FINISH ---
 
@@ -658,6 +662,12 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
+	isDeadCode( builder ) {
+
+		return this.getOutputNode( builder ).isDeadCode( builder );
+
+	}
+
 	generate( builder, output ) {
 
 		return this.getOutputNode( builder ).build( builder, output ) || '';
@@ -725,6 +735,17 @@ class ShaderCallNodeInternal extends Node {
 					}
 
 				}
+
+			}
+
+			// a function that is not pure can assign values which are read, so the node of the stack that calls it is not
+			// dead code, see StackNode#isPure(). The body of a block, e.g. a branch of `If()`, has no output
+
+			const stack = builder.getActiveStack();
+
+			if ( stack !== undefined && stack._currentNode !== null && outputNode.outputNode && outputNode.isPure( builder ) === false ) {
+
+				builder.getNodeProperties( stack._currentNode ).callsFunction = true;
 
 			}
 
@@ -908,6 +929,14 @@ class ShaderNodeInternal extends Node {
 	call( rawInputs = null ) {
 
 		return new ShaderCallNodeInternal( this, rawInputs );
+
+	}
+
+	isDeadCode( builder ) {
+
+		const { outputNode } = builder.getNodeProperties( this );
+
+		return outputNode !== null && outputNode.isDeadCode( builder );
 
 	}
 
@@ -1234,7 +1263,9 @@ class FnNode extends Node {
 export function Fn( jsFunc, layout = null ) {
 
 	// Layout functions are cached across shaders of the same backend. Their bodies
-	// must depend only on explicit inputs and constants, not uniforms or material context.
+	// must depend only on explicit inputs, constants and uniforms, not material context.
+	// A function that reads uniforms or textures is built per shader, since each shader
+	// declares and names its own uniforms.
 	//
 	// Parameters can have default values. A call without some inputs passes the defaults as
 	// arguments, so values like `uv()` are evaluated at the call site. The defaults are resolved

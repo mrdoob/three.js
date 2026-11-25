@@ -43,6 +43,11 @@ let _id = 0;
 
 const _functionNodeCache = new WeakMap();
 const _functionShaderNodes = new WeakMap();
+
+// The function nodes whose code refers to uniforms. The uniforms are declared and named by the
+// builder that builds the code, so these functions can't share their code with other builders.
+const _builderFunctionNodes = new WeakSet();
+
 const _layoutDefaultsCache = new WeakMap();
 
 // The texture nodes of the texture inputs of a function layout. Their textures only define the code
@@ -159,15 +164,17 @@ const _isVectorCache = new Map();
 const _isMatrixCache = new Map();
 const _isIntegerCache = new Map();
 
-const _checkWriteUsage = ( data ) => {
+const _analyzeShaderStages = [ 'fragment', 'vertex', 'compute' ];
 
-	if ( data.writeUsageCount > 0 ) return true;
+const _checkUsage = ( data, usageCount ) => {
+
+	if ( data[ usageCount ] > 0 ) return true;
 
 	if ( data.subBuildsCache !== undefined ) {
 
 		for ( const subBuild in data.subBuildsCache ) {
 
-			if ( _checkWriteUsage( data.subBuildsCache[ subBuild ] ) ) {
+			if ( _checkUsage( data.subBuildsCache[ subBuild ], usageCount ) ) {
 
 				return true;
 
@@ -547,6 +554,15 @@ class NodeBuilder {
 		this.currentFunctionNode = null;
 
 		/**
+		 * The function nodes built by this builder whose code can't be shared with other builders,
+		 * per shader stage. See {@link NodeBuilder#buildFunctionNode}.
+		 *
+		 * @private
+		 * @type {Object<string,Map<ShaderNodeInternal,FunctionNode>>}
+		 */
+		this._functionNodes = {};
+
+		/**
 		 * The builder's context.
 		 *
 		 * @type {Object}
@@ -877,7 +893,7 @@ class NodeBuilder {
 	 * This method sets the given node (value) with the given hash (key) into this dictionary.
 	 *
 	 * @param {Node} node - The node to add.
-	 * @param {number} hash - The hash of the node.
+	 * @param {number|string} hash - The hash of the node.
 	 */
 	setHashNode( node, hash ) {
 
@@ -931,7 +947,7 @@ class NodeBuilder {
 
 			const updateType = node.updateType;
 
-			if ( updateType !== NodeUpdateType.NONE ) {
+			if ( updateType !== NodeUpdateType.NONE && node.isDeadCode( this ) === false ) {
 
 				this.updateNodes.push( node );
 
@@ -940,6 +956,8 @@ class NodeBuilder {
 		}
 
 		for ( const node of this.sequentialNodes ) {
+
+			if ( node.isDeadCode( this ) ) continue;
 
 			const updateBeforeType = node.updateBeforeType;
 			const updateAfterType = node.updateAfterType;
@@ -1095,7 +1113,7 @@ class NodeBuilder {
 	/**
 	 * Returns a node for the given hash, see {@link NodeBuilder#setHashNode}.
 	 *
-	 * @param {number} hash - The hash of the node.
+	 * @param {number|string} hash - The hash of the node.
 	 * @return {Node} The found node.
 	 */
 	getNodeFromHash( hash ) {
@@ -1413,12 +1431,38 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns whether the given node has been read in any shader stage.
+	 *
+	 * @param {Node} node - The node to check.
+	 * @return {boolean} Whether the node has been read.
+	 */
+	hasReadUsage( node ) {
+
+		return this._hasUsage( node, 'readUsageCount' );
+
+	}
+
+	/**
 	 * Returns whether the given node has been written to in any shader stage.
 	 *
 	 * @param {Node} node - The node to check.
 	 * @return {boolean} Whether the node has been written to.
 	 */
 	hasWriteUsage( node ) {
+
+		return this._hasUsage( node, 'writeUsageCount' );
+
+	}
+
+	/**
+	 * Returns whether the given usage count of the node is greater than zero in any shader stage or sub-build.
+	 *
+	 * @private
+	 * @param {Node} node - The node to check.
+	 * @param {('readUsageCount'|'writeUsageCount')} usageCount - The usage count to check.
+	 * @return {boolean} Whether the node has the usage.
+	 */
+	_hasUsage( node, usageCount ) {
 
 		const refNode = node.getShared( this );
 		const cache = refNode.isGlobal( this ) ? this.globalCache : this.cache;
@@ -1430,7 +1474,7 @@ class NodeBuilder {
 
 				const data = nodeData[ shaderStage ];
 
-				if ( data !== undefined && _checkWriteUsage( data ) ) {
+				if ( data !== undefined && _checkUsage( data, usageCount ) ) {
 
 					return true;
 
@@ -2217,6 +2261,54 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Follows the setup output of the given node until a node accepted by `isTarget()` is found
+	 * and returns the result of `callback( target )`. A stack keeps its statements, e.g. the
+	 * statements of a function whose returned node is the target.
+	 *
+	 * @param {?Node} node - The node to resolve.
+	 * @param {function(Node): boolean} isTarget - Whether the given node is the target.
+	 * @param {function(Node): Node} callback - Returns the result for the target.
+	 * @return {?Node} The result, or `null` if no target is found.
+	 */
+	resolveNode( node, isTarget, callback ) {
+
+		if ( node === null || node.isNode !== true ) return null;
+
+		if ( isTarget( node ) ) return callback( node );
+
+		if ( node.isContextNode === true ) {
+
+			// the node inside the context is resolved with the context, which is applied to the result
+
+			const previousContext = this.addContext( node.value );
+
+			const outputNode = this.resolveNode( node.node, isTarget, callback );
+
+			this.setContext( previousContext );
+
+			return outputNode !== null ? outputNode.context( node.value ) : null;
+
+		}
+
+		if ( node.isStackNode === true ) {
+
+			const outputNode = this.resolveNode( node.outputNode, isTarget, callback );
+
+			if ( outputNode === null || node.nodes.length === 0 ) return outputNode;
+
+			const resolvedStack = stack();
+			resolvedStack.nodes = node.nodes;
+			resolvedStack.outputNode = outputNode;
+
+			return resolvedStack;
+
+		}
+
+		return this.resolveNode( node.build( this ), isTarget, callback );
+
+	}
+
+	/**
 	 * The builder maintains (cached) data for each node during the building process. This method
 	 * can be used to get these data for a specific shader stage and cache.
 	 *
@@ -2395,6 +2487,8 @@ class NodeBuilder {
 	getUniformFromNode( node, type, shaderStage = this.shaderStage, name = null ) {
 
 		if ( node.isParameterNode === true ) return node;
+
+		if ( this.currentFunctionNode !== null ) _builderFunctionNodes.add( this.currentFunctionNode );
 
 		const nodeData = this.getDataFromNode( node, shaderStage, this.globalCache );
 
@@ -2787,7 +2881,8 @@ class NodeBuilder {
 	 */
 	buildFunctionNode( shaderNode ) {
 
-		// the code is shared by all builders of a backend, per shader stage since it can differ between stages
+		// the code is shared by all builders of a backend, per shader stage since it can differ between stages.
+		// code that refers to uniforms is built per builder, since the uniforms are declared and named per builder.
 
 		const backend = this.renderer.backend;
 
@@ -2801,8 +2896,13 @@ class NodeBuilder {
 		}
 
 		const cache = stages[ this.shaderStage ] || ( stages[ this.shaderStage ] = new WeakMap() );
+		const builderCache = this._functionNodes[ this.shaderStage ] || ( this._functionNodes[ this.shaderStage ] = new Map() );
 
 		let fn = cache.get( shaderNode );
+
+		const isBuilderFunction = fn !== undefined && _builderFunctionNodes.has( fn );
+
+		if ( isBuilderFunction ) fn = builderCache.get( shaderNode );
 
 		if ( fn === undefined ) {
 
@@ -2816,8 +2916,18 @@ class NodeBuilder {
 
 			this.currentFunctionNode = previous;
 
-			cache.set( shaderNode, fn );
+			if ( isBuilderFunction === false ) cache.set( shaderNode, fn );
+			if ( isBuilderFunction || _builderFunctionNodes.has( fn ) ) builderCache.set( shaderNode, fn );
+
 			_functionShaderNodes.set( fn, shaderNode );
+
+		}
+
+		// a function that calls a function of this builder is a function of this builder as well
+
+		if ( _builderFunctionNodes.has( fn ) && this.currentFunctionNode !== null ) {
+
+			_builderFunctionNodes.add( this.currentFunctionNode );
 
 		}
 
@@ -2900,6 +3010,18 @@ class NodeBuilder {
 		flowData.parameters = parameters;
 
 		return flowData;
+
+	}
+
+	/**
+	 * Requests a sampler for the binding of the given texture node.
+	 *
+	 * @abstract
+	 * @param {TextureNode} textureNode - The texture node.
+	 */
+	addSamplerNode( /* textureNode */ ) {
+
+		warn( 'Abstract function.' );
 
 	}
 
@@ -3809,7 +3931,11 @@ class NodeBuilder {
 
 			}
 
-			for ( const shaderStage of shaderStages ) {
+			// the fragment stage is analyzed before the vertex stage, so the vertex code knows which values the varyings read
+
+			const stages = buildStage === 'analyze' ? _analyzeShaderStages : shaderStages;
+
+			for ( const shaderStage of stages ) {
 
 				this.setShaderStage( shaderStage );
 

@@ -1,4 +1,4 @@
-import { Bone, BufferAttribute, BufferGeometry, DynamicDrawUsage, Float16BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Skeleton, SkinnedMesh, Vector3 } from 'three';
+import { Bone, BufferAttribute, BufferGeometry, DynamicDrawUsage, Float16BufferAttribute, InstancedInterleavedBuffer, IntType, InterleavedBuffer, InterleavedBufferAttribute, Skeleton, SkinnedMesh, Vector3 } from 'three';
 import * as BufferGeometryUtils from '../../../../examples/jsm/utils/BufferGeometryUtils.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
@@ -329,6 +329,30 @@ export default QUnit.module( 'Addons', () => {
 					assert.deepEqual( Array.from( normal.array ), [ 0, 0, 1, 0, 0, 1 ], 'keeps normals' );
 					assert.deepEqual( Array.from( morphPosition0.array ), [ 0, 1, 0, 1, 1, 0 ], 'keeps first morph target' );
 					assert.deepEqual( Array.from( morphPosition1.array ), [ 0, 2, 0, 1, 2, 0 ], 'keeps second morph target' );
+
+				} );
+
+				QUnit.test( 'keeps instanced interleaved attributes instanced', ( assert ) => {
+
+					const geometry = new BufferGeometry();
+
+					const instanceBuffer = new InstancedInterleavedBuffer( new Float32Array( [
+						0, 0, 0, 1, 1, 1,
+						2, 2, 2, 3, 3, 3
+					] ), 6, 2 );
+
+					geometry.setAttribute( 'instanceStart', new InterleavedBufferAttribute( instanceBuffer, 3, 0 ) );
+					geometry.setAttribute( 'instanceEnd', new InterleavedBufferAttribute( instanceBuffer, 3, 3 ) );
+
+					BufferGeometryUtils.deinterleaveGeometry( geometry );
+
+					const instanceStart = geometry.getAttribute( 'instanceStart' );
+					const instanceEnd = geometry.getAttribute( 'instanceEnd' );
+
+					assert.ok( instanceStart.isInstancedBufferAttribute && instanceEnd.isInstancedBufferAttribute, 'keeps attributes instanced' );
+					assert.strictEqual( instanceStart.meshPerAttribute, 2, 'keeps meshPerAttribute' );
+					assert.deepEqual( Array.from( instanceStart.array ), [ 0, 0, 0, 2, 2, 2 ], 'keeps start values' );
+					assert.deepEqual( Array.from( instanceEnd.array ), [ 1, 1, 1, 3, 3, 3 ], 'keeps end values' );
 
 				} );
 

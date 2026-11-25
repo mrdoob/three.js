@@ -54,7 +54,17 @@ class PassTextureNode extends TextureNode {
 		 */
 		this.isPassTextureNode = true;
 
-		this.setUpdateMatrix( false );
+	}
+
+	/**
+	 * Returns `false` because pass textures are sampled directly in render target UVs.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
+	get updateMatrix() {
+
+		return false;
 
 	}
 
@@ -75,7 +85,10 @@ class PassTextureNode extends TextureNode {
 
 	clone() {
 
-		return new this.constructor( this.passNode, this.value );
+		const newNode = super.clone();
+		newNode.passNode = this.passNode;
+
+		return newNode;
 
 	}
 
@@ -154,16 +167,9 @@ class PassMultipleTextureNode extends PassTextureNode {
 
 	clone() {
 
-		const newNode = new this.constructor( this.passNode, this.textureName, this.previousTexture );
-		newNode.uvNode = this.uvNode;
-		newNode.levelNode = this.levelNode;
-		newNode.biasNode = this.biasNode;
-		newNode.sampler = this.sampler;
-		newNode.depthNode = this.depthNode;
-		newNode.compareNode = this.compareNode;
-		newNode.gradNode = this.gradNode;
-		newNode.gatherNode = this.gatherNode;
-		newNode.offsetNode = this.offsetNode;
+		const newNode = super.clone();
+		newNode.textureName = this.textureName;
+		newNode.previousTexture = this.previousTexture;
 
 		return newNode;
 

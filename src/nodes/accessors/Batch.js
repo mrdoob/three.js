@@ -30,16 +30,16 @@ const getBatchingColor = /*@__PURE__*/ Fn( ( [ colorsTexture, id ] ) => {
 /**
  * TSL function that retrieves the indirect index for a given batch ID.
  *
- * @param {BatchedMesh} batchMesh - The batched mesh.
+ * @param {TextureNode} indirectTextureNode - The indirect texture node.
  * @param {Node<int>} id - The draw or instance ID.
  * @returns {Node<uint>} The indirect index.
  */
-const getIndirectIndex = /*@__PURE__*/ Fn( ( [ indirectTexture, id ] ) => {
+const getIndirectIndex = /*@__PURE__*/ Fn( ( [ indirectTextureNode, id ] ) => {
 
-	const size = int( textureSize( textureLoad( indirectTexture ), 0 ).x ).toConst();
+	const size = int( textureSize( indirectTextureNode, 0 ).x ).toConst();
 	const x = int( id ).mod( size ).toConst();
 	const y = int( id ).div( size ).toConst();
-	return textureLoad( indirectTexture, ivec2( x, y ) ).x;
+	return textureLoad( indirectTextureNode, ivec2( x, y ) ).x;
 
 } );
 
@@ -94,6 +94,25 @@ function getPreviousMatricesTexture( batchMesh ) {
 }
 
 /**
+ * Returns the indirect texture for the given call depth of the renderer. With the WebGPU backend,
+ * nested renders write their draw order into their own texture since the draws of the outer render
+ * are executed when its pass is submitted.
+ *
+ * @param {BatchedMesh} batchMesh - The batched mesh.
+ * @param {number} callDepth - The call depth of the renderer.
+ * @returns {DataTexture} The indirect texture.
+ */
+function getIndirectTexture( batchMesh, callDepth ) {
+
+	// without culling and sorting, the draw order is the same for all cameras so the main texture can be shared
+
+	if ( batchMesh.perObjectFrustumCulled === false && batchMesh.sortObjects === false ) return batchMesh._indirectTexture;
+
+	return batchMesh._getIndirectTexture( callDepth );
+
+}
+
+/**
  * TSL object representing a varying property for the batching color vector.
  *
  * @type {VaryingNode<vec4>}
@@ -120,7 +139,9 @@ export const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
 
 	const batchingIdNode = builder.getDrawIndex() === null ? instanceIndex : drawIndex;
 
-	const indirectId = getIndirectIndex( batchMesh._indirectTexture, int( batchingIdNode ) );
+	const indirectTextureNode = textureLoad( batchMesh._indirectTexture );
+
+	const indirectId = getIndirectIndex( indirectTextureNode, int( batchingIdNode ) );
 
 	batchIndirectIndex.assign( indirectId );
 
@@ -169,15 +190,19 @@ export const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
 
 	if ( builder.hasGeometryAttribute( 'tangent' ) ) {
 
-		tangentLocal.mulAssign( bm );
+		tangentLocal.assign( bm.mul( tangentLocal ) );
 
 	}
 
 	const drawFormat = builder.renderer.backend.isWebGPUBackend === true ? 'merged' : 'multiDraw';
 
-	OnObjectUpdate( ( { object, camera, material } ) => {
+	OnObjectUpdate( ( { object, camera, material, renderer } ) => {
 
-		object._updateDrawParameters( camera, object.geometry, material, drawFormat );
+		const indirectTexture = drawFormat === 'merged' ? getIndirectTexture( object, renderer._callDepth ) : object._indirectTexture;
+
+		indirectTextureNode.value = indirectTexture;
+
+		object._updateDrawParameters( camera, object.geometry, material, drawFormat, indirectTexture );
 
 	} );
 

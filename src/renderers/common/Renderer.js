@@ -3723,8 +3723,10 @@ class Renderer {
 
 		if ( cache === undefined || cache.version !== version ) {
 
-			const hasMap = material.map && material.map.isTexture;
-			const hasColorNode = material.colorNode && material.colorNode.isNode;
+			// the color's alpha only shapes the shadow of materials that use alpha (alpha test, alpha hash, transparency)
+			const usesAlpha = material.transparent === true || material.alphaTest > 0 || material.alphaHash === true;
+			const hasMap = usesAlpha && material.map && material.map.isTexture;
+			const hasColorNode = usesAlpha && material.colorNode && material.colorNode.isNode;
 			const hasCastShadowNode = material.castShadowNode && material.castShadowNode.isNode;
 			const hasMaskNode = ( material.maskShadowNode && material.maskShadowNode.isNode ) || ( material.maskNode && material.maskNode.isNode );
 

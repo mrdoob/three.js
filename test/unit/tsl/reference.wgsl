@@ -686,6 +686,183 @@ while ( ( nodeVar0 < 3 ) ) {
 
 nodeVar0
 
+// dead code removes unused variable
+
+var result : f32;
+
+result = 2.0;
+
+result
+
+// dead code removes chain of unused variables
+
+0.0
+
+// dead code removes unused branch
+
+var result : f32;
+
+result = 0.0;
+
+result
+
+// dead code removes assignment in a branch
+
+var result : f32;
+
+result = 0.0;
+
+if ( ( nodeVarying0.x > 0.5 ) ) {
+
+	result = 1.0;
+
+}
+
+result
+
+// dead code removes assignment in the if branch
+
+var result : f32;
+
+result = 0.0;
+
+if ( !( ( nodeVarying0.x > 0.5 ) ) ) {
+
+	result = 2.0;
+
+}
+
+result
+
+// dead code removes unused loop
+
+var result : f32;
+
+result = 0.0;
+
+result
+
+// dead code removes assignment in a loop
+
+var sum : f32;
+
+sum = 0.0;
+
+for ( var i : i32 = 0; i < 4; i ++ ) {
+
+	sum = ( sum + f32( i ) );
+
+}
+
+sum
+
+// dead code removes call of pure function
+
+1.0
+
+// dead code keeps loop bound
+
+var count : i32;
+var sum : i32;
+
+count = 1;
+sum = 0;
+count = 3;
+
+for ( var i : i32 = 0; i < count; i ++ ) {
+
+	sum = ( sum + 1 );
+
+}
+
+sum
+
+// dead code keeps loop condition
+
+var done : bool;
+var sum : i32;
+
+done = false;
+sum = 0;
+
+while ( ( ! done ) ) {
+
+	sum = ( sum + 1 );
+
+	if ( ( sum > 2 ) ) {
+
+		done = true;
+
+	}
+
+}
+
+sum
+
+// dead code keeps loop carried value in a branch
+
+var sum : i32;
+var carried : i32;
+var next : i32;
+
+sum = 0;
+carried = 7;
+next = 0;
+
+for ( var i : i32 = 0; i < 3; i ++ ) {
+
+	sum = ( sum + carried );
+	next = 2;
+
+	if ( ( i < 2 ) ) {
+
+		carried = next;
+		sum = ( sum + 1 );
+
+	}
+
+}
+
+sum
+
+// dead code keeps texture gradient
+
+var grad : vec2<f32>;
+var nodeVar0 : vec4<f32>;
+
+grad = vec2<f32>( 1.0, 1.0 );
+
+if ( ( nodeVarying0.y > 0.5 ) ) {
+
+	grad = vec2<f32>( 0.0 );
+
+}
+
+nodeVar0 = textureSampleGrad( nodeUniform0, nodeUniform0_sampler, nodeVarying0, grad, grad );
+
+nodeVar0
+
+// dead code keeps assignment with side effects
+
+var result : i32;
+var unused : i32;
+
+result = 0;
+unused = 0;
+result = ( result + 2 );
+unused = 1;
+
+result
+
+// dead code keeps condition with side effects
+
+var result : i32;
+
+result = 0;
+result = ( result + 4 );
+
+result
+
 // function inline reuse
 
 let nodeConst0 = ( 3.0 * 3.0 );
@@ -1754,3 +1931,58 @@ fn fn0 ( map : texture_2d<f32>, map_sampler : sampler, coord : vec2<f32> ) -> ve
 }
 
 fn0( nodeUniform0, nodeUniform0_sampler, nodeVarying0 )
+
+// deferred texture sample
+
+var nodeVar0 : vec4<f32>;
+
+nodeVar0 = textureSampleLevel( nodeUniform0, nodeUniform0_sampler, ( nodeVarying0 * vec2<f32>( 2.0 ) ), 2.0 );
+
+nodeVar0
+
+// deferred texture with statements
+
+var nodeVar0 : vec2<f32>;
+var nodeVar1 : vec4<f32>;
+var nodeVar2 : vec4<f32>;
+
+nodeVar0 = nodeVarying0;
+nodeVar0 = ( nodeVar0 + vec2<f32>( 0.25 ) );
+nodeVar1 = textureSample( nodeUniform0, nodeUniform0_sampler, ( nodeVarying0 * vec2<f32>( 2.0 ) ) );
+nodeVar2 = textureSampleLevel( nodeUniform0, nodeUniform0_sampler, nodeVar0, 1.0 );
+
+( ( nodeVar1 + nodeVar2 ) + vec4<f32>( vec2<f32>( textureDimensions( nodeUniform0, 0 ) ), 0.0, 1.0 ) )
+
+// deferred texture as parameter
+
+var nodeVar0 : vec4<f32>;
+
+nodeVar0 = textureSampleLevel( nodeUniform0, nodeUniform0_sampler, ( object.nodeUniform1 * vec3<f32>( nodeVarying0, 1.0 ) ).xy, 2.0 );
+
+nodeVar0
+
+// uniform array element
+
+vec4<f32>( ( nodeUniform0.value[ 1 ].xyz * vec3<f32>( nodeUniform1.value[ 0u ].x ) ), 1.0 )
+
+// uniform array element of function
+
+f32( nodeUniform0.value[ i32( ( nodeVarying0.x * 3.0 ) ) ].x )
+
+// reference array element
+
+nodeUniform0.value[ 1 ].xyz
+
+// storage element of function
+
+( nodeUniform0.value[ u32( ( nodeVarying0.x * 2.0 ) ) ] + nodeUniform0.value[ 1u ] )
+
+// array element assign
+
+var nodeVar0 : array< vec3<f32>, 2 >;
+
+nodeVar0 = array< vec3<f32>, 2 >( vec3<f32>( 0.0, 0.0, 0.0 ), vec3<f32>( 0.0, 0.0, 0.0 ) );
+nodeVar0[ 1 ] = vec3<f32>( 1.0, 0.0, 0.0 );
+nodeVar0[ 1 ].y = 0.5;
+
+nodeVar0[ 1 ]

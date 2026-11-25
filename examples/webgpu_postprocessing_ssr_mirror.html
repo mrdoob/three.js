@@ -44,7 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, velocity, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, specularColorBlended, velocity, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 		import { reprojectedBeauty, previousViewZ } from 'three/addons/tsl/display/ReprojectedBeautyNode.js';
@@ -145,6 +145,7 @@
 				output: output,
 				normal: packNormalToOctahedral( normalView ),
 				metalrough: vec2( metalness, roughness ), // pack metalness and roughness into a single attachment
+				specular: specularColorBlended, // the material's F0, tints reflections on metals
 				velocity: vec4( velocity, 0, previousViewZ )
 			} ) );
 
@@ -160,6 +161,7 @@
 
 			} );
 			const scenePassMetalRough = scenePass.getTextureNode( 'metalrough' ).toInspector( 'Metalness-Roughness' );
+			const scenePassSpecular = scenePass.getTextureNode( 'specular' ).toInspector( 'Specular' );
 
 			// octahedral normals can't be filtered across their folds
 
@@ -171,6 +173,9 @@
 
 			const metalRoughTexture = scenePass.getTexture( 'metalrough' );
 			metalRoughTexture.type = THREE.UnsignedByteType;
+			metalRoughTexture.format = THREE.RGFormat;
+
+			scenePass.getTexture( 'specular' ).type = THREE.UnsignedByteType;
 
 			const sceneNormal = sample( ( uv ) => {
 
@@ -184,6 +189,7 @@
 				camera,
 				metalnessNode: scenePassMetalRough.r,
 				roughnessNode: scenePassMetalRough.g,
+				specularNode: scenePassSpecular,
 				binaryRefine: params.binaryRefine
 			} ).toInspector( 'SSR' );
 

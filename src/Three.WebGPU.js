@@ -40,5 +40,5 @@ export { default as StandardNodeLibrary } from './renderers/webgpu/nodes/Standar
 export { default as WGSLNodeBuilder } from './renderers/webgpu/nodes/WGSLNodeBuilder.js';
 export { ClippingGroup } from './objects/ClippingGroup.js';
 export * from './nodes/Nodes.js';
-import * as TSL from './Three.TSL.js';
+import * as TSL from './Three.Nodes.js';
 export { TSL };

@@ -168,7 +168,7 @@ class BufferAttributeNode extends InputNode {
 	 * and thus the hash should be shared as well.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The hash.
+	 * @return {number} The hash.
 	 */
 	getHash( builder ) {
 
@@ -196,7 +196,7 @@ class BufferAttributeNode extends InputNode {
 
 		}
 
-		return String( id );
+		return id;
 
 	}
 

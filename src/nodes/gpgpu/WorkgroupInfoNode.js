@@ -1,58 +1,6 @@
-import ArrayElementNode from '../utils/ArrayElementNode.js';
 import Node from '../core/Node.js';
 import { error, warn } from '../../utils.js';
 import StackTrace from '../core/StackTrace.js';
-
-/**
- * Represents an element of a 'workgroup' scoped buffer.
- *
- * @augments ArrayElementNode
- */
-class WorkgroupInfoElementNode extends ArrayElementNode {
-
-	/**
-	 * Constructs a new workgroup info element node.
-	 *
-	 * @param {Node} workgroupInfoNode - The workgroup info node.
-	 * @param {Node} indexNode - The index node that defines the element access.
-	 */
-	constructor( workgroupInfoNode, indexNode ) {
-
-		super( workgroupInfoNode, indexNode );
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isWorkgroupInfoElementNode = true;
-
-	}
-
-	generate( builder, output ) {
-
-		let snippet;
-
-		const isAssignContext = builder.isContextAssign();
-		snippet = super.generate( builder );
-
-		if ( isAssignContext !== true ) {
-
-			const type = this.getNodeType( builder );
-
-			snippet = builder.format( snippet, type, output );
-
-		}
-
-		// TODO: Possibly activate clip distance index on index access rather than from clipping context
-
-		return snippet;
-
-	}
-
-}
 
 /**
  * A node allowing the user to create a 'workgroup' scoped buffer within the
@@ -231,18 +179,6 @@ class WorkgroupInfoNode extends Node {
 	getInputType( /*builder*/ ) {
 
 		return `${this.scope}Array`;
-
-	}
-
-	/**
-	 * This method can be used to access elements via an index node.
-	 *
-	 * @param {IndexNode} indexNode - indexNode.
-	 * @return {WorkgroupInfoElementNode} A reference to an element.
-	 */
-	element( indexNode ) {
-
-		return new WorkgroupInfoElementNode( this, indexNode );
 
 	}
 

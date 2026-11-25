@@ -8,20 +8,31 @@ import { vectorComponents } from '../core/constants.js';
  * The node is marked as assigned, so it is declared as a variable.
  *
  * @private
+ * @param {NodeBuilder} builder - The current node builder.
  * @param {Node} node - The target node of the assignment.
  * @return {Node} The scope of the assignment.
  */
-function getScope( node ) {
+function getScope( builder, node ) {
 
 	while ( true ) {
 
-		if ( node.isContextNode === true || node.isSplitNode === true || node.isArrayElementNode === true ) {
+		if ( node.isContextNode === true || node.isSplitNode === true ) {
 
 			node = node.node;
 
 		} else if ( node.isMemberNode === true ) {
 
 			node = node.structNode;
+
+		} else if ( node.isStackNode === true ) {
+
+			node = node.outputNode;
+
+		} else if ( node.isArrayElementNode === true ) {
+
+			// an element redirected to a buffer, e.g. a storage buffer returned by a function
+
+			node = node.getOutputNode( builder ) || node.node;
 
 		} else {
 
@@ -82,6 +93,12 @@ class AssignNode extends Node {
 
 	}
 
+	isDeadCode( builder ) {
+
+		return getScope( builder, this.targetNode ).isDeadCode( builder );
+
+	}
+
 	/**
 	 * Assignments must not be cached in temporary variables.
 	 *
@@ -128,7 +145,7 @@ class AssignNode extends Node {
 
 		const { targetNode, sourceNode } = this;
 
-		const scope = getScope( targetNode );
+		const scope = getScope( builder, targetNode );
 
 		const scopeData = builder.getDataFromNode( scope );
 		scopeData.assign = true;

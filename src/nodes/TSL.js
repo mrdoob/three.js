@@ -50,7 +50,6 @@ export * from './utils/RTTNode.js';
 export * from './utils/PostProcessingUtils.js';
 export * from './utils/SampleNode.js';
 export * from './utils/EventNode.js';
-export * from './utils/StorageArrayElementNode.js';
 
 // three.js shading language
 export * from './tsl/TSLBase.js';
@@ -171,7 +170,7 @@ export { default as BRDF_Sheen } from './functions/BSDF/BRDF_Sheen.js';
 export { default as D_GGX } from './functions/BSDF/D_GGX.js';
 export { default as D_GGX_Anisotropic } from './functions/BSDF/D_GGX_Anisotropic.js';
 export { default as DFGLUT } from './functions/BSDF/DFGLUT.js';
-export { default as EnvironmentBRDF } from './functions/BSDF/EnvironmentBRDF.js';
+export { default as EnvironmentBRDF, EnvironmentBRDF_MultiScattering } from './functions/BSDF/EnvironmentBRDF.js';
 export { default as F_Schlick } from './functions/BSDF/F_Schlick.js';
 export { default as Schlick_to_F0 } from './functions/BSDF/Schlick_to_F0.js';
 export { default as V_GGX_SmithCorrelated } from './functions/BSDF/V_GGX_SmithCorrelated.js';

@@ -5,8 +5,7 @@ import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import { NodeSampledTexture, NodeSampledCubeTexture, NodeSampledTexture3D } from '../../common/nodes/NodeSampledTexture.js';
 
-import { NoColorSpace, ByteType, ShortType, RGBAIntegerFormat, RGBIntegerFormat, RedIntegerFormat, RGIntegerFormat, UnsignedByteType, UnsignedIntType, UnsignedShortType, RedFormat, RGFormat, IntType, RGBFormat, RGBAFormat, FloatType } from '../../../constants.js';
-import { DataTexture } from '../../../textures/DataTexture.js';
+import { NoColorSpace, UnsignedIntType, IntType } from '../../../constants.js';
 import { error } from '../../../utils.js';
 
 const glslPolyfills = {
@@ -391,6 +390,13 @@ class GLSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * GLSL samples textures without separate samplers.
+	 *
+	 * @param {TextureNode} textureNode - The texture node.
+	 */
+	addSamplerNode( /* textureNode */ ) {}
+
+	/**
 	 * Returns the parameters that pass a texture to a function: the texture and its y-flip.
 	 * Cube textures are not flipped, see {@link CubeTextureNode#setupUV}.
 	 *
@@ -446,76 +452,31 @@ ${ flowData.code }
 	 * Setups the Pixel Buffer Object (PBO) for the given storage
 	 * buffer node.
 	 *
-	 * Note: The `array` of the storage buffer attribute is replaced
-	 * with a padded copy that fits the dimensions of the texture.
-	 *
 	 * @param {StorageBufferNode} storageBufferNode - The storage buffer node.
 	 */
 	setupPBO( storageBufferNode ) {
 
-		const attribute = storageBufferNode.value;
+		const nodeData = this.getDataFromNode( storageBufferNode, 'any' );
 
-		if ( attribute.pbo === undefined ) {
+		if ( nodeData.pboNode === undefined ) {
 
-			const originalArray = attribute.array;
-			const numElements = attribute.count * attribute.itemSize;
+			const { attributeUtils } = this.renderer.backend;
+			const attribute = storageBufferNode.value;
 
-			const { itemSize } = attribute;
+			const pboNode = new TextureNode( attributeUtils.getPBO( attribute ), null, null );
+			pboNode.setPrecision( 'high' );
+			pboNode.onRenderUpdate( () => { // upload CPU updates of the attribute
 
-			const isInteger = attribute.array.constructor.name.toLowerCase().includes( 'int' );
+				attributeUtils.getPBO( attribute );
 
-			let format = isInteger ? RedIntegerFormat : RedFormat;
+			} );
 
-			if ( itemSize === 2 ) {
-
-				format = isInteger ? RGIntegerFormat : RGFormat;
-
-			} else if ( itemSize === 3 ) {
-
-				format = isInteger ? RGBIntegerFormat : RGBFormat;
-
-			} else if ( itemSize === 4 ) {
-
-				format = isInteger ? RGBAIntegerFormat : RGBAFormat;
-
-			}
-
-			const typeMap = {
-				Float32Array: FloatType,
-				Uint8Array: UnsignedByteType,
-				Uint16Array: UnsignedShortType,
-				Uint32Array: UnsignedIntType,
-				Int8Array: ByteType,
-				Int16Array: ShortType,
-				Int32Array: IntType,
-				Uint8ClampedArray: UnsignedByteType,
-			};
-
-			const width = Math.pow( 2, Math.ceil( Math.log2( Math.sqrt( numElements / itemSize ) ) ) );
-			let height = Math.ceil( ( numElements / itemSize ) / width );
-			if ( width * height * itemSize < numElements ) height ++; // Ensure enough space
-
-			const newSize = width * height * itemSize;
-
-			const newArray = new originalArray.constructor( newSize );
-
-			newArray.set( originalArray, 0 );
-
-			attribute.array = newArray;
-
-			const pboTexture = new DataTexture( attribute.array, width, height, format, typeMap[ attribute.array.constructor.name ] || FloatType );
-			pboTexture.needsUpdate = true;
-			pboTexture.isPBOTexture = true;
-
-			const pbo = new TextureNode( pboTexture, null, null );
-			pbo.setPrecision( 'high' );
-
-			attribute.pboNode = pbo;
-			attribute.pbo = pbo.value;
-
-			this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.nodeName );
+			nodeData.pboNode = pboNode;
 
 		}
+
+		this.addNode( nodeData.pboNode );
+		this.getUniformFromNode( nodeData.pboNode, 'texture', this.shaderStage, this.context.nodeName );
 
 	}
 
@@ -554,7 +515,7 @@ ${ flowData.code }
 	 * Generates the code that reads the given storage array element from
 	 * the Pixel Buffer Object (PBO) of its storage buffer.
 	 *
-	 * @param {StorageArrayElementNode} storageArrayElementNode - The storage array element node.
+	 * @param {ArrayElementNode} storageArrayElementNode - The element node of the storage buffer.
 	 * @return {string} The name of the variable holding the element.
 	 */
 	generatePBO( storageArrayElementNode ) {
@@ -562,14 +523,8 @@ ${ flowData.code }
 		const { node, indexNode } = storageArrayElementNode;
 		const attribute = node.value;
 
-		if ( this.renderer.backend.has( attribute ) ) {
-
-			const attributeData = this.renderer.backend.get( attribute );
-			attributeData.pbo = attribute.pbo;
-
-		}
-
-		const nodeUniform = this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.nodeName );
+		const { pboNode } = this.getDataFromNode( node, 'any' );
+		const nodeUniform = this.getUniformFromNode( pboNode, 'texture', this.shaderStage, this.context.nodeName );
 		const textureName = this.getPropertyName( nodeUniform );
 
 		this.increaseUsage( indexNode ); // force cache generate to be used as index in x,y
@@ -619,11 +574,11 @@ ${ flowData.code }
 
 			let prefix = 'vec4';
 
-			if ( attribute.pbo.type === UnsignedIntType ) {
+			if ( pboNode.value.type === UnsignedIntType ) {
 
 				prefix = 'uvec4';
 
-			} else if ( attribute.pbo.type === IntType ) {
+			} else if ( pboNode.value.type === IntType ) {
 
 				prefix = 'ivec4';
 

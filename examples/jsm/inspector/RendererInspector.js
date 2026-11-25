@@ -13,6 +13,8 @@ class ObjectStats {
 		this.timer = null;
 		this.cpu = 0;
 		this.gpu = 0;
+		this.gpuStart = null; // GPU timestamps, only comparable with each other and null in WebGL
+		this.gpuEnd = null;
 		this.gpuNotAvailable = false;
 		this.fps = 0;
 
@@ -68,6 +70,32 @@ class ComputeStats extends ObjectStats {
 		this.isComputeStats = true;
 
 	}
+
+}
+
+// returns the union of the measured call spans, or the sum of their times without timestamps
+
+function getSpanTime( children ) {
+
+	const spans = children.filter( ( stats ) => stats.gpuStart !== null ).sort( ( a, b ) => a.gpuStart - b.gpuStart );
+
+	if ( spans.length === 0 ) return children.reduce( ( sum, stats ) => sum + stats.gpu, 0 );
+
+	let duration = 0;
+	let end = - Infinity;
+
+	for ( const { gpuStart, gpuEnd } of spans ) {
+
+		if ( gpuEnd > end ) {
+
+			duration += gpuEnd - Math.max( gpuStart, end );
+			end = gpuEnd;
+
+		}
+
+	}
+
+	return duration;
 
 }
 
@@ -311,6 +339,8 @@ export class RendererInspector extends InspectorBase {
 			} else {
 
 				stats.gpu = gpu.delta;
+				stats.gpuStart = gpu.start;
+				stats.gpuEnd = gpu.end;
 
 			}
 
@@ -325,6 +355,8 @@ export class RendererInspector extends InspectorBase {
 	_resolveFrameIfComplete( frame ) {
 
 		if ( frame.finished === true && frame.pendingTimers === 0 && this.framesLib[ frame.frameId ] === frame ) {
+
+			frame.gpuSpanTime = getSpanTime( frame.children );
 
 			this.resolveFrame( frame );
 

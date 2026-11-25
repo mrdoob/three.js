@@ -166,7 +166,7 @@ class VaryingNode extends Node {
 
 		}
 
-		this.setupVarying( builder );
+		// the varying is created in the analyze stage, so a varying that is only used by dead code is not declared
 
 		builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
 
