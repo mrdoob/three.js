@@ -552,15 +552,14 @@ class GTAONode extends Node {
 					// Manual normalize guards against zero-length delta.
 					const sHX = dot( viewDir, viewDeltaX ).div( max( lenX, float( 0.0001 ) ) );
 
-					// Falloff: over the outer half of the radius, fade the sample toward the tangent-plane
-					// horizon (no occlusion) before taking the max, so occluders near the radius boundary
-					// phase out smoothly. (XeGTAO's blend toward the low horizon, with a quadratic fade.)
-					const fX = clamp( lenX.mul( invRadius ).mul( 2 ).sub( 1 ), 0, 1 );
-					const falloffX = fX.mul( fX );
+					// Sphere falloff: ( dist / radius )² fades the sample's horizon contribution
+					// back toward the prior horizon as it approaches the radius boundary. (EEVEE legacy)
+					const distFacX = min( lenX.mul( invRadius ), 1 );
+					const distFacSqX = distFacX.mul( distFacX );
 
 					If( isValidSample( sampleScreenPositionX, centerTexel, depthSize ).and( abs( viewDeltaX.z ).lessThan( this.thickness ) ), () => {
 
-						cosHorizons.x.assign( max( cosHorizons.x, mix( sHX, cosHorizon, falloffX ) ) );
+						cosHorizons.x.assign( mix( max( cosHorizons.x, sHX ), cosHorizons.x, distFacSqX ) );
 
 					} );
 
@@ -574,12 +573,12 @@ class GTAONode extends Node {
 
 					const sHY = dot( viewDir, viewDeltaY ).div( max( lenY, float( 0.0001 ) ) );
 
-					const fY = clamp( lenY.mul( invRadius ).mul( 2 ).sub( 1 ), 0, 1 );
-					const falloffY = fY.mul( fY );
+					const distFacY = min( lenY.mul( invRadius ), 1 );
+					const distFacSqY = distFacY.mul( distFacY );
 
 					If( isValidSample( sampleScreenPositionY, centerTexel, depthSize ).and( abs( viewDeltaY.z ).lessThan( this.thickness ) ), () => {
 
-						cosHorizons.y.assign( max( cosHorizons.y, mix( sHY, cosHorizon.negate(), falloffY ) ) );
+						cosHorizons.y.assign( mix( max( cosHorizons.y, sHY ), cosHorizons.y, distFacSqY ) );
 
 					} );
 
