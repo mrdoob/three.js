@@ -597,7 +597,7 @@ class SSGINode extends Node {
 			const noiseOffset = spatialOffsets( screenCoordinate );
 			const noiseDirection = interleavedGradientNoise( screenCoordinate );
 			const noiseJitterIdx = this._temporalDirection.mul( 0.02 ); // Port: Add noiseJitterIdx here for slightly better noise convergence with TRAA (see #31890 for more details)
-			const initialRayStep = fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) );
+			const initialRayStep = fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ) ).mul( 2 ).sub( 1 ) ); // SSRT3 jitter: ( rand * 2 - 1 ) in [ - 1, 1 )
 
 			const ao = float( 0 );
 			const color = vec3( 0 );

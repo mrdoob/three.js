@@ -2,7 +2,7 @@ import BRDF_Lambert from './BSDF/BRDF_Lambert.js';
 import BRDF_EON, { EON_DirectionalAlbedo } from './BSDF/BRDF_EON.js';
 import BRDF_GGX from './BSDF/BRDF_GGX.js';
 import DFGLUT from './BSDF/DFGLUT.js';
-import EnvironmentBRDF from './BSDF/EnvironmentBRDF.js';
+import EnvironmentBRDF, { EnvironmentBRDF_MultiScattering } from './BSDF/EnvironmentBRDF.js';
 import F_Schlick from './BSDF/F_Schlick.js';
 import Schlick_to_F0 from './BSDF/Schlick_to_F0.js';
 import BRDF_Sheen from './BSDF/BRDF_Sheen.js';
@@ -503,20 +503,12 @@ class PhysicalLightingModel extends LightingModel {
 		this.multiScatteringCompensation = null;
 
 		/**
-		 * The dielectric single-scattering term, shared by the indirect lighting paths.
+		 * The dielectric single- plus multi-scattering term, shared by the indirect lighting paths.
 		 *
 		 * @type {?Node}
 		 * @default null
 		 */
-		this.singleScatteringDielectric = null;
-
-		/**
-		 * The dielectric multi-scattering term, shared by the indirect lighting paths.
-		 *
-		 * @type {?Node}
-		 * @default null
-		 */
-		this.multiScatteringDielectric = null;
+		this.totalScatteringDielectric = null;
 
 	}
 
@@ -617,10 +609,7 @@ class PhysicalLightingModel extends LightingModel {
 		// Compensate for the energy lost to multiple scattering, tinting the added term by F0 ( equation 16 )
 		this.multiScatteringCompensation = specularColorBlended.mul( Ess.reciprocal().sub( 1.0 ) ).add( 1.0 ).toConst( 'multiScatteringCompensation' );
 
-		this.singleScatteringDielectric = vec3().toVar( 'singleScatteringDielectric' );
-		this.multiScatteringDielectric = vec3().toVar( 'multiScatteringDielectric' );
-
-		this.computeMultiscattering( this.singleScatteringDielectric, this.multiScatteringDielectric, specularF90, specularColor, this.iridescenceF0Dielectric );
+		this.totalScatteringDielectric = this.computeMultiscattering( specularF90, specularColor, this.iridescenceF0Dielectric ).toVar( 'totalScatteringDielectric' );
 
 		if ( this.diffuseRoughness === true ) {
 
@@ -632,26 +621,11 @@ class PhysicalLightingModel extends LightingModel {
 
 	}
 
-	// Fdez-Agüera's "Multiple-Scattering Microfacet Model for Real-Time Image Based Lighting"
-	// Approximates multi-scattering in order to preserve energy.
-	// http://www.jcgt.org/published/0008/01/03/
+	computeMultiscattering( specularF90, f0, iridescenceF0 = null ) {
 
-	computeMultiscattering( singleScatter, multiScatter, specularF90, f0, iridescenceF0 = null ) {
+		const specularColor = iridescenceF0 ? iridescence.mix( f0, iridescenceF0 ) : f0;
 
-		const fab = this.dfg;
-
-		const Fr = iridescenceF0 ? iridescence.mix( f0, iridescenceF0 ) : f0;
-
-		const FssEss = Fr.mul( fab.x ).add( specularF90.mul( fab.y ) );
-
-		const Ess = fab.x.add( fab.y );
-		const Ems = Ess.oneMinus();
-
-		const Favg = Fr.add( Fr.oneMinus().mul( 0.047619 ) ); // 1/21
-		const Fms = FssEss.mul( Favg ).div( Ems.mul( Favg ).oneMinus() );
-
-		singleScatter.addAssign( FssEss );
-		multiScatter.addAssign( Fms.mul( Ems ) );
+		return EnvironmentBRDF_MultiScattering( { specularColor, specularF90, dfg: this.dfg } );
 
 	}
 
@@ -845,8 +819,7 @@ class PhysicalLightingModel extends LightingModel {
 		const { ambientOcclusion, irradiance, occlusionAwareIrradiance, reflectedLight } = builder.context;
 
 		// Energy reflected by the specular lobe is not available to the diffuse layer
-		const singleScattering = this.singleScatteringDielectric;
-		const multiScattering = this.multiScatteringDielectric;
+		const totalScattering = this.totalScatteringDielectric;
 
 		const diffuseBRDF = this.diffuseRoughness
 			? this.eonDirectionalAlbedo.mul( metalness.oneMinus(), 1 / Math.PI )
@@ -854,7 +827,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		const diffuseIrradiance = irradiance.mul( this.getIndirectDiffuseOcclusion( builder ) ).add( occlusionAwareIrradiance );
 
-		const diffuse = diffuseIrradiance.mul( diffuseBRDF ).mul( singleScattering.add( multiScattering ).oneMinus() ).toVar();
+		const diffuse = diffuseIrradiance.mul( diffuseBRDF ).mul( totalScattering.oneMinus() ).toVar();
 
 		if ( this.sheen === true ) {
 
@@ -898,20 +871,14 @@ class PhysicalLightingModel extends LightingModel {
 
 		// Compute multiscattering separately for dielectric and metallic, then mix
 
-		const singleScatteringDielectric = this.singleScatteringDielectric;
-		const multiScatteringDielectric = this.multiScatteringDielectric;
-		const singleScatteringMetallic = vec3().toVar( 'singleScatteringMetallic' );
-		const multiScatteringMetallic = vec3().toVar( 'multiScatteringMetallic' );
-
-		this.computeMultiscattering( singleScatteringMetallic, multiScatteringMetallic, specularF90, diffuseColor.rgb, this.iridescenceF0Metallic );
+		const totalScatteringMetallic = this.computeMultiscattering( specularF90, diffuseColor.rgb, this.iridescenceF0Metallic );
 
 		// Mix based on metalness
-		const singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, metalness );
-		const multiScattering = mix( multiScatteringDielectric, multiScatteringMetallic, metalness );
+		const totalScattering = mix( this.totalScatteringDielectric, totalScatteringMetallic, metalness );
 
 		// The multiple scattering lobe has the shape of the single scattering lobe, so it scales the radiance, see
 		// Turquin, "Practical multiple scattering compensation for microfacet models"
-		const indirectSpecular = radiance.mul( singleScattering.add( multiScattering ) ).toVar();
+		const indirectSpecular = radiance.mul( totalScattering ).toVar();
 
 		if ( this.sheen === true ) {
 
