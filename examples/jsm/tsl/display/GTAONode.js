@@ -1,5 +1,5 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
+import { reference, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, fract, rand, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -118,7 +118,10 @@ class GTAONode extends Node {
 		this.radius = uniform( 0.25 );
 
 		/**
-		 * The thickness of the ambient occlusion.
+		 * The maximum view-space depth difference between the shaded point and a sample
+		 * for the sample to count as an occluder. Lower values keep thin foreground objects
+		 * from darkening the background behind them. Samples farther away than `radius` are
+		 * always ignored, so this only has an effect when it is smaller than `radius`.
 		 *
 		 * @type {UniformNode<float>}
 		 */
@@ -467,6 +470,9 @@ class GTAONode extends Node {
 			const radius = this.radius;
 			const invRadius = radius.reciprocal().toConst();
 			const viewDir = ( this._camera.isPerspectiveCamera === true ) ? normalize( viewPosition.xyz.negate() ).toConst() : vec3( 0, 0, 1 ).toConst();
+			// Nudge the shaded point toward the camera (proportional to depth) so depth and normal
+			// quantization do not make coplanar neighbors register as occluders on grazing surfaces. (XeGTAO)
+			const biasedViewPosition = viewPosition.add( viewDir.mul( viewPosition.z.abs().mul( 0.0005 ) ) ).toConst();
 			const clipPosition = this._cameraProjectionMatrix.mul( vec4( viewPosition, 1.0 ) ).toConst();
 
 			const noiseResolution = textureSize( this._noiseNode, 0 );
@@ -488,11 +494,12 @@ class GTAONode extends Node {
 
 			const ao = float( 0 ).toVar();
 
-			// Each iteration analyzes one vertical "slice" of the 3D space around the fragment.
-
-			// Per-step phase jitter for spatio-temporal decorrelation.
+			// Per-pixel offset of the ray-march steps in [0, 1), so all steps stay inside the radius.
+			// The per-frame hash decorrelates the pattern over time, which helps TAA convergence.
 			const noiseJitterIdx = this._temporalDirection.mul( 0.02 );
-			const stepJitter = interleavedGradientNoise( screenCoordinate.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) );
+			const stepJitter = fract( interleavedGradientNoise( screenCoordinate.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ) ) ) );
+
+			// Each iteration analyzes one vertical "slice" of the 3D space around the fragment.
 
 			Loop( { start: int( 0 ), end: int( DIRECTIONS ), type: 'int', condition: '<' }, ( { i } ) => {
 
@@ -528,7 +535,7 @@ class GTAONode extends Node {
 
 					// Quadratic step distribution ( sampleDist = t² ) concentrates samples in the
 					// near-field. (Blender's Eevee adaptation)
-					const t = float( j ).add( 1.0 ).add( stepJitter ).mul( invSteps ).toConst();
+					const t = float( j ).add( stepJitter ).mul( invSteps ).toConst();
 					const sampleDist = t.mul( t );
 					const clipOffset = clipDirRadius.mul( sampleDist ).toConst();
 
@@ -539,16 +546,14 @@ class GTAONode extends Node {
 					const sampleScreenPositionX = getScreenPositionFromClip( clipPosition.add( clipOffset ) ).toConst();
 					const sampleDepthX = sampleDepth( sampleScreenPositionX ).toConst();
 					const sampleSceneViewPositionX = getViewPosition( sampleScreenPositionX, sampleDepthX, this._cameraProjectionMatrixInverse ).toConst();
-					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition ).toConst();
+					const viewDeltaX = sampleSceneViewPositionX.sub( biasedViewPosition ).toConst();
 					const lenX = viewDeltaX.length().toConst();
 
 					// Manual normalize guards against zero-length delta.
 					const sHX = dot( viewDir, viewDeltaX ).div( max( lenX, float( 0.0001 ) ) );
 
 					// Sphere falloff: ( dist / radius )² fades the sample's horizon contribution
-					// back toward the prior horizon as it approaches the radius boundary.
-					// (squared variant of the paper's near-field attenuation;
-					// Activision GTAO paper, Section 4.3 "Bounding the sampling area")
+					// back toward the prior horizon as it approaches the radius boundary. (EEVEE legacy)
 					const distFacX = min( lenX.mul( invRadius ), 1 );
 					const distFacSqX = distFacX.mul( distFacX );
 
@@ -563,7 +568,7 @@ class GTAONode extends Node {
 					const sampleScreenPositionY = getScreenPositionFromClip( clipPosition.sub( clipOffset ) ).toConst();
 					const sampleDepthY = sampleDepth( sampleScreenPositionY ).toConst();
 					const sampleSceneViewPositionY = getViewPosition( sampleScreenPositionY, sampleDepthY, this._cameraProjectionMatrixInverse ).toConst();
-					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition ).toConst();
+					const viewDeltaY = sampleSceneViewPositionY.sub( biasedViewPosition ).toConst();
 					const lenY = viewDeltaY.length().toConst();
 
 					const sHY = dot( viewDir, viewDeltaY ).div( max( lenY, float( 0.0001 ) ) );
@@ -581,15 +586,16 @@ class GTAONode extends Node {
 
 				// Cosine-weighted inner integral, closed-form (Activision GTAO paper, Eq. 7).
 				// Per horizon h_i:    term_i = −cos( 2 h_i − γ ) + cos( γ ) + 2 h_i sin( γ )
-				// The 0.25 factor is ½ (integral normalization) × ½ (averaging the two horizons).
+				// The 0.25 factor comes from the integral itself: ∫₀ʰ cos( θ − γ ) sin( θ ) dθ = ¼ term( h ).
+				// The two half-slice terms are summed, not averaged.
 				//
 				// In this slice setup `sliceTangent = cross( sliceBitangent, viewDir )` works out
 				// opposite to `sampleDir`, so the +sampleDir samples (cosHorizons.x) live on the
 				// −T side of the slice and −sampleDir samples (cosHorizons.y) on the +T side.
 				// γ is signed by +T (sliceTangent), so hPos must read from cosHorizons.y.
 
-				const hPos = acos( cosHorizons.y ).toConst();
-				const hNeg = acos( cosHorizons.x ).negate().toConst();
+				const hPos = acos( clamp( cosHorizons.y, - 1, 1 ) ).toConst();
+				const hNeg = acos( clamp( cosHorizons.x, - 1, 1 ) ).negate().toConst();
 
 				const termPos = cos( hPos.mul( 2 ).sub( angleN ) ).negate().add( nCos ).add( hPos.mul( 2 ).mul( nSin ) );
 				const termNeg = cos( hNeg.mul( 2 ).sub( angleN ) ).negate().add( nCos ).add( hNeg.mul( 2 ).mul( nSin ) );
