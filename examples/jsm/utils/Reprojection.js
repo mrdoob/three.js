@@ -19,8 +19,7 @@ class Reprojection {
 	 * @param {TextureNode} depthNode - The scene's depth.
 	 * @param {TextureNode} velocityNode - The scene's velocity.
 	 * @param {Camera} camera - The camera the scene is rendered with.
-	 * @param {?TextureNode} [previousDepthNode=null] - The previous frame's depth, e.g. from
-	 * `PassNode.getPreviousTextureNode()`. When omitted, the depth is copied in `update()`.
+	 * @param {?TextureNode} [previousDepthNode=null] - The previous frame's depth. Copied in `update()` when omitted.
 	 */
 	constructor( depthNode, velocityNode, camera, previousDepthNode = null ) {
 
@@ -46,8 +45,7 @@ class Reprojection {
 		this.camera = camera;
 
 		/**
-		 * The render target that holds the depth of the previous frame. It is `null`
-		 * when the previous depth is provided.
+		 * The render target that holds the depth of the previous frame, if not provided.
 		 *
 		 * @private
 		 * @type {?RenderTarget}
@@ -256,17 +254,14 @@ class Reprojection {
 
 		}
 
-		// store the current matrices first so they become the previous ones
-
 		this._storeCamera();
 		this.advance();
 
 	}
 
 	/**
-	 * Makes the camera matrices stored by the last call the previous ones and stores
-	 * the current ones. Call it once per frame before the history is read, instead of
-	 * `update()`, when the previous depth is provided and nothing renders in between.
+	 * Advances the camera matrices by one frame. Call it before the history is read,
+	 * instead of `update()`, when the previous depth is provided.
 	 */
 	advance() {
 

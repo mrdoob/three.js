@@ -19,9 +19,8 @@ export const previousViewZ = /*@__PURE__*/ velocity.previousCameraViewMatrix.mul
  * The history is validated against the previous depth. RGB holds the radiance and
  * alpha the valid bilinear support, both are zero where the history is missing.
  *
- * The node reprojects at each `sample( uv )` call, which suits effects that read it
- * once per pixel like SSR. Effects that read it many times per pixel or share it should
- * use a cached buffer instead, which `convertToTexture()` provides.
+ * It reprojects at each `sample( uv )` call. Use `convertToTexture()` to cache it
+ * for effects that read it many times per pixel.
  *
  * ```js
  * scenePass.setMRT( mrt( { output, velocity: vec4( velocity, 0, previousViewZ ) } ) );
@@ -88,8 +87,7 @@ class ReprojectedBeautyNode extends Node {
 		this._jitterDelta = uniform( new Vector2() );
 
 		/**
-		 * Whether the previous frame matches the current one. Its update advances the
-		 * history state once per frame.
+		 * Whether the history is valid. Its update advances the history once per frame.
 		 *
 		 * @private
 		 * @type {UniformNode<bool>}
