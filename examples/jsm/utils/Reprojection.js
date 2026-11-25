@@ -220,8 +220,10 @@ class Reprojection {
 
 		}
 
+		// store the current matrices first so they become the previous ones
+
 		this._storeCamera();
-		this._advanceCamera();
+		this.advance();
 
 	}
 
@@ -232,7 +234,11 @@ class Reprojection {
 	 */
 	advance() {
 
-		this._advanceCamera();
+		this.previousCameraWorldMatrix.value.copy( this._cameraWorldMatrix );
+		this.previousCameraViewMatrix.value.copy( this._cameraViewMatrix );
+		this.previousCameraProjectionMatrix.value.copy( this._cameraProjectionMatrix );
+		this.previousCameraProjectionMatrixInverse.value.copy( this._cameraProjectionMatrixInverse );
+
 		this._storeCamera();
 
 	}
@@ -248,15 +254,6 @@ class Reprojection {
 		this._cameraProjectionMatrixInverse.copy( camera.projectionMatrixInverse );
 		this._width = width;
 		this._height = height;
-
-	}
-
-	_advanceCamera() {
-
-		this.previousCameraWorldMatrix.value.copy( this._cameraWorldMatrix );
-		this.previousCameraViewMatrix.value.copy( this._cameraViewMatrix );
-		this.previousCameraProjectionMatrix.value.copy( this._cameraProjectionMatrix );
-		this.previousCameraProjectionMatrixInverse.value.copy( this._cameraProjectionMatrixInverse );
 
 	}
 
