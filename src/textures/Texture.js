@@ -303,7 +303,7 @@ class Texture extends EventDispatcher {
 		 * @type {number}
 		 * @default 4
 		 */
-		this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
+		this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see https://registry.khronos.org/OpenGL-Refpages/es3.0/html/glPixelStorei.xhtml)
 
 		/**
 		 * Textures containing color data should be annotated with `SRGBColorSpace` or `LinearSRGBColorSpace`.
