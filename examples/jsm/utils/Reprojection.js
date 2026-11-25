@@ -120,15 +120,51 @@ class Reprojection {
 		this.previousCameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse.clone() );
 
 		/**
-		 * The camera matrices and depth size stored by the last `update()` or `advance()`.
+		 * The camera's world matrix when the camera was last stored.
 		 *
 		 * @private
+		 * @type {Matrix4}
 		 */
 		this._cameraWorldMatrix = camera.matrixWorld.clone();
+
+		/**
+		 * The camera's view matrix when the camera was last stored.
+		 *
+		 * @private
+		 * @type {Matrix4}
+		 */
 		this._cameraViewMatrix = camera.matrixWorldInverse.clone();
+
+		/**
+		 * The camera's projection matrix when the camera was last stored.
+		 *
+		 * @private
+		 * @type {Matrix4}
+		 */
 		this._cameraProjectionMatrix = camera.projectionMatrix.clone();
+
+		/**
+		 * The camera's projection matrix inverse when the camera was last stored.
+		 *
+		 * @private
+		 * @type {Matrix4}
+		 */
 		this._cameraProjectionMatrixInverse = camera.projectionMatrixInverse.clone();
+
+		/**
+		 * The depth's width when the camera was last stored.
+		 *
+		 * @private
+		 * @type {number}
+		 */
 		this._width = 0;
+
+		/**
+		 * The depth's height when the camera was last stored.
+		 *
+		 * @private
+		 * @type {number}
+		 */
 		this._height = 0;
 
 	}
@@ -243,6 +279,11 @@ class Reprojection {
 
 	}
 
+	/**
+	 * Stores the current camera matrices and depth size.
+	 *
+	 * @private
+	 */
 	_storeCamera() {
 
 		const { camera } = this;
