@@ -35,6 +35,7 @@ class Memory extends Tab {
 
 		const graphItem = new Item( graphContainer );
 		graphItem.itemRow.childNodes[ 0 ].style.gridColumn = '1 / -1';
+		graphItem.itemRow.classList.add( 'no-hover' ); // keep the background of the graph
 		graphStats.add( graphItem );
 
 		// info

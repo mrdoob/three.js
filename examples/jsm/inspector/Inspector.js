@@ -466,6 +466,8 @@ class Inspector extends RendererInspector {
 
 		data.cpu = this.getAverageDeltaTime( data, 'cpu' );
 		data.gpu = this.getAverageDeltaTime( data, 'gpu' );
+		data.cpuOffset = this.getAverageDeltaTime( data, 'cpuOffset' );
+		data.gpuOffset = stats.gpuOffset >= 0 ? this.getAverageDeltaTime( data, 'gpuOffset' ) : null;
 
 		// children: the CPU and GPU time of a render or compute call include the calls nested in it
 

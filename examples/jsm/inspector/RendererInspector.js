@@ -15,6 +15,8 @@ class ObjectStats {
 		this.gpu = 0;
 		this.gpuStart = null; // GPU timestamps, only comparable with each other and null in WebGL
 		this.gpuEnd = null;
+		this.cpuOffset = - 1; // time since the start of the frame, negative if not available
+		this.gpuOffset = - 1;
 		this.gpuNotAvailable = false;
 		this.fps = 0;
 
@@ -73,6 +75,42 @@ class ComputeStats extends ObjectStats {
 
 }
 
+// consecutive calls of the same group, e.g. the passes of an effect
+
+class GroupStats extends ObjectStats {
+
+	constructor( uid, name, parent, calls ) {
+
+		super( uid, name );
+
+		const first = calls[ 0 ];
+		const last = calls[ calls.length - 1 ];
+		const timed = calls.filter( ( stats ) => stats.gpuStart !== null );
+
+		this.parent = parent;
+		this.children = calls;
+
+		this.timestamp = first.timestamp;
+		this.cpu = last.timestamp + last.cpu - first.timestamp;
+		this.cpuOffset = first.cpuOffset;
+
+		this.gpu = getSpanTime( calls );
+		this.gpuNotAvailable = calls.every( ( stats ) => stats.gpuNotAvailable );
+
+		if ( timed.length > 0 ) {
+
+			this.gpuStart = Math.min( ...timed.map( ( stats ) => stats.gpuStart ) );
+			this.gpuEnd = Math.max( ...timed.map( ( stats ) => stats.gpuEnd ) );
+			this.gpuOffset = Math.min( ...timed.map( ( stats ) => stats.gpuOffset ) );
+
+		}
+
+		this.isGroupStats = true;
+
+	}
+
+}
+
 // returns the union of the measured call spans, or the sum of their times without timestamps
 
 function getSpanTime( children ) {
@@ -96,6 +134,101 @@ function getSpanTime( children ) {
 	}
 
 	return duration;
+
+}
+
+// tile-based GPUs can run the vertex stage of a call while the previous ones are still shading, so its time
+// includes the wait. Each call starts after the end of the previous ones, and the sum is the union of the spans
+
+function sequenceCalls( children, end = - Infinity ) {
+
+	const calls = children.filter( ( stats ) => stats.gpuStart !== null ).sort( ( a, b ) => a.gpuStart - b.gpuStart );
+
+	for ( const stats of calls ) {
+
+		stats.gpuStart = Math.max( stats.gpuStart, end );
+		stats.gpuEnd = Math.max( stats.gpuEnd, stats.gpuStart );
+		stats.gpu = stats.gpuEnd - stats.gpuStart;
+
+		sequenceCalls( stats.children, stats.gpuStart );
+
+		end = stats.gpuEnd;
+
+	}
+
+}
+
+// stores the offsets of the calls in the frame, the CPU and GPU clocks have separate origins
+
+function resolveOffsets( frame ) {
+
+	const calls = [ ...frame.renders, ...frame.computes ];
+	const gpuStart = calls.reduce( ( start, stats ) => stats.gpuStart !== null ? Math.min( start, stats.gpuStart ) : start, Infinity );
+
+	for ( const stats of calls ) {
+
+		stats.cpuOffset = stats.timestamp - frame.startTime;
+
+		if ( stats.gpuStart !== null ) stats.gpuOffset = stats.gpuStart - gpuStart;
+
+	}
+
+}
+
+// splits names like "Group [ Pass ]" and "Group [ ID ] - Pass"
+
+function parseName( name ) {
+
+	const match = /^(.+?)\s*\[\s*(.+?)\s*\]$/.exec( name ) || /^(.+\])\s*-\s*(.+)$/.exec( name );
+
+	return match !== null ? { group: match[ 1 ], pass: match[ 2 ] } : { group: null, pass: name };
+
+}
+
+// moves two or more consecutive calls of the same group under a GroupStats
+
+function groupCalls( parent, frameId ) {
+
+	const runs = [];
+
+	for ( const stats of parent.children ) {
+
+		groupCalls( stats, frameId );
+
+		const { group, pass } = stats.isGroupStats ? { group: null, pass: stats.name } : parseName( stats.name );
+		const run = runs[ runs.length - 1 ];
+
+		if ( group !== null && run !== undefined && run.group === group ) {
+
+			run.calls.push( stats );
+			run.passes.push( pass );
+
+		} else {
+
+			const index = runs.filter( ( run ) => run.group === group ).length;
+
+			runs.push( { group, index, calls: [ stats ], passes: [ pass ] } );
+
+		}
+
+	}
+
+	parent.children = runs.map( ( { group, index, calls, passes } ) => {
+
+		if ( calls.length === 1 ) return calls[ 0 ];
+
+		const groupStats = new GroupStats( `${ parent.cid || '' }/${ group }/${ index }:f${ frameId }`, group, parent, calls );
+
+		calls.forEach( ( stats, i ) => {
+
+			stats.name = passes[ i ];
+			stats.parent = groupStats;
+
+		} );
+
+		return groupStats;
+
+	} );
 
 }
 
@@ -357,6 +490,10 @@ export class RendererInspector extends InspectorBase {
 		if ( frame.finished === true && frame.pendingTimers === 0 && this.framesLib[ frame.frameId ] === frame ) {
 
 			frame.gpuSpanTime = getSpanTime( frame.children );
+
+			sequenceCalls( frame.children );
+			resolveOffsets( frame );
+			groupCalls( frame, frame.frameId );
 
 			this.resolveFrame( frame );
 
