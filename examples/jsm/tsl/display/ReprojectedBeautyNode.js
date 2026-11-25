@@ -1,6 +1,5 @@
-import { RTTNode, Vector2 } from 'three/webgpu';
-import { Fn, float, getViewPosition, isBackgroundDepth, ivec2, positionPrevious, textureSize, uniform, uv, vec2, vec3, vec4, velocity } from 'three/tsl';
-import { Reprojection } from '../../utils/Reprojection.js';
+import { Matrix4, Node, Vector2 } from 'three/webgpu';
+import { Fn, float, getViewPosition, isBackgroundDepth, ivec2, positionPrevious, projectionDepth, reference, textureSize, uniform, uv, vec2, vec3, vec4, velocity } from 'three/tsl';
 
 /**
  * The view-space depth the surface had in the previous frame. It follows both camera
@@ -19,18 +18,25 @@ export const previousViewZ = /*@__PURE__*/ velocity.previousCameraViewMatrix.mul
  * The history is validated against the previous depth. RGB holds the radiance and
  * alpha the valid bilinear support, both are zero where the history is missing.
  *
+ * The node reprojects at each `sample( uv )` call, which suits effects that read it
+ * once per pixel like SSR. Effects that read it many times per pixel or share it should
+ * use a cached buffer instead, which `convertToTexture()` provides.
+ *
  * ```js
  * scenePass.setMRT( mrt( { output, velocity: vec4( velocity, 0, previousViewZ ) } ) );
  *
- * const reflection = ssr( reprojectedBeauty( scenePass ), scenePassDepth, sceneNormal, { camera } );
+ * const beauty = reprojectedBeauty( scenePass );
+ *
+ * const reflection = ssr( beauty, scenePassDepth, sceneNormal, { camera } );
+ * const gi = ssgi( convertToTexture( beauty ), scenePassDepth, sceneNormal, camera );
  * ```
  *
  * Note: This node can only be used with `WebGPURenderer`.
  *
- * @augments RTTNode
+ * @augments Node
  * @three_import import { reprojectedBeauty, previousViewZ } from 'three/addons/tsl/display/ReprojectedBeautyNode.js';
  */
-class ReprojectedBeautyNode extends RTTNode {
+class ReprojectedBeautyNode extends Node {
 
 	static get type() {
 
@@ -46,80 +52,31 @@ class ReprojectedBeautyNode extends RTTNode {
 	 */
 	constructor( scenePass ) {
 
-		const velocityNode = scenePass.getTextureNode( 'velocity' );
-		const reprojection = new Reprojection( scenePass.getTextureNode( 'depth' ), velocityNode, scenePass.camera );
-
-		const previousColor = scenePass.getPreviousTextureNode( 'output' );
-		const previousDepth = reprojection.previousDepthNode;
-		const projectionMatrixInverse = reprojection.previousCameraProjectionMatrixInverse;
-
-		const jitterDelta = uniform( new Vector2() );
-		const historyValid = uniform( false );
-
-		const reproject = Fn( () => {
-
-			const size = vec2( textureSize( velocityNode ) );
-			const texel = ivec2( uv().mul( size ) );
-			const historyUV = reprojection.getHistoryUV( uv(), texel ).add( jitterDelta ).toConst();
-			const expectedZ = velocityNode.load( texel ).w.toConst();
-
-			// the depth slope per pixel, taken from the flatter side so it does not cross silhouettes
-
-			const flatter = ( a, b ) => a.abs().lessThan( b.abs() ).select( a, b );
-			const neighborZ = ( x, y ) => velocityNode.load( texel.add( ivec2( x, y ) ) ).w;
-			const slope = vec2(
-				flatter( neighborZ( 1, 0 ).sub( expectedZ ), expectedZ.sub( neighborZ( - 1, 0 ) ) ),
-				flatter( neighborZ( 0, 1 ).sub( expectedZ ), expectedZ.sub( neighborZ( 0, - 1 ) ) )
-			).toConst();
-
-			const pixel = historyUV.mul( size ).sub( 0.5 );
-			const base = pixel.floor();
-			const fraction = pixel.fract();
-			const valid = historyValid.and( expectedZ.lessThan( 0 ) )
-				.and( historyUV.greaterThanEqual( 0 ).all() ).and( historyUV.lessThanEqual( 1 ).all() );
-
-			// allow a small pixel footprint for curved surfaces, plus half-float rounding
-
-			const pixelDepth = projectionMatrixInverse.element( 1 ).y.abs().mul( expectedZ.abs() ).mul( 3 ).div( size.y );
-			const tolerance = pixelDepth.max( expectedZ.abs().mul( 0.002 ) ).max( 0.001 );
-			const radiance = vec3( 0 ).toVar();
-			const support = float( 0 ).toVar();
-
-			// validate each bilinear tap so interpolation cannot pull color across an occlusion edge
-
-			for ( let y = 0; y <= 1; y ++ ) {
-
-				for ( let x = 0; x <= 1; x ++ ) {
-
-					const tapUV = base.add( vec2( x, y ) ).add( 0.5 ).div( size ).toConst();
-					const depth = previousDepth.sample( tapUV ).r;
-					const viewZ = getViewPosition( tapUV, depth, projectionMatrixInverse ).z;
-					const tapZ = expectedZ.add( slope.dot( vec2( x, y ).sub( fraction ) ) );
-					const accepted = valid.and( isBackgroundDepth( depth ).not() ).and( viewZ.sub( tapZ ).abs().lessThanEqual( tolerance ) );
-					const weightX = x === 0 ? fraction.x.oneMinus() : fraction.x;
-					const weightY = y === 0 ? fraction.y.oneMinus() : fraction.y;
-					const weight = weightX.mul( weightY ).mul( accepted ).toConst();
-
-					radiance.addAssign( previousColor.sample( tapUV ).rgb.mul( weight ) );
-					support.addAssign( weight );
-
-				}
-
-			}
-
-			return vec4( radiance.div( support.max( 1e-6 ) ), support );
-
-		} );
-
-		super( reproject() );
+		super( 'vec4' );
 
 		/**
-		 * Holds the previous frame's depth and camera matrices.
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isReprojectedBeautyNode = true;
+
+		/**
+		 * The scene pass.
+		 *
+		 * @type {PassNode}
+		 */
+		this.scenePass = scenePass;
+
+		/**
+		 * The previous frame's camera projection matrix inverse.
 		 *
 		 * @private
-		 * @type {Reprojection}
+		 * @type {UniformNode<mat4>}
 		 */
-		this._reprojection = reprojection;
+		this._previousProjectionMatrixInverse = uniform( new Matrix4() );
 
 		/**
 		 * The TRAA jitter of the previous frame relative to the current one, in UV space.
@@ -127,50 +84,141 @@ class ReprojectedBeautyNode extends RTTNode {
 		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
-		this._jitterDelta = jitterDelta;
+		this._jitterDelta = uniform( new Vector2() );
 
 		/**
-		 * Whether the stored previous frame matches the current one.
+		 * Whether the previous frame matches the current one. Its update advances the
+		 * history state once per frame.
 		 *
 		 * @private
 		 * @type {UniformNode<bool>}
 		 */
-		this._historyValid = historyValid;
+		this._historyValid = uniform( false ).onFrameUpdate( () => this._updateHistory() );
+
+		/**
+		 * The current frame's projection matrix inverse, jitter and size. They become
+		 * the previous ones in the next frame.
+		 *
+		 * @private
+		 */
+		this._projectionMatrixInverse = new Matrix4();
+		this._jitter = new Vector2();
+		this._size = new Vector2();
 
 	}
 
 	/**
-	 * Reprojects the previous frame and then stores the current one.
+	 * Reprojects at the default UV.
 	 *
-	 * @param {NodeFrame} frame - The current node frame.
+	 * @return {Node<vec4>} The reprojected beauty.
 	 */
-	updateBefore( frame ) {
+	setup() {
 
-		const reprojection = this._reprojection;
+		return Fn( () => this.sample( uv() ) )();
+
+	}
+
+	/**
+	 * Advances the history state by one frame.
+	 *
+	 * @private
+	 * @return {boolean} Whether the previous frame matches the current one.
+	 */
+	_updateHistory() {
+
+		const camera = this.scenePass.camera;
+		const { width, height } = this.scenePass.renderTarget;
 
 		// the scene buffers carry TRAA jitter, the velocity does not
 
-		const current = reprojection.camera.projectionMatrix.elements;
-		const previous = reprojection.previousCameraProjectionMatrix.value.elements;
+		const projection = camera.projectionMatrix.elements;
 
-		this._jitterDelta.value.set( current[ 8 ] - previous[ 8 ], previous[ 9 ] - current[ 9 ] ).multiplyScalar( 0.5 );
-		this._historyValid.value = reprojection.needsHistoryReset() === false;
+		this._jitterDelta.value.set( projection[ 8 ] - this._jitter.x, this._jitter.y - projection[ 9 ] ).multiplyScalar( 0.5 );
+		this._jitter.set( projection[ 8 ], projection[ 9 ] );
 
-		super.updateBefore( frame );
+		this._previousProjectionMatrixInverse.value.copy( this._projectionMatrixInverse );
+		this._projectionMatrixInverse.copy( camera.projectionMatrixInverse );
 
-		reprojection.update( frame.renderer );
+		const valid = this._size.x === width && this._size.y === height;
+
+		this._size.set( width, height );
+
+		return valid;
 
 	}
 
 	/**
-	 * Frees internal resources. This method should be called
-	 * when the node is no longer required.
+	 * Reprojects the previous frame's beauty at the given UV. Must be called inside a `Fn()`.
+	 *
+	 * @param {Node<vec2>} uvNode - The UV in the current frame.
+	 * @return {Node<vec4>} The radiance in RGB and the valid bilinear support in alpha.
 	 */
-	dispose() {
+	sample( uvNode ) {
 
-		this._reprojection.dispose();
+		const { scenePass } = this;
 
-		super.dispose();
+		const velocityNode = scenePass.getTextureNode( 'velocity' );
+		const previousColor = scenePass.getPreviousTextureNode( 'output' );
+		const previousDepth = scenePass.getPreviousTextureNode( 'depth' );
+
+		const cameraNear = reference( 'near', 'float', scenePass.camera );
+		const cameraFar = reference( 'far', 'float', scenePass.camera );
+		const projectionMatrixInverse = this._previousProjectionMatrixInverse;
+
+		const size = vec2( textureSize( velocityNode ) ).toConst();
+		const texel = ivec2( uvNode.mul( size ) ).toConst();
+		const motion = velocityNode.load( texel ).toConst();
+		const expectedZ = motion.w;
+
+		// convert the NDC offset to UV offset
+
+		const historyUV = uvNode.sub( motion.xy.mul( vec2( 0.5, - 0.5 ) ) ).add( this._jitterDelta ).toConst();
+
+		// the depth slope per pixel, taken from the flatter side so it does not cross silhouettes
+
+		const flatter = ( a, b ) => a.abs().lessThan( b.abs() ).select( a, b );
+		const neighborZ = ( x, y ) => velocityNode.load( texel.add( ivec2( x, y ) ) ).w;
+		const slope = vec2(
+			flatter( neighborZ( 1, 0 ).sub( expectedZ ), expectedZ.sub( neighborZ( - 1, 0 ) ) ),
+			flatter( neighborZ( 0, 1 ).sub( expectedZ ), expectedZ.sub( neighborZ( 0, - 1 ) ) )
+		).toConst();
+
+		const pixel = historyUV.mul( size ).sub( 0.5 ).toConst();
+		const base = pixel.floor();
+		const fraction = pixel.fract();
+		const valid = this._historyValid.and( expectedZ.lessThan( 0 ) )
+			.and( historyUV.greaterThanEqual( 0 ).all() ).and( historyUV.lessThanEqual( 1 ).all() ).toConst();
+
+		// allow a small pixel footprint for curved surfaces, plus half-float rounding
+
+		const pixelDepth = projectionMatrixInverse.element( 1 ).y.abs().mul( expectedZ.abs() ).mul( 3 ).div( size.y );
+		const tolerance = pixelDepth.max( expectedZ.abs().mul( 0.002 ) ).max( 0.001 ).toConst();
+		const radiance = vec3( 0 ).toVar();
+		const support = float( 0 ).toVar();
+
+		// validate each bilinear tap so interpolation cannot pull color across an occlusion edge
+
+		for ( let y = 0; y <= 1; y ++ ) {
+
+			for ( let x = 0; x <= 1; x ++ ) {
+
+				const tapUV = base.add( vec2( x, y ) ).add( 0.5 ).div( size ).toConst();
+				const depth = previousDepth.sample( tapUV ).r.toConst();
+				const viewZ = getViewPosition( tapUV, projectionDepth( depth, cameraNear, cameraFar ), projectionMatrixInverse ).z;
+				const tapZ = expectedZ.add( slope.dot( vec2( x, y ).sub( fraction ) ) );
+				const accepted = valid.and( isBackgroundDepth( depth ).not() ).and( viewZ.sub( tapZ ).abs().lessThanEqual( tolerance ) );
+				const weightX = x === 0 ? fraction.x.oneMinus() : fraction.x;
+				const weightY = y === 0 ? fraction.y.oneMinus() : fraction.y;
+				const weight = weightX.mul( weightY ).mul( accepted ).toConst();
+
+				radiance.addAssign( previousColor.sample( tapUV ).rgb.mul( weight ) );
+				support.addAssign( weight );
+
+			}
+
+		}
+
+		return vec4( radiance.div( support.max( 1e-6 ) ), support );
 
 	}
 
