@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - postprocessing traa follow camera</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - postprocessing traa follow camera">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_postprocessing_traa_follow.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_postprocessing_traa_follow.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>TRAA Follow Camera</span>
+			</div>
+
+			<small>
+				An object moves through a scene at rest and the camera follows it. It stays still on the screen,<br/>
+				so it should keep its history. Turn off object motion to see the camera jitter on the object.<br/>
+				Drag to orbit around the object.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { mrt, output, pass, positionPrevious, velocity, vec4 } from 'three/tsl';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			const LENGTH = 2000; // of the road, in meters
+
+			const params = { objectMotion: true };
+
+			let camera, scene, renderer, renderPipeline, timer, controls, follower;
+
+			init();
+
+			function init() {
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 500 );
+				camera.position.set( 0, 2.2, - 295.5 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x8fb4d9 );
+
+				timer = new THREE.Timer();
+
+				// the scene at rest: a road with posts along it
+
+				const road = new THREE.Mesh(
+					new THREE.PlaneGeometry( 12, LENGTH, 6, LENGTH / 2 ),
+					new THREE.MeshBasicMaterial( { color: 0x404448, wireframe: true } )
+				);
+				road.rotation.x = - Math.PI / 2;
+				road.position.z = - LENGTH / 2 + 10;
+				scene.add( road );
+
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 400, LENGTH ), new THREE.MeshBasicMaterial( { color: 0x8a8f85 } ) );
+				ground.rotation.x = - Math.PI / 2;
+				ground.position.set( 0, - 0.02, - LENGTH / 2 );
+				scene.add( ground );
+
+				const postGeometry = new THREE.BoxGeometry( 0.6, 5, 0.6 );
+				const postMaterials = [ new THREE.MeshBasicMaterial( { color: 0xb5523a } ), new THREE.MeshBasicMaterial( { color: 0xe8e2d0 } ) ];
+
+				for ( let i = 0; i < LENGTH / 10; i ++ ) {
+
+					for ( const side of [ - 1, 1 ] ) {
+
+						const post = new THREE.Mesh( postGeometry, postMaterials[ i % 2 ] );
+						post.position.set( side * 7, 2.5, - i * 10 );
+						scene.add( post );
+
+					}
+
+				}
+
+				// the object that moves, with detail the jitter shows on
+
+				const texture = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
+				texture.minFilter = THREE.NearestFilter;
+				texture.magFilter = THREE.NearestFilter;
+				texture.generateMipmaps = false;
+				texture.colorSpace = THREE.SRGBColorSpace;
+
+				follower = new THREE.Group();
+				follower.position.set( 0, 1, - 300 );
+				scene.add( follower );
+
+				// the camera orbits the object and is carried along with it, see animate()
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.copy( follower.position );
+				controls.minDistance = 3;
+				controls.maxDistance = 30;
+				controls.maxPolarAngle = Math.PI * 0.49;
+				controls.enablePan = false;
+				controls.update();
+
+				const body = new THREE.Mesh( new THREE.BoxGeometry( 1.6, 1.6, 1.6 ), new THREE.MeshBasicMaterial( { map: texture } ) );
+				follower.add( body );
+
+				const cage = new THREE.Mesh( new THREE.BoxGeometry( 2.4, 2, 2.4, 6, 5, 6 ), new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } ) );
+				follower.add( cage );
+
+				// postprocessing
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				const scenePass = pass( scene, camera );
+
+				const previousViewZ = velocity.previousCameraViewMatrix.mul( velocity.previousModelWorldMatrix ).mul( vec4( positionPrevious, 1 ) ).z.toVarying();
+				scenePass.setMRT( mrt( {
+					output: output,
+					velocity: vec4( velocity, 0, previousViewZ ) // the view z is for the disocclusion test of TRAA
+				} ) );
+
+				const scenePassColor = scenePass.getTextureNode( 'output' );
+				const scenePassDepth = scenePass.getTextureNode( 'depth' );
+				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
+
+				const updateTRAA = () => {
+
+					const previousTRAA = renderPipeline.outputNode;
+					const traaNode = traa( scenePassColor, scenePassDepth, scenePassVelocity, camera );
+					traaNode.usePreviousViewZ = params.objectMotion;
+
+					renderPipeline.outputNode = traaNode;
+					renderPipeline.needsUpdate = true;
+
+					if ( previousTRAA.isTRAANode ) previousTRAA.dispose();
+
+				};
+
+				updateTRAA();
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( params, 'objectMotion' ).name( 'object motion' ).onChange( updateTRAA );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				// the camera is carried along with the object, which never moves on the screen
+
+				const z = follower.position.z;
+				follower.position.z -= 20 * timer.getDelta();
+				if ( follower.position.z < - LENGTH + 300 ) follower.position.z = - 300;
+				if ( follower.position.z > - 300 ) follower.position.z = - LENGTH + 300;
+
+				camera.position.z += follower.position.z - z;
+				controls.target.copy( follower.position );
+				controls.update();
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+	</body>
+</html>
