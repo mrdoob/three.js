@@ -1325,7 +1325,7 @@ export class Style {
 		display: none;
 	}
 
-	/* ten ticks in each step, the one in the middle is taller */
+	/* ten ticks in each step, the one in the middle is taller. The layers don't overlap, they are translucent */
 	.frame-timeline-ruler {
 		--tick: rgba(255, 255, 255, 0.3) 0 1px, transparent 1px;
 		position: relative;
@@ -1333,8 +1333,8 @@ export class Style {
 		margin-bottom: -6px; /* padding of the header */
 		overflow: hidden;
 		background:
-			repeating-linear-gradient(to right, var(--tick) var(--frame-timeline-step, 100%)),
-			repeating-linear-gradient(to right, var(--tick) calc(var(--frame-timeline-step, 100%) / 2)) 0 100% / 100% 7px no-repeat,
+			repeating-linear-gradient(to right, var(--tick) var(--frame-timeline-step, 100%)) 0 0 / 100% calc(100% - 10px) no-repeat,
+			repeating-linear-gradient(to right, var(--tick) calc(var(--frame-timeline-step, 100%) / 2)) 0 calc(100% - 4px) / 100% 6px no-repeat,
 			repeating-linear-gradient(to right, var(--tick) calc(var(--frame-timeline-step, 100%) / 10)) 0 100% / 100% 4px no-repeat;
 	}
 
