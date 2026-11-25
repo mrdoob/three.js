@@ -1,7 +1,6 @@
 
 //addons/utils
 import './addons/utils/BufferGeometryUtils.tests.js';
-import './addons/utils/SceneUtils.tests.js';
 import './addons/utils/ColorUtils.tests.js';
 import './addons/utils/GaussianSplatUtils.tests.js';
 import './addons/utils/unwrapUVs.tests.js';
