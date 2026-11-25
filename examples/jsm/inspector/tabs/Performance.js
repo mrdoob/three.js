@@ -4,15 +4,28 @@ import { Graph } from '../ui/Graph.js';
 import { Item } from '../ui/Item.js';
 import { createValueSpan, setText } from '../ui/utils.js';
 
+// creates the cell of a row in the timeline, with a CPU and a GPU bar
+
+function createTimelineCell() {
+
+	const cell = document.createElement( 'div' );
+	cell.className = 'frame-timeline';
+	cell.append( document.createElement( 'div' ), document.createElement( 'div' ) );
+
+	return cell;
+
+}
+
 class Performance extends Tab {
 
 	constructor( options = {} ) {
 
 		super( 'Performance', options );
 
-		const perfList = new List( 'Name', 'CPU', 'GPU' );
-		perfList.setGridStyle( 'minmax(200px, 2fr) 80px 80px' );
-		perfList.domElement.style.minWidth = '520px';
+		const perfList = new List( 'Name', 'CPU', 'GPU', '' );
+		perfList.setGridStyle( 'minmax(0, 1fr) 60px 60px min(60cqw, 100cqw - 372px)' ); // the timeline is as wide in the nested rows
+		perfList.domElement.style.containerType = 'inline-size';
+		perfList.domElement.style.minWidth = '640px';
 
 		const scrollWrapper = document.createElement( 'div' );
 		scrollWrapper.className = 'list-scroll-wrapper';
@@ -47,7 +60,13 @@ class Performance extends Tab {
 		*/
 
 		this.graphFpsCounter = createValueSpan();
-		const graphStats = new Item( 'Graph Stats', createValueSpan(), this.graphFpsCounter );
+		this.graphMsCounter = createValueSpan();
+		this.graphMsCounter.classList.add( 'secondary' );
+
+		const graphCounters = document.createElement( 'div' );
+		graphCounters.append( this.graphFpsCounter, this.graphMsCounter );
+
+		const graphStats = new Item( 'Graph Stats', createValueSpan(), createValueSpan(), graphCounters );
 		perfList.add( graphStats );
 
 		const graphItem = new Item( graphContainer );
@@ -56,7 +75,7 @@ class Performance extends Tab {
 
 		//
 
-		const frameStats = new Item( 'Frame Stats', createValueSpan(), createValueSpan() );
+		const frameStats = new Item( 'Frame Stats', createValueSpan(), createValueSpan(), createTimelineCell() );
 		perfList.domElement.appendChild( perfList.domElement.querySelector( '.list-header' ) ); // move the header below the graph
 		perfList.add( frameStats );
 
@@ -67,7 +86,14 @@ class Performance extends Tab {
 
 		//
 
+		const timelineRuler = perfList.domElement.querySelector( '.list-header-cell:last-child' );
+		timelineRuler.classList.add( 'frame-timeline-ruler' );
+
+		//
+
 		this.notInUse = new Map();
+		this.perfList = perfList;
+		this.timelineRuler = timelineRuler;
 		this.frameStats = frameStats;
 		this.graphStats = graphStats;
 		this.graph = graph;
@@ -89,7 +115,7 @@ class Performance extends Tab {
 
 		if ( item === undefined ) {
 
-			item = new Item( createValueSpan(), createValueSpan(), createValueSpan() );
+			item = new Item( createValueSpan(), createValueSpan(), createValueSpan(), createTimelineCell() );
 
 			if ( stats.name ) {
 
@@ -159,6 +185,68 @@ class Performance extends Tab {
 		this.currentItem = previousItem;
 
 		this.frameItems.set( stats.cid, item );
+
+	}
+
+	updateTimeline( inspector ) {
+
+		const period = inspector.fps > 0 ? 1000 / inspector.fps : 0;
+		const calls = [];
+
+		// the CPU and GPU clocks are not comparable: the GPU is delayed, so no call starts on it before the CPU
+
+		let gpuDelay = 0;
+
+		for ( const [ cid, item ] of this.frameItems ) {
+
+			const data = inspector.getStatsData( cid );
+
+			if ( data.gpuOffset !== null ) gpuDelay = Math.max( gpuDelay, data.cpuOffset - data.gpuOffset );
+
+			calls.push( { data, bars: item.data[ 3 ].children } );
+
+		}
+
+		// the timeline shows a frame period, or more if the calls end after it
+
+		const duration = calls.reduce( ( end, { data } ) => Math.max( end, data.cpuOffset + data.cpu, data.gpuOffset !== null ? gpuDelay + data.gpuOffset + data.gpu : 0 ), Math.max( period, 1e-3 ) );
+		const toPercent = ( time ) => ( time / duration ) * 100 + '%';
+
+		const setBar = ( bar, start, time ) => {
+
+			bar.style.left = toPercent( start );
+			bar.style.width = toPercent( time );
+
+		};
+
+		for ( const { data, bars } of calls ) {
+
+			setBar( bars[ 0 ], data.cpuOffset, data.cpu );
+
+			bars[ 1 ].hidden = data.gpuOffset === null;
+
+			if ( data.gpuOffset !== null ) setBar( bars[ 1 ], gpuDelay + data.gpuOffset, data.gpu );
+
+		}
+
+		// the ruler has up to ten ticks, at a multiple of 1, 2 or 5
+
+		const magnitude = 10 ** Math.floor( Math.log10( duration / 10 ) );
+		const step = magnitude * [ 1, 2, 5, 10 ].find( ( multiple ) => duration / ( magnitude * multiple ) <= 10 );
+
+		const ticks = [];
+
+		for ( let i = 0; i * step < duration; i ++ ) {
+
+			const tick = document.createElement( 'span' );
+			tick.textContent = parseFloat( ( i * step ).toFixed( 3 ) ) + ( i === 0 ? ' ms' : '' );
+			tick.style.left = toPercent( i * step );
+			ticks.push( tick );
+
+		}
+
+		this.timelineRuler.replaceChildren( ...ticks );
+		this.perfList.domElement.style.setProperty( '--frame-timeline-step', toPercent( step ) );
 
 	}
 
@@ -237,6 +325,8 @@ class Performance extends Tab {
 
 		}
 
+		this.updateTimeline( inspector );
+
 		// remove unused frame items
 
 		for ( const [ cid, item ] of oldFrameItems ) {
@@ -261,7 +351,10 @@ class Performance extends Tab {
 
 		//
 
-		setText( this.graphFpsCounter, inspector.fps.toFixed() + ' FPS' );
+		const fps = inspector.fps;
+
+		setText( this.graphFpsCounter, fps.toFixed() + ' FPS' );
+		setText( this.graphMsCounter, ( fps > 0 ? 1000 / fps : 0 ).toFixed( 2 ) + ' ms' );
 
 		//
 

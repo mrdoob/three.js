@@ -15,6 +15,8 @@ class ObjectStats {
 		this.gpu = 0;
 		this.gpuStart = null; // GPU timestamps, only comparable with each other and null in WebGL
 		this.gpuEnd = null;
+		this.cpuOffset = - 1; // time since the start of the frame, negative if not available
+		this.gpuOffset = - 1;
 		this.gpuNotAvailable = false;
 		this.fps = 0;
 
@@ -96,6 +98,23 @@ function getSpanTime( children ) {
 	}
 
 	return duration;
+
+}
+
+// stores the offsets of the calls in the frame, the CPU and GPU clocks have separate origins
+
+function resolveOffsets( frame ) {
+
+	const calls = [ ...frame.renders, ...frame.computes ];
+	const gpuStart = calls.reduce( ( start, stats ) => stats.gpuStart !== null ? Math.min( start, stats.gpuStart ) : start, Infinity );
+
+	for ( const stats of calls ) {
+
+		stats.cpuOffset = stats.timestamp - frame.startTime;
+
+		if ( stats.gpuStart !== null ) stats.gpuOffset = stats.gpuStart - gpuStart;
+
+	}
 
 }
 
@@ -357,6 +376,8 @@ export class RendererInspector extends InspectorBase {
 		if ( frame.finished === true && frame.pendingTimers === 0 && this.framesLib[ frame.frameId ] === frame ) {
 
 			frame.gpuSpanTime = getSpanTime( frame.children );
+
+			resolveOffsets( frame );
 
 			this.resolveFrame( frame );
 
