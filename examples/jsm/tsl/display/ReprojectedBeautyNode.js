@@ -1,5 +1,5 @@
 import { Node, Vector2 } from 'three/webgpu';
-import { Fn, float, getViewPosition, isBackgroundDepth, ivec2, positionPrevious, projectionDepth, reference, textureSize, uniform, uv, vec2, vec3, vec4, velocity } from 'three/tsl';
+import { Fn, depthToViewZ, float, isBackgroundDepth, ivec2, positionPrevious, textureSize, uniform, uv, vec2, vec3, vec4, velocity } from 'three/tsl';
 import { Reprojection } from '../../utils/Reprojection.js';
 
 /**
@@ -79,6 +79,22 @@ class ReprojectedBeautyNode extends Node {
 		this._reprojection = new Reprojection( scenePass.getTextureNode( 'depth' ), scenePass.getTextureNode( 'velocity' ), scenePass.camera, scenePass.getPreviousTextureNode( 'depth' ) );
 
 		/**
+		 * The camera's near and far planes from the last scene render.
+		 *
+		 * @private
+		 * @type {Vector2}
+		 */
+		this._cameraNearFar = new Vector2( scenePass.camera.near, scenePass.camera.far );
+
+		/**
+		 * The near and far planes used to encode the previous depth texture.
+		 *
+		 * @private
+		 * @type {UniformNode<vec2>}
+		 */
+		this._previousCameraNearFar = uniform( this._cameraNearFar.clone() );
+
+		/**
 		 * The TRAA jitter of the previous frame relative to the current one, in UV space.
 		 *
 		 * @private
@@ -128,13 +144,16 @@ class ReprojectedBeautyNode extends Node {
 	_updateHistory() {
 
 		const reprojection = this._reprojection;
+		const { camera } = reprojection;
 		const valid = reprojection.needsHistoryReset() === false;
 
 		reprojection.advance();
+		this._previousCameraNearFar.value.copy( this._cameraNearFar );
+		this._cameraNearFar.set( camera.near, camera.far );
 
 		// the scene buffers carry TRAA jitter, the velocity does not
 
-		const current = reprojection.camera.projectionMatrix.elements;
+		const current = camera.projectionMatrix.elements;
 		const previous = reprojection.previousCameraProjectionMatrix.value.elements;
 
 		this._jitterDelta.value.set( current[ 8 ] - previous[ 8 ], previous[ 9 ] - current[ 9 ] ).multiplyScalar( 0.5 );
@@ -159,8 +178,7 @@ class ReprojectedBeautyNode extends Node {
 		const previousDepth = reprojection.previousDepthNode;
 		const projectionMatrixInverse = reprojection.previousCameraProjectionMatrixInverse;
 
-		const cameraNear = reference( 'near', 'float', scenePass.camera );
-		const cameraFar = reference( 'far', 'float', scenePass.camera );
+		const cameraNearFar = this._previousCameraNearFar;
 
 		const size = vec2( textureSize( velocityNode ) ).toConst();
 		const texel = ivec2( uvNode.mul( size ) ).toConst();
@@ -197,7 +215,7 @@ class ReprojectedBeautyNode extends Node {
 
 				const tapUV = base.add( vec2( x, y ) ).add( 0.5 ).div( size ).toConst();
 				const depth = previousDepth.sample( tapUV ).r.toConst();
-				const viewZ = getViewPosition( tapUV, projectionDepth( depth, cameraNear, cameraFar ), projectionMatrixInverse ).z;
+				const viewZ = depthToViewZ( depth, cameraNearFar.x, cameraNearFar.y, scenePass.camera );
 				const tapZ = expectedZ.add( slope.dot( vec2( x, y ).sub( fraction ) ) );
 				const accepted = valid.and( isBackgroundDepth( depth ).not() ).and( viewZ.sub( tapZ ).abs().lessThanEqual( tolerance ) );
 				const weightX = x === 0 ? fraction.x.oneMinus() : fraction.x;
