@@ -2742,6 +2742,8 @@ class AnimationParser {
 				const animationCurveID = relationships.parents[ 0 ].ID;
 				const animationCurveRelationship = relationships.parents[ 0 ].relationship;
 
+				if ( ! curveNodesMap.has( animationCurveID ) ) continue;
+
 				if ( animationCurveRelationship.match( /X/ ) ) {
 
 					curveNodesMap.get( animationCurveID ).curves[ 'x' ] = animationCurve;
@@ -2754,7 +2756,7 @@ class AnimationParser {
 
 					curveNodesMap.get( animationCurveID ).curves[ 'z' ] = animationCurve;
 
-				} else if ( animationCurveRelationship.match( /DeformPercent/ ) && curveNodesMap.has( animationCurveID ) ) {
+				} else if ( animationCurveRelationship.match( /DeformPercent/ ) ) {
 
 					curveNodesMap.get( animationCurveID ).curves[ 'morph' ] = animationCurve;
 
