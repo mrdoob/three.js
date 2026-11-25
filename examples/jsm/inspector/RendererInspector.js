@@ -75,6 +75,42 @@ class ComputeStats extends ObjectStats {
 
 }
 
+// consecutive calls of the same group, e.g. the passes of an effect
+
+class GroupStats extends ObjectStats {
+
+	constructor( uid, name, parent, calls ) {
+
+		super( uid, name );
+
+		const first = calls[ 0 ];
+		const last = calls[ calls.length - 1 ];
+		const timed = calls.filter( ( stats ) => stats.gpuStart !== null );
+
+		this.parent = parent;
+		this.children = calls;
+
+		this.timestamp = first.timestamp;
+		this.cpu = last.timestamp + last.cpu - first.timestamp;
+		this.cpuOffset = first.cpuOffset;
+
+		this.gpu = getSpanTime( calls );
+		this.gpuNotAvailable = calls.every( ( stats ) => stats.gpuNotAvailable );
+
+		if ( timed.length > 0 ) {
+
+			this.gpuStart = Math.min( ...timed.map( ( stats ) => stats.gpuStart ) );
+			this.gpuEnd = Math.max( ...timed.map( ( stats ) => stats.gpuEnd ) );
+			this.gpuOffset = Math.min( ...timed.map( ( stats ) => stats.gpuOffset ) );
+
+		}
+
+		this.isGroupStats = true;
+
+	}
+
+}
+
 // returns the union of the measured call spans, or the sum of their times without timestamps
 
 function getSpanTime( children ) {
@@ -115,6 +151,63 @@ function resolveOffsets( frame ) {
 		if ( stats.gpuStart !== null ) stats.gpuOffset = stats.gpuStart - gpuStart;
 
 	}
+
+}
+
+// splits names like "Group [ Pass ]" and "Group [ ID ] - Pass"
+
+function parseName( name ) {
+
+	const match = /^(.+?)\s*\[\s*(.+?)\s*\]$/.exec( name ) || /^(.+\])\s*-\s*(.+)$/.exec( name );
+
+	return match !== null ? { group: match[ 1 ], pass: match[ 2 ] } : { group: null, pass: name };
+
+}
+
+// moves two or more consecutive calls of the same group under a GroupStats
+
+function groupCalls( parent, frameId ) {
+
+	const runs = [];
+
+	for ( const stats of parent.children ) {
+
+		groupCalls( stats, frameId );
+
+		const { group, pass } = stats.isGroupStats ? { group: null, pass: stats.name } : parseName( stats.name );
+		const run = runs[ runs.length - 1 ];
+
+		if ( group !== null && run !== undefined && run.group === group ) {
+
+			run.calls.push( stats );
+			run.passes.push( pass );
+
+		} else {
+
+			const index = runs.filter( ( run ) => run.group === group ).length;
+
+			runs.push( { group, index, calls: [ stats ], passes: [ pass ] } );
+
+		}
+
+	}
+
+	parent.children = runs.map( ( { group, index, calls, passes } ) => {
+
+		if ( calls.length === 1 ) return calls[ 0 ];
+
+		const groupStats = new GroupStats( `${ parent.cid || '' }/${ group }/${ index }:f${ frameId }`, group, parent, calls );
+
+		calls.forEach( ( stats, i ) => {
+
+			stats.name = passes[ i ];
+			stats.parent = groupStats;
+
+		} );
+
+		return groupStats;
+
+	} );
 
 }
 
@@ -378,6 +471,7 @@ export class RendererInspector extends InspectorBase {
 			frame.gpuSpanTime = getSpanTime( frame.children );
 
 			resolveOffsets( frame );
+			groupCalls( frame, frame.frameId );
 
 			this.resolveFrame( frame );
 

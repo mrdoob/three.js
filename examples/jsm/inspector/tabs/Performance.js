@@ -23,7 +23,7 @@ class Performance extends Tab {
 		super( 'Performance', options );
 
 		const perfList = new List( 'Name', 'CPU', 'GPU', '' );
-		perfList.setGridStyle( 'minmax(0, 1fr) 60px 60px min(60cqw, 100cqw - 372px)' ); // the timeline is as wide in the nested rows
+		perfList.setGridStyle( 'minmax(0, 1fr) 60px 60px var(--frame-timeline-width)' ); // the timeline is as wide in the nested rows
 		perfList.domElement.style.containerType = 'inline-size';
 		perfList.domElement.style.minWidth = '640px';
 
@@ -71,11 +71,13 @@ class Performance extends Tab {
 
 		const graphItem = new Item( graphContainer );
 		graphItem.itemRow.childNodes[ 0 ].style.gridColumn = '1 / -1';
+		graphItem.itemRow.classList.add( 'no-hover' ); // keep the background of the graph
 		graphStats.add( graphItem );
 
 		//
 
 		const frameStats = new Item( 'Frame Stats', createValueSpan(), createValueSpan(), createTimelineCell() );
+		frameStats.domElement.classList.add( 'frame-stats' );
 		perfList.domElement.appendChild( perfList.domElement.querySelector( '.list-header' ) ); // move the header below the graph
 		perfList.add( frameStats );
 
@@ -117,6 +119,13 @@ class Performance extends Tab {
 
 			item = new Item( createValueSpan(), createValueSpan(), createValueSpan(), createTimelineCell() );
 
+			if ( stats.isGroupStats === true ) {
+
+				item.itemRow.classList.add( 'group' );
+				item.close();
+
+			}
+
 			if ( stats.name ) {
 
 				if ( stats.isComputeStats === true ) {
@@ -150,7 +159,7 @@ class Performance extends Tab {
 
 			const statsIndex = stats.parent.children.indexOf( stats );
 
-			if ( item.parent === null || item.parent.children.indexOf( item ) !== statsIndex ) {
+			if ( item.parent !== this.currentItem || item.parent.children.indexOf( item ) !== statsIndex ) {
 
 				this.currentItem.add( item, statsIndex );
 
@@ -229,10 +238,11 @@ class Performance extends Tab {
 
 		}
 
-		// the ruler has up to ten ticks, at a multiple of 1, 2 or 5
+		// the labels of the ruler are at a multiple of 1, 2 or 5, at least 80 pixels apart
 
-		const magnitude = 10 ** Math.floor( Math.log10( duration / 10 ) );
-		const step = magnitude * [ 1, 2, 5, 10 ].find( ( multiple ) => duration / ( magnitude * multiple ) <= 10 );
+		const count = Math.max( this.timelineRuler.clientWidth / 80, 1 );
+		const magnitude = 10 ** Math.floor( Math.log10( duration / count ) );
+		const step = magnitude * [ 1, 2, 5, 10 ].find( ( multiple ) => duration / ( magnitude * multiple ) <= count );
 
 		const ticks = [];
 
