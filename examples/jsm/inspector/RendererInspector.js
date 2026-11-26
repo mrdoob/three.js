@@ -184,9 +184,18 @@ function resolveOffsets( frame ) {
 
 function parseName( name ) {
 
-	const match = /^(.+?): (.+)$/.exec( name );
+	const separator = name.indexOf( ':' );
 
-	return match !== null ? { group: match[ 1 ], pass: match[ 2 ] } : { group: null, pass: name };
+	if ( separator !== - 1 ) {
+
+		const group = name.slice( 0, separator ).trim();
+		const pass = name.slice( separator + 1 ).trim();
+
+		if ( group && pass ) return { group, pass };
+
+	}
+
+	return { group: null, pass: name };
 
 }
 
