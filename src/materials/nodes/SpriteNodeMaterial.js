@@ -1,7 +1,7 @@
 import NodeMaterial from './NodeMaterial.js';
 import { materialRotation } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewMatrix, modelWorldMatrix } from '../../nodes/accessors/ModelNode.js';
-import { positionGeometry } from '../../nodes/accessors/Position.js';
+import { positionGeometry, positionLocal } from '../../nodes/accessors/Position.js';
 import { rotate } from '../../nodes/utils/RotateNode.js';
 import { float, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
 
@@ -112,7 +112,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		const { positionNode, rotationNode, scaleNode, sizeAttenuation } = this;
 
-		const mvPosition = modelViewMatrix.mul( vec3( positionNode || 0 ) );
+		const mvPosition = modelViewMatrix.mul( positionNode !== null ? positionLocal : vec3( 0 ) );
 
 		let scale = vec2( modelWorldMatrix[ 0 ].xyz.length(), modelWorldMatrix[ 1 ].xyz.length() );
 
