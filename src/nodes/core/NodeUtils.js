@@ -23,37 +23,6 @@ import {
 import { error } from '../../utils.js';
 import StackTrace from '../core/StackTrace.js';
 
-/**
- * Finds the nearest name along a single-input node chain. Texture reads and
- * passes are boundaries because their source may be rendered separately.
- *
- * @private
- * @param {Node} node - The node rendered by a pass.
- * @return {string} The name, or an empty string when the chain has no name.
- */
-export function getRenderNodeName( node ) {
-
-	const visited = new Set();
-
-	while ( node?.isNode === true && visited.has( node ) === false ) {
-
-		if ( node.name ) return node.name;
-		if ( node.isTextureNode === true || node.isPassNode === true ) break;
-
-		visited.add( node );
-
-		const children = node.getChildren();
-
-		if ( children.length !== 1 ) break;
-
-		node = children[ 0 ];
-
-	}
-
-	return '';
-
-}
-
 // cyrb53 (c) 2018 bryc (github.com/bryc). License: Public domain. Attribution appreciated.
 // A fast and simple 64-bit (or 53-bit) string hash function with decent collision resistance.
 // Largely inspired by MurmurHash2/3, but with a focus on speed/simplicity.

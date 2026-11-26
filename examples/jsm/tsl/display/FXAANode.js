@@ -25,8 +25,6 @@ class FXAANode extends Node {
 
 		super( 'vec4' );
 
-		this.name = 'FXAA';
-
 		/**
 		 * The texture node that represents the input of the effect.
 		 *

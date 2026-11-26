@@ -1,7 +1,6 @@
 import { nodeObject } from '../tsl/TSLCore.js';
 import TextureNode from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { getRenderNodeName } from '../core/NodeUtils.js';
 import { uv } from '../accessors/UV.js';
 import { context } from '../core/ContextNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
@@ -292,7 +291,7 @@ class RTTNode extends TextureNode {
 
 		let name = 'RTT';
 
-		const callName = this.name || getRenderNodeName( this.node ) || ( this.node.isRenderOutputNode ? 'Output' : '' );
+		const callName = this.name || this.node.name;
 
 		if ( callName ) {
 
