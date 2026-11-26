@@ -11,6 +11,7 @@ import {
 	Matrix4,
 	Mesh,
 	MeshPhongMaterial,
+	SRGBColorSpace,
 	TextureLoader
 } from 'three';
 
@@ -322,6 +323,7 @@ class TDSLoader extends Loader {
 
 				this.debugMessage( '   ColorMap' );
 				material.map = this.readMap( next, path );
+				material.map.colorSpace = SRGBColorSpace;
 
 			} else if ( next.id === MAT_BUMPMAP ) {
 
