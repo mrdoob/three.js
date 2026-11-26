@@ -258,6 +258,8 @@ class SunShadowNode extends ShadowNode {
 
 		const currentSceneName = scene.name;
 
+		scene.name = `Shadow Map [ ${ light.name || 'ID: ' + light.id } ]`;
+
 		// clear once, the cascades share the atlas
 
 		renderer.autoClear = false;
@@ -279,7 +281,6 @@ class SunShadowNode extends ShadowNode {
 				tileHeight * viewport.w
 			);
 
-			scene.name = `Sun Shadow [ ${ light.name || 'ID: ' + light.id } ] - Cascade ${ i + 1 }`;
 			renderer.render( scene, shadow.getCamera( i ) );
 
 		}

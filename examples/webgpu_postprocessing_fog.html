@@ -461,8 +461,7 @@
 					type: THREE.UnsignedByteType,
 					format: THREE.RedFormat,
 					resolutionScale: resolutionScale.value
-				} ).toInspector( 'Volumetric Fog' );
-				lowResFogPass.name = 'Volumetric Fog';
+				} ).setName( 'lowResFogPass' ).toInspector( 'Volumetric Fog' );
 
 				// Denoising Options: JBU, Gaussian Blur, Disabled (Raw)
 

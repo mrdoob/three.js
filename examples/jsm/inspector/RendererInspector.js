@@ -31,17 +31,15 @@ const _cubeFaces = [ '+X', '-X', '+Y', '-Y', '+Z', '-Z' ];
 
 class RenderStats extends ObjectStats {
 
-	constructor( uid, scene, camera, renderTarget ) {
+	constructor( uid, scene, camera, renderTarget, renderer ) {
 
 		let name = scene.name || scene.material?.name || camera.name || ( scene.isQuadMesh ? 'QuadMesh' : scene.type );
 
-		const cubeCamera = camera.parent;
+		if ( renderTarget?.isCubeRenderTarget ) {
 
-		if ( renderTarget?.isCubeRenderTarget && cubeCamera?.type === 'CubeCamera' ) {
-
-			const face = _cubeFaces[ cubeCamera.children.indexOf( camera ) ];
-			const group = scene.name || scene.material?.name || cubeCamera.name || 'Cube Capture';
-			const mip = cubeCamera.activeMipmapLevel;
+			const face = _cubeFaces[ renderer.getActiveCubeFace() ];
+			const group = scene.name || scene.material?.name || renderTarget.texture.name || 'Cube Capture';
+			const mip = renderer.getActiveMipmapLevel();
 
 			name = mip === 0 ? `${ group } [ ${ face } ]` : `${ group } (Mip ${ mip }) [ ${ face } ]`;
 
@@ -64,17 +62,19 @@ class ComputeStats extends ObjectStats {
 	constructor( uid, computeNode ) {
 
 		let name = computeNode.name;
+		const isUnnamedGroup = ! name && Array.isArray( computeNode );
 
-		if ( ! name && Array.isArray( computeNode ) ) {
+		if ( isUnnamedGroup ) {
 
-			const names = new Set( computeNode.map( ( node ) => node.name || 'Compute' ) );
-			name = [ ...names ].join( ', ' );
+			const names = new Set( computeNode.map( ( node ) => node.name ).filter( Boolean ) );
+			name = [ ...names ].join( ', ' ) || 'Compute Group';
 
 		}
 
 		super( uid, name || 'Compute' );
 
 		this.computeNode = computeNode;
+		this.hasGeneratedName = isUnnamedGroup;
 
 		this.isComputeStats = true;
 
@@ -202,7 +202,7 @@ function groupCalls( parent, frameId ) {
 
 		groupCalls( stats, frameId );
 
-		const { group, pass } = stats.isGroupStats ? { group: null, pass: stats.name } : parseName( stats.name );
+		const { group, pass } = stats.isGroupStats || stats.hasGeneratedName ? { group: null, pass: stats.name } : parseName( stats.name );
 		const run = runs[ runs.length - 1 ];
 
 		if ( group !== null && run !== undefined && run.group === group ) {
@@ -601,7 +601,7 @@ export class RendererInspector extends InspectorBase {
 
 		if ( ! frame ) return;
 
-		const currentRender = new RenderStats( uid, scene, camera, renderTarget );
+		const currentRender = new RenderStats( uid, scene, camera, renderTarget, this.getRenderer() );
 		currentRender.timestamp = performance.now();
 		currentRender.parent = this.getParent();
 

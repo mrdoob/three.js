@@ -574,7 +574,7 @@ function _createRenderTarget( size, generateMipmaps, depthBuffer ) {
 function _getMaterial( type, uniforms, fragmentNode ) {
 
 	const material = new NodeMaterial();
-	material.name = `PMREM ${ type }`;
+	material.name = `PMREM_${ type }`;
 	material.fragmentNode = fragmentNode;
 	material.side = BackSide;
 	material.blending = NoBlending;
@@ -594,7 +594,7 @@ function _getBlurMaterial() {
 		sigma: uniform( 0 )
 	};
 
-	return _getMaterial( 'Blur', uniforms, sphericalGaussianBlur( {
+	return _getMaterial( 'blur', uniforms, sphericalGaussianBlur( {
 		...uniforms,
 		direction: positionWorldDirection,
 		SAMPLES: int( BLUR_SAMPLES )
@@ -610,7 +610,7 @@ function _getGGXMaterial() {
 		lodBias: uniform( 0 )
 	};
 
-	return _getMaterial( 'GGX Convolution', uniforms, ggxConvolution( {
+	return _getMaterial( 'ggx', uniforms, ggxConvolution( {
 		...uniforms,
 		direction: positionWorldDirection,
 		GGX_SAMPLES: uint( GGX_SAMPLES )
@@ -627,7 +627,7 @@ function _getIntegrationMaterial() {
 		sourceSize: uniform( INTEGRATION_SIZE, 'int' ) // a uniform so the loops aren't unrolled
 	};
 
-	return _getMaterial( 'GGX Integration', uniforms, ggxIntegration( {
+	return _getMaterial( 'integration', uniforms, ggxIntegration( {
 		...uniforms,
 		direction: positionWorldDirection
 	} ) );
@@ -640,7 +640,7 @@ function _getCubemapMaterial() {
 		envMap: cubeTexture()
 	};
 
-	return _getMaterial( 'Cubemap Conversion', uniforms, uniforms.envMap.sample( positionWorldDirection ).level( 0 ) );
+	return _getMaterial( 'cubemap', uniforms, uniforms.envMap.sample( positionWorldDirection ).level( 0 ) );
 
 }
 
@@ -666,7 +666,7 @@ function _getEquirectMaterial() {
 
 	} )();
 
-	return _getMaterial( 'Equirectangular Conversion', uniforms, fragmentNode );
+	return _getMaterial( 'equirect', uniforms, fragmentNode );
 
 }
 

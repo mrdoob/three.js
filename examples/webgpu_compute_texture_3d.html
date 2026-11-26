@@ -137,7 +137,7 @@
 				storageTexture.generateMipmaps = false;
 				storageTexture.name = 'cloud';
 			
-				computeNode = computeCloud( { storageTexture } ).compute( size * size * size ).setName( 'Generate Cloud Texture' );
+				computeNode = computeCloud( { storageTexture } ).compute( size * size * size ).setName( 'computeCloud' );
 
 				// Shader
 

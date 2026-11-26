@@ -168,7 +168,6 @@ class SeamStitchGenerator {
 		// the map with its coverage in alpha, then the stitched texels on top
 
 		renderer.setRenderTarget( renderTarget );
-		solver.copy.name = 'Seam Stitch [ Copy ]';
 		solver.copy.render( renderer );
 
 		if ( solver.compute !== null ) {

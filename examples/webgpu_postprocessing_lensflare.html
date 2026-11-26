@@ -116,6 +116,7 @@
 				const emissivePass = scenePass.getTextureNode( 'emissive' ).toInspector( 'Emissive' );
 
 				const bloomPass = bloom( emissivePass, 1, 1 ).toInspector( 'Bloom' );
+				bloomPass.name = 'Bloom';
 
 				// flares
 
@@ -128,6 +129,8 @@
 					ghostAttenuationFactor,
 					ghostSpacing
 				} );
+
+				flarePass.name = 'Lens Flare';
 
 				const blurPass = gaussianBlur( flarePass, 8 ); // optional (blurring produces better flare quality but also adds some overhead)
 

@@ -112,7 +112,6 @@ class GutterFillGenerator {
 
 		_quadMesh.material = this._fill;
 		renderer.setRenderTarget( renderTarget );
-		_quadMesh.name = 'Gutter Fill [ Resolve ]';
 		_quadMesh.render( renderer );
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );

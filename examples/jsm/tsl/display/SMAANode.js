@@ -250,7 +250,6 @@ class SMAANode extends Node {
 
 		renderer.setRenderTarget( this._renderTargetEdges );
 
-		_quadMesh.name = 'SMAA [ Edge Detection ]';
 		_quadMesh.material = this._materialEdges;
 		_quadMesh.render( renderer );
 
@@ -258,7 +257,6 @@ class SMAANode extends Node {
 
 		renderer.setRenderTarget( this._renderTargetWeights );
 
-		_quadMesh.name = 'SMAA [ Blend Weights ]';
 		_quadMesh.material = this._materialWeights;
 		_quadMesh.render( renderer );
 
@@ -266,7 +264,6 @@ class SMAANode extends Node {
 
 		renderer.setRenderTarget( this._renderTargetBlend );
 
-		_quadMesh.name = 'SMAA [ Neighborhood Blend ]';
 		_quadMesh.material = this._materialBlend;
 		_quadMesh.render( renderer );
 
