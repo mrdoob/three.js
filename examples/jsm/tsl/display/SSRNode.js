@@ -792,7 +792,7 @@ class SSRNode extends Node {
 		// ssr
 
 		renderer.setRenderTarget( ssrRenderTarget );
-		_quadMesh.name = 'SSR: Reflections';
+		_quadMesh.name = 'SSR: Trace';
 		_quadMesh.render( renderer );
 
 		// blur (optional)
