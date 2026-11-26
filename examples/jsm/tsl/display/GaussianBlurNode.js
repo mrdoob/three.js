@@ -187,7 +187,7 @@ class GaussianBlurNode extends Node {
 
 		renderer.setRenderTarget( this._horizontalRT );
 
-		_quadMesh.name = 'Gaussian Blur: Horizontal Pass';
+		_quadMesh.name = 'Gaussian Blur: Horizontal';
 		_quadMesh.render( renderer );
 
 		// vertical
@@ -196,7 +196,7 @@ class GaussianBlurNode extends Node {
 
 		renderer.setRenderTarget( this._verticalRT );
 
-		_quadMesh.name = 'Gaussian Blur: Vertical Pass';
+		_quadMesh.name = 'Gaussian Blur: Vertical';
 		_quadMesh.render( renderer );
 
 		// restore
