@@ -123,12 +123,10 @@
 
 				const scenePass = pass( scene, camera ).toInspector( 'Color' );
 				const outputPass = renderOutput( scenePass );
-				outputPass.name = 'Output';
 
 				// FXAA must be computed in sRGB color space (so after tone mapping and color space conversion)
 
 				const fxaaPass = fxaa( outputPass );
-				fxaaPass.name = 'FXAA';
 				renderPipeline.outputNode = fxaaPass;
 
 				//

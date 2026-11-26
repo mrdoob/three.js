@@ -1,6 +1,7 @@
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { vec4, renderOutput, context } from '../../nodes/TSL.js';
+import { getRenderNodeName } from '../../nodes/core/NodeUtils.js';
 import { NoToneMapping } from '../../constants.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { warnOnce } from '../../utils.js';
@@ -217,7 +218,7 @@ class RenderPipeline {
 
 		this._contextData = contextData;
 
-		this._quadMesh.name = this.outputNode.name || 'Render Pipeline';
+		this._quadMesh.name = getRenderNodeName( this.outputNode ) || 'Render Pipeline';
 		this._quadMesh.material.contextNode = context( contextData );
 		this._quadMesh.material.fragmentNode = outputNode;
 		this._quadMesh.material.needsUpdate = true;
