@@ -210,14 +210,6 @@ class TRAANode extends Node {
 		this._cameraNearFar = uniform( new Vector2() );
 
 		/**
-		 * The camera's near and far for the stored depth buffer.
-		 *
-		 * @private
-		 * @type {UniformNode<vec2>}
-		 */
-		this._previousCameraNearFar = uniform( new Vector2( camera.near, camera.far ) );
-
-		/**
 		 * A texture node for the history.
 		 *
 		 * @private
@@ -380,7 +372,6 @@ class TRAANode extends Node {
 		// store the depth and camera matrices for the next frame
 
 		this._reprojection.update( renderer );
-		this._previousCameraNearFar.value.copy( this._cameraNearFar.value );
 
 		// restore
 
@@ -500,7 +491,7 @@ class TRAANode extends Node {
 			if ( this.usePreviousViewZ ) {
 
 				// Compare the expected and visible surface depths in the previous camera's view space.
-				const { x: near, y: far } = this._previousCameraNearFar;
+				const { x: near, y: far } = this._reprojection.previousCameraNearFar;
 				const sampledDepth = this._reprojection.previousDepthNode.sample( historyUV ).r;
 				const sampledDistance = depthToViewZ( sampledDepth, near, far, this.camera ).negate();
 				const expectedDistance = surfaceVelocity.w.negate().toConst();

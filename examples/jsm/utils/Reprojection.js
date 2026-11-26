@@ -1,4 +1,4 @@
-import { DepthTexture, RenderTarget } from 'three/webgpu';
+import { DepthTexture, RenderTarget, Vector2 } from 'three/webgpu';
 import { getViewPosition, projectionDepth, texture, uniform, vec2, vec4, viewZToOrthographicDepth, viewZToPerspectiveDepth } from 'three/tsl';
 
 /**
@@ -100,6 +100,13 @@ class Reprojection {
 		 */
 		this.previousCameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse.clone() );
 
+		/**
+		 * The previous frame's camera near and far, for decoding the previous frame's depth.
+		 *
+		 * @type {UniformNode<vec2>}
+		 */
+		this.previousCameraNearFar = uniform( new Vector2( camera.near, camera.far ) );
+
 	}
 
 	/**
@@ -184,6 +191,7 @@ class Reprojection {
 		this.previousCameraViewMatrix.value.copy( this.camera.matrixWorldInverse );
 		this.previousCameraProjectionMatrix.value.copy( this.camera.projectionMatrix );
 		this.previousCameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
+		this.previousCameraNearFar.value.set( this.camera.near, this.camera.far );
 
 	}
 
