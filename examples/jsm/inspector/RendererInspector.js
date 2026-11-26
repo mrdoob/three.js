@@ -31,7 +31,7 @@ class RenderStats extends ObjectStats {
 
 	constructor( uid, scene, camera, renderTarget, renderer ) {
 
-		let name = scene.name || scene.material?.name || camera.name || ( scene.isQuadMesh ? 'QuadMesh' : scene.type );
+		let name = scene.name || scene.material?.name || camera.name || ( scene.isQuadMesh ? 'Quad Mesh' : scene.type );
 
 		if ( renderTarget?.isCubeRenderTarget ) {
 

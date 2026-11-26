@@ -603,7 +603,7 @@ class TemporalReprojectNode extends Node {
 
 			renderer.setRenderTarget( this._historyRenderTarget );
 			_quadMesh.material = this._seedMaterial;
-			_quadMesh.name = 'TemporalReproject.seed';
+			_quadMesh.name = 'Temporal Reproject: Seed';
 			_quadMesh.render( renderer );
 			renderer.setRenderTarget( null );
 
@@ -612,7 +612,7 @@ class TemporalReprojectNode extends Node {
 		renderer.setRenderTarget( this._resolveRenderTarget );
 
 		_quadMesh.material = this._resolveMaterial;
-		_quadMesh.name = 'TemporalReproject';
+		_quadMesh.name = 'Temporal Reproject';
 		_quadMesh.render( renderer );
 		renderer.setRenderTarget( null );
 

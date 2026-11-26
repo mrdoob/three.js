@@ -409,7 +409,7 @@ class RecurrentDenoiseNode extends Node {
 
 		renderer.setRenderTarget( this._renderTarget );
 		_quadMesh.material = this._material;
-		_quadMesh.name = 'RecurrentDenoise';
+		_quadMesh.name = 'Recurrent Denoise';
 		_quadMesh.render( renderer );
 		renderer.setRenderTarget( null );
 

@@ -368,7 +368,7 @@ class TAAUNode extends Node {
 
 			renderer.setRenderTarget( this._historyRenderTarget );
 			_quadMesh.material = this._seedMaterial;
-			_quadMesh.name = 'TAAU.seed';
+			_quadMesh.name = 'TAAU: Seed';
 			_quadMesh.render( renderer );
 			renderer.setRenderTarget( null );
 

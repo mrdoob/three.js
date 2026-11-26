@@ -156,7 +156,7 @@ class AfterImageNode extends Node {
 		// composite
 
 		_quadMesh.material = this._materialComposed;
-		_quadMesh.name = 'AfterImage';
+		_quadMesh.name = 'After Image';
 
 		renderer.setRenderTarget( this._compRT );
 		_quadMesh.render( renderer );

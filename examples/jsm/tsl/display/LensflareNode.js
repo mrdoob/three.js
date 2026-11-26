@@ -123,7 +123,7 @@ class LensflareNode extends Node {
 		 * @type {NodeMaterial}
 		 */
 		this._material = new NodeMaterial();
-		this._material.name = 'LensflareNode';
+		this._material.name = 'Lens Flare';
 
 		/**
 		 * The result of the effect is represented as a separate texture node.
