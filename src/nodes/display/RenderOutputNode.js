@@ -1,6 +1,7 @@
 import Node from '../core/Node.js';
 import { addMethodChaining, nodeObject, vec4 } from '../tsl/TSLCore.js';
 import { premultiplyAlpha, unpremultiplyAlpha } from './PremultiplyAlphaFunctions.js';
+import { dither } from './DitherFunctions.js';
 
 import { NoColorSpace, NoToneMapping } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
@@ -42,8 +43,9 @@ class RenderOutputNode extends Node {
 	 * @param {Node} colorNode - The color node to process.
 	 * @param {?number} toneMapping - The tone mapping type.
 	 * @param {?string} outputColorSpace - The output color space.
+	 * @param {?boolean} [dithering=null] - Whether to apply dithering or not.
 	 */
-	constructor( colorNode, toneMapping, outputColorSpace ) {
+	constructor( colorNode, toneMapping, outputColorSpace, dithering = null ) {
 
 		super( 'vec4' );
 
@@ -68,6 +70,14 @@ class RenderOutputNode extends Node {
 		 * @type {?string}
 		 */
 		this.outputColorSpace = outputColorSpace;
+
+		/**
+		 * Whether to apply dithering or not.
+		 *
+		 * @type {?boolean}
+		 * @default null
+		 */
+		this.dithering = dithering;
 
 		/**
 		 * Whether the color node uses premultiplied alpha. The output
@@ -133,6 +143,8 @@ class RenderOutputNode extends Node {
 
 		const outputColorSpace = ( this.outputColorSpace !== null ? this.outputColorSpace : context.outputColorSpace ) || NoColorSpace;
 
+		const dithering = ( this.dithering !== null ? this.dithering : context.dithering ) || false;
+
 		if ( toneMapping !== NoToneMapping ) {
 
 			outputNode = outputNode.toneMapping( toneMapping );
@@ -153,6 +165,12 @@ class RenderOutputNode extends Node {
 
 		}
 
+		if ( dithering === true ) {
+
+			outputNode = dither( outputNode );
+
+		}
+
 		return outputNode;
 
 	}
@@ -169,8 +187,9 @@ export default RenderOutputNode;
  * @param {Node} color - The color node to process.
  * @param {?number} [toneMapping=null] - The tone mapping type.
  * @param {?string} [outputColorSpace=null] - The output color space.
+ * @param {?boolean} [dithering=null] - Whether to apply dithering or not.
  * @returns {RenderOutputNode}
  */
-export const renderOutput = ( color, toneMapping = null, outputColorSpace = null ) => new RenderOutputNode( nodeObject( color ), toneMapping, outputColorSpace );
+export const renderOutput = ( color, toneMapping = null, outputColorSpace = null, dithering = null ) => new RenderOutputNode( nodeObject( color ), toneMapping, outputColorSpace, dithering );
 
 addMethodChaining( 'renderOutput', renderOutput );

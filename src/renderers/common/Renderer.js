@@ -275,6 +275,14 @@ class Renderer {
 		this.toneMappingExposure = 1.0;
 
 		/**
+		 * Whether to apply dithering to the output to remove the appearance of banding.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.dithering = false;
+
+		/**
 		 * Whether the renderer should sort its render lists or not.
 		 *
 		 * Note: Sorting is used to attempt to properly render objects that have some degree of transparency.
@@ -2936,7 +2944,7 @@ class Renderer {
 	}
 
 	/**
-	 * Returns `true` if a framebuffer target is needed to perform tone mapping or color space conversion.
+	 * Returns `true` if a framebuffer target is needed to perform tone mapping, color space conversion or dithering.
 	 * If this is the case, the renderer allocates an internal render target for that purpose.
 	 *
 	 * @type {boolean}
@@ -2945,8 +2953,9 @@ class Renderer {
 
 		const useToneMapping = this.currentToneMapping !== NoToneMapping;
 		const useColorSpace = this.currentColorSpace !== ColorManagement.workingColorSpace;
+		const useDithering = this.currentDithering === true;
 
-		return useToneMapping || useColorSpace;
+		return useToneMapping || useColorSpace || useDithering;
 
 	}
 
@@ -3010,6 +3019,18 @@ class Renderer {
 	get currentColorSpace() {
 
 		return this.isOutputTarget ? this.outputColorSpace : ColorManagement.workingColorSpace;
+
+	}
+
+	/**
+	 * The current dithering setting of the renderer. When not producing screen output,
+	 * dithering is always disabled.
+	 *
+	 * @type {boolean}
+	 */
+	get currentDithering() {
+
+		return this.isOutputTarget ? this.dithering : false;
 
 	}
 

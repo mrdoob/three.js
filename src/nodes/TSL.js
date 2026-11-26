@@ -103,6 +103,7 @@ export * from './display/BlendModes.js';
 export * from './display/BumpMapNode.js';
 export * from './display/ColorAdjustment.js';
 export * from './display/ColorSpaceNode.js';
+export * from './display/DitherFunctions.js';
 export * from './display/FrontFacingNode.js';
 export * from './display/NormalMapNode.js';
 export * from './display/PremultiplyAlphaFunctions.js';

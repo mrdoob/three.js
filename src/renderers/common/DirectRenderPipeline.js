@@ -95,6 +95,7 @@ class DirectRenderPipeline extends RenderPipeline {
 		let depthBuffer;
 		let toneMapping;
 		let outputColorSpace;
+		let dithering;
 
 		if ( backgroundNode !== null ) scene.backgroundNode = backgroundNode;
 
@@ -116,9 +117,11 @@ class DirectRenderPipeline extends RenderPipeline {
 
 			toneMapping = renderer.toneMapping;
 			outputColorSpace = renderer.outputColorSpace;
+			dithering = renderer.dithering;
 
 			renderer.toneMapping = NoToneMapping;
 			renderer.outputColorSpace = ColorManagement.workingColorSpace;
+			renderer.dithering = false;
 
 			if ( renderer.xr.enabled ) {
 
@@ -132,6 +135,7 @@ class DirectRenderPipeline extends RenderPipeline {
 
 			if ( toneMapping !== undefined ) renderer.toneMapping = toneMapping;
 			if ( outputColorSpace !== undefined ) renderer.outputColorSpace = outputColorSpace;
+			if ( dithering !== undefined ) renderer.dithering = dithering;
 
 			if ( backgroundNode !== null && scene.backgroundNode === backgroundNode ) scene.backgroundNode = currentBackgroundNode;
 
@@ -209,6 +213,7 @@ class DirectRenderPipeline extends RenderPipeline {
 		const pipelineOutputNode = this.outputNode;
 		const toneMapping = this._toneMapping;
 		const outputColorSpace = this._outputColorSpace;
+		const dithering = this._dithering;
 		const outputColorTransform = this.outputColorTransform;
 
 		this._contextNode = this._rendererContextNode.context( {
@@ -226,7 +231,7 @@ class DirectRenderPipeline extends RenderPipeline {
 
 				if ( outputColorTransform === false ) return pipelineOutputNode;
 
-				const renderOutputNode = renderOutput( pipelineOutputNode, toneMapping, outputColorSpace );
+				const renderOutputNode = renderOutput( pipelineOutputNode, toneMapping, outputColorSpace, dithering );
 				renderOutputNode.premultipliedAlpha = builder.material.premultipliedAlpha;
 
 				return renderOutputNode;
