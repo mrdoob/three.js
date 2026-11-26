@@ -173,7 +173,7 @@ class SeamStitchGenerator {
 		if ( solver.compute !== null ) {
 
 			renderer.autoClear = false;
-			solver.scene.name = 'Seam Stitch [ Resolve ]';
+			solver.scene.name = 'Seam Stitch: Resolve';
 			renderer.render( solver.scene, this._camera );
 
 		}

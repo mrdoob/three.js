@@ -227,7 +227,7 @@ class SunShadowNode extends ShadowNode {
 
 		const node = Fn( ( builder ) => this._setupCascades( builder, filterFn ) )().toVar();
 
-		const inspectName = `${ light.type } Shadow [ ${ light.name || 'ID: ' + light.id } ]`;
+		const inspectName = `${ light.type } Shadow: ${ light.name || 'ID ' + light.id }`;
 
 		// the cascade cameras are orthographic, so the stored depth is linear already
 
@@ -258,7 +258,7 @@ class SunShadowNode extends ShadowNode {
 
 		const currentSceneName = scene.name;
 
-		scene.name = `Shadow Map [ ${ light.name || 'ID: ' + light.id } ]`;
+		scene.name = `Shadow Map: ${ light.name || 'ID ' + light.id }`;
 
 		// clear once, the cascades share the atlas
 

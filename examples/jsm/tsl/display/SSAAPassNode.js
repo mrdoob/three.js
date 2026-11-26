@@ -176,7 +176,7 @@ class SSAAPassNode extends PassNode {
 
 			renderer.setRenderTarget( this._sampleRenderTarget );
 			renderer.clear();
-			scene.name = `${ passName } [ Sample ${ i + 1 } ]`;
+			scene.name = `${ passName }: Sample ${ i + 1 }`;
 			renderer.render( scene, camera );
 			scene.name = sceneName;
 
@@ -193,7 +193,7 @@ class SSAAPassNode extends PassNode {
 
 			}
 
-			this._quadMesh.name = `${ passName } [ Accumulate ${ i + 1 } ]`;
+			this._quadMesh.name = `${ passName }: Accumulate ${ i + 1 }`;
 			this._quadMesh.render( renderer );
 
 		}

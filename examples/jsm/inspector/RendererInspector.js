@@ -36,10 +36,10 @@ class RenderStats extends ObjectStats {
 		if ( renderTarget?.isCubeRenderTarget ) {
 
 			const face = renderer.getActiveCubeFace();
-			const group = scene.name || scene.material?.name || renderTarget.texture.name || 'Cube Capture';
+			const label = scene.name || scene.material?.name || renderTarget.texture.name || 'Cube Capture';
 			const mip = renderer.getActiveMipmapLevel();
 
-			name = mip === 0 ? `${ group } [ ${ face } ]` : `${ group } (Mip ${ mip }) [ ${ face } ]`;
+			name = `${ label }: Mip ${ mip }: Face ${ face }`;
 
 		}
 
@@ -180,11 +180,11 @@ function resolveOffsets( frame ) {
 
 }
 
-// splits names like "Group [ Pass ]" and "Group [ ID ] - Pass"
+// splits the first level of names like "Group: Stage: Pass"
 
 function parseName( name ) {
 
-	const match = /^(.+?)\s*\[\s*(.+?)\s*\]$/.exec( name ) || /^(.+\])\s*-\s*(.+)$/.exec( name );
+	const match = /^(.+?): (.+)$/.exec( name );
 
 	return match !== null ? { group: match[ 1 ], pass: match[ 2 ] } : { group: null, pass: name };
 
@@ -197,8 +197,6 @@ function groupCalls( parent, frameId ) {
 	const runs = [];
 
 	for ( const stats of parent.children ) {
-
-		groupCalls( stats, frameId );
 
 		const { group, pass } = stats.isGroupStats || stats.hasGeneratedName ? { group: null, pass: stats.name } : parseName( stats.name );
 		const run = runs[ runs.length - 1 ];
@@ -220,7 +218,12 @@ function groupCalls( parent, frameId ) {
 
 	parent.children = runs.map( ( { group, index, calls, passes } ) => {
 
-		if ( calls.length === 1 ) return calls[ 0 ];
+		if ( calls.length === 1 ) {
+
+			groupCalls( calls[ 0 ], frameId );
+			return calls[ 0 ];
+
+		}
 
 		const groupStats = new GroupStats( `${ parent.cid || '' }/${ group }/${ index }:f${ frameId }`, group, parent, calls );
 
@@ -230,6 +233,8 @@ function groupCalls( parent, frameId ) {
 			stats.parent = groupStats;
 
 		} );
+
+		groupCalls( groupStats, frameId );
 
 		return groupStats;
 

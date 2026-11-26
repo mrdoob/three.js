@@ -277,7 +277,7 @@ class OITPassNode extends PassNode {
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setRenderObjectFunction( this._defaultRenderObjectFunction );
 
-		scene.name = passName + ' [ Opaque and Non-OIT Objects ]';
+		scene.name = passName + ': Opaque and Non-OIT Objects';
 		renderer.render( scene, camera );
 		scene.name = sceneName;
 
@@ -292,7 +292,7 @@ class OITPassNode extends PassNode {
 		renderer.opaque = false;
 		renderer.transparent = true;
 
-		scene.name = passName + ' [ Transparency Accumulation ]';
+		scene.name = passName + ': Transparency Accumulation';
 		renderer.render( scene, camera );
 		scene.name = sceneName;
 

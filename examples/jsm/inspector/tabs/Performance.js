@@ -160,7 +160,7 @@ class Performance extends Tab {
 
 		if ( stats.isComputeStats ) {
 
-			name += ' [ Compute ]';
+			name += ', Compute';
 
 		}
 

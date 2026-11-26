@@ -132,7 +132,7 @@ class SharpenNode extends Node {
 		renderer.setRenderTarget( this._renderTarget );
 
 		_quadMesh.material = this._material;
-		_quadMesh.name = 'Sharpen [ RCAS ]';
+		_quadMesh.name = 'Sharpen: RCAS';
 		_quadMesh.render( renderer );
 
 		//

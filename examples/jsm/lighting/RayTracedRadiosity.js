@@ -474,7 +474,7 @@ class RayTracedRadiosity {
 		} )();
 
 		const quad = new QuadMesh( material );
-		quad.name = 'Radiosity [ Sample Sky ]';
+		quad.name = 'Radiosity: Sample Sky';
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 

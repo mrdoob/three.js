@@ -524,7 +524,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		// Shadow Output + Inspector
 
-		const inspectName = `${ this.light.type } Shadow [ ${ this.light.name || 'ID: ' + this.light.id } ]`;
+		const inspectName = `${ this.light.type } Shadow: ${ this.light.name || 'ID ' + this.light.id }`;
 
 		if ( shadowColor ) {
 
@@ -645,7 +645,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		const currentSceneName = scene.name;
 
-		scene.name = `Shadow Map [ ${ light.name || 'ID: ' + light.id } ]`;
+		scene.name = `Shadow Map: ${ light.name || 'ID ' + light.id }`;
 
 		renderer.render( scene, shadow.camera );
 

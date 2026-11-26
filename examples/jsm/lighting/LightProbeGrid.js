@@ -778,7 +778,7 @@ class LightProbeGrid extends Light {
 			renderer.autoClear = true;
 			renderer.setRenderTarget( _faceTarget );
 			const sceneName = scene.name;
-			scene.name = 'Light Probe Grid [ Capture ]';
+			scene.name = 'Light Probe Grid: Capture';
 			renderer.render( scene, _captureCamera );
 			scene.name = sceneName;
 
@@ -786,7 +786,7 @@ class LightProbeGrid extends Light {
 			_batchStartUniform.value = batchStart;
 			_batchTarget.viewport.set( 0, batchStart, 9 * 6 * FACE_BLOCKS, batchCount );
 			renderer.setRenderTarget( _batchTarget );
-			_quad.name = 'Light Probe Grid [ Project SH ]';
+			_quad.name = 'Light Probe Grid: Project SH';
 			_quad.material = _shMaterial;
 			_quad.render( renderer );
 
@@ -837,7 +837,7 @@ class LightProbeGrid extends Light {
 
 				for ( let t = 0; t < 7; t ++ ) {
 
-					_quad.name = 'Light Probe Grid [ Pack Atlas ]';
+					_quad.name = 'Light Probe Grid: Pack Atlas';
 					_quad.material = _repackMaterials[ t ];
 					const base = t * paddedSlices;
 

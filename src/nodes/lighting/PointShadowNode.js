@@ -343,7 +343,7 @@ class PointShadowNode extends ShadowNode {
 
 			const currentSceneName = scene.name;
 
-			scene.name = `Point Light Shadow [ ${ light.name || 'ID: ' + light.id } ] - Face ${ face + 1 }`;
+			scene.name = `Point Light Shadow: ${ light.name || 'ID ' + light.id }`;
 
 			renderer.render( scene, camera );
 
