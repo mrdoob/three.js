@@ -5,7 +5,7 @@ import {
 } from 'three';
 
 import { gunzipSync } from '../libs/fflate.module.js';
-import { ZSTDDecoder } from '../libs/zstddec-stream.module.js';
+import { ZSTDDecoder } from '../libs/zstddec.module.js';
 import { SH_BAND_COMPONENTS, SH_BAND_WORDS, SH_C0, createGaussianSplatGeometry, createPackedSphericalHarmonicsBand, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const SPZ_MAGIC = 0x5053474e;
@@ -271,7 +271,7 @@ class SPZLoader extends Loader {
 	 * Parses raw SPZ v4 data.
 	 *
 	 * @param {Uint8Array} bytes - The raw SPZ v4 data.
-	 * @param {ZSTDDecoder} zstd - The initialized ZSTD decoder from the streaming build (`zstddec-stream.module.js`).
+	 * @param {ZSTDDecoder} zstd - The initialized ZSTD decoder.
 	 * @return {BufferGeometry} The parsed splat geometry.
 	 */
 	parseRawSPZV4( bytes, zstd ) {
