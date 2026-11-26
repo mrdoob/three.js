@@ -101,12 +101,9 @@
 
 				}
 
-				// the object that moves, with detail the jitter shows on
+				// the brick texture makes shimmer visible as the camera follows the cube
 
 				const texture = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
-				texture.minFilter = THREE.NearestFilter;
-				texture.magFilter = THREE.NearestFilter;
-				texture.generateMipmaps = false;
 				texture.colorSpace = THREE.SRGBColorSpace;
 
 				follower = new THREE.Group();
