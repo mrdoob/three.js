@@ -1361,6 +1361,8 @@ class NodeMaterial extends Material {
 
 			for ( const property in descriptors ) {
 
+				if ( property === 'iridescenceThicknessRange' ) continue; // @deprecated r187
+
 				if ( descriptors[ property ].set !== undefined && source[ property ] !== undefined ) {
 
 					const value = source[ property ];
