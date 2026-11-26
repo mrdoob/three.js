@@ -189,7 +189,7 @@ class BilateralBlurNode extends Node {
 
 		this._passDirection.value.set( 1, 0 );
 
-		_quadMesh.name = 'Bilateral Blur: Horizontal Pass';
+		_quadMesh.name = 'Bilateral Blur: Horizontal';
 		_quadMesh.render( renderer );
 
 		// vertical
@@ -199,7 +199,7 @@ class BilateralBlurNode extends Node {
 
 		this._passDirection.value.set( 0, 1 );
 
-		_quadMesh.name = 'Bilateral Blur: Vertical Pass';
+		_quadMesh.name = 'Bilateral Blur: Vertical';
 		_quadMesh.render( renderer );
 
 		// restore

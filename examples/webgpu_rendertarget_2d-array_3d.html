@@ -137,10 +137,10 @@
 
 				// Create views after renderer initialization
 				views = [
-					new View( 'Data Array Texture', 0.0, 0.0, 0.5, 0.5 ),
-					new View( '3D Data Texture', 0.5, 0.0, 0.5, 0.5 ),
-					new View( 'Array Render Target', 0.0, 0.5, 0.5, 0.5 ),
-					new View( '3D Render Target', 0.5, 0.5, 0.5, 0.5 )
+					new View( 'Texture View: Data Array', 0.0, 0.0, 0.5, 0.5 ),
+					new View( 'Texture View: 3D Data', 0.5, 0.0, 0.5, 0.5 ),
+					new View( 'Texture View: Array Render Target', 0.0, 0.5, 0.5, 0.5 ),
+					new View( 'Texture View: 3D Render Target', 0.5, 0.5, 0.5, 0.5 )
 				];
 
 				// Add OrbitControls after views and renderer are created
@@ -252,7 +252,7 @@
 							const materialClear = new THREE.NodeMaterial();
 							materialClear.outputNode = vec4( 0 );
 							const clearQuadMesh = new THREE.QuadMesh( materialClear );
-							clearQuadMesh.name = 'Clear 3D Render Target';
+							clearQuadMesh.name = 'Texture Update: Clear 3D Target';
 							for ( let i = 0; i < size.depth; i ++ ) {
 			
 								renderer.setRenderTarget( fbo3D, i );
@@ -282,12 +282,12 @@
 
 							renderer.setRenderTarget( fboArray, j );
 							renderer.clear();
-							quadMesh.name = 'Write Array Texture Layer';
+							quadMesh.name = 'Texture Update: Write Array Layer';
 							quadMesh.render( renderer );
 
 							renderer.setRenderTarget( fbo3D, j );
 							renderer.clear();
-							quadMesh.name = 'Write 3D Texture Slice';
+							quadMesh.name = 'Texture Update: Write 3D Slice';
 							quadMesh.render( renderer );
 
 							renderer.setRenderTarget( null );

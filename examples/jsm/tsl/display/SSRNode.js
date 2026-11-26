@@ -807,7 +807,7 @@ class SSRNode extends Node {
 
 				this._blurSpread.value = i;
 				renderer.setRenderTarget( blurRenderTarget, 0, i );
-				_quadMesh.name = 'SSR: Blur Level ' + i;
+				_quadMesh.name = `SSR: Blur: Mip ${ i }`;
 				_quadMesh.render( renderer );
 
 			}
