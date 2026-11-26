@@ -374,13 +374,13 @@ class BloomNode extends Node {
 			this._separableBlurMaterials[ i ].colorTexture.value = inputRenderTarget.texture;
 			this._separableBlurMaterials[ i ].direction.value = _BlurDirectionX;
 			renderer.setRenderTarget( this._renderTargetsHorizontal[ i ] );
-			_quadMesh.name = `Bloom: Blur Horizontal, ${ i }`;
+			_quadMesh.name = `Bloom: Blur: Mip ${ i }: Horizontal`;
 			_quadMesh.render( renderer );
 
 			this._separableBlurMaterials[ i ].colorTexture.value = this._renderTargetsHorizontal[ i ].texture;
 			this._separableBlurMaterials[ i ].direction.value = _BlurDirectionY;
 			renderer.setRenderTarget( this._renderTargetsVertical[ i ] );
-			_quadMesh.name = `Bloom: Blur Vertical, ${ i }`;
+			_quadMesh.name = `Bloom: Blur: Mip ${ i }: Vertical`;
 			_quadMesh.render( renderer );
 
 			inputRenderTarget = this._renderTargetsVertical[ i ];
