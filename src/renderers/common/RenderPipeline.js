@@ -95,7 +95,6 @@ class RenderPipeline {
 		 * @type {QuadMesh}
 		 */
 		this._quadMesh = new QuadMesh( material );
-		this._quadMesh.name = 'Render Pipeline';
 
 		/**
 		 * The context data for the render pipeline.
@@ -218,6 +217,7 @@ class RenderPipeline {
 
 		this._contextData = contextData;
 
+		this._quadMesh.name = this.outputNode.name || 'Render Pipeline';
 		this._quadMesh.material.contextNode = context( contextData );
 		this._quadMesh.material.fragmentNode = outputNode;
 		this._quadMesh.material.needsUpdate = true;
