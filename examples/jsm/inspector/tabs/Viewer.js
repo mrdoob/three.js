@@ -1022,6 +1022,7 @@ class Viewer extends Tab {
 
 			renderer.toneMapping = NoToneMapping;
 			renderer.outputColorSpace = LinearSRGBColorSpace;
+			renderer.dithering = false;
 
 			renderer.setCanvasTarget( this.splitCanvasTarget );
 			renderer.setClearColor( 0x000000, 0 );
@@ -1279,6 +1280,7 @@ class Viewer extends Tab {
 
 			renderer.toneMapping = NoToneMapping;
 			renderer.outputColorSpace = LinearSRGBColorSpace;
+			renderer.dithering = false;
 
 			renderer.setCanvasTarget( canvasData.canvasTarget );
 

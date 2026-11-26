@@ -16,6 +16,7 @@ export function saveRendererState( renderer, state = {} ) {
 	state.toneMapping = renderer.toneMapping;
 	state.toneMappingExposure = renderer.toneMappingExposure;
 	state.outputColorSpace = renderer.outputColorSpace;
+	state.dithering = renderer.dithering;
 	state.renderTarget = renderer.getRenderTarget();
 	state.activeCubeFace = renderer.getActiveCubeFace();
 	state.activeMipmapLevel = renderer.getActiveMipmapLevel();
@@ -79,6 +80,7 @@ export function restoreRendererState( renderer, state ) {
 	renderer.toneMapping = state.toneMapping;
 	renderer.toneMappingExposure = state.toneMappingExposure;
 	renderer.outputColorSpace = state.outputColorSpace;
+	renderer.dithering = state.dithering;
 	renderer.setRenderTarget( state.renderTarget, state.activeCubeFace, state.activeMipmapLevel );
 	renderer.setRenderObjectFunction( state.renderObjectFunction );
 	renderer.setPixelRatio( state.pixelRatio );
