@@ -1134,13 +1134,13 @@ async function createRawTexture( container ) {
 
 		if ( ! _zstd ) {
 
-			_zstd = new Promise( async ( resolve ) => {
+			_zstd = ( async () => {
 
 				const zstd = new ZSTDDecoder();
 				await zstd.init();
-				resolve( zstd );
+				return zstd;
 
-			} );
+			} )();
 
 		}
 
