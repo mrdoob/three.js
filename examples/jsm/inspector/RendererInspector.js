@@ -59,20 +59,11 @@ class ComputeStats extends ObjectStats {
 
 	constructor( uid, computeNode ) {
 
-		let name = computeNode.name;
-		const isUnnamedGroup = ! name && Array.isArray( computeNode );
+		const name = computeNode.name || ( computeNode.isComputeNode ? 'Compute' : 'Compute Group' );
 
-		if ( isUnnamedGroup ) {
-
-			const names = new Set( computeNode.map( ( node ) => node.name ).filter( Boolean ) );
-			name = [ ...names ].join( ', ' ) || 'Compute Group';
-
-		}
-
-		super( uid, name || 'Compute' );
+		super( uid, name );
 
 		this.computeNode = computeNode;
-		this.hasGeneratedName = isUnnamedGroup;
 
 		this.isComputeStats = true;
 
@@ -198,7 +189,7 @@ function groupCalls( parent, frameId ) {
 
 	for ( const stats of parent.children ) {
 
-		const { group, pass } = stats.isGroupStats || stats.hasGeneratedName ? { group: null, pass: stats.name } : parseName( stats.name );
+		const { group, pass } = stats.isGroupStats ? { group: null, pass: stats.name } : parseName( stats.name );
 		const run = runs[ runs.length - 1 ];
 
 		if ( group !== null && run !== undefined && run.group === group ) {
