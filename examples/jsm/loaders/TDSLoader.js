@@ -11,6 +11,7 @@ import {
 	Matrix4,
 	Mesh,
 	MeshPhongMaterial,
+	SRGBColorSpace,
 	TextureLoader
 } from 'three';
 
@@ -322,6 +323,7 @@ class TDSLoader extends Loader {
 
 				this.debugMessage( '   ColorMap' );
 				material.map = this.readMap( next, path );
+				material.map.colorSpace = SRGBColorSpace;
 
 			} else if ( next.id === MAT_BUMPMAP ) {
 
@@ -347,6 +349,10 @@ class TDSLoader extends Loader {
 			next = chunk.readChunk();
 
 		}
+
+		// in 3ds Max, a diffuse map replaces the diffuse color instead of being multiplied by it
+
+		if ( material.map !== null ) material.color.setRGB( 1, 1, 1 );
 
 		this.materials[ material.name ] = material;
 
@@ -649,7 +655,7 @@ class TDSLoader extends Loader {
 			const g = subChunk.readByte( );
 			const b = subChunk.readByte( );
 
-			color.setRGB( r / 255, g / 255, b / 255 );
+			color.setRGB( r / 255, g / 255, b / 255, SRGBColorSpace );
 
 			this.debugMessage( '      Color: ' + color.r + ', ' + color.g + ', ' + color.b );
 
@@ -659,7 +665,7 @@ class TDSLoader extends Loader {
 			const g = subChunk.readFloat( );
 			const b = subChunk.readFloat( );
 
-			color.setRGB( r, g, b );
+			color.setRGB( r, g, b, SRGBColorSpace );
 
 			this.debugMessage( '      Color: ' + color.r + ', ' + color.g + ', ' + color.b );
 
