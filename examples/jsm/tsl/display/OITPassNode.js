@@ -269,7 +269,7 @@ class OITPassNode extends PassNode {
 		renderer.autoClearStencil = this.autoClearStencil;
 
 		const sceneName = scene.name;
-		const passName = this.name || 'Weighted Blended OIT';
+		const passName = this.name || 'OIT';
 
 		// default pass: opaque objects and transparent objects that do not qualify for OIT
 
@@ -277,7 +277,7 @@ class OITPassNode extends PassNode {
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setRenderObjectFunction( this._defaultRenderObjectFunction );
 
-		scene.name = passName + ': Opaque and Non-OIT Objects';
+		scene.name = passName + ': Base';
 		renderer.render( scene, camera );
 		scene.name = sceneName;
 
@@ -292,7 +292,7 @@ class OITPassNode extends PassNode {
 		renderer.opaque = false;
 		renderer.transparent = true;
 
-		scene.name = passName + ': Transparency Accumulation';
+		scene.name = passName + ': Accumulated';
 		renderer.render( scene, camera );
 		scene.name = sceneName;
 
