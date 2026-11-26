@@ -231,7 +231,7 @@ class TRAANode extends Node {
 		 * @private
 		 * @type {Reprojection}
 		 */
-		this._reprojection = new Reprojection( depthNode, velocityNode, camera );
+		this._reprojection = new Reprojection( depthNode, camera );
 		this._reprojection.previousDepthNode.value.name = 'TRAANode.previousDepth';
 
 		/**
@@ -493,7 +493,8 @@ class TRAANode extends Node {
 
 			// sample the previous depth
 
-			const historyUV = this._reprojection.getHistoryUV( uvNode, closestPositionTexel ).toConst();
+			const surfaceVelocity = this.velocityNode.load( closestPositionTexel );
+			const historyUV = this._reprojection.getHistoryUV( uvNode, surfaceVelocity.xy ).toConst();
 			let previousDepth, expectedDepth;
 
 			if ( this.usePreviousViewZ ) {
@@ -502,7 +503,7 @@ class TRAANode extends Node {
 				const { x: near, y: far } = this._previousCameraNearFar;
 				const viewZToDepth = this.camera.isOrthographicCamera ? viewZToOrthographicDepth : viewZToPerspectiveDepth;
 				const sampledDepth = this._reprojection.previousDepthNode.sample( historyUV ).r;
-				const previousViewZ = this.velocityNode.load( closestPositionTexel ).w.toConst();
+				const previousViewZ = surfaceVelocity.w.toConst();
 
 				previousDepth = viewZToDepth( depthToViewZ( sampledDepth, near, far, this.camera ), near, far );
 				expectedDepth = previousViewZ.lessThan( 0 ).select( viewZToDepth( previousViewZ, near, far ), 1 );

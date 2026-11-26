@@ -234,7 +234,7 @@ class TAAUNode extends Node {
 		 * @private
 		 * @type {Reprojection}
 		 */
-		this._reprojection = new Reprojection( depthNode, velocityNode, camera );
+		this._reprojection = new Reprojection( depthNode, camera );
 		this._reprojection.previousDepthNode.value.name = 'TAAUNode.previousDepth';
 
 	}
@@ -472,7 +472,7 @@ class TAAUNode extends Node {
 
 			// reproject using the velocity sampled at the dilated depth tap
 
-			const historyUV = this._reprojection.getHistoryUV( uvNode, closestPositionTexel ).toConst();
+			const historyUV = this._reprojection.getHistoryUV( uvNode, this.velocityNode.load( closestPositionTexel ).xy ).toConst();
 			const previousDepth = this._reprojection.getPreviousDepth( historyUV, this._cameraNearFar );
 
 			// history validity

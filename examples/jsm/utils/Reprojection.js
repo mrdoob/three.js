@@ -17,10 +17,9 @@ class Reprojection {
 	 * Constructs a new reprojection.
 	 *
 	 * @param {TextureNode} depthNode - The scene's depth.
-	 * @param {TextureNode} velocityNode - The scene's velocity.
 	 * @param {Camera} camera - The camera the scene is rendered with.
 	 */
-	constructor( depthNode, velocityNode, camera ) {
+	constructor( depthNode, camera ) {
 
 		/**
 		 * The scene's depth.
@@ -28,13 +27,6 @@ class Reprojection {
 		 * @type {TextureNode}
 		 */
 		this.depthNode = depthNode;
-
-		/**
-		 * The scene's velocity.
-		 *
-		 * @type {TextureNode}
-		 */
-		this.velocityNode = velocityNode;
 
 		/**
 		 * The camera the scene is rendered with.
@@ -114,16 +106,14 @@ class Reprojection {
 	 * Returns the UV the surface at the given UV had in the previous frame.
 	 *
 	 * @param {Node<vec2>} uvNode - The UV in the current frame.
-	 * @param {Node<ivec2>} texel - The texel to load the velocity from.
+	 * @param {Node<vec2>} velocity - The surface velocity in NDC.
 	 * @return {Node<vec2>} The UV in the previous frame.
 	 */
-	getHistoryUV( uvNode, texel ) {
-
-		const velocity = this.velocityNode.load( texel );
+	getHistoryUV( uvNode, velocity ) {
 
 		// convert the NDC offset to UV offset
 
-		return uvNode.sub( velocity.xy.mul( vec2( 0.5, - 0.5 ) ) );
+		return uvNode.sub( velocity.mul( vec2( 0.5, - 0.5 ) ) );
 
 	}
 
