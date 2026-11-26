@@ -27,8 +27,6 @@ class ObjectStats {
 
 }
 
-const _cubeFaces = [ '+X', '-X', '+Y', '-Y', '+Z', '-Z' ];
-
 class RenderStats extends ObjectStats {
 
 	constructor( uid, scene, camera, renderTarget, renderer ) {
@@ -37,7 +35,7 @@ class RenderStats extends ObjectStats {
 
 		if ( renderTarget?.isCubeRenderTarget ) {
 
-			const face = _cubeFaces[ renderer.getActiveCubeFace() ];
+			const face = renderer.getActiveCubeFace();
 			const group = scene.name || scene.material?.name || renderTarget.texture.name || 'Cube Capture';
 			const mip = renderer.getActiveMipmapLevel();
 

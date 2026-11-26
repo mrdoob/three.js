@@ -611,14 +611,13 @@ class OutlineNode extends Node {
 		this._blurDirection.value.copy( _BLUR_DIRECTION_X );
 
 		_quadMesh.material = this._separableBlurMaterial;
-		_quadMesh.name = 'Outline [ Blur Half Resolution Horizontal ]';
+		_quadMesh.name = 'Outline [ Blur Half Resolution ]';
 		renderer.setRenderTarget( this._renderTargetBlurBuffer1 );
 		_quadMesh.render( renderer );
 
 		this._blurColorTextureUniform.value = this._renderTargetBlurBuffer1.texture;
 		this._blurDirection.value.copy( _BLUR_DIRECTION_Y );
 
-		_quadMesh.name = 'Outline [ Blur Half Resolution Vertical ]';
 		renderer.setRenderTarget( this._renderTargetEdgeBuffer1 );
 		_quadMesh.render( renderer );
 
@@ -628,21 +627,20 @@ class OutlineNode extends Node {
 		this._blurDirection.value.copy( _BLUR_DIRECTION_X );
 
 		_quadMesh.material = this._separableBlurMaterial2;
-		_quadMesh.name = 'Outline [ Blur Quarter Resolution Horizontal ]';
+		_quadMesh.name = 'Outline [ Blur Quarter Resolution ]';
 		renderer.setRenderTarget( this._renderTargetBlurBuffer2 );
 		_quadMesh.render( renderer );
 
 		this._blurColorTextureUniform.value = this._renderTargetBlurBuffer2.texture;
 		this._blurDirection.value.copy( _BLUR_DIRECTION_Y );
 
-		_quadMesh.name = 'Outline [ Blur Quarter Resolution Vertical ]';
 		renderer.setRenderTarget( this._renderTargetEdgeBuffer2 );
 		_quadMesh.render( renderer );
 
 		// 7. Composite
 
 		_quadMesh.material = this._compositeMaterial;
-		_quadMesh.name = 'Outline [ Composite ]';
+		_quadMesh.name = 'Outline [ Blur Quarter Resolution ]';
 		renderer.setRenderTarget( this._renderTargetComposite );
 		_quadMesh.render( renderer );
 
