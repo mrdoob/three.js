@@ -1,5 +1,5 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4 } from 'three/webgpu';
-import { float, Fn, max, texture, uniform, uv, vec4, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline, depthToViewZ, viewZToOrthographicDepth, viewZToPerspectiveDepth } from 'three/tsl';
+import { float, Fn, max, texture, uniform, uv, vec4, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline, depthToViewZ } from 'three/tsl';
 import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth } from '../utils/TAAUtils.js';
 import { Reprojection } from '../../utils/Reprojection.js';
 
@@ -89,8 +89,8 @@ class TRAANode extends Node {
 		this.camera = camera;
 
 		/**
-		 * When the difference between the current and previous depth goes above this threshold,
-		 * the history is considered invalid.
+		 * The normalized depth difference above which history is rejected when
+		 * `usePreviousViewZ` is disabled.
 		 *
 		 * @type {number}
 		 * @default 0.0005
@@ -491,36 +491,39 @@ class TRAANode extends Node {
 			const closestPositionTexel = currentDepth.get( 'closestPositionTexel' );
 			const farthestDepth = currentDepth.get( 'farthestDepth' );
 
-			// sample the previous depth
-
 			const surfaceVelocity = this.velocityNode.load( closestPositionTexel );
 			const historyUV = this._reprojection.getHistoryUV( uvNode, surfaceVelocity.xy ).toConst();
-			let previousDepth, expectedDepth;
+
+			let isValidHistoryPosition = historyUV.greaterThanEqual( 0 ).all().and( historyUV.lessThanEqual( 1 ).all() );
+			let isDisocclusion;
 
 			if ( this.usePreviousViewZ ) {
 
-				// Compare where the surface was last frame with what the previous camera saw there.
+				// Compare the expected and visible surface depths in the previous camera's view space.
 				const { x: near, y: far } = this._previousCameraNearFar;
-				const viewZToDepth = this.camera.isOrthographicCamera ? viewZToOrthographicDepth : viewZToPerspectiveDepth;
 				const sampledDepth = this._reprojection.previousDepthNode.sample( historyUV ).r;
-				const previousViewZ = surfaceVelocity.w.toConst();
+				const sampledDistance = depthToViewZ( sampledDepth, near, far, this.camera ).negate();
+				const expectedDistance = surfaceVelocity.w.negate().toConst();
 
-				previousDepth = viewZToDepth( depthToViewZ( sampledDepth, near, far, this.camera ), near, far );
-				expectedDepth = previousViewZ.lessThan( 0 ).select( viewZToDepth( previousViewZ, near, far ), 1 );
+				// Allow for half-float rounding and subpixel reprojection.
+				const relativeTolerance = 0.002;
+				const tolerance = expectedDistance.mul( relativeTolerance );
+				isDisocclusion = expectedDistance.sub( sampledDistance ).greaterThan( tolerance );
+
+				// A surface outside the previous camera's clip range has no history, even on edges.
+				isValidHistoryPosition = isValidHistoryPosition.and( expectedDistance.greaterThan( 0 ) )
+					.and( expectedDistance.greaterThanEqual( near.mul( 1 - relativeTolerance ) ) )
+					.and( expectedDistance.lessThanEqual( far.mul( 1 + relativeTolerance ) ) );
 
 			} else {
 
-				previousDepth = this._reprojection.getPreviousDepth( historyUV, this._cameraNearFar );
-				expectedDepth = closestDepth;
+				const previousDepth = this._reprojection.getPreviousDepth( historyUV, this._cameraNearFar );
+				isDisocclusion = closestDepth.sub( previousDepth ).greaterThan( this.depthThreshold );
 
 			}
 
-			// history is considered valid when the UV is in range and there's no disocclusion except on edges
-
-			const isValidUV = historyUV.greaterThanEqual( 0 ).all().and( historyUV.lessThanEqual( 1 ).all() );
 			const isEdge = farthestDepth.sub( closestDepth ).greaterThan( this.edgeDepthDiff );
-			const isDisocclusion = expectedDepth.sub( previousDepth ).greaterThan( this.depthThreshold );
-			const hasValidHistory = isValidUV.and( isEdge.or( isDisocclusion.not() ) );
+			const hasValidHistory = isValidHistoryPosition.and( isEdge.or( isDisocclusion.not() ) );
 
 			// sample the current and previous colors
 
