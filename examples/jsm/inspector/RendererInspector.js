@@ -27,23 +27,23 @@ class ObjectStats {
 
 }
 
+const _cubeFaces = [ '+X', '-X', '+Y', '-Y', '+Z', '-Z' ];
+
 class RenderStats extends ObjectStats {
 
 	constructor( uid, scene, camera, renderTarget ) {
 
-		let name = scene.name;
+		let name = scene.name || scene.material?.name || camera.name || ( scene.isQuadMesh ? 'QuadMesh' : scene.type );
 
-		if ( name === '' ) {
+		const cubeCamera = camera.parent;
 
-			if ( scene.isScene ) {
+		if ( renderTarget?.isCubeRenderTarget && cubeCamera?.type === 'CubeCamera' ) {
 
-				name = 'Scene';
+			const face = _cubeFaces[ cubeCamera.children.indexOf( camera ) ];
+			const group = scene.name || scene.material?.name || cubeCamera.name || 'Cube Capture';
+			const mip = cubeCamera.activeMipmapLevel;
 
-			} else if ( scene.isQuadMesh ) {
-
-				name = 'QuadMesh';
-
-			}
+			name = mip === 0 ? `${ group } [ ${ face } ]` : `${ group } (Mip ${ mip }) [ ${ face } ]`;
 
 		}
 
@@ -63,9 +63,16 @@ class ComputeStats extends ObjectStats {
 
 	constructor( uid, computeNode ) {
 
-		const name = computeNode.name || ( computeNode.isComputeNode ? 'Compute' : 'Compute Group' );
+		let name = computeNode.name;
 
-		super( uid, name );
+		if ( ! name && Array.isArray( computeNode ) ) {
+
+			const names = new Set( computeNode.map( ( node ) => node.name || 'Compute' ) );
+			name = [ ...names ].join( ', ' );
+
+		}
+
+		super( uid, name || 'Compute' );
 
 		this.computeNode = computeNode;
 

@@ -474,6 +474,7 @@ class RayTracedRadiosity {
 		} )();
 
 		const quad = new QuadMesh( material );
+		quad.name = 'Radiosity [ Sample Sky ]';
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
@@ -501,7 +502,7 @@ class RayTracedRadiosity {
 
 			table.element( row.add( SKY_CELLS ) ).assign( vec4( sum, 0, 0, 0 ) );
 
-		} )().compute( SKY_ROWS );
+		} )().compute( SKY_ROWS ).setName( 'Sum Sky Rows' );
 
 		const sumSky = Fn( () => {
 
@@ -528,7 +529,7 @@ class RayTracedRadiosity {
 
 			} );
 
-		} )().compute( 1 );
+		} )().compute( 1 ).setName( 'Sum Sky Irradiance' );
 
 		renderer.compute( [ sumRows, sumSky ] );
 

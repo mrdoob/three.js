@@ -268,13 +268,18 @@ class OITPassNode extends PassNode {
 		renderer.autoClearDepth = this.autoClearDepth;
 		renderer.autoClearStencil = this.autoClearStencil;
 
+		const sceneName = scene.name;
+		const passName = this.name || 'Weighted Blended OIT';
+
 		// default pass: opaque objects and transparent objects that do not qualify for OIT
 
 		renderer.setMRT( this._mrt );
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setRenderObjectFunction( this._defaultRenderObjectFunction );
 
+		scene.name = passName + ' [ Opaque and Non-OIT Objects ]';
 		renderer.render( scene, camera );
+		scene.name = sceneName;
 
 		// OIT pass: accumulate the weighted colors and the revealage of all OIT-qualified objects
 
@@ -287,7 +292,9 @@ class OITPassNode extends PassNode {
 		renderer.opaque = false;
 		renderer.transparent = true;
 
+		scene.name = passName + ' [ Transparency Accumulation ]';
 		renderer.render( scene, camera );
+		scene.name = sceneName;
 
 		// restore
 

@@ -111,11 +111,11 @@
 
 								return pointPositionArray.toAttribute();
 
-							} )().compute( countOfPoints ).onInit( () => {
+							} )().compute( countOfPoints ).setName( 'Initialize Skinning Points' ).onInit( () => {
 
 								// initialize point positions and speeds
 
-								renderer.compute( updateSkinningPoints().compute( countOfPoints ) );
+								renderer.compute( updateSkinningPoints().compute( countOfPoints ).setName( 'Update Skinning Points' ) );
 
 							} );
 

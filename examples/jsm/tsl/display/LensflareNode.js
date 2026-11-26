@@ -175,6 +175,7 @@ class LensflareNode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
+		_quadMesh.name = 'Lens Flare';
 		_quadMesh.material = this._material;
 
 		// clear

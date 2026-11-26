@@ -48,6 +48,7 @@ export async function decompress( blitTexture, maxTextureSize = Infinity, render
 	renderer.outputColorSpace = blitTexture.colorSpace;
 
 	_quadMesh.material = material;
+	_quadMesh.name = 'Texture Blit';
 	_quadMesh.render( renderer );
 
 	renderer.outputColorSpace = currentOutputColorSpace;

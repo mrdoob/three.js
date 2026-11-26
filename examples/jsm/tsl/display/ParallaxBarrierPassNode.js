@@ -26,6 +26,8 @@ class ParallaxBarrierPassNode extends StereoCompositePassNode {
 
 		super( scene, camera );
 
+		this.name = 'Parallax Barrier';
+
 		/**
 		 * This flag can be used for type testing.
 		 *

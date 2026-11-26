@@ -246,7 +246,7 @@
 			
 					} );
 			
-				} )().compute( params.particleCount, [ workgroupSize, 1, 1 ] ).setName( 'p2g1Kernel' );
+				} )().compute( params.particleCount, [ workgroupSize, 1, 1 ] ).setName( 'Transfer Particles to Grid (Mass and Momentum)' );
 
 				p2g2Kernel = Fn( () => {
 
@@ -312,7 +312,7 @@
 			
 					} );
 			
-				} )().compute( params.particleCount, [ workgroupSize, 1, 1 ] ).setName( 'p2g2Kernel' );
+				} )().compute( params.particleCount, [ workgroupSize, 1, 1 ] ).setName( 'Transfer Particles to Grid (Stress)' );
 
 				updateGridKernel = Fn( () => {
 
@@ -353,7 +353,7 @@
 
 					cellBufferFloat.element( instanceIndex ).assign( vec4( vx, vy, vz, mass ) );
 			
-				} )().compute( cellCount ).setName( 'updateGridKernel' );
+				} )().compute( cellCount ).setName( 'Update Grid' );
 
 
 				const clampToRoundedBox = ( pos, box, radius ) => {
@@ -454,7 +454,7 @@
 					particleBuffer.element( instanceIndex ).get( 'position' ).assign( particlePosition );
 					particleBuffer.element( instanceIndex ).get( 'velocity' ).assign( particleVelocity );
 			
-				} )().compute( params.particleCount, [ workgroupSize, 1, 1 ] ).setName( 'g2pKernel' );
+				} )().compute( params.particleCount, [ workgroupSize, 1, 1 ] ).setName( 'Transfer Grid to Particles' );
 
 			}
 

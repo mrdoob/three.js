@@ -46,6 +46,7 @@ class ProgressiveLightMap {
 
 		this._lightMapContainers = [];
 		this._scene = new Scene();
+		this._scene.name = 'Progressive Light Map';
 		this._buffer1Active = false;
 		this._labelMesh = null;
 		this._blurringPlane = null;

@@ -283,7 +283,7 @@ class SSAONode extends Node {
 		// ambient occlusion
 
 		_quadMesh.material = this._aoMaterial;
-		_quadMesh.name = 'SSAO.AO';
+		_quadMesh.name = 'SSAO [ Occlusion ]';
 		renderer.setRenderTarget( this._aoRenderTarget );
 		_quadMesh.render( renderer );
 
@@ -292,7 +292,7 @@ class SSAONode extends Node {
 		if ( this.blurEnabled === true ) {
 
 			_quadMesh.material = this._blurMaterial;
-			_quadMesh.name = 'SSAO.Blur';
+			_quadMesh.name = 'SSAO [ Blur Horizontal ]';
 
 			this._blurInput.value = this._aoRenderTarget.texture;
 			this._blurDirection.value.set( 1 / this.resolution.x, 0 );
@@ -302,6 +302,7 @@ class SSAONode extends Node {
 			this._blurInput.value = this._blurRenderTarget.texture;
 			this._blurDirection.value.set( 0, 1 / this.resolution.y );
 			renderer.setRenderTarget( this._aoRenderTarget );
+			_quadMesh.name = 'SSAO [ Blur Vertical ]';
 			_quadMesh.render( renderer );
 
 		}

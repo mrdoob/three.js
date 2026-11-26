@@ -320,7 +320,10 @@ class TileShadowNode extends ShadowBaseNode {
 
 		}
 
+		const sceneName = scene.name;
+		scene.name = 'Tiled Shadow Map';
 		renderer.render( scene, this.cameraArray );
+		scene.name = sceneName;
 		renderer.setRenderObjectFunction( currentRenderObjectFunction );
 
 		if ( light.isPointLight !== true && shadowType === VSMShadowMap ) {

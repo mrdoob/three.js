@@ -183,13 +183,19 @@
 				//
 
 				normalRenderPipeline = new THREE.RenderPipeline( normalRenderer );
-				normalRenderPipeline.outputNode = pass( scene, camera );
+				const normalPass = pass( scene, camera );
+				normalPass.name = 'Standard Depth';
+				normalRenderPipeline.outputNode = normalPass;
 
 				logarithmicRenderPipeline = new THREE.RenderPipeline( logarithmicRenderer );
-				logarithmicRenderPipeline.outputNode = pass( scene, camera );
+				const logarithmicPass = pass( scene, camera );
+				logarithmicPass.name = 'Logarithmic Depth';
+				logarithmicRenderPipeline.outputNode = logarithmicPass;
 
 				reverseRenderPipeline = new THREE.RenderPipeline( reverseRenderer );
-				reverseRenderPipeline.outputNode = pass( scene, reversedCamera );
+				const reversePass = pass( scene, reversedCamera );
+				reversePass.name = 'Reversed Depth';
+				reverseRenderPipeline.outputNode = reversePass;
 
 				await Promise.all( [ normalRenderer.init(), logarithmicRenderer.init(), reverseRenderer.init() ] );
 

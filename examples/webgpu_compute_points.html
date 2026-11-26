@@ -110,7 +110,7 @@
 
 					} );
 
-					renderer.compute( precomputeShaderNode().compute( particlesCount ) );
+					renderer.compute( precomputeShaderNode().compute( particlesCount ).setName( 'Initialize Point Positions' ) );
 
 				} );
 

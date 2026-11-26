@@ -700,9 +700,12 @@ function createOcclusion( width, height ) {
 
 	}
 
+	const scene = new Scene();
+	scene.name = 'Meshlet Occlusion Depth';
+
 	return {
 		target,
-		scene: new Scene(),
+		scene,
 		hzb: storage( hzbAttribute, 'float' ).toReadOnly(),
 		hzbLevels: uniformArray( levelData, 'vec4' ),
 		hzbLevelCount: uniform( levels.length, 'uint' ),

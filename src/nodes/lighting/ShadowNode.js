@@ -724,10 +724,12 @@ class ShadowNode extends ShadowBaseNode {
 		this.vsmShadowMapHorizontal.setSize( shadow.mapSize.width, shadow.mapSize.height, depth );
 
 		renderer.setRenderTarget( this.vsmShadowMapVertical );
+		_quadMesh.name = 'VSM [ Blur Vertical ]';
 		_quadMesh.material = this.vsmMaterialVertical;
 		_quadMesh.render( renderer );
 
 		renderer.setRenderTarget( this.vsmShadowMapHorizontal );
+		_quadMesh.name = 'VSM [ Blur Horizontal ]';
 		_quadMesh.material = this.vsmMaterialHorizontal;
 		_quadMesh.render( renderer );
 

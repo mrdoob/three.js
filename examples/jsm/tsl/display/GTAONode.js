@@ -382,7 +382,7 @@ class GTAONode extends Node {
 		this.setSize( size.width, size.height );
 
 		_quadMesh.material = this._material;
-		_quadMesh.name = 'AO';
+		_quadMesh.name = 'GTAO';
 
 		// clear
 
