@@ -244,6 +244,7 @@ class NodeMaterialObserver {
 				geometryVersion: this.getGeometryData( geometry )._version,
 				materialVersion: this.getMaterialData( renderObject.material )._version,
 				attributesDisposeVersion: renderObject._geometries.attributes.disposeVersion,
+				texturesDisposeVersion: renderObject.renderer._textures.disposeVersion,
 				worldMatrix: object.matrixWorld.clone()
 			};
 
@@ -1113,6 +1114,32 @@ class NodeMaterialObserver {
 		if ( renderObjectData.attributesDisposeVersion !== attributes.disposeVersion ) {
 
 			if ( this.hasDisposedAttributes( renderObject, renderObjectData ) ) refreshType = RenderObjectRefreshType.FULL;
+
+		}
+
+		// rebuild bind groups that sample destroyed textures. checked before the static early out since a shared texture can be destroyed by others
+
+		const textures = renderObject.renderer._textures;
+
+		if ( renderObjectData.texturesDisposeVersion !== textures.disposeVersion ) {
+
+			renderObjectData.texturesDisposeVersion = textures.disposeVersion;
+
+			for ( const bindGroup of renderObject.getBindings() ) {
+
+				for ( const binding of bindGroup.bindings ) {
+
+					// a disposal releases the texture, a re-creation changes its generation
+
+					if ( binding.isSampledTexture === true && ( binding.texture === null || textures.has( binding.texture ) === false || textures.get( binding.texture ).generation !== binding.generation ) ) {
+
+						refreshType = RenderObjectRefreshType.FULL;
+
+					}
+
+				}
+
+			}
 
 		}
 
