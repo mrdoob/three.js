@@ -35,6 +35,7 @@ const _defaultUV = screenUV.flipX();
 _defaultRT.depthTexture = new DepthTexture( 1, 1 );
 
 let _inReflector = false;
+let _reflectionDepth = 0;
 
 /**
  * This node can be used to implement mirror-like flat reflective surfaces.
@@ -588,10 +589,6 @@ class ReflectorBaseNode extends Node {
 
 		renderer.setRenderTarget( renderTarget );
 
-		const previousName = scene.name;
-
-		scene.name = 'Reflector'; // TODO: Add bounce index
-
 		if ( needsClear ) {
 
 			renderer.clear();
@@ -600,13 +597,24 @@ class ReflectorBaseNode extends Node {
 
 		} else {
 
-			renderer.render( scene, virtualCamera );
+			const previousName = scene.name;
+			scene.name = target.name || frame.object?.name || ( _reflectionDepth === 0 ? 'Reflector' : `Reflector Bounce ${ _reflectionDepth }` );
+			_reflectionDepth ++;
+
+			try {
+
+				renderer.render( scene, virtualCamera );
+
+			} finally {
+
+				_reflectionDepth --;
+				scene.name = previousName;
+
+			}
 
 			this.hasOutput = true;
 
 		}
-
-		scene.name = previousName;
 
 		restoreRendererState( renderer, this._rendererState );
 
