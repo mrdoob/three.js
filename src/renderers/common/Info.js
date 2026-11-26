@@ -18,8 +18,17 @@ class Info {
 
 	/**
 	 * Constructs a new info component.
+	 *
+	 * @param {Renderer} renderer - The renderer.
 	 */
-	constructor() {
+	constructor( renderer ) {
+
+		/**
+		 * The renderer.
+		 *
+		 * @type {Renderer}
+		 */
+		this.renderer = renderer;
 
 		/**
 		 * Whether frame related metrics should automatically be reset at the
@@ -232,6 +241,8 @@ class Info {
 		this.memory.total += size;
 		this.memory.texturesSize += size;
 
+		this.renderer.inspector.createResource( texture, 'textures', size );
+
 	}
 
 	/**
@@ -249,6 +260,8 @@ class Info {
 		this.memory.total += delta;
 		this.memory.texturesSize += delta;
 
+		this.renderer.inspector.updateResource( texture, size );
+
 	}
 
 	/**
@@ -264,6 +277,8 @@ class Info {
 		this.memory.textures --;
 		this.memory.total -= size;
 		this.memory.texturesSize -= size;
+
+		this.renderer.inspector.destroyResource( texture );
 
 	}
 
@@ -282,6 +297,8 @@ class Info {
 		this.memory[ type ] ++;
 		this.memory.total += size;
 		this.memory[ type + 'Size' ] += size;
+
+		this.renderer.inspector.createResource( attribute, type, size );
 
 	}
 
@@ -346,6 +363,8 @@ class Info {
 			this.memory.total -= data.size;
 			this.memory[ data.type + 'Size' ] -= data.size;
 
+			this.renderer.inspector.destroyResource( attribute );
+
 		}
 
 	}
@@ -364,6 +383,8 @@ class Info {
 		this.memory.total += maxByteLength;
 		this.memory.readbackBuffersSize += maxByteLength;
 
+		this.renderer.inspector.createResource( readbackBuffer, 'readbackBuffers', maxByteLength );
+
 	}
 
 	/**
@@ -380,6 +401,8 @@ class Info {
 		this.memory.total -= size;
 		this.memory.readbackBuffersSize -= size;
 
+		this.renderer.inspector.destroyResource( readbackBuffer );
+
 	}
 
 	/**
@@ -395,6 +418,8 @@ class Info {
 		this.memory.uniformBuffers ++;
 		this.memory.total += size;
 		this.memory.uniformBuffersSize += size;
+
+		this.renderer.inspector.createResource( uniformBuffer, 'uniformBuffers', size );
 
 	}
 
@@ -415,6 +440,8 @@ class Info {
 			this.memory.total -= data.size;
 			this.memory.uniformBuffersSize -= data.size;
 
+			this.renderer.inspector.destroyResource( uniformBuffer );
+
 		}
 
 	}
@@ -434,6 +461,8 @@ class Info {
 		this.memory.total += size;
 		this.memory.programsSize += size;
 
+		this.renderer.inspector.createResource( program, 'programs', size );
+
 	}
 
 	/**
@@ -449,6 +478,8 @@ class Info {
 		this.memory.programs --;
 		this.memory.total -= size;
 		this.memory.programsSize -= size;
+
+		this.renderer.inspector.destroyResource( program );
 
 	}
 

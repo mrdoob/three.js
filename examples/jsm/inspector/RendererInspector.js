@@ -258,6 +258,9 @@ export class RendererInspector extends InspectorBase {
 		this.framesLib = {};
 		this.maxFrames = 512;
 
+		this.resources = new Set(); // tracked GPU resources as { type, name, size, creator }
+		this._resourceData = new WeakMap();
+
 		this._lastFinishTime = 0;
 		this._lastRenderedFinishTime = 0;
 
@@ -553,6 +556,40 @@ export class RendererInspector extends InspectorBase {
 
 	}
 
+	// the creator is the path of the render and compute calls the resource was created in, null outside of them
+
+	createResource( resource, type, size ) {
+
+		const creator = [];
+
+		for ( let stats = this.currentContext; stats !== null && stats !== this.currentFrame; stats = stats.parent ) {
+
+			creator.unshift( ...stats.name.split( ':' ).map( ( name ) => name.trim() ) );
+
+		}
+
+		const data = { type, name: resource.name || '', size, creator: creator.length > 0 ? creator : null };
+
+		this.resources.add( data );
+		this._resourceData.set( resource, data );
+
+	}
+
+	updateResource( resource, size ) {
+
+		const data = this._resourceData.get( resource );
+
+		if ( data !== undefined ) data.size = size;
+
+	}
+
+	destroyResource( resource ) {
+
+		this.resources.delete( this._resourceData.get( resource ) );
+		this._resourceData.delete( resource );
+
+	}
+
 	beginCompute( uid, computeNode ) {
 
 		const frame = this.getFrame();
@@ -646,6 +683,7 @@ export class RendererInspector extends InspectorBase {
 
 		this.frames = [];
 		this.framesLib = {};
+		this.resources.clear();
 
 	}
 

@@ -317,7 +317,7 @@ class Renderer {
 		 *
 		 * @type {Info}
 		 */
-		this.info = new Info();
+		this.info = new Info( this );
 
 		/**
 		 * A global context node that stores override nodes for specific transformations or calculations.
