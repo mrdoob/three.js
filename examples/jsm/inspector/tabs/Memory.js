@@ -156,6 +156,11 @@ class Memory extends Tab {
 
 			}
 
+			const sort = inspector.settings.creatorsSort;
+
+			if ( sort === 'name' ) rows.sort( ( a, b ) => a[ 0 ].localeCompare( b[ 0 ], undefined, { numeric: true } ) );
+			if ( sort === 'size' ) rows.sort( ( a, b ) => b[ 1 ].size - a[ 1 ].size );
+
 			return rows;
 
 		};
@@ -167,8 +172,11 @@ class Memory extends Tab {
 			setText( item.data[ 1 ], node.count.toString() );
 			setText( item.data[ 2 ], formatBytes( node.size ) );
 
-			for ( const [ name, child ] of getRows( node ) ) {
+			const rows = getRows( node );
 
+			for ( let i = 0; i < rows.length; i ++ ) {
+
+				const [ name, child ] = rows[ i ];
 				const childPath = path + '/' + name;
 
 				let childItem = this.creatorItems.get( childPath );
@@ -179,8 +187,12 @@ class Memory extends Tab {
 					childItem.data[ 0 ].title = name;
 					setText( childItem.data[ 0 ], name );
 
-					item.add( childItem );
+					item.add( childItem, i );
 					this.creatorItems.set( childPath, childItem );
+
+				} else if ( item.children[ i ] !== childItem ) {
+
+					item.add( childItem, i );
 
 				}
 
