@@ -53,8 +53,7 @@ function _loadState() {
 		forceWebGL: settings.forceWebGL !== undefined ? settings.forceWebGL : false,
 		captureStackTrace: settings.captureStackTrace !== undefined ? settings.captureStackTrace : false,
 		activeExtensions: settings.activeExtensions !== undefined ? settings.activeExtensions : {},
-		storage: settings.storage !== undefined ? settings.storage : 'url',
-		creatorsSort: settings.creatorsSort !== undefined ? settings.creatorsSort : 'creation'
+		storage: settings.storage !== undefined ? settings.storage : 'url'
 	};
 
 	if ( _state.forceWebGL ) {
@@ -79,8 +78,7 @@ function _saveState() {
 		forceWebGL: _state.forceWebGL,
 		captureStackTrace: _state.captureStackTrace,
 		activeExtensions: _state.activeExtensions,
-		storage: _state.storage,
-		creatorsSort: _state.creatorsSort
+		storage: _state.storage
 	} );
 
 }
@@ -130,19 +128,6 @@ class Settings extends Parameters {
 			this.inspector.overdraw = enable;
 
 		} ).info( 'Shows how many times each pixel is shaded.' );
-
-		// Memory
-
-		const memoryGroup = this.createGroup( 'Memory' );
-
-		this.creatorsSort = currentState.creatorsSort;
-
-		memoryGroup.add( currentState, 'creatorsSort', { 'Creation Order': 'creation', 'Name': 'name', 'Size': 'size' } ).name( 'Sort Creators' ).onChange( ( value ) => {
-
-			this.creatorsSort = value;
-			_saveState();
-
-		} ).info( 'Sorts the rows of each group in the Creators section of the Memory tab.' );
 
 	}
 

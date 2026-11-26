@@ -2,18 +2,7 @@ import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
 import { Graph } from '../ui/Graph.js';
 import { Item } from '../ui/Item.js';
-import { createValueSpan, setText, formatBytes } from '../ui/utils.js';
-
-const _typeNames = {
-	attributes: 'Attribute',
-	indexAttributes: 'Index Attribute',
-	indirectStorageAttributes: 'Indirect Storage Attribute',
-	programs: 'Program',
-	readbackBuffers: 'Readback Buffer',
-	storageAttributes: 'Storage Attribute',
-	textures: 'Texture',
-	uniformBuffers: 'Uniform Buffer'
-};
+import { createValueSpan, setText, formatBytes, splitCamelCase } from '../ui/utils.js';
 
 class Memory extends Tab {
 
@@ -107,7 +96,7 @@ class Memory extends Tab {
 		for ( const { type, name, size, creator } of inspector.resources ) {
 
 			const path = creator || [ 'Miscellaneous' ];
-			const keys = [ ...path, _typeNames[ type ], ...name.split( ':' ).map( ( key ) => key.trim() ).filter( ( key ) => key !== '' ) ];
+			const keys = [ ...path, splitCamelCase( type[ 0 ].toUpperCase() + type.slice( 1, - 1 ) ), ...name.split( ':' ).map( ( key ) => key.trim() ).filter( ( key ) => key !== '' ) ];
 
 			let node = root;
 
@@ -156,11 +145,6 @@ class Memory extends Tab {
 
 			}
 
-			const sort = inspector.settings.creatorsSort;
-
-			if ( sort === 'name' ) rows.sort( ( a, b ) => a[ 0 ].localeCompare( b[ 0 ], undefined, { numeric: true } ) );
-			if ( sort === 'size' ) rows.sort( ( a, b ) => b[ 1 ].size - a[ 1 ].size );
-
 			return rows;
 
 		};
@@ -172,11 +156,8 @@ class Memory extends Tab {
 			setText( item.data[ 1 ], node.count.toString() );
 			setText( item.data[ 2 ], formatBytes( node.size ) );
 
-			const rows = getRows( node );
+			for ( const [ name, child ] of getRows( node ) ) {
 
-			for ( let i = 0; i < rows.length; i ++ ) {
-
-				const [ name, child ] = rows[ i ];
 				const childPath = path + '/' + name;
 
 				let childItem = this.creatorItems.get( childPath );
@@ -187,12 +168,8 @@ class Memory extends Tab {
 					childItem.data[ 0 ].title = name;
 					setText( childItem.data[ 0 ], name );
 
-					item.add( childItem, i );
+					item.add( childItem );
 					this.creatorItems.set( childPath, childItem );
-
-				} else if ( item.children[ i ] !== childItem ) {
-
-					item.add( childItem, i );
 
 				}
 
