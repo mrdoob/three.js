@@ -20,9 +20,7 @@
 			</div>
 
 			<small>
-				An object moves through a scene at rest and the camera follows it. It stays still on the screen,<br/>
-				so it should keep its history. Turn off object motion to see the camera jitter on the object.<br/>
-				Drag to orbit around the object.
+				Stress test object and camera motion together by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>
 			</small>
 		</div>
 
@@ -48,7 +46,7 @@
 
 			const LENGTH = 2000; // of the road, in meters
 
-			const params = { objectMotion: true };
+			const params = { usePreviousViewZ: true };
 
 			let camera, scene, renderer, renderPipeline, timer, controls, follower;
 
@@ -148,7 +146,7 @@
 
 					const previousTRAA = renderPipeline.outputNode;
 					const traaNode = traa( scenePassColor, scenePassDepth, scenePassVelocity, camera );
-					traaNode.usePreviousViewZ = params.objectMotion;
+					traaNode.usePreviousViewZ = params.usePreviousViewZ;
 
 					renderPipeline.outputNode = traaNode;
 					renderPipeline.needsUpdate = true;
@@ -160,7 +158,7 @@
 				updateTRAA();
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
-				gui.add( params, 'objectMotion' ).name( 'object motion' ).onChange( updateTRAA );
+				gui.add( params, 'usePreviousViewZ' ).name( 'Motion-aware depth check' ).onChange( updateTRAA );
 
 				window.addEventListener( 'resize', onWindowResize );
 
