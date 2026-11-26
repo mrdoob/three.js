@@ -158,7 +158,7 @@
 				updateTRAA();
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
-				gui.add( params, 'usePreviousViewZ' ).name( 'Motion-aware depth check' ).onChange( updateTRAA );
+				gui.add( params, 'usePreviousViewZ' ).name( 'Motion-aware' ).onChange( updateTRAA );
 
 				window.addEventListener( 'resize', onWindowResize );
 
