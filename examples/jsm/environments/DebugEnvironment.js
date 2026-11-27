@@ -76,6 +76,8 @@ class DebugEnvironment extends Scene {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		const resources = new Set();
 
 		this.traverse( ( object ) => {

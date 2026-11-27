@@ -205,6 +205,8 @@ class Sky extends Mesh {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.geometry.dispose();
 		this.material.dispose();
 

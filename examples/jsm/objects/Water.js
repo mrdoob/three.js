@@ -354,6 +354,19 @@ class Water extends Mesh {
 
 		};
 
+		/**
+		 * Frees the GPU-related resources allocated by this instance. Call this
+		 * method whenever this instance is no longer used in your app.
+		 */
+		this.dispose = () => {
+
+			super.dispose();
+
+			renderTarget.dispose();
+			scope.material.dispose();
+
+		};
+
 	}
 
 }

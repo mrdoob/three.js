@@ -4370,7 +4370,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		const { positionNode, rotationNode, scaleNode, sizeAttenuation } = this;
 
-		const mvPosition = modelViewMatrix.mul( vec3( positionNode || 0 ) );
+		const mvPosition = modelViewMatrix.mul( positionNode !== null ? positionLocal : vec3( 0 ) );
 
 		let scale = vec2( modelWorldMatrix[ 0 ].xyz.length(), modelWorldMatrix[ 1 ].xyz.length() );
 
@@ -4504,9 +4504,7 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 
 	setupPositionView() {
 
-		const { positionNode } = this;
-
-		return modelViewMatrix.mul( vec3( positionNode || positionLocal ) ).xyz;
+		return modelViewMatrix.mul( positionLocal ).xyz;
 
 	}
 
@@ -18722,7 +18720,7 @@ class NodeManager extends DataMap {
 
 		const renderer = this.renderer;
 
-		return renderer.toneMapping + ',' + renderer.currentColorSpace + ',' + renderer.xr.isPresenting;
+		return renderer.toneMapping + ',' + renderer.currentColorSpace + ',' + renderer.dithering + ',' + renderer.xr.isPresenting;
 
 	}
 
@@ -18743,17 +18741,17 @@ class NodeManager extends DataMap {
 
 			if ( this.backend.isWebGLBackend ) {
 
-				output = texture( outputTarget, screenUV ).depth( builtin( 'gl_ViewID_OVR' ) ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
+				output = texture( outputTarget, screenUV ).depth( builtin( 'gl_ViewID_OVR' ) ).renderOutput( renderer.toneMapping, renderer.currentColorSpace, renderer.dithering );
 
 			} else {
 
-				output = texture( outputTarget, screenUV ).depth( _outputLayerIndex ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
+				output = texture( outputTarget, screenUV ).depth( _outputLayerIndex ).renderOutput( renderer.toneMapping, renderer.currentColorSpace, renderer.dithering );
 
 			}
 
 		} else {
 
-			output = texture( outputTarget, screenUV ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
+			output = texture( outputTarget, screenUV ).renderOutput( renderer.toneMapping, renderer.currentColorSpace, renderer.dithering );
 
 		}
 
@@ -20834,7 +20832,7 @@ class XRManager extends EventDispatcher {
 
 						getOutput: ( outputNode, builder ) => {
 
-							const renderOutputNode = renderOutput( outputNode, renderer.toneMapping, renderer.outputColorSpace );
+							const renderOutputNode = renderOutput( outputNode, renderer.toneMapping, renderer.outputColorSpace, renderer.dithering );
 							renderOutputNode.premultipliedAlpha = builder.material.premultipliedAlpha;
 
 							return renderOutputNode;
@@ -22534,6 +22532,14 @@ class Renderer {
 		 * @default 1
 		 */
 		this.toneMappingExposure = 1.0;
+
+		/**
+		 * Whether to apply dithering to the output to remove the appearance of banding.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.dithering = false;
 
 		/**
 		 * Whether the renderer should sort its render lists or not.
@@ -25197,7 +25203,7 @@ class Renderer {
 	}
 
 	/**
-	 * Returns `true` if a framebuffer target is needed to perform tone mapping or color space conversion.
+	 * Returns `true` if a framebuffer target is needed to perform tone mapping, color space conversion or dithering.
 	 * If this is the case, the renderer allocates an internal render target for that purpose.
 	 *
 	 * @type {boolean}
@@ -25206,8 +25212,9 @@ class Renderer {
 
 		const useToneMapping = this.currentToneMapping !== NoToneMapping;
 		const useColorSpace = this.currentColorSpace !== ColorManagement.workingColorSpace;
+		const useDithering = this.currentDithering === true;
 
-		return useToneMapping || useColorSpace;
+		return useToneMapping || useColorSpace || useDithering;
 
 	}
 
@@ -25271,6 +25278,18 @@ class Renderer {
 	get currentColorSpace() {
 
 		return this.isOutputTarget ? this.outputColorSpace : ColorManagement.workingColorSpace;
+
+	}
+
+	/**
+	 * The current dithering setting of the renderer. When not producing screen output,
+	 * dithering is always disabled.
+	 *
+	 * @type {boolean}
+	 */
+	get currentDithering() {
+
+		return this.isOutputTarget ? this.dithering : false;
 
 	}
 
@@ -52427,6 +52446,14 @@ class RenderPipeline {
 		 */
 		this._outputColorSpace = renderer.outputColorSpace;
 
+		/**
+		 * The current dithering setting.
+		 *
+		 * @private
+		 * @type {boolean}
+		 */
+		this._dithering = renderer.dithering;
+
 
 	}
 
@@ -52445,9 +52472,11 @@ class RenderPipeline {
 
 		const toneMapping = renderer.toneMapping;
 		const outputColorSpace = renderer.outputColorSpace;
+		const dithering = renderer.dithering;
 
 		renderer.toneMapping = NoToneMapping;
 		renderer.outputColorSpace = ColorManagement.workingColorSpace;
+		renderer.dithering = false;
 
 		//
 
@@ -52462,6 +52491,7 @@ class RenderPipeline {
 
 		renderer.toneMapping = toneMapping;
 		renderer.outputColorSpace = outputColorSpace;
+		renderer.dithering = dithering;
 
 		for ( const callback of this._contextData.onAfterPipelineCallbacks ) callback();
 
@@ -52485,6 +52515,7 @@ class RenderPipeline {
 
 		const toneMapping = this._toneMapping;
 		const outputColorSpace = this._outputColorSpace;
+		const dithering = this._dithering;
 
 		const contextData = {
 			renderPipeline: this,
@@ -52499,12 +52530,13 @@ class RenderPipeline {
 
 		if ( this.outputColorTransform === true ) {
 
-			outputNode = renderOutput( outputNode, toneMapping, outputColorSpace );
+			outputNode = renderOutput( outputNode, toneMapping, outputColorSpace, dithering );
 
 		} else {
 
 			contextData.toneMapping = toneMapping;
 			contextData.outputColorSpace = outputColorSpace;
+			contextData.dithering = dithering;
 
 		}
 
@@ -52533,6 +52565,13 @@ class RenderPipeline {
 		if ( this._outputColorSpace !== this.renderer.outputColorSpace ) {
 
 			this._outputColorSpace = this.renderer.outputColorSpace;
+			this.needsUpdate = true;
+
+		}
+
+		if ( this._dithering !== this.renderer.dithering ) {
+
+			this._dithering = this.renderer.dithering;
 			this.needsUpdate = true;
 
 		}
@@ -52660,6 +52699,7 @@ class DirectRenderPipeline extends RenderPipeline {
 		let depthBuffer;
 		let toneMapping;
 		let outputColorSpace;
+		let dithering;
 
 		if ( backgroundNode !== null ) scene.backgroundNode = backgroundNode;
 
@@ -52681,9 +52721,11 @@ class DirectRenderPipeline extends RenderPipeline {
 
 			toneMapping = renderer.toneMapping;
 			outputColorSpace = renderer.outputColorSpace;
+			dithering = renderer.dithering;
 
 			renderer.toneMapping = NoToneMapping;
 			renderer.outputColorSpace = ColorManagement.workingColorSpace;
+			renderer.dithering = false;
 
 			if ( renderer.xr.enabled ) {
 
@@ -52697,6 +52739,7 @@ class DirectRenderPipeline extends RenderPipeline {
 
 			if ( toneMapping !== undefined ) renderer.toneMapping = toneMapping;
 			if ( outputColorSpace !== undefined ) renderer.outputColorSpace = outputColorSpace;
+			if ( dithering !== undefined ) renderer.dithering = dithering;
 
 			if ( backgroundNode !== null && scene.backgroundNode === backgroundNode ) scene.backgroundNode = currentBackgroundNode;
 
@@ -52774,6 +52817,7 @@ class DirectRenderPipeline extends RenderPipeline {
 		const pipelineOutputNode = this.outputNode;
 		const toneMapping = this._toneMapping;
 		const outputColorSpace = this._outputColorSpace;
+		const dithering = this._dithering;
 		const outputColorTransform = this.outputColorTransform;
 
 		this._contextNode = this._rendererContextNode.context( {
@@ -52791,7 +52835,7 @@ class DirectRenderPipeline extends RenderPipeline {
 
 				if ( outputColorTransform === false ) return pipelineOutputNode;
 
-				const renderOutputNode = renderOutput( pipelineOutputNode, toneMapping, outputColorSpace );
+				const renderOutputNode = renderOutput( pipelineOutputNode, toneMapping, outputColorSpace, dithering );
 				renderOutputNode.premultipliedAlpha = builder.material.premultipliedAlpha;
 
 				return renderOutputNode;

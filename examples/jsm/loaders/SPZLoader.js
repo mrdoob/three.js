@@ -15,6 +15,7 @@ const FLAG_LOD = 0x80;
 const FLAG_HAS_EXTENSIONS = 0x02;
 const MAX_SUPPORTED_SH_DEGREE = 3;
 const SH_DEGREE_TO_VECTORS = [ 0, 3, 8, 15, 24 ];
+const ZSTD_INPUT_CHUNK_BYTES = 8 * 1024 * 1024;
 
 let _zstd;
 
@@ -325,7 +326,7 @@ class SPZLoader extends Loader {
 
 			const stream = toc[ streamIndex ++ ];
 			const compressed = bytes.subarray( stream.compressedOffset, stream.compressedOffset + stream.compressedSize );
-			streams.push( zstd.decode( compressed, streamSize ) );
+			streams.push( decodeZSTDStream( zstd, compressed, streamSize ) );
 
 		}
 
@@ -362,6 +363,71 @@ function getZSTDDecoder() {
 	}
 
 	return _zstd;
+
+}
+
+// Decodes through the streaming API so the decoder's wasm heap holds one input
+// chunk at a time instead of the whole compressed and decoded stream.
+// The decoder only frees its buffers when a stream is decoded to the end, so a
+// stream rejected below leaves up to one input chunk allocated in that heap.
+function decodeZSTDStream( zstd, compressed, size ) {
+
+	const output = new Uint8Array( size );
+	let offset = 0;
+	let emptyParts = 0;
+	let maxEmptyParts = 0;
+
+	function* chunks() {
+
+		for ( let start = 0; start < compressed.byteLength; start += ZSTD_INPUT_CHUNK_BYTES ) {
+
+			const chunk = compressed.subarray( start, start + ZSTD_INPUT_CHUNK_BYTES );
+			emptyParts = 0;
+			maxEmptyParts = chunk.byteLength / 8 + 2;
+			yield chunk;
+
+		}
+
+	}
+
+	for ( const part of zstd.decodeStreaming( chunks() ) ) {
+
+		if ( part.byteLength === 0 ) {
+
+			// The decoder doesn't report errors, it yields empty parts forever.
+			// A valid empty part ends a frame (at least 8 bytes), a frame that
+			// began in the previous chunk, or the chunk itself, so a longer run
+			// of them means decoding makes no progress.
+			if ( ++ emptyParts > maxEmptyParts ) {
+
+				throw new Error( 'THREE.SPZLoader: ZSTD stream decoding stalled, the data is corrupt or uses an unsupported window size.' );
+
+			}
+
+			continue;
+
+		}
+
+		emptyParts = 0;
+
+		if ( offset + part.byteLength > size ) {
+
+			throw new Error( `THREE.SPZLoader: ZSTD stream decoded to more than ${ size } bytes.` );
+
+		}
+
+		output.set( part, offset );
+		offset += part.byteLength;
+
+	}
+
+	if ( offset !== size ) {
+
+		throw new Error( `THREE.SPZLoader: ZSTD stream decoded to ${ offset } bytes, expected ${ size }.` );
+
+	}
+
+	return output;
 
 }
 

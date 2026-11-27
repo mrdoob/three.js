@@ -281,6 +281,8 @@ class AnimationPathHelper extends Object3D {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		if ( this.line ) {
 
 			this.line.geometry.dispose();
