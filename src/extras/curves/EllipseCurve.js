@@ -134,13 +134,17 @@ class EllipseCurve extends Curve {
 
 		const twoPi = Math.PI * 2;
 		let deltaAngle = this.aEndAngle - this.aStartAngle;
-		const samePoints = Math.abs( deltaAngle ) < Number.EPSILON;
+
+		// angles a whole number of turns apart, like a and a + 2 PI, are only equal up to rounding,
+		// which can leave a few ulps either side of 0 or 2 PI below
+		const epsilon = 8 * Number.EPSILON * Math.max( twoPi, Math.abs( this.aStartAngle ), Math.abs( this.aEndAngle ) );
+		const samePoints = Math.abs( deltaAngle ) < epsilon;
 
 		// ensures that deltaAngle is 0 .. 2 PI
 		while ( deltaAngle < 0 ) deltaAngle += twoPi;
 		while ( deltaAngle > twoPi ) deltaAngle -= twoPi;
 
-		if ( deltaAngle < Number.EPSILON ) {
+		if ( deltaAngle < epsilon || twoPi - deltaAngle < epsilon ) {
 
 			if ( samePoints ) {
 

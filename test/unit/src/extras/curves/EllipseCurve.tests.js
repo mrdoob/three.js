@@ -139,6 +139,37 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
+			QUnit.test( 'getPoint (full turn from any start angle)', ( assert ) => {
+
+				// a and a + 2 PI differ by a few ulps more or less than 2 PI for these angles
+				const cases = [
+					[ 2.3, 2.3 + 2 * Math.PI, false ],
+					[ 2.2, 2.2 + 2 * Math.PI, true ],
+					[ - 2.2, - 2.2 - 2 * Math.PI, false ],
+					[ - 2.3, - 2.3 - 2 * Math.PI, true ]
+				];
+
+				const p = new Vector2();
+
+				cases.forEach( function ( [ start, end, clockwise ] ) {
+
+					const ellipse = new EllipseCurve( 0, 0, 10, 10, start, end, clockwise, 0 );
+					const direction = clockwise ? - 1 : 1;
+					const label = start + ' to ' + end + ( clockwise ? ' clockwise' : '' );
+
+					[ 0, 0.25, 0.5, 1 ].forEach( function ( t ) {
+
+						ellipse.getPoint( t, p );
+
+						assert.numEqual( p.x, Math.cos( start + direction * t * Math.PI * 2 ) * 10, label + ', getPoint(' + t + ').x correct' );
+						assert.numEqual( p.y, Math.sin( start + direction * t * Math.PI * 2 ) * 10, label + ', getPoint(' + t + ').y correct' );
+
+					} );
+
+				} );
+
+			} );
+
 			QUnit.test( 'getTangent', ( assert ) => {
 
 				const expectedTangents = [
