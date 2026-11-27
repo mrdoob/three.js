@@ -152,25 +152,17 @@ class VaryingNode extends Node {
 
 	setup( builder ) {
 
-		// the context can evaluate varyings directly in the fragment stage, e.g. if the surface is reconstructed per fragment.
-		// indices and attributes create their own varyings in the fragment stage, so their varyings are kept unless the
-		// context provides the attribute
+		// the context can evaluate varyings directly in the fragment or compute stage, e.g. if the surface is reconstructed
+		// per fragment or at a ray hit. indices and attributes create their own varyings in the fragment stage, so their
+		// varyings are kept unless the context provides the attribute
 
-		if ( builder.context.inlineVaryings === true && builder.shaderStage === 'fragment' ) {
+		if ( builder.context.inlineVaryings === true && ( builder.shaderStage === 'fragment' || builder.shaderStage === 'compute' ) ) {
 
 			let node = this.node;
 
 			while ( node.isSubBuildNode === true ) node = node.node;
 
 			if ( node.isIndexNode !== true && ( node.isAttributeNode !== true || node.getContextAttribute( builder ) ) ) return this.node;
-
-		}
-
-		// a compute shader has no vertex stage to pass a varying from, so the context evaluates it in place
-
-		if ( builder.context.inlineVaryings === true && builder.shaderStage === 'compute' ) {
-
-			return this.node;
 
 		}
 
