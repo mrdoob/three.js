@@ -36,10 +36,10 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec3, vec4, packNormalToRGB, unpackRGBToNormal, sample } from 'three/tsl';
+			import { pass, mrt, output, normalView, diffuseColor, velocity, viewZDelta, add, vec3, vec4, packNormalToRGB, unpackRGBToNormal, sample } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
-			import { reprojectedBeauty, previousViewZ } from 'three/addons/tsl/display/ReprojectedBeautyNode.js';
+			import { reprojectedBeauty } from 'three/addons/tsl/display/ReprojectedBeautyNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -83,7 +83,7 @@
 					output: output,
 					diffuseColor: diffuseColor,
 					normal: packNormalToRGB( normalView ),
-					velocity: vec4( velocity, 0, previousViewZ )
+					velocity: vec4( velocity, 0, viewZDelta )
 				} ) );
 
 				const scenePassColor = scenePass.getTextureNode( 'output' );
