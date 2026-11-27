@@ -24,6 +24,7 @@ const MAX_STEPS = 64;
  * @property {Texture} [environmentNode=null] - Equirectangular HDR environment map with CPU-side `image.data` (e.g. from RGBELoader). Not compatible with PMREM / `scene.environment` cubemaps.
  * @property {boolean} [envImportanceSampling=false] - When `true`, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.
  * @property {Node} [diffuseNode=null] - Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
+ * @property {boolean} [binaryRefine=false] - Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
  * @property {LinearTracer} [tracer=null] - Traces the reflection rays, a `LinearTracer` when omitted.
  * @property {Camera} [camera=null] - Camera the scene is rendered with. Inferred from the color pass when omitted.
  */
@@ -66,6 +67,7 @@ class SSRNode extends Node {
 			environmentNode = null,
 			envImportanceSampling = false,
 			diffuseNode = null,
+			binaryRefine = false,
 			tracer = null
 		} = options;
 
@@ -273,6 +275,17 @@ class SSRNode extends Node {
 		 * @default 2
 		 */
 		this._blurQuality = 2;
+
+		/**
+		 * Enables sub-step binary-search refinement of a detected hit. When on, a coarse
+		 * crossing is bisected toward the exact intersection (sharper hits, less step
+		 * aliasing) at the cost of extra depth samples. Baked into the shader as a
+		 * compile-time constant; assigning a new value rebuilds the SSR material.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._binaryRefine = binaryRefine;
 
 		/**
 		 * Internal storage for {@link SSRNode#tracer}.
@@ -590,6 +603,29 @@ class SSRNode extends Node {
 	}
 
 	/**
+	 * Whether sub-step binary-search hit refinement is enabled (compile-time constant).
+	 * Assigning a new value rebuilds the SSR material.
+	 *
+	 * @type {boolean}
+	 */
+	get binaryRefine() {
+
+		return this._binaryRefine;
+
+	}
+
+	set binaryRefine( value ) {
+
+		if ( value !== this._binaryRefine ) {
+
+			this._binaryRefine = value;
+			this._buildSSRMaterial();
+
+		}
+
+	}
+
+	/**
 	 * Traces the reflection rays through the depth. Assigning a new value rebuilds the SSR material.
 	 *
 	 * @type {LinearTracer}
@@ -636,7 +672,7 @@ class SSRNode extends Node {
 
 	/**
 	 * Rebuilds the SSR material's node graph by re-invoking the fragment `Fn`, which
-	 * re-bakes the compile-time constants ({@link SSRNode#tracer},
+	 * re-bakes the compile-time constants ({@link SSRNode#binaryRefine}, {@link SSRNode#tracer},
 	 * {@link SSRNode#stepExponent}, {@link SSRNode#screenEdgeFadeBlack}) at their current
 	 * values. A no-op until {@link SSRNode#setup} has captured the `Fn`.
 	 *
@@ -767,8 +803,6 @@ class SSRNode extends Node {
 		this._cameraWorldMatrix.value.copy( this.camera.matrixWorld );
 		this._cameraWorldPosition.value.copy( this.camera.position );
 
-		this._tracer.update( frame );
-
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		const ssrRenderTarget = this._ssrRenderTarget;
@@ -886,7 +920,7 @@ class SSRNode extends Node {
 
 			const viewPosition = getViewPosition( uvPos, depth, this._cameraProjectionMatrixInverse ).toVar();
 			const worldPosition = this._cameraWorldMatrix.mul( vec4( viewPosition, 1.0 ) ).xyz.toVar();
-			const viewNormal = this.normalNode.toVar();
+			const viewNormal = this.normalNode.rgb.toVar();
 
 			const viewIncidentDir = ( ( this.camera.isPerspectiveCamera ) ? normalize( viewPosition ) : vec3( 0, 0, - 1 ) ).toVar();
 
@@ -1133,6 +1167,7 @@ class SSRNode extends Node {
 				steps: totalStep.sub( 1 ),
 				parameter: ( index ) => sampleFraction( index.add( 1 ) ),
 				projectDepth: ( raw ) => projectionDepth( raw, near, far ),
+				refine: this.binaryRefine,
 				acceptHit: ( uvS, s, raw, lastS ) => {
 
 					// Gate by thickness so an occluder gap doesn't end the trace, and by the normal so the ray
@@ -1144,10 +1179,10 @@ class SSRNode extends Node {
 
 					return isBackgroundDepth( d ).not()
 						.and( away.lessThanEqual( tolerance ) )
-						.and( dot( viewReflectDir, this.normalNode.sample( uvS ) ).lessThan( 0 ) );
+						.and( dot( viewReflectDir, this.normalNode.sample( uvS ).rgb ).lessThan( 0 ) );
 
 				},
-				refineHit: ( uvS ) => dot( viewReflectDir, this.normalNode.sample( uvS ) ).lessThan( 0 )
+				refineHit: ( uvS ) => dot( viewReflectDir, this.normalNode.sample( uvS ).rgb ).lessThan( 0 )
 			} );
 
 			const hitUvS = result.uv;
@@ -1173,7 +1208,7 @@ class SSRNode extends Node {
 					withinRange.assign( withinRange.and( isBackgroundDepth( hitD ).not() )
 						.and( pointToLineDistance( vP, viewPosition, d1viewPosition ).lessThanEqual( tk ) ) );
 
-					withinRange.assign( withinRange.and( dot( viewReflectDir, this.normalNode.sample( uvS ) ).lessThan( 0 ) ) );
+					withinRange.assign( withinRange.and( dot( viewReflectDir, this.normalNode.sample( uvS ).rgb ).lessThan( 0 ) ) );
 
 				}
 

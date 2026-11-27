@@ -1,7 +1,5 @@
 import { WebGLCoordinateSystem } from 'three/webgpu';
-import { Break, Fn, If, Loop, bool, float, fract, getScreenPositionFromClip, int, interleavedGradientNoise, rand, screenCoordinate, uniform, uv, vec2, vec3, vec4 } from 'three/tsl';
-
-const _temporalOffsets = [ 0, 0.5, 0.25, 0.75 ];
+import { Break, Fn, If, Loop, bool, float, getScreenPositionFromClip, int, vec2, vec3, vec4 } from 'three/tsl';
 
 /**
  * Projects a view position to the UV and projected depth the rays are traced in, for any camera and depth buffer.
@@ -153,67 +151,17 @@ export function traceLinear( depthNode, origin, end, { resolution, reversedDepth
 export class LinearTracer {
 
 	/**
-	 * Constructs a new linear tracer.
-	 *
-	 * @param {Object} [options] - The options.
-	 * @param {boolean} [options.binaryRefine=false] - Whether a hit is bisected towards the exact intersection.
-	 */
-	constructor( { binaryRefine = false } = {} ) {
-
-		/**
-		 * Whether a hit is bisected towards the exact intersection, read when the tracing is built.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.binaryRefine = binaryRefine;
-
-		/**
-		 * The steps per pixel of a ray, in the range `[0,1]`.
-		 *
-		 * @type {UniformNode<float>}
-		 * @default 0.5
-		 */
-		this.quality = uniform( 0.5 );
-
-		/**
-		 * Whether the samples are offset each frame, which requires a temporal filter like `TRAANode`.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.useTemporalFiltering = false;
-
-		this._temporalOffset = uniform( 0 );
-
-	}
-
-	/**
-	 * Updates the tracer, called once per frame before tracing.
-	 *
-	 * @param {NodeFrame} frame - The current node frame.
-	 */
-	update( frame ) {
-
-		this._temporalOffset.value = this.useTemporalFiltering === true ? _temporalOffsets[ frame.frameId % 4 ] : 0;
-
-	}
-
-	/**
 	 * Traces a ray inside the calling TSL function.
 	 *
 	 * @param {TextureNode} depthNode - The depth of the scene.
 	 * @param {Node<vec3>} origin - Start UV and projected depth.
 	 * @param {Node<vec3>} end - End UV and projected depth.
-	 * @param {Object} options - The resolution, the depth convention and the predicates, see `traceLinear()`. `steps` and
-	 * `parameter` replace the samples given by `quality`.
-	 * @return {Object} Hit flag, UV, raw depth and parameter.
+	 * @param {Object} options - See `traceLinear()`.
+	 * @return {Object} Hit flag, UV, raw depth and parameter, and whether hits are refined.
 	 */
 	trace( depthNode, origin, end, options ) {
 
-		const offset = fract( interleavedGradientNoise( screenCoordinate ).add( this._temporalOffset ) ).add( rand( uv() ) ).toConst();
-
-		return traceLinear( depthNode, origin, end, { quality: this.quality.clamp(), offset, ...options, refine: this.binaryRefine } );
+		return traceLinear( depthNode, origin, end, options );
 
 	}
 
