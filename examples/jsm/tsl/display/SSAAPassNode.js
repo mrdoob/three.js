@@ -145,7 +145,7 @@ class SSAAPassNode extends PassNode {
 
 		for ( let i = 0; i < jitterOffsets.length; i ++ ) {
 
-			const sampleName = `${ passName }: ${ i + 1 }`;
+			const sampleName = `${ passName } / ${ i + 1 }`;
 			const jitterOffset = jitterOffsets[ i ];
 
 			if ( camera.setViewOffset ) {
@@ -177,7 +177,7 @@ class SSAAPassNode extends PassNode {
 
 			renderer.setRenderTarget( this._sampleRenderTarget );
 			renderer.clear();
-			scene.name = `${ sampleName }: Sample`;
+			scene.name = `${ sampleName } / Sample`;
 			renderer.render( scene, camera );
 			scene.name = sceneName;
 
@@ -194,7 +194,7 @@ class SSAAPassNode extends PassNode {
 
 			}
 
-			this._quadMesh.name = `${ sampleName }: Accumulate`;
+			this._quadMesh.name = `${ sampleName } / Accumulate`;
 			this._quadMesh.render( renderer );
 
 		}

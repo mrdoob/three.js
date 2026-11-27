@@ -62,7 +62,7 @@ class SavePass extends Pass {
 		if ( this.renderTarget === undefined ) {
 
 			this.renderTarget = new WebGLRenderTarget( 1, 1, { type: HalfFloatType, depthBuffer: false } ); // will be resized later
-			this.renderTarget.texture.name = 'SavePass.rt';
+			this.renderTarget.texture.name = 'Save / Target';
 
 		}
 

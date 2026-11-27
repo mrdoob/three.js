@@ -621,7 +621,7 @@ class WebGPUTextureUtils {
 
 		// recreate
 
-		depthTexture.name = 'depthBuffer';
+		depthTexture.name = 'Depth';
 		depthTexture.format = format;
 		depthTexture.type = type;
 		depthTexture.image.width = width;

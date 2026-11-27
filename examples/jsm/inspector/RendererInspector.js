@@ -39,7 +39,7 @@ class RenderStats extends ObjectStats {
 			const label = scene.name || scene.material?.name || renderTarget.texture.name || 'Cube Capture';
 			const mip = renderer.getActiveMipmapLevel();
 
-			name = `${ label }: Mip ${ mip }: Face ${ face }`;
+			name = `${ label } / Mip ${ mip } / Face ${ face }`;
 
 		}
 
@@ -171,11 +171,11 @@ function resolveOffsets( frame ) {
 
 }
 
-// splits the first level of names like "Group: Stage: Pass"
+// splits the first level of names like "Group / Stage / Pass"
 
 function parseName( name ) {
 
-	const match = /^\s*([^:]*?[^:\s])\s*:\s*(\S.*?)\s*$/s.exec( name );
+	const match = /^\s*([^/]*?[^/\s])\s*\/\s*(\S.*?)\s*$/s.exec( name );
 
 	return match !== null ? { group: match[ 1 ], pass: match[ 2 ] } : { group: null, pass: name };
 

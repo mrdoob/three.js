@@ -66,7 +66,7 @@ class BokehPass extends Pass {
 			type: HalfFloatType
 		} );
 
-		this._renderTargetDepth.texture.name = 'BokehPass.depth';
+		this._renderTargetDepth.texture.name = 'Bokeh / Depth';
 
 		// depth material
 

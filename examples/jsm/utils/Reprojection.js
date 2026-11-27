@@ -50,7 +50,7 @@ class Reprojection {
 		 * @type {RenderTarget}
 		 */
 		this._previousDepthRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, depthTexture: new DepthTexture(), count: 0 } );
-		this._previousDepthRenderTarget.depthTexture.name = 'Reprojection.previousDepth';
+		this._previousDepthRenderTarget.depthTexture.name = 'Reprojection / Previous Depth';
 
 		/**
 		 * The previous frame's depth.

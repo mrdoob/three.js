@@ -161,7 +161,7 @@ class SeamStitchGenerator {
 			const passes = [ initialize, limit ];
 			for ( let i = 0; i < this.iterations; i ++ ) passes.push( residual, solve );
 
-			passes.name = 'Seam Stitch: Solve';
+			passes.name = 'Seam Stitch / Solve';
 			renderer.compute( passes );
 
 		}
@@ -174,7 +174,7 @@ class SeamStitchGenerator {
 		if ( solver.compute !== null ) {
 
 			renderer.autoClear = false;
-			solver.scene.name = 'Seam Stitch: Resolve';
+			solver.scene.name = 'Seam Stitch / Resolve';
 			renderer.render( solver.scene, this._camera );
 
 		}
@@ -300,7 +300,7 @@ class SeamStitchGenerator {
 			initial.element( instanceIndex ).assign( vec4( value.rgb, weight ) );
 			values.element( instanceIndex ).assign( vec4( value.rgb, weight ) );
 
-		} )().compute( unknownCount ).setName( 'Seam Stitch: Initialize' );
+		} )().compute( unknownCount ).setName( 'Seam Stitch / Initialize' );
 
 		// each texel stays within the values that its seams sample on both sides, so that conflicting
 		// seams, e.g. where several charts meet, do not push it to extremes
@@ -325,7 +325,7 @@ class SeamStitchGenerator {
 			bounds.element( instanceIndex.mul( 2 ) ).assign( vec4( low, 0 ) );
 			bounds.element( instanceIndex.mul( 2 ).add( 1 ) ).assign( vec4( high, 0 ) );
 
-		} )().compute( unknownCount ).setName( 'Seam Stitch: Limit' );
+		} )().compute( unknownCount ).setName( 'Seam Stitch / Limit' );
 
 		// the weighted difference of the bilinear samples on both sides, and the weight
 
@@ -336,7 +336,7 @@ class SeamStitchGenerator {
 
 			residuals.element( instanceIndex ).assign( vec4( difference.mul( weight ), weight ) );
 
-		} )().compute( sampleCount ).setName( 'Seam Stitch: Residual' );
+		} )().compute( sampleCount ).setName( 'Seam Stitch / Residual' );
 
 		// a damped Jacobi step on the normal equations of the texel
 
@@ -365,7 +365,7 @@ class SeamStitchGenerator {
 
 			values.element( instanceIndex ).assign( vec4( result, value.w ) );
 
-		} )().compute( unknownCount ).setName( 'Seam Stitch: Solve' );
+		} )().compute( unknownCount ).setName( 'Seam Stitch / Solve' );
 
 		solver.compute = { initialize, limit, residual, solve };
 
@@ -449,7 +449,7 @@ function createCopyMaterial( source ) {
 
 	const material = new NodeMaterial();
 	material.fragmentNode = copy();
-	material.name = 'Seam Stitch: Copy';
+	material.name = 'Seam Stitch / Copy';
 
 	return material;
 

@@ -282,7 +282,7 @@ class PassNode extends Node {
 
 			depthTexture.isRenderTargetTexture = true;
 			//depthTexture.type = FloatType;
-			depthTexture.name = 'depth';
+			depthTexture.name = 'Pass / Depth';
 
 			renderTarget.depthTexture = depthTexture;
 

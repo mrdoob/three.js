@@ -701,7 +701,7 @@ function createOcclusion( width, height ) {
 	}
 
 	const scene = new Scene();
-	scene.name = 'Meshlets: Occlusion Depth';
+	scene.name = 'Meshlets / Occlusion Depth';
 
 	return {
 		target,
@@ -4960,12 +4960,12 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 			// first phase, the depth of the clusters visible in the last frame and the second phase
 
-			cullNodes.name = 'Meshlets: Prepare Occlusion Depth';
+			cullNodes.name = 'Meshlets / Prepare Occlusion Depth';
 			renderer.compute( cullNodes );
 
 			this._renderOcclusionDepth( occlusion, active );
 
-			computeNodes.name = batchComputeNodes.length > 0 ? 'Meshlets: Occlusion Cull and Rasterize' : 'Meshlets: Occlusion Cull';
+			computeNodes.name = batchComputeNodes.length > 0 ? 'Meshlets / Occlusion Cull and Rasterize' : 'Meshlets / Occlusion Cull';
 			renderer.compute( computeNodes );
 
 		} else {
@@ -4975,7 +4975,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 			const nodes = occlusion !== null
 				? [ ...computeNodesBefore, ...culling.skipOcclusionNodes, ...( view.computeClear !== null ? [ view.computeClear ] : [] ), ...batchComputeNodes ]
 				: [ ...cullNodes, ...computeNodes ];
-			nodes.name = batchComputeNodes.length > 0 ? 'Meshlets: Cull and Rasterize' : 'Meshlets: Cull';
+			nodes.name = batchComputeNodes.length > 0 ? 'Meshlets / Cull and Rasterize' : 'Meshlets / Cull';
 			renderer.compute( nodes );
 
 		}

@@ -67,7 +67,7 @@ class EffectComposer {
 			this._height = size.height;
 
 			renderTarget = new WebGLRenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType } );
-			renderTarget.texture.name = 'EffectComposer.rt1';
+			renderTarget.texture.name = 'EffectComposer / Target 1';
 
 		} else {
 
@@ -78,7 +78,7 @@ class EffectComposer {
 
 		this.renderTarget1 = renderTarget;
 		this.renderTarget2 = renderTarget.clone();
-		this.renderTarget2.texture.name = 'EffectComposer.rt2';
+		this.renderTarget2.texture.name = 'EffectComposer / Target 2';
 
 		/**
 		 * A reference to the internal write buffer. Passes usually write
