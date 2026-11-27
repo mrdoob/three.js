@@ -168,7 +168,11 @@ class VaryingNode extends Node {
 
 		// a compute shader has no vertex stage to pass a varying from, so the context evaluates it in place
 
-		if ( builder.context.inlineVaryings === true && builder.shaderStage === 'compute' ) return this.node;
+		if ( builder.context.inlineVaryings === true && builder.shaderStage === 'compute' ) {
+
+			return this.node;
+
+		}
 
 		// the varying is created in the analyze stage, so a varying that is only used by dead code is not declared
 
