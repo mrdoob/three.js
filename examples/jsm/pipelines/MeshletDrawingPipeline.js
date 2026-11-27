@@ -4968,14 +4968,20 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 			computeNodes.name = batchComputeNodes.length > 0 ? 'Meshlets / Occlusion Cull and Rasterize' : 'Meshlets / Occlusion Cull';
 			renderer.compute( computeNodes );
 
+		} else if ( occlusion !== null ) {
+
+			const nodes = [ ...computeNodesBefore, ...culling.skipOcclusionNodes, ...( view.computeClear !== null ? [ view.computeClear ] : [] ), ...batchComputeNodes ];
+			nodes.name = batchComputeNodes.length > 0 ? 'Meshlets / Cull and Rasterize' : 'Meshlets / Cull';
+
+			renderer.compute( nodes );
+
 		} else {
 
 			// one compute call for all batches of the render list
 
-			const nodes = occlusion !== null
-				? [ ...computeNodesBefore, ...culling.skipOcclusionNodes, ...( view.computeClear !== null ? [ view.computeClear ] : [] ), ...batchComputeNodes ]
-				: [ ...cullNodes, ...computeNodes ];
+			const nodes = [ ...cullNodes, ...computeNodes ];
 			nodes.name = batchComputeNodes.length > 0 ? 'Meshlets / Cull and Rasterize' : 'Meshlets / Cull';
+
 			renderer.compute( nodes );
 
 		}
