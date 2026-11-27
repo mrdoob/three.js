@@ -160,6 +160,8 @@ class PositionalAudioHelper extends Line {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.geometry.dispose();
 		this.material[ 0 ].dispose();
 		this.material[ 1 ].dispose();
