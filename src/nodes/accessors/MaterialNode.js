@@ -264,7 +264,7 @@ class MaterialNode extends Node {
 
 			} else if ( material.bumpMap ) {
 
-				node = bumpMap( this.getTexture( 'bump' ).r, this.getFloat( 'bumpScale' ) );
+				node = bumpMap( this.getTexture( 'bump' ), this.getFloat( 'bumpScale' ) );
 
 			} else {
 
