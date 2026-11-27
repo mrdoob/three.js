@@ -2459,6 +2459,13 @@ class ColladaComposer {
 			const geometries = this.getGeometry( controller.id );
 			const newObjects = this.buildObjects( geometries, instance.materials );
 
+			if ( controller.skin === undefined ) {
+
+				objects.push( ...newObjects );
+				continue;
+
+			}
+
 			const skeletons = instance.skeletons;
 			const joints = controller.skin.joints;
 
