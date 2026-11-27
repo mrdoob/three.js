@@ -38,7 +38,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { mrt, output, pass, positionPrevious, velocity, vec4 } from 'three/tsl';
+			import { mrt, output, pass, velocity, vec4, viewZDelta } from 'three/tsl';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -132,10 +132,9 @@
 				renderPipeline = new THREE.RenderPipeline( renderer );
 				const scenePass = pass( scene, camera );
 
-				const previousViewZ = velocity.previousCameraViewMatrix.mul( velocity.previousModelWorldMatrix ).mul( vec4( positionPrevious, 1 ) ).z.toVarying();
 				scenePass.setMRT( mrt( {
 					output: output,
-					velocity: vec4( velocity, 0, previousViewZ ) // the view z is for the disocclusion test of TRAA
+					velocity: vec4( velocity, 0, viewZDelta ) // the view z delta is for the disocclusion test of TRAA
 				} ) );
 
 				const scenePassColor = scenePass.getTextureNode( 'output' );

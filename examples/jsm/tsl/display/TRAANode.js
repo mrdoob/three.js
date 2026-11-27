@@ -124,8 +124,7 @@ class TRAANode extends Node {
 
 		/**
 		 * Enables motion-aware disocclusion testing. Set before building the node and
-		 * write the previous view-space Z of each surface to the velocity texture's
-		 * alpha channel. The velocity texture must support signed floating-point values.
+		 * write `viewZDelta` to the velocity texture's alpha channel. The velocity texture must support signed floating-point values.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -494,9 +493,12 @@ class TRAANode extends Node {
 				const { x: near, y: far } = this._reprojection.previousCameraNearFar;
 				const sampledDepth = this._reprojection.previousDepthNode.sample( historyUV ).r;
 				const sampledDistance = depthToViewZ( sampledDepth, near, far, this.camera ).negate();
-				const expectedDistance = surfaceVelocity.w.negate().toConst();
 
-				// Allow for half-float rounding and subpixel reprojection.
+				// The previous view z of the surface is its current view z minus the change since then.
+				const currentViewZ = depthToViewZ( this.depthNode.load( closestPositionTexel ).r, this._cameraNearFar.x, this._cameraNearFar.y, this.camera );
+				const expectedDistance = currentViewZ.sub( surfaceVelocity.w ).negate().toConst();
+
+				// Allow for depth precision and subpixel reprojection.
 				const relativeTolerance = 0.002;
 				const tolerance = expectedDistance.mul( relativeTolerance );
 				isDisocclusion = expectedDistance.sub( sampledDistance ).greaterThan( tolerance );
