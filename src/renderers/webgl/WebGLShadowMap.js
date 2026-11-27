@@ -231,9 +231,11 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 						magFilter: LinearFilter,
 						generateMipmaps: false
 					} );
+					shadow.map.texture.name = light.name + '.shadowMap';
 
 					// Native depth texture for VSM - depth is captured here, then blurred into the color texture
 					shadow.map.depthTexture = new DepthTexture( _shadowMapSize.x, _shadowMapSize.y, FloatType );
+					shadow.map.depthTexture.name = light.name + '.shadowMapDepth';
 					shadow.map.depthTexture.format = DepthFormat;
 					shadow.map.depthTexture.compareFunction = null; // For regular sampling (not shadow comparison)
 					shadow.map.depthTexture.minFilter = NearestFilter;
@@ -253,6 +255,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 					}
 
+					shadow.map.depthTexture.name = light.name + '.shadowMap';
 					shadow.map.depthTexture.format = DepthFormat;
 
 					if ( this.type === PCFShadowMap ) {
@@ -270,10 +273,6 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 					}
 
 				}
-
-				const lightName = light.name || light.type;
-				shadow.map.texture.name = lightName + ' / Shadow Target';
-				shadow.map.depthTexture.name = lightName + ' / Shadow Depth';
 
 				shadow.camera.updateProjectionMatrix();
 
