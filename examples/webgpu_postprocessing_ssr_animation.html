@@ -39,12 +39,13 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, velocity } from 'three/tsl';
+			import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, velocity, viewZDelta } from 'three/tsl';
 			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 			import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 			import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { smaa } from 'three/addons/tsl/display/SMAANode.js';
+			import { reprojectedBeauty } from 'three/addons/tsl/display/ReprojectedBeautyNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -187,7 +188,7 @@
 					output: output,
 					diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
 					normal: packNormalToOctahedral( normalView ),
-					velocity: vec4( velocity, materialRoughness, 0 )
+					velocity: vec4( velocity, materialRoughness, viewZDelta )
 				} ) );
 
 				// octahedral normals can't be filtered across their folds
@@ -217,7 +218,8 @@
 
 				// ssr
 
-				const ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+				const ssrNode = ssr( reprojectedBeauty( scenePass ), scenePassDepth, sceneNormal, {
+					camera,
 					stochastic: true,
 					diffuseNode: scenePassDiffuseColor,
 					metalnessNode: scenePassDiffuseColor.a,

@@ -19,8 +19,9 @@ class Reprojection {
 	 * @param {TextureNode} depthNode - The scene's depth.
 	 * @param {TextureNode} velocityNode - The scene's velocity.
 	 * @param {Camera} camera - The camera the scene is rendered with.
+	 * @param {?TextureNode} [previousDepthNode=null] - The previous frame's depth. Copied in `update()` when omitted.
 	 */
-	constructor( depthNode, velocityNode, camera ) {
+	constructor( depthNode, velocityNode, camera, previousDepthNode = null ) {
 
 		/**
 		 * The scene's depth.
@@ -44,20 +45,28 @@ class Reprojection {
 		this.camera = camera;
 
 		/**
-		 * The render target that holds the depth of the previous frame.
+		 * The render target that holds the depth of the previous frame, if not provided.
 		 *
 		 * @private
-		 * @type {RenderTarget}
+		 * @type {?RenderTarget}
 		 */
-		this._previousDepthRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, depthTexture: new DepthTexture(), count: 0 } );
-		this._previousDepthRenderTarget.depthTexture.name = 'Reprojection.previousDepth';
+		this._previousDepthRenderTarget = null;
+
+		if ( previousDepthNode === null ) {
+
+			this._previousDepthRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, depthTexture: new DepthTexture(), count: 0 } );
+			this._previousDepthRenderTarget.depthTexture.name = 'Reprojection.previousDepth';
+
+			previousDepthNode = texture( this._previousDepthRenderTarget.depthTexture );
+
+		}
 
 		/**
 		 * The previous frame's depth.
 		 *
 		 * @type {TextureNode}
 		 */
-		this.previousDepthNode = texture( this._previousDepthRenderTarget.depthTexture );
+		this.previousDepthNode = previousDepthNode;
 
 		/**
 		 * The camera's world matrix.
@@ -107,6 +116,54 @@ class Reprojection {
 		 * @type {UniformNode<mat4>}
 		 */
 		this.previousCameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse.clone() );
+
+		/**
+		 * The camera's world matrix when the camera was last stored.
+		 *
+		 * @private
+		 * @type {Matrix4}
+		 */
+		this._cameraWorldMatrix = camera.matrixWorld.clone();
+
+		/**
+		 * The camera's view matrix when the camera was last stored.
+		 *
+		 * @private
+		 * @type {Matrix4}
+		 */
+		this._cameraViewMatrix = camera.matrixWorldInverse.clone();
+
+		/**
+		 * The camera's projection matrix when the camera was last stored.
+		 *
+		 * @private
+		 * @type {Matrix4}
+		 */
+		this._cameraProjectionMatrix = camera.projectionMatrix.clone();
+
+		/**
+		 * The camera's projection matrix inverse when the camera was last stored.
+		 *
+		 * @private
+		 * @type {Matrix4}
+		 */
+		this._cameraProjectionMatrixInverse = camera.projectionMatrixInverse.clone();
+
+		/**
+		 * The depth's width when the camera was last stored.
+		 *
+		 * @private
+		 * @type {number}
+		 */
+		this._width = 0;
+
+		/**
+		 * The depth's height when the camera was last stored.
+		 *
+		 * @private
+		 * @type {number}
+		 */
+		this._height = 0;
 
 	}
 
@@ -158,6 +215,10 @@ class Reprojection {
 		const depth = this.depthNode.value;
 		const previousDepth = this.previousDepthNode.value;
 
+		// a provided previous depth is resized together with the current one
+
+		if ( this._previousDepthRenderTarget === null ) return this._width !== depth.image.width || this._height !== depth.image.height;
+
 		return previousDepth.image.width !== depth.image.width ||
 			previousDepth.image.height !== depth.image.height ||
 			previousDepth.format !== depth.format ||
@@ -174,26 +235,61 @@ class Reprojection {
 	update( renderer ) {
 
 		const depth = this.depthNode.value;
-		const previousDepth = this._previousDepthRenderTarget.depthTexture;
 
-		const { width, height } = depth.image;
+		if ( this._previousDepthRenderTarget !== null ) {
 
-		if ( this.needsHistoryReset() ) {
+			const previousDepth = this._previousDepthRenderTarget.depthTexture;
 
-			previousDepth.image.width = width;
-			previousDepth.image.height = height;
-			previousDepth.format = depth.format;
-			previousDepth.type = depth.type;
-			previousDepth.needsUpdate = true;
+			if ( this.needsHistoryReset() ) {
+
+				previousDepth.image.width = depth.image.width;
+				previousDepth.image.height = depth.image.height;
+				previousDepth.format = depth.format;
+				previousDepth.type = depth.type;
+				previousDepth.needsUpdate = true;
+
+			}
+
+			renderer.copyTextureToTexture( depth, previousDepth );
 
 		}
 
-		renderer.copyTextureToTexture( depth, previousDepth );
+		this._storeCamera();
+		this.advance();
 
-		this.previousCameraWorldMatrix.value.copy( this.camera.matrixWorld );
-		this.previousCameraViewMatrix.value.copy( this.camera.matrixWorldInverse );
-		this.previousCameraProjectionMatrix.value.copy( this.camera.projectionMatrix );
-		this.previousCameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
+	}
+
+	/**
+	 * Advances the camera matrices by one frame. Call it before the history is read,
+	 * instead of `update()`, when the previous depth is provided.
+	 */
+	advance() {
+
+		this.previousCameraWorldMatrix.value.copy( this._cameraWorldMatrix );
+		this.previousCameraViewMatrix.value.copy( this._cameraViewMatrix );
+		this.previousCameraProjectionMatrix.value.copy( this._cameraProjectionMatrix );
+		this.previousCameraProjectionMatrixInverse.value.copy( this._cameraProjectionMatrixInverse );
+
+		this._storeCamera();
+
+	}
+
+	/**
+	 * Stores the current camera matrices and depth size.
+	 *
+	 * @private
+	 */
+	_storeCamera() {
+
+		const { camera } = this;
+		const { width, height } = this.depthNode.value.image;
+
+		this._cameraWorldMatrix.copy( camera.matrixWorld );
+		this._cameraViewMatrix.copy( camera.matrixWorldInverse );
+		this._cameraProjectionMatrix.copy( camera.projectionMatrix );
+		this._cameraProjectionMatrixInverse.copy( camera.projectionMatrixInverse );
+		this._width = width;
+		this._height = height;
 
 	}
 
@@ -203,7 +299,7 @@ class Reprojection {
 	 */
 	dispose() {
 
-		this._previousDepthRenderTarget.dispose();
+		if ( this._previousDepthRenderTarget !== null ) this._previousDepthRenderTarget.dispose();
 
 	}
 

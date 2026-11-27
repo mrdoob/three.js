@@ -44,9 +44,10 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, specularColorBlended, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, specularColorBlended, velocity, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking, viewZDelta } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
+		import { reprojectedBeauty } from 'three/addons/tsl/display/ReprojectedBeautyNode.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -144,7 +145,8 @@
 				output: output,
 				normal: packNormalToOctahedral( normalView ),
 				metalrough: vec2( metalness, roughness ), // pack metalness and roughness into a single attachment
-				specular: specularColorBlended // the material's F0, tints reflections on metals
+				specular: specularColorBlended, // the material's F0, tints reflections on metals
+				velocity: vec4( velocity, 0, viewZDelta )
 			} ) );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
@@ -171,6 +173,7 @@
 
 			const metalRoughTexture = scenePass.getTexture( 'metalrough' );
 			metalRoughTexture.type = THREE.UnsignedByteType;
+			metalRoughTexture.format = THREE.RGFormat;
 
 			scenePass.getTexture( 'specular' ).type = THREE.UnsignedByteType;
 
@@ -182,7 +185,8 @@
 
 			//
 
-			const reflection = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+			const reflection = ssr( reprojectedBeauty( scenePass ), scenePassDepth, sceneNormal, {
+				camera,
 				metalnessNode: scenePassMetalRough.r,
 				roughnessNode: scenePassMetalRough.g,
 				specularNode: scenePassSpecular,
