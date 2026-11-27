@@ -206,7 +206,10 @@ class VaryingNode extends Node {
 		// The vertex assignment is emitted once per block, from the fragment stage it is emitted outside of any block.
 		const flowBlock = builder.shaderStage === NodeShaderStage.VERTEX ? builder.flowBlock : null;
 
-		if ( properties[ propertyKey ] !== flowBlock ) {
+		// not emitted again once the varying was assigned
+		const isAssigned = builder.getDataFromNode( this, NodeShaderStage.VERTEX ).assigned === true;
+
+		if ( properties[ propertyKey ] === undefined || ( isAssigned === false && properties[ propertyKey ] !== flowBlock ) ) {
 
 			const type = this.getNodeType( builder );
 			const propertyName = builder.getPropertyName( varying, NodeShaderStage.VERTEX );

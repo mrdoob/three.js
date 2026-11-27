@@ -147,6 +147,7 @@ class NodeData {
 		this.generated = undefined;
 		this.flowBlock = undefined;
 		this.assign = undefined;
+		this.assigned = undefined;
 		this.forceDeclaration = undefined;
 		this.variable = undefined;
 		this.cacheVariable = undefined;
