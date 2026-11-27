@@ -164,7 +164,7 @@ class TRAANode extends Node {
 		 * @type {NodeMaterial}
 		 */
 		this._resolveMaterial = new NodeMaterial();
-		this._resolveMaterial.name = 'TRAA.resolve';
+		this._resolveMaterial.name = 'TRAA / Resolve';
 
 		/**
 		 * The result of the effect is represented as a separate texture node.

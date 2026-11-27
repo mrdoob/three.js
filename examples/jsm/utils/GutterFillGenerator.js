@@ -462,7 +462,7 @@ function createFillMaterial( source, levels ) {
 
 	const material = new NodeMaterial();
 	material.fragmentNode = fill();
-	material.name = 'Gutter Fill: Resolve';
+	material.name = 'Gutter Fill / Resolve';
 
 	return material;
 

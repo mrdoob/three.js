@@ -449,7 +449,7 @@ function createCopyMaterial( source ) {
 
 	const material = new NodeMaterial();
 	material.fragmentNode = copy();
-	material.name = 'Seam Stitch: Copy';
+	material.name = 'Seam Stitch / Copy';
 
 	return material;
 

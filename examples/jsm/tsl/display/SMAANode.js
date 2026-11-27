@@ -173,7 +173,7 @@ class SMAANode extends Node {
 		 * @type {NodeMaterial}
 		 */
 		this._materialEdges = new NodeMaterial();
-		this._materialEdges.name = 'SMAA: Edges';
+		this._materialEdges.name = 'SMAA / Edges';
 
 		/**
 		 * The node material that holds the TSL for rendering the weights pass.
@@ -182,7 +182,7 @@ class SMAANode extends Node {
 		 * @type {NodeMaterial}
 		 */
 		this._materialWeights = new NodeMaterial();
-		this._materialWeights.name = 'SMAA: Weights';
+		this._materialWeights.name = 'SMAA / Weights';
 
 		/**
 		 * The node material that holds the TSL for rendering the blend pass.
@@ -191,7 +191,7 @@ class SMAANode extends Node {
 		 * @type {NodeMaterial}
 		 */
 		this._materialBlend = new NodeMaterial();
-		this._materialBlend.name = 'SMAA: Blend';
+		this._materialBlend.name = 'SMAA / Blend';
 
 		/**
 		 * The result of the effect is represented as a separate texture node.
