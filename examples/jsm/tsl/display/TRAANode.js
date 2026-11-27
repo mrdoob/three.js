@@ -1,5 +1,5 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4 } from 'three/webgpu';
-import { float, Fn, max, texture, uniform, uv, vec4, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
+import { float, Fn, max, texture, uniform, uv, vec4, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline, depthToViewZ } from 'three/tsl';
 import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth } from '../utils/TAAUtils.js';
 import { Reprojection } from '../../utils/Reprojection.js';
 
@@ -89,8 +89,8 @@ class TRAANode extends Node {
 		this.camera = camera;
 
 		/**
-		 * When the difference between the current and previous depth goes above this threshold,
-		 * the history is considered invalid.
+		 * The normalized depth difference above which history is rejected when
+		 * `usePreviousViewZ` is disabled.
 		 *
 		 * @type {number}
 		 * @default 0.0005
@@ -121,6 +121,15 @@ class TRAANode extends Node {
 		 * @default true
 		 */
 		this.useSubpixelCorrection = true;
+
+		/**
+		 * Enables motion-aware disocclusion testing. Set before building the node and
+		 * write `viewZDelta` to the velocity texture's alpha channel. The velocity texture must support signed floating-point values.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.usePreviousViewZ = false;
 
 		/**
 		 * The jitter index selects the current camera offset value.
@@ -213,7 +222,7 @@ class TRAANode extends Node {
 		 * @private
 		 * @type {Reprojection}
 		 */
-		this._reprojection = new Reprojection( depthNode, velocityNode, camera );
+		this._reprojection = new Reprojection( depthNode, camera );
 		this._reprojection.previousDepthNode.value.name = 'TRAANode.previousDepth';
 
 		/**
@@ -472,17 +481,42 @@ class TRAANode extends Node {
 			const closestPositionTexel = currentDepth.get( 'closestPositionTexel' );
 			const farthestDepth = currentDepth.get( 'farthestDepth' );
 
-			// sample the previous depth
+			const surfaceVelocity = this.velocityNode.load( closestPositionTexel );
+			const historyUV = this._reprojection.getHistoryUV( uvNode, surfaceVelocity.xy ).toConst();
 
-			const historyUV = this._reprojection.getHistoryUV( uvNode, closestPositionTexel ).toConst();
-			const previousDepth = this._reprojection.getPreviousDepth( historyUV, this._cameraNearFar );
+			let isValidHistoryPosition = historyUV.greaterThanEqual( 0 ).all().and( historyUV.lessThanEqual( 1 ).all() );
+			let isDisocclusion;
 
-			// history is considered valid when the UV is in range and there's no disocclusion except on edges
+			if ( this.usePreviousViewZ ) {
 
-			const isValidUV = historyUV.greaterThanEqual( 0 ).all().and( historyUV.lessThanEqual( 1 ).all() );
+				// Compare the expected and visible surface depths in the previous camera's view space.
+				const { x: near, y: far } = this._reprojection.previousCameraNearFar;
+				const sampledDepth = this._reprojection.previousDepthNode.sample( historyUV ).r;
+				const sampledDistance = depthToViewZ( sampledDepth, near, far, this.camera ).negate();
+
+				// The previous view z of the surface is its current view z minus the change since then.
+				const currentViewZ = depthToViewZ( this.depthNode.load( closestPositionTexel ).r, this._cameraNearFar.x, this._cameraNearFar.y, this.camera );
+				const expectedDistance = currentViewZ.sub( surfaceVelocity.w ).negate().toConst();
+
+				// Allow for depth precision and subpixel reprojection.
+				const relativeTolerance = 0.002;
+				const tolerance = expectedDistance.mul( relativeTolerance );
+				isDisocclusion = expectedDistance.sub( sampledDistance ).greaterThan( tolerance );
+
+				// A surface outside the previous camera's clip range has no history, even on edges.
+				isValidHistoryPosition = isValidHistoryPosition.and( expectedDistance.greaterThan( 0 ) )
+					.and( expectedDistance.greaterThanEqual( near.mul( 1 - relativeTolerance ) ) )
+					.and( expectedDistance.lessThanEqual( far.mul( 1 + relativeTolerance ) ) );
+
+			} else {
+
+				const previousDepth = this._reprojection.getPreviousDepth( historyUV, this._cameraNearFar );
+				isDisocclusion = closestDepth.sub( previousDepth ).greaterThan( this.depthThreshold );
+
+			}
+
 			const isEdge = farthestDepth.sub( closestDepth ).greaterThan( this.edgeDepthDiff );
-			const isDisocclusion = closestDepth.sub( previousDepth ).greaterThan( this.depthThreshold );
-			const hasValidHistory = isValidUV.and( isEdge.or( isDisocclusion.not() ) );
+			const hasValidHistory = isValidHistoryPosition.and( isEdge.or( isDisocclusion.not() ) );
 
 			// sample the current and previous colors
 

@@ -1,4 +1,4 @@
-import { DepthTexture, RenderTarget } from 'three/webgpu';
+import { DepthTexture, RenderTarget, Vector2 } from 'three/webgpu';
 import { getViewPosition, projectionDepth, texture, uniform, vec2, vec4, viewZToOrthographicDepth, viewZToPerspectiveDepth } from 'three/tsl';
 
 /**
@@ -17,10 +17,9 @@ class Reprojection {
 	 * Constructs a new reprojection.
 	 *
 	 * @param {TextureNode} depthNode - The scene's depth.
-	 * @param {TextureNode} velocityNode - The scene's velocity.
 	 * @param {Camera} camera - The camera the scene is rendered with.
 	 */
-	constructor( depthNode, velocityNode, camera ) {
+	constructor( depthNode, camera ) {
 
 		/**
 		 * The scene's depth.
@@ -28,13 +27,6 @@ class Reprojection {
 		 * @type {TextureNode}
 		 */
 		this.depthNode = depthNode;
-
-		/**
-		 * The scene's velocity.
-		 *
-		 * @type {TextureNode}
-		 */
-		this.velocityNode = velocityNode;
 
 		/**
 		 * The camera the scene is rendered with.
@@ -108,22 +100,27 @@ class Reprojection {
 		 */
 		this.previousCameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse.clone() );
 
+		/**
+		 * The previous frame's camera near and far, for decoding the previous frame's depth.
+		 *
+		 * @type {UniformNode<vec2>}
+		 */
+		this.previousCameraNearFar = uniform( new Vector2( camera.near, camera.far ) );
+
 	}
 
 	/**
 	 * Returns the UV the surface at the given UV had in the previous frame.
 	 *
 	 * @param {Node<vec2>} uvNode - The UV in the current frame.
-	 * @param {Node<ivec2>} texel - The texel to load the velocity from.
+	 * @param {Node<vec2>} velocity - The surface velocity in NDC.
 	 * @return {Node<vec2>} The UV in the previous frame.
 	 */
-	getHistoryUV( uvNode, texel ) {
-
-		const velocity = this.velocityNode.load( texel );
+	getHistoryUV( uvNode, velocity ) {
 
 		// convert the NDC offset to UV offset
 
-		return uvNode.sub( velocity.xy.mul( vec2( 0.5, - 0.5 ) ) );
+		return uvNode.sub( velocity.mul( vec2( 0.5, - 0.5 ) ) );
 
 	}
 
@@ -194,6 +191,7 @@ class Reprojection {
 		this.previousCameraViewMatrix.value.copy( this.camera.matrixWorldInverse );
 		this.previousCameraProjectionMatrix.value.copy( this.camera.projectionMatrix );
 		this.previousCameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
+		this.previousCameraNearFar.value.set( this.camera.near, this.camera.far );
 
 	}
 

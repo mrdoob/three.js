@@ -498,7 +498,7 @@ class TemporalReprojectNode extends Node {
 
 		this._resolution = uniform( new Vector2() );
 
-		this._reprojection = new Reprojection( depthNode, velocityNode, camera );
+		this._reprojection = new Reprojection( depthNode, camera );
 		this._reprojection.previousDepthNode.value.name = 'TemporalReprojectNode.previousDepth';
 
 		this.maxFrames = uniform( 32 );
@@ -734,7 +734,7 @@ class TemporalReprojectNode extends Node {
 
 			// Surface-velocity reprojection — the base history for both modes. `historyUV` is
 			// reused below for the stretch guard, so it is computed once here.
-			const historyUV = reprojection.getHistoryUV( uvNode, screenTexel ).toVar();
+			const historyUV = reprojection.getHistoryUV( uvNode, this.velocityNode.load( screenTexel ).xy ).toVar();
 			const motionFactor = uvNode.sub( historyUV ).mul( this._resolution ).length().div( float( this.maxVelocityLength ) ).saturate();
 
 			const surf = sampleHistory( historyUV );
