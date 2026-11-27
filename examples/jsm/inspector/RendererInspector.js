@@ -31,7 +31,7 @@ class RenderStats extends ObjectStats {
 
 	constructor( uid, scene, camera, renderTarget, renderer ) {
 
-		// Material and compute node names also label GPU programs.
+		// Keep the material's name intact for shader program labels.
 		const materialLabel = scene.material?.name?.replaceAll( ': ', ' / ' );
 		let name = scene.name || materialLabel || camera.name || ( scene.isQuadMesh ? 'Quad Mesh' : scene.type );
 
@@ -61,7 +61,7 @@ class ComputeStats extends ObjectStats {
 
 	constructor( uid, computeNode ) {
 
-		const name = computeNode.name?.replaceAll( ': ', ' / ' ) || ( computeNode.isComputeNode ? 'Compute' : 'Compute Group' );
+		const name = computeNode.name || ( computeNode.isComputeNode ? 'Compute' : 'Compute Group' );
 
 		super( uid, name );
 

@@ -246,7 +246,7 @@
 			
 					} );
 			
-				} )().compute( params.particleCount, [ workgroupSize, 1, 1 ] ).setName( 'Fluid Simulation: Particle to Grid, Transfer' );
+				} )().compute( params.particleCount, [ workgroupSize, 1, 1 ] ).setName( 'Fluid Simulation / Particle to Grid, Transfer' );
 
 				p2g2Kernel = Fn( () => {
 
@@ -312,7 +312,7 @@
 			
 					} );
 			
-				} )().compute( params.particleCount, [ workgroupSize, 1, 1 ] ).setName( 'Fluid Simulation: Particle to Grid, Stress' );
+				} )().compute( params.particleCount, [ workgroupSize, 1, 1 ] ).setName( 'Fluid Simulation / Particle to Grid, Stress' );
 
 				updateGridKernel = Fn( () => {
 
@@ -353,7 +353,7 @@
 
 					cellBufferFloat.element( instanceIndex ).assign( vec4( vx, vy, vz, mass ) );
 			
-				} )().compute( cellCount ).setName( 'Fluid Simulation: Update Grid' );
+				} )().compute( cellCount ).setName( 'Fluid Simulation / Update Grid' );
 
 
 				const clampToRoundedBox = ( pos, box, radius ) => {
@@ -454,7 +454,7 @@
 					particleBuffer.element( instanceIndex ).get( 'position' ).assign( particlePosition );
 					particleBuffer.element( instanceIndex ).get( 'velocity' ).assign( particleVelocity );
 			
-				} )().compute( params.particleCount, [ workgroupSize, 1, 1 ] ).setName( 'Fluid Simulation: Grid to Particle' );
+				} )().compute( params.particleCount, [ workgroupSize, 1, 1 ] ).setName( 'Fluid Simulation / Grid to Particle' );
 
 			}
 

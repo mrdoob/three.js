@@ -381,7 +381,7 @@ function push( texel, above, size, target, dispatchSize ) {
 
 		} );
 
-	} )().compute( dispatchSize, [ WORKGROUP_SIZE, WORKGROUP_SIZE, 1 ] ).setName( 'Gutter Fill: Push' );
+	} )().compute( dispatchSize, [ WORKGROUP_SIZE, WORKGROUP_SIZE, 1 ] ).setName( 'Gutter Fill / Push' );
 
 }
 
@@ -428,7 +428,7 @@ function pull( texel, above, size, belowTexel, below, target, dispatchSize ) {
 
 		} );
 
-	} )().compute( dispatchSize, [ WORKGROUP_SIZE, WORKGROUP_SIZE, 1 ] ).setName( 'Gutter Fill: Pull' );
+	} )().compute( dispatchSize, [ WORKGROUP_SIZE, WORKGROUP_SIZE, 1 ] ).setName( 'Gutter Fill / Pull' );
 
 }
 
