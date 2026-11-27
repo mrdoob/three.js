@@ -2224,7 +2224,7 @@ ${ flowData.code }
 		if ( shaderStage === 'vertex' || shaderStage === 'fragment' ) {
 
 			const varyings = this.varyings;
-			const vars = this.vars[ shaderStage ];
+			const vars = this.vars[ shaderStage ] || ( this.vars[ shaderStage ] = [] );
 
 			let varyingIndex = 0;
 
