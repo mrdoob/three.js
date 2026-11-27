@@ -417,6 +417,11 @@ class Parameters extends Tab {
 		paramList.setGridStyle( 'minmax(0, .5fr) minmax(0, 1fr)' );
 		paramList.domElement.style.minWidth = '300px';
 
+		this.filterText = '';
+		this.openStates = null;
+
+		if ( options.filter !== false ) this.buildHeader();
+
 		const scrollWrapper = document.createElement( 'div' );
 		scrollWrapper.className = 'list-scroll-wrapper';
 		scrollWrapper.appendChild( paramList.domElement );
@@ -425,6 +430,94 @@ class Parameters extends Tab {
 		this.paramList = paramList;
 
 		this.groups = [];
+
+	}
+
+	buildHeader() {
+
+		const header = document.createElement( 'div' );
+		header.className = 'toolbar';
+
+		const filterInput = document.createElement( 'input' );
+		filterInput.type = 'text';
+		filterInput.className = 'parameters-filter-input';
+		filterInput.placeholder = 'Filter...';
+		filterInput.addEventListener( 'input', ( e ) => {
+
+			this.filterText = e.target.value.trim().toLowerCase();
+			this.applyFilter();
+
+		} );
+
+		header.appendChild( filterInput );
+		this.content.appendChild( header );
+
+	}
+
+	applyFilter() {
+
+		const items = this.groups.map( group => group.paramList );
+
+		// open states of the folders, restored when the filter is cleared
+
+		if ( this.filterText !== '' && this.openStates === null ) {
+
+			this.openStates = new Map();
+
+			for ( const item of items ) this._traverse( item, child => this.openStates.set( child, child.isOpen ) );
+
+		}
+
+		for ( const item of items ) this._filterItem( item, false );
+
+		if ( this.filterText === '' && this.openStates !== null ) {
+
+			for ( const [ item, isOpen ] of this.openStates ) {
+
+				if ( item.isOpen !== isOpen ) item.toggle();
+
+			}
+
+			this.openStates = null;
+
+		}
+
+	}
+
+	_filterItem( item, parentMatch ) {
+
+		// items hidden by the app stay hidden
+
+		if ( item.domElement.style.display === 'none' ) return false;
+
+		const label = item.data[ 0 ];
+		const name = typeof label === 'string' ? label : label.title || label.textContent;
+
+		const match = parentMatch || name.toLowerCase().includes( this.filterText );
+
+		let childMatch = false;
+
+		for ( const child of item.children ) {
+
+			if ( this._filterItem( child, match ) ) childMatch = true;
+
+		}
+
+		if ( childMatch && this.filterText !== '' && item.isOpen === false ) item.toggle();
+
+		const visible = match || childMatch;
+
+		item.domElement.classList.toggle( 'hidden', ! visible );
+
+		return visible;
+
+	}
+
+	_traverse( item, callback ) {
+
+		callback( item );
+
+		for ( const child of item.children ) this._traverse( child, callback );
 
 	}
 

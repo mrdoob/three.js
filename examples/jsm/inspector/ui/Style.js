@@ -1207,6 +1207,10 @@ export class Style {
 		display: none !important;
 	}
 
+	.parameters .list-item-wrapper.hidden {
+		display: none;
+	}
+
 	.item-toggler {
 		display: inline-block;
 		margin-right: 0.8em;
@@ -1376,7 +1380,8 @@ export class Style {
 		gap: 20px;
 	}
 
-	.console-filter-input {
+	.console-filter-input,
+	.parameters-filter-input {
 		background-color: var(--profiler-background);
 		border: 1px solid var(--profiler-border);
 		color: var(--text-primary);
@@ -1388,9 +1393,15 @@ export class Style {
 		border-radius: 15px;
 	}
 
-	.console-filter-input:focus {
+	.console-filter-input:focus,
+	.parameters-filter-input:focus {
 		outline: none;
 		border-color: var(--text-secondary);
+	}
+
+	.mini-panel-content .parameters-filter-input {
+		max-width: none;
+		padding-left: 8px;
 	}
 
 	.console-copy-button {
