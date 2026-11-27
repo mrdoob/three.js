@@ -782,6 +782,9 @@ class NodeMaterial extends Material {
 
 		const { object, geometry } = builder;
 
+		// Shared by vertex and fragment contexts when reconstructing local-space data.
+		builder.context.geometryTransforms = {};
+
 		if ( geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color ) {
 
 			morphReference( object );

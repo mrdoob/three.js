@@ -14,9 +14,11 @@ export default /* glsl */`
 		vec2 dSTdx = dFdx( vBumpMapUv );
 		vec2 dSTdy = dFdy( vBumpMapUv );
 
-		float Hll = bumpScale * texture2D( bumpMap, vBumpMapUv ).x;
-		float dBx = bumpScale * texture2D( bumpMap, vBumpMapUv + dSTdx ).x - Hll;
-		float dBy = bumpScale * texture2D( bumpMap, vBumpMapUv + dSTdy ).x - Hll;
+		float scale = bumpScale;
+
+		float Hll = scale * texture2D( bumpMap, vBumpMapUv ).x;
+		float dBx = scale * texture2D( bumpMap, vBumpMapUv + dSTdx ).x - Hll;
+		float dBy = scale * texture2D( bumpMap, vBumpMapUv + dSTdy ).x - Hll;
 
 		return vec2( dBx, dBy );
 
@@ -24,10 +26,16 @@ export default /* glsl */`
 
 	vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy, float faceDirection ) {
 
-		// normalize is done to ensure that the bump map looks the same regardless of the texture's scale
-		vec3 vSigmaX = normalize( dFdx( surf_pos.xyz ) );
-		vec3 vSigmaY = normalize( dFdy( surf_pos.xyz ) );
-		vec3 vN = surf_norm; // normalized
+		// the surface derivatives are not normalized so the bump height keeps its units and the
+		// slope stays the same at any view distance
+		vec3 vSigmaX = dFdx( surf_pos.xyz );
+		vec3 vSigmaY = dFdy( surf_pos.xyz );
+
+		// bumpScale is a height in local units, so the surface is displaced along the local
+		// normal carried to view space as a direction, which matches the displacement map
+		vec3 vN = surf_norm * vBumpMatrix;
+		float invLength = inversesqrt( dot( vN, vN ) );
+		vN = vBumpMatrix * vN * invLength;
 
 		vec3 R1 = cross( vSigmaY, vN );
 		vec3 R2 = cross( vN, vSigmaX );
@@ -35,7 +43,7 @@ export default /* glsl */`
 		float fDet = dot( vSigmaX, R1 ) * faceDirection;
 
 		vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );
-		return normalize( abs( fDet ) * surf_norm - vGrad );
+		return normalize( abs( fDet ) * invLength * surf_norm - vGrad );
 
 	}
 

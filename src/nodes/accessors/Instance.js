@@ -225,6 +225,12 @@ function canReferenceInstanceData( object, builder ) {
  */
 function transformInstance( builder, instanceMatrixNode, previousMatrixNode ) {
 
+	if ( builder.context.geometryTransforms ) {
+
+		builder.context.geometryTransforms.instanceMatrix = instanceMatrixNode;
+
+	}
+
 	// POSITION
 
 	const instancePosition = instanceMatrixNode.mul( positionLocal ).xyz;
