@@ -27,25 +27,34 @@ class ObjectStats {
 
 }
 
+function getRenderName( scene, camera, renderTarget, activeCubeFace, activeMipmapLevel ) {
+
+	// Keep the material's name intact for shader program labels.
+	const materialLabel = scene.material?.name?.replaceAll( ': ', ' / ' );
+
+	if ( renderTarget?.isCubeRenderTarget ) {
+
+		const label = scene.name || materialLabel || renderTarget.texture.name || 'Cube Capture';
+
+		return `${ label } / Mip ${ activeMipmapLevel } / Face ${ activeCubeFace }`;
+
+	}
+
+	return scene.name || materialLabel || camera.name || ( scene.isQuadMesh ? 'Quad Mesh' : scene.type );
+
+}
+
+function getComputeName( computeNode ) {
+
+	return computeNode.name || ( computeNode.isComputeNode ? 'Compute' : 'Compute Group' );
+
+}
+
 class RenderStats extends ObjectStats {
 
 	constructor( uid, scene, camera, renderTarget, renderer ) {
 
-		// Keep the material's name intact for shader program labels.
-		const materialLabel = scene.material?.name?.replaceAll( ': ', ' / ' );
-		let name = scene.name || materialLabel || camera.name || ( scene.isQuadMesh ? 'Quad Mesh' : scene.type );
-
-		if ( renderTarget?.isCubeRenderTarget ) {
-
-			const face = renderer.getActiveCubeFace();
-			const label = scene.name || materialLabel || renderTarget.texture.name || 'Cube Capture';
-			const mip = renderer.getActiveMipmapLevel();
-
-			name = `${ label } / Mip ${ mip } / Face ${ face }`;
-
-		}
-
-		super( uid, name );
+		super( uid, getRenderName( scene, camera, renderTarget, renderer.getActiveCubeFace(), renderer.getActiveMipmapLevel() ) );
 
 		this.scene = scene;
 		this.camera = camera;
@@ -61,9 +70,7 @@ class ComputeStats extends ObjectStats {
 
 	constructor( uid, computeNode ) {
 
-		const name = computeNode.name || ( computeNode.isComputeNode ? 'Compute' : 'Compute Group' );
-
-		super( uid, name );
+		super( uid, getComputeName( computeNode ) );
 
 		this.computeNode = computeNode;
 
@@ -260,8 +267,7 @@ export class RendererInspector extends InspectorBase {
 		this.framesLib = {};
 		this.maxFrames = 512;
 
-		this.resources = new Set(); // tracked GPU resources as { type, name, size, creator }
-		this._resourceData = new WeakMap();
+		this._callNames = new WeakMap();
 
 		this._lastFinishTime = 0;
 		this._lastRenderedFinishTime = 0;
@@ -558,37 +564,27 @@ export class RendererInspector extends InspectorBase {
 
 	}
 
-	// the creator is the path of the render and compute calls the resource was created in, null outside of them
+	// returns the path of names of the render and compute calls which created a resource, see Info.resources
 
-	createResource( resource, type, size ) {
+	getCreatorPath( creator ) {
 
-		const creator = [];
+		return creator.flatMap( ( call ) => {
 
-		for ( let stats = this.currentContext; stats !== null && stats !== this.currentFrame; stats = stats.parent ) {
+			let names = this._callNames.get( call );
 
-			creator.unshift( ...stats.name.trim().split( /\s*\/\s*/ ) );
+			if ( names === undefined ) {
 
-		}
+				const name = call.computeNode ? getComputeName( call.computeNode ) : getRenderName( call.scene, call.camera, call.renderTarget, call.activeCubeFace, call.activeMipmapLevel );
 
-		const data = { type, name: resource.name || '', size, creator: creator.length > 0 ? creator : null };
+				names = name.trim().split( /\s*\/\s*/ );
 
-		this.resources.add( data );
-		this._resourceData.set( resource, data );
+				this._callNames.set( call, names );
 
-	}
+			}
 
-	updateResource( resource, size ) {
+			return names;
 
-		const data = this._resourceData.get( resource );
-
-		if ( data !== undefined ) data.size = size;
-
-	}
-
-	destroyResource( resource ) {
-
-		this.resources.delete( this._resourceData.get( resource ) );
-		this._resourceData.delete( resource );
+		} );
 
 	}
 
@@ -685,7 +681,6 @@ export class RendererInspector extends InspectorBase {
 
 		this.frames = [];
 		this.framesLib = {};
-		this.resources.clear();
 
 	}
 

@@ -18,17 +18,8 @@ class Info {
 
 	/**
 	 * Constructs a new info component.
-	 *
-	 * @param {Renderer} renderer - The renderer.
 	 */
-	constructor( renderer ) {
-
-		/**
-		 * The renderer.
-		 *
-		 * @type {Renderer}
-		 */
-		this.renderer = renderer;
+	constructor() {
 
 		/**
 		 * Whether frame related metrics should automatically be reset at the
@@ -144,12 +135,74 @@ class Info {
 		};
 
 		/**
-		 * Map for storing calculated byte sizes of tracked objects.
+		 * The tracked GPU resources. `creator` is the stack of the render and compute calls
+		 * the resource was created in, see {@link Info#beginRender} and {@link Info#beginCompute},
+		 * or `null` outside of them.
 		 *
-		 * @type {WeakMap<Object, number>}
+		 * @type {Set<{type: string, name: string, size: number, creator: ?Array<Object>}>}
+		 * @readonly
+		 */
+		this.resources = new Set();
+
+		/**
+		 * Map for storing the data of tracked objects.
+		 *
+		 * @type {WeakMap<Object, Object>}
 		 * @private
 		 */
 		this.memoryMap = new WeakMap();
+
+		/**
+		 * The stack of the active render and compute calls.
+		 *
+		 * @type {Array<Object>}
+		 * @private
+		 */
+		this._calls = [];
+
+	}
+
+	/**
+	 * Called when a render call begins.
+	 *
+	 * @param {Object3D} scene - The scene or 3D object to render.
+	 * @param {Camera} camera - The camera.
+	 * @param {?RenderTarget} renderTarget - The render target.
+	 * @param {number} activeCubeFace - The active cube face.
+	 * @param {number} activeMipmapLevel - The active mipmap level.
+	 */
+	beginRender( scene, camera, renderTarget, activeCubeFace, activeMipmapLevel ) {
+
+		this._calls.push( { scene, camera, renderTarget, activeCubeFace, activeMipmapLevel } );
+
+	}
+
+	/**
+	 * Called when a render call ends.
+	 */
+	finishRender() {
+
+		this._calls.pop();
+
+	}
+
+	/**
+	 * Called when a compute call begins.
+	 *
+	 * @param {Node|Array<Node>} computeNode - The compute node(s).
+	 */
+	beginCompute( computeNode ) {
+
+		this._calls.push( { computeNode } );
+
+	}
+
+	/**
+	 * Called when a compute call ends.
+	 */
+	finishCompute() {
+
+		this._calls.pop();
 
 	}
 
@@ -222,6 +275,7 @@ class Info {
 
 		}
 
+		this.resources.clear();
 		this.memoryMap = new WeakMap();
 
 	}
@@ -234,14 +288,7 @@ class Info {
 	 */
 	createTexture( texture, options ) {
 
-		const size = this._getTextureMemorySize( texture, options );
-		this.memoryMap.set( texture, size );
-
-		this.memory.textures ++;
-		this.memory.total += size;
-		this.memory.texturesSize += size;
-
-		this.renderer.inspector.createResource( texture, 'textures', size );
+		this._createResource( texture, 'textures', this._getTextureMemorySize( texture, options ) );
 
 	}
 
@@ -253,14 +300,14 @@ class Info {
 	 */
 	updateTexture( texture, options ) {
 
+		const data = this.memoryMap.get( texture );
 		const size = this._getTextureMemorySize( texture, options );
-		const delta = size - this.memoryMap.get( texture );
-		this.memoryMap.set( texture, size );
+		const delta = size - data.size;
+
+		data.size = size;
 
 		this.memory.total += delta;
 		this.memory.texturesSize += delta;
-
-		this.renderer.inspector.updateResource( texture, size );
 
 	}
 
@@ -271,14 +318,7 @@ class Info {
 	 */
 	destroyTexture( texture ) {
 
-		const size = this.memoryMap.get( texture ) || 0;
-		this.memoryMap.delete( texture );
-
-		this.memory.textures --;
-		this.memory.total -= size;
-		this.memory.texturesSize -= size;
-
-		this.renderer.inspector.destroyResource( texture );
+		this._destroyResource( texture );
 
 	}
 
@@ -291,14 +331,7 @@ class Info {
 	 */
 	_createAttribute( attribute, type ) {
 
-		const size = this._getAttributeMemorySize( attribute );
-		this.memoryMap.set( attribute, { size, type } );
-
-		this.memory[ type ] ++;
-		this.memory.total += size;
-		this.memory[ type + 'Size' ] += size;
-
-		this.renderer.inspector.createResource( attribute, type, size );
+		this._createResource( attribute, type, this._getAttributeMemorySize( attribute ) );
 
 	}
 
@@ -353,19 +386,7 @@ class Info {
 	 */
 	destroyAttribute( attribute ) {
 
-		const data = this.memoryMap.get( attribute );
-
-		if ( data ) {
-
-			this.memoryMap.delete( attribute );
-
-			this.memory[ data.type ] --;
-			this.memory.total -= data.size;
-			this.memory[ data.type + 'Size' ] -= data.size;
-
-			this.renderer.inspector.destroyResource( attribute );
-
-		}
+		this._destroyResource( attribute );
 
 	}
 
@@ -376,14 +397,7 @@ class Info {
 	 */
 	createReadbackBuffer( readbackBuffer ) {
 
-		const maxByteLength = readbackBuffer.maxByteLength;
-		this.memoryMap.set( readbackBuffer, { size: maxByteLength, type: 'readbackBuffers' } );
-
-		this.memory.readbackBuffers ++;
-		this.memory.total += maxByteLength;
-		this.memory.readbackBuffersSize += maxByteLength;
-
-		this.renderer.inspector.createResource( readbackBuffer, 'readbackBuffers', maxByteLength );
+		this._createResource( readbackBuffer, 'readbackBuffers', readbackBuffer.maxByteLength );
 
 	}
 
@@ -394,14 +408,7 @@ class Info {
 	 */
 	destroyReadbackBuffer( readbackBuffer ) {
 
-		const { size } = this.memoryMap.get( readbackBuffer );
-		this.memoryMap.delete( readbackBuffer );
-
-		this.memory.readbackBuffers --;
-		this.memory.total -= size;
-		this.memory.readbackBuffersSize -= size;
-
-		this.renderer.inspector.destroyResource( readbackBuffer );
+		this._destroyResource( readbackBuffer );
 
 	}
 
@@ -412,14 +419,7 @@ class Info {
 	 */
 	createUniformBuffer( uniformBuffer ) {
 
-		const size = uniformBuffer.byteLength;
-		this.memoryMap.set( uniformBuffer, { size, type: 'uniformBuffers' } );
-
-		this.memory.uniformBuffers ++;
-		this.memory.total += size;
-		this.memory.uniformBuffersSize += size;
-
-		this.renderer.inspector.createResource( uniformBuffer, 'uniformBuffers', size );
+		this._createResource( uniformBuffer, 'uniformBuffers', uniformBuffer.byteLength );
 
 	}
 
@@ -430,19 +430,7 @@ class Info {
 	 */
 	destroyUniformBuffer( uniformBuffer ) {
 
-		const data = this.memoryMap.get( uniformBuffer );
-
-		if ( data ) {
-
-			this.memoryMap.delete( uniformBuffer );
-
-			this.memory.uniformBuffers --;
-			this.memory.total -= data.size;
-			this.memory.uniformBuffersSize -= data.size;
-
-			this.renderer.inspector.destroyResource( uniformBuffer );
-
-		}
+		this._destroyResource( uniformBuffer );
 
 	}
 
@@ -453,15 +441,7 @@ class Info {
 	 */
 	createProgram( program ) {
 
-		const size = program.code.length; // Approx size
-
-		this.memoryMap.set( program, size );
-
-		this.memory.programs ++;
-		this.memory.total += size;
-		this.memory.programsSize += size;
-
-		this.renderer.inspector.createResource( program, 'programs', size );
+		this._createResource( program, 'programs', program.code.length ); // Approx size
 
 	}
 
@@ -472,14 +452,50 @@ class Info {
 	 */
 	destroyProgram( program ) {
 
-		const size = this.memoryMap.get( program ) || 0;
-		this.memoryMap.delete( program );
+		this._destroyResource( program );
 
-		this.memory.programs --;
-		this.memory.total -= size;
-		this.memory.programsSize -= size;
+	}
 
-		this.renderer.inspector.destroyResource( program );
+	/**
+	 * Tracks the memory of a resource.
+	 *
+	 * @param {Object} resource - The resource to track.
+	 * @param {string} type - The memory type, see {@link Info#memory}.
+	 * @param {number} size - The memory size in bytes.
+	 * @private
+	 */
+	_createResource( resource, type, size ) {
+
+		const creator = this._calls.length > 0 ? this._calls.slice() : null;
+		const data = { type, name: resource.name || '', size, creator };
+
+		this.memoryMap.set( resource, data );
+		this.resources.add( data );
+
+		this.memory[ type ] ++;
+		this.memory.total += size;
+		this.memory[ type + 'Size' ] += size;
+
+	}
+
+	/**
+	 * Stops tracking the memory of a resource.
+	 *
+	 * @param {Object} resource - The tracked resource.
+	 * @private
+	 */
+	_destroyResource( resource ) {
+
+		const data = this.memoryMap.get( resource );
+
+		if ( data === undefined ) return;
+
+		this.memoryMap.delete( resource );
+		this.resources.delete( data );
+
+		this.memory[ data.type ] --;
+		this.memory.total -= data.size;
+		this.memory[ data.type + 'Size' ] -= data.size;
 
 	}
 

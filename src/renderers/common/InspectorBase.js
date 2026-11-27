@@ -117,30 +117,6 @@ class InspectorBase extends EventDispatcher {
 	computeAsync( /*computeNode, dispatchSizeOrCount*/ ) { }
 
 	/**
-	 * Called when the memory of a GPU resource starts being tracked.
-	 *
-	 * @param {Object} resource - The tracked resource.
-	 * @param {string} type - The memory type of the resource, see {@link Info#memory}.
-	 * @param {number} size - The memory size in bytes.
-	 */
-	createResource( /*resource, type, size*/ ) { }
-
-	/**
-	 * Called when the memory size of a tracked GPU resource changes.
-	 *
-	 * @param {Object} resource - The tracked resource.
-	 * @param {number} size - The memory size in bytes.
-	 */
-	updateResource( /*resource, size*/ ) { }
-
-	/**
-	 * Called when the memory of a GPU resource is no longer tracked.
-	 *
-	 * @param {Object} resource - The tracked resource.
-	 */
-	destroyResource( /*resource*/ ) { }
-
-	/**
 	 * Called when a compute operation begins.
 	 *
 	 * @param {string} uid - A unique identifier for the render context.

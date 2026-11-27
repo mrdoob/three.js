@@ -93,9 +93,9 @@ class Memory extends Tab {
 		const createNode = ( isAllocation ) => ( { count: 0, size: 0, ownCount: 0, ownSize: 0, isAllocation, children: new Map() } );
 		const root = createNode( false );
 
-		for ( const { type, name, size, creator } of inspector.resources ) {
+		for ( const { type, name, size, creator } of inspector.getRenderer().info.resources ) {
 
-			const path = creator || [ 'Miscellaneous' ];
+			const path = creator !== null ? inspector.getCreatorPath( creator ) : [ 'Miscellaneous' ];
 			const labels = type === 'textures' || type === 'programs' ? name.trim().split( /\s*\/\s*/ ).filter( ( key ) => key !== '' ) : ( name.trim() !== '' ? [ name ] : [] );
 			const keys = [ ...path, splitCamelCase( type[ 0 ].toUpperCase() + type.slice( 1, - 1 ) ), ...labels ];
 
