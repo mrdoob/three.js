@@ -252,7 +252,11 @@ class BufferGeometryLoader extends Loader {
 
 				const group = groups[ i ];
 
-				geometry.addGroup( group.start, group.count, group.materialIndex );
+				// a group count of Infinity is serialized as null
+
+				const count = ( group.count === null ) ? Infinity : group.count;
+
+				geometry.addGroup( group.start, count, group.materialIndex );
 
 			}
 
