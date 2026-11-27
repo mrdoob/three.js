@@ -1,11 +1,6 @@
 import LightingNode from './LightingNode.js';
 import { isolate } from '../core/IsolateNode.js';
-import { roughness, clearcoatRoughness, retroreflectivity } from '../core/PropertyNode.js';
-import { cameraWorldMatrix } from '../accessors/Camera.js';
-import { normalView, clearcoatNormalView, normalWorld } from '../accessors/Normal.js';
-import { positionViewDirection } from '../accessors/Position.js';
-import { float, pow4 } from '../tsl/TSLBase.js';
-import { bentNormalView } from '../accessors/AccessorsUtils.js';
+import { float } from '../tsl/TSLBase.js';
 import { pmremTexture } from '../pmrem/PMREMNode.js';
 import { materialEnvIntensity } from '../accessors/MaterialProperties.js';
 import { NodeUpdateType } from '../core/constants.js';
@@ -16,6 +11,9 @@ const _rendererCache = new WeakMap();
  * Represents a physical model for Image-based lighting (IBL). The environment
  * is defined by an equirectangular or cube texture.
  * `EnvironmentNode` is intended for PBR materials like {@link MeshStandardNodeMaterial}.
+ *
+ * It answers queries for indirect specular and indirect diffuse light, which the default
+ * providers of {@link IndirectLightingNode} ask.
  *
  * @augments LightingNode
  */
@@ -54,11 +52,24 @@ class EnvironmentNode extends LightingNode {
 		 */
 		this._pmremNode = null;
 
+		/**
+		 * The node the queries are evaluated on, which is the PMREM node if there is one.
+		 *
+		 * @private
+		 * @type {?Node}
+		 * @default null
+		 */
+		this._resolvedNode = null;
+
 	}
 
+	/**
+	 * Resolves the environment. A texture is converted to PMREM here. The node contributes
+	 * no light by itself: the default providers of {@link IndirectLightingNode} query it.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
 	setup( builder ) {
-
-		const { material } = builder;
 
 		let envNode = this.envNode;
 
@@ -83,43 +94,38 @@ class EnvironmentNode extends LightingNode {
 
 		}
 
-		//
+		this._resolvedNode = envNode;
 
-		const useAnisotropy = material.useAnisotropy === true || material.anisotropy > 0;
-		const radianceNormalView = useAnisotropy ? bentNormalView : normalView;
+	}
 
-		let radiance = isolate( envNode.context( createRadianceContext( roughness, radianceNormalView ) ).mul( materialEnvIntensity ) );
+	/**
+	 * Returns the indirect specular light of the environment: the radiance arriving around
+	 * the given direction, filtered to the given roughness.
+	 *
+	 * @param {Object} query - The query.
+	 * @param {Node<vec3>} query.direction - The direction to look in, in world space.
+	 * @param {Node<float>} query.roughness - The roughness of the specular lobe.
+	 * @return {Node<vec3>} The radiance.
+	 */
+	getIndirectSpecular( { direction, roughness } ) {
 
-		if ( material.useRetroreflection === true || material.retroreflectivity > 0 ) {
+		// an environment is any node that samples textures without coordinates or a level, so the query reaches it through the context
 
-			const retroRadiance = isolate( envNode.context( createRetroRadianceContext( roughness, radianceNormalView ) ).mul( materialEnvIntensity ) );
+		return isolate( this._resolvedNode.context( { getUV: () => direction, getTextureLevel: () => roughness } ).mul( materialEnvIntensity ) );
 
-			radiance = retroreflectivity.clamp().mix( radiance, retroRadiance );
+	}
 
-		}
+	/**
+	 * Returns the indirect diffuse light of the environment: the irradiance arriving on a
+	 * surface with the given normal.
+	 *
+	 * @param {Object} query - The query.
+	 * @param {Node<vec3>} query.normal - The normal of the surface, in world space.
+	 * @return {Node<vec3>} The irradiance.
+	 */
+	getIndirectDiffuse( { normal } ) {
 
-		const irradiance = envNode.context( createIrradianceContext( normalWorld ) ).mul( Math.PI ).mul( materialEnvIntensity );
-
-		const isolateIrradiance = isolate( irradiance );
-
-		//
-
-		builder.context.radiance.addAssign( radiance );
-
-		builder.context.irradiance.addAssign( isolateIrradiance );
-
-		//
-
-		const clearcoatRadiance = builder.context.lightingModel.clearcoatRadiance;
-
-		if ( clearcoatRadiance ) {
-
-			const clearcoatRadianceContext = envNode.context( createRadianceContext( clearcoatRoughness, clearcoatNormalView ) ).mul( materialEnvIntensity );
-			const isolateClearcoatRadiance = isolate( clearcoatRadianceContext );
-
-			clearcoatRadiance.addAssign( isolateClearcoatRadiance );
-
-		}
+		return isolate( this._resolvedNode.context( { getUV: () => normal, getTextureLevel: () => float( 1.0 ) } ).mul( Math.PI ).mul( materialEnvIntensity ) );
 
 	}
 
@@ -187,78 +193,3 @@ class EnvironmentNode extends LightingNode {
 }
 
 export default EnvironmentNode;
-
-const createRadianceContext = ( roughnessNode, normalViewNode ) => {
-
-	let reflectVec = null;
-
-	return {
-		getUV: () => {
-
-			if ( reflectVec === null ) {
-
-				reflectVec = positionViewDirection.negate().reflect( normalViewNode );
-
-				// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
-				reflectVec = pow4( roughnessNode ).mix( reflectVec, normalViewNode ).normalize();
-
-				reflectVec = reflectVec.transformDirection( cameraWorldMatrix );
-
-			}
-
-			return reflectVec;
-
-		},
-		getTextureLevel: () => {
-
-			return roughnessNode;
-
-		}
-	};
-
-};
-
-const createRetroRadianceContext = ( roughnessNode, normalViewNode ) => {
-
-	let retroVec = null;
-
-	return {
-		getUV: () => {
-
-			if ( retroVec === null ) {
-
-				// The retroreflective lobe returns light toward its source, so the environment is sampled along the view direction
-				retroVec = pow4( roughnessNode ).mix( positionViewDirection, normalViewNode ).normalize();
-
-				retroVec = retroVec.transformDirection( cameraWorldMatrix );
-
-			}
-
-			return retroVec;
-
-		},
-		getTextureLevel: () => {
-
-			return roughnessNode;
-
-		}
-	};
-
-};
-
-const createIrradianceContext = ( normalWorldNode ) => {
-
-	return {
-		getUV: () => {
-
-			return normalWorldNode;
-
-		},
-		getTextureLevel: () => {
-
-			return float( 1.0 );
-
-		}
-	};
-
-};

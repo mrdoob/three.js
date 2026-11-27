@@ -39,16 +39,18 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, velocity } from 'three/tsl';
+			import { pass, mrt, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, velocity, Fn, builtinIndirectContext, defaultIndirectSpecular, screenUV } from 'three/tsl';
 			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 			import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 			import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { smaa } from 'three/addons/tsl/display/SMAANode.js';
+			import { reprojectedBeauty, previousViewZ } from 'three/addons/tsl/display/ReprojectedBeautyNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { coverageCascade } from 'three/addons/tsl/lighting/CoverageCascade.js';
 
 			const params = {
 				output: 'Beauty', traa: true,
@@ -182,27 +184,27 @@
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
 
+				// the pre-pass renders the geometry SSR traces, without shading it
+
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
-					output: output,
+					output: packNormalToOctahedral( normalView ),
 					diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
-					normal: packNormalToOctahedral( normalView ),
-					velocity: vec4( velocity, materialRoughness, 0 )
+					velocity: vec4( velocity, materialRoughness, previousViewZ )
 				} ) );
 
-				// octahedral normals can't be filtered across their folds
+				const scenePassDepth = scenePass.getTextureNode( 'depth' );
+				const scenePassNormal = scenePass.getTextureNode( 'output' );
+				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
+				const scenePassDiffuseColor = scenePass.getTextureNode( 'diffuseColor' );
 
-				const normalTexture = scenePass.getTexture( 'normal' );
+				// octahedral normals can't be filtered across their folds, the other attachments are created before the output becomes RG
+
+				const normalTexture = scenePass.getTexture( 'output' );
 				normalTexture.format = THREE.RGFormat;
 				normalTexture.minFilter = normalTexture.magFilter = THREE.NearestFilter;
 
 				scenePass.getTexture( 'diffuseColor' ).type = THREE.UnsignedByteType;
-
-				const scenePassColor = scenePass.getTextureNode( 'output' );
-				const scenePassDepth = scenePass.getTextureNode( 'depth' );
-				const scenePassNormal = scenePass.getTextureNode( 'normal' );
-				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
-				const scenePassDiffuseColor = scenePass.getTextureNode( 'diffuseColor' );
 
 				const normalDecode = ( value ) => unpackOctahedralToNormal( value.rg );
 				const sceneNormal = sample( ( uv ) => normalDecode( scenePassNormal.sample( uv ) ) );
@@ -217,9 +219,13 @@
 
 				// ssr
 
-				const ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+				// SSR reflects the previous frame's beauty, so it is ready before this frame is shaded
+
+				const beautyPass = pass( scene, camera );
+
+				const ssrNode = ssr( reprojectedBeauty( scenePass, beautyPass ), scenePassDepth, sceneNormal, {
+					camera,
 					stochastic: true,
-					diffuseNode: scenePassDiffuseColor,
 					metalnessNode: scenePassDiffuseColor.a,
 					roughnessNode: sceneRoughness,
 					binaryRefine: params.binaryRefine
@@ -231,6 +237,7 @@
 
 				const temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
 					mode: 'specular',
+					hitDistance: ssrNode.getHitDistanceNode(),
 					accumulate: false,
 					normalDecode: normalDecode
 				} );
@@ -242,6 +249,8 @@
 					normal: sceneNormal,
 					raw: ssrNode,
 					metalRoughness: sceneMetalRough,
+					hitDistance: ssrNode.getHitDistanceNode(),
+					frameCount: temporalReprojectNode.getFrameCountNode(),
 					mode: 'specular',
 					accumulate: true
 				} );
@@ -252,19 +261,26 @@
 				denoiseNode.strength.value = 0.725;
 				denoiseNode.adaptiveTrust.value = 1;
 
-				// feed the denoised result + velocity back into SSR for multi-bounce reflections
-
-				ssrNode.setHistory( denoiseNode, scenePassVelocity );
 				temporalReprojectNode.setHistoryTexture( denoiseNode );
 
-				// composite
+				// the materials reflect SSR through their BRDF, and the environment where SSR has no coverage
 
 				const denoiseEnabled = uniform( 1 );
 
-				const combined = scenePassColor.rgb.add( mix( ssrTexture.rgb, denoiseNode.rgb, denoiseEnabled ) );
+				beautyPass.contextNode = builtinIndirectContext( {
+					specular: coverageCascade( [ ssrNode.getSpecularSource( mix( ssrTexture.sample( screenUV ), denoiseNode.getTextureNode().sample( screenUV ), denoiseEnabled ) ) ], defaultIndirectSpecular )
+				} );
 
-				const temporalAA = traa( vec4( combined, 1 ), scenePassDepth, scenePassVelocity, camera );
-				const spatialAA = smaa( vec4( combined, 1 ) );
+				const temporalAA = traa( beautyPass, scenePassDepth, scenePassVelocity, camera );
+				const spatialAA = smaa( beautyPass );
+
+				// every view renders the beauty, since the next frame reflects it
+
+				const keepBeauty = Fn( () => {
+
+					beautyPass.toVar();
+
+				} )();
 
 				function updateOutput() {
 
@@ -275,10 +291,11 @@
 						case 'Beauty': outputNode = params.traa ? temporalAA : spatialAA; break;
 						case 'SSR': outputNode = vec4( ssrTexture.rgb, 1 ); break;
 						case 'SSR DN': outputNode = vec4( denoiseNode.rgb, 1 ); break;
+						case 'Coverage': outputNode = vec4( denoiseNode.aaa, 1 ); break;
 
 					}
 
-					renderPipeline.outputNode = outputNode;
+					renderPipeline.outputNode = outputNode.bypass( keepBeauty );
 					renderPipeline.outputColorTransform = true;
 					renderPipeline.needsUpdate = true;
 
@@ -298,7 +315,7 @@
 				// GUI
 
 				const displayGui = renderer.inspector.createParameters( 'Display' );
-				displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN' ] ).name( 'Output' ).onChange( updateOutput );
+				displayGui.add( params, 'output', [ 'Beauty', 'SSR', 'SSR DN', 'Coverage' ] ).name( 'Output' ).onChange( updateOutput );
 				displayGui.add( params, 'traa' ).name( 'TRAA' ).onChange( updateOutput );
 
 				const ssrGui = renderer.inspector.createParameters( 'SSR' );

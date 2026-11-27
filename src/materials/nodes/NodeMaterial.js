@@ -14,7 +14,7 @@ import { morphReference, morphColor } from '../../nodes/accessors/Morph.js';
 import { fwidth, mix, smoothstep } from '../../nodes/math/MathNode.js';
 import { float, vec3, vec4, bool } from '../../nodes/tsl/TSLBase.js';
 import AONode from '../../nodes/lighting/AONode.js';
-import OcclusionAwareIrradianceNode from '../../nodes/lighting/OcclusionAwareIrradianceNode.js';
+import IndirectLightingNode from '../../nodes/lighting/IndirectLightingNode.js';
 import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
 import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
 import { depth, viewZToLogarithmicDepth, viewZToOrthographicDepth } from '../../nodes/display/ViewportDepthNode.js';
@@ -1026,15 +1026,7 @@ class NodeMaterial extends Material {
 	 */
 	setupMaterialLightings( builder ) {
 
-		const materialLightsNode = [];
-
-		const envNode = this.setupEnvironment( builder );
-
-		if ( envNode && envNode.isLightingNode ) {
-
-			materialLightsNode.push( envNode );
-
-		}
+		const materialLightsNode = this.setupIndirectLightings( builder );
 
 		const lightMapNode = this.setupLightMap( builder );
 
@@ -1050,15 +1042,34 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( builder.context.getGI ) {
+		return materialLightsNode;
 
-			const giNode = builder.context.getGI( null, builder );
+	}
 
-			if ( giNode !== null ) {
+	/**
+	 * Setups the lighting nodes of the environment and of the indirect diffuse
+	 * provider of the context, see {@link builtinIndirectContext}.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Array<LightingNode>} The lighting nodes.
+	 */
+	setupIndirectLightings( builder ) {
 
-				materialLightsNode.push( new OcclusionAwareIrradianceNode( giNode ) );
+		const materialLightsNode = [];
 
-			}
+		const envNode = this.setupEnvironment( builder );
+
+		if ( envNode && envNode.isLightingNode ) {
+
+			materialLightsNode.push( envNode );
+
+		}
+
+		const diffuse = builder.context.indirectDiffuse;
+
+		if ( diffuse !== undefined ) {
+
+			materialLightsNode.push( new IndirectLightingNode( null, diffuse ) );
 
 		}
 

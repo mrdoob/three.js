@@ -33,7 +33,9 @@ const outgoingLight = property( 'vec3', 'outgoingLight' );
  */
 const sortLights = ( lights ) => {
 
-	return lights.sort( ( a, b ) => a.id - b.id );
+	// the indirect lighting comes last, its default providers return what the lights have written
+
+	return lights.sort( ( a, b ) => ( a.isIndirectLightingNode === true ) - ( b.isIndirectLightingNode === true ) || a.id - b.id );
 
 };
 
@@ -336,17 +338,31 @@ class LightsNode extends Node {
 	 */
 	setupLights( builder, lightNodes ) {
 
+		let lightProbes = false;
+
+		const setupLightProbes = () => {
+
+			if ( lightProbes === false && builder.context.lightProbeIrradiance !== undefined ) {
+
+				builder.context.irradiance.addAssign( builder.context.lightProbeIrradiance );
+
+				lightProbes = true;
+
+			}
+
+		};
+
 		for ( const lightNode of lightNodes ) {
+
+			// the indirect lighting comes last, and its default provider returns the irradiance
+
+			if ( lightNode.isIndirectLightingNode === true ) setupLightProbes();
 
 			lightNode.build( builder );
 
 		}
 
-		if ( builder.context.lightProbeIrradiance !== undefined ) {
-
-			builder.context.irradiance.addAssign( builder.context.lightProbeIrradiance );
-
-		}
+		setupLightProbes();
 
 	}
 

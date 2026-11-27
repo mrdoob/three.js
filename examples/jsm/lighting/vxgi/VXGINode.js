@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, HalfFloatType, RGBAFormat, RedFormat, UnsignedByteType } from 'three/webgpu';
-import { Fn, NodeUpdateType, uniform, reference, vec2, vec4, float, uv, mix, passTexture, getViewPosition, getNormalFromDepth, screenCoordinate, interleavedGradientNoise, normalize, floor, exp2, pow, PI, Loop, If, Break, outputStruct, context, projectionDepth } from 'three/tsl';
+import { Fn, NodeUpdateType, uniform, reference, vec2, vec4, float, uv, mix, passTexture, getViewPosition, getNormalFromDepth, screenCoordinate, interleavedGradientNoise, normalize, floor, exp2, pow, PI, Loop, If, Break, outputStruct, context, projectionDepth, screenUV } from 'three/tsl';
 
 import { VXGIVolume } from './VXGIVolume.js';
 import { createConeTracer, gather, intersectVolume, sampleDirectional } from './VXGIConeTracer.js';
@@ -325,13 +325,25 @@ class VXGINode extends Node {
 
 	/**
 	 * Returns the GI result of the effect as a texture node. The texture holds the indirect
-	 * diffuse irradiance, ready to be added to the lighting via `builtinGIContext()`.
+	 * diffuse irradiance. Use {@link VXGINode#getDiffuseSource} to light materials with it.
 	 *
 	 * @return {PassTextureNode} A texture node that represents the GI result of the effect.
 	 */
 	getGINode() {
 
 		return this._giNode;
+
+	}
+
+	/**
+	 * Returns the GI as an indirect diffuse source for `coverageCascade()`.
+	 * It adds to the sources behind it.
+	 *
+	 * @return {Node<vec4>} The irradiance, with a coverage of zero.
+	 */
+	getDiffuseSource() {
+
+		return vec4( this._giNode.sample( screenUV ).rgb, 0 );
 
 	}
 

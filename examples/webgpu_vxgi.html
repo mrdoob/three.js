@@ -36,13 +36,14 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, sample, screenUV, builtinGIContext } from 'three/tsl';
+			import { pass, mrt, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, sample, screenUV, builtinAOContext, builtinIndirectContext, defaultIndirectDiffuse } from 'three/tsl';
 			import { vxgi } from 'three/addons/lighting/vxgi/VXGINode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import { coverageCascade } from 'three/addons/tsl/lighting/CoverageCascade.js';
 
 			if ( WebGPU.isAvailable() === false ) {
 
@@ -118,7 +119,7 @@
 				// scene pass: AO and indirect irradiance are injected into the materials' lighting
 
 				const scenePass = pass( scene, camera ).toInspector( 'Color' );
-				const giContext = builtinGIContext( ao.sample( screenUV ).r, gi.sample( screenUV ).rgb );
+				const giContext = builtinAOContext( ao.sample( screenUV ).r, builtinIndirectContext( { diffuse: coverageCascade( [ giPass.getDiffuseSource() ], defaultIndirectDiffuse ) } ) );
 				scenePass.contextNode = giContext;
 
 				// traa ( resolves the temporal noise of the cone tracing )

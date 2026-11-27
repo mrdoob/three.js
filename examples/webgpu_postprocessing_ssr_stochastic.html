@@ -57,46 +57,28 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
+		import { pass, mrt, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, velocity, diffuseColor, vec4, uniform, mix, step, abs, float, renderOutput, saturation, Fn, builtinIndirectContext, defaultIndirectSpecular } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 		import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
 		import { traa } from 'three/addons/tsl/display/TRAANode.js';
+		import { reprojectedBeauty, previousViewZ } from 'three/addons/tsl/display/ReprojectedBeautyNode.js';
 
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { Inspector } from 'three/addons/inspector/Inspector.js';
 		import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
-
-		// Disable env map specular (radiance and clearcoat radiance) for every PBR material
-		// in this scene, since SSR provides the specular reflections instead. Diffuse env
-		// (irradiance) is left untouched. Equivalent to zeroing EnvironmentNode contributions,
-		// but scoped to this example rather than modifying the core library.
-		const _indirectSpecular = THREE.PhysicalLightingModel.prototype.indirectSpecular;
-		THREE.PhysicalLightingModel.prototype.indirectSpecular = function ( builder ) {
-
-			builder.context.radiance = vec3( 0 );
-
-			if ( this.clearcoatRadiance ) {
-
-				this.clearcoatRadiance.assign( vec3( 0 ) );
-
-			}
-
-			_indirectSpecular.call( this, builder );
-
-		};
+		import { coverageCascade } from 'three/addons/tsl/lighting/CoverageCascade.js';
 
 		const OUTPUT_COMPARE_DENOISE = 8;
-		const OUTPUT_COMPARE_SSR = 9;
 		const compareHint = document.getElementById( 'compare-hint' );
 		const compareSplit = uniform( 0.5 );
 		const compareResolution = uniform( new THREE.Vector2( window.innerWidth, window.innerHeight ) );
 
 		function isCompareMode() {
 
-			return params.output === OUTPUT_COMPARE_DENOISE || params.output === OUTPUT_COMPARE_SSR;
+			return params.output === OUTPUT_COMPARE_DENOISE;
 
 		}
 
@@ -124,10 +106,7 @@
 				maxLuminance: 35,
 				binaryRefine: false,
 				stepExponent: 3,
-				envImportanceSampling: false,
 				screenEdgeFade: 0.2,
-				screenEdgeFadeBlack: false, // for indoor scenes, set to true
-				environmentIntensity: 3.14, // not too sure why exactly, but multiplying by ~PI makes the env map reflections match Blender more
 			},
 
 			temporalReproject: {
@@ -160,7 +139,7 @@
 
 		let camera, scene, model, renderer, renderPipeline, ssrNode, temporalReprojectNode, denoiseNode;
 		let controls;
-		let combinedOutputNode, scenePassColor, scenePassDepth, scenePassVelocity;
+		let combinedOutputNode, beautyPass, scenePassDepth, scenePassVelocity;
 		let gammaUniform, contrastUniform, saturationUniform;
 		const temporalOutputs = new Map();
 
@@ -233,20 +212,17 @@
 
 			renderPipeline = new THREE.RenderPipeline( renderer );
 
+			// the pre-pass renders the geometry SSR traces, without shading it
+
 			const scenePass = pass( scene, camera );
 			scenePass.setMRT( mrt( {
-				output: output,
-				// Store base color (albedo) in RGB + metalness in alpha. The albedo is needed for
-				// metal Fresnel f0; do NOT bake in the (1-metalness) diffuse attenuation here, as
-				// that zeroes metals and destroys their specular tint (f0 would become 0 → black).
+				output: packNormalToOctahedral( normalView ),
 				diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
-				normal: packNormalToOctahedral( normalView ),
 				// Pack roughness into the spare velocity channel to save MRT bandwidth
-				velocity: vec4( velocity, materialRoughness, 0 )
+				velocity: vec4( velocity, materialRoughness, previousViewZ )
 			} ) );
 
-			scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
-			const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', ( node ) => packNormalToRGB( unpackOctahedralToNormal( node.rg ) ) );
+			const scenePassNormal = scenePass.getTextureNode( 'output' ).toInspector( 'Normal', ( node ) => packNormalToRGB( unpackOctahedralToNormal( node.rg ) ) );
 			scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
 
 				return scenePass.getLinearDepthNode();
@@ -255,9 +231,9 @@
 			scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
 			const scenePassDiffuseColor = scenePass.getTextureNode( 'diffuseColor' ).toInspector( 'Diffuse Color' );
 
-			// octahedral normals can't be filtered across their folds
+			// octahedral normals can't be filtered across their folds, the other attachments are created before the output becomes RG
 
-			const normalTexture = scenePass.getTexture( 'normal' );
+			const normalTexture = scenePass.getTexture( 'output' );
 			normalTexture.format = THREE.RGFormat;
 			normalTexture.minFilter = normalTexture.magFilter = THREE.NearestFilter;
 
@@ -273,18 +249,21 @@
 				scenePassVelocity.sample( uv ).z
 			) ).toInspector( 'Metalness/Roughness' );
 
-			ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+			// SSR reflects the previous frame's beauty, so it is ready before this frame is shaded
+
+			beautyPass = pass( scene, camera );
+
+			ssrNode = ssr( reprojectedBeauty( scenePass, beautyPass ), scenePassDepth, sceneNormal, {
+				camera,
 				stochastic: true,
-				diffuseNode: scenePassDiffuseColor,
 				metalnessNode: scenePassDiffuseColor.a,
 				roughnessNode: scenePassVelocity.z,
-				environmentNode: hdrTexture,
-				envImportanceSampling: params.ssr.envImportanceSampling,
 				binaryRefine: params.ssr.binaryRefine
 			} ).toInspector( 'SSR' );
 
 			temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
 				mode: 'specular',
+				hitDistance: ssrNode.getHitDistanceNode(),
 				accumulate: false,
 				normalDecode: normalDecode
 			} );
@@ -295,26 +274,25 @@
 				normal: sceneNormal,
 				raw: ssrNode,
 				metalRoughness: scenePassMetalRough,
+				hitDistance: ssrNode.getHitDistanceNode(),
+				frameCount: temporalReprojectNode.getFrameCountNode(),
 				mode: 'specular',
 				accumulate: true,
 			} );
-			denoiseNode.alphaSource = 'raylength'; // SSR alpha channel contains ray length
 			denoiseNode.toInspector( 'Denoise' );
-			// feed the denoised result + velocity back into SSR for multi-bounce reflections
-			ssrNode.setHistory( denoiseNode, scenePassVelocity );
 			temporalReprojectNode.setHistoryTexture( denoiseNode );
 
-			const denoisePassBlend = vec4( denoiseNode.rgb, ssrNode.a.greaterThan( 0 ).toVar() );
+			// the materials reflect SSR through their BRDF, and the environment where SSR has no coverage
+
+			beautyPass.contextNode = builtinIndirectContext( {
+				specular: coverageCascade( [ ssrNode.getSpecularSource( denoiseNode.getTextureNode().sample( screenUV ) ) ], defaultIndirectSpecular )
+			} );
 
 			gammaUniform = uniform( params.post.grading.gamma );
 			contrastUniform = uniform( params.post.grading.contrast );
 			saturationUniform = uniform( params.post.grading.saturation );
 
-			const litColor = scenePassColor.rgb.add( denoisePassBlend.rgb );
-
-			const outputNode = vec4( litColor, 1 );
-			outputNode.toInspector( 'Combined SSR' );
-			combinedOutputNode = outputNode;
+			combinedOutputNode = beautyPass.getTextureNode().toInspector( 'Combined SSR' );
 
 			renderPipeline.outputNode = applyPostProcessing( combinedOutputNode );
 			renderPipeline.outputColorTransform = false;
@@ -346,9 +324,9 @@
 				SSR: 1,
 				'SSR DN': 4,
 				'Compare (Denoise)': OUTPUT_COMPARE_DENOISE,
-				'Compare (Reflections)': OUTPUT_COMPARE_SSR,
+				Coverage: 5,
 				'Ray Length': 7,
-				'Accumulation Speed (Alpha)': 6
+				'Accumulation Speed': 6
 			};
 
 			const displayGui = renderer.inspector.createParameters( 'Display' );
@@ -356,7 +334,7 @@
 			displayGui.add( params.post, 'traa' ).name( 'TRAA' ).onChange( updateOutputNode );
 
 			const ssrGui = renderer.inspector.createParameters( 'SSR' );
-			ssrGui.add( params.ssr, 'intensity', 0, 4 ).name( 'Intensity' ).onChange( applyParams );
+			ssrGui.add( params.ssr, 'intensity', 0, 1 ).name( 'Intensity' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'binaryRefine' ).name( 'Binary refine' ).onChange( applyParams );
 			ssrGui.add( params.ssr, 'maxDistance', 0, 5 ).name( 'Max distance' ).onChange( applyParams );
@@ -388,7 +366,6 @@
 				} );
 
 			} );
-			sceneGui.add( params.ssr, 'environmentIntensity', 0, 10 ).name( 'Environment intensity' ).onChange( applyParams );
 
 			const advancedGui = renderer.inspector.createParameters( 'SSR advanced' ).close();
 			advancedGui.add( params.ssr, 'mirrorBias', 0, 1 ).name( 'Mirror bias' ).onChange( applyParams );
@@ -416,7 +393,7 @@
 			ssrNode.resolutionScale = params.ssr.resolutionScale;
 			ssrNode.quality.value = params.ssr.quality;
 			ssrNode.mirrorBias.value = params.ssr.mirrorBias;
-			// stepExponent / screenEdgeFadeBlack / binaryRefine are build-time constants: assigning
+			// stepExponent / binaryRefine are build-time constants: assigning
 			// them recompiles the SSR material (the setters no-op when the value is unchanged).
 			ssrNode.stepExponent = params.ssr.stepExponent;
 			ssrNode.binaryRefine = params.ssr.binaryRefine;
@@ -425,8 +402,6 @@
 			ssrNode.thickness.value = params.ssr.thickness;
 			ssrNode.maxLuminance.value = params.ssr.maxLuminance;
 			ssrNode.screenEdgeFade.value = params.ssr.screenEdgeFade;
-			ssrNode.screenEdgeFadeBlack = params.ssr.screenEdgeFadeBlack;
-			ssrNode.environmentIntensity.value = params.ssr.environmentIntensity;
 
 			if ( temporalReprojectNode ) {
 
@@ -506,16 +481,14 @@
 				case 0: node = applyPostProcessing( combinedOutputNode ); break; // Beauty
 				case 1: node = applyGrading( vec4( ssrNode.rgb, 1 ) ); break; // SSR
 				case 4: node = applyGrading( vec4( denoiseNode.rgb, 1 ) ); break; // SSR DN
-				case 6: node = vec4( denoiseNode.aaa, 1 ); break; // Accumulation Speed (Alpha)
-				case 7: node = vec4( ssrNode.aaa, 1 ); break; // Ray Length
+				case 6: node = vec4( temporalReprojectNode.getFrameCountNode().rrr, 1 ); break; // Accumulation Speed
+				case 5: node = vec4( denoiseNode.aaa, 1 ); break; // Coverage
+				case 7: node = vec4( ssrNode.getHitDistanceNode().rrr, 1 ); break; // Ray Length
 				case OUTPUT_COMPARE_DENOISE:
 					node = buildCompareNode(
 						applyGrading( vec4( denoiseNode.rgb, 1 ) ),
 						applyGrading( vec4( ssrNode.rgb, 1 ) )
 					);
-					break;
-				case OUTPUT_COMPARE_SSR:
-					node = buildCompareNode( applyPostProcessing( combinedOutputNode ), applyPostProcessing( scenePassColor ) );
 					break;
 
 			}
@@ -523,8 +496,14 @@
 			compareHint.hidden = ! isCompareMode();
 			releaseCompareControls();
 
-			renderPipeline.outputColorTransform = params.output === 6 || params.output === 7;
-			renderPipeline.outputNode = node;
+			// every view renders the beauty, since the next frame reflects it
+
+			renderPipeline.outputColorTransform = params.output >= 5 && params.output <= 7;
+			renderPipeline.outputNode = node.bypass( Fn( () => {
+
+				beautyPass.toVar();
+
+			} )() );
 			renderPipeline.needsUpdate = true;
 
 		}

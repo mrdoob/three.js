@@ -1,4 +1,4 @@
-import { abs, atan, bool, convertToTexture, cos, cross, Discard, dot, EPSILON, exp, float, Fn, getScreenPosition, getViewPosition, If, int, log, Loop, luminance, mat2, max, mix, nodeObject, NodeUpdateType, normalize, passTexture, PI, property, reflect, sin, smoothstep, sqrt, tan, texture, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth } from 'three/tsl';
+import { abs, atan, bool, convertToTexture, cos, cross, Discard, dot, EPSILON, exp, float, Fn, getScreenPosition, getViewPosition, If, int, log, Loop, luminance, mat2, max, mix, nodeObject, NodeUpdateType, normalize, passTexture, PI, property, reflect, sin, smoothstep, sqrt, outputStruct, tan, texture, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth } from 'three/tsl';
 import { HalfFloatType, MathUtils, Matrix4, NodeMaterial, QuadMesh, RendererUtils, RenderTarget, Node, Vector2 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
@@ -230,6 +230,8 @@ const toTextureNode = ( value ) => {
  * @property {?Node<vec4>} [metalRoughness=null] - Roughness/metalness G-buffer for specular edge stopping.
  * @property {?Node<vec4>} [diffuse=null] - Scene base color (albedo) G-buffer for chromatic edge stopping.
  * @property {?Node<vec4>} [raw=null] - Unfiltered input (e.g. raw SSR/SSGI) for secondary sampling and temporal blend.
+ * @property {?TextureNode} [hitDistance=null] - The hit distance of the raw input for the `'raylength'` alpha source, e.g. `ssrNode.getHitDistanceNode()`.
+ * @property {?TextureNode} [frameCount=null] - The frame count of the input, e.g. `temporalReprojectNode.getFrameCountNode()`.
  * @property {DenoiseMode} [mode='diffuse'] - Denoising kernel type.
  * @property {boolean} [accumulate=true] - When `true`, temporally blend the spatially-denoised result
  * (Karis-style) and write frame weight to alpha for feedback loops. When `false`, only spatial filtering is applied.
@@ -268,6 +270,8 @@ class RecurrentDenoiseNode extends Node {
 			metalRoughness = null,
 			diffuse = null,
 			raw = null,
+			hitDistance = null,
+			frameCount = null,
 			mode = 'diffuse',
 			accumulate = true,
 		} = options;
@@ -294,6 +298,8 @@ class RecurrentDenoiseNode extends Node {
 		this.depthNode = depth !== null ? nodeObject( depth ) : null;
 		this.normalNode = normal !== null ? nodeObject( normal ) : null;
 		this.rawNode = toTextureNode( raw );
+		this.hitDistanceNode = hitDistance;
+		this.frameCountNode = frameCount;
 		this.roughnessMetalnessNode = metalRoughness !== null ? nodeObject( metalRoughness ) : null;
 		this.diffuseNode = diffuse !== null ? nodeObject( diffuse ) : null;
 
@@ -332,13 +338,14 @@ class RecurrentDenoiseNode extends Node {
 		this._cameraProjectionMatrix = uniform( new Matrix4().copy( camera.projectionMatrix ) );
 		this._viewMatrix = uniform( new Matrix4().copy( camera.matrixWorldInverse ) );
 
-		this._renderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._renderTarget.texture.name = 'RecurrentDenoiseNode.output';
+		this._renderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, count: 2 } );
+		this._renderTarget.textures[ 0 ].name = 'RecurrentDenoiseNode.output';
+		this._renderTarget.textures[ 1 ].name = 'RecurrentDenoiseNode.frameCount';
 
 		this._material = new NodeMaterial();
 		this._material.name = 'RecurrentDenoise';
 
-		this._textureNode = passTexture( this, this._renderTarget.texture );
+		this._textureNode = passTexture( this, this._renderTarget.textures[ 0 ] );
 
 	}
 
@@ -372,9 +379,9 @@ class RecurrentDenoiseNode extends Node {
 
 		const { renderer } = frame;
 
-		const drawingBufferSize = renderer.getDrawingBufferSize( _size );
-		const width = drawingBufferSize.width;
-		const height = drawingBufferSize.height;
+		// the effect renders at the resolution of its depth input
+
+		const { width, height } = this.depthNode !== null ? this.depthNode.value.image : renderer.getDrawingBufferSize( _size );
 
 		const needsRestart = this._renderTarget.width !== width || this._renderTarget.height !== height;
 		this.setSize( width, height );
@@ -429,6 +436,8 @@ class RecurrentDenoiseNode extends Node {
 		}, { r: 'float', return: 'mat2' } );
 
 		const sampleTexture = ( uvCoord ) => texture( this.textureNode, uvCoord ).max( 0 );
+		const sampleHitDistance = ( uvCoord ) => this.hitDistanceNode?.sample( uvCoord )?.r ?? float( 1 );
+		const sampleFrameCount = ( uvCoord ) => this.frameCountNode?.sample( uvCoord )?.r?.max( EPSILON ) ?? float( 1 );
 		const sampleRaw = ( uvCoord ) => this.rawNode?.sample( uvCoord )?.max( 0 ) ?? vec3( 0 ).max( 0 );
 		const sampleDepth = ( uvCoord ) => this.depthNode?.sample( uvCoord )?.x ?? float( 0.5 );
 		const sampleNormal = ( uvCoord ) => this.normalNode?.sample( uvCoord ) ?? vec3( 0, 0, 1 );
@@ -449,13 +458,14 @@ class RecurrentDenoiseNode extends Node {
 			// The center tap reuses the caller's already-sampled raw texel.
 			const accumulate = ( dx, dy, sample ) => {
 
+				const neighborUv = uvCoord.add( vec2( dx, dy ).div( this._resolution ) );
 				const neighbor = sample !== undefined
 					? sample
-					: texture( this.rawNode, uvCoord.add( vec2( dx, dy ).div( this._resolution ) ) ).max( 0 ).toConst();
+					: texture( this.rawNode, neighborUv ).max( 0 ).toConst();
 
 				if ( this.alphaSource === 'raylength' ) {
 
-					const sampleRl = neighbor.a.toVar();
+					const sampleRl = sampleHitDistance( neighborUv ).toVar();
 					If( sampleRl.greaterThan( ENV_RAY_LENGTH_THRESHOLD ), () => {
 
 						sampleRl.assign( 0.25 );
@@ -494,6 +504,8 @@ class RecurrentDenoiseNode extends Node {
 
 		} );
 
+		const resultFrameCount = property( 'float' );
+
 		const denoiseFn = Fn( ( [ uvCoord ] ) => {
 
 			const result = property( 'vec4' );
@@ -514,7 +526,8 @@ class RecurrentDenoiseNode extends Node {
 				const noiseTexel = sampleAnalyticNoise( uvCoord, this._noiseIndex );
 				const rotationMatrix = noiseRotationMatrix( noiseTexel.r );
 
-				const frameNum = float( 1 ).div( texel.a );
+				const texelFrameCount = sampleFrameCount( uvCoord ).toConst();
+				const frameNum = float( 1 ).div( texelFrameCount );
 				const varianceFactor = getTemporalVarianceFactor( frameNum, this.strength.oneMinus() );
 				const aggressivity = varianceFactor.oneMinus();
 
@@ -551,20 +564,26 @@ class RecurrentDenoiseNode extends Node {
 					? computeHitDistFactor( rl, viewZ, tanHalfFovY ).toConst()
 					: float( 1 );
 
-				const denoised = texel.rgb.toVar();
+				const denoised = texel.toVar();
 				const totalWeight = float( 1 ).toVar();
 				const denoisedFrame = frameNum.toVar();
 				const totalFrameWeight = float( 1 ).toVar();
 
-				const denoisedRaw = raw.rgb.toVar();
+				const denoisedRaw = raw.toVar();
 				const totalWeightRaw = float( 1 ).toVar();
 
-				If( raw.rgb.length().lessThan( 0.0001 ), () => {
+				// with a hit distance, a black raw sample is a miss with no coverage and counts as such
 
-					denoisedRaw.assign( vec3( 0 ) );
-					totalWeightRaw.assign( 0 );
+				if ( this.alphaSource !== 'raylength' ) {
 
-				} );
+					If( raw.rgb.length().lessThan( 0.0001 ), () => {
+
+						denoisedRaw.assign( vec4( 0 ) );
+						totalWeightRaw.assign( 0 );
+
+					} );
+
+				}
 
 				const avgAo = this.alphaSource === 'ao' ? raw.a.toConst() : float( 1 );
 				const mappedAvgAo = this.alphaSource === 'ao' ? mapAo( avgAo ) : float( 0 );
@@ -679,13 +698,14 @@ class RecurrentDenoiseNode extends Node {
 
 						// Ray length edge stopping
 
-						const neighborHitDistFactor = computeHitDistFactor( rawNeighborColor.a, nViewZ, tanHalfFovY );
+						const neighborHitDistance = sampleHitDistance( sampleUv ).toConst();
+						const neighborHitDistFactor = computeHitDistFactor( neighborHitDistance, nViewZ, tanHalfFovY );
 						const hdfDiff = hitDistFactor.sub( neighborHitDistFactor ).abs();
 
 						const rayLengthFactor = hdfDiff.mul( this.alphaPhi ).div( viewPosition.z.abs() );
 
 						// Env rays are harder to compare so we accept if this sample is an env ray and there is an env ray in the neighborhood
-						kernelDiff.addAssign( rawNeighborColor.a.greaterThan( ENV_RAY_LENGTH_THRESHOLD ).and( hasEnvRay ).select( 1, rayLengthFactor ) );
+						kernelDiff.addAssign( neighborHitDistance.greaterThan( ENV_RAY_LENGTH_THRESHOLD ).and( hasEnvRay ).select( 1, rayLengthFactor ) );
 
 					}
 
@@ -712,17 +732,18 @@ class RecurrentDenoiseNode extends Node {
 					// to mitigate the effect of fireflies and high variance in recently disoccluded regions, we weigh by the inverse luminance for the first 5 frames
 					w.mulAssign( mix( float( 1 ).div( luminance( rawNeighborColor.rgb ).pow( 2 ).add( 0.01 ) ), 1, frameNum.div( 5 ).min( 1 ) ) );
 
-					denoisedRaw.addAssign( rawNeighborColor.rgb.mul( w ) );
+					denoisedRaw.addAssign( rawNeighborColor.mul( w ) );
 					totalWeightRaw.addAssign( w );
 
-					denoised.addAssign( neighborColor.rgb.mul( w ) );
+					denoised.addAssign( neighborColor.mul( w ) );
 					totalWeight.addAssign( w );
 
 					// Denoising the alpha (accumulation speed), to get smoother disocclusion transitions
 					If( this.smoothDisocclusions, () => {
 
-						const neighborAWeight = neighborColor.a.greaterThan( texel.a ).select( w.mul( 0.33 ), 0 );
-						denoisedFrame.addAssign( float( 1 ).div( neighborColor.a ).mul( neighborAWeight ) );
+						const neighborFrameCount = sampleFrameCount( sampleUv ).toConst();
+						const neighborAWeight = neighborFrameCount.greaterThan( texelFrameCount ).select( w.mul( 0.33 ), 0 );
+						denoisedFrame.addAssign( float( 1 ).div( neighborFrameCount ).mul( neighborAWeight ) );
 						totalFrameWeight.addAssign( neighborAWeight );
 
 					} );
@@ -741,8 +762,8 @@ class RecurrentDenoiseNode extends Node {
 					if ( this.rawNode !== null ) {
 
 						const blended = karisTemporalBlend(
-							denoised,
-							denoisedRaw,
+							denoised.rgb,
+							denoisedRaw.rgb,
 							a,
 							this.flickerSuppression,
 							this.adaptiveTrust,
@@ -750,18 +771,20 @@ class RecurrentDenoiseNode extends Node {
 							nbhdStddevLuma
 						);
 
-						result.assign( vec4( blended, a ) );
+						result.assign( vec4( blended, mix( denoised.a, denoisedRaw.a, a ) ) );
 
 					} else {
 
-						const finalDenoised = mix( denoised, denoisedRaw, a );
-						result.assign( vec4( finalDenoised, a ) );
+						result.assign( mix( denoised, denoisedRaw, a ) );
 
 					}
 
+					resultFrameCount.assign( a );
+
 				} else {
 
-					result.assign( vec4( denoised, texel.a ) );
+					result.assign( denoised );
+					resultFrameCount.assign( texelFrameCount );
 
 				}
 
@@ -778,7 +801,7 @@ class RecurrentDenoiseNode extends Node {
 		} );
 
 		this._material.contextNode = context( builder.getSharedContext() );
-		this._material.fragmentNode = denoiseFn( uv() );
+		this._material.fragmentNode = outputStruct( denoiseFn( uv() ), vec4( resultFrameCount ) );
 		this._material.needsUpdate = true;
 
 		return this._textureNode;
