@@ -53,7 +53,7 @@ class AfterImageNode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._compRT = new RenderTarget( 1, 1, { depthBuffer: false } );
-		this._compRT.texture.name = 'AfterImageNode.comp';
+		this._compRT.texture.name = 'After Image / Comp';
 
 		/**
 		 * The render target that represents the previous frame.
@@ -62,7 +62,7 @@ class AfterImageNode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._oldRT = new RenderTarget( 1, 1, { depthBuffer: false } );
-		this._oldRT.texture.name = 'AfterImageNode.old';
+		this._oldRT.texture.name = 'After Image / Old';
 
 		/**
 		 * The result of the effect is represented as a separate texture node.

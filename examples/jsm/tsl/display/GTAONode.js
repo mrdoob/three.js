@@ -106,7 +106,7 @@ class GTAONode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RedFormat } );
-		this._aoRenderTarget.texture.name = 'GTAONode.AO';
+		this._aoRenderTarget.texture.name = 'GTAO / AO';
 
 		// uniforms
 

@@ -150,20 +150,20 @@ class StereoCompositePassNode extends PassNode {
 		const sceneName = scene.name;
 		const passName = this.name || 'Stereo';
 
-		scene.name = passName + ': Left Eye';
+		scene.name = passName + ' / Left Eye';
 		renderer.render( scene, stereo.cameraL );
 
 		// right
 
 		renderer.setRenderTarget( this._renderTargetR );
-		scene.name = passName + ': Right Eye';
+		scene.name = passName + ' / Right Eye';
 		renderer.render( scene, stereo.cameraR );
 		scene.name = sceneName;
 
 		// composite
 
 		renderer.setRenderTarget( renderTarget );
-		_quadMesh.name = passName + ': Composite';
+		_quadMesh.name = passName + ' / Composite';
 		_quadMesh.material = this._material;
 		_quadMesh.render( renderer );
 

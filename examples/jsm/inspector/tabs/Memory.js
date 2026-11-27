@@ -96,7 +96,7 @@ class Memory extends Tab {
 		for ( const { type, name, size, creator } of inspector.resources ) {
 
 			const path = creator || [ 'Miscellaneous' ];
-			const keys = [ ...path, splitCamelCase( type[ 0 ].toUpperCase() + type.slice( 1, - 1 ) ), ...name.split( ':' ).map( ( key ) => key.trim() ).filter( ( key ) => key !== '' ) ];
+			const keys = [ ...path, splitCamelCase( type[ 0 ].toUpperCase() + type.slice( 1, - 1 ) ), ...name.trim().split( /\s*\/\s*/ ).filter( ( key ) => key !== '' ) ];
 
 			let node = root;
 
@@ -118,7 +118,7 @@ class Memory extends Tab {
 
 		}
 
-		// returns the rows of a node: a group of a single allocation name is a single row, like "Texture: output"
+		// returns the rows of a node: a group of a single allocation name is a single row, like "Texture / output"
 
 		const getRows = ( node ) => {
 
@@ -130,7 +130,7 @@ class Memory extends Tab {
 
 					const [ childName, grandchild ] = child.children.entries().next().value;
 
-					name += ': ' + childName;
+					name += ' / ' + childName;
 					child = grandchild;
 
 				}
@@ -158,9 +158,10 @@ class Memory extends Tab {
 
 			for ( const [ name, child ] of getRows( node ) ) {
 
-				const childPath = path + '/' + name;
+				const childPath = [ ...path, name ];
+				const childKey = JSON.stringify( childPath );
 
-				let childItem = this.creatorItems.get( childPath );
+				let childItem = this.creatorItems.get( childKey );
 
 				if ( childItem === undefined ) {
 
@@ -169,13 +170,13 @@ class Memory extends Tab {
 					setText( childItem.data[ 0 ], name );
 
 					item.add( childItem );
-					this.creatorItems.set( childPath, childItem );
+					this.creatorItems.set( childKey, childItem );
 
 				}
 
 				childItem.itemRow.classList.toggle( 'group', child.children.size > 0 );
 
-				unused.delete( childPath );
+				unused.delete( childKey );
 
 				update( childItem, child, childPath );
 
@@ -183,7 +184,7 @@ class Memory extends Tab {
 
 		};
 
-		update( this.creators, root, '' );
+		update( this.creators, root, [] );
 
 		for ( const [ path, item ] of unused ) {
 

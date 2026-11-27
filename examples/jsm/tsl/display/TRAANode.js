@@ -146,7 +146,7 @@ class TRAANode extends Node {
 		 * @type {?RenderTarget}
 		 */
 		this._historyRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._historyRenderTarget.texture.name = 'TRAANode.history';
+		this._historyRenderTarget.texture.name = 'TRAA / History';
 
 		/**
 		 * The render target for the resolve.
@@ -155,7 +155,7 @@ class TRAANode extends Node {
 		 * @type {?RenderTarget}
 		 */
 		this._resolveRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._resolveRenderTarget.texture.name = 'TRAANode.resolve';
+		this._resolveRenderTarget.texture.name = 'TRAA / Resolve';
 
 		/**
 		 * Material used for the resolve step.
@@ -164,7 +164,7 @@ class TRAANode extends Node {
 		 * @type {NodeMaterial}
 		 */
 		this._resolveMaterial = new NodeMaterial();
-		this._resolveMaterial.name = 'TRAA.resolve';
+		this._resolveMaterial.name = 'TRAA / Resolve';
 
 		/**
 		 * The result of the effect is represented as a separate texture node.
@@ -214,7 +214,7 @@ class TRAANode extends Node {
 		 * @type {Reprojection}
 		 */
 		this._reprojection = new Reprojection( depthNode, velocityNode, camera );
-		this._reprojection.previousDepthNode.value.name = 'TRAANode.previousDepth';
+		this._reprojection.previousDepthNode.value.name = 'TRAA / Previous Depth';
 
 		/**
 		 * The node used to render the scene's velocity.

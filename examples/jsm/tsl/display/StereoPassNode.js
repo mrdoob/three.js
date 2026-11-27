@@ -90,12 +90,12 @@ class StereoPassNode extends PassNode {
 		const sceneName = scene.name;
 		const passName = this.name || 'Stereo';
 
-		scene.name = passName + ': Left Eye';
+		scene.name = passName + ' / Left Eye';
 		renderer.render( scene, stereo.cameraL );
 
 		renderTarget.scissor.set( renderTarget.width / 2, 0, renderTarget.width / 2, renderTarget.height );
 		renderTarget.viewport.set( renderTarget.width / 2, 0, renderTarget.width / 2, renderTarget.height );
-		scene.name = passName + ': Right Eye';
+		scene.name = passName + ' / Right Eye';
 		renderer.render( scene, stereo.cameraR );
 		scene.name = sceneName;
 

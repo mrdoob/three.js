@@ -37,13 +37,13 @@ class SMAAPass extends Pass {
 			depthBuffer: false,
 			type: HalfFloatType
 		} );
-		this._edgesRT.texture.name = 'SMAAPass.edges';
+		this._edgesRT.texture.name = 'SMAA / Edges';
 
 		this._weightsRT = new WebGLRenderTarget( 1, 1, {
 			depthBuffer: false,
 			type: HalfFloatType
 		} );
-		this._weightsRT.texture.name = 'SMAAPass.weights';
+		this._weightsRT.texture.name = 'SMAA / Weights';
 
 		// textures
 		const scope = this;
@@ -58,7 +58,7 @@ class SMAAPass extends Pass {
 		};
 
 		this._areaTexture = new Texture();
-		this._areaTexture.name = 'SMAAPass.area';
+		this._areaTexture.name = 'SMAA / Area';
 		this._areaTexture.image = areaTextureImage;
 		this._areaTexture.minFilter = LinearFilter;
 		this._areaTexture.generateMipmaps = false;
@@ -74,7 +74,7 @@ class SMAAPass extends Pass {
 		};
 
 		this._searchTexture = new Texture();
-		this._searchTexture.name = 'SMAAPass.search';
+		this._searchTexture.name = 'SMAA / Search';
 		this._searchTexture.image = searchTextureImage;
 		this._searchTexture.magFilter = NearestFilter;
 		this._searchTexture.minFilter = NearestFilter;

@@ -165,7 +165,7 @@ class SSAARenderPass extends Pass {
 		if ( ! this._sampleRenderTarget ) {
 
 			this._sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { type: HalfFloatType, stencilBuffer: this.stencilBuffer } );
-			this._sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
+			this._sampleRenderTarget.texture.name = 'SSAA / Sample';
 
 		}
 

@@ -123,7 +123,7 @@
 				};
 
 				computeQuad = new THREE.QuadMesh( new THREE.NodeMaterial() );
-				computeQuad.name = 'Noise: Generate';
+				computeQuad.name = 'Noise / Generate';
 				computeQuad.material.fragmentNode = createComputeNode();
 
 				// sigma = 0 selects a sigma = 1 Gaussian with kernel radius 3
@@ -135,7 +135,7 @@
 				blurredDisplay = output( gaussianBlur( current, null, 0 ).r );
 
 				displayQuad = new THREE.QuadMesh( new THREE.NodeMaterial() );
-				displayQuad.name = 'Noise: Display';
+				displayQuad.name = 'Noise / Display';
 				displayQuad.material.fragmentNode = params.spatialBlur ? blurredDisplay : display;
 
 				const gui = renderer.inspector.createParameters( 'Settings' );

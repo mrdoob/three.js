@@ -333,7 +333,7 @@ class RecurrentDenoiseNode extends Node {
 		this._viewMatrix = uniform( new Matrix4().copy( camera.matrixWorldInverse ) );
 
 		this._renderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._renderTarget.texture.name = 'RecurrentDenoiseNode.output';
+		this._renderTarget.texture.name = 'Recurrent Denoise / Output';
 
 		this._material = new NodeMaterial();
 		this._material.name = 'RecurrentDenoise';
