@@ -31,12 +31,14 @@ class RenderStats extends ObjectStats {
 
 	constructor( uid, scene, camera, renderTarget, renderer ) {
 
-		let name = scene.name || scene.material?.name || camera.name || ( scene.isQuadMesh ? 'Quad Mesh' : scene.type );
+		// Material and compute node names also label GPU programs.
+		const materialLabel = scene.material?.name?.replaceAll( ': ', ' / ' );
+		let name = scene.name || materialLabel || camera.name || ( scene.isQuadMesh ? 'Quad Mesh' : scene.type );
 
 		if ( renderTarget?.isCubeRenderTarget ) {
 
 			const face = renderer.getActiveCubeFace();
-			const label = scene.name || scene.material?.name || renderTarget.texture.name || 'Cube Capture';
+			const label = scene.name || materialLabel || renderTarget.texture.name || 'Cube Capture';
 			const mip = renderer.getActiveMipmapLevel();
 
 			name = `${ label } / Mip ${ mip } / Face ${ face }`;
@@ -59,7 +61,7 @@ class ComputeStats extends ObjectStats {
 
 	constructor( uid, computeNode ) {
 
-		const name = computeNode.name || ( computeNode.isComputeNode ? 'Compute' : 'Compute Group' );
+		const name = computeNode.name?.replaceAll( ': ', ' / ' ) || ( computeNode.isComputeNode ? 'Compute' : 'Compute Group' );
 
 		super( uid, name );
 

@@ -96,7 +96,8 @@ class Memory extends Tab {
 		for ( const { type, name, size, creator } of inspector.resources ) {
 
 			const path = creator || [ 'Miscellaneous' ];
-			const keys = [ ...path, splitCamelCase( type[ 0 ].toUpperCase() + type.slice( 1, - 1 ) ), ...name.trim().split( /\s*\/\s*/ ).filter( ( key ) => key !== '' ) ];
+			const labels = type === 'textures' ? name.trim().split( /\s*\/\s*/ ).filter( ( key ) => key !== '' ) : ( name.trim() !== '' ? [ name ] : [] );
+			const keys = [ ...path, splitCamelCase( type[ 0 ].toUpperCase() + type.slice( 1, - 1 ) ), ...labels ];
 
 			let node = root;
 

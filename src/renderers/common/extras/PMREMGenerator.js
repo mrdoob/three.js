@@ -574,7 +574,7 @@ function _createRenderTarget( size, generateMipmaps, depthBuffer ) {
 function _getMaterial( type, uniforms, fragmentNode ) {
 
 	const material = new NodeMaterial();
-	material.name = `PMREM / ${ type }`;
+	material.name = `PMREM: ${ type }`;
 	material.fragmentNode = fragmentNode;
 	material.side = BackSide;
 	material.blending = NoBlending;
