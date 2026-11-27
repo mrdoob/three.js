@@ -181,7 +181,7 @@ function parseName( name ) {
 
 }
 
-// moves two or more consecutive calls of the same group under a GroupStats
+// moves the consecutive calls of the same group under a GroupStats, even a single one
 
 function groupCalls( parent, frameId ) {
 
@@ -209,7 +209,7 @@ function groupCalls( parent, frameId ) {
 
 	parent.children = runs.map( ( { group, index, calls, passes } ) => {
 
-		if ( calls.length === 1 ) {
+		if ( group === null ) {
 
 			groupCalls( calls[ 0 ], frameId );
 			return calls[ 0 ];
