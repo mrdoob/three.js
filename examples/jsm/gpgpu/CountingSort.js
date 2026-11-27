@@ -186,9 +186,11 @@ class CountingSort {
 	 */
 	compute( renderer ) {
 
-		renderer.compute( this._histogramNode );
-		renderer.compute( this._prefixNode );
-		renderer.compute( this._scatterNode );
+		renderer.compute( [
+			this._histogramNode,
+			this._prefixNode,
+			this._scatterNode
+		] );
 
 	}
 
