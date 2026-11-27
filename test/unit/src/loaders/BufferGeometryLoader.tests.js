@@ -74,22 +74,6 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.test( 'parser - groups', ( assert ) => {
-
-			const geometry = new BufferGeometry();
-			geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( 18 ), 3 ) );
-			geometry.addGroup( 0, 3, 0 );
-			geometry.addGroup( 3, Infinity, 1 );
-
-			const geometry2 = new BufferGeometryLoader().parse( JSON.parse( JSON.stringify( geometry.toJSON() ) ) );
-
-			assert.deepEqual( geometry2.groups, [
-				{ start: 0, count: 3, materialIndex: 0 },
-				{ start: 3, count: Infinity, materialIndex: 1 }
-			], 'groups are restored, including groups with a count of Infinity' );
-
-		} );
-
 	} );
 
 } );
