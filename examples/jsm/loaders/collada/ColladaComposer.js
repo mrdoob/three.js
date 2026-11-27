@@ -2459,32 +2459,26 @@ class ColladaComposer {
 			const geometries = this.getGeometry( controller.id );
 			const newObjects = this.buildObjects( geometries, instance.materials );
 
-			if ( controller.skin === undefined ) {
+			if ( controller.skin !== undefined ) {
 
-				objects.push( ...newObjects );
-				continue;
+				const skeleton = this.buildSkeleton( instance.skeletons, controller.skin.joints );
 
-			}
+				for ( let j = 0, jl = newObjects.length; j < jl; j ++ ) {
 
-			const skeletons = instance.skeletons;
-			const joints = controller.skin.joints;
+					const object = newObjects[ j ];
 
-			const skeleton = this.buildSkeleton( skeletons, joints );
+					if ( object.isSkinnedMesh ) {
 
-			for ( let j = 0, jl = newObjects.length; j < jl; j ++ ) {
+						object.bind( skeleton, controller.skin.bindMatrix );
+						object.normalizeSkinWeights();
 
-				const object = newObjects[ j ];
-
-				if ( object.isSkinnedMesh ) {
-
-					object.bind( skeleton, controller.skin.bindMatrix );
-					object.normalizeSkinWeights();
+					}
 
 				}
 
-				objects.push( object );
-
 			}
+
+			objects.push( ...newObjects );
 
 		}
 
