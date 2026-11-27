@@ -215,7 +215,7 @@ export default VelocityNode;
 export const velocity = /*@__PURE__*/ nodeImmutable( VelocityNode );
 
 /**
- * TSL object that represents the change of the view-space depth since the previous.
+ * TSL object that represents the change of the view-space depth since the previous frame.
  * It depends on the uniforms of {@link velocity}, so it must be used together with it in the same material.
  *
  * @tsl
