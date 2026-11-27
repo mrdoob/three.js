@@ -902,7 +902,7 @@ class Viewer extends Tab {
 			let inspectNode = node.callback !== null ? node.callback( node.node ) : node.node;
 			let rttNode = null;
 
-			if ( inspectNode.isTextureNode !== true && inspectNode.isPassNode !== true ) {
+			if ( inspectNode.isSampleable !== true && inspectNode.isPassNode !== true ) {
 
 				// render other nodes in the resolution of the renderer, e.g. screen-space nodes
 

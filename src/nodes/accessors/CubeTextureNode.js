@@ -1,6 +1,7 @@
 import TextureNode from './TextureNode.js';
+import SamplerNode, { sampleTexture } from './SamplerNode.js';
 import { reflectVector, refractVector } from './ReflectVector.js';
-import { nodeObject, nodeProxy, vec3 } from '../tsl/TSLBase.js';
+import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 import { CubeReflectionMapping, CubeRefractionMapping, WebGPUCoordinateSystem } from '../../constants.js';
 
@@ -129,11 +130,34 @@ class CubeTextureNode extends TextureNode {
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {Node} cubeUV - The uv node to generate code for.
+	 * @param {SamplerNode} samplerNode - The sampler node.
 	 * @return {string} The generated code snippet.
 	 */
-	generateUV( builder, cubeUV ) {
+	generateUV( builder, cubeUV, samplerNode ) {
 
-		return cubeUV.build( builder, this.sampler === true ? 'vec3' : 'ivec3' );
+		return cubeUV.build( builder, samplerNode.sampler === true ? 'vec3' : 'ivec3' );
+
+	}
+
+}
+
+/**
+ * A sampler node that creates a cube texture node for its texture.
+ *
+ * @private
+ * @augments SamplerNode
+ */
+class CubeSamplerNode extends SamplerNode {
+
+	static get type() {
+
+		return 'CubeSamplerNode';
+
+	}
+
+	createTextureNode( texture ) {
+
+		return new CubeTextureNode( texture );
 
 	}
 
@@ -155,53 +179,27 @@ export default CubeTextureNode;
 export const cubeTextureBase = /*@__PURE__*/ nodeProxy( CubeTextureNode ).setParameterLength( 1, 4 ).setName( 'cubeTexture' );
 
 /**
- * TSL function for creating a cube texture uniform node.
+ * TSL function for sampling a cube texture, a cube texture node or a sampler node.
+ * The samples of a cube texture share a single binding with the other samples of the
+ * same texture.
  *
  * @tsl
  * @function
- * @param {?(CubeTexture|CubeTextureNode)} [value=EmptyTexture] - The cube texture.
+ * @param {?(CubeTexture|CubeTextureNode|SamplerNode)} [value=EmptyTexture] - The cube texture.
  * @param {?Node<vec3>} [uvNode=null] - The uv node.
  * @param {?Node<int>} [levelNode=null] - The level node.
  * @param {?Node<float>} [biasNode=null] - The bias node.
- * @returns {CubeTextureNode}
+ * @returns {SamplerNode}
  */
-export const cubeTexture = ( value = EmptyTexture, uvNode = null, levelNode = null, biasNode = null ) => {
-
-	let textureNode;
-
-	if ( value && value.isCubeTextureNode === true ) {
-
-		textureNode = value.clone();
-		textureNode.referenceNode = value; // Ensure the reference is set to the original node
-
-		if ( uvNode !== null ) textureNode.uvNode = nodeObject( uvNode );
-		if ( levelNode !== null ) textureNode.levelNode = nodeObject( levelNode );
-		if ( biasNode !== null ) textureNode.biasNode = nodeObject( biasNode );
-
-	} else {
-
-		textureNode = cubeTextureBase( value, uvNode, levelNode, biasNode );
-
-	}
-
-	return textureNode;
-
-};
+export const cubeTexture = ( value = EmptyTexture, uvNode = null, levelNode = null, biasNode = null ) => sampleTexture( CubeSamplerNode, value, uvNode, levelNode, biasNode );
 
 /**
- * TSL function for creating a non-mergeable uniform cube texture node.
+ * TSL function for creating a uniform cube texture node: the binding of a cube texture,
+ * never merged with other texture nodes.
  *
  * @tsl
  * @function
  * @param {?CubeTexture} [value=EmptyTexture] - The cube texture.
  * @returns {CubeTextureNode}
  */
-export const uniformCubeTexture = ( value = EmptyTexture ) => {
-
-	const textureNode = cubeTextureBase( value );
-
-	textureNode.mergeable = false;
-
-	return textureNode;
-
-};
+export const uniformCubeTexture = ( value = EmptyTexture ) => new CubeTextureNode( value );

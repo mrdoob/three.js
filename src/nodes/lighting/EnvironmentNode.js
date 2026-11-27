@@ -62,7 +62,7 @@ class EnvironmentNode extends LightingNode {
 
 		let envNode = this.envNode;
 
-		if ( envNode.isTextureNode || envNode.isMaterialReferenceNode ) {
+		if ( envNode.isSampleable || envNode.isMaterialReferenceNode ) {
 
 			const cache = this._getPMREMNodeCache( builder.renderer );
 

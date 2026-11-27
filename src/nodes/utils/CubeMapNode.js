@@ -85,9 +85,9 @@ class CubeMapNode extends Node {
 
 		const envNode = this.envNode;
 
-		if ( envNode.isTextureNode || envNode.isMaterialReferenceNode ) {
+		if ( envNode.isSampleable || envNode.isMaterialReferenceNode ) {
 
-			const texture = ( envNode.isTextureNode ) ? envNode.value : material[ envNode.property ];
+			const texture = envNode.isMaterialReferenceNode ? material[ envNode.property ] : envNode.value;
 
 			if ( texture && texture.isTexture ) {
 

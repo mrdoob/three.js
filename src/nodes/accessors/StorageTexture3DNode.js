@@ -54,11 +54,12 @@ class StorageTexture3DNode extends StorageTextureNode {
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {Node} uvNode - The uv node to generate code for.
+	 * @param {SamplerNode} samplerNode - The sampler node.
 	 * @return {string} The generated code snippet.
 	 */
-	generateUV( builder, uvNode ) {
+	generateUV( builder, uvNode, samplerNode ) {
 
-		return uvNode.build( builder, this.sampler === true ? 'vec3' : 'ivec3' );
+		return uvNode.build( builder, samplerNode.sampler === true ? 'vec3' : 'ivec3' );
 
 	}
 

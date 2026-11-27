@@ -158,7 +158,7 @@ class RetroPassNode extends PassNode {
 
 						let finalUV;
 
-						if ( texture.isCubeTextureNode ) {
+						if ( texture.value.isCubeTexture === true ) {
 
 							finalUV = reflectVector;
 
