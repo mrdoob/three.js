@@ -16,8 +16,7 @@ export { default as RenderPipeline } from './renderers/common/RenderPipeline.js'
 export { default as DirectRenderPipeline } from './renderers/common/DirectRenderPipeline.js';
 export { default as PostProcessing } from './renderers/common/PostProcessing.js';
 export { default as ReadbackBuffer } from './renderers/common/ReadbackBuffer.js';
-import * as RendererUtils from './renderers/common/RendererUtils.js';
-export { RendererUtils };
+export * as RendererUtils from './renderers/common/RendererUtils.js';
 export { default as CubeRenderTarget } from './renderers/common/CubeRenderTarget.js';
 export { default as StorageTexture } from './renderers/common/StorageTexture.js';
 export { default as Storage3DTexture } from './renderers/common/Storage3DTexture.js';
@@ -40,5 +39,4 @@ export { default as StandardNodeLibrary } from './renderers/webgpu/nodes/Standar
 export { default as WGSLNodeBuilder } from './renderers/webgpu/nodes/WGSLNodeBuilder.js';
 export { ClippingGroup } from './objects/ClippingGroup.js';
 export * from './nodes/Nodes.js';
-import * as TSL from './Three.Nodes.js';
-export { TSL };
+export * as TSL from './Three.Nodes.js';
