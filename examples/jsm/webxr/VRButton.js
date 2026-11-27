@@ -31,10 +31,20 @@ class VRButton {
 
 				session.addEventListener( 'end', onSessionEnded );
 
-				await renderer.xr.setSession( session );
-				button.textContent = 'EXIT VR';
-
 				currentSession = session;
+
+				try {
+
+					await renderer.xr.setSession( session );
+					button.textContent = 'EXIT VR';
+
+				} catch ( error ) {
+
+					console.error( 'VRButton: Unable to set the XR session.', error );
+
+					session.end();
+
+				}
 
 			}
 
@@ -91,7 +101,13 @@ class VRButton {
 
 				if ( currentSession === null ) {
 
-					navigator.xr.requestSession( 'immersive-vr', sessionOptions ).then( onSessionStarted );
+					navigator.xr.requestSession( 'immersive-vr', sessionOptions )
+						.then( onSessionStarted )
+						.catch( ( error ) => {
+
+							console.error( 'VRButton: Unable to start the XR session.', error );
+
+						} );
 
 				} else {
 
