@@ -2088,6 +2088,7 @@ class Renderer {
 		this.info.calls ++;
 		this.info.render.calls ++;
 		this.info.render.frameCalls ++;
+		this.info.beginRender( scene, camera, renderTarget, this.getActiveCubeFace(), this.getActiveMipmapLevel() );
 
 		nodeFrame.renderId = this.info.calls;
 
@@ -2273,6 +2274,7 @@ class Renderer {
 		//
 
 		this.inspector.finishRender( this.backend.getTimestampUID( renderContext ) );
+		this.info.finishRender();
 
 		//
 
@@ -3298,6 +3300,7 @@ class Renderer {
 		this.info.calls ++;
 		this.info.compute.calls ++;
 		this.info.compute.frameCalls ++;
+		this.info.beginCompute( computeNodes );
 
 		nodeFrame.renderId = this.info.calls;
 
@@ -3370,6 +3373,7 @@ class Renderer {
 		//
 
 		this.inspector.finishCompute( this.backend.getTimestampUID( computeNodes ) );
+		this.info.finishCompute();
 
 	}
 
