@@ -210,6 +210,8 @@ class CSMHelper extends Group {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		const frustumLines = this.frustumLines;
 		const cascadeLines = this.cascadeLines;
 		const cascadePlanes = this.cascadePlanes;

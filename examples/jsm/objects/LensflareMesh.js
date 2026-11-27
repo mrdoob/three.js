@@ -18,6 +18,11 @@ import {
 
 import { texture, textureLoad, uv, ivec2, vec2, vec4, positionGeometry, reference, varyingProperty, materialReference, Fn } from 'three/tsl';
 
+const _positionView = /*@__PURE__*/ new Vector3();
+const _screenPositionPixels = /*@__PURE__*/ new Vector4( 0, 0, 16, 16 );
+const _validArea = /*@__PURE__*/ new Box2();
+const _viewport = /*@__PURE__*/ new Vector4();
+
 /**
  * Creates a simulated lens flare that tracks a light.
  *
@@ -74,16 +79,10 @@ class LensflareMesh extends Mesh {
 		 */
 		this.renderOrder = Infinity;
 
-		//
-
-		const positionView = new Vector3();
-
 		// textures
 
 		const tempMap = new FramebufferTexture( 16, 16 );
 		const occlusionMap = new FramebufferTexture( 16, 16 );
-
-		let currentType = UnsignedByteType;
 
 		const geometry = LensflareMesh.Geometry;
 
@@ -122,15 +121,6 @@ class LensflareMesh extends Mesh {
 
 		material1b.vertexNode = vertexNode;
 		material1b.colorNode = texture( tempMap, vec2( uv().flipY() ) );
-
-		// the following object is used for occlusionMap generation
-
-		const mesh1 = new Mesh( geometry, material1a );
-
-		//
-
-		const elements = [];
-		const elementMeshes = [];
 
 		const material2 = new NodeMaterial();
 
@@ -190,148 +180,164 @@ class LensflareMesh extends Mesh {
 
 		} )();
 
-		/**
-		 * Adds the given lensflare element to this instance.
-		 *
-		 * @param {LensflareElement} element - The element to add.
-		 */
-		this.addElement = function ( element ) {
+		this._tempMap = tempMap;
+		this._occlusionMap = occlusionMap;
+		this._currentType = UnsignedByteType;
+		this._sharedValues = sharedValues;
+		this._material1a = material1a;
+		this._material1b = material1b;
+		this._material2 = material2;
+		this._mesh1 = new Mesh( geometry, material1a ); // used for occlusionMap generation
+		this._elements = [];
+		this._elementMeshes = [];
+		this._lightsNode = new Node(); // dummy node for renderer.renderObject()
 
-			elements.push( element );
+	}
 
-		};
+	/**
+	 * Adds the given lensflare element to this instance.
+	 *
+	 * @param {LensflareElement} element - The element to add.
+	 */
+	addElement( element ) {
 
-		//
+		this._elements.push( element );
 
-		const positionScreen = sharedValues.positionScreen;
-		const screenPositionPixels = new Vector4( 0, 0, 16, 16 );
-		const validArea = new Box2();
-		const viewport = new Vector4();
+	}
 
-		// dummy node for renderer.renderObject()
-		const lightsNode = new Node();
+	onBeforeRender( renderer, scene, camera ) {
 
-		this.onBeforeRender = ( renderer, scene, camera ) => {
+		const tempMap = this._tempMap;
+		const occlusionMap = this._occlusionMap;
+		const material1a = this._material1a;
+		const material1b = this._material1b;
+		const material2 = this._material2;
+		const mesh1 = this._mesh1;
+		const elements = this._elements;
+		const elementMeshes = this._elementMeshes;
+		const lightsNode = this._lightsNode;
+		const geometry = LensflareMesh.Geometry;
+		const positionScreen = this._sharedValues.positionScreen;
 
-			renderer.getViewport( viewport );
+		renderer.getViewport( _viewport );
 
-			viewport.multiplyScalar( renderer.getPixelRatio() ).floor();
+		_viewport.multiplyScalar( renderer.getPixelRatio() ).floor();
 
-			const renderTarget = renderer.getRenderTarget();
-			const type = ( renderTarget !== null ) ? renderTarget.texture.type : UnsignedByteType;
+		const renderTarget = renderer.getRenderTarget();
+		const type = ( renderTarget !== null ) ? renderTarget.texture.type : UnsignedByteType;
 
-			if ( currentType !== type ) {
-
-				tempMap.dispose();
-				occlusionMap.dispose();
-
-				tempMap.type = occlusionMap.type = type;
-
-				currentType = type;
-
-			}
-
-			const invAspect = viewport.w / viewport.z;
-			const halfViewportWidth = viewport.z / 2.0;
-			const halfViewportHeight = viewport.w / 2.0;
-
-			const size = 16 / viewport.w;
-
-			sharedValues.scale.set( size * invAspect, size );
-
-			validArea.min.set( viewport.x, viewport.y );
-			validArea.max.set( viewport.x + ( viewport.z - 16 ), viewport.y + ( viewport.w - 16 ) );
-
-			// calculate position in screen space
-
-			positionView.setFromMatrixPosition( this.matrixWorld );
-			positionView.applyMatrix4( camera.matrixWorldInverse );
-
-			if ( positionView.z > 0 ) return; // lensflare is behind the camera
-
-			positionScreen.copy( positionView ).applyMatrix4( camera.projectionMatrix );
-
-			// horizontal and vertical coordinate of the lower left corner of the pixels to copy
-
-			screenPositionPixels.x = viewport.x + ( positionScreen.x * halfViewportWidth ) + halfViewportWidth - 8;
-			screenPositionPixels.y = viewport.y - ( positionScreen.y * halfViewportHeight ) + halfViewportHeight - 8;
-
-			// screen cull
-
-			if ( validArea.containsPoint( screenPositionPixels ) ) {
-
-				// save current RGB to temp texture
-
-				renderer.copyFramebufferToTexture( tempMap, screenPositionPixels );
-
-				// render pink quad
-
-				renderer.renderObject( mesh1, scene, camera, geometry, material1a, null, lightsNode );
-
-				// copy result to occlusionMap
-
-				renderer.copyFramebufferToTexture( occlusionMap, screenPositionPixels );
-
-				// restore graphics
-
-				renderer.renderObject( mesh1, scene, camera, geometry, material1b, null, lightsNode );
-
-				// render elements
-
-				const vecX = - positionScreen.x * 2;
-				const vecY = - positionScreen.y * 2;
-
-				for ( let i = 0, l = elements.length; i < l; i ++ ) {
-
-					const element = elements[ i ];
-
-					let mesh2 = elementMeshes[ i ];
-
-					if ( mesh2 === undefined ) {
-
-						mesh2 = elementMeshes[ i ] = new Mesh( geometry, material2 );
-
-						mesh2.color = element.color.convertSRGBToLinear();
-						mesh2.map = element.texture;
-
-					}
-
-					material2.screenPosition.x = positionScreen.x + vecX * element.distance;
-					material2.screenPosition.y = positionScreen.y - vecY * element.distance;
-					material2.screenPosition.z = positionScreen.z;
-
-					const size = element.size / viewport.w;
-
-					material2.scale.set( size * invAspect, size );
-
-					renderer.renderObject( mesh2, scene, camera, geometry, material2, null, lightsNode );
-
-				}
-
-			}
-
-		};
-
-		/**
-		 * Frees the GPU-related resources allocated by this instance. Call this
-		 * method whenever this instance is no longer used in your app.
-		 */
-		this.dispose = function () {
-
-			material1a.dispose();
-			material1b.dispose();
-			material2.dispose();
+		if ( this._currentType !== type ) {
 
 			tempMap.dispose();
 			occlusionMap.dispose();
 
+			tempMap.type = occlusionMap.type = type;
+
+			this._currentType = type;
+
+		}
+
+		const invAspect = _viewport.w / _viewport.z;
+		const halfViewportWidth = _viewport.z / 2.0;
+		const halfViewportHeight = _viewport.w / 2.0;
+
+		const size = 16 / _viewport.w;
+
+		this._sharedValues.scale.set( size * invAspect, size );
+
+		_validArea.min.set( _viewport.x, _viewport.y );
+		_validArea.max.set( _viewport.x + ( _viewport.z - 16 ), _viewport.y + ( _viewport.w - 16 ) );
+
+		// calculate position in screen space
+
+		_positionView.setFromMatrixPosition( this.matrixWorld );
+		_positionView.applyMatrix4( camera.matrixWorldInverse );
+
+		if ( _positionView.z > 0 ) return; // lensflare is behind the camera
+
+		positionScreen.copy( _positionView ).applyMatrix4( camera.projectionMatrix );
+
+		// horizontal and vertical coordinate of the lower left corner of the pixels to copy
+
+		_screenPositionPixels.x = _viewport.x + ( positionScreen.x * halfViewportWidth ) + halfViewportWidth - 8;
+		_screenPositionPixels.y = _viewport.y - ( positionScreen.y * halfViewportHeight ) + halfViewportHeight - 8;
+
+		// screen cull
+
+		if ( _validArea.containsPoint( _screenPositionPixels ) ) {
+
+			// save current RGB to temp texture
+
+			renderer.copyFramebufferToTexture( tempMap, _screenPositionPixels );
+
+			// render pink quad
+
+			renderer.renderObject( mesh1, scene, camera, geometry, material1a, null, lightsNode );
+
+			// copy result to occlusionMap
+
+			renderer.copyFramebufferToTexture( occlusionMap, _screenPositionPixels );
+
+			// restore graphics
+
+			renderer.renderObject( mesh1, scene, camera, geometry, material1b, null, lightsNode );
+
+			// render elements
+
+			const vecX = - positionScreen.x * 2;
+			const vecY = - positionScreen.y * 2;
+
 			for ( let i = 0, l = elements.length; i < l; i ++ ) {
 
-				elements[ i ].texture.dispose();
+				const element = elements[ i ];
+
+				let mesh2 = elementMeshes[ i ];
+
+				if ( mesh2 === undefined ) {
+
+					mesh2 = elementMeshes[ i ] = new Mesh( geometry, material2 );
+
+					mesh2.color = element.color.convertSRGBToLinear();
+					mesh2.map = element.texture;
+
+				}
+
+				material2.screenPosition.x = positionScreen.x + vecX * element.distance;
+				material2.screenPosition.y = positionScreen.y - vecY * element.distance;
+				material2.screenPosition.z = positionScreen.z;
+
+				const size = element.size / _viewport.w;
+
+				material2.scale.set( size * invAspect, size );
+
+				renderer.renderObject( mesh2, scene, camera, geometry, material2, null, lightsNode );
 
 			}
 
-		};
+		}
+
+	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		this._material1a.dispose();
+		this._material1b.dispose();
+		this._material2.dispose();
+
+		this._tempMap.dispose();
+		this._occlusionMap.dispose();
+
+		for ( let i = 0, l = this._elements.length; i < l; i ++ ) {
+
+			this._elements[ i ].texture.dispose();
+
+		}
 
 	}
 

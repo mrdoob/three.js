@@ -316,7 +316,9 @@ class Lensflare extends Mesh {
 		 * Frees the GPU-related resources allocated by this instance. Call this
 		 * method whenever this instance is no longer used in your app.
 		 */
-		this.dispose = function () {
+		this.dispose = () => {
+
+			super.dispose();
 
 			material1a.dispose();
 			material1b.dispose();

@@ -22,6 +22,8 @@
         ],
         "exclude": [
             "src/extras/lib",
+            "src/renderers/common/Uniform.js",
+            "src/renderers/common/UniformsGroup.js",
             "src/renderers/common/extras/PMREMGenerator.js",
             "examples/jsm/helpers/LightProbeHelperGPU.js",
             "examples/jsm/helpers/TextureHelperGPU.js",

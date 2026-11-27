@@ -10,6 +10,7 @@ export class Style {
 		--profiler-header-background: #2a2a33aa;
 		--profiler-header: #2a2a33;
 		--profiler-border: #4a4a5a;
+		--chart-background: var(--profiler-background);
 		--text-primary: #e0e0e0;
 		--text-secondary: #9a9aab;
 		--color-accent: #00aaff;
@@ -1133,6 +1134,10 @@ export class Style {
 		min-height: 23px;
 	}
 
+	.list-item-row.collapsible.group {
+		background-color: rgba(0, 170, 255, 0.07) !important;
+	}
+
 	.list-item-row.collapsible.alert,
 	.list-item-row.alert {
 		background-color: rgba(244, 67, 54, 0.1) !important;
@@ -1239,6 +1244,111 @@ export class Style {
 	.list-container.parameters .list-item-row:not(.collapsible) {
 	}
 
+	.performance-content .value.secondary {
+		margin-left: 12px;
+		color: var(--text-primary);
+		opacity: 0.8;
+		font-weight: normal;
+	}
+
+	.performance-content .list-header-cell:nth-child(2),
+	.performance-content .list-item-cell:nth-child(2) {
+		color: var(--color-yellow);
+	}
+
+	.performance-content .list-header-cell:nth-child(3),
+	.performance-content .list-item-cell:nth-child(3) {
+		color: var(--color-green);
+	}
+
+	.list-item-row:has(.frame-timeline) > .list-item-cell:first-child {
+		min-width: 0;
+	}
+
+	.list-item-row:has(.frame-timeline) > .list-item-cell:first-child > .value {
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.list-item-cell:has(> .frame-timeline) {
+		align-self: stretch;
+		align-items: stretch;
+		margin: -4px 0; /* fill the height of the row */
+	}
+
+	.performance-content {
+		--frame-timeline-width: min(60cqw, 100cqw - 372px);
+	}
+
+	/* the timeline has a darker background, up to the padding of the rows */
+	.frame-stats {
+		background: linear-gradient(var(--chart-background), var(--chart-background)) 100% 0 / calc(var(--frame-timeline-width) + 8px) 100% no-repeat;
+		border-radius: 3px;
+		position: relative;
+	}
+
+	/* the dashed lines are not interrupted by the rows */
+	.frame-stats::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		right: 8px;
+		width: var(--frame-timeline-width);
+		background: repeating-linear-gradient(to right, rgba(255, 255, 255, 0.2) 0 1px, transparent 1px var(--frame-timeline-step, 100%));
+		mask: repeating-linear-gradient(to bottom, black 0 3px, transparent 3px 6px);
+		pointer-events: none;
+	}
+
+	.frame-timeline {
+		position: relative;
+		width: 100%;
+		overflow: hidden;
+	}
+
+	.frame-timeline > div {
+		position: absolute;
+		bottom: calc(50% + 1px);
+		min-width: 1px;
+		height: 7px;
+		border-radius: 2px;
+		background-color: var(--color-yellow);
+	}
+
+	.frame-timeline > .gpu {
+		top: calc(50% + 1px);
+		background-color: var(--color-green);
+	}
+
+	.list-item-row.alert .frame-timeline > div {
+		display: none;
+	}
+
+	/* ten ticks in each step, the one in the middle is taller. The layers don't overlap, they are translucent */
+	.frame-timeline-ruler {
+		--tick: rgba(255, 255, 255, 0.3) 0 1px, transparent 1px;
+		position: relative;
+		align-self: stretch;
+		margin-bottom: -6px; /* padding of the header */
+		overflow: hidden;
+		background:
+			repeating-linear-gradient(to right, var(--tick) var(--frame-timeline-step, 100%)) 0 0 / 100% calc(100% - 10px) no-repeat,
+			repeating-linear-gradient(to right, var(--tick) calc(var(--frame-timeline-step, 100%) / 2)) 0 calc(100% - 4px) / 100% 6px no-repeat,
+			repeating-linear-gradient(to right, var(--tick) calc(var(--frame-timeline-step, 100%) / 10)) 0 100% / 100% 4px no-repeat;
+	}
+
+	.frame-timeline-ruler > span {
+		position: absolute;
+		padding-left: 4px;
+		font-size: 10px;
+		font-weight: normal;
+		white-space: nowrap;
+	}
+
+	.list-item-wrapper:not(.header-wrapper) > .list-item-row:has(.graph-container) {
+		background-color: var(--chart-background);
+	}
+
 	.graph-container {
 		width: 100%;
 		box-sizing: border-box;
@@ -1250,8 +1360,8 @@ export class Style {
 		width: 0;
 		min-width: 100%;
 		height: 80px;
-		background-color: var(--profiler-header);
-		border: 1px solid var(--profiler-border);
+		background-color: color-mix(in srgb, var(--chart-background), black 15%);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 4px;
 		display: block;
 	}

@@ -4,15 +4,35 @@ import { Graph } from '../ui/Graph.js';
 import { Item } from '../ui/Item.js';
 import { createValueSpan, setText } from '../ui/utils.js';
 
+// creates the cell of a row in the timeline, with a bar for each type
+
+function createTimelineCell( ...types ) {
+
+	const cell = document.createElement( 'div' );
+	cell.className = 'frame-timeline';
+
+	for ( const type of types ) {
+
+		const bar = document.createElement( 'div' );
+		bar.className = type;
+		cell.appendChild( bar );
+
+	}
+
+	return cell;
+
+}
+
 class Performance extends Tab {
 
 	constructor( options = {} ) {
 
 		super( 'Performance', options );
 
-		const perfList = new List( 'Name', 'CPU', 'GPU' );
-		perfList.setGridStyle( 'minmax(200px, 2fr) 80px 80px' );
-		perfList.domElement.style.minWidth = '520px';
+		const perfList = new List( 'Name', 'CPU', 'GPU', '' );
+		perfList.setGridStyle( 'minmax(0, 1fr) 60px 60px var(--frame-timeline-width)' ); // the timeline is as wide in the nested rows
+		perfList.domElement.style.containerType = 'inline-size';
+		perfList.domElement.style.minWidth = '640px';
 
 		const scrollWrapper = document.createElement( 'div' );
 		scrollWrapper.className = 'list-scroll-wrapper';
@@ -47,16 +67,24 @@ class Performance extends Tab {
 		*/
 
 		this.graphFpsCounter = createValueSpan();
-		const graphStats = new Item( 'Graph Stats', createValueSpan(), this.graphFpsCounter );
+		this.graphMsCounter = createValueSpan();
+		this.graphMsCounter.classList.add( 'secondary' );
+
+		const graphCounters = document.createElement( 'div' );
+		graphCounters.append( this.graphFpsCounter, this.graphMsCounter );
+
+		const graphStats = new Item( 'Graph Stats', createValueSpan(), createValueSpan(), graphCounters );
 		perfList.add( graphStats );
 
 		const graphItem = new Item( graphContainer );
 		graphItem.itemRow.childNodes[ 0 ].style.gridColumn = '1 / -1';
+		graphItem.itemRow.classList.add( 'no-hover' ); // keep the background of the graph
 		graphStats.add( graphItem );
 
 		//
 
-		const frameStats = new Item( 'Frame Stats', createValueSpan(), createValueSpan() );
+		const frameStats = new Item( 'Frame Stats', createValueSpan(), createValueSpan(), createTimelineCell() );
+		frameStats.domElement.classList.add( 'frame-stats' );
 		perfList.domElement.appendChild( perfList.domElement.querySelector( '.list-header' ) ); // move the header below the graph
 		perfList.add( frameStats );
 
@@ -67,7 +95,14 @@ class Performance extends Tab {
 
 		//
 
+		const timelineRuler = perfList.domElement.querySelector( '.list-header-cell:last-child' );
+		timelineRuler.classList.add( 'frame-timeline-ruler' );
+
+		//
+
 		this.notInUse = new Map();
+		this.perfList = perfList;
+		this.timelineRuler = timelineRuler;
 		this.frameStats = frameStats;
 		this.graphStats = graphStats;
 		this.graph = graph;
@@ -89,7 +124,14 @@ class Performance extends Tab {
 
 		if ( item === undefined ) {
 
-			item = new Item( createValueSpan(), createValueSpan(), createValueSpan() );
+			item = new Item( createValueSpan(), createValueSpan(), createValueSpan(), createTimelineCell( 'cpu', 'gpu' ) );
+
+			if ( stats.isGroupStats === true ) {
+
+				item.itemRow.classList.add( 'group' );
+				item.close();
+
+			}
 
 			if ( stats.name ) {
 
@@ -124,7 +166,7 @@ class Performance extends Tab {
 
 			const statsIndex = stats.parent.children.indexOf( stats );
 
-			if ( item.parent === null || item.parent.children.indexOf( item ) !== statsIndex ) {
+			if ( item.parent !== this.currentItem || item.parent.children.indexOf( item ) !== statsIndex ) {
 
 				this.currentItem.add( item, statsIndex );
 
@@ -159,6 +201,75 @@ class Performance extends Tab {
 		this.currentItem = previousItem;
 
 		this.frameItems.set( stats.cid, item );
+
+	}
+
+	updateTimeline( inspector, frame ) {
+
+		const period = inspector.fps > 0 ? 1000 / inspector.fps : 0;
+		const calls = [];
+
+		// the CPU and GPU clocks are not comparable: the GPU is delayed, so no call starts on it before the CPU
+
+		let gpuDelay = 0;
+
+		for ( const [ cid, item ] of this.frameItems ) {
+
+			const data = inspector.getStatsData( cid );
+
+			if ( data.gpuOffset !== null ) gpuDelay = Math.max( gpuDelay, data.cpuOffset - data.gpuOffset );
+
+			calls.push( { data, bars: item.data[ 3 ].children } );
+
+		}
+
+		// the timeline shows a frame period, or more if the calls end after it
+
+		const duration = calls.reduce( ( end, { data } ) => Math.max( end, data.cpuOffset + data.cpu, data.gpuOffset !== null ? gpuDelay + data.gpuOffset + data.gpu : 0 ), Math.max( period, 1e-3 ) );
+		const toPercent = ( time ) => ( time / duration ) * 100 + '%';
+
+		const setBar = ( bar, start, time ) => {
+
+			bar.style.left = toPercent( start );
+			bar.style.width = toPercent( time );
+
+		};
+
+		for ( const { data, bars } of calls ) {
+
+			setBar( bars[ 0 ], data.cpuOffset, data.cpu );
+
+			bars[ 1 ].hidden = data.gpuOffset === null;
+
+			if ( data.gpuOffset !== null ) setBar( bars[ 1 ], gpuDelay + data.gpuOffset, data.gpu );
+
+		}
+
+		// the frame has the bars of its calls
+
+		const getBars = ( stats ) => Array.from( this.frameItems.get( stats.cid ).data[ 3 ].children );
+
+		this.frameStats.data[ 3 ].replaceChildren( ...frame.children.flatMap( getBars ).map( ( bar ) => bar.cloneNode() ) );
+
+		// the labels of the ruler are at a multiple of 1, 2 or 5, at least 80 pixels apart
+
+		const count = Math.max( this.timelineRuler.clientWidth / 80, 1 );
+		const magnitude = 10 ** Math.floor( Math.log10( duration / count ) );
+		const step = magnitude * [ 1, 2, 5, 10 ].find( ( multiple ) => duration / ( magnitude * multiple ) <= count );
+
+		const ticks = [];
+
+		for ( let i = 0; i * step < duration; i ++ ) {
+
+			const tick = document.createElement( 'span' );
+			tick.textContent = parseFloat( ( i * step ).toFixed( 3 ) ) + ( i === 0 ? ' ms' : '' );
+			tick.style.left = toPercent( i * step );
+			ticks.push( tick );
+
+		}
+
+		this.timelineRuler.replaceChildren( ...ticks );
+		this.perfList.domElement.style.setProperty( '--frame-timeline-step', toPercent( step ) );
 
 	}
 
@@ -237,6 +348,8 @@ class Performance extends Tab {
 
 		}
 
+		this.updateTimeline( inspector, frame );
+
 		// remove unused frame items
 
 		for ( const [ cid, item ] of oldFrameItems ) {
@@ -261,7 +374,10 @@ class Performance extends Tab {
 
 		//
 
-		setText( this.graphFpsCounter, inspector.fps.toFixed() + ' FPS' );
+		const fps = inspector.fps;
+
+		setText( this.graphFpsCounter, fps.toFixed() + ' FPS' );
+		setText( this.graphMsCounter, ( fps > 0 ? 1000 / fps : 0 ).toFixed( 2 ) + ' ms' );
 
 		//
 

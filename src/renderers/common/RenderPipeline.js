@@ -122,6 +122,14 @@ class RenderPipeline {
 		 */
 		this._outputColorSpace = renderer.outputColorSpace;
 
+		/**
+		 * The current dithering setting.
+		 *
+		 * @private
+		 * @type {boolean}
+		 */
+		this._dithering = renderer.dithering;
+
 
 	}
 
@@ -140,9 +148,11 @@ class RenderPipeline {
 
 		const toneMapping = renderer.toneMapping;
 		const outputColorSpace = renderer.outputColorSpace;
+		const dithering = renderer.dithering;
 
 		renderer.toneMapping = NoToneMapping;
 		renderer.outputColorSpace = ColorManagement.workingColorSpace;
+		renderer.dithering = false;
 
 		//
 
@@ -157,6 +167,7 @@ class RenderPipeline {
 
 		renderer.toneMapping = toneMapping;
 		renderer.outputColorSpace = outputColorSpace;
+		renderer.dithering = dithering;
 
 		for ( const callback of this._contextData.onAfterPipelineCallbacks ) callback();
 
@@ -180,6 +191,7 @@ class RenderPipeline {
 
 		const toneMapping = this._toneMapping;
 		const outputColorSpace = this._outputColorSpace;
+		const dithering = this._dithering;
 
 		const contextData = {
 			renderPipeline: this,
@@ -194,12 +206,13 @@ class RenderPipeline {
 
 		if ( this.outputColorTransform === true ) {
 
-			outputNode = renderOutput( outputNode, toneMapping, outputColorSpace );
+			outputNode = renderOutput( outputNode, toneMapping, outputColorSpace, dithering );
 
 		} else {
 
 			contextData.toneMapping = toneMapping;
 			contextData.outputColorSpace = outputColorSpace;
+			contextData.dithering = dithering;
 
 		}
 
@@ -228,6 +241,13 @@ class RenderPipeline {
 		if ( this._outputColorSpace !== this.renderer.outputColorSpace ) {
 
 			this._outputColorSpace = this.renderer.outputColorSpace;
+			this.needsUpdate = true;
+
+		}
+
+		if ( this._dithering !== this.renderer.dithering ) {
+
+			this._dithering = this.renderer.dithering;
 			this.needsUpdate = true;
 
 		}

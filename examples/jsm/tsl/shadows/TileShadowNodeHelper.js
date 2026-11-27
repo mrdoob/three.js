@@ -180,6 +180,8 @@ class TileShadowNodeHelper extends Group {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		if ( this.scene ) {
 
 			for ( const mesh of this._debugMeshes ) {
