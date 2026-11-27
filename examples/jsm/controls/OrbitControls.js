@@ -194,7 +194,7 @@ class OrbitControls extends Controls {
 		 * must be a sub-interval of `[ - 2 PI, 2 PI ]`, with `( max - min < 2 PI )`.
 		 *
 		 * @type {number}
-		 * @default -Infinity
+		 * @default Infinity
 		 */
 		this.maxAzimuthAngle = Infinity;
 

@@ -12,7 +12,7 @@ import { Vector3 } from 'three';
  *
  * @param {Vector3} [center] - Center of Hilbert curve.
  * @param {number} [size=10] - Total width of Hilbert curve.
- * @param {number} [iterations=10] - Number of subdivisions.
+ * @param {number} [iterations=1] - Number of subdivisions.
  * @param {number} [v0=0] - Corner index -X, -Z.
  * @param {number} [v1=1] - Corner index -X, +Z.
  * @param {number} [v2=2] - Corner index +X, +Z.
