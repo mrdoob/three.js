@@ -211,6 +211,8 @@ class LightProbeGridHelperWebGL extends InstancedMesh {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.geometry.dispose();
 		this.material.dispose();
 

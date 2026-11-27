@@ -41,38 +41,48 @@ class HTMLMesh extends Mesh {
 
 		super( geometry, material );
 
-		function onEvent( event ) {
-
-			material.map.dispatchDOMEvent( event );
-
-		}
-
-		this.addEventListener( 'mousedown', onEvent );
-		this.addEventListener( 'mousemove', onEvent );
-		this.addEventListener( 'mouseup', onEvent );
-		this.addEventListener( 'click', onEvent );
-
 		/**
-		 * Frees the GPU-related resources allocated by this instance and removes all event listeners.
-		 * Call this method whenever this instance is no longer used in your app.
+		 * Forwards the mesh's pointer events to the DOM element.
+		 *
+		 * @private
+		 * @type {Function}
 		 */
-		this.dispose = function () {
+		this._onEvent = onEvent.bind( this );
 
-			geometry.dispose();
-			material.dispose();
-
-			material.map.dispose();
-
-			canvases.delete( dom );
-
-			this.removeEventListener( 'mousedown', onEvent );
-			this.removeEventListener( 'mousemove', onEvent );
-			this.removeEventListener( 'mouseup', onEvent );
-			this.removeEventListener( 'click', onEvent );
-
-		};
+		this.addEventListener( 'mousedown', this._onEvent );
+		this.addEventListener( 'mousemove', this._onEvent );
+		this.addEventListener( 'mouseup', this._onEvent );
+		this.addEventListener( 'click', this._onEvent );
 
 	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance and removes all event listeners.
+	 * Call this method whenever this instance is no longer used in your app.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		this.geometry.dispose();
+		this.material.dispose();
+
+		this.material.map.dispose();
+
+		canvases.delete( this.material.map.dom );
+
+		this.removeEventListener( 'mousedown', this._onEvent );
+		this.removeEventListener( 'mousemove', this._onEvent );
+		this.removeEventListener( 'mouseup', this._onEvent );
+		this.removeEventListener( 'click', this._onEvent );
+
+	}
+
+}
+
+function onEvent( event ) {
+
+	this.material.map.dispatchDOMEvent( event );
 
 }
 

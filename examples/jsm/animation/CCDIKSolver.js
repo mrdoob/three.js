@@ -498,6 +498,8 @@ class CCDIKHelper extends Object3D {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.sphereGeometry.dispose();
 
 		this.targetSphereMaterial.dispose();
