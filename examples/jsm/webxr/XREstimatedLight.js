@@ -216,84 +216,91 @@ export class XREstimatedLight extends Group {
 		 */
 		this.environment = null;
 
-		let sessionLightProbe = null;
-		let estimationStarted = false;
+		this._renderer = renderer;
+		this._environmentEstimation = environmentEstimation;
+		this._sessionLightProbe = null;
+		this._estimationStarted = false;
 
-		const onSessionStart = () => {
+		this._onSessionStart = onSessionStart.bind( this );
+		this._onSessionEnd = onSessionEnd.bind( this );
 
-			const session = renderer.xr.getSession();
+		renderer.xr.addEventListener( 'sessionstart', this._onSessionStart );
+		renderer.xr.addEventListener( 'sessionend', this._onSessionEnd );
 
-			if ( 'requestLightProbe' in session ) {
+	}
 
-				session.requestLightProbe( {
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
+	dispose() {
 
-					reflectionFormat: session.preferredReflectionFormat
+		super.dispose();
 
-				} ).then( ( probe ) => {
+		this._renderer.xr.removeEventListener( 'sessionstart', this._onSessionStart );
+		this._renderer.xr.removeEventListener( 'sessionend', this._onSessionEnd );
 
-					sessionLightProbe = new SessionLightProbe( this, renderer, probe, environmentEstimation, () => {
+		if ( this._sessionLightProbe ) {
 
-						estimationStarted = true;
+			this._sessionLightProbe.dispose();
+			this._sessionLightProbe = null;
 
-						// Fired to indicate that the estimated lighting values are now being updated.
-						this.dispatchEvent( { type: 'estimationstart' } );
+		}
 
-					} );
+		this.lightProbe.texture.dispose();
+		this.lightProbe.dispose();
+		this.remove( this.lightProbe );
+		this.lightProbe = null;
 
-				} );
+		this.remove( this.directionalLight );
+		this.directionalLight = null;
 
-			}
+		this.environment = null;
 
-		};
+	}
 
-		const onSessionEnd = () => {
+}
 
-			if ( sessionLightProbe ) {
+function onSessionStart() {
 
-				sessionLightProbe.dispose();
-				sessionLightProbe = null;
+	const session = this._renderer.xr.getSession();
 
-			}
+	if ( 'requestLightProbe' in session ) {
 
-			if ( estimationStarted ) {
+		session.requestLightProbe( {
 
-				// Fired to indicate that the estimated lighting values are no longer being updated.
-				this.dispatchEvent( { type: 'estimationend' } );
+			reflectionFormat: session.preferredReflectionFormat
 
-			}
+		} ).then( ( probe ) => {
 
-		};
+			this._sessionLightProbe = new SessionLightProbe( this, this._renderer, probe, this._environmentEstimation, () => {
 
-		renderer.xr.addEventListener( 'sessionstart', onSessionStart );
-		renderer.xr.addEventListener( 'sessionend', onSessionEnd );
+				this._estimationStarted = true;
 
-		/**
-		 * Frees the GPU-related resources allocated by this instance. Call this
-		 * method whenever this instance is no longer used in your app.
-		 */
-		this.dispose = () => {
+				// Fired to indicate that the estimated lighting values are now being updated.
+				this.dispatchEvent( { type: 'estimationstart' } );
 
-			renderer.xr.removeEventListener( 'sessionstart', onSessionStart );
-			renderer.xr.removeEventListener( 'sessionend', onSessionEnd );
+			} );
 
-			if ( sessionLightProbe ) {
+		} );
 
-				sessionLightProbe.dispose();
-				sessionLightProbe = null;
+	}
 
-			}
+}
 
-			this.lightProbe.texture.dispose();
-			this.lightProbe.dispose();
-			this.remove( this.lightProbe );
-			this.lightProbe = null;
+function onSessionEnd() {
 
-			this.remove( this.directionalLight );
-			this.directionalLight = null;
+	if ( this._sessionLightProbe ) {
 
-			this.environment = null;
+		this._sessionLightProbe.dispose();
+		this._sessionLightProbe = null;
 
-		};
+	}
+
+	if ( this._estimationStarted ) {
+
+		// Fired to indicate that the estimated lighting values are no longer being updated.
+		this.dispatchEvent( { type: 'estimationend' } );
 
 	}
 

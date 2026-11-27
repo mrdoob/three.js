@@ -213,3 +213,12 @@ export default VelocityNode;
  * @type {VelocityNode}
  */
 export const velocity = /*@__PURE__*/ nodeImmutable( VelocityNode );
+
+/**
+ * TSL object that represents the change of the view-space depth since the previous.
+ * It depends on the uniforms of {@link velocity}, so it must be used together with it in the same material.
+ *
+ * @tsl
+ * @type {Node<float>}
+ */
+export const viewZDelta = /*@__PURE__*/ modelViewMatrix.mul( positionLocal ).z.sub( velocity.previousCameraViewMatrix.mul( velocity.previousModelWorldMatrix ).mul( positionPrevious ).z ).toVarying();

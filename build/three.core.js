@@ -7591,7 +7591,7 @@ class Texture extends EventDispatcher {
 		 * @type {number}
 		 * @default 4
 		 */
-		this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
+		this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see https://registry.khronos.org/OpenGL-Refpages/es3.0/html/glPixelStorei.xhtml)
 
 		/**
 		 * Textures containing color data should be annotated with `SRGBColorSpace` or `LinearSRGBColorSpace`.
@@ -12341,8 +12341,10 @@ class Object3D extends EventDispatcher {
 		/**
 		 * Whether the 3D object is supposed to be static or not. If set to `true`, it means
 		 * the 3D object is not going to be changed after the first render. This includes
-		 * geometry and material settings. A static 3D object can be processed by the renderer
-		 * slightly faster since certain state checks can be bypassed.
+		 * world transform, geometry, and material settings. A static 3D object can be processed
+		 * by the renderer slightly faster since certain state checks can be bypassed.
+		 *
+		 * The flag is not implicitly applied to children.
 		 *
 		 * Only relevant in context of {@link WebGPURenderer}.
 		 *

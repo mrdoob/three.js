@@ -49,6 +49,8 @@ class ColorEnvironment extends Scene {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.children[ 0 ].geometry.dispose();
 		this.children[ 0 ].material.dispose();
 
