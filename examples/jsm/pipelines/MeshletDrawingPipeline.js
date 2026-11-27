@@ -622,6 +622,28 @@ function isSupportedObject( object, geometry, group, allowEmpty = false ) {
 const MAX_HZB_LEVELS = 16;
 
 /**
+ * Fills the given compute group with the given lists of compute nodes. The same group is reused in
+ * each compute call, so the renderer keeps its data instead of creating it for a new array every frame.
+ *
+ * @private
+ * @param {Array<ComputeNode>} group - The compute group.
+ * @param {string} name - The name of the compute call.
+ * @param {...Array<ComputeNode>} lists - The lists of compute nodes.
+ * @return {Array<ComputeNode>} The compute group.
+ */
+function setComputeGroup( group, name, ...lists ) {
+
+	group.length = 0;
+
+	for ( const list of lists ) group.push( ...list );
+
+	group.name = name;
+
+	return group;
+
+}
+
+/**
  * Creates the occlusion data of a view: the depth of the clusters visible in the last frame and its
  * hierarchical depth. Each level stores the maximum depth of 2x2 texels of the previous level, the first
  * level covers 2x2 pixels. The levels are stored in one storage buffer.
@@ -700,9 +722,12 @@ function createOcclusion( width, height ) {
 
 	}
 
+	const scene = new Scene();
+	scene.name = 'Meshlets / Occlusion Depth';
+
 	return {
 		target,
-		scene: new Scene(),
+		scene,
 		hzb: storage( hzbAttribute, 'float' ).toReadOnly(),
 		hzbLevels: uniformArray( levelData, 'vec4' ),
 		hzbLevelCount: uniform( levels.length, 'uint' ),
@@ -4943,6 +4968,10 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 		const cullNodes = computeNodesBefore.length > 0 ? [ ...computeNodesBefore, ...culling.cullNodes ] : culling.cullNodes;
 
+		// one compute group per record, reused in each compute call
+
+		const group = record.computeGroup || ( record.computeGroup = [] );
+
 		if ( compile === true ) {
 
 			// Compile all compute stages asynchronously, without dispatching the culling.
@@ -4957,21 +4986,27 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 			// first phase, the depth of the clusters visible in the last frame and the second phase
 
-			renderer.compute( cullNodes );
+			renderer.compute( setComputeGroup( group, 'Meshlets / Prepare Occlusion Depth', cullNodes ) );
 
 			this._renderOcclusionDepth( occlusion, active );
 
-			renderer.compute( computeNodes );
-
-		} else if ( occlusion !== null ) {
-
-			renderer.compute( [ ...computeNodesBefore, ...culling.skipOcclusionNodes, ...( view.computeClear !== null ? [ view.computeClear ] : [] ), ...batchComputeNodes ] );
+			renderer.compute( setComputeGroup( group, batchComputeNodes.length > 0 ? 'Meshlets / Occlusion Cull and Rasterize' : 'Meshlets / Occlusion Cull', computeNodes ) );
 
 		} else {
 
 			// one compute call for all batches of the render list
 
-			renderer.compute( [ ...cullNodes, ...computeNodes ] );
+			const name = batchComputeNodes.length > 0 ? 'Meshlets / Cull and Rasterize' : 'Meshlets / Cull';
+
+			if ( occlusion !== null ) {
+
+				renderer.compute( setComputeGroup( group, name, computeNodesBefore, culling.skipOcclusionNodes, view.computeClear !== null ? [ view.computeClear ] : EMPTY_NODES, batchComputeNodes ) );
+
+			} else {
+
+				renderer.compute( setComputeGroup( group, name, cullNodes, computeNodes ) );
+
+			}
 
 		}
 

@@ -161,8 +161,8 @@ class TAAUNode extends Node {
 		 * @type {?RenderTarget}
 		 */
 		this._historyRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, count: 2 } );
-		this._historyRenderTarget.textures[ 0 ].name = 'TAAUNode.history.color';
-		this._historyRenderTarget.textures[ 1 ].name = 'TAAUNode.history.lock';
+		this._historyRenderTarget.textures[ 0 ].name = 'TAAU / History / Color';
+		this._historyRenderTarget.textures[ 1 ].name = 'TAAU / History / Lock';
 
 		/**
 		 * The render target for the resolve. Sized to the renderer's drawing
@@ -172,7 +172,7 @@ class TAAUNode extends Node {
 		 * @type {?RenderTarget}
 		 */
 		this._resolveRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._resolveRenderTarget.texture.name = 'TAAUNode.resolve';
+		this._resolveRenderTarget.texture.name = 'TAAU / Resolve';
 
 		/**
 		 * Material used for the resolve step.
@@ -235,7 +235,7 @@ class TAAUNode extends Node {
 		 * @type {Reprojection}
 		 */
 		this._reprojection = new Reprojection( depthNode, velocityNode, camera );
-		this._reprojection.previousDepthNode.value.name = 'TAAUNode.previousDepth';
+		this._reprojection.previousDepthNode.value.name = 'TAAU / Previous Depth';
 
 	}
 
@@ -368,7 +368,7 @@ class TAAUNode extends Node {
 
 			renderer.setRenderTarget( this._historyRenderTarget );
 			_quadMesh.material = this._seedMaterial;
-			_quadMesh.name = 'TAAU.seed';
+			_quadMesh.name = 'TAAU / Seed';
 			_quadMesh.render( renderer );
 			renderer.setRenderTarget( null );
 

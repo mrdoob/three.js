@@ -253,8 +253,8 @@
 				} )().computeKernel( [ 16, 16 ] );
 
 				// Create both ping-pong compute shaders
-				computeHeightAtoB = createComputeHeight( heightStorageA, heightStorageB ).setName( 'Update Height A→B' );
-				computeHeightBtoA = createComputeHeight( heightStorageB, heightStorageA ).setName( 'Update Height B→A' );
+				computeHeightAtoB = createComputeHeight( heightStorageA, heightStorageB ).setName( 'Water / Height, A to B' );
+				computeHeightBtoA = createComputeHeight( heightStorageB, heightStorageA ).setName( 'Water / Height, B to A' );
 
 				// Water Geometry corresponds with buffered compute grid.
 				const waterGeometry = new THREE.PlaneGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH - 1 );
@@ -432,7 +432,7 @@
 					duckInstanceDataStorage.element( instanceIndex ).get( 'position' ).assign( instancePosition );
 					duckInstanceDataStorage.element( instanceIndex ).get( 'velocity' ).assign( velocity );
 
-				} )().compute( NUM_DUCKS ).setName( 'Update Ducks' );
+				} )().compute( NUM_DUCKS ).setName( 'Water / Ducks' );
 
 				// Models / Textures
 

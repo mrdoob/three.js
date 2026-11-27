@@ -590,7 +590,7 @@ class ReflectorBaseNode extends Node {
 
 		const previousName = scene.name;
 
-		scene.name = ( scene.name || 'Scene' ) + ' [ Reflector ]'; // TODO: Add bounce index
+		scene.name = ( scene.name || 'Scene' ) + ' / Reflector'; // TODO: Add bounce index
 
 		if ( needsClear ) {
 

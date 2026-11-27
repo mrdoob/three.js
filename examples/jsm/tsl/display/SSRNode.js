@@ -422,7 +422,7 @@ class SSRNode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._ssrRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._ssrRenderTarget.texture.name = 'SSRNode.SSR';
+		this._ssrRenderTarget.texture.name = 'SSR / Reflections';
 
 		/**
 		 * The render target for the blurred SSR reflections.
@@ -431,7 +431,7 @@ class SSRNode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._blurRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, minFilter: LinearMipmapLinearFilter, magFilter: LinearFilter } );
-		this._blurRenderTarget.texture.name = 'SSRNode.Blur';
+		this._blurRenderTarget.texture.name = 'SSR / Blur';
 		this._blurRenderTarget.texture.mipmaps.push( {}, {}, {}, {}, {} );
 
 		/**
@@ -792,7 +792,7 @@ class SSRNode extends Node {
 		// ssr
 
 		renderer.setRenderTarget( ssrRenderTarget );
-		_quadMesh.name = 'SSR [ Reflections ]';
+		_quadMesh.name = 'SSR / Trace';
 		_quadMesh.render( renderer );
 
 		// blur (optional)
@@ -807,7 +807,7 @@ class SSRNode extends Node {
 
 				this._blurSpread.value = i;
 				renderer.setRenderTarget( blurRenderTarget, 0, i );
-				_quadMesh.name = 'SSR [ Blur Level ' + i + ' ]';
+				_quadMesh.name = `SSR / Blur / Mip ${ i }`;
 				_quadMesh.render( renderer );
 
 			}

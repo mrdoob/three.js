@@ -219,12 +219,12 @@ class VXGINode extends Node {
 		this._renderTarget = new RenderTarget( 1, 1, { depthBuffer: false, count: 2 } );
 
 		const aoTexture = this._renderTarget.textures[ 0 ];
-		aoTexture.name = 'VXGI.AO';
+		aoTexture.name = 'VXGI / AO';
 		aoTexture.type = UnsignedByteType;
 		aoTexture.format = RedFormat;
 
 		const giTexture = this._renderTarget.textures[ 1 ];
-		giTexture.name = 'VXGI.GI';
+		giTexture.name = 'VXGI / GI';
 		giTexture.type = HalfFloatType;
 		giTexture.format = RGBAFormat;
 

@@ -140,7 +140,7 @@ class SSAONode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RedFormat } );
-		this._aoRenderTarget.texture.name = 'SSAONode.AO';
+		this._aoRenderTarget.texture.name = 'SSAO / AO';
 
 		/**
 		 * The render target the intermediate (horizontally blurred) result is rendered into.
@@ -149,7 +149,7 @@ class SSAONode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._blurRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RedFormat } );
-		this._blurRenderTarget.texture.name = 'SSAONode.Blur';
+		this._blurRenderTarget.texture.name = 'SSAO / Blur';
 
 		/**
 		 * Represents the projection matrix of the scene's camera.
@@ -283,7 +283,7 @@ class SSAONode extends Node {
 		// ambient occlusion
 
 		_quadMesh.material = this._aoMaterial;
-		_quadMesh.name = 'SSAO.AO';
+		_quadMesh.name = 'SSAO / AO';
 		renderer.setRenderTarget( this._aoRenderTarget );
 		_quadMesh.render( renderer );
 
@@ -292,7 +292,7 @@ class SSAONode extends Node {
 		if ( this.blurEnabled === true ) {
 
 			_quadMesh.material = this._blurMaterial;
-			_quadMesh.name = 'SSAO.Blur';
+			_quadMesh.name = 'SSAO / Blur';
 
 			this._blurInput.value = this._aoRenderTarget.texture;
 			this._blurDirection.value.set( 1 / this.resolution.x, 0 );

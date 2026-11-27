@@ -92,7 +92,7 @@ class BilateralBlurNode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._horizontalRT = new RenderTarget( 1, 1, { depthBuffer: false } );
-		this._horizontalRT.texture.name = 'BilateralBlurNode.horizontal';
+		this._horizontalRT.texture.name = 'Bilateral Blur / Horizontal';
 
 		/**
 		 * The render target used for the vertical pass.
@@ -101,7 +101,7 @@ class BilateralBlurNode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._verticalRT = new RenderTarget( 1, 1, { depthBuffer: false } );
-		this._verticalRT.texture.name = 'BilateralBlurNode.vertical';
+		this._verticalRT.texture.name = 'Bilateral Blur / Vertical';
 
 		/**
 		 * The result of the effect is represented as a separate texture node.
@@ -189,7 +189,7 @@ class BilateralBlurNode extends Node {
 
 		this._passDirection.value.set( 1, 0 );
 
-		_quadMesh.name = 'Bilateral Blur [ Horizontal Pass ]';
+		_quadMesh.name = 'Bilateral Blur / Horizontal';
 		_quadMesh.render( renderer );
 
 		// vertical
@@ -199,7 +199,7 @@ class BilateralBlurNode extends Node {
 
 		this._passDirection.value.set( 0, 1 );
 
-		_quadMesh.name = 'Bilateral Blur [ Vertical Pass ]';
+		_quadMesh.name = 'Bilateral Blur / Vertical';
 		_quadMesh.render( renderer );
 
 		// restore

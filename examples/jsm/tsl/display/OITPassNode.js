@@ -81,11 +81,11 @@ class OITPassNode extends PassNode {
 		oitRenderTarget.depthTexture = this.renderTarget.depthTexture;
 
 		const accumTexture = oitRenderTarget.textures[ 0 ]; // RGBA16
-		accumTexture.name = 'accum';
+		accumTexture.name = 'OIT / Accumulation';
 		accumTexture.type = HalfFloatType;
 
 		const revealageTexture = oitRenderTarget.textures[ 1 ]; // R8
-		revealageTexture.name = 'revealage';
+		revealageTexture.name = 'OIT / Revealage';
 		revealageTexture.format = RedFormat;
 		revealageTexture.type = UnsignedByteType;
 
@@ -188,11 +188,15 @@ class OITPassNode extends PassNode {
 			revealageBlending.blendSrc = ZeroFactor;
 			revealageBlending.blendDst = OneMinusSrcColorFactor;
 
+			const [ accumTexture, revealageTexture ] = this._oitRenderTarget.textures;
+			const accumName = accumTexture.name;
+			const revealageName = revealageTexture.name;
+
 			this._oitMRTNode = mrt( {
-				accum: vec4( output.rgb.mul( alpha ), alpha ).mul( weight ),
-				revealage: alpha
-			} ).setBlendMode( 'accum', accumBlending ).setBlendMode( 'revealage', revealageBlending )
-				.setClearColor( 'accum', 0x000000, 0 ).setClearColor( 'revealage', 0xffffff, 1 );
+				[ accumName ]: vec4( output.rgb.mul( alpha ), alpha ).mul( weight ),
+				[ revealageName ]: alpha
+			} ).setBlendMode( accumName, accumBlending ).setBlendMode( revealageName, revealageBlending )
+				.setClearColor( accumName, 0x000000, 0 ).setClearColor( revealageName, 0xffffff, 1 );
 
 		}
 
@@ -268,13 +272,18 @@ class OITPassNode extends PassNode {
 		renderer.autoClearDepth = this.autoClearDepth;
 		renderer.autoClearStencil = this.autoClearStencil;
 
+		const sceneName = scene.name;
+		const passName = this.name || 'OIT';
+
 		// default pass: opaque objects and transparent objects that do not qualify for OIT
 
 		renderer.setMRT( this._mrt );
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setRenderObjectFunction( this._defaultRenderObjectFunction );
 
+		scene.name = passName + ' / Base';
 		renderer.render( scene, camera );
+		scene.name = sceneName;
 
 		// OIT pass: accumulate the weighted colors and the revealage of all OIT-qualified objects
 
@@ -287,7 +296,9 @@ class OITPassNode extends PassNode {
 		renderer.opaque = false;
 		renderer.transparent = true;
 
+		scene.name = passName + ' / Accumulated';
 		renderer.render( scene, camera );
+		scene.name = sceneName;
 
 		// restore
 

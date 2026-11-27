@@ -183,7 +183,9 @@ class LightMapper {
 		this._textureNodes = {};
 
 		this._scene = new Scene();
+		this._scene.name = 'Light Map / Accumulate';
 		this._guideScene = new Scene();
+		this._guideScene.name = 'Light Map / Guides';
 		this._camera = new OrthographicCamera();
 		this._objects = [];
 		this._jitter = uniform( new Vector2() );
@@ -251,6 +253,7 @@ class LightMapper {
 		resolveMaterial.fragmentNode = moments !== null ? mrt( { output: resolve(), variance: estimateVariance() } ) : resolve();
 
 		this._quad = new QuadMesh( resolveMaterial );
+		this._quad.name = 'Light Map / Resolve';
 
 	}
 

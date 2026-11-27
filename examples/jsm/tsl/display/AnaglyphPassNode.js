@@ -298,6 +298,8 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 
 		super( scene, camera );
 
+		this.name = 'Anaglyph';
+
 		/**
 		 * This flag can be used for type testing.
 		 *

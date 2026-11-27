@@ -91,7 +91,7 @@
 
 				// compute
 
-				computeNode = computeShaderFn().compute( particlesCount ).setName( 'Update Particles' );
+				computeNode = computeShaderFn().compute( particlesCount ).setName( 'Points / Update' );
 				computeNode.onInit( ( { renderer } ) => {
 
 					const precomputeShaderNode = Fn( () => {
@@ -110,7 +110,7 @@
 
 					} );
 
-					renderer.compute( precomputeShaderNode().compute( particlesCount ) );
+					renderer.compute( precomputeShaderNode().compute( particlesCount ).setName( 'Points / Initialize Positions' ) );
 
 				} );
 

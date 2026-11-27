@@ -62,6 +62,7 @@ class GutterFillGenerator {
 		this._height = 0;
 		this._levels = [];
 		this._passes = [];
+		this._passes.name = 'Gutter Fill / Push and Pull';
 
 		this._source = texture();
 		this._firstLevel = texture();
@@ -380,7 +381,7 @@ function push( texel, above, size, target, dispatchSize ) {
 
 		} );
 
-	} )().compute( dispatchSize, [ WORKGROUP_SIZE, WORKGROUP_SIZE, 1 ] ).setName( 'GutterFill.push' );
+	} )().compute( dispatchSize, [ WORKGROUP_SIZE, WORKGROUP_SIZE, 1 ] ).setName( 'Gutter Fill / Push' );
 
 }
 
@@ -427,7 +428,7 @@ function pull( texel, above, size, belowTexel, below, target, dispatchSize ) {
 
 		} );
 
-	} )().compute( dispatchSize, [ WORKGROUP_SIZE, WORKGROUP_SIZE, 1 ] ).setName( 'GutterFill.pull' );
+	} )().compute( dispatchSize, [ WORKGROUP_SIZE, WORKGROUP_SIZE, 1 ] ).setName( 'Gutter Fill / Pull' );
 
 }
 
@@ -461,7 +462,7 @@ function createFillMaterial( source, levels ) {
 
 	const material = new NodeMaterial();
 	material.fragmentNode = fill();
-	material.name = 'GutterFill.fill';
+	material.name = 'Gutter Fill / Resolve';
 
 	return material;
 

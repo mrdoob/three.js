@@ -295,7 +295,7 @@ class RTTNode extends TextureNode {
 
 		if ( callName ) {
 
-			name = callName + ' [ ' + name + ' ]';
+			name = callName + ' / ' + name;
 
 		}
 

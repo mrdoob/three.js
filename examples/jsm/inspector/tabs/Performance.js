@@ -133,28 +133,10 @@ class Performance extends Tab {
 
 			}
 
-			if ( stats.name ) {
-
-				if ( stats.isComputeStats === true ) {
-
-					stats.name = `${ stats.name } [ Compute ]`;
-
-				}
-
-			} else {
-
-				stats.name = `Unnamed ${ stats.cid }`;
-
-			}
-
-			item.userData.name = stats.name;
-
 			this.currentItem.add( item );
 			data.item = item;
 
 		} else {
-
-			item.userData.name = stats.name;
 
 			if ( this.notInUse.has( stats.cid ) ) {
 
@@ -174,15 +156,17 @@ class Performance extends Tab {
 
 		}
 
-		let name = item.userData.name;
+		let name = stats.name || `Unnamed ${ stats.cid }`;
 
 		if ( stats.isComputeStats ) {
 
-			name += ' [ Compute ]';
+			name += ', Compute';
 
 		}
 
+		item.userData.name = name;
 		setText( item.data[ 0 ], name );
+		item.data[ 0 ].title = name;
 		setText( item.data[ 1 ], data.cpu.toFixed( 2 ) );
 		setText( item.data[ 2 ], stats.gpuNotAvailable === true ? '-' : data.gpu.toFixed( 2 ) );
 

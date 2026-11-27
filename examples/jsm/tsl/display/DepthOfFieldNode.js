@@ -86,8 +86,8 @@ class DepthOfFieldNode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._CoCRT = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, format: RedFormat, count: 2 } );
-		this._CoCRT.textures[ 0 ].name = 'DepthOfField.NearField';
-		this._CoCRT.textures[ 1 ].name = 'DepthOfField.FarField';
+		this._CoCRT.textures[ 0 ].name = 'Depth Of Field / Near Field';
+		this._CoCRT.textures[ 1 ].name = 'Depth Of Field / Far Field';
 
 		/**
 		 * The render target used for blurring the near field.
@@ -96,7 +96,7 @@ class DepthOfFieldNode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._CoCBlurredRT = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, format: RedFormat } );
-		this._CoCBlurredRT.texture.name = 'DepthOfField.NearFieldBlurred';
+		this._CoCBlurredRT.texture.name = 'Depth Of Field / Near Field Blurred';
 
 		/**
 		 * The render target used for the first blur pass.
@@ -105,7 +105,7 @@ class DepthOfFieldNode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._blur64RT = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._blur64RT.texture.name = 'DepthOfField.Blur64';
+		this._blur64RT.texture.name = 'Depth Of Field / Blur64';
 
 		/**
 		 * The render target used for the near field's second blur pass.
@@ -114,7 +114,7 @@ class DepthOfFieldNode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._blur16NearRT = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._blur16NearRT.texture.name = 'DepthOfField.Blur16Near';
+		this._blur16NearRT.texture.name = 'Depth Of Field / Blur16 / Near';
 
 		/**
 		 * The render target used for the far field's second blur pass.
@@ -123,7 +123,7 @@ class DepthOfFieldNode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._blur16FarRT = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._blur16FarRT.texture.name = 'DepthOfField.Blur16Far';
+		this._blur16FarRT.texture.name = 'Depth Of Field / Blur16 / Far';
 
 		/**
 		 * The render target used for the composite
@@ -132,7 +132,7 @@ class DepthOfFieldNode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._compositeRT = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._compositeRT.texture.name = 'DepthOfField.Composite';
+		this._compositeRT.texture.name = 'Depth Of Field / Composite';
 
 		/**
 		 * The material used for the CoC/near and far fields.
@@ -293,7 +293,7 @@ class DepthOfFieldNode extends Node {
 
 		_quadMesh.material = this._CoCMaterial;
 		renderer.setRenderTarget( this._CoCRT );
-		_quadMesh.name = 'DoF [ CoC ]';
+		_quadMesh.name = 'DOF / CoC';
 		_quadMesh.render( renderer );
 
 		// blur near field to avoid visible aliased edges when the near field
@@ -303,7 +303,7 @@ class DepthOfFieldNode extends Node {
 
 		_quadMesh.material = this._CoCBlurredMaterial;
 		renderer.setRenderTarget( this._CoCBlurredRT );
-		_quadMesh.name = 'DoF [ CoC Blur ]';
+		_quadMesh.name = 'DOF / CoC Blur';
 		_quadMesh.render( renderer );
 
 		// blur64 near
@@ -312,14 +312,14 @@ class DepthOfFieldNode extends Node {
 
 		_quadMesh.material = this._blur64Material;
 		renderer.setRenderTarget( this._blur64RT );
-		_quadMesh.name = 'DoF [ Blur64 Near ]';
+		_quadMesh.name = 'DOF / Near / Blur64';
 		_quadMesh.render( renderer );
 
 		// blur16 near
 
 		_quadMesh.material = this._blur16Material;
 		renderer.setRenderTarget( this._blur16NearRT );
-		_quadMesh.name = 'DoF [ Blur16 Near ]';
+		_quadMesh.name = 'DOF / Near / Blur16';
 		_quadMesh.render( renderer );
 
 		// blur64 far
@@ -328,21 +328,21 @@ class DepthOfFieldNode extends Node {
 
 		_quadMesh.material = this._blur64Material;
 		renderer.setRenderTarget( this._blur64RT );
-		_quadMesh.name = 'DoF [ Blur64 Far ]';
+		_quadMesh.name = 'DOF / Far / Blur64';
 		_quadMesh.render( renderer );
 
 		// blur16 far
 
 		_quadMesh.material = this._blur16Material;
 		renderer.setRenderTarget( this._blur16FarRT );
-		_quadMesh.name = 'DoF [ Blur16 Far ]';
+		_quadMesh.name = 'DOF / Far / Blur16';
 		_quadMesh.render( renderer );
 
 		// composite
 
 		_quadMesh.material = this._compositeMaterial;
 		renderer.setRenderTarget( this._compositeRT );
-		_quadMesh.name = 'DoF [ Composite ]';
+		_quadMesh.name = 'DOF / Composite';
 		_quadMesh.render( renderer );
 
 		// restore

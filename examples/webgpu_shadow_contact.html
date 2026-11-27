@@ -144,6 +144,7 @@
 				shadowGroup.add( fillPlane );
 
 				shadowCamera = new THREE.OrthographicCamera( - PLANE_WIDTH / 2, PLANE_WIDTH / 2, PLANE_HEIGHT / 2, - PLANE_HEIGHT / 2, 0, CAMERA_HEIGHT );
+				shadowCamera.name = 'Contact Shadow / Capture';
 				shadowCamera.rotation.x = Math.PI / 2;
 				shadowGroup.add( shadowCamera );
 

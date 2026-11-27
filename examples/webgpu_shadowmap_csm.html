@@ -94,6 +94,7 @@
 				scene.background = new THREE.Color( '#454e61' );
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 5000 );
 				orthoCamera = new THREE.OrthographicCamera();
+				orthoCamera.name = 'Shadow Camera / Preview';
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );

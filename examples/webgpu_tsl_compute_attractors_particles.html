@@ -207,7 +207,7 @@
 
 				} );
 
-				const initCompute = init().compute( count );
+				const initCompute = init().compute( count ).setName( 'Attractor Particles / Initialize' );
 
 				const reset = () => {
 
@@ -274,7 +274,7 @@
 					position.assign( mod( position.add( halfHalfExtent ), boundHalfExtent ).sub( halfHalfExtent ) );
 
 				} );
-				updateCompute = update().compute( count ).setName( 'Update Particles' );
+				updateCompute = update().compute( count ).setName( 'Attractor Particles / Update' );
 
 				// nodes
 

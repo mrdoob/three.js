@@ -49,13 +49,16 @@
 				// scene
 
 				const baseScene = new THREE.Scene();
+				baseScene.name = 'Masking / Base';
 				baseScene.background = new THREE.Color( 0xe0e0e0 );
 
 				const maskScene1 = new THREE.Scene();
+				maskScene1.name = 'Masking / Mask 1';
 				box = new THREE.Mesh( new THREE.BoxGeometry( 4, 4, 4 ) );
 				maskScene1.add( box );
 
 				const maskScene2 = new THREE.Scene();
+				maskScene2.name = 'Masking / Mask 2';
 				torus = new THREE.Mesh( new THREE.TorusGeometry( 3, 1, 16, 32 ) );
 				maskScene2.add( torus );
 

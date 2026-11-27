@@ -912,7 +912,7 @@ function createSphericalHarmonicsComputeNode( buffers, localCameraPosition ) {
 		applySphericalHarmonics( rgb, center, localCameraPosition, splatIndex, buffers );
 		buffers.sphericalHarmonicsContributionWrite.element( splatIndex ).assign( vec4( rgb, 0 ) );
 
-	} )().compute( buffers.count, [ WORKGROUP_SIZE ] ).setName( 'GaussianSplatSphericalHarmonics' );
+	} )().compute( buffers.count, [ WORKGROUP_SIZE ] ).setName( 'Gaussian Splats / Spherical Harmonics' );
 
 }
 

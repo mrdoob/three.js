@@ -116,9 +116,11 @@
 				camera.position.z = 1500;
 
 				scene1 = new THREE.Scene();
+				scene1.name = 'Anisotropy / Maximum';
 				scene1.fog = new THREE.Fog( 0xf2f7ff, 1, 25000 );
 
 				scene2 = new THREE.Scene();
+				scene2.name = 'Anisotropy / Off';
 				scene2.fog = new THREE.Fog( 0xf2f7ff, 1, 25000 );
 
 				scene1.add( new THREE.AmbientLight( 0xeef0ff, 3 ) );

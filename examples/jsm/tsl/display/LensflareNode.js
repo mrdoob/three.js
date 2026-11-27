@@ -114,7 +114,7 @@ class LensflareNode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._renderTarget = new RenderTarget( 1, 1, { depthBuffer: false } );
-		this._renderTarget.texture.name = 'LensflareNode';
+		this._renderTarget.texture.name = 'Lensflare';
 
 		/**
 		 * The node material that holds the effect's TSL code.
@@ -123,7 +123,7 @@ class LensflareNode extends Node {
 		 * @type {NodeMaterial}
 		 */
 		this._material = new NodeMaterial();
-		this._material.name = 'LensflareNode';
+		this._material.name = 'Lens Flare';
 
 		/**
 		 * The result of the effect is represented as a separate texture node.

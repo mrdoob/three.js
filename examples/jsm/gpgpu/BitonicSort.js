@@ -351,7 +351,7 @@ export class BitonicSort {
 			const idx = getBitonicDisperseIndices( instanceIndex, currentSwapSpan );
 			this._globalCompareAndSwapTSL( idx.x, idx.y, readBuffer, writeBuffer );
 
-		} )().compute( this.dispatchSize, [ this.workgroupSize ] );
+		} )().compute( this.dispatchSize, [ this.workgroupSize ] ).setName( 'Bitonic Sort / Global Disperse' );
 
 		return fnDef;
 
@@ -376,7 +376,7 @@ export class BitonicSort {
 			const idx = getBitonicFlipIndices( instanceIndex, currentSwapSpan );
 			this._globalCompareAndSwapTSL( idx.x, idx.y, readBuffer, writeBuffer );
 
-		} )().compute( this.dispatchSize, [ this.workgroupSize ] );
+		} )().compute( this.dispatchSize, [ this.workgroupSize ] ).setName( 'Bitonic Sort / Global Flip' );
 
 		return fnDef;
 
@@ -446,7 +446,7 @@ export class BitonicSort {
 			dataBuffer.element( localOffset.add( localID1 ) ).assign( localStorage.element( localID1 ) );
 			dataBuffer.element( localOffset.add( localID2 ) ).assign( localStorage.element( localID2 ) );
 
-		} )().compute( this.dispatchSize, [ this.workgroupSize ] );
+		} )().compute( this.dispatchSize, [ this.workgroupSize ] ).setName( 'Bitonic Sort / Local Sort' );
 
 		return fnDef;
 
@@ -498,7 +498,7 @@ export class BitonicSort {
 			readWriteBuffer.element( localOffset.add( localID1 ) ).assign( localStorage.element( localID1 ) );
 			readWriteBuffer.element( localOffset.add( localID2 ) ).assign( localStorage.element( localID2 ) );
 
-		} )().compute( this.dispatchSize, [ this.workgroupSize ] );
+		} )().compute( this.dispatchSize, [ this.workgroupSize ] ).setName( 'Bitonic Sort / Local Disperse' );
 
 		return fnDef;
 
@@ -524,7 +524,7 @@ export class BitonicSort {
 			currentSwapSpan.assign( 2 );
 			maxSwapSpan.assign( 2 );
 
-		} )().compute( 1 );
+		} )().compute( 1 ).setName( 'Bitonic Sort / Reset' );
 
 		return fnDef;
 
@@ -546,7 +546,7 @@ export class BitonicSort {
 
 			dataBuffer.element( instanceIndex ).assign( tempBuffer.element( instanceIndex ) );
 
-		} )().compute( this.count, [ this.workgroupSize ] );
+		} )().compute( this.count, [ this.workgroupSize ] ).setName( 'Bitonic Sort / Copy Result' );
 
 		return fnDef;
 
@@ -599,7 +599,7 @@ export class BitonicSort {
 
 			} );
 
-		} )().compute( 1 );
+		} )().compute( 1 ).setName( 'Bitonic Sort / Advance Step' );
 
 		return fnDef;
 

@@ -294,12 +294,12 @@ class SSGINode extends Node {
 		this._ssgiRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, count: 2 } );
 
 		const aoTexture = this._ssgiRenderTarget.textures[ 0 ];
-		aoTexture.name = 'SSGI.AO';
+		aoTexture.name = 'SSGI / AO';
 		aoTexture.type = UnsignedByteType;
 		aoTexture.format = RedFormat;
 
 		const giTexture = this._ssgiRenderTarget.textures[ 1 ];
-		giTexture.name = 'SSGI.GI';
+		giTexture.name = 'SSGI / GI';
 		giTexture.type = UnsignedInt101111Type;
 		giTexture.format = RGBFormat;
 

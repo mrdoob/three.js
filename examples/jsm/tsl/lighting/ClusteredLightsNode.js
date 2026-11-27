@@ -928,7 +928,7 @@ class ClusteredLightsNode extends LightsNode {
 
 			}
 
-		} )().compute( clusterCount * invocationsPerCluster ).setName( 'Update Clustered Lights' );
+		} )().compute( clusterCount * invocationsPerCluster ).setName( 'Clustered Lighting / Update' );
 
 		// shading-side: fragment → cluster index
 

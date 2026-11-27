@@ -499,7 +499,7 @@ class TemporalReprojectNode extends Node {
 		this._resolution = uniform( new Vector2() );
 
 		this._reprojection = new Reprojection( depthNode, velocityNode, camera );
-		this._reprojection.previousDepthNode.value.name = 'TemporalReprojectNode.previousDepth';
+		this._reprojection.previousDepthNode.value.name = 'Temporal Reproject / Previous Depth';
 
 		this.maxFrames = uniform( 32 );
 		this.hitPointReprojection = uniform( hitPointReprojection, 'bool' );
@@ -507,11 +507,11 @@ class TemporalReprojectNode extends Node {
 		this.flickerSuppression = uniform( 1 );
 
 		this._historyRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._historyRenderTarget.texture.name = 'TemporalReprojectNode.history';
+		this._historyRenderTarget.texture.name = 'Temporal Reproject / History';
 		this._historyTextureNode = texture( this._historyRenderTarget.texture );
 
 		this._resolveRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._resolveRenderTarget.texture.name = 'TemporalReprojectNode.resolve';
+		this._resolveRenderTarget.texture.name = 'Temporal Reproject / Resolve';
 
 		this._resolveMaterial = new NodeMaterial();
 		this._resolveMaterial.name = 'TemporalReproject.resolve';
@@ -603,7 +603,7 @@ class TemporalReprojectNode extends Node {
 
 			renderer.setRenderTarget( this._historyRenderTarget );
 			_quadMesh.material = this._seedMaterial;
-			_quadMesh.name = 'TemporalReproject.seed';
+			_quadMesh.name = 'Temporal Reproject / Seed';
 			_quadMesh.render( renderer );
 			renderer.setRenderTarget( null );
 
@@ -612,7 +612,7 @@ class TemporalReprojectNode extends Node {
 		renderer.setRenderTarget( this._resolveRenderTarget );
 
 		_quadMesh.material = this._resolveMaterial;
-		_quadMesh.name = 'TemporalReproject';
+		_quadMesh.name = 'Temporal Reproject';
 		_quadMesh.render( renderer );
 		renderer.setRenderTarget( null );
 

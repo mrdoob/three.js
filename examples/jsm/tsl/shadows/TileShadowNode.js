@@ -166,12 +166,12 @@ class TileShadowNode extends ShadowBaseNode {
 
 		const depthTexture = new DepthTexture( shadowWidth, shadowHeight, this.config.depthType, undefined, undefined, undefined, undefined, undefined, undefined, undefined, tileCount );
 		depthTexture.compareFunction = builder.renderer.reversedDepthBuffer ? GreaterEqualCompare : LessCompare;
-		depthTexture.name = 'ShadowDepthArrayTexture';
+		depthTexture.name = 'Tile Shadow / Depth';
 		// The color attachment is only sampled for transmitted shadows, which read its color and alpha.
 		const count = builder.renderer.shadowMap.transmitted === true ? 1 : 0;
 		const shadowMap = builder.createRenderTarget( shadowWidth, shadowHeight, { count, depth: tileCount, useArrayDepthTexture: true } );
 		shadowMap.depthTexture = depthTexture;
-		if ( count > 0 ) shadowMap.texture.name = 'ShadowTexture';
+		if ( count > 0 ) shadowMap.texture.name = 'Tile Shadow / Shadow';
 		this.shadowMap = shadowMap;
 		const cameras = [];
 
@@ -320,7 +320,10 @@ class TileShadowNode extends ShadowBaseNode {
 
 		}
 
+		const sceneName = scene.name;
+		scene.name = 'Tiled Shadow Map';
 		renderer.render( scene, this.cameraArray );
+		scene.name = sceneName;
 		renderer.setRenderObjectFunction( currentRenderObjectFunction );
 
 		if ( light.isPointLight !== true && shadowType === VSMShadowMap ) {

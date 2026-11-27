@@ -29,21 +29,17 @@ class ObjectStats {
 
 class RenderStats extends ObjectStats {
 
-	constructor( uid, scene, camera, renderTarget ) {
+	constructor( uid, scene, camera, renderTarget, renderer ) {
 
-		let name = scene.name;
+		let name = scene.name || scene.material?.name || camera.name || ( scene.isQuadMesh ? 'Quad Mesh' : scene.type );
 
-		if ( name === '' ) {
+		if ( renderTarget?.isCubeRenderTarget ) {
 
-			if ( scene.isScene ) {
+			const face = renderer.getActiveCubeFace();
+			const label = scene.name || scene.material?.name || renderTarget.texture.name || 'Cube Capture';
+			const mip = renderer.getActiveMipmapLevel();
 
-				name = 'Scene';
-
-			} else if ( scene.isQuadMesh ) {
-
-				name = 'QuadMesh';
-
-			}
+			name = `${ label } / Mip ${ mip } / Face ${ face }`;
 
 		}
 
@@ -175,25 +171,23 @@ function resolveOffsets( frame ) {
 
 }
 
-// splits names like "Group [ Pass ]" and "Group [ ID ] - Pass"
+// splits the first level of names like "Group / Stage / Pass"
 
 function parseName( name ) {
 
-	const match = /^(.+?)\s*\[\s*(.+?)\s*\]$/.exec( name ) || /^(.+\])\s*-\s*(.+)$/.exec( name );
+	const match = /^\s*([^/]*?[^/\s])\s*\/\s*(\S.*?)\s*$/s.exec( name );
 
 	return match !== null ? { group: match[ 1 ], pass: match[ 2 ] } : { group: null, pass: name };
 
 }
 
-// moves two or more consecutive calls of the same group under a GroupStats
+// moves the consecutive calls of the same group under a GroupStats, even a single one
 
 function groupCalls( parent, frameId ) {
 
 	const runs = [];
 
 	for ( const stats of parent.children ) {
-
-		groupCalls( stats, frameId );
 
 		const { group, pass } = stats.isGroupStats ? { group: null, pass: stats.name } : parseName( stats.name );
 		const run = runs[ runs.length - 1 ];
@@ -215,7 +209,12 @@ function groupCalls( parent, frameId ) {
 
 	parent.children = runs.map( ( { group, index, calls, passes } ) => {
 
-		if ( calls.length === 1 ) return calls[ 0 ];
+		if ( group === null ) {
+
+			groupCalls( calls[ 0 ], frameId );
+			return calls[ 0 ];
+
+		}
 
 		const groupStats = new GroupStats( `${ parent.cid || '' }/${ group }/${ index }:f${ frameId }`, group, parent, calls );
 
@@ -225,6 +224,8 @@ function groupCalls( parent, frameId ) {
 			stats.parent = groupStats;
 
 		} );
+
+		groupCalls( groupStats, frameId );
 
 		return groupStats;
 
@@ -594,7 +595,7 @@ export class RendererInspector extends InspectorBase {
 
 		if ( ! frame ) return;
 
-		const currentRender = new RenderStats( uid, scene, camera, renderTarget );
+		const currentRender = new RenderStats( uid, scene, camera, renderTarget, this.getRenderer() );
 		currentRender.timestamp = performance.now();
 		currentRender.parent = this.getParent();
 

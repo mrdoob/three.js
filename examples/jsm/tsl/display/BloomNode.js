@@ -162,7 +162,7 @@ class BloomNode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._renderTargetBright = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._renderTargetBright.texture.name = 'UnrealBloomPass.bright';
+		this._renderTargetBright.texture.name = 'Unreal Bloom / Bright';
 		this._renderTargetBright.texture.generateMipmaps = false;
 
 		//
@@ -171,14 +171,14 @@ class BloomNode extends Node {
 
 			const renderTargetHorizontal = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 
-			renderTargetHorizontal.texture.name = 'UnrealBloomPass.h' + i;
+			renderTargetHorizontal.texture.name = 'Unreal Bloom / Horizontal ' + i;
 			renderTargetHorizontal.texture.generateMipmaps = false;
 
 			this._renderTargetsHorizontal.push( renderTargetHorizontal );
 
 			const renderTargetVertical = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 
-			renderTargetVertical.texture.name = 'UnrealBloomPass.v' + i;
+			renderTargetVertical.texture.name = 'Unreal Bloom / Vertical ' + i;
 			renderTargetVertical.texture.generateMipmaps = false;
 
 			this._renderTargetsVertical.push( renderTargetVertical );
@@ -360,7 +360,7 @@ class BloomNode extends Node {
 
 		renderer.setRenderTarget( this._renderTargetBright );
 		_quadMesh.material = this._highPassFilterMaterial;
-		_quadMesh.name = 'Bloom [ High Pass ]';
+		_quadMesh.name = 'Bloom / High Pass';
 		_quadMesh.render( renderer );
 
 		// 2. Blur all the mips progressively
@@ -374,13 +374,13 @@ class BloomNode extends Node {
 			this._separableBlurMaterials[ i ].colorTexture.value = inputRenderTarget.texture;
 			this._separableBlurMaterials[ i ].direction.value = _BlurDirectionX;
 			renderer.setRenderTarget( this._renderTargetsHorizontal[ i ] );
-			_quadMesh.name = `Bloom [ Blur Horizontal - ${ i } ]`;
+			_quadMesh.name = `Bloom / Blur / Mip ${ i } / Horizontal`;
 			_quadMesh.render( renderer );
 
 			this._separableBlurMaterials[ i ].colorTexture.value = this._renderTargetsHorizontal[ i ].texture;
 			this._separableBlurMaterials[ i ].direction.value = _BlurDirectionY;
 			renderer.setRenderTarget( this._renderTargetsVertical[ i ] );
-			_quadMesh.name = `Bloom [ Blur Vertical - ${ i } ]`;
+			_quadMesh.name = `Bloom / Blur / Mip ${ i } / Vertical`;
 			_quadMesh.render( renderer );
 
 			inputRenderTarget = this._renderTargetsVertical[ i ];
@@ -391,7 +391,7 @@ class BloomNode extends Node {
 
 		renderer.setRenderTarget( this._renderTargetsHorizontal[ 0 ] );
 		_quadMesh.material = this._compositeMaterial;
-		_quadMesh.name = 'Bloom [ Composite ]';
+		_quadMesh.name = 'Bloom / Composite';
 		_quadMesh.render( renderer );
 
 		// restore

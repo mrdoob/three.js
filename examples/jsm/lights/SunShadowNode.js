@@ -88,11 +88,11 @@ class SunShadowNode extends ShadowNode {
 		const height = shadow.mapSize.height * frameExtents.y;
 
 		const depthTexture = new DepthTexture( width, height );
-		depthTexture.name = 'SunShadowDepthTexture';
+		depthTexture.name = 'Sun Shadow / Depth';
 		depthTexture.compareFunction = builder.renderer.reversedDepthBuffer ? GreaterEqualCompare : LessEqualCompare;
 
 		const shadowMap = builder.createRenderTarget( width, height );
-		shadowMap.texture.name = 'SunShadowMap';
+		shadowMap.texture.name = 'Sun Shadow / Shadow Map';
 		shadowMap.texture.type = shadow.mapType;
 		shadowMap.depthTexture = depthTexture;
 
@@ -227,7 +227,7 @@ class SunShadowNode extends ShadowNode {
 
 		const node = Fn( ( builder ) => this._setupCascades( builder, filterFn ) )().toVar();
 
-		const inspectName = `${ light.type } Shadow [ ${ light.name || 'ID: ' + light.id } ]`;
+		const inspectName = `${ light.type } Shadow / ${ light.name || 'ID ' + light.id }`;
 
 		// the cascade cameras are orthographic, so the stored depth is linear already
 
@@ -258,7 +258,7 @@ class SunShadowNode extends ShadowNode {
 
 		const currentSceneName = scene.name;
 
-		scene.name = `Shadow Map [ ${ light.name || 'ID: ' + light.id } ]`;
+		scene.name = `Shadow Map / ${ light.name || 'ID ' + light.id }`;
 
 		// clear once, the cascades share the atlas
 

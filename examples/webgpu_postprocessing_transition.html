@@ -111,6 +111,7 @@
 
 				// Setup scene
 				const scene = new THREE.Scene();
+				scene.name = geometry.type === 'BoxGeometry' ? 'Transition / Boxes' : 'Transition / Icosahedra';
 				scene.background = new THREE.Color( backgroundColor );
 				scene.add( new THREE.AmbientLight( 0xaaaaaa, 3 ) );
 

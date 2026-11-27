@@ -845,7 +845,7 @@ class VXGIVolume {
 
 			} );
 
-		} )().compute( this._voxelCount ).setName( 'VXGI.Clear' );
+		} )().compute( this._voxelCount ).setName( 'VXGI / Clear' );
 
 	}
 
@@ -960,7 +960,7 @@ class VXGIVolume {
 
 			} );
 
-		} )().compute( this._triangleCount ).setName( 'VXGI.Voxelize' );
+		} )().compute( this._triangleCount ).setName( 'VXGI / Voxelize' );
 
 	}
 
@@ -1000,7 +1000,7 @@ class VXGIVolume {
 
 			} );
 
-		} )().compute( this._voxelCount ).setName( 'VXGI.Resolve' );
+		} )().compute( this._voxelCount ).setName( 'VXGI / Resolve' );
 
 	}
 
@@ -1060,7 +1060,7 @@ class VXGIVolume {
 
 			} );
 
-		} )().compute( count ).setName( 'VXGI.OpacityMip' + level );
+		} )().compute( count ).setName( `VXGI / Opacity / Mip ${ level }` );
 
 	}
 
@@ -1099,7 +1099,7 @@ class VXGIVolume {
 
 			} );
 
-		} )().compute( count ).setName( 'VXGI.RadianceMip' + level );
+		} )().compute( count ).setName( `VXGI / Radiance / Mip ${ level }` );
 
 	}
 
@@ -1190,7 +1190,7 @@ class VXGIVolume {
 
 			} );
 
-		} )().compute( count ).setName( 'VXGI.Directional' + level );
+		} )().compute( count ).setName( `VXGI / Directional / Mip ${ level }` );
 
 	}
 
@@ -1389,7 +1389,7 @@ class VXGIVolume {
 
 			} );
 
-		} )().compute( this._voxelCount ).setName( 'VXGI.Inject' );
+		} )().compute( this._voxelCount ).setName( 'VXGI / Inject' );
 
 	}
 
@@ -1441,7 +1441,7 @@ class VXGIVolume {
 
 			} );
 
-		} )().compute( this._voxelCount ).setName( 'VXGI.Bounce' );
+		} )().compute( this._voxelCount ).setName( 'VXGI / Bounce' );
 
 	}
 

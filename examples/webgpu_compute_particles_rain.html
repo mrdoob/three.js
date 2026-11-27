@@ -125,7 +125,7 @@
 
 					rippleTime.x = 1000;
 
-				} )().compute( maxParticleCount );
+				} )().compute( maxParticleCount ).setName( 'Rain / Initialize Particles' );
 
 				//
 
@@ -184,7 +184,7 @@
 
 				} );
 
-				computeParticles = computeUpdate().compute( maxParticleCount ).setName( 'Particles' );
+				computeParticles = computeUpdate().compute( maxParticleCount ).setName( 'Rain / Update Particles' );
 
 				// rain
 
@@ -349,7 +349,7 @@
 				// position
 
 				scene.overrideMaterial = collisionPosMaterial;
-				scene.name = 'Collision Scene';
+				scene.name = 'Rain / Collision Depth';
 				renderer.setRenderTarget( collisionPosRT );
 				renderer.render( scene, collisionCamera );
 

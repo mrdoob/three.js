@@ -72,7 +72,7 @@ class SharpenNode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._renderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._renderTarget.texture.name = 'SharpenNode.output';
+		this._renderTarget.texture.name = 'Sharpen / Output';
 
 		/**
 		 * The result of the effect as a texture node.
@@ -132,7 +132,7 @@ class SharpenNode extends Node {
 		renderer.setRenderTarget( this._renderTarget );
 
 		_quadMesh.material = this._material;
-		_quadMesh.name = 'Sharpen [ RCAS ]';
+		_quadMesh.name = 'Sharpen';
 		_quadMesh.render( renderer );
 
 		//

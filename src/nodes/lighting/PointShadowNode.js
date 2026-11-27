@@ -265,11 +265,11 @@ class PointShadowNode extends ShadowNode {
 	setupRenderTarget( shadow, builder ) {
 
 		const depthTexture = new CubeDepthTexture( shadow.mapSize.width );
-		depthTexture.name = 'PointShadowDepthTexture';
+		depthTexture.name = 'Point Shadow / Cube Depth';
 		depthTexture.compareFunction = builder.renderer.reversedDepthBuffer ? GreaterEqualCompare : LessEqualCompare;
 
 		const shadowMap = builder.createCubeRenderTarget( shadow.mapSize.width );
-		shadowMap.texture.name = 'PointShadowMap';
+		shadowMap.texture.name = 'Point Shadow / Cube Target';
 		shadowMap.depthTexture = depthTexture;
 
 		return { shadowMap, depthTexture };
@@ -343,7 +343,7 @@ class PointShadowNode extends ShadowNode {
 
 			const currentSceneName = scene.name;
 
-			scene.name = `Point Light Shadow [ ${ light.name || 'ID: ' + light.id } ] - Face ${ face + 1 }`;
+			scene.name = `Point Light Shadow / ${ light.name || 'ID ' + light.id }`;
 
 			renderer.render( scene, camera );
 

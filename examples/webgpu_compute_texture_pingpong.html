@@ -112,7 +112,7 @@
 
 				} );
 
-				computeInitNode = computeInit().compute( width * height );
+				computeInitNode = computeInit().compute( width * height ).setName( 'Ping-Pong Texture / Initialize' );
 
 				// compute ping-pong: blur function using .load() for textureLoad
 				const blur = Fn( ( [ readTex, uv ] ) => {
@@ -140,8 +140,8 @@
 
 				} );
 
-				computeToPong = computePingPong( readPing, writePong ).compute( width * height );
-				computeToPing = computePingPong( readPong, writePing ).compute( width * height );
+				computeToPong = computePingPong( readPing, writePong ).compute( width * height ).setName( 'Ping-Pong Texture / Update, Ping to Pong' );
+				computeToPing = computePingPong( readPong, writePing ).compute( width * height ).setName( 'Ping-Pong Texture / Update, Pong to Ping' );
 
 				//
 

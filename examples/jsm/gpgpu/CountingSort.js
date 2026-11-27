@@ -152,7 +152,7 @@ class CountingSort {
 			this.binWrite.element( instanceIndex ).assign( bin );
 			atomicAdd( this.histogramAtomic.element( bin ), uint( 1 ) );
 
-		} )().compute( count, [ workgroupSize ] ).setName( 'CountingSortHistogram' );
+		} )().compute( count, [ workgroupSize ] ).setName( 'Counting Sort / Histogram' );
 
 		this._prefixNode = Fn( () => {
 
@@ -166,7 +166,7 @@ class CountingSort {
 
 			} );
 
-		} )().compute( 1 ).setName( 'CountingSortPrefix' );
+		} )().compute( 1 ).setName( 'Counting Sort / Prefix' );
 
 		this._scatterNode = Fn( () => {
 
@@ -175,7 +175,7 @@ class CountingSort {
 
 			this.orderWrite.element( targetIndex ).assign( instanceIndex );
 
-		} )().compute( count, [ workgroupSize ] ).setName( 'CountingSortScatter' );
+		} )().compute( count, [ workgroupSize ] ).setName( 'Counting Sort / Scatter' );
 
 	}
 

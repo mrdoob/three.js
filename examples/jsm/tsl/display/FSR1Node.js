@@ -73,7 +73,7 @@ class FSR1Node extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._easuRT = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._easuRT.texture.name = 'FSR1Node.easu';
+		this._easuRT.texture.name = 'FSR1 / EASU';
 
 		/**
 		 * The render target for the RCAS sharpen pass.
@@ -82,7 +82,7 @@ class FSR1Node extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._rcasRT = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._rcasRT.texture.name = 'FSR1Node.rcas';
+		this._rcasRT.texture.name = 'FSR1 / RCAS';
 
 		/**
 		 * The result of the effect as a texture node.
@@ -153,7 +153,7 @@ class FSR1Node extends Node {
 		renderer.setRenderTarget( this._easuRT );
 
 		_quadMesh.material = this._easuMaterial;
-		_quadMesh.name = 'FSR1 [ EASU Pass ]';
+		_quadMesh.name = 'FSR1 / EASU';
 		_quadMesh.render( renderer );
 
 		// RCAS pass
@@ -161,7 +161,7 @@ class FSR1Node extends Node {
 		renderer.setRenderTarget( this._rcasRT );
 
 		_quadMesh.material = this._rcasMaterial;
-		_quadMesh.name = 'FSR1 [ RCAS Pass ]';
+		_quadMesh.name = 'FSR1 / RCAS';
 		_quadMesh.render( renderer );
 
 		//

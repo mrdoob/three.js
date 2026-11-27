@@ -135,9 +135,9 @@
 
 				const storageTexture = new THREE.Storage3DTexture( size, size, size );
 				storageTexture.generateMipmaps = false;
-				storageTexture.name = 'cloud';
+				storageTexture.name = 'Cloud';
 			
-				computeNode = computeCloud( { storageTexture } ).compute( size * size * size ).setName( 'computeCloud' );
+				computeNode = computeCloud( { storageTexture } ).compute( size * size * size ).setName( 'Cloud / Generate' );
 
 				// Shader
 

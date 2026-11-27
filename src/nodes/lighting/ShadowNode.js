@@ -326,11 +326,11 @@ class ShadowNode extends ShadowBaseNode {
 	setupRenderTarget( shadow, builder ) {
 
 		const depthTexture = new DepthTexture( shadow.mapSize.width, shadow.mapSize.height );
-		depthTexture.name = 'ShadowDepthTexture';
+		depthTexture.name = 'Shadow / Depth';
 		depthTexture.compareFunction = builder.renderer.reversedDepthBuffer ? GreaterEqualCompare : LessEqualCompare;
 
 		const shadowMap = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
-		shadowMap.texture.name = 'ShadowMap';
+		shadowMap.texture.name = 'Shadow / Map';
 		shadowMap.texture.type = shadow.mapType;
 		shadowMap.depthTexture = depthTexture;
 
@@ -382,7 +382,7 @@ class ShadowNode extends ShadowBaseNode {
 				if ( ! shadowMap._vsmShadowMapVertical ) {
 
 					shadowMap._vsmShadowMapVertical = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height, { format: RGFormat, type: HalfFloatType, depth: shadowMap.depth, depthBuffer: false } );
-					shadowMap._vsmShadowMapVertical.texture.name = 'VSMVertical';
+					shadowMap._vsmShadowMapVertical.texture.name = 'Shadow / VSM Vertical';
 
 				}
 
@@ -391,7 +391,7 @@ class ShadowNode extends ShadowBaseNode {
 				if ( ! shadowMap._vsmShadowMapHorizontal ) {
 
 					shadowMap._vsmShadowMapHorizontal = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height, { format: RGFormat, type: HalfFloatType, depth: shadowMap.depth, depthBuffer: false } );
-					shadowMap._vsmShadowMapHorizontal.texture.name = 'VSMHorizontal';
+					shadowMap._vsmShadowMapHorizontal.texture.name = 'Shadow / VSM Horizontal';
 
 				}
 
@@ -524,7 +524,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		// Shadow Output + Inspector
 
-		const inspectName = `${ this.light.type } Shadow [ ${ this.light.name || 'ID: ' + this.light.id } ]`;
+		const inspectName = `${ this.light.type } Shadow / ${ this.light.name || 'ID ' + this.light.id }`;
 
 		if ( shadowColor ) {
 
@@ -645,7 +645,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		const currentSceneName = scene.name;
 
-		scene.name = `Shadow Map [ ${ light.name || 'ID: ' + light.id } ]`;
+		scene.name = `Shadow Map / ${ light.name || 'ID ' + light.id }`;
 
 		renderer.render( scene, shadow.camera );
 
