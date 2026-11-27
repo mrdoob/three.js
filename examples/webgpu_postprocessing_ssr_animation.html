@@ -41,6 +41,7 @@
 			import * as THREE from 'three/webgpu';
 			import { pass, mrt, output, normalView, materialMetalness, materialRoughness, diffuseColor, color, positionLocal, sample, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, velocity } from 'three/tsl';
 			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+			import { LinearTracer } from 'three/addons/tsl/utils/traceLinear.js';
 			import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 			import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
@@ -221,8 +222,7 @@
 					stochastic: true,
 					diffuseNode: scenePassDiffuseColor,
 					metalnessNode: scenePassDiffuseColor.a,
-					roughnessNode: sceneRoughness,
-					binaryRefine: params.binaryRefine
+					roughnessNode: sceneRoughness
 				} ).toInspector( 'SSR' );
 
 				const ssrTexture = ssrNode.getTextureNode();
@@ -287,7 +287,8 @@
 				function updateParameters() {
 
 					ssrNode.quality.value = params.quality;
-					ssrNode.binaryRefine = params.binaryRefine;
+					// the refinement is read when the tracing is built, a new tracer rebuilds the SSR material
+					if ( ssrNode.tracer.binaryRefine !== params.binaryRefine ) ssrNode.tracer = new LinearTracer( { binaryRefine: params.binaryRefine } );
 					ssrNode.maxDistance.value = params.maxDistance;
 					ssrNode.thickness.value = params.thickness;
 

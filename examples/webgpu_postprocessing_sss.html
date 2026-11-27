@@ -157,7 +157,7 @@
 
 				const sssPass = sss( prePassDepth, camera, dirLight );
 				sssPass.maxDistance.value = 0.2;
-				sssPass.useTemporalFiltering = true;
+				sssPass.tracer.useTemporalFiltering = true;
 
 				// scene context
 
@@ -192,9 +192,9 @@
 				gui.add( params, 'output', types ).onChange( updatePostprocessing );
 				gui.add( sssPass.shadowIntensity, 'value', 0, 1 ).name( 'shadow intensity' );
 				gui.add( sssPass.maxDistance, 'value', 0.01, 1 ).name( 'max ray distance' );
-				gui.add( sssPass.quality, 'value', 0, 1 ).name( 'quality' );
+				gui.add( sssPass.tracer.quality, 'value', 0, 1 ).name( 'quality' );
 				gui.add( sssPass.thickness, 'value', 0.01, 0.1 ).name( 'thickness' );
-				gui.add( sssPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );
+				gui.add( sssPass.tracer, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );
 
 				function updatePostprocessing() {
 
@@ -206,7 +206,7 @@
 
 					} else {
 
-						renderPipeline.outputNode = sssPass.useTemporalFiltering ? traaPass : scenePass;
+						renderPipeline.outputNode = sssPass.tracer.useTemporalFiltering ? traaPass : scenePass;
 
 					}
 

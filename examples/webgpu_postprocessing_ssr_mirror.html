@@ -46,6 +46,7 @@
 		import * as THREE from 'three/webgpu';
 		import { pass, mrt, output, normalView, metalness, roughness, specularColorBlended, screenUV, color, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, vec4, uniform, mix, passTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+		import { LinearTracer } from 'three/addons/tsl/utils/traceLinear.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -185,8 +186,7 @@
 			const reflection = ssr( scenePassColor, scenePassDepth, sceneNormal, {
 				metalnessNode: scenePassMetalRough.r,
 				roughnessNode: scenePassMetalRough.g,
-				specularNode: scenePassSpecular,
-				binaryRefine: params.binaryRefine
+				specularNode: scenePassSpecular
 			} ).toInspector( 'SSR' );
 
 			const raw = passTexture( reflection, reflection.getRenderTarget().texture );
@@ -254,7 +254,8 @@
 
 				reflection.quality.value = params.quality;
 				reflection.intensity.value = params.intensity;
-				reflection.binaryRefine = params.binaryRefine;
+				// the refinement is read when the tracing is built, a new tracer rebuilds the SSR material
+				if ( reflection.tracer.binaryRefine !== params.binaryRefine ) reflection.tracer = new LinearTracer( { binaryRefine: params.binaryRefine } );
 				reflection.maxDistance.value = params.maxDistance;
 				reflection.thickness.value = params.thickness;
 				reflection.blurQuality = params.blurQuality;

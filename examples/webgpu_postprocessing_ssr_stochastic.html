@@ -59,6 +59,7 @@
 		import * as THREE from 'three/webgpu';
 		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, packNormalToOctahedral, unpackOctahedralToNormal, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+		import { LinearTracer } from 'three/addons/tsl/utils/traceLinear.js';
 		import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 		import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 		import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
@@ -279,8 +280,7 @@
 				metalnessNode: scenePassDiffuseColor.a,
 				roughnessNode: scenePassVelocity.z,
 				environmentNode: hdrTexture,
-				envImportanceSampling: params.ssr.envImportanceSampling,
-				binaryRefine: params.ssr.binaryRefine
+				envImportanceSampling: params.ssr.envImportanceSampling
 			} ).toInspector( 'SSR' );
 
 			temporalReprojectNode = temporalReproject( ssrNode, scenePassDepth, scenePassNormal, scenePassVelocity, camera, {
@@ -416,10 +416,10 @@
 			ssrNode.resolutionScale = params.ssr.resolutionScale;
 			ssrNode.quality.value = params.ssr.quality;
 			ssrNode.mirrorBias.value = params.ssr.mirrorBias;
-			// stepExponent / screenEdgeFadeBlack / binaryRefine are build-time constants: assigning
+			// stepExponent / screenEdgeFadeBlack / tracer are build-time constants: assigning
 			// them recompiles the SSR material (the setters no-op when the value is unchanged).
 			ssrNode.stepExponent = params.ssr.stepExponent;
-			ssrNode.binaryRefine = params.ssr.binaryRefine;
+			if ( ssrNode.tracer.binaryRefine !== params.ssr.binaryRefine ) ssrNode.tracer = new LinearTracer( { binaryRefine: params.ssr.binaryRefine } );
 			ssrNode.maxDistance.value = params.ssr.maxDistance;
 			ssrNode.intensity.value = params.ssr.intensity;
 			ssrNode.thickness.value = params.ssr.thickness;
