@@ -28,6 +28,13 @@ class ComputePipeline extends Pipeline {
 		this.computeProgram = computeProgram;
 
 		/**
+		 * Pending compilation shared by all callers waiting for this pipeline.
+		 *
+		 * @type {?Promise}
+		 */
+		this.compilationPromise = null;
+
+		/**
 		 * The transforms (only relevant for WebGL 2 which uses Transform Feedback).
 		 *
 		 * @type {?Array<Object>}

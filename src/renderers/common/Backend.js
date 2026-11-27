@@ -262,6 +262,20 @@ class Backend {
 	// cache key
 
 	/**
+	 * Returns the backend-specific part of a compute pipeline cache key.
+	 * By default each node owns its pipeline (e.g. for WebGL transform feedback).
+	 *
+	 * @param {Node} computeNode - The compute node.
+	 * @param {Array<BindGroup>} bindings - The ordered bind groups.
+	 * @return {string} The cache key.
+	 */
+	getComputeCacheKey( computeNode /*, bindings*/ ) {
+
+		return String( computeNode.id );
+
+	}
+
+	/**
 	 * Returns `true` if the render pipeline requires an update.
 	 *
 	 * @abstract

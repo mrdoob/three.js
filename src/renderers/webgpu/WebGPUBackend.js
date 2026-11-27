@@ -1923,6 +1923,13 @@ class WebGPUBackend extends Backend {
 
 		if ( pipelineData.error === true ) return;
 
+		// A sibling may be precompiling the shared pipeline during a synchronous dispatch.
+		if ( pipelineData.pipeline === undefined && pipeline.compilationPromise !== null ) {
+
+			this.createComputePipeline( pipeline, bindings );
+
+		}
+
 		const pipelineGPU = pipelineData.pipeline;
 
 		if ( groupGPU.currentPipeline !== pipelineGPU ) {
@@ -2511,6 +2518,19 @@ class WebGPUBackend extends Backend {
 			this.attributeUtils.getVertexBufferLayoutCacheKey( renderObject ),
 			renderObject.clippingContextCacheKey
 		].join();
+
+	}
+
+	/**
+	 * Returns the ordered bind group layout keys used to create the compute pipeline.
+	 *
+	 * @param {Node} computeNode - The compute node.
+	 * @param {Array<BindGroup>} bindings - The ordered bind groups.
+	 * @return {string} The cache key.
+	 */
+	getComputeCacheKey( computeNode, bindings ) {
+
+		return bindings.map( group => this.get( group ).layoutKey ).join( ',' );
 
 	}
 
