@@ -1,6 +1,6 @@
 import { RedFormat, RenderTarget, Vector2, RendererUtils, QuadMesh, Node, NodeMaterial, NodeUpdateType, UnsignedByteType } from 'three/webgpu';
 import { reference, getViewPosition, interleavedGradientNoise, screenCoordinate, Fn, passTexture, uv, uniform, depthToViewZ, vec3, lightPosition, lightTargetPosition, fract, rand, mix, context, isBackgroundDepth, projectionDepth } from 'three/tsl';
-import { LinearTracer, getRayPosition } from '../utils/traceLinear.js';
+import { traceLinear, getRayPosition } from '../utils/traceLinear.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -130,13 +130,6 @@ class SSSNode extends Node {
 		 * @default false
 		 */
 		this.useTemporalFiltering = false;
-
-		/**
-		 * Traces the shadow rays through the depth.
-		 *
-		 * @type {LinearTracer}
-		 */
-		this.tracer = new LinearTracer();
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
@@ -370,7 +363,7 @@ class SSSNode extends Node {
 			const noise = interleavedGradientNoise( screenCoordinate );
 			const offset = fract( noise.add( this._temporalOffset ) ).add( rand( uvNode.add( this._frameId ) ) ).toConst( 'offset' );
 
-			const result = this.tracer.trace( this.depthNode, vec3( uvNode, depth ), getRayPosition( rayEndPosition, this._cameraProjectionMatrix ), {
+			const result = traceLinear( this.depthNode, vec3( uvNode, depth ), getRayPosition( rayEndPosition, this._cameraProjectionMatrix ), {
 				resolution: this._resolution,
 				reversedDepth: builder.renderer.reversedDepthBuffer === true,
 				quality: this.quality.clamp(),

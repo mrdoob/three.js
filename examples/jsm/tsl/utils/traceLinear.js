@@ -142,27 +142,3 @@ export function traceLinear( depthNode, origin, end, { resolution, reversedDepth
 	return { hit, uv: hitUV, depth: hitDepth, parameter: hitS, refined: refine };
 
 }
-
-/**
- * Traces screen-space rays by marching the depth linearly, see `traceLinear()`.
- *
- * @three_import import { LinearTracer } from 'three/addons/tsl/utils/traceLinear.js';
- */
-export class LinearTracer {
-
-	/**
-	 * Traces a ray inside the calling TSL function.
-	 *
-	 * @param {TextureNode} depthNode - The depth of the scene.
-	 * @param {Node<vec3>} origin - Start UV and projected depth.
-	 * @param {Node<vec3>} end - End UV and projected depth.
-	 * @param {Object} options - See `traceLinear()`.
-	 * @return {Object} Hit flag, UV, raw depth and parameter, and whether hits are refined.
-	 */
-	trace( depthNode, origin, end, options ) {
-
-		return traceLinear( depthNode, origin, end, options );
-
-	}
-
-}

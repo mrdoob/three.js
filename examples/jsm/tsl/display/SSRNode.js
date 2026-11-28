@@ -4,7 +4,7 @@ import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
 import { boxBlur } from './boxBlur.js';
 import ImportanceSampledEnvironment from './ImportanceSampledEnvironment.js';
-import { LinearTracer, getRayPosition } from '../utils/traceLinear.js';
+import { traceLinear, getRayPosition } from '../utils/traceLinear.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -25,7 +25,6 @@ const MAX_STEPS = 64;
  * @property {boolean} [envImportanceSampling=false] - When `true`, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.
  * @property {Node} [diffuseNode=null] - Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
  * @property {boolean} [binaryRefine=false] - Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
- * @property {LinearTracer} [tracer=null] - Traces the reflection rays, a `LinearTracer` when omitted.
  * @property {Camera} [camera=null] - Camera the scene is rendered with. Inferred from the color pass when omitted.
  */
 
@@ -67,8 +66,7 @@ class SSRNode extends Node {
 			environmentNode = null,
 			envImportanceSampling = false,
 			diffuseNode = null,
-			binaryRefine = false,
-			tracer = null
+			binaryRefine = false
 		} = options;
 
 		let camera = options.camera ?? null;
@@ -286,14 +284,6 @@ class SSRNode extends Node {
 		 * @default false
 		 */
 		this._binaryRefine = binaryRefine;
-
-		/**
-		 * Internal storage for {@link SSRNode#tracer}.
-		 *
-		 * @private
-		 * @type {LinearTracer}
-		 */
-		this._tracer = tracer !== null ? tracer : new LinearTracer();
 
 		/**
 		 * Non-linear step distribution exponent. `1` = uniform steps; `> 1` concentrates
@@ -626,28 +616,6 @@ class SSRNode extends Node {
 	}
 
 	/**
-	 * Traces the reflection rays through the depth. Assigning a new value rebuilds the SSR material.
-	 *
-	 * @type {LinearTracer}
-	 */
-	get tracer() {
-
-		return this._tracer;
-
-	}
-
-	set tracer( value ) {
-
-		if ( value !== this._tracer ) {
-
-			this._tracer = value;
-			this._buildSSRMaterial();
-
-		}
-
-	}
-
-	/**
 	 * Whether dielectrics are reflected in the non-stochastic path (compile-time constant).
 	 * Assigning a new value rebuilds the SSR material.
 	 *
@@ -672,7 +640,7 @@ class SSRNode extends Node {
 
 	/**
 	 * Rebuilds the SSR material's node graph by re-invoking the fragment `Fn`, which
-	 * re-bakes the compile-time constants ({@link SSRNode#binaryRefine}, {@link SSRNode#tracer},
+	 * re-bakes the compile-time constants ({@link SSRNode#binaryRefine},
 	 * {@link SSRNode#stepExponent}, {@link SSRNode#screenEdgeFadeBlack}) at their current
 	 * values. A no-op until {@link SSRNode#setup} has captured the `Fn`.
 	 *
@@ -1161,7 +1129,7 @@ class SSRNode extends Node {
 
 			};
 
-			const result = this._tracer.trace( this.depthNode, origin, end, {
+			const result = traceLinear( this.depthNode, origin, end, {
 				resolution: this._resolution,
 				reversedDepth: reversed,
 				steps: totalStep.sub( 1 ),
