@@ -214,6 +214,10 @@ class SVGLoader extends Loader {
 					break;
 
 				case 'defs':
+				case 'clipPath':
+				case 'mask':
+				case 'pattern':
+				case 'marker':
 					isDefsNode = true;
 					break;
 
@@ -273,6 +277,8 @@ class SVGLoader extends Loader {
 					continue;
 
 				}
+
+				if ( node.nodeName === 'symbol' ) continue; // only rendered when referenced by a use element
 
 				parseNode( node, style );
 
