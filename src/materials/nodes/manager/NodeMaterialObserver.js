@@ -244,6 +244,7 @@ class NodeMaterialObserver {
 				geometryVersion: this.getGeometryData( geometry )._version,
 				materialVersion: this.getMaterialData( renderObject.material )._version,
 				attributesDisposeVersion: renderObject._geometries.attributes.disposeVersion,
+				texturesDisposeVersion: renderObject.renderer._textures.disposeVersion,
 				worldMatrix: object.matrixWorld.clone()
 			};
 
@@ -1065,6 +1066,98 @@ class NodeMaterialObserver {
 	}
 
 	/**
+	 * Returns `true` if a texture sampled by the given render object has been
+	 * disposed or re-created since the last check.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Object} renderObjectData - The cached render object data.
+	 * @return {boolean} Whether textures of the render object have been disposed or not.
+	 */
+	hasDisposedTextures( renderObject, renderObjectData ) {
+
+		const textures = renderObject.renderer._textures;
+
+		renderObjectData.texturesDisposeVersion = textures.disposeVersion;
+
+		for ( const bindGroup of renderObject.getBindings() ) {
+
+			for ( const binding of bindGroup.bindings ) {
+
+				// a disposal releases the texture, a re-creation changes its generation
+
+				if ( binding.isSampledTexture === true && ( binding.texture === null || textures.has( binding.texture ) === false || textures.get( binding.texture ).generation !== binding.generation ) ) return true;
+
+			}
+
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * Returns `true` if the GPU resources used by the given render object are outdated.
+	 * Unlike `equals()`, this check also applies to static objects since resources
+	 * can be invalidated by other objects or render targets.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Object} renderObjectData - The cached render object data.
+	 * @param {Renderer} renderer - The renderer.
+	 * @return {boolean} Whether the resources of the render object are outdated or not.
+	 */
+	hasOutdatedResources( renderObject, renderObjectData, renderer ) {
+
+		let outdated = false;
+
+		// bindings might refer to per-target resources
+
+		const outputTarget = this.getOutputTarget( renderer );
+
+		if ( renderObjectData.outputTarget !== outputTarget ) {
+
+			renderObjectData.outputTarget = outputTarget;
+
+			outdated = true;
+
+		}
+
+		// shared buffers and textures can be destroyed by others. they are only verified after a disposal
+
+		if ( renderObjectData.attributesDisposeVersion !== renderObject._geometries.attributes.disposeVersion ) {
+
+			if ( this.hasDisposedAttributes( renderObject, renderObjectData ) ) outdated = true;
+
+		}
+
+		if ( renderObjectData.texturesDisposeVersion !== renderObject.renderer._textures.disposeVersion ) {
+
+			if ( this.hasDisposedTextures( renderObject, renderObjectData ) ) outdated = true;
+
+		}
+
+		return outdated;
+
+	}
+
+	/**
+	 * Returns `true` if the given render object is static or belongs to a static
+	 * bundle that is already recorded. Such render objects skip `equals()`.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Object} renderObjectData - The cached render object data.
+	 * @return {boolean} Whether the render object is static or not.
+	 */
+	isStatic( renderObject, renderObjectData ) {
+
+		if ( renderObject.object.static === true ) return true;
+
+		const bundle = renderObject.bundle;
+
+		return bundle !== null && bundle.static === true && renderObjectData.version === bundle.version;
+
+	}
+
+	/**
 	 * Checks if the given render object requires a refresh.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
@@ -1093,33 +1186,15 @@ class NodeMaterialObserver {
 
 		}
 
-		// bindings might refer to per-target resources so a target switch needs a full refresh
-
 		const renderObjectData = this.getRenderObjectData( renderObject );
-		const outputTarget = this.getOutputTarget( nodeFrame.renderer );
 
-		if ( renderObjectData.outputTarget !== outputTarget ) {
-
-			renderObjectData.outputTarget = outputTarget;
+		if ( this.hasOutdatedResources( renderObject, renderObjectData, nodeFrame.renderer ) ) {
 
 			refreshType = RenderObjectRefreshType.FULL;
 
 		}
 
-		const attributes = renderObject._geometries.attributes;
-
-		// re-upload disposed attributes. checked before the static early out since other geometries can destroy shared buffers
-
-		if ( renderObjectData.attributesDisposeVersion !== attributes.disposeVersion ) {
-
-			if ( this.hasDisposedAttributes( renderObject, renderObjectData ) ) refreshType = RenderObjectRefreshType.FULL;
-
-		}
-
-		const isStatic = renderObject.object.static === true;
-		const isBundle = renderObject.bundle !== null && renderObject.bundle.static === true && renderObjectData.version === renderObject.bundle.version;
-
-		if ( isStatic || isBundle )
+		if ( this.isStatic( renderObject, renderObjectData ) )
 			return refreshType;
 
 		const lightsData = this.getLights( renderObject.lightsNode, renderId );

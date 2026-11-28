@@ -96,6 +96,15 @@ class Textures extends DataMap {
 		 */
 		this._registry = new FinalizationRegistry( ( ref ) => this._tracked.delete( ref ) );
 
+		/**
+		 * Incremented whenever the GPU texture of a texture is destroyed. Render objects
+		 * only have to verify their sampled textures if this version has changed.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.disposeVersion = 0;
+
 	}
 
 	/**
@@ -310,6 +319,8 @@ class Textures extends DataMap {
 			// it's an update
 
 			backend.destroyTexture( texture );
+
+			this.disposeVersion ++;
 
 		}
 
@@ -731,6 +742,8 @@ class Textures extends DataMap {
 
 			const isDefaultTexture = textureData.isDefaultTexture;
 			this.backend.destroyTexture( texture, isDefaultTexture );
+
+			this.disposeVersion ++;
 
 			// delete cached bind groups so they don't point to destroyed textures
 

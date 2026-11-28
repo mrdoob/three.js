@@ -1715,6 +1715,36 @@ class Renderer {
 
 		}
 
+		// the recorded bundle references the bind groups of its objects. they are only verified after a texture disposal
+
+		const textures = this._textures;
+
+		if ( renderBundleData.texturesDisposeVersion !== textures.disposeVersion ) {
+
+			renderBundleData.texturesDisposeVersion = textures.disposeVersion;
+
+			for ( const renderObject of renderBundleData.renderObjects ) {
+
+				for ( const bindGroup of renderObject.getBindings() ) {
+
+					for ( const binding of bindGroup.bindings ) {
+
+						if ( binding.isSampledTexture === true && ( binding.texture === null || textures.has( binding.texture ) === false || textures.get( binding.texture ).generation !== binding.generation ) ) {
+
+							renderBundleData.version = null;
+
+							return true;
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
 		return false;
 
 	}
