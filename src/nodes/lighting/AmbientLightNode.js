@@ -30,7 +30,10 @@ class AmbientLightNode extends AnalyticLightNode {
 
 		builder.context.irradiance.addAssign( colorNode );
 
-		builder.context.lightingModel.indirectRadiance( () => colorNode, builder );
+		// A uniform environment reflects its irradiance / PI at any roughness
+		const radiance = colorNode.div( Math.PI );
+
+		builder.context.lightingModel.indirectRadiance( () => radiance, builder );
 
 	}
 

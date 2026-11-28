@@ -266,12 +266,30 @@ IncidentLight directLight;
 
 #if defined( RE_IndirectSpecular )
 
-	vec3 radiance = getIndirectLightRadiance( geometryViewDir, geometryNormal, material.roughness );
+	// Same lookups as the environment map in lights_fragment_maps
+	#ifdef USE_ANISOTROPY
+
+		vec3 radianceNormal = getAnisotropyBentNormal( geometryViewDir, geometryNormal, material.roughness, material.anisotropyB, material.anisotropy );
+
+	#else
+
+		vec3 radianceNormal = geometryNormal;
+
+	#endif
+
+	vec3 radiance = getIndirectLightRadiance( reflect( - geometryViewDir, radianceNormal ), radianceNormal, geometryNormal, material.roughness );
+
+	#ifdef USE_RETROREFLECTION
+
+		radiance = mix( radiance, getIndirectLightRadiance( geometryViewDir, radianceNormal, geometryNormal, material.roughness ), saturate( material.retroreflectivity ) );
+
+	#endif
+
 	vec3 clearcoatRadiance = vec3( 0.0 );
 
 	#ifdef USE_CLEARCOAT
 
-		clearcoatRadiance += getIndirectLightRadiance( geometryViewDir, geometryClearcoatNormal, material.clearcoatRoughness );
+		clearcoatRadiance += getIndirectLightRadiance( reflect( - geometryViewDir, geometryClearcoatNormal ), geometryClearcoatNormal, geometryClearcoatNormal, material.clearcoatRoughness );
 
 	#endif
 
