@@ -66,6 +66,7 @@ const exceptionList = [
 	'webgpu_postprocessing_ssr_animation',
 	'webgpu_postprocessing_ssr_mirror',
 	'webgpu_postprocessing_ssr_stochastic',
+	'webgpu_radiance_cascades',
 	'webgpu_renderer_pathtracer',
 	'webgpu_vxgi',
 	'webgpu_vxgi_sponza',
