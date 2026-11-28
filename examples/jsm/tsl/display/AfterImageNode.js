@@ -238,6 +238,8 @@ class AfterImageNode extends Node {
 
 		if ( this._materialComposed !== null ) this._materialComposed.dispose();
 
+		if ( this.textureNode.intermediate === true ) this.textureNode.dispose();
+
 	}
 
 }
@@ -251,6 +253,6 @@ class AfterImageNode extends Node {
  * @param {(Node<float>|number)} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
  * @returns {AfterImageNode}
  */
-export const afterImage = ( node, damp ) => new AfterImageNode( convertToTexture( node ), nodeObject( damp ) );
+export const afterImage = ( node, damp ) => new AfterImageNode( convertToTexture( node, null, null, { intermediate: true } ), nodeObject( damp ) );
 
 export default AfterImageNode;

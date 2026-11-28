@@ -462,6 +462,8 @@ class FSR1Node extends Node {
 		if ( this._easuMaterial !== null ) this._easuMaterial.dispose();
 		if ( this._rcasMaterial !== null ) this._rcasMaterial.dispose();
 
+		if ( this.textureNode.intermediate === true ) this.textureNode.dispose();
+
 	}
 
 }
@@ -478,4 +480,4 @@ export default FSR1Node;
  * @param {(boolean|Node<bool>)} [denoise=false] - Whether to attenuate RCAS sharpening in noisy areas.
  * @returns {FSR1Node}
  */
-export const fsr1 = ( node, sharpness, denoise ) => new FSR1Node( convertToTexture( node ), sharpness, denoise );
+export const fsr1 = ( node, sharpness, denoise ) => new FSR1Node( convertToTexture( node, null, null, { intermediate: true } ), sharpness, denoise );

@@ -121,6 +121,20 @@ class TransitionNode extends Node {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the effect is no longer required.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		if ( this.textureNodeA.intermediate === true ) this.textureNodeA.dispose();
+		if ( this.textureNodeB.intermediate === true ) this.textureNodeB.dispose();
+		if ( this.mixTextureNode.intermediate === true ) this.mixTextureNode.dispose();
+
+	}
+
 }
 
 export default TransitionNode;
@@ -138,4 +152,4 @@ export default TransitionNode;
  * @param {Node<float> | number} useTexture - Whether `mixTextureNode` should influence the transition or not.
  * @returns {TransitionNode}
  */
-export const transition = ( nodeA, nodeB, mixTextureNode, mixRatio, threshold, useTexture ) => new TransitionNode( convertToTexture( nodeA ), convertToTexture( nodeB ), convertToTexture( mixTextureNode ), nodeObject( mixRatio ), nodeObject( threshold ), nodeObject( useTexture ) );
+export const transition = ( nodeA, nodeB, mixTextureNode, mixRatio, threshold, useTexture ) => new TransitionNode( convertToTexture( nodeA, null, null, { intermediate: true } ), convertToTexture( nodeB, null, null, { intermediate: true } ), convertToTexture( mixTextureNode, null, null, { intermediate: true } ), nodeObject( mixRatio ), nodeObject( threshold ), nodeObject( useTexture ) );

@@ -211,7 +211,7 @@ const toTextureNode = ( value ) => {
 
 	if ( value.isTexture === true ) return texture( value );
 
-	return convertToTexture( value.getTextureNode?.() ?? value );
+	return convertToTexture( value.getTextureNode?.() ?? value, null, null, { intermediate: true } );
 
 };
 
@@ -791,6 +791,9 @@ class RecurrentDenoiseNode extends Node {
 
 		this._renderTarget.dispose();
 		this._material.dispose();
+
+		if ( this.textureNode.intermediate === true ) this.textureNode.dispose();
+		if ( this.rawNode !== null && this.rawNode.intermediate === true ) this.rawNode.dispose();
 
 	}
 

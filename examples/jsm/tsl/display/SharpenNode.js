@@ -265,6 +265,8 @@ class SharpenNode extends Node {
 
 		if ( this._material !== null ) this._material.dispose();
 
+		if ( this.textureNode.intermediate === true ) this.textureNode.dispose();
+
 	}
 
 }
@@ -281,4 +283,4 @@ export default SharpenNode;
  * @param {(boolean|Node<bool>)} [denoise=false] - Whether to attenuate sharpening in noisy areas.
  * @returns {SharpenNode}
  */
-export const sharpen = ( node, sharpness, denoise ) => new SharpenNode( convertToTexture( node ), sharpness, denoise );
+export const sharpen = ( node, sharpness, denoise ) => new SharpenNode( convertToTexture( node, null, null, { intermediate: true } ), sharpness, denoise );

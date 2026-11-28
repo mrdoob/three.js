@@ -688,6 +688,8 @@ class SMAANode extends Node {
 		this._materialWeights.dispose();
 		this._materialBlend.dispose();
 
+		if ( this.textureNode.intermediate === true ) this.textureNode.dispose();
+
 	}
 
 	/**
@@ -726,4 +728,4 @@ export default SMAANode;
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @returns {SMAANode}
  */
-export const smaa = ( node ) => new SMAANode( convertToTexture( node ) );
+export const smaa = ( node ) => new SMAANode( convertToTexture( node, null, null, { intermediate: true } ) );

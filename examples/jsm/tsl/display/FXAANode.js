@@ -342,6 +342,18 @@ class FXAANode extends Node {
 
 	}
 
+	/**
+	 * Frees internal resources. This method should be called
+	 * when the effect is no longer required.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		if ( this.textureNode.intermediate === true ) this.textureNode.dispose();
+
+	}
+
 }
 
 export default FXAANode;
@@ -354,4 +366,4 @@ export default FXAANode;
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @returns {FXAANode}
  */
-export const fxaa = ( node ) => new FXAANode( convertToTexture( node ) );
+export const fxaa = ( node ) => new FXAANode( convertToTexture( node, null, null, { intermediate: true } ) );

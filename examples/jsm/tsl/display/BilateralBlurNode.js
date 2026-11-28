@@ -331,6 +331,8 @@ class BilateralBlurNode extends Node {
 
 		if ( this._material !== null ) this._material.dispose();
 
+		if ( this.textureNode.intermediate === true ) this.textureNode.dispose();
+
 	}
 
 	/**
@@ -374,4 +376,4 @@ export default BilateralBlurNode;
  * @param {number} sigmaColor - Controls the intensity kernel. Higher values allow more color difference to be blurred together.
  * @returns {BilateralBlurNode}
  */
-export const bilateralBlur = ( node, directionNode, sigma, sigmaColor ) => new BilateralBlurNode( convertToTexture( node ), directionNode, sigma, sigmaColor );
+export const bilateralBlur = ( node, directionNode, sigma, sigmaColor ) => new BilateralBlurNode( convertToTexture( node, null, null, { intermediate: true } ), directionNode, sigma, sigmaColor );

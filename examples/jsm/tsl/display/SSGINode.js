@@ -690,6 +690,8 @@ class SSGINode extends Node {
 
 		this._material.dispose();
 
+		if ( this.beautyNode.intermediate === true ) this.beautyNode.dispose();
+
 	}
 
 }
@@ -707,4 +709,4 @@ export default SSGINode;
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {SSGINode}
  */
-export const ssgi = ( beautyNode, depthNode, normalNode, camera ) => new SSGINode( convertToTexture( beautyNode ), depthNode, normalNode, camera );
+export const ssgi = ( beautyNode, depthNode, normalNode, camera ) => new SSGINode( convertToTexture( beautyNode, null, null, { intermediate: true } ), depthNode, normalNode, camera );

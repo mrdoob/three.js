@@ -551,6 +551,8 @@ class DepthOfFieldNode extends Node {
 
 		this._CoCBlurNode.dispose();
 
+		if ( this.textureNode.intermediate === true ) this.textureNode.dispose();
+
 	}
 
 }
@@ -569,4 +571,4 @@ export default DepthOfFieldNode;
  * @param {Node<float> | number} [bokehScale=1] - A unitless value for artistic purposes to adjust the size of the bokeh.
  * @returns {DepthOfFieldNode}
  */
-export const dof = ( node, viewZNode, focusDistance = 1, focalLength = 1, bokehScale = 1 ) => new DepthOfFieldNode( convertToTexture( node ), nodeObject( viewZNode ), nodeObject( focusDistance ), nodeObject( focalLength ), nodeObject( bokehScale ) );
+export const dof = ( node, viewZNode, focusDistance = 1, focalLength = 1, bokehScale = 1 ) => new DepthOfFieldNode( convertToTexture( node, null, null, { intermediate: true } ), nodeObject( viewZNode ), nodeObject( focusDistance ), nodeObject( focalLength ), nodeObject( bokehScale ) );

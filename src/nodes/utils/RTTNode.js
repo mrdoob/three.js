@@ -39,12 +39,14 @@ class RTTNode extends TextureNode {
 	 * @param {Object} [options={}] - The options for the internal render target.
 	 * @param {number} [options.type=HalfFloatType] - The texture type.
 	 * @param {boolean} [options.autoUpdate=true] - Whether the texture should automatically be updated or not.
+	 * @param {boolean} [options.intermediate=false] - Whether the node is an intermediate node automatically created by the runtime to ensure correct texture input.
 	 * @param {number} [options.resolutionScale=1] - The resolution scale.
 	 */
 	constructor( node = null, width = null, height = null, options = {} ) {
 
 		const {
 			autoUpdate = true,
+			intermediate = false,
 			resolutionScale = 1
 		} = options;
 
@@ -107,6 +109,15 @@ class RTTNode extends TextureNode {
 		 * @default true
 		 */
 		this.autoUpdate = autoUpdate;
+
+		/**
+		 * Whether the node is an intermediate node automatically created by the
+		 * runtime to ensure correct texture input.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.intermediate = intermediate;
 
 		/**
 		 * The resolution scale
@@ -351,6 +362,7 @@ export default RTTNode;
  * @param {Object} [options={}] - The options for the internal render target.
  * @param {number} [options.type=HalfFloatType] - The texture type.
  * @param {boolean} [options.autoUpdate=true] - Whether the texture should automatically be updated or not.
+ * @param {boolean} [options.intermediate=false] - Whether the node is an intermediate node automatically created by the runtime to ensure correct texture input.
  * @param {number} [options.resolutionScale=1] - The resolution scale.
  * @returns {RTTNode}
  */
@@ -367,6 +379,7 @@ export const rtt = ( node, ...params ) => new RTTNode( nodeObject( node ), ...pa
  * @param {Object} [options={}] - The options for the internal render target.
  * @param {number} [options.type=HalfFloatType] - The texture type.
  * @param {boolean} [options.autoUpdate=true] - Whether the texture should automatically be updated or not.
+ * @param {boolean} [options.intermediate=false] - Whether the node is an intermediate node automatically created by the runtime to ensure correct texture input.
  * @param {number} [options.resolutionScale=1] - The resolution scale.
  * @returns {RTTNode}
  */
