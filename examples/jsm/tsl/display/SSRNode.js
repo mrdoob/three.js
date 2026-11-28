@@ -1167,6 +1167,19 @@ class SSRNode extends Node {
 				const distancePointPlane = this.stochastic === false ? pointPlaneDistance( vP, viewPosition, viewNormal ).toVar() : float( 0 );
 				const withinRange = distancePointPlane.lessThanEqual( this.maxDistance ).toVar();
 
+				if ( result.refined === true ) {
+
+					// bisection can land on a depth discontinuity, so validate the refined hit
+
+					const neighbor = getViewPosition( uvS.add( uvPixelStepX ), hitD, this._cameraProjectionMatrixInverse );
+					const tk = max( neighbor.x.sub( vP.x ).mul( 3 ), this.thickness );
+					withinRange.assign( withinRange.and( isBackgroundDepth( hitD ).not() )
+						.and( pointToLineDistance( vP, viewPosition, d1viewPosition ).lessThanEqual( tk ) ) );
+
+					withinRange.assign( withinRange.and( dot( viewReflectDir, this.normalNode.sample( uvS ).rgb ).lessThan( 0 ) ) );
+
+				}
+
 				If( withinRange, () => {
 
 					const hitWorldPosition = this._cameraWorldMatrix.mul( vec4( vP, 1.0 ) ).xyz.toVar();
