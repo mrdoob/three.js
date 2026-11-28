@@ -11,9 +11,9 @@ const _size = new Vector3();
 /**
  * Manages interaction for 3D objects independently of the scene graph.
  *
- * For objects with an {@link HTMLTexture}, the manager computes CSS `matrix3d`
- * transforms each frame so the underlying HTML elements stay aligned with
- * their meshes. Because the elements are children of the canvas, the browser
+ * For objects with an {@link HTMLTexture}, the manager updates the canvas
+ * transforms of the underlying HTML elements each frame so they stay aligned
+ * with their meshes. Because the elements are children of the canvas, the browser
  * dispatches pointer events to them natively.
  *
  * ```js
@@ -133,9 +133,13 @@ class InteractionManager {
 
 		if ( canvas === null || camera === null ) return;
 
+		// HTML-in-Canvas API not available.
+
+		if ( typeof canvas.updateElementGeometry !== 'function' ) return;
+
 		// Viewport: NDC (-1,1) to canvas CSS pixels, Y flipped.
-		// Using CSS pixels (clientWidth/clientHeight) so the resulting matrix
-		// can be applied directly as a CSS transform without DPR conversion.
+		// Using CSS pixels (clientWidth/clientHeight) since canvas transforms
+		// map the element into the CSS pixel space of the canvas.
 
 		const cssW = canvas.clientWidth;
 		const cssH = canvas.clientHeight;
@@ -162,13 +166,14 @@ class InteractionManager {
 
 			const element = texture.image;
 
-			if ( ! element ) continue;
+			// Wait until the renderer has made the element a drawable child of the canvas.
 
-			// Position at canvas origin so the CSS matrix3d maps correctly.
+			if ( ! element || element.parentNode !== canvas ) continue;
+
+			// Position at canvas origin so the canvas transform maps correctly.
 			element.style.position = 'absolute';
 			element.style.left = '0';
 			element.style.top = '0';
-			element.style.transformOrigin = '0 0';
 
 			const elemW = element.offsetWidth;
 			const elemH = element.offsetHeight;
@@ -201,9 +206,10 @@ class InteractionManager {
 
 			_mvp.premultiply( _viewport );
 
-			// The browser performs the perspective divide (by w) when applying the matrix3d.
+			// The browser performs the perspective divide (by w) when applying the canvas transform.
+			// Updating the geometry also registers the element for hit testing.
 
-			element.style.transform = 'matrix3d(' + _mvp.elements.join( ',' ) + ')';
+			canvas.updateElementGeometry( element, { canvasTransform: new DOMMatrix( _mvp.elements ) } );
 
 		}
 
