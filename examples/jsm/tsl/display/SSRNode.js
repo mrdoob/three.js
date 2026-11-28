@@ -1,4 +1,4 @@
-import { DFGLUT, EnvironmentBRDF_MultiScattering, Fn, If, abs, cross, distance, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth } from 'three/tsl';
+import { DFGLUT, EnvironmentBRDF_MultiScattering, Fn, If, cross, distance, dot, float, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
@@ -1043,42 +1043,29 @@ class SSRNode extends Node {
 
 			}
 
-			const d0 = uvPos.mul( this._resolution ).xy.toVar();
-			const d1 = getScreenPosition( d1viewPosition, this._cameraProjectionMatrix ).mul( this._resolution ).toVar();
+			// the ray in UV and projected depth, where it is linear, clipped to the screen so all steps land on visible texels
 
-			// clip the ray to the screen so all steps land on visible texels
-
-			const extent = d1.sub( d0 ).toVar();
+			const origin = vec3( uvPos, depth ).toConst();
+			const rayEnd = getRayPosition( d1viewPosition, this._cameraProjectionMatrix ).toConst();
+			const extent = rayEnd.xy.sub( uvPos ).toConst();
 			const exitT = vec2(
-				extent.x.greaterThanEqual( 0 ).select( this._resolution.x.sub( d0.x ), d0.x ),
-				extent.y.greaterThanEqual( 0 ).select( this._resolution.y.sub( d0.y ), d0.y )
-			).div( extent.abs().max( 1e-6 ) );
-			const clipT = min( exitT.x, exitT.y ).min( 1 ).toConst();
-
-			If( clipT.lessThan( 1 ), () => {
-
-				d1.assign( d0.add( extent.mul( clipT ) ) );
-				d1viewPosition.assign( this.camera.isPerspectiveCamera
-					? mix( viewPosition.div( viewPosition.z ), d1viewPosition.div( d1viewPosition.z ), clipT ).div( mix( viewPosition.z.reciprocal(), d1viewPosition.z.reciprocal(), clipT ) )
-					: mix( viewPosition, d1viewPosition, clipT ) );
-
-			} );
-
-			const xLen = d1.x.sub( d0.x ).toVar();
-			const yLen = d1.y.sub( d0.y ).toVar();
+				extent.x.greaterThanEqual( 0 ).select( uvPos.x.oneMinus(), uvPos.x ),
+				extent.y.greaterThanEqual( 0 ).select( uvPos.y.oneMinus(), uvPos.y )
+			).div( extent.abs().max( 1e-9 ) );
+			const end = mix( origin, rayEnd, min( exitT.x, exitT.y ).min( 1 ) ).toConst();
 
 			// dominant-axis ray length in texels (used for the per-step floor below)
-			const rayLen = max( xLen.abs(), yLen.abs() ).max( 1 ).toVar();
+			const pixels = end.xy.sub( uvPos ).mul( this._resolution ).abs().toConst();
+			const rayLen = max( pixels.x, pixels.y ).max( 1 ).toVar();
 
 			// Blur traces a single mirror ray, so spend steps in proportion to the ray's screen-space
 			// length (cheap for the short rays that dominate). Scatter needs a fixed, bounded count for
 			// coherent stochastic sampling; each step then spans the whole ray as rayVec / totalStep.
 			const totalStep = int( this.stochastic === false
-				? trunc( max( abs( xLen ), abs( yLen ) ).mul( this.quality.clamp() ) ).max( int( 1 ) ).toConst()
+				? trunc( max( pixels.x, pixels.y ).mul( this.quality.clamp() ) ).max( int( 1 ) ).toConst()
 				: this.quality.clamp().mul( MAX_STEPS ).max( float( 1 ) ) ).toConst();
 
-			const invResolution = vec2( float( 1 ), float( 1 ) ).div( this._resolution ).toVar();
-			const uvPixelStepX = vec2( invResolution.x, float( 0 ) ).toVar();
+			const uvPixelStepX = vec2( this._resolution.x.reciprocal(), float( 0 ) ).toVar();
 
 			const output = vec4( 0 ).toVar();
 			const hit = float( 0 ).toVar();
@@ -1098,9 +1085,6 @@ class SSRNode extends Node {
 			const near = this._cameraNear;
 			const far = this._cameraFar;
 			const reversed = builder.renderer.reversedDepthBuffer === true;
-
-			const origin = vec3( uvPos, depth ).toConst();
-			const end = vec3( d1.mul( invResolution ), getRayPosition( d1viewPosition, this._cameraProjectionMatrix ).z ).toConst();
 
 			// view-space point on the ray at s, the ray is linear in UV and projected depth
 
