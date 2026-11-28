@@ -221,4 +221,4 @@ export const velocity = /*@__PURE__*/ nodeImmutable( VelocityNode );
  * @tsl
  * @type {Node<float>}
  */
-export const viewZDelta = /*@__PURE__*/ modelViewMatrix.mul( positionLocal ).z.sub( velocity.previousCameraViewMatrix.mul( velocity.previousModelWorldMatrix ).mul( positionPrevious ).z ).toVarying();
+export const velocityViewZ = /*@__PURE__*/ modelViewMatrix.mul( positionLocal ).z.sub( velocity.previousCameraViewMatrix.mul( velocity.previousModelWorldMatrix ).mul( positionPrevious ).z ).toVarying();
