@@ -1121,8 +1121,7 @@ class SSRNode extends Node {
 						.and( away.lessThanEqual( tolerance ) )
 						.and( dot( viewReflectDir, this.normalNode.sample( uvS ).rgb ).lessThan( 0 ) );
 
-				},
-				refineHit: ( uvS ) => dot( viewReflectDir, this.normalNode.sample( uvS ).rgb ).lessThan( 0 )
+				}
 			} );
 
 			const hitUvS = result.uv;
