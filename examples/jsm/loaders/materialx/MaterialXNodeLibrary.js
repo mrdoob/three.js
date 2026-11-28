@@ -95,7 +95,7 @@ import { normalizeSpaceName, toBooleanNode, toVec3Channels } from './MaterialXUt
 
 const createMXElement = ( name, nodeFunc, params = [], usesNode = false ) => ( { name, nodeFunc, params, usesNode } );
 
-const mx_range = ( inNode, inLow, inHigh, outLow, outHigh, gamma = 1 ) => {
+const mx_range = Fn( ( [ inNode, inLow, inHigh, outLow, outHigh, gamma = 1 ] ) => {
 
 	const inSpan = max( sub( inHigh, inLow ), 1e-6 );
 	const normalized = div( sub( inNode, inLow ), inSpan );
@@ -103,9 +103,9 @@ const mx_range = ( inNode, inLow, inHigh, outLow, outHigh, gamma = 1 ) => {
 	const gammaApplied = mul( pow( abs( normalized ), reciprocalGamma ), sign( normalized ) );
 	return add( outLow, mul( gammaApplied, sub( outHigh, outLow ) ) );
 
-};
+} );
 
-const mx_open_pbr_anisotropy = ( roughness = 0, anisotropy = 0 ) => {
+const mx_open_pbr_anisotropy = Fn( ( [ roughness = 0, anisotropy = 0 ] ) => {
 
 	const anisoInvert = sub( float( 1 ), anisotropy );
 	const anisoInvertSq = mul( anisoInvert, anisoInvert );
@@ -117,37 +117,37 @@ const mx_open_pbr_anisotropy = ( roughness = 0, anisotropy = 0 ) => {
 	const alphaY = mul( anisoInvert, alphaX );
 	return vec2( alphaX, alphaY );
 
-};
+} );
 
 const mx_boolean = ( inNode ) => toBooleanNode( inNode );
 const mx_and = ( in1, in2 ) => tslAnd( mx_boolean( in1 ), mx_boolean( in2 ) );
 const mx_or = ( in1, in2 ) => tslOr( mx_boolean( in1 ), mx_boolean( in2 ) );
 const mx_xor = ( in1, in2 ) => tslXor( mx_boolean( in1 ), mx_boolean( in2 ) );
 const mx_not = ( inNode ) => tslNot( mx_boolean( inNode ) );
-const mx_checkerboard = ( color1, color2, uvtiling, uvoffset, texcoord ) => {
+const mx_checkerboard = Fn( ( [ color1, color2, uvtiling, uvoffset, texcoord ] ) => {
 
 	const tiledUv = sub( mul( texcoord, uvtiling ), uvoffset );
 	const checkerMix = mx_modulo( dot( floor( tiledUv ), vec2( 1, 1 ) ), float( 2 ) );
 	return mix( color2, color1, checkerMix );
 
-};
+} );
 
-const mx_circle = ( texcoord, center, radius ) => {
+const mx_circle = Fn( ( [ texcoord, center, radius ] ) => {
 
 	const delta = sub( texcoord, center );
 	const distanceSquared = dot( delta, delta );
 	const radiusSquared = mul( radius, radius );
 	return mx_ifgreater( distanceSquared, radiusSquared, 0, 1 );
 
-};
+} );
 
-const mx_normalmap = (
+const mx_normalmap = Fn( ( [
 	value = vec3( 0.5, 0.5, 1.0 ),
 	scale = 1.0,
 	normal = vec3( 0.0, 0.0, 1.0 ),
 	tangent = vec3( 1.0, 0.0, 0.0 ),
 	bitangent = vec3( 0.0, 1.0, 0.0 ),
-) => {
+] ) => {
 
 	const mapValue = toVec3Channels( value );
 	const decoded = sub( mul( mapValue, 2.0 ), vec3( 1.0, 1.0, 1.0 ) );
@@ -163,18 +163,18 @@ const mx_normalmap = (
 		);
 	return normalize( blended );
 
-};
+} );
 
-const mx_bump = (
+const mx_bump = Fn( ( [
 	height,
 	scale = 1,
 	normal = vec3( 0.0, 0.0, 1.0 ),
 	tangent = vec3( 1.0, 0.0, 0.0 ),
 	bitangent = vec3( 0.0, 1.0, 0.0 ),
-) => mx_normalmap( mx_heighttonormal( height, 1 ), scale, normal, tangent, bitangent );
+] ) => mx_normalmap( mx_heighttonormal( height, 1 ), scale, normal, tangent, bitangent ) );
 const mx_dot = ( inNode ) => inNode;
 
-const mx_viewdirection = ( space = 'world' ) => {
+const mx_viewdirection = Fn( ( [ space = 'world' ] ) => {
 
 	const outputSpace = normalizeSpaceName( space, 'world' );
 	const worldDirection = normalize( sub( positionWorld, cameraPosition ) );
@@ -187,26 +187,26 @@ const mx_viewdirection = ( space = 'world' ) => {
 
 	return mx_transformnormal( worldDirection, 'world', outputSpace );
 
-};
+} );
 
-const mx_hsvadjust = ( inNode, amount, nodeX ) => {
+const mx_hsvadjust = Fn( ( [ inNode, amount, nodeX ] ) => {
 
 	const hsv = mx_rgbtohsv( vec3( inNode ) );
 	const adjusted = mul( add( hsv, vec3( element( amount, 0 ), 0, 0 ) ), vec3( 1, element( amount, 1 ), element( amount, 2 ) ) );
 	const rgb = mx_hsvtorgb( adjusted );
 	return nodeX && nodeX.type === 'color4' ? vec4( rgb, element( vec4( inNode ), 3 ) ) : rgb;
 
-};
+} );
 
-const mx_facingratio = ( viewdirection, normal, faceforward, invert ) => {
+const mx_facingratio = Fn( ( [ viewdirection, normal, faceforward, invert ] ) => {
 
 	const cosine = dot( viewdirection, normal );
 	const facing = toBooleanNode( faceforward ).select( abs( cosine ), mul( cosine, - 1 ) );
 	return toBooleanNode( invert ).select( sub( 1, facing ), facing );
 
-};
+} );
 
-const mx_blackbody = ( temperature = 5000 ) => {
+const mx_blackbody = Fn( ( [ temperature = 5000 ] ) => {
 
 	const temperatureKelvin = clamp( temperature, float( 800 ), float( 25000 ) );
 	const t = div( float( 1000 ), temperatureKelvin );
@@ -245,18 +245,18 @@ const mx_blackbody = ( temperature = 5000 ) => {
 	const validYcMask = step( float( 1e-6 ), yc );
 	return mix( vec3( 1, 1, 1 ), clampedRgb, validYcMask );
 
-};
+} );
 
-const mx_unpremult = ( input ) => {
+const mx_unpremult = Fn( ( [ input ] ) => {
 
 	const alpha = element( input, 3 );
 	const rgb = toVec3Channels( input );
 	const unpremultiplied = alpha.equal( 0 ).mix( rgb, div( rgb, alpha ) );
 	return vec4( unpremultiplied, alpha );
 
-};
+} );
 
-const mx_colorcorrect = (
+const mx_colorcorrect = Fn( ( [
 	input,
 	hue = 0,
 	saturationAmount = 1,
@@ -266,7 +266,7 @@ const mx_colorcorrect = (
 	contrast = 1,
 	contrastPivot = 0.5,
 	exposure = 0,
-) => {
+] ) => {
 
 	const rgbInput = toVec3Channels( input );
 	const hsv = mx_rgbtohsv( rgbInput );
@@ -280,27 +280,27 @@ const mx_colorcorrect = (
 	const preserveAlpha = input && ( input.nodeType === 'vec4' || input.nodeType === 'color4' );
 	return preserveAlpha ? vec4( exposureApplied, element( input, 3 ) ) : exposureApplied;
 
-};
+} );
 
-const mx_minus = ( fg, bg, mixval = 1 ) => add( mul( mixval, sub( bg, fg ) ), mul( sub( 1, mixval ), bg ) );
-const mx_difference = ( fg, bg, mixval = 1 ) => add( mul( mixval, abs( sub( bg, fg ) ) ), mul( sub( 1, mixval ), bg ) );
-const mx_screen = ( fg, bg, mixval = 1 ) => {
+const mx_minus = Fn( ( [ fg, bg, mixval = 1 ] ) => add( mul( mixval, sub( bg, fg ) ), mul( sub( 1, mixval ), bg ) ) );
+const mx_difference = Fn( ( [ fg, bg, mixval = 1 ] ) => add( mul( mixval, abs( sub( bg, fg ) ) ), mul( sub( 1, mixval ), bg ) ) );
+const mx_screen = Fn( ( [ fg, bg, mixval = 1 ] ) => {
 
 	const screened = sub( 1, mul( sub( 1, fg ), sub( 1, bg ) ) );
 	return mix( bg, screened, mixval );
 
-};
+} );
 
-const mx_overlay = ( fg, bg, mixval = 1 ) => {
+const mx_overlay = Fn( ( [ fg, bg, mixval = 1 ] ) => {
 
 	const lowBranch = mul( mul( 2, fg ), bg );
 	const highBranch = sub( 1, mul( mul( 2, sub( 1, fg ) ), sub( 1, bg ) ) );
 	const overlayed = mix( lowBranch, highBranch, step( 0.5, bg ) );
 	return mix( bg, overlayed, mixval );
 
-};
+} );
 
-const mx_transformnormal = ( inNode = vec3( 0, 0, 1 ), fromspace = 'world', tospace = 'world' ) => {
+const mx_transformnormal = Fn( ( [ inNode = vec3( 0, 0, 1 ), fromspace = 'world', tospace = 'world' ] ) => {
 
 	const from = normalizeSpaceName( fromspace, 'world' );
 	const to = normalizeSpaceName( tospace, 'world' );
@@ -320,9 +320,9 @@ const mx_transformnormal = ( inNode = vec3( 0, 0, 1 ), fromspace = 'world', tosp
 
 	return normalize( mul( inNormal, mat3( modelWorldMatrix ) ) );
 
-};
+} );
 
-const mx_transformvector = ( inNode = vec3( 0, 0, 0 ), fromspace = 'world', tospace = 'world' ) => {
+const mx_transformvector = Fn( ( [ inNode = vec3( 0, 0, 0 ), fromspace = 'world', tospace = 'world' ] ) => {
 
 	const from = normalizeSpaceName( fromspace, 'world' );
 	const to = normalizeSpaceName( tospace, 'world' );
@@ -342,9 +342,9 @@ const mx_transformvector = ( inNode = vec3( 0, 0, 0 ), fromspace = 'world', tosp
 
 	return mul( inVector, mat3( modelWorldMatrixInverse ) );
 
-};
+} );
 
-const mx_transformpoint = ( inNode = vec3( 0, 0, 0 ), fromspace = 'world', tospace = 'world' ) => {
+const mx_transformpoint = Fn( ( [ inNode = vec3( 0, 0, 0 ), fromspace = 'world', tospace = 'world' ] ) => {
 
 	const from = normalizeSpaceName( fromspace, 'world' );
 	const to = normalizeSpaceName( tospace, 'world' );
@@ -361,27 +361,27 @@ const mx_transformpoint = ( inNode = vec3( 0, 0, 0 ), fromspace = 'world', tospa
 	const transformed4 = mul( matrix, point4 );
 	return vec3( element( transformed4, 0 ), element( transformed4, 1 ), element( transformed4, 2 ) );
 
-};
+} );
 
 // MaterialX returns 0 where the divisor vanishes. Selecting the result, rather than multiplying it
 // by a step, keeps the division by zero from turning that 0 into NaN.
-const mx_burn_channel = ( fg, bg, mixval = 1 ) => {
+const mx_burn_channel = Fn( ( [ fg, bg, mixval = 1 ] ) => {
 
 	const vanishes = abs( fg ).lessThan( 1e-6 );
 	const divisor = vanishes.select( float( 1 ), fg );
 	const composed = add( mul( mixval, sub( 1, div( sub( 1, bg ), divisor ) ) ), mul( sub( 1, mixval ), bg ) );
 	return vanishes.select( float( 0 ), composed );
 
-};
+} );
 
-const mx_dodge_channel = ( fg, bg, mixval = 1 ) => {
+const mx_dodge_channel = Fn( ( [ fg, bg, mixval = 1 ] ) => {
 
 	const vanishes = abs( sub( 1, fg ) ).lessThan( 1e-6 );
 	const divisor = vanishes.select( float( 1 ), sub( 1, fg ) );
 	const composed = add( mul( mixval, div( bg, divisor ) ), mul( sub( 1, mixval ), bg ) );
 	return vanishes.select( float( 0 ), composed );
 
-};
+} );
 
 const isVec3Like = ( node ) =>
 	node && ( node.nodeType === 'vec3' || node.nodeType === 'color' || node.nodeType === 'color3' );
@@ -414,8 +414,8 @@ const applyBlendByChannel = ( channelFunc, fg, bg, mixval = 1 ) => {
 
 };
 
-const mx_burn = ( fg, bg, mixval = 1 ) => applyBlendByChannel( mx_burn_channel, fg, bg, mixval );
-const mx_dodge = ( fg, bg, mixval = 1 ) => applyBlendByChannel( mx_dodge_channel, fg, bg, mixval );
+const mx_burn = Fn( ( [ fg, bg, mixval = 1 ] ) => applyBlendByChannel( mx_burn_channel, fg, bg, mixval ) );
+const mx_dodge = Fn( ( [ fg, bg, mixval = 1 ] ) => applyBlendByChannel( mx_dodge_channel, fg, bg, mixval ) );
 
 const mixColor4 = ( bg, fg, factor ) =>
 	vec4(
@@ -443,7 +443,7 @@ const mxRampSegment = ( x, color1, color2, interval1, interval2, interpolation )
 
 };
 
-const mx_ramp_gradient = (
+const mx_ramp_gradient = Fn( ( [
 	x = 0,
 	interval1 = 0,
 	interval2 = 1,
@@ -453,7 +453,7 @@ const mx_ramp_gradient = (
 	prevColor = vec4( 0, 0, 0, 1 ),
 	intervalNum = 1,
 	numIntervals = 2,
-) => {
+] ) => {
 
 	const xFloat = float( x );
 	const interval1Float = float( interval1 );
@@ -465,9 +465,9 @@ const mx_ramp_gradient = (
 	const withinInterval = mixColor4( prevColor, interpolated, step( add( interval1Float, float( 1e-6 ) ), xFloat ) );
 	return mixColor4( withinInterval, prevColor, step( numIntervalsFloat, intervalNumFloat ) );
 
-};
+} );
 
-const mx_ramp = ( texcoord = vec2( 0, 0 ), type = 0, interpolation = 1, numIntervals = 2, ...rest ) => {
+const mx_ramp = Fn( ( [ texcoord = vec2( 0, 0 ), type = 0, interpolation = 1, numIntervals = 2, ...rest ] ) => {
 
 	const rampTypeFloat = float( type );
 	const interpolationFloat = float( interpolation );
@@ -523,7 +523,7 @@ const mx_ramp = ( texcoord = vec2( 0, 0 ), type = 0, interpolation = 1, numInter
 
 	return result;
 
-};
+} );
 
 const usesVec2Noise = ( nodeX ) => nodeX && nodeX.type === 'vector2';
 const usesVec3Noise = ( nodeX ) => nodeX && ( nodeX.type === 'vector3' || nodeX.type === 'color3' );
@@ -585,12 +585,12 @@ const mx_fractal_noise_materialx_3d = ( position, octaves, lacunarity, diminish,
 
 };
 
-const mx_randomfloat = ( inNode, minNode, maxNode, seed, scale = 4096 ) => {
+const mx_randomfloat = Fn( ( [ inNode, minNode, maxNode, seed, scale = 4096 ] ) => {
 
 	const noise = mx_cell_noise_float( vec2( mul( float( inNode ), scale ), float( seed ) ) );
 	return clamp( add( minNode, mul( noise, sub( maxNode, minNode ) ) ), minNode, maxNode );
 
-};
+} );
 
 const mx_randomfloat_materialx = ( inNode, minNode, maxNode, seed, nodeX ) => {
 
@@ -599,7 +599,7 @@ const mx_randomfloat_materialx = ( inNode, minNode, maxNode, seed, nodeX ) => {
 
 };
 
-const mx_randomcolor = ( inNode, hueLow, hueHigh, saturationLow, saturationHigh, brightnessLow, brightnessHigh, seed ) => {
+const mx_randomcolor = Fn( ( [ inNode, hueLow, hueHigh, saturationLow, saturationHigh, brightnessLow, brightnessHigh, seed ] ) => {
 
 	const randomInRange = ( offset, low, high ) => add( low, mul( mx_randomfloat( inNode, float( 0 ), float( 1 ), ceil( add( float( seed ), offset ) ) ), sub( high, low ) ) );
 
@@ -609,17 +609,17 @@ const mx_randomcolor = ( inNode, hueLow, hueHigh, saturationLow, saturationHigh,
 		randomInRange( 1813.8, brightnessLow, brightnessHigh ),
 	) );
 
-};
+} );
 
 const mx_cell_noise_materialx = ( position, nodeX ) =>
 	usesVec3Noise( nodeX ) ? mx_cell_noise_vec3( position ) : mx_cell_noise_float( position );
 
-const mx_worley_noise_vec2_style = ( position, jitter, style ) => {
+const mx_worley_noise_vec2_style = Fn( ( [ position, jitter, style ] ) => {
 
 	const result = mx_worley_noise_vec3_style( position, jitter, style, 0 );
 	return vec2( element( result, 0 ), element( result, 1 ) );
 
-};
+} );
 
 const mx_worley_noise_materialx_2d = ( texcoord, jitter, style, nodeX ) =>
 	usesVec3Noise( nodeX ) ? mx_worley_noise_vec3_style( texcoord, jitter, style, 0 ) : usesVec2Noise( nodeX ) ? mx_worley_noise_vec2_style( texcoord, jitter, style ) : mx_worley_noise_float_2d( texcoord, jitter, style );
