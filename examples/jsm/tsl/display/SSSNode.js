@@ -353,17 +353,17 @@ class SSSNode extends Node {
 			const rayDirection = this._cameraViewMatrix.transformDirection( lightPosition( this._mainLight ).sub( lightTargetPosition( this._mainLight ) ) ).toConst( 'rayDirection' );
 			const rayEndPosition = rayStartPosition.add( rayDirection.mul( this.maxDistance ) ).toConst( 'rayEndPosition' );
 
-			// the viewZ of the ray, its parameter is linear in screen space
+			// the ray in UV and projected depth, where it is linear, and its viewZ
 
-			const rayZ = this._camera.isPerspectiveCamera === true
-				? ( s ) => mix( rayStartPosition.z.reciprocal(), rayEndPosition.z.reciprocal(), s ).reciprocal()
-				: ( s ) => mix( rayStartPosition.z, rayEndPosition.z, s );
+			const origin = vec3( uvNode, depth ).toConst();
+			const end = getRayPosition( rayEndPosition, this._cameraProjectionMatrix ).toConst();
+			const rayZ = ( s ) => getViewPosition( mix( origin.xy, end.xy, s ), mix( origin.z, end.z, s ), this._cameraProjectionMatrixInverse ).z;
 
 			// compute noise based ray offset
 			const noise = interleavedGradientNoise( screenCoordinate );
 			const offset = fract( noise.add( this._temporalOffset ) ).add( rand( uvNode.add( this._frameId ) ) ).toConst( 'offset' );
 
-			const result = traceLinear( this.depthNode, vec3( uvNode, depth ), getRayPosition( rayEndPosition, this._cameraProjectionMatrix ), {
+			const result = traceLinear( this.depthNode, origin, end, {
 				resolution: this._resolution,
 				reversedDepth: builder.renderer.reversedDepthBuffer === true,
 				quality: this.quality.clamp(),

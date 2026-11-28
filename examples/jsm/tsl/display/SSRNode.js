@@ -1083,21 +1083,6 @@ class SSRNode extends Node {
 			const output = vec4( 0 ).toVar();
 			const hit = float( 0 ).toVar();
 
-			// Reflected-ray view-space Z at ray parameter s ∈ [0,1] (linear in 1/z for perspective).
-			const recipVPZ = float( 1 ).div( viewPosition.z ).toConst();
-			const recipD1VPZ = float( 1 ).div( d1viewPosition.z ).toConst();
-
-			// Camera type is known at build time, so branch at compile time rather than via a runtime select.
-			const reflectRayZAt = this.camera.isPerspectiveCamera
-				? ( sVal ) => float( 1 ).div( recipVPZ.add( sVal.mul( recipD1VPZ.sub( recipVPZ ) ) ) )
-				: ( sVal ) => viewPosition.z.add( sVal.mul( d1viewPosition.z.sub( viewPosition.z ) ) );
-
-			// view-space point on the reflected ray at s
-
-			const rayPointAt = this.camera.isPerspectiveCamera
-				? ( sVal ) => mix( viewPosition.div( viewPosition.z ), d1viewPosition.div( d1viewPosition.z ), sVal ).mul( reflectRayZAt( sVal ) )
-				: ( sVal ) => mix( viewPosition, d1viewPosition, sVal );
-
 			// Ray parameter s ∈ [0,1] for step `idx`. Blur marches uniformly (matching the original loop:
 			// one ~texel step per iteration). Scatter uses an exponential remap `(idx/steps)^stepExponent`
 			// that concentrates samples near the origin, floored to ≥1 texel/step; `jitter` dissolves banding.
@@ -1116,6 +1101,10 @@ class SSRNode extends Node {
 
 			const origin = vec3( uvPos, depth ).toConst();
 			const end = vec3( d1.mul( invResolution ), getRayPosition( d1viewPosition, this._cameraProjectionMatrix ).z ).toConst();
+
+			// view-space point on the ray at s, the ray is linear in UV and projected depth
+
+			const rayPointAt = ( s ) => getViewPosition( mix( origin.xy, end.xy, s ), mix( origin.z, end.z, s ), this._cameraProjectionMatrixInverse );
 
 			// the distance of the surface at a depth from the ray and the thickness it has to be within
 
