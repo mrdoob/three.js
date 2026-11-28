@@ -369,10 +369,10 @@ class SSSNode extends Node {
 			const steps = int( pixels.x.max( pixels.y ).mul( this.quality.clamp() ) ).toConst();
 
 			const result = traceLinear( this.depthNode, origin, end, {
-				reversedDepth: builder.renderer.reversedDepthBuffer === true,
 				steps,
 				parameter: ( index ) => index.add( offset ).div( float( steps ) ),
-				projectDepth: ( raw ) => projectionDepth( raw, this._cameraNear, this._cameraFar ),
+				near: this._cameraNear,
+				far: this._cameraFar,
 				// an occluder is at most `thickness` in front of the ray
 				acceptHit: ( uv, s, raw ) => depthToViewZ( raw, this._cameraNear, this._cameraFar, this._camera ).sub( rayZ( s ) ).lessThan( this.thickness )
 			} );

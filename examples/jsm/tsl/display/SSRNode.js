@@ -1084,7 +1084,6 @@ class SSRNode extends Node {
 
 			const near = this._cameraNear;
 			const far = this._cameraFar;
-			const reversed = builder.renderer.reversedDepthBuffer === true;
 
 			// view-space point on the ray at s, the ray is linear in UV and projected depth
 
@@ -1103,10 +1102,10 @@ class SSRNode extends Node {
 			};
 
 			const result = traceLinear( this.depthNode, origin, end, {
-				reversedDepth: reversed,
 				steps: totalStep.sub( 1 ),
 				parameter: ( index ) => sampleFraction( index.add( 1 ) ),
-				projectDepth: ( raw ) => projectionDepth( raw, near, far ),
+				near,
+				far,
 				refine: this.binaryRefine,
 				acceptHit: ( uvS, s, raw, lastS ) => {
 

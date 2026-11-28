@@ -1,5 +1,5 @@
 import { WebGLCoordinateSystem } from 'three/webgpu';
-import { Break, Fn, If, Loop, bool, float, getScreenPositionFromClip, int, vec2, vec3, vec4 } from 'three/tsl';
+import { Break, Fn, If, Loop, bool, float, getScreenPositionFromClip, int, projectionDepth, vec2, vec3, vec4 } from 'three/tsl';
 
 /**
  * Projects a view position to the UV and projected depth the rays are traced in, for any camera and depth buffer.
@@ -21,6 +21,8 @@ export const getRayPosition = /*@__PURE__*/ Fn( ( [ viewPosition, projectionMatr
 
 } );
 
+const isInFront = /*@__PURE__*/ Fn( ( [ z, depth ], builder ) => builder.renderer.reversedDepthBuffer === true ? z.greaterThan( depth ) : z.lessThan( depth ) );
+
 /**
  * Marches a screen-space ray through the depth one sample at a time, inside the calling TSL function.
  *
@@ -28,17 +30,17 @@ export const getRayPosition = /*@__PURE__*/ Fn( ( [ viewPosition, projectionMatr
  * @param {Node<vec3>} origin - Start UV and projected depth.
  * @param {Node<vec3>} end - End UV and projected depth.
  * @param {Object} options - Traversal configuration.
- * @param {boolean} [options.reversedDepth=false] - Projected depth convention.
  * @param {Node<int>} options.steps - The number of samples.
  * @param {Function} options.parameter - Returns the ray parameter of a sample index.
- * @param {Function} [options.projectDepth] - Converts raw depth to projected depth (log-depth inputs).
+ * @param {Node<float>} options.near - The camera's near value.
+ * @param {Node<float>} options.far - The camera's far value.
  * @param {Function} [options.acceptHit] - TSL predicate accepting (UV, parameter, raw depth). With `refine` it also
  * receives the parameter of the previous sample, to widen its tolerance to the step, and tests the refined hit without it.
  * @param {boolean} [options.refine=false] - Whether a hit is bisected towards the sample before it, where the ray was in front.
  * @param {Function} [options.refineHit] - TSL predicate (UV, parameter, raw depth): whether the ray can hit the surface it is behind at a bisection sample.
  * @return {Object} Hit flag, UV, raw depth and parameter.
  */
-export function traceLinear( depthNode, origin, end, { steps, parameter, reversedDepth = false, projectDepth = value => value, acceptHit = () => bool( true ), refine = false, refineHit = () => bool( true ) } ) {
+export function traceLinear( depthNode, origin, end, { steps, parameter, near, far, acceptHit = () => bool( true ), refine = false, refineHit = () => bool( true ) } ) {
 
 	const delta = end.sub( origin ).toConst();
 
@@ -52,14 +54,7 @@ export function traceLinear( depthNode, origin, end, { steps, parameter, reverse
 	const previousS = float( 0 ).toVar();
 	const previousInFront = bool( true ).toVar();
 
-	const inFrontAt = ( s, raw ) => {
-
-		const z = origin.z.add( delta.z.mul( s ) );
-		const depth = projectDepth( raw );
-
-		return reversedDepth ? z.greaterThan( depth ) : z.lessThan( depth );
-
-	};
+	const inFrontAt = ( s, raw ) => isInFront( origin.z.add( delta.z.mul( s ) ), projectionDepth( raw, near, far ) );
 
 	Loop( steps, ( { i } ) => {
 
