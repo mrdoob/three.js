@@ -733,9 +733,12 @@ class GLSLDecoder {
 
 	}
 
-	parseFunction() {
+	parseFunction( arrayCount = null ) {
 
 		const type = this.readToken().str;
+
+		if ( arrayCount !== null ) this.readTokensUntil( ']' );
+
 		const name = this.readToken().str;
 
 		const paramsTokens = this.readTokensUntil( ')' );
@@ -743,7 +746,7 @@ class GLSLDecoder {
 		const params = this.parseFunctionParams( paramsTokens.slice( 1, paramsTokens.length - 1 ) );
 		const body = this.parseBlock();
 
-		const func = new FunctionDeclaration( type, name, params, body );
+		const func = new FunctionDeclaration( type, name, params, body, arrayCount );
 
 		return func;
 
@@ -1232,9 +1235,13 @@ class GLSLDecoder {
 
 				} else if ( isBuiltinType( token.str ) || this.structTypes.has( token.str ) ) {
 
-					if ( this.getToken( 2 ).str === '(' ) {
+					const size = this.getToken( 2 )?.str;
+					const isArrayReturn = this.getToken( 1 )?.str === '[' && /^\d+$/.test( size ) &&
+						this.getToken( 3 )?.str === ']' && this.getToken( 4 )?.isLiteral && this.getToken( 5 )?.str === '(';
 
-						statement = this.parseFunction();
+					if ( size === '(' || isArrayReturn ) {
+
+						statement = this.parseFunction( isArrayReturn ? size : null );
 
 					} else {
 

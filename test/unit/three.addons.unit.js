@@ -27,3 +27,4 @@ import './addons/tsl/ClusteredLightsNode.tests.js';
 import './addons/tsl/DenoiseNode.tests.js';
 import './addons/postprocessing/GTAOPass.tests.js';
 import './addons/pipelines/MeshletDrawingPipeline.tests.js';
+import './addons/transpiler/Transpiler.tests.js';

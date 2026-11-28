@@ -643,7 +643,8 @@ class WGSLEncoder {
 	emitFunction( node ) {
 
 		const name = node.name;
-		const returnType = this.getWgslType( node.type );
+		const type = this.getWgslType( node.type );
+		const returnType = node.arrayCount !== null ? `array<${ type }, ${ node.arrayCount }>` : type;
 
 		const params = [];
 		// We will prepend to a copy of the body, not the original AST node.
