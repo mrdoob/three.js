@@ -36,10 +36,10 @@ export const getRayPosition = /*@__PURE__*/ Fn( ( [ viewPosition, projectionMatr
  * @param {Function} [options.parameter] - Returns the ray parameter of a sample index, instead of even steps.
  * @param {Function} [options.projectDepth] - Converts raw depth to projected depth (log-depth inputs).
  * @param {Function} [options.acceptHit] - TSL predicate accepting (UV, parameter, raw depth). With `refine` it also
- * receives the parameter of the previous sample, to widen its tolerance to the step.
+ * receives the parameter of the previous sample, to widen its tolerance to the step, and tests the refined hit without it.
  * @param {boolean} [options.refine=false] - Whether a hit is bisected towards the sample before it, where the ray was in front.
  * @param {Function} [options.refineHit] - TSL predicate (UV, parameter, raw depth): whether the ray can hit the surface it is behind at a bisection sample.
- * @return {Object} Hit flag, UV, raw depth and parameter, and whether hits are refined.
+ * @return {Object} Hit flag, UV, raw depth and parameter.
  */
 export function traceLinear( depthNode, origin, end, { resolution, reversedDepth = false, quality = 1, offset = 0, steps = null, parameter = null, projectDepth = value => value, acceptHit = () => bool( true ), refine = false, refineHit = () => bool( true ) } ) {
 
@@ -137,8 +137,16 @@ export function traceLinear( depthNode, origin, end, { resolution, reversedDepth
 
 		} );
 
+		// bisection can land on a depth discontinuity, so validate the refined hit
+
+		If( hit, () => {
+
+			hit.assign( acceptHit( hitUV, hitS, hitDepth ) );
+
+		} );
+
 	}
 
-	return { hit, uv: hitUV, depth: hitDepth, parameter: hitS, refined: refine };
+	return { hit, uv: hitUV, depth: hitDepth, parameter: hitS };
 
 }
