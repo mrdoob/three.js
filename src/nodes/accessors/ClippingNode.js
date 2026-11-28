@@ -43,6 +43,22 @@ class ClippingNode extends Node {
 		 */
 		this.scope = scope;
 
+		/**
+		 * Whether hardware clipping is enabled for the current build.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.hardwareClipping = false;
+
+		/**
+		 * The position node used for plane distance evaluation.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.position = null;
+
 	}
 
 	isCacheable( /*builder*/ ) {
