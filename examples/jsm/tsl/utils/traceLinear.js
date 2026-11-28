@@ -35,9 +35,10 @@ export const getRayPosition = /*@__PURE__*/ Fn( ( [ viewPosition, projectionMatr
  * @param {Function} [options.acceptHit] - TSL predicate accepting (UV, parameter, raw depth). With `refine` it also
  * receives the parameter of the previous sample, to widen its tolerance to the step, and tests the refined hit without it.
  * @param {boolean} [options.refine=false] - Whether a hit is bisected towards the sample before it, where the ray was in front.
+ * @param {Function} [options.refineHit] - TSL predicate (UV, parameter, raw depth): whether the ray can hit the surface it is behind at a bisection sample.
  * @return {Object} Hit flag, UV, raw depth and parameter.
  */
-export function traceLinear( depthNode, origin, end, { steps, parameter, reversedDepth = false, projectDepth = value => value, acceptHit = () => bool( true ), refine = false } ) {
+export function traceLinear( depthNode, origin, end, { steps, parameter, reversedDepth = false, projectDepth = value => value, acceptHit = () => bool( true ), refine = false, refineHit = () => bool( true ) } ) {
 
 	const delta = end.sub( origin ).toConst();
 
@@ -106,7 +107,7 @@ export function traceLinear( depthNode, origin, end, { steps, parameter, reverse
 				const sampleUV = origin.xy.add( delta.xy.mul( s ) ).toConst();
 				const raw = depthNode.sample( sampleUV ).r.toConst();
 
-				If( inFrontAt( s, raw ).not(), () => {
+				If( inFrontAt( s, raw ).not().and( refineHit( sampleUV, s, raw ) ), () => {
 
 					hitS.assign( s );
 
