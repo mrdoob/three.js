@@ -149,6 +149,40 @@ class WebGPUBindingUtils {
 
 		const bindLayoutGPU = this.createBindingsLayout( bindGroup );
 
+		let pooledAllocation = null;
+
+		for ( let i = 0, l = bindGroup.bindings.length; i < l; i ++ ) {
+
+			const binding = bindGroup.bindings[ i ];
+
+			if ( binding.isUniformBuffer ) {
+
+				const allocation = backend.get( binding ).allocation;
+				if ( allocation !== null ) pooledAllocation = allocation;
+
+			}
+
+		}
+
+		bindingsData.dynamicOffset = pooledAllocation !== null ? pooledAllocation.byteOffset : - 1;
+
+		if ( pooledAllocation !== null && bindGroup.bindings.length === 1 ) {
+
+			const key = `${ bindingsData.layoutKey }:${ pooledAllocation.byteLength }`;
+			let bindGroupGPU = pooledAllocation.slab.bindGroups.get( key );
+
+			if ( bindGroupGPU === undefined ) {
+
+				bindGroupGPU = this.createBindGroup( bindGroup, bindLayoutGPU );
+				pooledAllocation.slab.bindGroups.set( key, bindGroupGPU );
+
+			}
+
+			bindingsData.group = bindGroupGPU;
+			return;
+
+		}
+
 		let bindGroupGPU;
 
 		if ( cacheKey !== '' ) {
@@ -193,10 +227,19 @@ class WebGPUBindingUtils {
 	updateBinding( binding ) {
 
 		const backend = this.backend;
+		const bindingData = backend.get( binding );
+
+		if ( bindingData.allocation !== null ) {
+
+			backend.uniformBufferPool.markDirty( bindingData.allocation );
+			return;
+
+		}
+
 		const device = backend.device;
 
 		const array = binding.buffer; // cpu
-		const buffer = backend.get( binding ).buffer; // gpu
+		const buffer = bindingData.buffer; // gpu
 
 		const updateRanges = binding.updateRanges;
 
@@ -314,8 +357,12 @@ class WebGPUBindingUtils {
 			if ( binding.isUniformBuffer ) {
 
 				const bindingData = backend.get( binding );
+				const allocation = bindingData.allocation;
+				const resource = allocation !== null
+					? { buffer: allocation.bufferGPU, offset: 0, size: allocation.byteLength }
+					: { buffer: bindingData.buffer };
 
-				_bindGroupDescriptor.entries.push( { binding: bindingPoint, resource: { buffer: bindingData.buffer } } );
+				_bindGroupDescriptor.entries.push( { binding: bindingPoint, resource } );
 
 			} else if ( binding.isStorageBuffer ) {
 
@@ -462,6 +509,10 @@ class WebGPUBindingUtils {
 						buffer.type = GPUBufferBindingType.ReadOnlyStorage;
 
 					}
+
+				} else if ( backend.uniformBufferPool.canPool( binding ) === true ) {
+
+					buffer.hasDynamicOffset = true;
 
 				}
 
