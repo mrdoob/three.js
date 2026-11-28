@@ -1,5 +1,5 @@
 import { RedFormat, RenderTarget, Vector2, RendererUtils, QuadMesh, Node, NodeMaterial, NodeUpdateType, UnsignedByteType } from 'three/webgpu';
-import { reference, getViewPosition, interleavedGradientNoise, screenCoordinate, Fn, passTexture, uv, uniform, depthToViewZ, vec3, lightPosition, lightTargetPosition, fract, rand, mix, context, isBackgroundDepth, projectionDepth } from 'three/tsl';
+import { reference, getViewPosition, interleavedGradientNoise, screenCoordinate, Fn, passTexture, uv, uniform, depthToViewZ, vec3, lightPosition, lightTargetPosition, fract, rand, mix, context, float, int, isBackgroundDepth, projectionDepth } from 'three/tsl';
 import { traceLinear, getRayPosition } from '../utils/traceLinear.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -363,11 +363,15 @@ class SSSNode extends Node {
 			const noise = interleavedGradientNoise( screenCoordinate );
 			const offset = fract( noise.add( this._temporalOffset ) ).add( rand( uvNode.add( this._frameId ) ) ).toConst( 'offset' );
 
+			// step by pixels of the ray
+
+			const pixels = end.xy.sub( uvNode ).mul( this._resolution ).abs();
+			const steps = int( pixels.x.max( pixels.y ).mul( this.quality.clamp() ) ).toConst();
+
 			const result = traceLinear( this.depthNode, origin, end, {
-				resolution: this._resolution,
 				reversedDepth: builder.renderer.reversedDepthBuffer === true,
-				quality: this.quality.clamp(),
-				offset,
+				steps,
+				parameter: ( index ) => index.add( offset ).div( float( steps ) ),
 				projectDepth: ( raw ) => projectionDepth( raw, this._cameraNear, this._cameraFar ),
 				// an occluder is at most `thickness` in front of the ray
 				acceptHit: ( uv, s, raw ) => depthToViewZ( raw, this._cameraNear, this._cameraFar, this._camera ).sub( rayZ( s ) ).lessThan( this.thickness )

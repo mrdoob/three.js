@@ -1103,7 +1103,6 @@ class SSRNode extends Node {
 			};
 
 			const result = traceLinear( this.depthNode, origin, end, {
-				resolution: this._resolution,
 				reversedDepth: reversed,
 				steps: totalStep.sub( 1 ),
 				parameter: ( index ) => sampleFraction( index.add( 1 ) ),

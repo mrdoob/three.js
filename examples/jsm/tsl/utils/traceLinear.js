@@ -28,12 +28,9 @@ export const getRayPosition = /*@__PURE__*/ Fn( ( [ viewPosition, projectionMatr
  * @param {Node<vec3>} origin - Start UV and projected depth.
  * @param {Node<vec3>} end - End UV and projected depth.
  * @param {Object} options - Traversal configuration.
- * @param {Node<vec2>} options.resolution - The resolution the steps are counted in.
  * @param {boolean} [options.reversedDepth=false] - Projected depth convention.
- * @param {Node<float>|number} [options.quality=1] - The steps per pixel of the ray.
- * @param {Node<float>|number} [options.offset=0] - The offset of the samples, in steps.
- * @param {Node<int>} [options.steps] - The number of samples, instead of the one given by `quality`.
- * @param {Function} [options.parameter] - Returns the ray parameter of a sample index, instead of even steps.
+ * @param {Node<int>} options.steps - The number of samples.
+ * @param {Function} options.parameter - Returns the ray parameter of a sample index.
  * @param {Function} [options.projectDepth] - Converts raw depth to projected depth (log-depth inputs).
  * @param {Function} [options.acceptHit] - TSL predicate accepting (UV, parameter, raw depth). With `refine` it also
  * receives the parameter of the previous sample, to widen its tolerance to the step, and tests the refined hit without it.
@@ -41,19 +38,9 @@ export const getRayPosition = /*@__PURE__*/ Fn( ( [ viewPosition, projectionMatr
  * @param {Function} [options.refineHit] - TSL predicate (UV, parameter, raw depth): whether the ray can hit the surface it is behind at a bisection sample.
  * @return {Object} Hit flag, UV, raw depth and parameter.
  */
-export function traceLinear( depthNode, origin, end, { resolution, reversedDepth = false, quality = 1, offset = 0, steps = null, parameter = null, projectDepth = value => value, acceptHit = () => bool( true ), refine = false, refineHit = () => bool( true ) } ) {
+export function traceLinear( depthNode, origin, end, { steps, parameter, reversedDepth = false, projectDepth = value => value, acceptHit = () => bool( true ), refine = false, refineHit = () => bool( true ) } ) {
 
 	const delta = end.sub( origin ).toConst();
-
-	if ( steps === null ) {
-
-		const pixels = delta.xy.mul( resolution ).abs();
-
-		steps = int( pixels.x.max( pixels.y ).mul( quality ) ).toConst();
-
-	}
-
-	if ( parameter === null ) parameter = ( index ) => index.add( offset ).div( float( steps ) );
 
 	const hit = bool( false ).toVar();
 	const hitUV = vec2( 0 ).toVar();
