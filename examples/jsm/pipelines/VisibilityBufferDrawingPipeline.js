@@ -770,8 +770,9 @@ class VisibilityBufferBatch extends MeshletBatch {
  * The visibility buffer stores the triangle in 16 bits, so only the levels of detail whose triangles fit
  * into this range are used. Geometries whose most detailed level doesn't fit are drawn by the hardware
  * pipeline of {@link MeshletDrawingPipeline}. The resolve only writes the color, so render calls with MRT, like the
- * velocity of TRAA, draw all clusters with the hardware pipeline. The position node of the material is evaluated
- * per corner of the triangles by the software rasterizer and by the resolve.
+ * velocity of TRAA, draw all clusters with the hardware pipeline. Skinned meshes are drawn by the hardware pipeline
+ * as well. The position node of the material is evaluated per corner of the triangles by the software rasterizer
+ * and by the resolve.
  *
  * ```js
  * renderer.drawingPipeline = new VisibilityBufferDrawingPipeline();
@@ -928,9 +929,10 @@ class VisibilityBufferDrawingPipeline extends MeshletDrawingPipeline {
 		// the instances of instanced meshes are drawn as objects, their world matrices are computed on the GPU. the resolve
 		// doesn't read the instanced attributes of the geometry and the instance colors, these instanced meshes are drawn by the hardware rasterizer
 
-		// the software rasterizer doesn't evaluate the alpha of alpha-tested materials
+		// the software rasterizer doesn't evaluate the alpha of alpha-tested materials. skinned meshes are drawn by the hardware
+		// path as well: their bones and bind matrices would exceed the storage buffers of the rasterizer
 
-		if ( this._shadowPass === true || ( entry.instanced === true && ( entry.clusters.instancedAttributes.length > 0 || entry.instanceColor === true ) ) || entry.material.alphaTest > 0 || view === null || view.hardware === true ) return super.createBatch( entry, capacity, view, culling );
+		if ( this._shadowPass === true || ( entry.instanced === true && ( entry.clusters.instancedAttributes.length > 0 || entry.instanceColor === true ) ) || entry.skinned === true || entry.material.alphaTest > 0 || view === null || view.hardware === true ) return super.createBatch( entry, capacity, view, culling );
 
 		const lodTriangleEnds = entry.clusters.lodTriangleEnds;
 

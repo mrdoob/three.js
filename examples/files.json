@@ -418,6 +418,7 @@
 		"webgpu_meshlets_instanced",
 		"webgpu_meshlets_materials",
 		"webgpu_meshlets_meshes",
+		"webgpu_meshlets_skinning",
 		"webgpu_mirror",
 		"webgpu_modifier_curve",
 		"webgpu_morphtargets",
