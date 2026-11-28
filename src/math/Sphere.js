@@ -266,7 +266,8 @@ class Sphere {
 	applyMatrix4( matrix ) {
 
 		this.center.applyMatrix4( matrix );
-		this.radius = this.radius * matrix.getMaxScaleOnAxis();
+
+		if ( ! this.isEmpty() ) this.radius = this.radius * matrix.getMaxScaleOnAxis();
 
 		return this;
 

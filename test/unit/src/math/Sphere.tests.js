@@ -231,6 +231,18 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'applyMatrix4 with zero scale', ( assert ) => {
+
+			const matrix = new Matrix4().makeScale( 0, 0, 0 );
+			const empty = new Sphere().applyMatrix4( matrix );
+			const solid = new Sphere( one3.clone(), 1 ).applyMatrix4( matrix );
+
+			assert.ok( empty.isEmpty(), 'An empty sphere stays empty.' );
+			assert.ok( ! solid.isEmpty(), 'A non-empty sphere collapses to a point.' );
+			assert.strictEqual( solid.radius, 0 );
+
+		} );
+
 		QUnit.test( 'translate', ( assert ) => {
 
 			const a = new Sphere( one3.clone(), 1 );
