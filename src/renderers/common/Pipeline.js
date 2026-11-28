@@ -28,6 +28,15 @@ class Pipeline {
 		 */
 		this.usedTimes = 0;
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isPipeline = true;
+
 	}
 
 }
