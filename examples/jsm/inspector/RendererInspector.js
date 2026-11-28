@@ -27,23 +27,34 @@ class ObjectStats {
 
 }
 
+function getRenderName( scene, camera, renderTarget, activeCubeFace, activeMipmapLevel ) {
+
+	// Keep the material's name intact for shader program labels.
+	const materialLabel = scene.material?.name?.replaceAll( ': ', ' / ' );
+
+	if ( renderTarget?.isCubeRenderTarget ) {
+
+		const label = scene.name || materialLabel || renderTarget.texture.name || 'Cube Capture';
+
+		return `${ label } / Mip ${ activeMipmapLevel } / Face ${ activeCubeFace }`;
+
+	}
+
+	return scene.name || materialLabel || camera.name || ( scene.isQuadMesh ? 'Quad Mesh' : scene.type );
+
+}
+
+function getComputeName( computeNode ) {
+
+	return computeNode.name || ( computeNode.isComputeNode ? 'Compute' : 'Compute Group' );
+
+}
+
 class RenderStats extends ObjectStats {
 
 	constructor( uid, scene, camera, renderTarget, renderer ) {
 
-		let name = scene.name || scene.material?.name || camera.name || ( scene.isQuadMesh ? 'Quad Mesh' : scene.type );
-
-		if ( renderTarget?.isCubeRenderTarget ) {
-
-			const face = renderer.getActiveCubeFace();
-			const label = scene.name || scene.material?.name || renderTarget.texture.name || 'Cube Capture';
-			const mip = renderer.getActiveMipmapLevel();
-
-			name = `${ label } / Mip ${ mip } / Face ${ face }`;
-
-		}
-
-		super( uid, name );
+		super( uid, getRenderName( scene, camera, renderTarget, renderer.getActiveCubeFace(), renderer.getActiveMipmapLevel() ) );
 
 		this.scene = scene;
 		this.camera = camera;
@@ -59,9 +70,7 @@ class ComputeStats extends ObjectStats {
 
 	constructor( uid, computeNode ) {
 
-		const name = computeNode.name || ( computeNode.isComputeNode ? 'Compute' : 'Compute Group' );
-
-		super( uid, name );
+		super( uid, getComputeName( computeNode ) );
 
 		this.computeNode = computeNode;
 
@@ -257,6 +266,8 @@ export class RendererInspector extends InspectorBase {
 		this.frames = [];
 		this.framesLib = {};
 		this.maxFrames = 512;
+
+		this._callNames = new WeakMap();
 
 		this._lastFinishTime = 0;
 		this._lastRenderedFinishTime = 0;
@@ -550,6 +561,30 @@ export class RendererInspector extends InspectorBase {
 			warnOnce( 'RendererInspector: Unable to inspect node outside of frame scope. Use "renderer.setAnimationLoop()".' );
 
 		}
+
+	}
+
+	// returns the path of names of the render and compute calls which created a resource, see Info.resources
+
+	getCreatorPath( creator ) {
+
+		return creator.flatMap( ( call ) => {
+
+			let names = this._callNames.get( call );
+
+			if ( names === undefined ) {
+
+				const name = call.computeNode ? getComputeName( call.computeNode ) : getRenderName( call.scene, call.camera, call.renderTarget, call.activeCubeFace, call.activeMipmapLevel );
+
+				names = name.trim().split( /\s*\/\s*/ );
+
+				this._callNames.set( call, names );
+
+			}
+
+			return names;
+
+		} );
 
 	}
 

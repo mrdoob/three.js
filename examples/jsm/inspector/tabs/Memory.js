@@ -2,7 +2,7 @@ import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
 import { Graph } from '../ui/Graph.js';
 import { Item } from '../ui/Item.js';
-import { createValueSpan, setText, formatBytes } from '../ui/utils.js';
+import { createValueSpan, setText, formatBytes, splitCamelCase } from '../ui/utils.js';
 
 class Memory extends Tab {
 
@@ -74,7 +74,125 @@ class Memory extends Tab {
 		this.uniformBuffers = new Item( 'Uniform Buffers', createValueSpan(), createValueSpan() );
 		this.memoryStats.add( this.uniformBuffers );
 
+		// creators
+
+		this.creators = new Item( 'Creators', createValueSpan(), createValueSpan() );
+		this.creators.domElement.firstChild.classList.add( 'no-hover' );
+		memoryList.add( this.creators );
+
+		this.creatorItems = new Map();
+
 		this.graph = graph;
+
+	}
+
+	// tree of the render and compute calls which created the resources, the allocations are grouped by type and name
+
+	updateCreators( inspector ) {
+
+		const createNode = ( isAllocation ) => ( { count: 0, size: 0, ownCount: 0, ownSize: 0, isAllocation, children: new Map() } );
+		const root = createNode( false );
+
+		for ( const { type, name, size, creator } of inspector.getRenderer().info.resources ) {
+
+			const path = creator !== null ? inspector.getCreatorPath( creator ) : [ 'Miscellaneous' ];
+			const labels = type === 'textures' || type === 'programs' ? name.trim().split( /\s*\/\s*/ ).filter( ( key ) => key !== '' ) : ( name.trim() !== '' ? [ name ] : [] );
+			const keys = [ ...path, splitCamelCase( type[ 0 ].toUpperCase() + type.slice( 1, - 1 ) ), ...labels ];
+
+			let node = root;
+
+			for ( let i = 0; i < keys.length; i ++ ) {
+
+				node.count ++;
+				node.size += size;
+
+				if ( node.children.has( keys[ i ] ) === false ) node.children.set( keys[ i ], createNode( i >= path.length ) );
+
+				node = node.children.get( keys[ i ] );
+
+			}
+
+			node.count ++;
+			node.size += size;
+			node.ownCount ++;
+			node.ownSize += size;
+
+		}
+
+		// returns the rows of a node: a group of a single allocation name is a single row, like "Texture / output"
+
+		const getRows = ( node ) => {
+
+			const rows = [];
+
+			for ( let [ name, child ] of node.children ) {
+
+				while ( child.isAllocation && child.ownCount === 0 && child.children.size === 1 ) {
+
+					const [ childName, grandchild ] = child.children.entries().next().value;
+
+					name += ' / ' + childName;
+					child = grandchild;
+
+				}
+
+				rows.push( [ name, child ] );
+
+			}
+
+			if ( node.ownCount > 0 && rows.length > 0 ) {
+
+				rows.push( [ 'Unnamed', { count: node.ownCount, size: node.ownSize, children: new Map() } ] );
+
+			}
+
+			return rows;
+
+		};
+
+		const unused = new Map( this.creatorItems );
+
+		const update = ( item, node, path ) => {
+
+			setText( item.data[ 1 ], node.count.toString() );
+			setText( item.data[ 2 ], formatBytes( node.size ) );
+
+			for ( const [ name, child ] of getRows( node ) ) {
+
+				const childPath = [ ...path, name ];
+				const childKey = JSON.stringify( childPath );
+
+				let childItem = this.creatorItems.get( childKey );
+
+				if ( childItem === undefined ) {
+
+					childItem = new Item( createValueSpan(), createValueSpan(), createValueSpan() ).close();
+					childItem.data[ 0 ].title = name;
+					setText( childItem.data[ 0 ], name );
+
+					item.add( childItem );
+					this.creatorItems.set( childKey, childItem );
+
+				}
+
+				childItem.itemRow.classList.toggle( 'group', child.children.size > 0 );
+
+				unused.delete( childKey );
+
+				update( childItem, child, childPath );
+
+			}
+
+		};
+
+		update( this.creators, root, [] );
+
+		for ( const [ path, item ] of unused ) {
+
+			item.parent.remove( item );
+			this.creatorItems.delete( path );
+
+		}
 
 	}
 
@@ -127,6 +245,8 @@ class Memory extends Tab {
 
 		setText( this.uniformBuffers.data[ 1 ], memory.uniformBuffers.toString() );
 		setText( this.uniformBuffers.data[ 2 ], formatBytes( memory.uniformBuffersSize ) );
+
+		this.updateCreators( inspector );
 
 	}
 
