@@ -36,7 +36,6 @@ class CSS2DObject extends Object3D {
 		 *
 		 * @type {HTMLElement}
 		 * @readonly
-		 * @default true
 		 */
 		this.element = element;
 

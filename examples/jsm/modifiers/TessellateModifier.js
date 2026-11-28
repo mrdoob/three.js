@@ -36,10 +36,10 @@ class TessellateModifier {
 		this.maxEdgeLength = maxEdgeLength;
 
 		/**
-		 * The maximum edge length.
+		 * The maximum number of iterations.
 		 *
 		 * @type {number}
-		 * @default 0.1
+		 * @default 6
 		 */
 		this.maxIterations = maxIterations;
 
