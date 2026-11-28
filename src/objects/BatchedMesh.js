@@ -260,6 +260,9 @@ class BatchedMesh extends Mesh {
 		this._availableInstanceIds = [];
 		this._availableGeometryIds = [];
 
+		// per-geometry linked lists of active instance ids, built on first use by deleteGeometry() and kept up to date afterwards
+		this._geometryInstanceLists = null;
+
 		// used to track where the next point is that geometry should be inserted
 		this._nextIndexStart = 0;
 		this._nextVertexStart = 0;
@@ -633,6 +636,12 @@ class BatchedMesh extends Mesh {
 
 		}
 
+		if ( this._geometryInstanceLists !== null ) {
+
+			this._linkGeometryInstance( geometryId, drawId );
+
+		}
+
 		const matricesTexture = this._matricesTexture;
 		_matrix.identity().toArray( matricesTexture.image.data, drawId * 16 );
 		matricesTexture.needsUpdate = true;
@@ -871,15 +880,19 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		// delete any instances associated with this geometry
-		const instanceInfo = this._instanceInfo;
-		for ( let i = 0, l = instanceInfo.length; i < l; i ++ ) {
+		// delete any instances associated with this geometry, in ascending id order
+		const { first, next } = this._getGeometryInstanceLists();
+		const instanceIds = [];
+		for ( let id = first[ geometryId ] ?? - 1; id !== - 1; id = next[ id ] ) {
 
-			if ( instanceInfo[ i ].active && instanceInfo[ i ].geometryIndex === geometryId ) {
+			instanceIds.push( id );
 
-				this.deleteInstance( i );
+		}
 
-			}
+		instanceIds.sort( ascIdSort );
+		for ( let i = 0, l = instanceIds.length; i < l; i ++ ) {
+
+			this.deleteInstance( instanceIds[ i ] );
 
 		}
 
@@ -901,11 +914,92 @@ class BatchedMesh extends Mesh {
 
 		this.validateInstanceId( instanceId );
 
+		if ( this._geometryInstanceLists !== null ) {
+
+			this._unlinkGeometryInstance( this._instanceInfo[ instanceId ].geometryIndex, instanceId );
+
+		}
+
 		this._instanceInfo[ instanceId ].active = false;
 		minHeapPush( this._availableInstanceIds, instanceId );
 		this._visibilityChanged = true;
 
 		return this;
+
+	}
+
+	/**
+	 * Returns the per-geometry linked lists of active instance ids, building them from the
+	 * instance info on first use. `first[ geometryId ]` is the first instance of a geometry,
+	 * `next` / `prev` link instances of the same geometry, and `-1` marks the end of a list.
+	 *
+	 * @private
+	 * @return {{first: Array<number>, next: Int32Array, prev: Int32Array}} The instance lists.
+	 */
+	_getGeometryInstanceLists() {
+
+		if ( this._geometryInstanceLists === null ) {
+
+			this._geometryInstanceLists = {
+				first: new Array( this._geometryInfo.length ).fill( - 1 ),
+				next: new Int32Array( this._maxInstanceCount ),
+				prev: new Int32Array( this._maxInstanceCount )
+			};
+
+			// link in reverse so each list starts in ascending id order
+			const instanceInfo = this._instanceInfo;
+			for ( let i = instanceInfo.length - 1; i >= 0; i -- ) {
+
+				if ( instanceInfo[ i ].active ) {
+
+					this._linkGeometryInstance( instanceInfo[ i ].geometryIndex, i );
+
+				}
+
+			}
+
+		}
+
+		return this._geometryInstanceLists;
+
+	}
+
+	/**
+	 * Adds the given instance to the front of the list of instances using the given geometry.
+	 *
+	 * @private
+	 * @param {number} geometryId - The geometry ID.
+	 * @param {number} instanceId - The instance ID.
+	 */
+	_linkGeometryInstance( geometryId, instanceId ) {
+
+		const { first, next, prev } = this._geometryInstanceLists;
+		const head = first[ geometryId ] ?? - 1;
+
+		next[ instanceId ] = head;
+		prev[ instanceId ] = - 1;
+		if ( head !== - 1 ) prev[ head ] = instanceId;
+		first[ geometryId ] = instanceId;
+
+	}
+
+	/**
+	 * Removes the given instance from the list of instances using the given geometry.
+	 *
+	 * @private
+	 * @param {number} geometryId - The geometry ID.
+	 * @param {number} instanceId - The instance ID.
+	 */
+	_unlinkGeometryInstance( geometryId, instanceId ) {
+
+		const { first, next, prev } = this._geometryInstanceLists;
+		const nextId = next[ instanceId ];
+		const prevId = prev[ instanceId ];
+
+		if ( prevId !== - 1 ) next[ prevId ] = nextId;
+		else first[ geometryId ] = nextId;
+
+		if ( nextId !== - 1 ) prev[ nextId ] = prevId;
 
 	}
 
@@ -1242,6 +1336,13 @@ class BatchedMesh extends Mesh {
 		this.validateInstanceId( instanceId );
 		this.validateGeometryId( geometryId );
 
+		if ( this._geometryInstanceLists !== null ) {
+
+			this._unlinkGeometryInstance( this._instanceInfo[ instanceId ].geometryIndex, instanceId );
+			this._linkGeometryInstance( geometryId, instanceId );
+
+		}
+
 		this._instanceInfo[ instanceId ].geometryIndex = geometryId;
 		this._visibilityChanged = true;
 
@@ -1342,6 +1443,7 @@ class BatchedMesh extends Mesh {
 		this._mergedDrawStarts = mergedDrawStarts;
 		this._mergedDrawInstanceCounts = mergedDrawInstanceCounts;
 		this._maxInstanceCount = maxInstanceCount;
+		this._geometryInstanceLists = null;
 
 		// update texture data for instance sampling
 		const indirectTexture = this._indirectTexture;
@@ -1522,6 +1624,7 @@ class BatchedMesh extends Mesh {
 			boundingSphere: info.boundingSphere !== null ? info.boundingSphere.clone() : null,
 		} ) );
 		this._instanceInfo = source._instanceInfo.map( info => ( { ...info } ) );
+		this._geometryInstanceLists = null;
 
 		this._availableInstanceIds = source._availableInstanceIds.slice();
 		this._availableGeometryIds = source._availableGeometryIds.slice();
