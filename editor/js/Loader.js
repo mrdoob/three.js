@@ -186,10 +186,11 @@ function Loader( editor ) {
 					const { Rhino3dmLoader } = await import( 'three/addons/loaders/3DMLoader.js' );
 
 					const loader = new Rhino3dmLoader();
-					loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.32.1/' );
+					loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@9.2.0-beta.1/' );
 					loader.parse( contents, function ( object ) {
 
 						object.name = filename;
+						object.rotation.x = - Math.PI / 2; // Rhino is Z-up
 
 						editor.execute( new AddObjectCommand( editor, object ) );
 
